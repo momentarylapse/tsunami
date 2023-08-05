@@ -31,6 +31,7 @@ AudioEffect::AudioEffect() :
 	port_in.add({SignalType::AUDIO, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	apply_to_whole_buffer = false;
+	wetness = 1.0f;
 }
 
 void AudioEffect::__init__() {
@@ -41,13 +42,32 @@ void AudioEffect::__delete__() {
 	this->AudioEffect::~AudioEffect();
 }
 
+// assumes buf_out already correctly sized etc!
+void combine_buffers(AudioBuffer &buf_out, const AudioBuffer& a, float fa, const AudioBuffer& b, float fb) {
+	for (int c=0; c<a.channels; c++)
+		for (int i=0; i<a.length; i++)
+			buf_out.c[c][i] = a.c[c][i] * fa + b.c[c][i] * fb;
+}
+
+void AudioEffect::apply_with_wetness(AudioBuffer &buf) {
+	if (wetness <= 0.0f or !enabled)
+		return;
+	if (wetness == 1.0f)
+		process(buf);
+
+	AudioBuffer buf_wet = buf;
+	process(buf_wet);
+
+	combine_buffers(buf, buf, (1 - wetness), buf_wet, wetness);
+}
+
 int AudioEffect::read(AudioBuffer &buf) {
 	sample_rate = session->sample_rate();
 	int samples = source->read_audio(buf);
 	
 	perf_start();
-	if (samples > 0)
-		process(buf);
+	if (samples > 0 and enabled)
+		apply_with_wetness(buf);
 	perf_end();
 	return samples;
 }

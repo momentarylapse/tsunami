@@ -19,11 +19,6 @@ class TrackLayer;
 class AudioBuffer;
 class Session;
 
-namespace Script{
-	class Script;
-	class Type;
-};
-
 class AudioEffect : public Module {
 public:
 	AudioEffect();
@@ -33,6 +28,7 @@ public:
 
 	int sample_rate;
 	bool apply_to_whole_buffer;
+	float wetness;
 
 	class Output : public Port {
 	public:
@@ -44,6 +40,7 @@ public:
 	Port *source;
 
 	virtual void _cdecl process(AudioBuffer &buf){};
+	void apply_with_wetness(AudioBuffer &buf);
 	virtual int _cdecl read(AudioBuffer &buf);
 };
 

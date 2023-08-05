@@ -176,6 +176,7 @@ class Module extends Object as shared
 
 class AudioEffect extends Module
 	var apply_to_whole_buffer: bool
+	var wetness: float
 	var source: Module.Port&
 	func extern __init__()
 	func extern override __delete__()
@@ -490,9 +491,10 @@ class Track as shared
 	func extern mut set_volume(volume: float)
 	func extern mut set_panning(panning: float)
 	func extern mut add_effect(effect: shared![AudioEffect])
-	func extern mut delete_effect(index: int)
-	func extern mut edit_effect(index: int)
-	func extern mut enable_effect(index: int, enabled: bool)
+	func extern mut delete_effect(effect: AudioEffect&)
+	func extern mut edit_effect(effect: AudioEffect&)
+	func extern mut enable_effect(effect: AudioEffect&, enabled: bool)
+	func extern mut set_effect_wetness(effect: AudioEffect&, enabled: bool)
 	func extern mut set_synthesizer(synth: shared![Synthesizer])
 
 struct Tag

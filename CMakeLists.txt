@@ -50,10 +50,10 @@ set(SOURCE
 	src/action/track/data/ActionTrackSetInstrument.cpp
 	src/action/track/data/ActionTrackSetTarget.cpp
 	src/action/track/effect/ActionTrackAddAudioEffect.cpp
-	src/action/track/effect/ActionTrackDeleteEffect.cpp
+	src/action/track/effect/ActionTrackDeleteAudioEffect.cpp
 	src/action/track/effect/ActionTrackEditAudioEffect.cpp
 	src/action/track/effect/ActionTrackMoveAudioEffect.cpp
-	src/action/track/effect/ActionTrackToggleAudioEffectEnabled.cpp
+	src/action/track/effect/ActionTrackSetAudioEffectEnabledWetness.cpp
 	src/action/track/layer/ActionTrackFadeAdd.cpp
 	src/action/track/layer/ActionTrackFadeDelete.cpp
 	src/action/track/layer/ActionTrackLayer__Delete.cpp

@@ -1,5 +1,5 @@
 /*
- * ActionTrackAddEffect.h
+ * ActionTrackAddAudioEffect.h
  *
  *  Created on: 15.12.2012
  *      Author: michi
@@ -11,9 +11,9 @@
 class Track;
 class AudioEffect;
 
-class ActionTrackAddEffect: public Action {
+class ActionTrackAddAudioEffect: public Action {
 public:
-	ActionTrackAddEffect(Track *t, shared<AudioEffect> effect);
+	ActionTrackAddAudioEffect(Track *t, shared<AudioEffect> effect);
 
 	string name() const override { return ":##:add fx"; }
 

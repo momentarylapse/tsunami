@@ -409,7 +409,7 @@ void TrackRenderer::apply_fx(AudioBuffer &buf, Array<AudioEffect*> &fx_list) {
 	for (AudioEffect *f: fx_list)
 		if (f->enabled) {
 			f->perf_start();
-			f->process(buf);
+			f->apply_with_wetness(buf);
 			f->perf_end();
 		}
 }

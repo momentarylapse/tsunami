@@ -67,6 +67,7 @@ public:
 	void _cdecl delete_effect(AudioEffect *effect);
 	void _cdecl edit_effect(AudioEffect *effect);
 	void _cdecl enable_effect(AudioEffect *effect, bool enabled);
+	void _cdecl set_effect_wetness(AudioEffect *effect, float wetness);
 	void _cdecl move_effect(int source, int target);
 	void _cdecl add_midi_effect(shared<MidiEffect> effect);
 	void _cdecl delete_midi_effect(MidiEffect *effect);

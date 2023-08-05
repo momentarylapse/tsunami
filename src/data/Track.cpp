@@ -40,11 +40,11 @@
 #include "../action/track/synthesizer/ActionTrackSetSynthesizer.h"
 #include "../action/track/synthesizer/ActionTrackEditSynthesizer.h"
 #include "../action/track/synthesizer/ActionTrackDetuneSynthesizer.h"
-#include "../action/track/effect/ActionTrackAddEffect.h"
+#include "../action/track/effect/ActionTrackAddAudioEffect.h"
 #include "../action/track/effect/ActionTrackDeleteAudioEffect.h"
-#include "../action/track/effect/ActionTrackEditEffect.h"
+#include "../action/track/effect/ActionTrackEditAudioEffect.h"
 #include "../action/track/effect/ActionTrackMoveAudioEffect.h"
-#include "../action/track/effect/ActionTrackToggleEffectEnabled.h"
+#include "../action/track/effect/ActionTrackSetAudioEffectEnabledWetness.h"
 #include "../module/synthesizer/Synthesizer.h"
 #include "../module/audio/AudioEffect.h"
 #include "../plugins/PluginManager.h"
@@ -189,7 +189,7 @@ void Track::set_channels(int _channels) {
 }
 
 void Track::add_effect(shared<AudioEffect> effect) {
-	song->execute(new ActionTrackAddEffect(this, effect));
+	song->execute(new ActionTrackAddAudioEffect(this, effect));
 	_register_fx(effect.get());
 }
 
@@ -208,12 +208,17 @@ void Track::_register_synth(Synthesizer *s) {
 
 // execute after editing...
 void Track::edit_effect(AudioEffect *effect) {
-	song->execute(new ActionTrackEditEffect(effect));
+	song->execute(new ActionTrackEditAudioEffect(effect));
 }
 
 void Track::enable_effect(AudioEffect *effect, bool enabled) {
 	if (effect->enabled != enabled)
-		song->execute(new ActionTrackToggleEffectEnabled(effect));
+		song->execute(new ActionTrackSetAudioEffectEnabledWetness(effect, enabled, effect->wetness));
+}
+
+void Track::set_effect_wetness(AudioEffect *effect, float wetness) {
+	if (effect->wetness != wetness)
+		song->execute(new ActionTrackSetAudioEffectEnabledWetness(effect, effect->enabled, wetness));
 }
 
 void Track::delete_effect(AudioEffect *effect) {

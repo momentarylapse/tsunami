@@ -1,5 +1,5 @@
 /*
- * ActionTrackDeleteEffect.cpp
+ * ActionTrackDeleteAudioEffect.cpp
  *
  *  Created on: 15.12.2012
  *      Author: michi

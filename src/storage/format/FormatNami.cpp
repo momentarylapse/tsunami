@@ -142,9 +142,10 @@ public:
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
 		int version = Module::VERSION_LEGACY;
-		if (_chunk_version >= 1) {
+		if (_chunk_version >= 1)
 			version = f->read_int();
-		}
+		if (_chunk_version >= 2)
+			me->wetness = f->read_float();
 
 		me->config_from_string(version, params);
 		me->_config_latest_history = params;
@@ -153,11 +154,12 @@ public:
 	void write(BinaryFormatter *f) override {
 		f->write_str(me->module_class);
 		f->write_bool(false);
-		f->write_int(1); // chunk version
+		f->write_int(2); // chunk version
 		f->write_int(0);
 		f->write_str(me->config_to_string());
 		f->write_str(me->enabled ? "" : "disabled");
 		f->write_int(me->version());
+		f->write_float(me->wetness);
 	}
 };
 

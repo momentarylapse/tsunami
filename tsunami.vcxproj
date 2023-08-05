@@ -160,10 +160,10 @@
     <ClCompile Include="src\action\track\data\ActionTrackSetInstrument.cpp" />
     <ClCompile Include="src\action\track\data\ActionTrackSetTarget.cpp" />
     <ClCompile Include="src\action\track\effect\ActionTrackAddAudioEffect.cpp" />
-    <ClCompile Include="src\action\track\effect\ActionTrackDeleteEffect.cpp" />
+    <ClCompile Include="src\action\track\effect\ActionTrackDeleteAudioEffect.cpp" />
     <ClCompile Include="src\action\track\effect\ActionTrackEditAudioEffect.cpp" />
     <ClCompile Include="src\action\track\effect\ActionTrackMoveAudioEffect.cpp" />
-    <ClCompile Include="src\action\track\effect\ActionTrackToggleAudioEffectEnabled.cpp" />
+    <ClCompile Include="src\action\track\effect\ActionTrackSetAudioEffectEnabledWetness.cpp" />
     <ClCompile Include="src\action\track\layer\ActionTrackFadeAdd.cpp" />
     <ClCompile Include="src\action\track\layer\ActionTrackFadeDelete.cpp" />
     <ClCompile Include="src\action\track\layer\ActionTrackLayer__Delete.cpp" />
@@ -2080,11 +2080,11 @@
     <ClInclude Include="src\action\track\data\ActionTrackEditVolume.h" />
     <ClInclude Include="src\action\track\data\ActionTrackSetInstrument.h" />
     <ClInclude Include="src\action\track\data\ActionTrackSetTarget.h" />
-    <ClInclude Include="src\action\track\effect\ActionTrackAddEffect.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackAddAudioEffect.h" />
     <ClInclude Include="src\action\track\effect\ActionTrackDeleteAudioEffect.h" />
-    <ClInclude Include="src\action\track\effect\ActionTrackEditEffect.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackEditAudioEffect.h" />
     <ClInclude Include="src\action\track\effect\ActionTrackMoveAudioEffect.h" />
-    <ClInclude Include="src\action\track\effect\ActionTrackToggleEffectEnabled.h" />
+    <ClInclude Include="src\action\track\effect\ActionTrackSetAudioEffectEnabledWetness.h" />
     <ClInclude Include="src\action\track\layer\ActionTrackFadeAdd.h" />
     <ClInclude Include="src\action\track\layer\ActionTrackFadeDelete.h" />
     <ClInclude Include="src\action\track\layer\ActionTrackLayer__Delete.h" />

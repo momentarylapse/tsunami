@@ -1,5 +1,5 @@
 /*
- * ActionTrackEditEffect.h
+ * ActionTrackEditAudioEffect.h
  *
  *  Created on: 15.12.2012
  *      Author: michi
@@ -10,9 +10,9 @@
 #include "../../ActionMergable.h"
 class AudioEffect;
 
-class ActionTrackEditEffect: public ActionMergable<string> {
+class ActionTrackEditAudioEffect: public ActionMergable<string> {
 public:
-	ActionTrackEditEffect(AudioEffect *fx);
+	ActionTrackEditAudioEffect(AudioEffect *fx);
 
 	string name() const override { return ":##:edit fx"; }
 

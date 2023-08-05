@@ -133,7 +133,7 @@
     <ClCompile Include="src\action\track\effect\ActionTrackAddAudioEffect.cpp">
       <Filter>src\action\track\effect</Filter>
     </ClCompile>
-    <ClCompile Include="src\action\track\effect\ActionTrackDeleteEffect.cpp">
+    <ClCompile Include="src\action\track\effect\ActionTrackDeleteAudioEffect.cpp">
       <Filter>src\action\track\effect</Filter>
     </ClCompile>
     <ClCompile Include="src\action\track\effect\ActionTrackEditAudioEffect.cpp">
@@ -142,7 +142,7 @@
     <ClCompile Include="src\action\track\effect\ActionTrackMoveAudioEffect.cpp">
       <Filter>src\action\track\effect</Filter>
     </ClCompile>
-    <ClCompile Include="src\action\track\effect\ActionTrackToggleAudioEffectEnabled.cpp">
+    <ClCompile Include="src\action\track\effect\ActionTrackSetAudioEffectEnabledWetness.cpp">
       <Filter>src\action\track\effect</Filter>
     </ClCompile>
     <ClCompile Include="src\action\track\layer\ActionTrackFadeAdd.cpp">
@@ -5889,19 +5889,19 @@
     <ClInclude Include="src\action\track\data\ActionTrackSetTarget.h">
       <Filter>src\action\track\data</Filter>
     </ClInclude>
-    <ClInclude Include="src\action\track\effect\ActionTrackAddEffect.h">
+    <ClInclude Include="src\action\track\effect\ActionTrackAddAudioEffect.h">
       <Filter>src\action\track\effect</Filter>
     </ClInclude>
     <ClInclude Include="src\action\track\effect\ActionTrackDeleteAudioEffect.h">
       <Filter>src\action\track\effect</Filter>
     </ClInclude>
-    <ClInclude Include="src\action\track\effect\ActionTrackEditEffect.h">
+    <ClInclude Include="src\action\track\effect\ActionTrackEditAudioEffect.h">
       <Filter>src\action\track\effect</Filter>
     </ClInclude>
     <ClInclude Include="src\action\track\effect\ActionTrackMoveAudioEffect.h">
       <Filter>src\action\track\effect</Filter>
     </ClInclude>
-    <ClInclude Include="src\action\track\effect\ActionTrackToggleEffectEnabled.h">
+    <ClInclude Include="src\action\track\effect\ActionTrackSetAudioEffectEnabledWetness.h">
       <Filter>src\action\track\effect</Filter>
     </ClInclude>
     <ClInclude Include="src\action\track\layer\ActionTrackFadeAdd.h">

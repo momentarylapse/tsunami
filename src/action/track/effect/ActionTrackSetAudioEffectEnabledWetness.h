@@ -1,5 +1,5 @@
 /*
- * ActionTrackToggleEffectEnabled.h
+ * ActionTrackSetAudioEffectEnabledWetness.h
  *
  *  Created on: 30.03.2014
  *      Author: michi
@@ -10,9 +10,9 @@
 #include "../../Action.h"
 class AudioEffect;
 
-class ActionTrackToggleEffectEnabled: public Action {
+class ActionTrackSetAudioEffectEnabledWetness: public Action {
 public:
-	ActionTrackToggleEffectEnabled(AudioEffect *fx);
+	ActionTrackSetAudioEffectEnabledWetness(AudioEffect *fx, bool enabled, float wetness);
 
 	string name() const override { return ":##:enable fx"; }
 
@@ -21,4 +21,6 @@ public:
 
 private:
 	AudioEffect *fx;
+	bool enabled;
+	float wetness;
 };

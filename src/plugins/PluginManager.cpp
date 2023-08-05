@@ -319,6 +319,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_size("AudioEffect", sizeof(AudioEffect));
 		ext->declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
 		ext->declare_class_element("AudioEffect.apply_to_whole_buffer", &AudioEffect::apply_to_whole_buffer);
+		ext->declare_class_element("AudioEffect.wetness", &AudioEffect::wetness);
 		ext->declare_class_element("AudioEffect.source", &AudioEffect::source);
 		ext->link_class_func("AudioEffect.__init__", &AudioEffect::__init__);
 		ext->link_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
@@ -627,6 +628,7 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("Track.delete_effect", &Track::delete_effect);
 	ext->link_class_func("Track.edit_effect", &Track::edit_effect);
 	ext->link_class_func("Track.enable_effect", &Track::enable_effect);
+	ext->link_class_func("Track.set_effect_wetness", &Track::set_effect_wetness);
 	ext->link_class_func("Track.set_synthesizer", &Track::set_synthesizer);
 
 	{

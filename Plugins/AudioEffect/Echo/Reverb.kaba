@@ -1,0 +1,145 @@
+# crudely implemented Geraint Luff's design:
+# "Let's Write A Reverb" - https://www.youtube.com/watch?v=QWnD30xHjW4
+
+use tsunami
+
+let AUTO_CONFIG_DELAY = "range=0:1:0.001,scale=1000,unit=ms"
+let AUTO_CONFIG_FEEDBACK = "range=0:1:0.001,scale=100,unit=%"
+
+class Config extends Module.Config
+	var delay: float
+	var feedback: float
+	func override reset()
+		delay = 0.2
+		feedback = 0.5
+
+class MultiChannelDelay
+	var temp: AudioBuffer
+	var length: int[]
+	var offset: int[]
+
+	func mut set_delay(_length: int[])
+		temp.set_channels(len(_length))
+		#temp.clear()
+		temp.resize(max(_length))
+		temp.scale(0.0)
+		length = _length
+		offset = [for l in length  0]
+
+	func mut process(buf: AudioBuffer, out buf_out: AudioBuffer)
+		buf_out.set_channels(buf.channels)
+		buf_out.resize(len(buf))
+		
+		for k in 0:max(buf.channels, len(length))
+			for i in 0:len(buf)
+				buf_out.c[k][i] = temp.c[k][offset[k]]
+				temp.c[k][offset[k]] = buf.c[k][i]
+				offset[k] ++
+				if offset[k] >= length[k]
+					offset[k] = 0
+
+class Diffusor
+	var delay: MultiChannelDelay
+
+	func mut set_delay(_delay: int)
+		let length = [for k in 0:4  max(rand(_delay), 4)]
+		delay.set_delay(length)
+
+	func mut process(buf: AudioBuffer, out buf_out: AudioBuffer)
+		delay.process(buf, buf_out)
+		
+		# hadamard...
+		for i in 0:len(buf)
+			let a = buf_out.c[0][i]
+			let b = buf_out.c[1][i]
+			let c = buf_out.c[2][i]
+			let d = buf_out.c[3][i]
+			
+			buf_out.c[0][i] = a + b + c + d
+			buf_out.c[1][i] = a - b + c - d
+			buf_out.c[2][i] = a + b - c - d
+			buf_out.c[3][i] = a - b - c + d
+		buf_out.scale(0.5)
+
+
+class MultiChannelEcho
+	var temp: AudioBuffer
+	var length: int[]
+	var offset: int[]
+	var scale: float[]
+	var v: float[]
+
+	func mut set_delay(_length: int[], _scale: float[])
+		temp.set_channels(len(_length))
+		#temp.clear()
+		temp.resize(max(_length))
+		temp.scale(0.0)
+		length = _length
+		offset = [for l in length  0]
+		scale = _scale
+		
+		v = [for l in length  rand(1.0)]
+		v /= sum(v*v)^2
+
+	func mut process(buf: AudioBuffer, out buf_out: AudioBuffer)
+		buf_out.set_channels(buf.channels)
+		buf_out.resize(len(buf))
+		
+		let NC = max(buf.channels, len(length))
+		var val: float[]
+		val.resize(NC)
+		
+		for i in 0:len(buf)
+			for k in 0:NC
+				val[k] = temp.c[k][offset[k]]
+				buf_out.c[k][i] = val[k]
+			val *= scale
+				
+			# reflect...
+			val -= v * sum(v * val)
+				
+			for k in 0:NC
+				temp.c[k][offset[k]] = buf.c[k][i] + val[k]
+				offset[k] ++
+				if offset[k] >= length[k]
+					offset[k] = 0
+
+
+class Reverb extends AudioEffect
+	var config: Config
+	
+	var diffusor1: Diffusor
+	var diffusor2: Diffusor
+	var diffusor3: Diffusor
+	var diffusor4: Diffusor
+	var echo: MultiChannelEcho
+	
+	func override reset_state()
+		let dif_dt = config.delay
+		diffusor1.set_delay(session.sample_rate() * dif_dt * 0.1)
+		diffusor2.set_delay(session.sample_rate() * dif_dt * 0.2)
+		diffusor3.set_delay(session.sample_rate() * dif_dt * 0.4)
+		diffusor4.set_delay(session.sample_rate() * dif_dt)
+		echo.set_delay([for k in 0:4  max(int(rand(session.sample_rate() * config.delay)), 4)], [0.4, 0.42, 0.45, 0.47] * config.feedback*2)
+	
+	func static split4(buf: AudioBuffer, out buf_out: AudioBuffer)
+		buf_out.set_channels(4)
+		buf_out.resize(len(buf))
+		for i in 0:4
+			buf_out.c[i] = buf.c[0]
+	
+	func static mix4(buf: AudioBuffer, out buf_out: AudioBuffer)
+		#buf_out.set_channels(1)
+		#buf_out.resize(len(buf))
+		buf_out.c[0][:] = (buf.c[0] + buf.c[1] + buf.c[2] + buf.c[3]) * 0.25
+
+	func override process(out buf: AudioBuffer)
+		var A, B: AudioBuffer
+		
+		split4(buf, A)
+		diffusor1.process(A, B)
+		diffusor2.process(B, A)
+		diffusor3.process(A, B)
+		diffusor4.process(B, A)
+		echo.process(A, B)
+		mix4(B, buf)

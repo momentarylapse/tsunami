@@ -101,7 +101,7 @@ void PeakMeterDisplay::set_visible(bool vis) {
 }
 
 void PeakMeterDisplay::connect() {
-	source->out_tick >> create_sink([this] { on_update(); });
+	source->out_changed >> create_sink([this] { on_update(); });
 	source->out_state_changed >> create_sink([this] { on_update(); });
 	if (mode == Mode::SPECTRUM)
 		source->request_spectrum();

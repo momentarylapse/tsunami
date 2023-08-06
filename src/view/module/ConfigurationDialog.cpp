@@ -11,8 +11,12 @@
 #include "../helper/Progress.h"
 #include "../../plugins/PluginManager.h"
 #include "../../Session.h"
+#include "../../Playback.h"
 #include "../../module/Module.h"
+#include "../../module/SignalChain.h"
 #include "../../module/audio/AudioEffect.h"
+#include "../../module/audio/SongRenderer.h"
+#include "../audioview/AudioView.h"
 
 extern const int CONFIG_PANEL_DIALOG_WIDTH;
 extern const int CONFIG_PANEL_DIALOG_HEIGHT;
@@ -49,7 +53,7 @@ public:
 			});
 		}
 
-		if (module->module_category != ModuleCategory::AUDIO_EFFECT)
+		if (module->module_category != ModuleCategory::AUDIO_EFFECT and module->module_category != ModuleCategory::AUDIO_SOURCE)
 			hide_control("preview", true);
 
 		event("ok", [this]{ on_ok(); });
@@ -73,19 +77,31 @@ public:
 	}
 
 	void preview_start() {
-		module->session->e("TODO: preview");
-		/*if (progress)
-			previewEnd();
-		config->configToString();
-		tsunami->win->view->renderer->preview_effect = (Effect*)config;
-
+		if (progress)
+			preview_end();
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->subscribe(this, [=]{ onProgressCancel(); }, progress->MESSAGE_CANCEL);
+		progress->out_cancel >> create_sink([=]{ on_progress_cancel(); });
 
-		tsunami->win->view->stream->subscribe(this, [=]{ onUpdateStream(); });
-		tsunami->win->view->renderer->prepare(tsunami->win->view->sel.range, false);
-		tsunami->win->view->stream->play();*/
+		playback = new Playback(module->session);
+		auto c = playback->signal_chain.get();
+		if (module->module_category == ModuleCategory::AUDIO_EFFECT) {
+			playback->renderer->set_range(module->session->view->sel.range());
+			playback->renderer->allow_layers({module->session->view->cur_layer()});
+
+			// TODO remove other effects?
+			playback->renderer->preview_effect = (AudioEffect*)module.get();
+		} else if (module->module_category == ModuleCategory::AUDIO_SOURCE) {
+			c->disconnect_out(playback->renderer.get(), 0);
+			c->_add(module);
+			c->connect(module.get(), 0, (Module*)playback->peak_meter.get(), 0);
+		}
+		playback->out_tick >> create_sink([this] { on_update_stream(); });
+		playback->out_state_changed >> create_sink([this] {
+			if (!playback->is_active())
+				hui::run_later(0.01f, [this] { preview_end(); });
+		});
+		playback->play();
 	}
 
 	void on_progress_cancel() {
@@ -93,29 +109,21 @@ public:
 	}
 
 	void on_update_stream() {
-		/*if (progress){
-			int pos = tsunami->win->view->stream->getPos(0); // TODO
-			Range r = tsunami->win->view->sel.range;
+		if (progress) {
+			int pos = playback->get_pos();
+			Range r = playback->renderer->range();
 			progress->set(_("Preview"), (float)(pos - r.offset) / r.length);
-			if (!tsunami->win->view->stream->isPlaying())
-				previewEnd();
-		}*/
+		}
 	}
 
 	void preview_end() {
-		/*if (!progress)
-			return;
-		tsunami->win->view->stream->unsubscribe(this);
-		progress->unsubscribe(this);
-		tsunami->win->view->stream->stop();
-		progress = NULL;
-
-
-		tsunami->win->view->renderer->preview_effect = NULL;*/
+		progress = nullptr;
+		playback = nullptr;
 	}
 
 	shared<Module> module;
 	owned<Progress> progress;
+	owned<Playback> playback;
 	hui::promise<void> _promise;
 };
 

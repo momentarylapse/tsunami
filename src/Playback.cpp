@@ -37,6 +37,7 @@ Playback::Playback(Session *s) {
 }
 
 Playback::~Playback() {
+	session->remove_signal_chain(signal_chain.get());
 	hui::config.set_float("Output.Volume", output_stream->get_volume());
 }
 

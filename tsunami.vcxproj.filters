@@ -1282,6 +1282,9 @@
     <ClCompile Include="src\view\dialog\SampleScaleDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\dialog\SampleSelectionDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\dialog\SelectStringDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -6964,6 +6967,9 @@
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\SampleScaleDialog.h">
+      <Filter>src\view\dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\SampleSelectionDialog.h">
       <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\SelectStringDialog.h">

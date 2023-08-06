@@ -543,6 +543,7 @@
     <ClCompile Include="src\view\dialog\PresetSelectionDialog.cpp" />
     <ClCompile Include="src\view\dialog\QuestionDialog.cpp" />
     <ClCompile Include="src\view\dialog\SampleScaleDialog.cpp" />
+    <ClCompile Include="src\view\dialog\SampleSelectionDialog.cpp" />
     <ClCompile Include="src\view\dialog\SelectStringDialog.cpp" />
     <ClCompile Include="src\view\dialog\SettingsDialog.cpp" />
     <ClCompile Include="src\view\dialog\TemperamentDialog.cpp" />
@@ -2439,6 +2440,7 @@
     <ClInclude Include="src\view\dialog\PresetSelectionDialog.h" />
     <ClInclude Include="src\view\dialog\QuestionDialog.h" />
     <ClInclude Include="src\view\dialog\SampleScaleDialog.h" />
+    <ClInclude Include="src\view\dialog\SampleSelectionDialog.h" />
     <ClInclude Include="src\view\dialog\SelectStringDialog.h" />
     <ClInclude Include="src\view\dialog\SettingsDialog.h" />
     <ClInclude Include="src\view\dialog\TemperamentDialog.h" />

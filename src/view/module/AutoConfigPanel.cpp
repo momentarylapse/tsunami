@@ -9,6 +9,7 @@
 #include "AutoConfigPanel.h"
 #include "../helper/Slider.h"
 #include "../helper/VolumeControl.h"
+#include "../dialog/SampleSelectionDialog.h"
 #include "../sidebar/SampleManagerConsole.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
@@ -432,7 +433,7 @@ public:
 		Sample *old = nullptr;
 		if (*value)
 			old = (*value)->origin.get();
-		SampleManagerConsole::select(session, panel, old).on([this, old] (Sample *s) {
+		SampleSelectionDialog::select(session, panel, old).on([this, old] (Sample *s) {
 			if (s != old) {
 				*value = nullptr;
 				if (s)

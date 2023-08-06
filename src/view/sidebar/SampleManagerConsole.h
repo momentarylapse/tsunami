@@ -70,8 +70,6 @@ public:
 	
 	string id_list;
 	owned<hui::Menu> menu_samples;
-
-	static hui::future<Sample*> select(Session *session, hui::Panel *parent, Sample *old);
 };
 
 #endif /* SAMPLEMANAGERCONSOLE_H_ */

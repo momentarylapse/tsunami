@@ -603,7 +603,7 @@ void TsunamiWindow::on_paste_aligned_to_beats() {
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
 
-	configure_module(this, fx, [this, fx] {
+	configure_module(this, fx).on([this, fx] {
 		int n_layers = song_apply_audio_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
@@ -613,7 +613,7 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 	auto s = CreateAudioSource(session, name);
 
-	configure_module(this, s, [s, this] {
+	configure_module(this, s).on([s, this] {
 		int n_layers = song_apply_audio_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
@@ -623,7 +623,7 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
-	configure_module(this, fx, [fx, this] {
+	configure_module(this, fx).on([fx, this] {
 		int n_layers = song_apply_midi_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
@@ -633,7 +633,7 @@ void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
-	configure_module(this, s, [s, this] {
+	configure_module(this, s).on([s, this] {
 		int n_layers = song_apply_midi_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));

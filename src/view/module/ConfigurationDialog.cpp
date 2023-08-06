@@ -42,8 +42,6 @@ public:
 			request_destroy();
 		});
 
-		ok = false;
-
 		if (module->module_category == ModuleCategory::AUDIO_EFFECT) {
 			socket.set_func_set_wetness([this] (float w) {
 				reinterpret_cast<AudioEffect*>(module.get())->wetness = w;
@@ -55,7 +53,7 @@ public:
 			hide_control("preview", true);
 
 		event("ok", [this]{ on_ok(); });
-		event("cancel", [this]{ request_destroy(); });
+		event("cancel", [this]{ on_cancel(); });
 		event("preview", [this]{ on_preview(); });
 	}
 	~ConfigurationDialog() {
@@ -63,7 +61,11 @@ public:
 			module->unsubscribe(this);
 	}
 	void on_ok() {
-		ok = true;
+		_promise();
+		request_destroy();
+	}
+	void on_cancel() {
+		_promise.fail();
 		request_destroy();
 	}
 	void on_preview() {
@@ -114,24 +116,24 @@ public:
 
 	shared<Module> module;
 	owned<Progress> progress;
-	bool ok;
+	hui::promise<void> _promise;
 };
 
-void configure_module(hui::Window *win, shared<Module> m, hui::Callback cb, hui::Callback cb_cancel) {
+hui::future<void> configure_module(hui::Window *win, shared<Module> m) {
 	auto *config = m->get_config();
 	if (!config) {
-		cb();
-		return;
+		static hui::promise<void> static_promise;
+		static_promise.cb_success = nullptr;
+		static_promise.cb_fail = nullptr;
+		hui::run_later(0.01f, [] {
+				static_promise();
+		});
+		return static_promise.get_future();
 	}
 
 	auto *dlg = new ConfigurationDialog(m, win);
-
-	hui::fly(dlg, [dlg, cb, cb_cancel, m] {
-		if (dlg->ok)
-			cb();
-		else if (cb_cancel)
-			cb_cancel();
-	});
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }
 
 

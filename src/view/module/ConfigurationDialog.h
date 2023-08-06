@@ -16,7 +16,7 @@ namespace hui {
 }
 class Module;
 
-void configure_module(hui::Window *win, shared<Module> m, hui::Callback cb = nullptr, hui::Callback cb_cancel = nullptr);
+hui::future<void> configure_module(hui::Window *win, shared<Module> m);
 
 
 

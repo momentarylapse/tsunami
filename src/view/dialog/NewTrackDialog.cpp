@@ -233,9 +233,7 @@ void NewTrackDialog::on_metronome() {
 }
 
 void NewTrackDialog::on_save_preset() {
-	QuestionDialogString::ask(this, _("Name of the track preset?"), [this] (const string& name) {
-		if (name == "")
-			return;
+	QuestionDialogString::ask(this, _("Name of the track preset?")).on([this] (const string& name) {
 		PresetManager::TrackPreset p;
 		p.name = name;
 		p.type = type;

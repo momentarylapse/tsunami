@@ -52,12 +52,10 @@ public:
 
 class QuestionDialogString : hui::Dialog {
 public:
-	using Callback = std::function<void(const string&)>;
-	QuestionDialogString(hui::Window *parent, const string &question, const string &options, Callback cb);
+	QuestionDialogString(hui::Window *parent, const string &question, const string &options);
 	string result;
-	Callback cb;
-	static bool aborted;
-	static void ask(hui::Window *parent, const string &question, Callback cb, const string &options = "");
+	hui::promise<const string&> _promise;
+	static hui::future<const string&> ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
 #endif /* SRC_VIEW_DIALOG_QUESTIONDIALOG_H_ */

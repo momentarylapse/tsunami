@@ -10,7 +10,6 @@
 
 
 bool QuestionDialogIntInt::aborted;
-bool QuestionDialogString::aborted;
 
 
 QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options)
@@ -158,10 +157,8 @@ hui::future<int> QuestionDialogMultipleChoice::ask(hui::Window *parent, const st
 
 
 
-QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &question, const string &options, Callback _cb)
+QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &question, const string &options)
 : hui::Dialog("question-dialog-text", _parent) {
-	cb = _cb;
-	aborted = true;
 	set_string("question", question);
 	set_options("value", options);
 	enable("ok", false);
@@ -171,17 +168,18 @@ QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &q
 		enable("ok", result.num > 0);
 	});
 	event("cancel", [this] {
-		cb("");
+		_promise.fail();
 		request_destroy();
 	});
 	event("ok", [this] {
-		aborted = false;
-		cb(result);
+		_promise.set_value(result);
 		request_destroy();
 	});
 }
 
-void QuestionDialogString::ask(hui::Window *parent, const string &question, Callback cb, const string &options) {
-	hui::fly(new QuestionDialogString(parent, question, options, cb));
+hui::future<const string&> QuestionDialogString::ask(hui::Window *parent, const string &question, const string &options) {
+	auto dlg = new QuestionDialogString(parent, question, options);
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }
 

@@ -71,7 +71,7 @@ void SessionConsole::on_save() {
 	if (!l.is_active())
 		return;
 
-	QuestionDialogString::ask(win, _("Session name"), [this, s=l.session] (const string& name) {
+	QuestionDialogString::ask(win, _("Session name")).on([this, s=l.session] (const string& name) {
 		if (tsunami->session_manager->session_exists(name))
 			hui::question_box(win, _("Session already exists"), _("Do you want to overwrite?"), [s, name=name] (const string& answer) {
 				if (answer == "hui:yes")

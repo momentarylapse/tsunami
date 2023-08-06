@@ -249,7 +249,7 @@ bool Storage::render_export_selection(Song *song, const SongSelection &sel, cons
 	return save_via_renderer(renderer.port_out[0], filename, renderer.get_num_samples(), song->tags);
 }
 
-void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, const hui::FileDialogCallback &cb, const Array<string> &opt) {
+Storage::Future Storage::ask_by_flags(hui::Window *win, const string &title, int flags, const Array<string> &opt) {
 	string filter, filter_show;
 	filter_show = _("all known files");
 	bool first = true;
@@ -283,28 +283,41 @@ void Storage::ask_by_flags(hui::Window *win, const string &title, int flags, con
 		}
 	Array<string> opts = {"filter=" + filter, "showfilter=" + filter_show};
 	opts.append(opt);
+
+	static hui::promise<const Path&> _promise; // TODO...
+	_promise.cb_success = nullptr;
+	_promise.cb_fail = nullptr;
+
+	auto cb = [] (const Path& p) {
+		if (p)
+			_promise.set_value(p);
+		else
+			_promise.fail();
+	};
+
 	if (flags & FormatDescriptor::Flag::WRITE) {
 		opts.add("defaultextension=nami");
-		return hui::file_dialog_save(win, title, current_directory, opts, cb);
+		hui::file_dialog_save(win, title, current_directory, opts, cb);
 	} else {
-		return hui::file_dialog_open(win, title, current_directory, opts, cb);
+		hui::file_dialog_open(win, title, current_directory, opts, cb);
 	}
+	return _promise.get_future();
 }
 
-void Storage::ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
-	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ, cb, opt);
+Storage::Future Storage::ask_open(hui::Window *win, const Array<string> &opt) {
+	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ, opt);
 }
 
-void Storage::ask_save(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
-	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE, cb, opt);
+Storage::Future Storage::ask_save(hui::Window *win, const Array<string> &opt) {
+	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE, opt);
 }
 
-void Storage::ask_open_import(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
-	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ, cb, opt);
+Storage::Future Storage::ask_open_import(hui::Window *win, const Array<string> &opt) {
+	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ, opt);
 }
 
-void Storage::ask_save_render_export(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt) {
-	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE, cb, opt);
+Storage::Future Storage::ask_save_render_export(hui::Window *win, const Array<string> &opt) {
+	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE, opt);
 }
 
 

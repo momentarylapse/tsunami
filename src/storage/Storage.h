@@ -45,12 +45,14 @@ public:
 	bool _cdecl save(Song *song, const Path &filename);
 	bool _cdecl _export(Song *song, const Path &filename);
 
-	void _cdecl ask_by_flags(hui::Window *win, const string &title, int flags, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
+	using Future = hui::future<const Path&>;
 
-	void _cdecl ask_open(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
-	void _cdecl ask_save(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
-	void _cdecl ask_open_import(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
-	void _cdecl ask_save_render_export(hui::Window *win, const hui::FileDialogCallback &cb, const Array<string> &opt = {});
+	Future ask_by_flags(hui::Window *win, const string &title, int flags, const Array<string> &opt = {});
+
+	Future ask_open(hui::Window *win, const Array<string> &opt = {});
+	Future ask_save(hui::Window *win, const Array<string> &opt = {});
+	Future ask_open_import(hui::Window *win, const Array<string> &opt = {});
+	Future ask_save_render_export(hui::Window *win, const Array<string> &opt = {});
 
 	FormatDescriptor *get_format(const string &ext, int flags);
 

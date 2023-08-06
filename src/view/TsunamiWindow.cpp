@@ -690,11 +690,9 @@ void TsunamiWindow::on_settings() {
 }
 
 void TsunamiWindow::on_track_import() {
-	session->storage->ask_open_import(this, [this] (const Path &filename) {
-		if (filename) {
-			Track *t = song->add_track(SignalType::AUDIO_STEREO);
-			session->storage->load_track(t->layers[0].get(), filename, view->cursor_pos());
-		}
+	session->storage->ask_open_import(this).on([this] (const Path &filename) {
+		Track *t = song->add_track(SignalType::AUDIO_STEREO);
+		session->storage->load_track(t->layers[0].get(), filename, view->cursor_pos());
 	});
 }
 
@@ -911,9 +909,7 @@ void TsunamiWindow::on_new() {
 }
 
 void TsunamiWindow::on_open() {
-	session->storage->ask_open(this, [this] (const Path &filename) {
-		if (!filename)
-			return;
+	session->storage->ask_open(this).on([this] (const Path &filename) {
 		auto *s = tsunami->session_manager->get_empty_session(session);
 		if (s->storage->load(s->song.get(), filename)) {
 			BackupManager::set_save_state(s);
@@ -975,11 +971,10 @@ void TsunamiWindow::on_save_as() {
 	if (song->filename == "")
 		def = _suggest_filename(song, session->storage->current_directory);
 
-	session->storage->ask_save(this, [this] (const Path &filename) {
-		if (filename)
-			if (session->storage->save(song, filename))
-				session->status(_("file saved"));
-	}, {"default=" + def});
+	session->storage->ask_save(this, {"default=" + def}).on([this] (const Path &filename) {
+		if (session->storage->save(song, filename))
+			session->status(_("file saved"));
+	});
 }
 
 void TsunamiWindow::on_export() {
@@ -987,18 +982,14 @@ void TsunamiWindow::on_export() {
 	if (song->filename == "")
 		def = _suggest_filename(song, session->storage->current_directory);
 
-	session->storage->ask_save(this, [this] (const Path &filename) {
-		if (filename)
-			if (session->storage->_export(song, filename))
-				session->status(_("file exported"));
-	}, {"default=" + def});
+	session->storage->ask_save(this, {"default=" + def}).on([this] (const Path &filename) {
+		if (session->storage->_export(song, filename))
+			session->status(_("file exported"));
+	});
 }
 
 void TsunamiWindow::on_export_selection() {
-	session->storage->ask_save(this, [this] (const Path &filename) {
-		if (!filename)
-			return;
-
+	session->storage->ask_save(this).on([this] (const Path &filename) {
 		if (view->get_playable_layers() == view->sel.layers()) {
 			if (export_selection(song, view->sel, filename))
 				session->status(_("file exported"));

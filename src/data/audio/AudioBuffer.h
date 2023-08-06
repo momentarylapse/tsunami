@@ -47,6 +47,7 @@ public:
 
 	void _cdecl clear();
 	void _cdecl set_zero();
+	void _cdecl scale(float factor);
 	void _cdecl set_channels(int channels);
 	void _cdecl resize(int length);
 	bool _cdecl is_ref() const;

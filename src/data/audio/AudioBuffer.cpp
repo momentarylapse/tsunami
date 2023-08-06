@@ -114,6 +114,15 @@ void AudioBuffer::set_zero() {
 	invalidate_compressed();
 }
 
+void AudioBuffer::scale(float scale) {
+	for (auto &cc: c)
+		for (float &f: cc)
+			f *= scale;
+	peaks.clear();
+	spectrum.clear();
+	invalidate_compressed();
+}
+
 void AudioBuffer::set_channels(int new_channels) {
 	if (new_channels < 1 or new_channels >= MAX_CHANNELS)
 		return;

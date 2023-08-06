@@ -3912,7 +3912,7 @@ header
 
 0
 0
-4
+5
 MenuButton
 menu
 image=hui:properties,flat,menu=popup_fx_menu
@@ -3925,16 +3925,22 @@ bold,center,expandx
 1
 0
 0
+Button
+wetness
+flat,small,width=40,padding=1
+2
+0
+0
 CheckBox
 enabled
 switch
-2
+3
 0
 0
 Button
 replace
 image=hui:open,flat
-3
+4
 0
 0
 Grid
@@ -9008,7 +9014,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-782
+783
 # Text
 /bars-add
 Add bars...
@@ -10327,6 +10333,9 @@ Configure
 module-panel/replace
 
 Replace
+module-panel/wetness
+
+Wetness (effect intensity)
 module_console/no_config
 this module is not configurable
 

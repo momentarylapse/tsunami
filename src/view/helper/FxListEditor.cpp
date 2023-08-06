@@ -51,6 +51,7 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 	if (hexpand)
 		module_panel_mode = ConfigPanelMode::FIXED_HEIGHT;
 	module_panel_mode = module_panel_mode | ConfigPanelMode::PROFILES | ConfigPanelMode::ENABLE | ConfigPanelMode::DELETE;
+	module_panel_mode = module_panel_mode | ConfigPanelMode::WETNESS;
 	assert(track);
 	event_ids.add(panel->event_x(id_list, "hui:select", [this] { on_select(); }));
 	event_ids.add(panel->event_x(id_list, "hui:change", [this] { on_edit(); }));
@@ -105,6 +106,9 @@ void FxListEditor::select_module(Module *m) {
 			auto fx = reinterpret_cast<AudioEffect*>(m);
 			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_effect(fx, enabled);
+			});
+			config_panel->set_func_set_wetness([this, fx](float wetness) {
+				track->set_effect_wetness(fx, wetness);
 			});
 			config_panel->set_func_delete([this, fx] {
 				track->delete_effect(fx);
@@ -219,7 +223,7 @@ void FxListEditor::update() {
 			pre = "<span alpha=\"50%\">";
 			post = "</span>";
 		}
-		panel->add_string(id_list, format("%s\\%s%s\n<small>    %s, %.0f%%</small>%s", b2s(fx->enabled), pre, fx->module_class, (fx->enabled?"active":"disabled"), 100.0f, post));
+		panel->add_string(id_list, format("%s\\%s%s\n<small>    %s, %.0f%%</small>%s", b2s(fx->enabled), pre, fx->module_class, (fx->enabled?"active":"disabled"), fx->wetness * 100, post));
 	}
 
 	update_list_selection();

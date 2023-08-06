@@ -7,6 +7,7 @@
 
 #include "ModulePanel.h"
 #include "ConfigPanel.h"
+#include "../dialog/QuestionDialog.h"
 #include "../TsunamiWindow.h"
 #include "../../module/Module.h"
 #include "../../plugins/PluginManager.h"
@@ -14,11 +15,24 @@
 #include "../../Session.h"
 #include "../../lib/hui/Controls/ControlMenuButton.h"
 
+
+#include "../../module/audio/AudioEffect.h"
+
 extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
 extern const int CONFIG_PANEL_DIALOG_WIDTH = 480;
 extern const int CONFIG_PANEL_DIALOG_HEIGHT = 380;
+
+
+
+float module_wetness(Module *m) {
+	if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
+		auto fx = reinterpret_cast<AudioEffect*>(m);
+		return fx->wetness;
+	}
+	return 0;
+}
 
 
 ConfigPanelSocket::ConfigPanelSocket(Module *_m, ConfigPanelMode _mode) {
@@ -51,8 +65,10 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 
 	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE) == 0);
 	panel->hide_control("replace", (int)(mode & ConfigPanelMode::REPLACE) == 0);
+	panel->hide_control("wetness", (int)(mode & ConfigPanelMode::WETNESS) == 0);
 
 	panel->event("enabled", [this] { on_enabled(); });
+	panel->event("wetness", [this] { on_wetness(); });
 	panel->event("delete", [this] { on_delete(); });
 	panel->event("load_favorite", [this] { on_load(); });
 	panel->event("save_favorite", [this] { on_save(); });
@@ -61,7 +77,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 	panel->event("replace", [this] { on_replace(); });
 	panel->event("detune", [this] { on_detune(); });
 
-	panel->check("enabled", module->enabled);
+	on_change();
 
 	auto *mb = (hui::ControlMenuButton*)panel->_get_control_("menu");
 	if (mb and mb->menu) {
@@ -70,9 +86,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 		menu->enable("replace", (int)(mode & ConfigPanelMode::REPLACE));
 	}
 
-	module->out_changed >> create_sink([this] {
-		panel->check("enabled", module->enabled);
-	});
+	module->out_changed >> create_sink([this] { on_change(); });
 }
 
 void ConfigPanelSocket::on_load() {
@@ -100,6 +114,15 @@ void ConfigPanelSocket::on_enabled() {
 		func_enable(panel->is_checked("enabled"));
 }
 
+void ConfigPanelSocket::on_wetness() {
+	if (func_set_wetness)
+		QuestionDialogFloat::ask(panel->win, "Effect wetness", [this] (float wetness) {
+			if (!QuestionDialogFloat::aborted)
+				func_set_wetness(clamp(wetness / 100, 0.0f, 1.0f));
+		}, module_wetness(module) * 100, 0, 100);
+
+}
+
 void ConfigPanelSocket::on_delete() {
 	if (func_delete)
 		hui::run_later(0, func_delete);
@@ -120,6 +143,9 @@ void ConfigPanelSocket::on_external() {
 
 void ConfigPanelSocket::on_change() {
 	panel->check("enabled", module->enabled);
+
+	if (module->module_category == ModuleCategory::AUDIO_EFFECT)
+		panel->set_string("wetness", format("%.0f%%", module_wetness(module) * 100));
 }
 
 void ConfigPanelSocket::on_replace() {
@@ -134,6 +160,10 @@ void ConfigPanelSocket::on_detune() {
 
 void ConfigPanelSocket::set_func_enable(std::function<void(bool)> f) {
 	func_enable = f;
+}
+
+void ConfigPanelSocket::set_func_set_wetness(std::function<void(float)> f) {
+	func_set_wetness = f;
 }
 
 void ConfigPanelSocket::set_func_delete(std::function<void()> f) {
@@ -161,6 +191,7 @@ void ConfigPanelSocket::set_func_detune(std::function<void()> f) {
 void ConfigPanelSocket::copy_into(ConfigPanelSocket *c) {
 	c->set_func_delete(func_delete);
 	c->set_func_enable(func_enable);
+	c->set_func_set_wetness(func_set_wetness);
 	c->set_func_close(func_close);
 	c->set_func_replace(func_replace);
 	c->set_func_detune(func_detune);

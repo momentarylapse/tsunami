@@ -12,11 +12,10 @@
 
 class QuestionDialogInt : hui::Dialog {
 public:
-	QuestionDialogInt(hui::Window *parent, const string &question, const string &options, std::function<void(int)> cb);
+	QuestionDialogInt(hui::Window *parent, const string &question, const string &options);
 	int result;
-	std::function<void(int)> cb;
-	static bool aborted;
-	static void ask(hui::Window *parent, const string &question, std::function<void(int)> cb, const string &options = "");
+	hui::promise<int> _promise;
+	static hui::future<int> ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
 
@@ -31,26 +30,24 @@ public:
 
 class QuestionDialogFloat : hui::Dialog {
 public:
-	using Callback = std::function<void(float)>;
-	QuestionDialogFloat(hui::Window *parent, const string &question, float value0, float min, float max, const string &options, Callback cb);
+	QuestionDialogFloat(hui::Window *parent, const string &question, float value0, float min, float max, const string &options);
 	float result;
 	float _min, _max;
 	void set_spin(float f);
 	void set_slider(float f);
 	float get_spin();
 	float get_slider();
-	Callback cb;
-	static bool aborted;
-	static void ask(hui::Window *parent, const string &question, Callback cb, float value0, float min, float max, const string& options = "");
+	hui::promise<float> _promise;
+	static hui::future<float> ask(hui::Window *parent, const string &question, float value0, float min, float max, const string& options = "");
 };
 
 
 class QuestionDialogMultipleChoice : hui::Dialog {
 public:
-	QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb);
+	QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel);
 	int result;
-	std::function<void(int)> cb;
-	static void ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb);
+	hui::promise<int> _promise;
+	static hui::future<int> ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel);
 };
 
 class QuestionDialogString : hui::Dialog {

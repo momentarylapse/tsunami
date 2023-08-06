@@ -399,16 +399,12 @@ void TsunamiWindow::on_track_render() {
 	} else {
 		QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
-				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true,
-				[this, range] (int answer) {
-					if (answer < 0)
-						return;
-
+				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true).on([this, range] (int answer) {
 					if (answer == 1)
 						song_render_track(song, range, view->sel.layers(), this);
 					else
 						song_render_track(song, range, view->get_playable_layers(), this);
-		});
+				});
 	}
 
 }
@@ -1009,8 +1005,7 @@ void TsunamiWindow::on_export_selection() {
 		} else {
 			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
 					{_("All non-muted"), _("All selected"), _("Only non-muted selected")},
-					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute"), _("only include if selected AND not muted")}, true,
-					[this, filename] (int answer) {
+					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute"), _("only include if selected AND not muted")}, true).on([this, filename] (int answer) {
 						auto sel = view->sel;
 						bool force_unmute = false;
 						if (answer == 0) {

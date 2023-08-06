@@ -116,10 +116,9 @@ void ConfigPanelSocket::on_enabled() {
 
 void ConfigPanelSocket::on_wetness() {
 	if (func_set_wetness)
-		QuestionDialogFloat::ask(panel->win, "Effect wetness", [this] (float wetness) {
-			if (!QuestionDialogFloat::aborted)
-				func_set_wetness(clamp(wetness / 100, 0.0f, 1.0f));
-		}, module_wetness(module) * 100, 0, 100);
+		QuestionDialogFloat::ask(panel->win, "Effect wetness", module_wetness(module) * 100, 0, 100).on([this] (float wetness) {
+			func_set_wetness(clamp(wetness / 100, 0.0f, 1.0f));
+		});
 
 }
 

@@ -9,36 +9,33 @@
 #include "../../lib/base/pointer.h"
 
 
-bool QuestionDialogInt::aborted;
 bool QuestionDialogIntInt::aborted;
-bool QuestionDialogFloat::aborted;
 bool QuestionDialogString::aborted;
 
 
-QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options, std::function<void(int)> _cb)
+QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &question, const string &options)
 : hui::Dialog("question-dialog-int", _parent) {
-	cb = _cb;
-	result = 0;
-	aborted = true;
 	set_string("question", question);
 	set_options("value", options);
+	result = 0;
 
 	event("value", [this] {
 		result = get_int("value");
 	});
 	event("cancel", [this] {
-		cb(-1);
+		_promise.fail();
 		request_destroy();
 	});
 	event("ok", [this] {
-		aborted = false;
-		cb(result);
+		_promise.set_value(result);
 		request_destroy();
 	});
 }
 
-void QuestionDialogInt::ask(hui::Window *parent, const string &question, std::function<void(int)> cb, const string &options) {
-	hui::fly(new QuestionDialogInt(parent, question, options, cb));
+hui::future<int> QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
+	auto dlg = new QuestionDialogInt(parent, question, options);
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }
 
 
@@ -79,11 +76,9 @@ void QuestionDialogIntInt::ask(hui::Window *parent, const string &question, cons
 
 
 
-QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &question, float value0, float min, float max, const string &options, Callback _cb)
+QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &question, float value0, float min, float max, const string &options)
 : hui::Dialog("question-dialog-float", _parent) {
-	cb = _cb;
 	result = value0;
-	aborted = true;
 	_min = min;
 	_max = max;
 	set_string("question", question);
@@ -100,12 +95,11 @@ QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &que
 		set_spin(result);
 	});
 	event("cancel", [this] {
-		cb(-1);
+		_promise.fail();
 		request_destroy();
 	});
 	event("ok", [this] {
-		aborted = false;
-		cb(result);
+		_promise.set_value(result);
 		request_destroy();
 	});
 }
@@ -126,16 +120,17 @@ float QuestionDialogFloat::get_slider() {
 	return _min + get_float("slider") * (_max - _min);
 }
 
-void QuestionDialogFloat::ask(hui::Window *parent, const string &question, Callback cb, float value0, float min, float max, const string &options) {
-	hui::fly(new QuestionDialogFloat(parent, question, value0, min, max, options, cb));
+hui::future<float> QuestionDialogFloat::ask(hui::Window *parent, const string &question, float value0, float min, float max, const string &options) {
+	auto dlg = new QuestionDialogFloat(parent, question, value0, min, max, options);
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }
 
 
 
 
-QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> _cb)
+QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel)
 		: hui::Dialog(title, 100, 40, parent, false) {
-	cb = _cb;
 	result = -1;
 	add_grid("", 0, 0, "grid");
 	set_target("grid");
@@ -149,14 +144,16 @@ QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, 
 			set_tooltip(id, tips[i]);
 		event(id, [i,this] {
 			result = i;
-			cb(i);
+			_promise.set_value(i);
 			request_destroy();
 		});
 	}
 }
 
-void QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel, std::function<void(int)> cb) {
-	hui::fly(new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel, cb));
+hui::future<int> QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
+	auto dlg = new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel);
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }
 
 

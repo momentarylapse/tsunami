@@ -557,9 +557,7 @@ void MidiEditorConsole::on_apply_string() {
 }
 
 void MidiEditorConsole::on_apply_hand_position() {
-	QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), [this] (int hand_position) {
-		if (QuestionDialogInt::aborted)
-			return;
+	QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), "range=0:99").on([this] (int hand_position) {
 		auto &string_pitch = layer->track->instrument.string_pitch;
 
 		song->begin_action_group("midi apply hand position");
@@ -573,20 +571,17 @@ void MidiEditorConsole::on_apply_hand_position() {
 			layer->midi_note_set_string(n, stringno);
 		}
 		song->end_action_group();
-	}, "range=0:99");
+	});
 }
 
 void MidiEditorConsole::on_apply_pitch_shift() {
-	QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), [this] (int delta) {
-		if (QuestionDialogInt::aborted)
-			return;
-
+	QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), "range=-99:99").on([this] (int delta) {
 		song->begin_action_group("midi pitch shift");
 		auto notes = layer->midi.get_notes_by_selection(view->sel);
 		for (auto *n: weak(notes))
 			layer->edit_midi_note(n, n->range, n->pitch + delta, n->volume);
 		song->end_action_group();
-	}, "range=-99:99");
+	});
 }
 
 void MidiEditorConsole::on_apply_flags(int mask) {

@@ -556,21 +556,20 @@ void TsunamiWindow::test_allow_termination(hui::Callback cb_yes, hui::Callback c
 			return;
 		}
 
-		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)),
-				[this, cb_yes, cb_no] (const string &answer) {
-			if (answer == "hui:yes") {
+		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true).on([this, cb_yes, cb_no] (bool answer) {
+			if (answer) {
 				on_save();
 				if (song->action_manager->is_save())
 					cb_yes();
 				else
 					cb_no();
-			} else if (answer == "hui:no") {
-				cb_yes();
 			} else {
-				// cancel
-				cb_no();
+				cb_yes();
 			}
-		}, true);
+		}).on_fail([cb_no] {
+			// cancel
+			cb_no();
+		});
 	}, [cb_no] {
 		cb_no();
 	});

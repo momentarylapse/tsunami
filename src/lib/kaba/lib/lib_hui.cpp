@@ -84,16 +84,23 @@ namespace kaba {
 		hui::run(win, [c]{ if (c) (*c)(); });
 	}
 	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_open(win, title, dir, params, [&c] (const Path &p) { c(p); });
+		hui::file_dialog_open(win, title, dir, params).on([&c] (const Path &p) { c(p); });
 	}
 	void hui_file_dialog_save_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_save(win, title, dir, params, [&c] (const Path &p) { c(p); });
+		hui::file_dialog_save(win, title, dir, params).on([&c] (const Path &p) { c(p); });
 	}
 	void hui_file_dialog_dir_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_dir(win, title, dir, params, [&c] (const Path &p) { c(p); });
+		hui::file_dialog_dir(win, title, dir, params).on([&c] (const Path &p) { c(p); });
 	}
 	void hui_question_box_kaba(hui::Window *win, const string &title, const string &text, Callable<void(const string &)> &c, bool allow_cancel) {
-		hui::question_box(win, title, text, [&c] (const string &p) { c(p); }, allow_cancel);
+		hui::question_box(win, title, text, allow_cancel).on([&c] (bool result) {
+			if (result)
+				c("hui:yes");
+			else
+				c("hui:no");
+		}).on_fail([&c] {
+			c("hui:cancel");
+		});
 	}
 #else
 	#define GetDAWindow(x)		0

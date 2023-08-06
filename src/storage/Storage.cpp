@@ -284,24 +284,12 @@ Storage::Future Storage::ask_by_flags(hui::Window *win, const string &title, int
 	Array<string> opts = {"filter=" + filter, "showfilter=" + filter_show};
 	opts.append(opt);
 
-	static hui::promise<const Path&> _promise; // TODO...
-	_promise.cb_success = nullptr;
-	_promise.cb_fail = nullptr;
-
-	auto cb = [] (const Path& p) {
-		if (p)
-			_promise.set_value(p);
-		else
-			_promise.fail();
-	};
-
 	if (flags & FormatDescriptor::Flag::WRITE) {
 		opts.add("defaultextension=nami");
-		hui::file_dialog_save(win, title, current_directory, opts, cb);
+		return hui::file_dialog_save(win, title, current_directory, opts);
 	} else {
-		hui::file_dialog_open(win, title, current_directory, opts, cb);
+		return hui::file_dialog_open(win, title, current_directory, opts);
 	}
-	return _promise.get_future();
 }
 
 Storage::Future Storage::ask_open(hui::Window *win, const Array<string> &opt) {

@@ -8,6 +8,11 @@
 namespace hui
 {
 
+template<class T>
+void reset_promise(promise<T> &p) {
+	p.cb_success = nullptr;
+	p.cb_fail = nullptr;
+}
 
 struct DialogParams {
 	string filter, show_filter;
@@ -80,29 +85,29 @@ static GtkWindow *get_window_save(Window *win) {
 	}
 #endif
 
-static FileDialogCallback cur_file_callback;
+static promise<const Path&> cur_file_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_file_dialog_open(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_open_finish(dlg, res, nullptr))
-		cur_file_callback(g_file_get_path(f));
+		cur_file_promise.set_value(g_file_get_path(f));
 	else
-		cur_file_callback("");
+		cur_file_promise.fail();
 }
 static void on_file_dialog_save(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_save_finish(dlg, res, nullptr))
-		cur_file_callback(g_file_get_path(f));
+		cur_file_promise.set_value(g_file_get_path(f));
 	else
-		cur_file_callback("");
+		cur_file_promise.set_value("");
 }
 static void on_file_dialog_dir(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_select_folder_finish(dlg, res, nullptr))
-		cur_file_callback(g_file_get_path(f));
+		cur_file_promise.set_value(g_file_get_path(f));
 	else
-		cur_file_callback("");
+		cur_file_promise.set_value("");
 }
 
 static void add_filters(GtkFileDialog *dlg, const DialogParams &p) {
@@ -125,10 +130,10 @@ static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpoin
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		auto fn = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(self));
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_callback(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
+		cur_file_promise.set_value(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
 	} else {
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_callback("");
+		cur_file_promise.set_value("");
 	}
 }
 #endif
@@ -148,7 +153,8 @@ static void add_filters(GtkWidget *dlg, const string &show_filter, const string 
 #endif
 
 // choose a directory (<dir> will be selected initially)
-void file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+FileFuture file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params) {
+	reset_promise(cur_file_promise);
 	auto p = DialogParams::parse(params);
 	GtkWindow *w = get_window_save(win);
 #if GTK_CHECK_VERSION(4,10,0)
@@ -166,7 +172,6 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 												nullptr);
 	if (dir)
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), g_file_new_for_path(dir.str().c_str()), nullptr);
-	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
@@ -182,15 +187,19 @@ void file_dialog_dir(Window *win, const string &title, const Path &dir, const Ar
 	if (r == GTK_RESPONSE_ACCEPT) {
 		auto fn = Path(gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dlg))).as_dir();
 		gtk_widget_destroy(dlg);
-		cb(fn);
+		run_later(0.01f, [fn] {
+			cur_file_promise.set_value(fn);
+		});
 	} else {
 		gtk_widget_destroy(dlg);
 	}
 #endif
+	return cur_file_promise.get_future();
 }
 
 // file selection for opening (filter should look like "*.txt")
-void file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params) {
+	reset_promise(cur_file_promise);
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
 	GtkWindow *w = get_window_save(win);
@@ -200,7 +209,6 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 	if (dir)
 		gtk_file_dialog_set_initial_folder(dlg, g_file_new_for_path(dir.str().c_str()));
 	add_filters(dlg, p);
-	cur_file_callback = cb;
 	/*if (p.multiple_files)
 		gtk_file_dialog_open_multiple(dlg, w, nullptr, &on_file_dialog_open_multi, nullptr);
 	else*/
@@ -221,7 +229,6 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 		//g_object_unref(path);
 	}
 	add_filters(dlg, p.show_filter, p.filter);
-	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 
@@ -237,22 +244,26 @@ void file_dialog_open(Window *win, const string &title, const Path &dir, const A
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
-	int r = gtk_dialog_run(GTK_DIALOG(dlg));
-	if (r == GTK_RESPONSE_ACCEPT) {
-		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
-		gtk_widget_destroy(dlg);
-		cb(p.try_to_ensure_extension(Path(fn)));
-		g_free(fn);
-	} else {
-		gtk_widget_destroy(dlg);
-		cb("");
-	}
+	run_later(0.01f, [dlg] {
+		int r = gtk_dialog_run(GTK_DIALOG(dlg));
+		if (r == GTK_RESPONSE_ACCEPT) {
+			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+			gtk_widget_destroy(dlg);
+			cur_file_promise.set_value(p.try_to_ensure_extension(Path(fn)));
+			g_free(fn);
+		} else {
+			gtk_widget_destroy(dlg);
+			cur_file_promise.fail();
+		}
+	});
 #endif
+	return cur_file_promise.get_future();
 }
 
 
 // file selection for saving
-void file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb) {
+FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params) {
+	reset_promise(cur_file_promise);
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
 	GtkWindow *w = get_window_save(win);
@@ -262,7 +273,6 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 	if (dir)
 		gtk_file_dialog_set_initial_folder(dlg, g_file_new_for_path(dir.str().c_str()));
 	add_filters(dlg, p);
-	cur_file_callback = cb;
 	gtk_file_dialog_save(dlg, w, nullptr, &on_file_dialog_save, nullptr);
 #elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *dlg = gtk_file_chooser_dialog_new(sys_str(title),
@@ -282,7 +292,6 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 	if (p.default_name)
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(*p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
-	cur_file_callback = cb;
 	g_signal_connect(dlg, "response", G_CALLBACK(on_gtk_file_dialog_response), nullptr);
 	gtk_window_present(GTK_WINDOW(dlg));
 #else
@@ -300,45 +309,50 @@ void file_dialog_save(Window *win, const string &title, const Path &dir, const A
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(*p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
-	int r = gtk_dialog_run(GTK_DIALOG(dlg));
-	if (r == GTK_RESPONSE_ACCEPT) {
-		gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
-		gtk_widget_destroy(dlg);
-		cb(p.try_to_ensure_extension(Path(fn)));
-		g_free(fn);
-	} else {
-		gtk_widget_destroy(dlg);
-		cb("");
-	}
+	run_later(0.01f, [dlg] {
+		int r = gtk_dialog_run(GTK_DIALOG(dlg));
+		if (r == GTK_RESPONSE_ACCEPT) {
+			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
+			gtk_widget_destroy(dlg);
+			cur_file_promise.set_value(p.try_to_ensure_extension(Path(fn)));
+			g_free(fn);
+		} else {
+			gtk_widget_destroy(dlg);
+			cur_file_promise.fail();
+		}
+	});
 #endif
+	return cur_file_promise.get_future();
 }
 
 
-static FontDialogCallback cur_font_callback;
+static promise<const string&> cur_font_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FONT_DIALOG(o);
 	if (auto f = gtk_font_dialog_choose_font_finish(dlg, res, nullptr))
-		cur_font_callback(pango_font_description_to_string(f));
-	//else
-	//	cur_font_callback("");
+		cur_font_promise.set_value(pango_font_description_to_string(f));
+	else
+		cur_font_promise.fail();
 }
 #elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(self));
-		cur_font_callback(fn);
+		cur_font_promise.set_value(fn);
 		g_free(fn);
+	} else {
+		cur_font_promise.fail();
 	}
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 #endif
 
-void select_font(Window *win, const string &title, const Array<string> &params, const FontDialogCallback &cb) {
+FontFuture select_font(Window *win, const string &title, const Array<string> &params) {
+	reset_promise(cur_font_promise);
 	auto p = DialogParams::parse(params);
 	GtkWindow *w = get_window_save(win);
-	cur_font_callback = cb;
 #if GTK_CHECK_VERSION(4,10,0)
 	auto dlg = gtk_font_dialog_new();
 	gtk_font_dialog_set_title(dlg, sys_str(title));
@@ -359,14 +373,19 @@ void select_font(Window *win, const string &title, const Array<string> &params, 
 	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	gtk_widget_show_all(dlg);
-	int r = gtk_dialog_run(GTK_DIALOG(dlg));
-	if (r == GTK_RESPONSE_OK) {
-		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dlg));
-		cb(fn);
-		g_free(fn);
-	}
-	gtk_widget_destroy(dlg);
+	run_later(0.01f, [dlg] {
+		int r = gtk_dialog_run(GTK_DIALOG(dlg));
+		if (r == GTK_RESPONSE_OK) {
+			gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dlg));
+			cur_font_promise.set_value(fn);
+			g_free(fn);
+		} else {
+			cur_font_promise.fail();
+		}
+		gtk_widget_destroy(dlg);
+	});
 #endif
+	return cur_font_promise.get_future();
 }
 
 
@@ -376,29 +395,33 @@ color color_user_to_gtk(const color &c);
 GdkRGBA color_to_gdk(const color &c);
 color color_from_gdk(const GdkRGBA &gcol);
 
-static ColorDialogCallback cur_color_callback;
+static promise<const color&> cur_color_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_COLOR_DIALOG(o);
 	if (auto c = gtk_color_dialog_choose_rgba_finish(dlg, res, nullptr))
-		cur_color_callback(color_from_gdk(*c));
+		cur_color_promise.set_value(color_from_gdk(*c));
+	else
+		cur_color_promise.fail();
 }
 #elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		GdkRGBA gcol;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(self), &gcol);
-		cur_color_callback(color_gtk_to_user(color_from_gdk(gcol)));
+		cur_color_promise.set_value(color_gtk_to_user(color_from_gdk(gcol)));
+	} else {
+		cur_color_promise.fail();
 	}
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 #endif
 
-void select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb) {
+ColorFuture select_color(Window *win, const string &title, const color &c) {
+	reset_promise(cur_color_promise);
 	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
 	GtkWindow *w = get_window_save(win);
-	cur_color_callback = cb;
 #if GTK_CHECK_VERSION(4,10,0)
 	auto dlg = gtk_color_dialog_new();
 	gtk_color_dialog_set_title(dlg, sys_str(title));
@@ -413,43 +436,49 @@ void select_color(Window *win, const string &title, const color &c, const ColorD
 	auto dlg = gtk_color_chooser_dialog_new("Color", w);
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
 	gtk_widget_show_all(dlg);
-	int r = gtk_dialog_run(GTK_DIALOG(dlg));
-	if (r == GTK_RESPONSE_OK) {
-		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-		cb(color_gtk_to_user(color_from_gdk(gcol)));
-	}
+	run_later(0.01f, [dlg] {
+		int r = gtk_dialog_run(GTK_DIALOG(dlg));
+		if (r == GTK_RESPONSE_OK) {
+			gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
+			cur_color_promise.set_value(color_gtk_to_user(color_from_gdk(gcol)));
+		} else {
+			cur_color_promise.fail();
+		}
+	});
 	gtk_widget_destroy(dlg);
 #endif
+	return cur_color_promise.get_future();
 }
 
 
-static QuestionDialogCallback cur_question_callback;
+static promise<bool> cur_question_promise;
+
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_question_reply(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_ALERT_DIALOG(o);
 	int r = gtk_alert_dialog_choose_finish(dlg, res, nullptr);
 	if (r == 0)
-		cur_question_callback("hui:yes");
+		cur_question_promise.set_value(true);
 	else if (r == 1)
-		cur_question_callback("hui:no");
+		cur_question_promise.set_value(false);
 	else
-		cur_question_callback("hui:cancel");
+		cur_question_promise.fail();
 }
 #elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_YES)
-		cur_question_callback("hui:yes");
+		cur_question_promise.set_value(true);
 	else if (response_id == GTK_RESPONSE_NO)
-		cur_question_callback("hui:no");
+		cur_question_promise.set_value(false);
 	else
-		cur_question_callback("hui:cancel");
+		cur_question_promise.fail();
 	gtk_window_destroy(GTK_WINDOW(self));
 }
 #endif
 
-void question_box(Window *win, const string &title, const string &text, const QuestionDialogCallback &cb, bool allow_cancel) {
+QuestionFuture question_box(Window *win, const string &title, const string &text, bool allow_cancel) {
+	reset_promise(cur_question_promise);
 	GtkWindow *w = get_window_save(win);
-	cur_question_callback = cb;
 #if GTK_CHECK_VERSION(4,10,0)
 	auto dlg = gtk_alert_dialog_new("%s", sys_str(title));
 	gtk_alert_dialog_set_detail(dlg, sys_str(text));
@@ -475,14 +504,17 @@ void question_box(Window *win, const string &title, const string &text, const Qu
 	gtk_widget_show_all(dlg);
 	gint result = gtk_dialog_run(GTK_DIALOG(dlg));
 	gtk_widget_destroy(dlg);
-	if (result == GTK_RESPONSE_YES)
-		cb("hui:yes");
-	else if (result == GTK_RESPONSE_NO)
-		cb("hui:no");
-	else
-		cb("hui:cancel");
+	run_later(0.01f, [] {
+		if (result == GTK_RESPONSE_YES)
+			cur_question_promise.set_value(true);
+		else if (result == GTK_RESPONSE_NO)
+			cur_question_promise.set_value(false);
+		else
+			cur_question_promise.fail();
+	});
 #endif
 #endif
+	return cur_question_promise.get_future();
 }
 
 

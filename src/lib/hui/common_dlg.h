@@ -16,20 +16,20 @@ namespace hui {
 
 class Window;
 
-typedef std::function<void(const Path&)> FileDialogCallback;
-typedef std::function<void(const color&)> ColorDialogCallback;
-typedef std::function<void(const string&)> FontDialogCallback;
-typedef std::function<void(const string&)> QuestionDialogCallback;
+using FileFuture = future<const Path&>;
+using ColorFuture = future<const color&>;
+using FontFuture = future<const string&>;
+using QuestionFuture = future<bool>;
 
 // file dialogs
-void _cdecl file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params, const FileDialogCallback &cb);
-void _cdecl select_color(Window *win, const string &title, const color &c, const ColorDialogCallback &cb);
-void _cdecl select_font(Window *win, const string &title, const Array<string> &params, const FontDialogCallback &cb);
+FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params);
+FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params);
+FileFuture file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params);
+ColorFuture select_color(Window *win, const string &title, const color &c);
+FontFuture select_font(Window *win, const string &title, const Array<string> &params);
 
 // message dialogs
-void _cdecl question_box(Window *win, const string &title, const string &text, const QuestionDialogCallback &cb, bool allow_cancel = false);
+QuestionFuture question_box(Window *win, const string &title, const string &text, bool allow_cancel = false);
 void _cdecl info_box(Window *win, const string &title, const string &text);
 void _cdecl error_box(Window *win, const string &title, const string &text);
 

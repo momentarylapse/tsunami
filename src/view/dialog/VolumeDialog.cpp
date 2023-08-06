@@ -37,7 +37,7 @@ VolumeDialog::VolumeDialog(hui::Window *_parent, float value0, float min, float 
 	});
 	event("ok", [this] {
 		maximize = is_checked("maximize");
-		_promise.set_value(result);
+		_promise(result);
 		request_destroy();
 	});
 }

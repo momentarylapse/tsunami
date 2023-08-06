@@ -84,7 +84,7 @@ void ModuleSelectorDialog::on_select() {
 	if (n < 0)
 		return;
 	_return = labels[n].name;
-	_promise.set_value(*_return);
+	_promise(*_return);
 	request_destroy();
 }
 
@@ -107,7 +107,7 @@ hui::future<const string&> ModuleSelectorDialog::choose(hui::Panel *parent, Sess
 
 	if (names.num == 1) {
 		hui::run_later(0.01f, [names] {
-			static_promise.set_value(names[0]);
+			static_promise(names[0]);
 		});
 		return static_promise.get_future();;
 	}

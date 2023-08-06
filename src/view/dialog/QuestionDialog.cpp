@@ -26,7 +26,7 @@ QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &questio
 		request_destroy();
 	});
 	event("ok", [this] {
-		_promise.set_value(result);
+		_promise(result);
 		request_destroy();
 	});
 }
@@ -98,7 +98,7 @@ QuestionDialogFloat::QuestionDialogFloat(hui::Window *_parent, const string &que
 		request_destroy();
 	});
 	event("ok", [this] {
-		_promise.set_value(result);
+		_promise(result);
 		request_destroy();
 	});
 }
@@ -143,7 +143,7 @@ QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, 
 			set_tooltip(id, tips[i]);
 		event(id, [i,this] {
 			result = i;
-			_promise.set_value(i);
+			_promise(i);
 			request_destroy();
 		});
 	}
@@ -172,7 +172,7 @@ QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &q
 		request_destroy();
 	});
 	event("ok", [this] {
-		_promise.set_value(result);
+		_promise(result);
 		request_destroy();
 	});
 }

@@ -28,16 +28,22 @@ typedef std::function<void(Painter*)> CallbackP;
 template<class T>
 struct future;
 
+template<class T>
+struct xcallback {
+	using t = std::function<void(T)>;
+};
+template<>
+struct xcallback<void> {
+	using t = std::function<void()>;
+};
+
 // internal
 template<class T>
 struct promise : public Sharable<base::Empty> {
-	using Callback = std::function<void(T)>;
-	using CallbackFail = std::function<void()>;
+	typename xcallback<T>::t cb_success;
+	Callback cb_fail;
 
-	Callback cb_success;
-	CallbackFail cb_fail;
-
-	void set_value(T t) {
+	void operator() (T t) {
 		if (cb_success)
 			cb_success(t);
 	}
@@ -55,8 +61,6 @@ struct promise : public Sharable<base::Empty> {
 template<class T>
 struct future {
 	using P = promise<T>;
-	using Callback = std::function<void(T)>;
-	using CallbackFail = std::function<void()>;
 
 	P& _promise;
 
@@ -65,14 +69,33 @@ struct future {
 	future(future<T>& f) : _promise(f._promise) {
 	}
 
-	future<T>& on(Callback cb) {
+	future<T>& on(typename xcallback<T>::t cb) {
 		_promise.cb_success = cb;
 		return *this;
 	}
 
-	future<T>& on_fail(CallbackFail cb) {
+	future<T>& on_fail(Callback cb) {
 		_promise.cb_fail = cb;
 		return *this;
+	}
+};
+
+
+template<>
+struct promise<void> : public Sharable<base::Empty> {
+	Callback cb_success;
+	Callback cb_fail;
+
+	void operator() () {
+		if (cb_success)
+			cb_success();
+	}
+	void fail() {
+		if (cb_fail)
+			cb_fail();
+	}
+	future<void> get_future() {
+		return future<void>(*this);
 	}
 };
 

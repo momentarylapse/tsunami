@@ -91,23 +91,23 @@ static promise<const Path&> cur_file_promise;
 static void on_file_dialog_open(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_open_finish(dlg, res, nullptr))
-		cur_file_promise.set_value(g_file_get_path(f));
+		cur_file_promise(g_file_get_path(f));
 	else
 		cur_file_promise.fail();
 }
 static void on_file_dialog_save(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_save_finish(dlg, res, nullptr))
-		cur_file_promise.set_value(g_file_get_path(f));
+		cur_file_promise(g_file_get_path(f));
 	else
-		cur_file_promise.set_value("");
+		cur_file_promise("");
 }
 static void on_file_dialog_dir(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_select_folder_finish(dlg, res, nullptr))
-		cur_file_promise.set_value(g_file_get_path(f));
+		cur_file_promise(g_file_get_path(f));
 	else
-		cur_file_promise.set_value("");
+		cur_file_promise("");
 }
 
 static void add_filters(GtkFileDialog *dlg, const DialogParams &p) {
@@ -130,10 +130,10 @@ static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpoin
 	if (response_id == GTK_RESPONSE_ACCEPT) {
 		auto fn = gtk_file_chooser_get_file(GTK_FILE_CHOOSER(self));
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_promise.set_value(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
+		cur_file_promise(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
 	} else {
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_promise.set_value("");
+		cur_file_promise("");
 	}
 }
 #endif
@@ -188,7 +188,7 @@ FileFuture file_dialog_dir(Window *win, const string &title, const Path &dir, co
 		auto fn = Path(gtk_file_chooser_get_current_folder(GTK_FILE_CHOOSER(dlg))).as_dir();
 		gtk_widget_destroy(dlg);
 		run_later(0.01f, [fn] {
-			cur_file_promise.set_value(fn);
+			cur_file_promise(fn);
 		});
 	} else {
 		gtk_widget_destroy(dlg);
@@ -249,7 +249,7 @@ FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, c
 		if (r == GTK_RESPONSE_ACCEPT) {
 			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
 			gtk_widget_destroy(dlg);
-			cur_file_promise.set_value(p.try_to_ensure_extension(Path(fn)));
+			cur_file_promise(p.try_to_ensure_extension(Path(fn)));
 			g_free(fn);
 		} else {
 			gtk_widget_destroy(dlg);
@@ -314,7 +314,7 @@ FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, c
 		if (r == GTK_RESPONSE_ACCEPT) {
 			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
 			gtk_widget_destroy(dlg);
-			cur_file_promise.set_value(p.try_to_ensure_extension(Path(fn)));
+			cur_file_promise(p.try_to_ensure_extension(Path(fn)));
 			g_free(fn);
 		} else {
 			gtk_widget_destroy(dlg);
@@ -332,7 +332,7 @@ static promise<const string&> cur_font_promise;
 static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FONT_DIALOG(o);
 	if (auto f = gtk_font_dialog_choose_font_finish(dlg, res, nullptr))
-		cur_font_promise.set_value(pango_font_description_to_string(f));
+		cur_font_promise(pango_font_description_to_string(f));
 	else
 		cur_font_promise.fail();
 }
@@ -340,7 +340,7 @@ static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
 static void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_OK) {
 		gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(self));
-		cur_font_promise.set_value(fn);
+		cur_font_promise(fn);
 		g_free(fn);
 	} else {
 		cur_font_promise.fail();
@@ -377,7 +377,7 @@ FontFuture select_font(Window *win, const string &title, const Array<string> &pa
 		int r = gtk_dialog_run(GTK_DIALOG(dlg));
 		if (r == GTK_RESPONSE_OK) {
 			gchar *fn = gtk_font_chooser_get_font(GTK_FONT_CHOOSER(dlg));
-			cur_font_promise.set_value(fn);
+			cur_font_promise(fn);
 			g_free(fn);
 		} else {
 			cur_font_promise.fail();
@@ -401,7 +401,7 @@ static promise<const color&> cur_color_promise;
 static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_COLOR_DIALOG(o);
 	if (auto c = gtk_color_dialog_choose_rgba_finish(dlg, res, nullptr))
-		cur_color_promise.set_value(color_from_gdk(*c));
+		cur_color_promise(color_from_gdk(*c));
 	else
 		cur_color_promise.fail();
 }
@@ -410,7 +410,7 @@ static void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpoi
 	if (response_id == GTK_RESPONSE_OK) {
 		GdkRGBA gcol;
 		gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(self), &gcol);
-		cur_color_promise.set_value(color_gtk_to_user(color_from_gdk(gcol)));
+		cur_color_promise(color_gtk_to_user(color_from_gdk(gcol)));
 	} else {
 		cur_color_promise.fail();
 	}
@@ -440,7 +440,7 @@ ColorFuture select_color(Window *win, const string &title, const color &c) {
 		int r = gtk_dialog_run(GTK_DIALOG(dlg));
 		if (r == GTK_RESPONSE_OK) {
 			gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-			cur_color_promise.set_value(color_gtk_to_user(color_from_gdk(gcol)));
+			cur_color_promise(color_gtk_to_user(color_from_gdk(gcol)));
 		} else {
 			cur_color_promise.fail();
 		}
@@ -458,18 +458,18 @@ static void on_question_reply(GObject* o, GAsyncResult* res, gpointer user_data)
 	auto dlg = GTK_ALERT_DIALOG(o);
 	int r = gtk_alert_dialog_choose_finish(dlg, res, nullptr);
 	if (r == 0)
-		cur_question_promise.set_value(true);
+		cur_question_promise(true);
 	else if (r == 1)
-		cur_question_promise.set_value(false);
+		cur_question_promise(false);
 	else
 		cur_question_promise.fail();
 }
 #elif GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	if (response_id == GTK_RESPONSE_YES)
-		cur_question_promise.set_value(true);
+		cur_question_promise(true);
 	else if (response_id == GTK_RESPONSE_NO)
-		cur_question_promise.set_value(false);
+		cur_question_promise(false);
 	else
 		cur_question_promise.fail();
 	gtk_window_destroy(GTK_WINDOW(self));
@@ -506,9 +506,9 @@ QuestionFuture question_box(Window *win, const string &title, const string &text
 	gtk_widget_destroy(dlg);
 	run_later(0.01f, [] {
 		if (result == GTK_RESPONSE_YES)
-			cur_question_promise.set_value(true);
+			cur_question_promise(true);
 		else if (result == GTK_RESPONSE_NO)
-			cur_question_promise.set_value(false);
+			cur_question_promise(false);
 		else
 			cur_question_promise.fail();
 	});

@@ -66,11 +66,11 @@ void SampleSelectionDialog::on_list() {
 	int n = get_int("");
 	if (n == 0) {
 		selected = nullptr;
-		_promise.set_value(selected);
+		_promise(selected);
 		request_destroy();
 	} else if (n >= 1) {
 		selected = song->samples[n - 1].get();
-		_promise.set_value(selected);
+		_promise(selected);
 		request_destroy();
 	}
 }
@@ -86,7 +86,7 @@ void SampleSelectionDialog::on_import() {
 }
 
 void SampleSelectionDialog::on_ok() {
-	_promise.set_value(selected);
+	_promise(selected);
 	request_destroy();
 }
 

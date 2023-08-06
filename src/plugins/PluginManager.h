@@ -51,9 +51,6 @@ public:
 	Array<string> find_module_sub_types(ModuleCategory type);
 	Array<string> find_module_sub_types_grouped(ModuleCategory type);
 
-	static void choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const base::optional<string>&)> cb, const base::optional<string> &old_name = base::None);
-
-
 	// (potentially) not compiled yet
 	struct PluginFile {
 		string name;

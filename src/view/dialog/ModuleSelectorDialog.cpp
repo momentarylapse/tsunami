@@ -56,11 +56,17 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory 
 	}
 	expand("list", true);
 
-	event("hui:close", [this] { request_destroy(); });
+	event("hui:close", [this] {
+		_promise.fail();
+		request_destroy();
+	});
 	event_x("list", "hui:select", [this] { on_list_select(); });
 	event("list", [this] { on_select(); });
 	event("toggle-favorite", [this] { on_toggle_favorite(); });
-	event("cancel", [this] { request_destroy(); });
+	event("cancel", [this] {
+		_promise.fail();
+		request_destroy();
+	});
 	event("ok", [this] { on_select(); });
 	enable("ok", false);
 }
@@ -78,6 +84,7 @@ void ModuleSelectorDialog::on_select() {
 	if (n < 0)
 		return;
 	_return = labels[n].name;
+	_promise.set_value(*_return);
 	request_destroy();
 }
 
@@ -89,4 +96,29 @@ void ModuleSelectorDialog::on_toggle_favorite() {
 	session->plugin_manager->set_favorite(session, type, l.name, is_checked("toggle-favorite"));
 
 	set_cell("list", n, 2, session->plugin_manager->is_favorite(session, type, l.name) ? "\u2764" : "");
+}
+
+
+
+
+hui::future<const string&> ModuleSelectorDialog::choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name) {
+	auto names = session->plugin_manager->find_module_sub_types(type);
+	static hui::promise<const string&> static_promise;
+
+	if (names.num == 1) {
+		hui::run_later(0.01f, [names] {
+			static_promise.set_value(names[0]);
+		});
+		return static_promise.get_future();;
+	}
+	if (names.num == 0) {
+		hui::run_later(0.01f, [names] {
+			static_promise.fail();
+		});
+		return static_promise.get_future();;
+	}
+
+	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);
+	hui::fly(dlg);
+	return dlg->_promise.get_future();
 }

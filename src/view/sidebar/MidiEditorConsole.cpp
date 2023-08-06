@@ -12,6 +12,7 @@
 #include "../dialog/MarkerDialog.h"
 #include "../dialog/QuestionDialog.h"
 #include "../dialog/SelectStringDialog.h"
+#include "../dialog/ModuleSelectorDialog.h"
 #include "../mode/ViewModeEditMidi.h"
 #include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"
@@ -599,16 +600,14 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_apply_effect() {
-	PluginManager::choose_module(win, session, ModuleCategory::MIDI_EFFECT, [this] (const base::optional<string> &name) {
-		if (name.has_value())
-			session->win->on_menu_execute_midi_effect(*name);
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_EFFECT).on([this] (const string &name) {
+		session->win->on_menu_execute_midi_effect(name);
 	});
 }
 
 void MidiEditorConsole::on_apply_source() {
-	PluginManager::choose_module(win, session, ModuleCategory::MIDI_SOURCE, [this] (const base::optional<string> &name) {
-		if (name.has_value())
-			session->win->on_menu_execute_midi_source(*name);
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_SOURCE).on([this] (const string &name) {
+		session->win->on_menu_execute_midi_source(name);
 	});
 }
 

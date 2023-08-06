@@ -3,6 +3,7 @@
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../mode/ViewModeEditAudio.h"
 #include "../dialog/VolumeDialog.h"
+#include "../dialog/ModuleSelectorDialog.h"
 #include "../TsunamiWindow.h"
 #include "../../command/Unsorted.h"
 #include "../../module/Module.h"
@@ -84,16 +85,14 @@ void AudioEditorConsole::on_edit_mode(int m) {
 }
 
 void AudioEditorConsole::on_action_source() {
-	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_SOURCE, [this] (const base::optional<string> &name) {
-		if (name)
-			session->win->on_menu_execute_audio_source(*name);
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_SOURCE).on([this] (const string &name) {
+		session->win->on_menu_execute_audio_source(name);
 	});
 }
 
 void AudioEditorConsole::on_action_effect() {
-	PluginManager::choose_module(win, session, ModuleCategory::AUDIO_EFFECT, [this] (const base::optional<string> &name) {
-		if (name)
-			session->win->on_menu_execute_audio_effect(*name);
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_EFFECT).on([this] (const string &name) {
+		session->win->on_menu_execute_audio_effect(name);
 	});
 }
 

@@ -6,6 +6,7 @@
 #include "EditStringsDialog.h"
 #include "PresetSelectionDialog.h"
 #include "QuestionDialog.h"
+#include "../dialog/ModuleSelectorDialog.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"
@@ -30,10 +31,9 @@ hui::Panel *create_synth_panel(Synthesizer *synth, Session *session, NewTrackDia
 	auto *p = new ModulePanel(synth, parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, session, synth] {
-		session->plugin_manager->choose_module(parent, session, ModuleCategory::SYNTHESIZER, [parent, session] (const base::optional<string> &name) {
-			if (name.has_value())
-				parent->set_synthesizer(CreateSynthesizer(session, *name));
-		}, synth->module_class);
+		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, synth->module_class).on([parent, session] (const string &name) {
+			parent->set_synthesizer(CreateSynthesizer(session, name));
+		});
 	});
 	/*p->set_func_detune([parent, track, session] {
 		hui::fly(new TemperamentDialog(track, session->view, parent->win));

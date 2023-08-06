@@ -6,6 +6,7 @@
  */
 
 #include "FxListEditor.h"
+#include "../dialog/ModuleSelectorDialog.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
 #include "../../data/base.h"
@@ -198,11 +199,9 @@ void FxListEditor::on_copy_from_track() {
 }
 
 void FxListEditor::on_add() {
-	session()->plugin_manager->choose_module(panel->win, session(), ModuleCategory::AUDIO_EFFECT, [this] (const base::optional<string> &name) {
-		if (name.has_value()) {
-			auto effect = CreateAudioEffect(session(), *name);
-			track->add_effect(effect);
-		}
+	ModuleSelectorDialog::choose(panel->win, session(), ModuleCategory::AUDIO_EFFECT).on([this] (const string &name) {
+		auto effect = CreateAudioEffect(session(), name);
+		track->add_effect(effect);
 	});
 }
 

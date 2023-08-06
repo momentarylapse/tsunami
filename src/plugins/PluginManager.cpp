@@ -142,9 +142,11 @@ public:
 
 
  void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
-	PluginManager::choose_module(parent, session, type, [&cb] (const base::optional<string> &name) {
+	ModuleSelectorDialog::choose(parent, session, type, old_name).on([&cb] (const base::optional<string> &name) {
 		cb(name);
-	}, old_name);
+	}).on_fail([&cb] {
+		cb(base::None);
+	});
  }
 
  void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
@@ -1109,23 +1111,6 @@ Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) 
 		return names;
 	}
 	return find_module_sub_types(type);
-}
-
-void PluginManager::choose_module(hui::Panel *parent, Session *session, ModuleCategory type, std::function<void(const base::optional<string>&)> cb, const base::optional<string> &old_name) {
-	auto names = session->plugin_manager->find_module_sub_types(type);
-	if (names.num == 1) {
-		cb(names[0]);
-		return;
-	}
-	if (names.num == 0) {
-		cb(base::None);
-		return;
-	}
-
-	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);
-	hui::fly(dlg, [dlg, cb] {
-		cb(dlg->_return);
-	});
 }
 
 void PluginManager::set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite) {

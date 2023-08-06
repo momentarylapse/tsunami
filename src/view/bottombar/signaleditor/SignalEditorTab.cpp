@@ -15,6 +15,7 @@
 #include "../../../module/port/Port.h"
 #include "../../../module/Module.h"
 #include "../../../module/SignalChain.h"
+#include "../../dialog/ModuleSelectorDialog.h"
 #include "../../helper/graph/SceneGraph.h"
 #include "../../helper/graph/Node.h"
 #include "../../helper/graph/Scrollable.h"
@@ -302,12 +303,10 @@ void SignalEditorTab::on_delete() {
 void SignalEditorTab::on_add(ModuleCategory type) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		session->plugin_manager->choose_module(win, session, type, [this, type] (const base::optional<string> &name) {
-			if (name.has_value()) {
-				auto m = chain->add(type, *name);
-				m->module_x = graph->m.x;
-				m->module_y = graph->m.y;
-			}
+		ModuleSelectorDialog::choose(win, session, type).on([this, type] (const string &name) {
+			auto m = chain->add(type, name);
+			m->module_x = graph->m.x;
+			m->module_y = graph->m.y;
 			update_module_positions();
 		});
 	} else {

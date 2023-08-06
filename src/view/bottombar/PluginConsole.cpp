@@ -7,6 +7,7 @@
 
 #include "PluginConsole.h"
 #include "../module/ModulePanel.h"
+#include "../dialog/ModuleSelectorDialog.h"
 #include "../../Session.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../plugins/PluginManager.h"
@@ -38,9 +39,8 @@ void PluginConsole::on_enter() {
 }
 
 void PluginConsole::on_add_button() {
-	session->plugin_manager->choose_module(this, session, ModuleCategory::TSUNAMI_PLUGIN, [this] (const base::optional<string> &name) {
-		if (name.has_value())
-			session->execute_tsunami_plugin(*name);
+	ModuleSelectorDialog::choose(this, session, ModuleCategory::TSUNAMI_PLUGIN).on([this] (const string &name) {
+		session->execute_tsunami_plugin(name);
 		
 		// TODO: have PluginManager send notifications...?
 		update_favotites();

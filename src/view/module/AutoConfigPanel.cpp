@@ -432,7 +432,7 @@ public:
 		Sample *old = nullptr;
 		if (*value)
 			old = (*value)->origin.get();
-		SampleManagerConsole::select(session, panel, old, [this, old] (Sample *s) {
+		SampleManagerConsole::select(session, panel, old).on([this, old] (Sample *s) {
 			if (s != old) {
 				*value = nullptr;
 				if (s)

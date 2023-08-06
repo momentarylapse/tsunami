@@ -424,9 +424,11 @@ public:
 		int n = get_int("");
 		if (n == 0) {
 			selected = nullptr;
+			_promise.set_value(selected);
 			request_destroy();
 		} else if (n >= 1) {
 			selected = song->samples[n - 1].get();
+			_promise.set_value(selected);
 			request_destroy();
 		}
 	}
@@ -442,11 +444,13 @@ public:
 	}
 
 	void on_ok() {
+		_promise.set_value(selected);
 		request_destroy();
 	}
 
 	void on_cancel() {
 		selected = _old;
+		_promise.fail();
 		request_destroy();
 	}
 
@@ -456,11 +460,12 @@ public:
 	Song *song;
 	Session *session;
 	string list_id;
+
+	hui::promise<Sample*> _promise;
 };
 
-void SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old, std::function<void(Sample*)> cb) {
+hui::future<Sample*> SampleManagerConsole::select(Session *session, hui::Panel *parent, Sample *old) {
 	auto s = new SampleSelector(session, parent, old);
-	hui::fly(s, [s, cb] {
-		cb(s->selected);
-	});
+	hui::fly(s);
+	return s->_promise.get_future();
 }

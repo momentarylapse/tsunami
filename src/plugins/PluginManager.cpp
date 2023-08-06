@@ -147,8 +147,10 @@ public:
  }
 
  void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
-	SampleManagerConsole::select(session, parent, old, [&cb] (Sample *s) {
+	SampleManagerConsole::select(session, parent, old).on([&cb] (Sample *s) {
 		cb(s);
+	}).on_fail([&cb, old] {
+		cb(old);
 	});
  }
 

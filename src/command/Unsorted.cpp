@@ -176,7 +176,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 	auto *a = l->edit_buffers(buf, r);
 
 	if (fx->apply_to_whole_buffer) {
-		fx->process(buf);
+		fx->apply_with_wetness(buf);
 	} else {
 
 		int chunk_size = 2048;
@@ -185,7 +185,7 @@ void fx_process_layer(TrackLayer *l, const Range &r, AudioEffect *fx, hui::Windo
 			p->set((float) done / (float) r.length);
 
 			auto ref = buf.ref(done, min(done + chunk_size, r.length));
-			fx->process(ref);
+			fx->apply_with_wetness(ref);
 			done += chunk_size;
 		}
 	}

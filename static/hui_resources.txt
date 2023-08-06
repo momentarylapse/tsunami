@@ -886,7 +886,7 @@ Grid
 buttonbar
 1
 0
-5
+6
 Button
 cancel
 image=hui:cancel
@@ -903,6 +903,12 @@ Button
 save_favorite
 flat,image=hui:save
 2
+0
+0
+Button
+wetness
+flat,small,width=40,padding=1
+3
 0
 0
 Button
@@ -3881,7 +3887,7 @@ Grid
 buttonbar
 1
 0
-2
+3
 MenuButton
 menu
 image=hui:properties,flat,menu=popup_fx_menu
@@ -3892,6 +3898,12 @@ CheckBox
 enabled
 switch
 1
+0
+0
+Button
+wetness
+flat,small,width=40,padding=1
+2
 0
 0
 # Resource
@@ -9014,7 +9026,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-783
+785
 # Text
 /bars-add
 Add bars...
@@ -9574,6 +9586,9 @@ Preview
 configurable_dialog/save_favorite
 
 save parameter
+configurable_dialog/wetness
+
+Wetness (effect intensity)
 cpu-display-dialog/cpu-display-dialog
 Cpu Monitor
 
@@ -10324,6 +10339,9 @@ active?
 module-external-dialog/module-external-dialog
 Module
 
+module-external-dialog/wetness
+
+Wetness (effect intensity)
 module-panel/enabled
 
 active?

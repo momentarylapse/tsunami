@@ -21,7 +21,7 @@
 extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
-extern const int CONFIG_PANEL_DIALOG_WIDTH = 480;
+extern const int CONFIG_PANEL_DIALOG_WIDTH = 520;
 extern const int CONFIG_PANEL_DIALOG_HEIGHT = 380;
 
 

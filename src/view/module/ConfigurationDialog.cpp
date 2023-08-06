@@ -12,9 +12,10 @@
 #include "../../plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../module/Module.h"
+#include "../../module/audio/AudioEffect.h"
 
-extern const int CONFIG_PANEL_WIDTH;
-extern const int CONFIG_PANEL_HEIGHT;
+extern const int CONFIG_PANEL_DIALOG_WIDTH;
+extern const int CONFIG_PANEL_DIALOG_HEIGHT;
 
 
 
@@ -22,13 +23,19 @@ class ConfigurationDialog : public obs::Node<hui::Dialog> {
 public:
 	ConfigPanelSocket socket;
 
+	static ConfigPanelMode config_panel_mode(shared<Module> m) {
+		if (m->module_category == ModuleCategory::AUDIO_EFFECT)
+			return ConfigPanelMode::PROFILES | ConfigPanelMode::WETNESS;
+		return ConfigPanelMode::PROFILES;
+	}
+
 	ConfigurationDialog(shared<Module> m, hui::Window *parent) :
 		obs::Node<hui::Dialog>("configurable_dialog", parent),
-		socket(m.get(), ConfigPanelMode::PROFILES)
+		socket(m.get(), config_panel_mode(m))
 	{
 		module = m;
 		set_title(module->module_class);
-		set_size(CONFIG_PANEL_WIDTH, 300);
+		set_size(CONFIG_PANEL_DIALOG_WIDTH, CONFIG_PANEL_DIALOG_HEIGHT);
 		socket.integrate(this);
 		module->out_death >> create_sink([this] {
 			module = nullptr;
@@ -37,6 +44,12 @@ public:
 
 		ok = false;
 
+		if (module->module_category == ModuleCategory::AUDIO_EFFECT) {
+			socket.set_func_set_wetness([this] (float w) {
+				reinterpret_cast<AudioEffect*>(module.get())->wetness = w;
+				module->out_changed();
+			});
+		}
 
 		if (module->module_category != ModuleCategory::AUDIO_EFFECT)
 			hide_control("preview", true);

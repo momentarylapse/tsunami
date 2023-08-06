@@ -4,3 +4,4 @@ Dialog module-external-dialog "Module" width=200 height=200 headerbar resizable 
 		Grid ? "" buttonbar
 			MenuButton menu "" image=hui:properties flat menu=popup_fx_menu
 			CheckBox enabled "" "tooltip=active?" switch
+			Button wetness "" flat small width=40 padding=1 "tooltip=Wetness (effect intensity)"

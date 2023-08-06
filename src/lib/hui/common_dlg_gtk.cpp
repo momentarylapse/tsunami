@@ -49,7 +49,7 @@ struct DialogParams {
 
 	static DialogParams STATIC_PARAMS;
 
-	Path try_to_ensure_extension(const Path &filename) {
+	Path try_to_ensure_extension(const Path &filename) const {
 		if (filename.extension() == "" and default_extension)
 			return filename.with("." + *default_extension);
 
@@ -244,7 +244,7 @@ FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, c
 		gtk_file_chooser_set_current_folder(GTK_FILE_CHOOSER(dlg), dir.c_str());
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
-	run_later(0.01f, [dlg] {
+	run_later(0.01f, [dlg, p] {
 		int r = gtk_dialog_run(GTK_DIALOG(dlg));
 		if (r == GTK_RESPONSE_ACCEPT) {
 			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
@@ -309,7 +309,7 @@ FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, c
 		gtk_file_chooser_set_current_name(GTK_FILE_CHOOSER(dlg), sys_str(*p.default_name));
 	add_filters(dlg, p.show_filter, p.filter);
 	gtk_widget_show_all(dlg);
-	run_later(0.01f, [dlg] {
+	run_later(0.01f, [dlg, p] {
 		int r = gtk_dialog_run(GTK_DIALOG(dlg));
 		if (r == GTK_RESPONSE_ACCEPT) {
 			gchar *fn = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(dlg));
@@ -436,11 +436,12 @@ ColorFuture select_color(Window *win, const string &title, const color &c) {
 	auto dlg = gtk_color_chooser_dialog_new("Color", w);
 	gtk_color_chooser_set_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
 	gtk_widget_show_all(dlg);
-	run_later(0.01f, [dlg] {
+	run_later(0.01f, [dlg, gcol] {
+		auto gc = gcol;
 		int r = gtk_dialog_run(GTK_DIALOG(dlg));
 		if (r == GTK_RESPONSE_OK) {
-			gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gcol);
-			cur_color_promise(color_gtk_to_user(color_from_gdk(gcol)));
+			gtk_color_chooser_get_rgba(GTK_COLOR_CHOOSER(dlg), &gc);
+			cur_color_promise(color_gtk_to_user(color_from_gdk(gc)));
 		} else {
 			cur_color_promise.fail();
 		}
@@ -492,7 +493,11 @@ QuestionFuture question_box(Window *win, const string &title, const string &text
 	gtk_alert_dialog_set_cancel_button(dlg, 2);
 	gtk_alert_dialog_choose(dlg, w, nullptr, &on_question_reply, nullptr);
 #else
-	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", sys_str(text));
+	GtkWidget *dlg = gtk_message_dialog_new(w, GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_NONE, "%s", sys_str(text));
+	gtk_dialog_add_button(GTK_DIALOG(dlg),  "Yes", GTK_RESPONSE_YES);
+	gtk_dialog_add_button(GTK_DIALOG(dlg),  "No", GTK_RESPONSE_NO);
+	if (allow_cancel)
+		gtk_dialog_add_button(GTK_DIALOG(dlg),  "Cancel", GTK_RESPONSE_CANCEL);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);
 	//gtk_window_set_default_size(GTK_WINDOW(dlg), 300, 150);
 	gtk_window_set_title(GTK_WINDOW(dlg), sys_str(title));
@@ -502,9 +507,9 @@ QuestionFuture question_box(Window *win, const string &title, const string &text
 #else
 	gtk_window_resize(GTK_WINDOW(dlg), 300, 100);
 	gtk_widget_show_all(dlg);
-	gint result = gtk_dialog_run(GTK_DIALOG(dlg));
-	gtk_widget_destroy(dlg);
-	run_later(0.01f, [] {
+	run_later(0.01f, [dlg] {
+		gint result = gtk_dialog_run(GTK_DIALOG(dlg));
+		gtk_widget_destroy(dlg);
 		if (result == GTK_RESPONSE_YES)
 			cur_question_promise(true);
 		else if (result == GTK_RESPONSE_NO)

@@ -97,9 +97,8 @@ void AudioEditorConsole::on_action_effect() {
 }
 
 void AudioEditorConsole::on_action_volume() {
-	VolumeDialog::ask(win, 1, 0, 8, [this] (float f) {
-		if (!VolumeDialog::aborted)
-			song_apply_volume(session->song.get(), f, VolumeDialog::maximize, session->view->sel, win);
+	VolumeDialog::ask(win, 1, 0, 8).on([this] (float f) {
+		song_apply_volume(session->song.get(), f, VolumeDialog::maximize, session->view->sel, win);
 	});
 
 }

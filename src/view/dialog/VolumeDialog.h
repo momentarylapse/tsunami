@@ -15,16 +15,14 @@ class VolumeControl;
 
 class VolumeDialog : obs::Node<hui::Dialog> {
 public:
-	using Callback = std::function<void(float)>;
-	VolumeDialog(hui::Window *parent, float value0, float min, float max, Callback cb);
+	VolumeDialog(hui::Window *parent, float value0, float min, float max);
 
 	owned<VolumeControl> volume_control;
 	float result;
-	Callback cb;
+	hui::promise<float> _promise;
 
-	static bool aborted;
 	static bool maximize;
-	static void ask(hui::Window *parent, float value0, float min, float max, Callback cb);
+	static hui::future<float> ask(hui::Window *parent, float value0, float min, float max);
 };
 
 

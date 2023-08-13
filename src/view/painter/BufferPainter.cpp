@@ -17,6 +17,13 @@
 #include "../../processing/audio/BufferSpectrogram.h"
 #include "../../Session.h"
 
+
+const int SPECTRUM_CHUNK = 512*2;
+const int SPECTRUM_IMAGE_CHUNK = 4096;
+const int SPECTRUM_N = 256;
+const float MIN_FREQ = 60.0f;
+const float MAX_FREQ = 3000.0f;
+
 BufferPainter::BufferPainter(AudioView *_view) {
 	view = _view;
 	area = rect(0,0,0,0);
@@ -217,16 +224,11 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
-const int SPECTRUM_CHUNK = 512;
-const int SPECTRUM_N = 256;
-const float MIN_FREQ = 60.0f;
-const float MAX_FREQ = 3000.0f;
-
 bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	if (b.spectrum.num > 0)
 		return false;
 
-	bytes spectrum = BufferSpectrogram::quantized_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::RECTANGLE);
+	bytes spectrum = BufferSpectrogram::quantized_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::HANN);
 
 	b.mtx.lock();
 	b.spectrum.exchange(spectrum);
@@ -267,6 +269,7 @@ Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
 	auto im = get_spectrum_image(b);
 	if (prepare_spectrum(b, sample_rate)) {
 		int n = b.spectrum.num / SPECTRUM_N;
+		n = min(n, SPECTRUM_IMAGE_CHUNK);
 		im->create(n, SPECTRUM_N, Black);
 
 		for (int i=0; i<n; i++) {

@@ -228,7 +228,7 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	if (b.spectrum.num > 0)
 		return false;
 
-	bytes spectrum = BufferSpectrogram::quantized_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::HANN);
+	bytes spectrum = BufferSpectrogram::quantize(BufferSpectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::HANN));
 
 	b.mtx.lock();
 	b.spectrum.exchange(spectrum);

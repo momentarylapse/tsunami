@@ -87,7 +87,7 @@ inline float exp_interpolate(float x, float x_min, float x_max) {
 	return x_min * exp( log(x_max / x_min) *x);
 }
 
-bytes quantized_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf) {
+Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf) {
 	int window_size = step_size * 8;
 	int fft_size = window_size / 2 + 1;
 
@@ -97,7 +97,7 @@ bytes quantized_spectrogram(AudioBuffer &b, float sample_rate, int step_size, fl
 
 	float scale = 2*pi / (float)(fft_size * fft_size) * 16;
 
-	bytes spectrum;
+	Array<float> rr;
 	for (int i=0; i<s.num/fft_size; i++) {
 		auto z = s.sub_ref(i*fft_size, (i+1)*fft_size);
 		for (int k=0; k<f_count; k++) {
@@ -108,11 +108,20 @@ bytes quantized_spectrogram(AudioBuffer &b, float sample_rate, int step_size, fl
 			float f = sum(z.sub_ref(j0, j1)) * scale;
 			f = sqrt(f);
 			f = (1-exp(-f)) * 2;
-			f = clamp(f, 0.0f, 1.0f);
-			spectrum.add(254 * f);
+			rr.add(f);
 		}
 	}
-	return spectrum;
+	return rr;
+}
+
+bytes quantize(const Array<float> &data) {
+	bytes r;
+	r.resize(data.num);
+	for (int i=0; i<data.num; i++) {
+		float f = clamp(data[i], 0.0f, 1.0f);
+		r[i] = 254 * f;
+	}
+	return r;
 }
 
 

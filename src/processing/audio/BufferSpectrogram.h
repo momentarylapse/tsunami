@@ -22,7 +22,11 @@ enum class WindowFunction {
 
 
 Array<float> spectrogram(AudioBuffer &b, int step_size, int window_size, WindowFunction wf);
-bytes quantized_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf);
+
+
+Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf);
+
+bytes quantize(const Array<float>& data);
 
 }
 

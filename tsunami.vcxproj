@@ -202,8 +202,6 @@
     <ClCompile Include="src\action\ActionGroup.cpp" />
     <ClCompile Include="src\action\ActionManager.cpp" />
     <ClCompile Include="src\action\ActionMergable.cpp" />
-    <ClCompile Include="src\command\audio\BufferInterpolator.cpp" />
-    <ClCompile Include="src\command\audio\BufferPitchShift.cpp" />
     <ClCompile Include="src\command\song\Diff.cpp" />
     <ClCompile Include="src\command\song\Export.cpp" />
     <ClCompile Include="src\command\song\Show.cpp" />
@@ -466,6 +464,8 @@
     <ClCompile Include="src\plugins\PluginManager.cpp" />
     <ClCompile Include="src\plugins\PresetManager.cpp" />
     <ClCompile Include="src\plugins\TsunamiPlugin.cpp" />
+    <ClCompile Include="src\processing\audio\BufferInterpolator.cpp" />
+    <ClCompile Include="src\processing\audio\BufferPitchShift.cpp" />
     <ClCompile Include="src\storage\dialog\PdfConfigDialog.cpp" />
     <ClCompile Include="src\storage\dialog\RawConfigDialog.cpp" />
     <ClCompile Include="src\storage\format\Format.cpp" />
@@ -2124,8 +2124,6 @@
     <ClInclude Include="src\action\ActionGroup.h" />
     <ClInclude Include="src\action\ActionManager.h" />
     <ClInclude Include="src\action\ActionMergable.h" />
-    <ClInclude Include="src\command\audio\BufferInterpolator.h" />
-    <ClInclude Include="src\command\audio\BufferPitchShift.h" />
     <ClInclude Include="src\command\song\Diff.h" />
     <ClInclude Include="src\command\song\Export.h" />
     <ClInclude Include="src\command\song\Show.h" />
@@ -2362,6 +2360,8 @@
     <ClInclude Include="src\plugins\PluginManager.h" />
     <ClInclude Include="src\plugins\PresetManager.h" />
     <ClInclude Include="src\plugins\TsunamiPlugin.h" />
+    <ClInclude Include="src\processing\audio\BufferInterpolator.h" />
+    <ClInclude Include="src\processing\audio\BufferPitchShift.h" />
     <ClInclude Include="src\storage\dialog\PdfConfigDialog.h" />
     <ClInclude Include="src\storage\dialog\RawConfigDialog.h" />
     <ClInclude Include="src\storage\format\Format.h" />

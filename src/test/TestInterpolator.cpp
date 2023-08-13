@@ -8,16 +8,14 @@
 #ifndef NDEBUG
 
 #include "TestInterpolator.h"
-#include "../command/audio/BufferInterpolator.h"
-//#include "../Data/Audio/AudioBuffer.h"
+#include "../processing/audio/BufferInterpolator.h"
 
 TestInterpolator::TestInterpolator() : UnitTest("interpolator")
 {
 }
 
 
-Array<UnitTest::Test> TestInterpolator::tests()
-{
+Array<UnitTest::Test> TestInterpolator::tests() {
 	Array<Test> list;
 	list.add({"linear-short", TestInterpolator::test_linear_short});
 	list.add({"linear", TestInterpolator::test_linear});
@@ -26,8 +24,7 @@ Array<UnitTest::Test> TestInterpolator::tests()
 	return list;
 }
 
-void TestInterpolator::test_linear_short()
-{
+void TestInterpolator::test_linear_short() {
 	Array<float> in = {1.0, 2.0};
 	Array<float> out;
 	out.resize((in.num - 1) * 4 + 1);
@@ -41,8 +38,7 @@ void TestInterpolator::test_linear_short()
 	assert_equal(out, {1.0, 1.0, 1.0});
 }
 
-void TestInterpolator::test_linear()
-{
+void TestInterpolator::test_linear() {
 	Array<float> in = {1, 2, 0, 4};
 	Array<float> out;
 	out.resize((in.num - 1) * 2 + 1);
@@ -51,8 +47,7 @@ void TestInterpolator::test_linear()
 	assert_equal(out, {1, 1.5, 2, 1, 0, 2, 4});
 }
 
-void TestInterpolator::test_cubic()
-{
+void TestInterpolator::test_cubic() {
 	Array<float> in = {0,0,1,0,2}, out;
 	out.resize((in.num-1)*4+1);
 	BufferInterpolator::interpolate_channel_cubic(in, out);
@@ -62,8 +57,8 @@ void TestInterpolator::test_cubic()
 		assert_equal(in[i], out[i * 4]);
 }
 
-void TestInterpolator::test_fourier()
-{}
+void TestInterpolator::test_fourier() {
+}
 
 #endif
 

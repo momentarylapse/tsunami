@@ -26,7 +26,7 @@
 #include "../data/SampleRef.h"
 #include "../data/audio/AudioBuffer.h"
 #include "../data/rhythm/Bar.h"
-#include "../command/audio/BufferInterpolator.h"
+#include "../processing/audio/BufferInterpolator.h"
 #include "../module/ModuleFactory.h"
 #include "../module/SignalChain.h"
 #include "../module/ModuleConfiguration.h"

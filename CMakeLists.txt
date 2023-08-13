@@ -92,8 +92,6 @@ set(SOURCE
 	src/action/ActionGroup.cpp
 	src/action/ActionManager.cpp
 	src/action/ActionMergable.cpp
-	src/command/audio/BufferInterpolator.cpp
-	src/command/audio/BufferPitchShift.cpp
 	src/command/song/Diff.cpp
 	src/command/song/Export.cpp
 	src/command/song/Show.cpp
@@ -356,6 +354,8 @@ set(SOURCE
 	src/plugins/PluginManager.cpp
 	src/plugins/PresetManager.cpp
 	src/plugins/TsunamiPlugin.cpp
+	src/processing/audio/BufferInterpolator.cpp
+	src/processing/audio/BufferPitchShift.cpp
 	src/storage/dialog/PdfConfigDialog.cpp
 	src/storage/dialog/RawConfigDialog.cpp
 	src/storage/format/Format.cpp

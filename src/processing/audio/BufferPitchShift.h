@@ -5,8 +5,8 @@
  *      Author: michi
  */
 
-#ifndef SRC_COMMAND_AUDIO_BUFFERPITCHSHIFT_H_
-#define SRC_COMMAND_AUDIO_BUFFERPITCHSHIFT_H_
+#ifndef SRC_PROCESSING_AUDIO_BUFFERPITCHSHIFT_H_
+#define SRC_PROCESSING_AUDIO_BUFFERPITCHSHIFT_H_
 
 #include "../../lib/base/base.h"
 class AudioBuffer;
@@ -17,4 +17,4 @@ void pitch_shift(AudioBuffer &buf, float factor);
 
 }
 
-#endif /* SRC_COMMAND_AUDIO_BUFFERPITCHSHIFT_H_ */
+#endif /* SRC_PROCESSING_AUDIO_BUFFERPITCHSHIFT_H_ */

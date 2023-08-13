@@ -9,8 +9,8 @@
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
-#include "../../command/audio/BufferInterpolator.h"
-#include "../../command/audio/BufferPitchShift.h"
+#include "../../processing/audio/BufferInterpolator.h"
+#include "../../processing/audio/BufferPitchShift.h"
 
 struct RubberPoint {
 	int source, target;

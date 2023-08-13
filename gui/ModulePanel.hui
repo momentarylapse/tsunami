@@ -4,6 +4,7 @@ Dialog module-panel "" width=200 height=200
 			MenuButton menu "" image=hui:properties flat menu=popup_fx_menu "tooltip=Configure"
 			Label name "" bold center expandx
 			Button wetness "" flat small width=40 padding=1 "tooltip=Wetness (effect intensity)"
-			CheckBox enabled "" "tooltip=active?" switch
+			Grid ? ""
+				CheckBox enabled "" "tooltip=active?" switch
 			Button replace "" image=hui:open flat "tooltip=Replace"
 		Grid content ""

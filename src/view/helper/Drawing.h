@@ -13,6 +13,8 @@ class vec2;
 class string;
 class color;
 
+color color_heat_map(float f);
+
 enum class TextAlign {
 	LEFT = 1,
 	CENTER = 0,

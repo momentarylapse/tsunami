@@ -12,7 +12,17 @@
 #include "../../lib/math/vec2.h"
 
 
+color color_heat_map(float f) {
+	static const color c[5] = {color(0,0,0,0), color(1,0,0,0.5f), color(1,1,0,0), color(1,1,1,0), color(1,1,1,1)};
+	static const float stop[5] = {0.0f, 0.2f, 0.6f, 0.8f, 1.0f};
 
+	f = clamp(f, 0.0f, 1.0f);
+
+	for (int i=0; i<4; i++)
+		if (f <= stop[i + 1])
+			return color::interpolate(c[i], c[i+1], (f - stop[i]) / (stop[i+1] - stop[i]));
+	return c[4];
+}
 
 rect get_boxed_str_rect(Painter *c, const vec2 &pos, const string &str) {
 	float w = c->get_str_width(str);

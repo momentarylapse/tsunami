@@ -8,6 +8,7 @@
 #include "BufferPainter.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
+#include "../helper/Drawing.h"
 #include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
 #include "../../data/Range.h"
@@ -229,6 +230,7 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 		return false;
 
 	bytes spectrum = Spectrogram::quantize(Spectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN));
+//	bytes spectrum = Spectrogram::quantize(Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN));
 
 	b.mtx.lock();
 	b.spectrum.exchange(spectrum);
@@ -289,16 +291,6 @@ HorizontallyChunkedImage& get_spectrum_image(AudioBuffer &b) {
 	return spectrum_images.back().image;
 }
 
-color col_heat_map(float f) {
-	//f = sqrt(f);
-	if (f < 0.333f)
-		return color(f*3, 0, 0, f*3);
-	if (f < 0.6666f)
-		return color(1, f*3 - 1, 0, 2 - f*3);
-	return color(1, 1, f*3 - 2, 0);
-}
-
-
 HorizontallyChunkedImage& render_spectrum_image(AudioBuffer &b, float sample_rate) {
 	auto& im = get_spectrum_image(b);
 	if (prepare_spectrum(b, sample_rate)) {
@@ -307,8 +299,8 @@ HorizontallyChunkedImage& render_spectrum_image(AudioBuffer &b, float sample_rat
 
 		for (int i=0; i<n; i++) {
 			for (int k=0; k<SPECTRUM_N; k++) {
-				float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
-				im.set_pixel(i, SPECTRUM_N - 1 - k, col_heat_map(f));
+				float f = Spectrogram::dequantize(b.spectrum[i * SPECTRUM_N + k]);
+				im.set_pixel(i, SPECTRUM_N - 1 - k, color_heat_map(f));
 			}
 		}
 	}

@@ -85,6 +85,10 @@ bytes quantize(const Array<float> &data) {
 	return r;
 }
 
+float dequantize(unsigned char q) {
+	return (float)q / 254.0f;
+}
+
 
 }
 

@@ -1051,6 +1051,9 @@
     <ClCompile Include="src\processing\audio\BufferPitchShift.cpp">
       <Filter>src\processing\audio</Filter>
     </ClCompile>
+    <ClCompile Include="src\processing\audio\BufferSpectrogram.cpp">
+      <Filter>src\processing\audio</Filter>
+    </ClCompile>
     <ClCompile Include="src\storage\dialog\PdfConfigDialog.cpp">
       <Filter>src\storage\dialog</Filter>
     </ClCompile>
@@ -6733,6 +6736,9 @@
       <Filter>src\processing\audio</Filter>
     </ClInclude>
     <ClInclude Include="src\processing\audio\BufferPitchShift.h">
+      <Filter>src\processing\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="src\processing\audio\BufferSpectrogram.h">
       <Filter>src\processing\audio</Filter>
     </ClInclude>
     <ClInclude Include="src\storage\dialog\PdfConfigDialog.h">

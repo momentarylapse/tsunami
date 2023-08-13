@@ -14,6 +14,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
 #include "../../lib/fft/fft.h"
+#include "../../processing/audio/BufferSpectrogram.h"
 #include "../../Session.h"
 
 BufferPainter::BufferPainter(AudioView *_view) {
@@ -216,22 +217,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
-float sum_abs(const Array<complex> &z) {
-	float r = 0;
-	for (auto &x: z)
-		r += x.abs();
-	return r;
-}
-
-float max_abs(const Array<complex> &z) {
-	float r = 0;
-	for (auto &x: z)
-		r = max(r, x.abs());
-	return r;
-}
-
 const int SPECTRUM_CHUNK = 512;
-const int SPECTRUM_FFT_INPUT = SPECTRUM_CHUNK * 8;
 const int SPECTRUM_N = 256;
 const float MIN_FREQ = 60.0f;
 const float MAX_FREQ = 3000.0f;
@@ -240,27 +226,8 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	if (b.spectrum.num > 0)
 		return false;
 
-	float ww = (float)SPECTRUM_FFT_INPUT / sample_rate;
+	bytes spectrum = BufferSpectrogram::quantized_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::RECTANGLE);
 
-	bytes spectrum;
-	Array<complex> z;
-	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
-		fft::r2c(b.c[0].sub_ref(i * SPECTRUM_CHUNK, i * SPECTRUM_CHUNK + SPECTRUM_FFT_INPUT), z);
-		for (int k=0; k<SPECTRUM_N; k++) {
-			float fmin = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * k);
-			float fmax = MIN_FREQ * exp( log(MAX_FREQ / MIN_FREQ) / (SPECTRUM_N - 1) * (k + 1));
-			int j0 = fmin * ww;
-			int j1 = fmax * ww + 1;
-			j0 = clamp(j0, 0, z.num);
-			j1 = clamp(j1, 0, z.num);
-			float f = sum_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
-			//float f = max_abs(z.sub_ref(j0, j1)) / (SPECTRUM_FFT_INPUT / 2) * pi * 3; // arbitrary... just "louder"
-			// / (SPECTRUM_FFT_INPUT / 2 / SPECTRUM_N);
-			f = clamp(f, 0.0f, 1.0f);
-			//f = 1-exp(-f);
-			spectrum.add(254 * f);
-		}
-	}
 	b.mtx.lock();
 	b.spectrum.exchange(spectrum);
 	b.mtx.unlock();
@@ -299,9 +266,10 @@ color col_heat_map(float f) {
 Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
 	auto im = get_spectrum_image(b);
 	if (prepare_spectrum(b, sample_rate)) {
-		im->create(b.length/SPECTRUM_CHUNK, SPECTRUM_N, Black);
+		int n = b.spectrum.num / SPECTRUM_N;
+		im->create(n, SPECTRUM_N, Black);
 
-		for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
+		for (int i=0; i<n; i++) {
 			for (int k=0; k<SPECTRUM_N; k++) {
 				float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
 				//f = 1-exp(-f*2);

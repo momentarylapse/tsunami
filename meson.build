@@ -453,6 +453,7 @@ sources = [
 	'src/plugins/TsunamiPlugin.cpp',
 	'src/processing/audio/BufferInterpolator.cpp',
 	'src/processing/audio/BufferPitchShift.cpp',
+	'src/processing/audio/BufferSpectrogram.cpp',
 	'src/storage/dialog/PdfConfigDialog.cpp',
 	'src/storage/dialog/RawConfigDialog.cpp',
 	'src/storage/format/Format.cpp',

@@ -236,23 +236,57 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	return true;
 }
 
-Image _spec_image_;
 
-struct SpectrumImage {
-	AudioBuffer *buf;
-	Image *image;
+// gtk/cairo does not like drawing huge images - let's split them into smaller chunks
+struct HorizontallyChunkedImage {
+	Array<Image> chunks;
+	int width = 0, height = 0;
+
+	void resize(int w, int h) {
+		width = w;
+		height = h;
+		chunks.clear();
+		while (w > 0) {
+			chunks.add(Image(min(w, SPECTRUM_IMAGE_CHUNK), h, Black));
+			w -= SPECTRUM_IMAGE_CHUNK;
+		}
+	}
+
+	void set_pixel(int x, int y, const color &c) {
+		chunks[x / SPECTRUM_IMAGE_CHUNK].set_pixel(x % SPECTRUM_IMAGE_CHUNK, y, c);
+	}
+
+	void draw(Painter *p, const rect &area) {
+
+		float scale[] = {area.width() / width, 0.0f, 0.0f, area.height() / height};
+
+		p->set_transform(scale, vec2(area.x1, area.y1));
+
+		for (int i=0; i<chunks.num; i++) {
+			p->draw_image(vec2(i*SPECTRUM_IMAGE_CHUNK, 0), &chunks[i]);
+		}
+
+		scale[0] = 1.0f;
+		scale[3] = 1.0f;
+		p->set_transform(scale, {0,0});
+	}
 };
-static Array<SpectrumImage> spectrum_images;
 
-Image *get_spectrum_image(AudioBuffer &b) {
+
+struct SpectrumImageEntry {
+	AudioBuffer *buf;
+	HorizontallyChunkedImage image;
+};
+static Array<SpectrumImageEntry> spectrum_images;
+
+HorizontallyChunkedImage& get_spectrum_image(AudioBuffer &b) {
 	for (auto &si: spectrum_images)
 		if (si.buf == &b)
 			return si.image;
-	SpectrumImage s;
+	SpectrumImageEntry s;
 	s.buf = &b;
-	s.image = new Image;
 	spectrum_images.add(s);
-	return s.image;
+	return spectrum_images.back().image;
 }
 
 color col_heat_map(float f) {
@@ -265,20 +299,16 @@ color col_heat_map(float f) {
 }
 
 
-Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
-	auto im = get_spectrum_image(b);
+HorizontallyChunkedImage& render_spectrum_image(AudioBuffer &b, float sample_rate) {
+	auto& im = get_spectrum_image(b);
 	if (prepare_spectrum(b, sample_rate)) {
 		int n = b.spectrum.num / SPECTRUM_N;
-		n = min(n, SPECTRUM_IMAGE_CHUNK);
-		im->create(n, SPECTRUM_N, Black);
+		im.resize(n, SPECTRUM_N);
 
 		for (int i=0; i<n; i++) {
 			for (int k=0; k<SPECTRUM_N; k++) {
 				float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
-				//f = 1-exp(-f*2);
-				//f = 1/(exp((0.5f-f) * 3) + 1);
-				//im->set_pixel(i, k, col_heat_map(f));//White.with_alpha(1-exp(-f)));
-				im->set_pixel(i, SPECTRUM_N - 1 - k, col_heat_map(f));//White.with_alpha(1-exp(-f)));
+				im.set_pixel(i, SPECTRUM_N - 1 - k, col_heat_map(f));
 			}
 		}
 	}
@@ -286,35 +316,12 @@ Image *render_spectrum_image(AudioBuffer &b, float sample_rate) {
 }
 
 void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
-	auto im = render_spectrum_image(b, this->view->session->sample_rate());
+	auto& im = render_spectrum_image(b, this->view->session->sample_rate());
 
-	if (false) {
-
-	for (int i=0; i<b.length/SPECTRUM_CHUNK; i++) {
-		float x1, x2;
-		view->cam.range2screen(Range(offset + i * SPECTRUM_CHUNK, SPECTRUM_CHUNK), x1, x2);
-		for (int k=0; k<SPECTRUM_N; k++) {
-			float f = (float)b.spectrum[i * SPECTRUM_N + k] / 254.0f;
-			c->set_color(White.with_alpha(1-exp(-f)));
-			c->draw_rect(rect(x1, x2, area.y2 - area.height() * k / SPECTRUM_N, area.y2 - area.height() * (k+1) / SPECTRUM_N));
-		}
-	}
-
-	} else {
-
-	//float x = view->cam.sample2screen_f(offset);
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);
 
-	float scale[] = {(x2 - x1) / im->width, 0.0f, 0.0f, area.height() / im->height};
-	c->set_transform(scale, vec2(x1, area.y1));
-	c->draw_image({0,0}, im);
-	scale[0] = 1.0f;
-	scale[3] = 1.0f;
-	c->set_transform(scale, {0,0});
-
-	}
-
+	im.draw(c, rect(x1, x2, area.y1, area.y2));
 }
 
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset) {

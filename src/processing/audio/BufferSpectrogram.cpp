@@ -112,7 +112,6 @@ bytes quantized_spectrogram(AudioBuffer &b, float sample_rate, int step_size, fl
 			spectrum.add(254 * f);
 		}
 	}
-	msg_write(spectrum.num);
 	return spectrum;
 }
 

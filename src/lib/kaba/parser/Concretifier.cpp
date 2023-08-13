@@ -678,16 +678,16 @@ shared<Node> Concretifier::concretify_statement_if(shared<Node> node, Block *blo
 	// [COND, TRUE-BLOCK, [FALSE-BLOCK]]
 	concretify_all_params(node, block, ns);
 
-	// return type from true block
-	node->type = node->params[1]->type;
-	if (node->type != TypeVoid) {
-		if (node->params.num != 3)
-			do_error("an `if` that returns a value requires an `else` branch", node);
-		if (node->params[1]->type != node->params[2]->type)
-			do_error(format("type returned by `if` branch (`%s`) and type returned by `else` branch (`%s`) have to be the same", node->params[1]->type->long_name(), node->params[2]->type->long_name()), node);
+	node->type = TypeVoid;
+	if (node->params.num >= 3) { // if/else
+		if (node->params[1]->type != TypeVoid and node->params[2]->type != TypeVoid) {
+			// return type from true block
+			node->type = node->params[1]->type;
+			if (node->params[1]->type != node->params[2]->type)
+				do_error(format("type returned by `if` branch (`%s`) and type returned by `else` branch (`%s`) have to be the same", node->params[1]->type->long_name(), node->params[2]->type->long_name()), node);
+		}
 	}
 
-	//node->set_param(0, check_param_link(node->params[0], TypeBool, Identifier::IF));
 	node->params[0] = check_param_link(node->params[0], TypeBool, Identifier::IF);
 	return node;
 }

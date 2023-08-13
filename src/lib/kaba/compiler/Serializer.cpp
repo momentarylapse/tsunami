@@ -447,7 +447,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 	auto statement = com->as_statement();
 	switch (statement->id) {
 		case StatementID::IF:
-			if (com->params.num == 2) {
+			if (com->params.num == 2) { // if
 				int label_after_true = list->create_label("_IF_AFTER_" + i2s(num_labels ++));
 				auto cond = serialize_node(com->params[0].get(), block, index);
 				// cmp;  jz m;  -block-  m;
@@ -455,7 +455,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 				cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true));
 				serialize_block(com->params[1]->as_block());
 				cmd.add_label(label_after_true);
-			} else {
+			} else { // if/else
 				auto ret = add_temp(com->type, true);
 				if (com->type->needs_constructor())
 					module->do_error("currently only trivial types allowed in valued `if/else`", com->token_id);

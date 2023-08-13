@@ -1,24 +1,18 @@
 /*
- * BufferSpectrogram.h
+ * Spectrogram.h
  *
  *  Created on: 13 Aug 2023
  *      Author: michi
  */
 
-#ifndef SRC_PROCESSING_AUDIO_BUFFERSPECTROGRAM_H_
-#define SRC_PROCESSING_AUDIO_BUFFERSPECTROGRAM_H_
+#ifndef SRC_PROCESSING_AUDIO_SPECTROGRAM_H_
+#define SRC_PROCESSING_AUDIO_SPECTROGRAM_H_
 
+#include "common.h"
 
-#include "../../lib/base/base.h"
 class AudioBuffer;
-class complex;
 
-namespace BufferSpectrogram {
-
-enum class WindowFunction {
-	RECTANGLE,
-	HANN
-};
+namespace Spectrogram {
 
 
 Array<float> spectrogram(AudioBuffer &b, int step_size, int window_size, WindowFunction wf);
@@ -31,4 +25,4 @@ bytes quantize(const Array<float>& data);
 }
 
 
-#endif /* SRC_PROCESSING_AUDIO_BUFFERSPECTROGRAM_H_ */
+#endif /* SRC_PROCESSING_AUDIO_SPECTROGRAM_H_ */

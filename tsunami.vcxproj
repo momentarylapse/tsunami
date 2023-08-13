@@ -466,7 +466,8 @@
     <ClCompile Include="src\plugins\TsunamiPlugin.cpp" />
     <ClCompile Include="src\processing\audio\BufferInterpolator.cpp" />
     <ClCompile Include="src\processing\audio\BufferPitchShift.cpp" />
-    <ClCompile Include="src\processing\audio\BufferSpectrogram.cpp" />
+    <ClCompile Include="src\processing\audio\common.cpp" />
+    <ClCompile Include="src\processing\audio\Spectrogram.cpp" />
     <ClCompile Include="src\storage\dialog\PdfConfigDialog.cpp" />
     <ClCompile Include="src\storage\dialog\RawConfigDialog.cpp" />
     <ClCompile Include="src\storage\format\Format.cpp" />
@@ -2363,7 +2364,8 @@
     <ClInclude Include="src\plugins\TsunamiPlugin.h" />
     <ClInclude Include="src\processing\audio\BufferInterpolator.h" />
     <ClInclude Include="src\processing\audio\BufferPitchShift.h" />
-    <ClInclude Include="src\processing\audio\BufferSpectrogram.h" />
+    <ClInclude Include="src\processing\audio\common.h" />
+    <ClInclude Include="src\processing\audio\Spectrogram.h" />
     <ClInclude Include="src\storage\dialog\PdfConfigDialog.h" />
     <ClInclude Include="src\storage\dialog\RawConfigDialog.h" />
     <ClInclude Include="src\storage\format\Format.h" />

@@ -14,7 +14,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
 #include "../../lib/fft/fft.h"
-#include "../../processing/audio/BufferSpectrogram.h"
+#include "../../processing/audio/Spectrogram.h"
 #include "../../Session.h"
 
 
@@ -228,7 +228,7 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	if (b.spectrum.num > 0)
 		return false;
 
-	bytes spectrum = BufferSpectrogram::quantize(BufferSpectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, BufferSpectrogram::WindowFunction::HANN));
+	bytes spectrum = Spectrogram::quantize(Spectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN));
 
 	b.mtx.lock();
 	b.spectrum.exchange(spectrum);

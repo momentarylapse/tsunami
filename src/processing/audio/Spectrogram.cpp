@@ -1,58 +1,19 @@
 /*
- * BufferSpectrogram.cpp
+ * Spectrogram.cpp
  *
  *  Created on: 13 Aug 2023
  *      Author: michi
  */
 
-#include "BufferSpectrogram.h"
+#include "Spectrogram.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
 #include "../../lib/math/math.h"
 #include "../../lib/fft/fft.h"
 
-#include "../../lib/os/msg.h"
-
-namespace BufferSpectrogram {
+namespace Spectrogram {
 
 
-[[maybe_unused]] static float sum(const Array<float> &a) {
-	float r = 0;
-	for (auto &x: a)
-		r += x;
-	return r;
-}
-
-[[maybe_unused]] static float xmax(const Array<float> &a) {
-	float r = 0;
-	for (auto &x: a)
-		if (x > r)
-			r = x;
-	return r;
-}
-
-[[maybe_unused]] static float sum_abs(const Array<complex> &z) {
-	float r = 0;
-	for (auto &x: z)
-		r += x.abs();
-	return r;
-}
-
-[[maybe_unused]] static float max_abs(const Array<complex> &z) {
-	float r = 0;
-	for (auto &x: z)
-		r = max(r, x.abs());
-	return r;
-}
-
-void apply_window_function(Array<float> &data, WindowFunction wf) {
-	if (wf == WindowFunction::HANN) {
-		for (int k=0; k<data.num; k++) {
-			float s = sin((float)k * pi / (data.num - 1));
-			data[k] *= s*s * 2;
-		}
-	}
-}
 
 Array<float> power_spectrum(Array<float> &chunk) {
 	Array<complex> z;

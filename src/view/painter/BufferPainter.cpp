@@ -19,7 +19,7 @@
 #include "../../Session.h"
 
 
-const int SPECTRUM_CHUNK = 512*2;
+const int SPECTRUM_CHUNK = 1024;
 const int SPECTRUM_IMAGE_CHUNK = 4096;
 const int SPECTRUM_N = 256;
 const float MIN_FREQ = 60.0f;
@@ -229,11 +229,15 @@ bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
 	if (b.spectrum.num > 0)
 		return false;
 
-	bytes spectrum = Spectrogram::quantize(Spectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN));
-//	bytes spectrum = Spectrogram::quantize(Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN));
+	const float DB_RANGE = 50;
+	const float DB_BOOST = 10;
+
+	auto pspectrum = Spectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
+	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
+	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
 	b.mtx.lock();
-	b.spectrum.exchange(spectrum);
+	b.spectrum.exchange(qspectrum);
 	b.mtx.unlock();
 	return true;
 }

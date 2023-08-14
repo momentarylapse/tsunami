@@ -21,7 +21,15 @@ float amplitude2db(float amp) {
 }
 
 float db2amplitude(float db) {
-	return pow(10, db * 0.05);
+	return pow(10, db * 0.05f);
+}
+
+float power2db(float power) {
+	return log10(power) * 10.0f;
+}
+
+float db2power(float db) {
+	return pow(10, db * 0.1f);
 }
 
 

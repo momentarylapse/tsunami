@@ -13,6 +13,8 @@
 
 float amplitude2db(float amp);
 float db2amplitude(float db);
+float power2db(float power);
+float db2power(float db);
 
 const int DEFAULT_SAMPLE_RATE = 44100;
 

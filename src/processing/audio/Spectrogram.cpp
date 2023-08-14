@@ -6,23 +6,31 @@
  */
 
 #include "Spectrogram.h"
+#include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
 #include "../../lib/math/math.h"
 #include "../../lib/fft/fft.h"
 
+#include "../../lib/os/msg.h"
+
 namespace Spectrogram {
 
 
+int spectrum_size(int window_size) {
+	return window_size / 2 + 1;
+}
 
 Array<float> power_spectrum(Array<float> &chunk) {
 	Array<complex> z;
 	fft::r2c(chunk, z);
 
+	float scale = 1.0f / (z.num * z.num);
+
 	Array<float> s;
 	s.resize(z.num);
 	for (int i=0; i<z.num; i++)
-		s[i] = z[i].abs_sqr();
+		s[i] = z[i].abs_sqr() * scale;
 	return s;
 }
 
@@ -50,13 +58,11 @@ inline float exp_interpolate(float x, float x_min, float x_max) {
 
 Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf) {
 	int window_size = step_size * 8;
-	int fft_size = window_size / 2 + 1;
+	int fft_size = spectrum_size(window_size);
 
 	float ww = (float)window_size / sample_rate;
 
 	auto s = spectrogram(b, step_size, window_size, wf);
-
-	float scale = 2*pi / (float)(fft_size * fft_size) * 16;
 
 	Array<float> rr;
 	for (int i=0; i<s.num/fft_size; i++) {
@@ -66,13 +72,23 @@ Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, f
 			float bin_f_max = f_min * exp( log(f_max / f_min) / (f_count - 1) * (k + 1));
 			int j0 = clamp(int(bin_f_min * ww), 0, z.num);
 			int j1 = clamp(int(bin_f_max * ww) + 1, 0, z.num);
-			float f = sum(z.sub_ref(j0, j1)) * scale;
-			f = sqrt(f);
-			f = (1-exp(-f)) * 2;
+			float f = xmax(z.sub_ref(j0, j1));
 			rr.add(f);
 		}
 	}
 	return rr;
+}
+
+Array<float> to_db(const Array<float> &data, float db_range, float db_boost) {
+	const float scale = 1.0f / db_range;
+
+	Array<float> r;
+	r.resize(data.num);
+	for (int i=0; i<data.num; i++) {
+		float db = power2db(data[i]);
+		r[i] = clamp((db + db_boost) * scale + 1.0f, 0.0f, 1.0f);
+	}
+	return r;
 }
 
 bytes quantize(const Array<float> &data) {

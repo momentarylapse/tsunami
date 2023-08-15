@@ -140,12 +140,6 @@ int Track::get_index() const {
 	return weak(song->tracks).find(const_cast<Track*>(this));
 }
 
-void Track::invalidate_all_peaks() {
-	for (TrackLayer *l: weak(layers))
-		for (AudioBuffer &b: l->buffers)
-			b.peaks.clear();
-}
-
 
 
 bool Track::has_version_selection() const {

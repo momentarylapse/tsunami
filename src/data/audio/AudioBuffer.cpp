@@ -22,12 +22,6 @@
 //   ALWAYS correct channels
 
 
-const int AudioBuffer::PEAK_CHUNK_EXP = 15;
-const int AudioBuffer::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
-const int AudioBuffer::PEAK_OFFSET_EXP = 3;
-const int AudioBuffer::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
-const int AudioBuffer::PEAK_MAGIC_LEVEL2 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP) * 2;
-
 const int MIN_CHANNELS = 2;
 const int MAX_CHANNELS = 1024;
 
@@ -38,6 +32,7 @@ AudioBuffer::AudioBuffer() {
 	offset = 0;
 	length = 0;
 	channels = 0;
+	version = 0;
 	set_channels(2);
 }
 
@@ -45,6 +40,7 @@ AudioBuffer::AudioBuffer(int _length, int _channels) {
 	offset = 0;
 	length = 0;
 	channels = 0;
+	version = 0;
 	set_channels(_channels);
 	resize(_length);
 }
@@ -56,6 +52,7 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 	channels = b.channels;
 	c = b.c;
 	compressed = b.compressed;
+	version = b.version;
 }
 
 // move constructor
@@ -65,6 +62,7 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b) {
 	channels = b.channels;
 	c = std::move(b.c);
 	compressed = b.compressed;
+	version = b.version;
 }
 
 void AudioBuffer::__init__() {
@@ -81,7 +79,7 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 	length = b.length;
 	channels = b.channels;
 	c = b.c;
-	peaks = b.peaks;
+	_data_was_changed();
 	compressed = b.compressed;
 }
 
@@ -91,7 +89,7 @@ void AudioBuffer::operator=(AudioBuffer &&b) {
 	length = b.length;
 	channels = b.channels;
 	c = std::move(b.c);
-	peaks = std::move(b.peaks);
+	_data_was_changed();
 	compressed = b.compressed;
 }
 
@@ -101,26 +99,20 @@ void AudioBuffer::clear() {
 	for (auto &cc: c)
 		cc.clear();
 	length = 0;
-	peaks.clear();
-	spectrum.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 void AudioBuffer::set_zero() {
 	for (auto &cc: c)
 		memset(&cc[0], 0, sizeof(float) * length);
-	peaks.clear();
-	spectrum.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 void AudioBuffer::scale(float scale) {
 	for (auto &cc: c)
 		for (float &f: cc)
 			f *= scale;
-	peaks.clear();
-	spectrum.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 void AudioBuffer::set_channels(int new_channels) {
@@ -137,22 +129,7 @@ void AudioBuffer::set_channels(int new_channels) {
 	for (int i=c_num_before; i<c.num; i++)
 		c[i].resize(length);
 
-	peaks.clear();
-	spectrum.clear();
-	invalidate_compressed();
-}
-
-void AudioBuffer::_truncate_peaks(int _length) {
-	int level4 = 0;
-	int n = 2*channels;
-	_length /= PEAK_FINEST_SIZE;
-	while (level4 < peaks.num) {
-		for (int k=0; k<n; k++)
-			peaks[level4 + k].resize(_length);
-		level4 += n;
-		_length /= 2;
-	}
-
+	_data_was_changed();
 }
 
 void AudioBuffer::resize(int _length) {
@@ -162,13 +139,10 @@ void AudioBuffer::resize(int _length) {
 	if (is_ref())
 		make_own();
 
-	if (_length < length)
-		_truncate_peaks(_length);
 	for (auto &cc: c)
 		cc.resize(_length);
 	length = _length;
-	spectrum.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 bool AudioBuffer::is_ref() const
@@ -184,7 +158,6 @@ void fa_make_own(Array<float> &a) {
 
 void AudioBuffer::make_own() {
 	if (is_ref()) {
-		//msg_write("bb::make_own!");
 		for (auto &cc: c)
 			fa_make_own(cc);
 	}
@@ -194,16 +167,13 @@ void AudioBuffer::swap_ref(AudioBuffer &b) {
 	// buffer
 	c.exchange(b.c);
 
-	// peaks
-	peaks.exchange(b.peaks);
-	spectrum.exchange(b.spectrum);
-
 	std::swap(length, b.length);
 	std::swap(offset, b.offset);
 	std::swap(channels, b.channels);
 
 	// TODO
 	std::swap(compressed, b.compressed);
+	std::swap(version, b.version);
 }
 
 void AudioBuffer::append(const AudioBuffer &b) {
@@ -224,12 +194,8 @@ void AudioBuffer::swap_value(AudioBuffer &b) {
 	// buffer
 	for (int i=0; i<min(channels, b.channels); i++)
 		float_array_swap_values(c[i], b.c[i]);
-	peaks.clear();
-	b.peaks.clear();
-	spectrum.clear();
-	b.spectrum.clear();
-	invalidate_compressed();
-	b.invalidate_compressed();
+	_data_was_changed();
+	b._data_was_changed();
 }
 
 // mixing a mono track will scale by (1,1) in the center
@@ -272,9 +238,7 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 
 	}
 
-	peaks.clear();
-	spectrum.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 
@@ -298,8 +262,8 @@ void AudioBuffer::add(const AudioBuffer &source, int _offset, float volume) {
 				c[tc][i + _offset] += source.c[sc][i] * volume;
 		}
 	}
-	invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
-	invalidate_compressed();
+	//invalidate_peaks(Range(i0 + _offset + offset, i1 - i0));
+	_data_was_changed();
 }
 
 // offsets must be valid!
@@ -351,7 +315,8 @@ void AudioBuffer::set_x(const AudioBuffer &source, int source_offset, int _lengt
 	} else {
 		_buf_copy_samples_scale_(*this, target_offset, source, source_offset, _length, volume);
 	}
-	invalidate_peaks(Range(target_offset, _length));
+	//invalidate_peaks(Range(target_offset, _length));
+	_data_was_changed();
 }
 
 // this[offset:] = source[:]
@@ -465,8 +430,7 @@ void AudioBuffer::import(void *data, int _channels, SampleFormat format, int sam
 				c[1][i] = c[0][i];
 		}
 	}
-	peaks.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 
@@ -634,8 +598,7 @@ void AudioBuffer::deinterleave(const float *p, int source_channels) {
 		}
 
 	}
-	peaks.clear();
-	invalidate_compressed();
+	_data_was_changed();
 }
 
 Range AudioBuffer::range() const {
@@ -646,158 +609,13 @@ Range AudioBuffer::range0() const {
 	return Range(0, length);
 }
 
-unsigned char inline _shrink_mean(unsigned char a, unsigned char b) {
-	return (unsigned char)(sqrt(((float)a * (float)a + (float)b * (float)b) / 2));
-}
-
-static bool _shrink_table_created = false;
-static unsigned char _shrink_mean_table[256][256];
-
-static void update_shrink_table() {
-	for (int a=0; a<256; a++)
-		for (int b=0; b<256; b++)
-			_shrink_mean_table[a][b] = _shrink_mean(a, b);
-	_shrink_table_created = true;
-}
-
-#define shrink_max(a, b)	max((a), (b))
-
-unsigned char inline shrink_mean(unsigned char a, unsigned char b) {
-	return _shrink_mean_table[a][b];
-}
-
-void AudioBuffer::invalidate_peaks(const Range &_range) {
-	Range r = range() and _range;
-
-	int pm = PEAK_MAGIC_LEVEL2 * channels;
-	if (peaks.num < pm)
-		return;
-
-	int i0 = (r.start() - offset) / PEAK_CHUNK_SIZE;
-	int i1 = min((r.end() - offset) / PEAK_CHUNK_SIZE + 1, peaks[pm].num);
-
-	for (int i=i0; i<i1; i++)
-		peaks[pm][i] = 255;
-
-	spectrum.clear();
-}
-
-inline float fabsmax(float *p) {
-	float a = fabs(*p ++);
-	float b = fabs(*p ++);
-	float c = fabs(*p ++);
-	float d = fabs(*p ++);
-	float e = fabs(*p ++);
-	float f = fabs(*p ++);
-	float g = fabs(*p ++);
-	float h = fabs(*p ++);
-	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
-}
-
-void AudioBuffer::_ensure_peak_size(int level4, int n, bool set_invalid) {
-	int dl = 2 * channels;
-	if (peaks.num < level4 + dl)
-		peaks.resize(level4 + dl);
-	if (peaks[level4].num < n) {
-		int n0 = peaks[level4].num;
-		for (int k=0; k<dl; k++) {
-			peaks[level4 + k].resize(n);
-			if (set_invalid)
-				memset(&peaks[level4 + k][n0], 255, (n - n0));
-		}
-	}/*else if (peaks[level4].num < n) {
-		for (int k=0; k<4; k++)
-			peaks[level4 + k].resize(n);
-	}*/
-}
-
-bool AudioBuffer::_peaks_chunk_needs_update(int index) {
-	int pm = PEAK_MAGIC_LEVEL2 * channels;
-	if (peaks.num <= pm)
-		return true;
-	if (index >= peaks[pm].num)
-		return true;
-	return (peaks[pm][index] == 255);
-}
-
-void AudioBuffer::_update_peaks_chunk(int index) {
-	// first level
-	int i0 = index * (PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE);
-	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, length / PEAK_FINEST_SIZE);
-	int n = i1 - i0;
-	int dl = 2*channels;
-
-	_ensure_peak_size(0, i1, true);
-
-	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, peaks[0].num, index));
-
-	for (int j=0; j<channels; j++) {
-		for (int i=i0; i<i1; i++)
-			peaks[j][i] = (unsigned char)(fabsmax(&c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
-		memcpy(&peaks[channels + j][i0], &peaks[j][i0], n);
-	}
-
-	// medium levels
-	int level4 = 0;
-	while (n >= 2) {
-		level4 += dl;
-		n = n / 2;
-		i0 = i0 / 2;
-		i1 = i0 + n;
-		_ensure_peak_size(level4, i1);
-
-		for (int j=0; j<channels; j++)
-			for (int i=i0; i<i1; i++) {
-				peaks[level4 + j][i] = shrink_max(peaks[level4 - dl + j][i * 2], peaks[level4 - dl + j][i * 2 + 1]);
-				//peaks[level4 + 1][i] = shrink_max(peaks[level4 - 3][i * 2], peaks[level4 - 3][i * 2 + 1]);
-				peaks[level4 + channels + j][i] = shrink_mean(peaks[level4 - channels + j][i * 2], peaks[level4 - channels + j][i * 2 + 1]);
-				//peaks[level4 + 3][i] = shrink_mean(peaks[level4 - 1][i * 2], peaks[level4 - 1][i * 2 + 1]);
-			}
-	}
-
-	//	msg_write(format("%d  %d  %d", level4 / 4, peaks.num / 4 - 1, n));
-	if (n == 0)
-		return;
-
-	// high levels
-	for (int k=0; k<32; k++) {
-		if ((index & (1<<k)) == 0)
-			break;
-
-		if (peaks[level4].num <= (i0 | 1))
-			break;
-
-		level4 += dl;
-		i0 = i0 / 2;
-
-		_ensure_peak_size(level4, i0 + 1);
-
-		for (int j=0; j<channels; j++) {
-			peaks[level4 + j][i0] = shrink_max(peaks[level4 - dl + j][i0 * 2], peaks[level4 - dl + j][i0 * 2 + 1]);
-			//peaks[level4 + 1][i0] = shrink_max(peaks[level4 - 3][i0 * 2], peaks[level4 - 3][i0 * 2 + 1]);
-			peaks[level4 + channels + j][i0] = shrink_mean(peaks[level4 - channels + j][i0 * 2], peaks[level4 - channels + j][i0 * 2 + 1]);
-			//peaks[level4 + 3][i0] = shrink_mean(peaks[level4 - 1][i0 * 2], peaks[level4 - 1][i0 * 2 + 1]);
-		}
-	}
-}
-
-int AudioBuffer::_update_peaks_prepare() {
-	if (!_shrink_table_created)
-		update_shrink_table();
-
-	int n = (int)ceil((float)length / (float)PEAK_CHUNK_SIZE);
-
-	for (int i=PEAK_OFFSET_EXP; i<=PEAK_CHUNK_EXP; i++)
-		_ensure_peak_size((i - PEAK_OFFSET_EXP) * 2 * channels, length >> i, true);
-	//_ensure_peak_size(PEAK_MAGIC_LEVEL4, n, true);
-
-	return n;
-}
-
 bool AudioBuffer::has_compressed() const {
 	return compressed.get();
 }
 
-void AudioBuffer::invalidate_compressed() {
+void AudioBuffer::_data_was_changed() {
+	// invalidate compressed
 	compressed = nullptr;
+
+	version = rand();
 }

@@ -13,9 +13,6 @@
 #include <shared_mutex>
 
 
-#define NUM_PEAK_LEVELS		24
-#define PEAK_FACTOR			2
-
 enum class SampleFormat;
 
 class AudioBuffer {
@@ -37,8 +34,7 @@ public:
 	int channels;
 	Array<Array<float>> c;
 
-	Array<bytes> peaks;
-	bytes spectrum;
+	int version;
 
 	std::shared_timed_mutex mtx;
 
@@ -69,29 +65,13 @@ public:
 	void _cdecl interleave(float *p, float volume) const;
 	void _cdecl deinterleave(const float *p, int num_channels);
 
-
-	static const int PEAK_CHUNK_EXP;
-	static const int PEAK_CHUNK_SIZE;
-	static const int PEAK_OFFSET_EXP;
-	static const int PEAK_FINEST_SIZE;
-	static const int PEAK_MAGIC_LEVEL2;
-
-	void _cdecl invalidate_peaks(const Range &r);
-
-	void _ensure_peak_size(int level4, int n, bool set_invalid = false);
-	int _update_peaks_prepare();
-	void _update_peaks_chunk(int index);
-	bool _peaks_chunk_needs_update(int index);
-	void _truncate_peaks(int length);
-
-
 	struct Compressed : Sharable<base::Empty> {
 		bytes data;
 		string codec;
 	};
 	shared<Compressed> compressed;
 	bool has_compressed() const;
-	void invalidate_compressed();
+	void _data_was_changed();
 };
 
 #endif /* SRC_AUDIO_AUDIOBUFFER_H_ */

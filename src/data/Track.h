@@ -45,8 +45,6 @@ public:
 	obs::source out_curve_list_changed{this, "curve-list-changed"};
 	obs::source out_edit_curve{this, "edit-curve"};
 
-	void _cdecl invalidate_all_peaks();
-
 	string _cdecl nice_name() const;
 	int _cdecl get_index() const;
 

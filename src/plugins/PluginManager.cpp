@@ -375,7 +375,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("AudioBuffer.c", &AudioBuffer::c);
 	//kaba::_declare_class_element("AudioBuffer.l", _offsetof(AudioBuffer, c[0]));
 	//kaba::_declare_class_element("AudioBuffer.r", _offsetof(AudioBuffer, c[1]));
-	ext->declare_class_element("AudioBuffer.peaks", &AudioBuffer::peaks);
+	ext->declare_class_element("AudioBuffer.version", &AudioBuffer::version);
 	ext->link_class_func("AudioBuffer.__init__", &AudioBuffer::__init__);
 	ext->link_class_func("AudioBuffer.__delete__", &AudioBuffer::__delete__);
 	ext->link_class_func("AudioBuffer.clear", &AudioBuffer::clear);

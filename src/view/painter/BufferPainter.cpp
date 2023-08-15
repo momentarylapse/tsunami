@@ -9,6 +9,7 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
 #include "../helper/Drawing.h"
+#include "../helper/PeakDatabase.h"
 #include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
 #include "../../data/Range.h"
@@ -27,6 +28,7 @@ const float MAX_FREQ = 3000.0f;
 
 BufferPainter::BufferPainter(AudioView *_view) {
 	view = _view;
+	db = view->peak_database.get();
 	area = rect(0,0,0,0);
 	x0 = x1 = 0;
 	mode = AudioViewMode::PEAKS;
@@ -174,13 +176,14 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	//c->set_color(col1);
 
 	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
-	int pm = AudioBuffer::PEAK_MAGIC_LEVEL2 * b.channels;
+	int pm = PeakData::PEAK_MAGIC_LEVEL2 * b.channels;
 	int l = view->prefered_buffer_layer * 2 * b.channels;
 	if (l >= 0) {
+		auto &p = db->get_data(b);
 		double bzf = view->buffer_zoom_factor;
 
 		// no peaks yet? -> show dummy
-		if (b.peaks.num <= l) {
+		if (p.peaks.num <= l) {
 			c->set_color(color::interpolate(col1, Red, 0.3f));
 			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
 			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
@@ -195,23 +198,23 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 		//cc.a *= 0.3f;
 		c->set_color(col2);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], p.peaks[ll+ci], offset);
 
 
 		// mean square
 		c->set_color(col1);
 		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, bzf, hf, x0, x1, y0[ci], b.peaks[l+b.channels+ci], offset);
+			draw_peak_buffer(c, di, view_pos_rel, view->cam.pixels_per_sample, bzf, hf, x0, x1, y0[ci], p.peaks[l+b.channels+ci], offset);
 
 
 		// invalid peaks...
-		if (b.peaks.num >= pm) {
-			int nn = min(b.length / b.PEAK_CHUNK_SIZE, b.peaks[pm].num);
+		if (p.peaks.num >= pm) {
+			int nn = min(b.length / PeakData::PEAK_CHUNK_SIZE, p.peaks[pm].num);
 			for (int i=0; i<nn; i++) {
-				if (b._peaks_chunk_needs_update(i)) {
+				if (p._peaks_chunk_needs_update(i)) {
 					c->set_color(color::interpolate(col1, Red, 0.3f));
-					float xx0 = max((float)view->cam.sample2screen(offset + i*b.PEAK_CHUNK_SIZE), x0);
-					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*b.PEAK_CHUNK_SIZE), x1);
+					float xx0 = max((float)view->cam.sample2screen(offset + i*PeakData::PEAK_CHUNK_SIZE), x0);
+					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*PeakData::PEAK_CHUNK_SIZE), x1);
 					c->draw_rect(rect(xx0, xx1, area.y1, area.y1 + h));
 				}
 			}
@@ -225,20 +228,20 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
-bool prepare_spectrum(AudioBuffer &b, float sample_rate) {
-	if (b.spectrum.num > 0)
+bool prepare_spectrum(PeakData &p, float sample_rate) {
+	if (p.spectrum.num > 0)
 		return false;
 
 	const float DB_RANGE = 50;
 	const float DB_BOOST = 10;
 
-	auto pspectrum = Spectrogram::log_spectrogram(b, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
+	auto pspectrum = Spectrogram::log_spectrogram(p.buffer, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
 	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
-	b.mtx.lock();
-	b.spectrum.exchange(qspectrum);
-	b.mtx.unlock();
+	p.buffer.mtx.lock();
+	p.spectrum.exchange(qspectrum);
+	p.buffer.mtx.unlock();
 	return true;
 }
 
@@ -285,25 +288,25 @@ struct SpectrumImageEntry {
 };
 static Array<SpectrumImageEntry> spectrum_images;
 
-HorizontallyChunkedImage& get_spectrum_image(AudioBuffer &b) {
+HorizontallyChunkedImage& get_spectrum_image(PeakData &p) {
 	for (auto &si: spectrum_images)
-		if (si.buf == &b)
+		if (si.buf == &p.buffer)
 			return si.image;
 	SpectrumImageEntry s;
-	s.buf = &b;
+	s.buf = &p.buffer;
 	spectrum_images.add(s);
 	return spectrum_images.back().image;
 }
 
-HorizontallyChunkedImage& render_spectrum_image(AudioBuffer &b, float sample_rate) {
-	auto& im = get_spectrum_image(b);
-	if (prepare_spectrum(b, sample_rate)) {
-		int n = b.spectrum.num / SPECTRUM_N;
+HorizontallyChunkedImage& render_spectrum_image(PeakData &p, float sample_rate) {
+	auto& im = get_spectrum_image(p);
+	if (prepare_spectrum(p, sample_rate)) {
+		int n = p.spectrum.num / SPECTRUM_N;
 		im.resize(n, SPECTRUM_N);
 
 		for (int i=0; i<n; i++) {
 			for (int k=0; k<SPECTRUM_N; k++) {
-				float f = Spectrogram::dequantize(b.spectrum[i * SPECTRUM_N + k]);
+				float f = Spectrogram::dequantize(p.spectrum[i * SPECTRUM_N + k]);
 				im.set_pixel(i, SPECTRUM_N - 1 - k, color_heat_map(f));
 			}
 		}
@@ -312,7 +315,8 @@ HorizontallyChunkedImage& render_spectrum_image(AudioBuffer &b, float sample_rat
 }
 
 void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
-	auto& im = render_spectrum_image(b, this->view->session->sample_rate());
+	auto &p = db->get_data(b);
+	auto& im = render_spectrum_image(p, this->view->session->sample_rate());
 
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);
@@ -324,58 +328,6 @@ void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset
 	std::swap(col2, col1);
 	draw_buffer(c, b, offset);
 	std::swap(col2, col1);
-	return;
-
-	double view_pos_rel = view->cam.screen2sample(0);
-	c->set_antialiasing(view->antialiasing);
-
-	float h = area.height();
-	float hf = h / (2 * b.channels);
-
-	// zero heights of both channels
-	float y0[2];
-	for (int ci=0; ci<b.channels; ci++)
-		y0[ci] = area.y1 + hf * (2*ci + 1);
-
-
-	int di = view->detail_steps;
-	//color cc = col;
-	//cc.a = 0.7f;
-	//c->set_color(cc);
-
-	//int l = min(view->prefered_buffer_layer - 1, b.peaks.num / 4);
-	int l = view->prefered_buffer_layer * 2 * b.channels;
-	if (l >= 0) {
-		double bzf = view->buffer_zoom_factor;
-
-
-		// no peaks yet? -> show dummy
-		if (b.peaks.num <= l) {
-			c->set_color(color::interpolate(col1, Red, 0.3f));
-			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
-			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
-			c->set_antialiasing(false);
-			return;
-		}
-
-		// maximum
-		double _bzf = bzf;
-		int ll = l;
-		/*double _bzf = bzf;
-		int ll = l;
-		if (ll + 4 < b.peaks.num){
-			ll += 4;
-			_bzf *= 2;
-		}*/
-		for (int ci=0; ci<b.channels; ci++)
-			draw_peak_buffer_sel(c, di, view_pos_rel, view->cam.pixels_per_sample, _bzf, hf, x0, x1, y0[ci], b.peaks[ll+ci], offset);
-	} else {
-
-		// directly show every sample
-		for (int ci=0; ci<b.channels; ci++)
-			draw_line_buffer_sel(c, view_pos_rel, view->cam.pixels_per_sample, hf, x0, x1, y0[ci], b.c[ci], offset);
-	}
-	c->set_antialiasing(false);
 }
 
 void BufferPainter::set_context(const rect &_area, AudioViewMode _mode) {

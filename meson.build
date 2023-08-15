@@ -548,6 +548,7 @@ sources = [
 	'src/view/helper/Drawing.cpp',
 	'src/view/helper/FxListEditor.cpp',
 	'src/view/helper/MidiPreview.cpp',
+	'src/view/helper/PeakDatabase.cpp',
 	'src/view/helper/PeakMeterDisplay.cpp',
 	'src/view/helper/PeakThread.cpp',
 	'src/view/helper/Progress.cpp',

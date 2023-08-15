@@ -10,6 +10,7 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../painter/BufferPainter.h"
+#include "../helper/PeakDatabase.h"
 #include "../sidebar/SideBar.h"
 #include "../../data/base.h"
 #include "../../data/Track.h"
@@ -54,7 +55,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 			view->buffer_painter->set_color(theme.capture_marker, l->background_color());
 
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
-			view->update_peaks_now(rec->buf);
+			view->peak_database->update_peaks_now(rec->buf);
 			view->buffer_painter->draw_buffer(c, rec->buf, offset);
 		} else if (d.type() == SignalType::MIDI) {
 			auto *rec = d.midi_recorder();

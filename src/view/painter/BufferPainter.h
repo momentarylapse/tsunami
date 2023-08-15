@@ -12,6 +12,7 @@
 #include "../../lib/image/color.h"
 
 class AudioView;
+class PeakDatabase;
 class Painter;
 class AudioBuffer;
 class color;
@@ -35,6 +36,7 @@ public:
 	void set_clip(const Range &r);
 
 	AudioView *view;
+	PeakDatabase *db;
 	rect area;
 	color col1, col2, col2sel;
 	float x0, x1;

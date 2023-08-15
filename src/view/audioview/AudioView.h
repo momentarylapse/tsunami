@@ -66,6 +66,7 @@ class PeakMeterDisplay;
 class Dial;
 class BottomBarExpandButton;
 class LogNotifier;
+class PeakDatabase;
 enum class MidiMode;
 
 
@@ -310,8 +311,6 @@ public:
 	void implode_track(Track *t);
 	void explode_track(Track *t);
 
-	void update_peaks_now(AudioBuffer &buf);
-
 	int prefered_buffer_layer;
 	double buffer_zoom_factor;
 	void update_buffer_zoom();
@@ -361,6 +360,8 @@ public:
 	void toggle_layer_mute();
 	void toggle_layer_solo();
 	void toggle_track_exploded();
+
+	owned<PeakDatabase> peak_database;
 };
 
 #endif /* AUDIOVIEW_H_ */

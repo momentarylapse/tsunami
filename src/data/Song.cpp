@@ -347,14 +347,6 @@ void Song::delete_time_interval(int index, const Range &range) {
 	//execute(new ActionBarDelete(index, affect_midi));
 }
 
-void Song::invalidate_all_peaks() {
-	for (auto t: tracks)
-		t->invalidate_all_peaks();
-	for (auto s: samples)
-		if (s->buf)
-			s->buf->peaks.clear();
-}
-
 
 Sample* Song::get_sample_by_uid(int uid) {
 	for (Sample *s: weak(samples))

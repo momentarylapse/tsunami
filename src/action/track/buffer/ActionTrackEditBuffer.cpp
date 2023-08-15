@@ -34,7 +34,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range)
 
 
 void ActionTrackEditBuffer::undo(Data *d) {
-	layer->buffers[index].invalidate_peaks(range);
+	layer->buffers[index]._data_was_changed();
 
 	AudioBuffer b;
 	layer->read_buffers(b, range, true);
@@ -46,7 +46,7 @@ void ActionTrackEditBuffer::redo(Data *d) {
 }
 
 void *ActionTrackEditBuffer::execute(Data *d) {
-	layer->buffers[index].invalidate_peaks(range);
+	layer->buffers[index]._data_was_changed();
 
 	// nothing to do...
 	return nullptr;

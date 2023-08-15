@@ -74,8 +74,6 @@ public:
 	void _cdecl reset() override;
 	bool is_empty();
 
-	void _cdecl invalidate_all_peaks();
-
 	Track *_cdecl time_track();
 	int _cdecl bar_offset(int index);
 

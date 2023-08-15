@@ -21,6 +21,7 @@
 #include "../helper/PeakThread.h"
 #include "../helper/CpuDisplay.h"
 #include "../helper/PeakMeterDisplay.h"
+#include "../helper/PeakDatabase.h"
 #include "../mode/ViewModeDefault.h"
 #include "../mode/ViewModeEdit.h"
 #include "../mode/ViewModeEditDummy.h"
@@ -165,6 +166,8 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cpu_display = new CpuDisplay(session);
 	scene_graph->add_child(cpu_display);
 
+	peak_database = new PeakDatabase;
+
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
 
@@ -186,7 +189,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = Image::load(tsunami->directory_static | "icons/track-midi.png");
 	images.track_group = Image::load(tsunami->directory_static | "icons/track-group.png");
 
-	peak_thread = new PeakThread(song);
+	peak_thread = new PeakThread(song, peak_database.get());
 	peak_thread->messanger.out_changed >> in_redraw;
 	peak_thread->run();
 	draw_runner_id = -1;
@@ -773,7 +776,7 @@ void AudioView::update_buffer_zoom() {
 	// which level of detail?
 	if (cam.pixels_per_sample < 0.2f)
 		for (int i=24-1;i>=0;i--) {
-			double _f = (double)(1 << (i + AudioBuffer::PEAK_OFFSET_EXP));
+			double _f = (double)(1 << (i + PeakData::PEAK_OFFSET_EXP));
 			if (_f > 2.0 / cam.pixels_per_sample) {
 				prefered_buffer_layer = i;
 				buffer_zoom_factor = _f;
@@ -905,14 +908,6 @@ void AudioView::on_stream_state_change() {
 void AudioView::on_update_sidebar() {
 	check_consistency();
 	force_redraw();
-}
-
-void AudioView::update_peaks_now(AudioBuffer &buf) {
-	int n = buf._update_peaks_prepare();
-
-	for (int i=0; i<n; i++)
-		if (buf._peaks_chunk_needs_update(i))
-			buf._update_peaks_chunk(i);
 }
 
 AudioViewTrack *AudioView::get_track(Track *track) {

@@ -6,6 +6,7 @@
  */
 
 #include "PeakThread.h"
+#include "PeakDatabase.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
@@ -49,8 +50,9 @@ void InterThreadMessager::notify_x() {
 
 
 
-PeakThread::PeakThread(Song *s) {
+PeakThread::PeakThread(Song *s, PeakDatabase *_db) {
 	song = s;
+	db = _db;
 	allow_running = true;
 	updating = false;
 	perf_channel = PerformanceMonitor::create_channel("peakthread", this);
@@ -102,7 +104,8 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		song->unlock();
 		throw Exception("aaa4");
 	}
-	int n = buf._update_peaks_prepare();
+	auto &p = db->get_data(buf);
+	int n = p._update_peaks_prepare();
 	song->unlock();
 
 	Thread::cancelation_point();
@@ -110,7 +113,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		throw Exception("aaa3");
 
 	for (int i=0; i<n; i++) {
-		if (buf._peaks_chunk_needs_update(i)) {
+		if (p._peaks_chunk_needs_update(i)) {
 			while (!song->try_lock()) {
 				Thread::cancelation_point();
 				os::sleep(0.01f);
@@ -118,7 +121,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 					throw Exception("aaa");
 			}
 			PerformanceMonitor::start_busy(perf_channel);
-			buf._update_peaks_chunk(i);
+			p._update_peaks_chunk(i);
 			PerformanceMonitor::end_busy(perf_channel);
 			song->unlock();
 			notify();

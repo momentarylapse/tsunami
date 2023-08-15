@@ -15,6 +15,7 @@
 class Song;
 class Track;
 class AudioBuffer;
+class PeakDatabase;
 
 class InterThreadMessager : public obs::Node<VirtualBase> {
 public:
@@ -30,9 +31,11 @@ public:
 class PeakThread : public Thread {
 public:
 	Song *song;
+	PeakDatabase *db;
 	int perf_channel;
 	std::atomic<bool> allow_running;
-	PeakThread(Song *s);
+
+	PeakThread(Song *s, PeakDatabase *db);
 	~PeakThread();
 	void on_run() override;
 

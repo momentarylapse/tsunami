@@ -6,6 +6,7 @@
  */
 
 #include "PeakDatabase.h"
+#include "PeakThread.h"
 #include "../../data/audio/AudioBuffer.h"
 #include <math.h>
 
@@ -184,7 +185,15 @@ int PeakData::_update_peaks_prepare() {
 	return n;
 }
 
-PeakDatabase::PeakDatabase() {
+PeakDatabase::PeakDatabase(Song *song) {
+	peak_thread = new PeakThread(song, this);
+	peak_thread->messanger.out_changed >> create_sink([this] { out_changed(); });
+	peak_thread->run();
+}
+
+PeakDatabase::~PeakDatabase() {
+	peak_thread->messanger.unsubscribe(this);
+	peak_thread->hard_stop();
 }
 
 void PeakDatabase::invalidate_all() {
@@ -216,5 +225,9 @@ void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
 	for (int i=0; i<n; i++)
 		if (p._peaks_chunk_needs_update(i))
 			p._update_peaks_chunk(i);
+}
+
+void PeakDatabase::stop_update() {
+	peak_thread->stop_update();
 }
 

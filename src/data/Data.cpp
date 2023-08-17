@@ -17,10 +17,6 @@ Data::Data(Session *_session) {
 	file_time = 0;
 }
 
-Data::~Data() {
-	delete action_manager;
-}
-
 
 
 bool Data::redo() {
@@ -65,6 +61,17 @@ bool Data::try_lock() {
 
 void Data::unlock() {
 	mtx.unlock();
+}
+void Data::lock_shared() {
+	mtx.lock_shared();
+}
+
+bool Data::try_lock_shared() {
+	return mtx.try_lock_shared();
+}
+
+void Data::unlock_shared() {
+	mtx.unlock_shared();
 }
 
 

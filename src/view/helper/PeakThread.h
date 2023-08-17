@@ -50,7 +50,6 @@ private:
 	std::atomic<bool> updating;
 
 	void update_buffer(AudioBuffer &buf);
-	void update_track(Track *t);
 	void update_song();
 
 	void notify();

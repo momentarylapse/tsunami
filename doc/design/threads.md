@@ -51,5 +51,8 @@
 * `OutputStream` sends in main thread, but needs to be controlled from main thread
 
 
+## new thoughts
 
+* Song owned by main thread -> can always read, needs to lock for writing (only through actions)
+** other threads only allowed to read when locking. Can not directly edit
 

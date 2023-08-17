@@ -37,7 +37,6 @@ class SignalChain;
 class TsunamiWindow;
 class AudioViewTrack;
 class AudioViewLayer;
-class PeakThread;
 class ViewMode;
 class ViewModeDefault;
 class ViewModeEdit;
@@ -127,7 +126,6 @@ public:
 	obs::sink in_solo_changed;
 	obs::sink in_redraw;
 
-	void update_peaks();
 	void zoom_in();
 	void zoom_out();
 
@@ -314,8 +312,6 @@ public:
 	int prefered_buffer_layer;
 	double buffer_zoom_factor;
 	void update_buffer_zoom();
-
-	owned<PeakThread> peak_thread;
 
 	struct ImageData {
 		owned<Image> speaker, x, solo, config;

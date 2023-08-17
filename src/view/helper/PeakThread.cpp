@@ -99,14 +99,14 @@ void PeakThread::hard_stop() {
 }
 
 void PeakThread::update_buffer(AudioBuffer &buf) {
-	song->lock();
+	buf.mtx.lock();
 	if (!updating) {
-		song->unlock();
+		buf.mtx.unlock();
 		throw Exception("aaa4");
 	}
 	auto &p = db->get_data(buf);
 	int n = p._update_peaks_prepare();
-	song->unlock();
+	buf.mtx.unlock();
 
 	Thread::cancelation_point();
 	if (!updating)
@@ -114,7 +114,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 
 	for (int i=0; i<n; i++) {
 		if (p._peaks_chunk_needs_update(i)) {
-			while (!song->try_lock()) {
+			while (!buf.mtx.try_lock()) {
 				Thread::cancelation_point();
 				os::sleep(0.01f);
 				if (!updating)
@@ -123,7 +123,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 			PerformanceMonitor::start_busy(perf_channel);
 			p._update_peaks_chunk(i);
 			PerformanceMonitor::end_busy(perf_channel);
-			song->unlock();
+			buf.mtx.unlock();
 			notify();
 			Thread::cancelation_point();
 		}
@@ -132,19 +132,25 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 	}
 }
 
-void PeakThread::update_track(Track *t) {
-	for (TrackLayer *l: weak(t->layers))
-		for (AudioBuffer &b: l->buffers)
-			update_buffer(b);
+// thread safe!
+Array<AudioBuffer*> enum_buffers(Song *song) {
+	Array<AudioBuffer*> buffers;
+	song->lock_shared();
+	for (Track *t: weak(song->tracks))
+		for (TrackLayer *l: weak(t->layers))
+			for (AudioBuffer &b: l->buffers)
+				buffers.add(&b);
+	for (Sample *s: weak(song->samples))
+		if (s->buf)
+			buffers.add(s->buf);
+	song->unlock_shared();
+	return buffers;
 }
 
 void PeakThread::update_song() {
-	//msg_write(".");
-	for (Track *t: weak(song->tracks))
-		update_track(t);
-	for (Sample *s: weak(song->samples))
-		if (s->buf)
-			update_buffer(*s->buf);
+	auto buffers = enum_buffers(song);
+	for (auto b: buffers)
+		update_buffer(*b);
 }
 
 void PeakThread::notify() {

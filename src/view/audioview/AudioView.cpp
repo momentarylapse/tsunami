@@ -166,7 +166,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	cpu_display = new CpuDisplay(session);
 	scene_graph->add_child(cpu_display);
 
-	peak_database = new PeakDatabase;
+	peak_database = new PeakDatabase(song);
 
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
@@ -189,9 +189,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	images.track_midi = Image::load(tsunami->directory_static | "icons/track-midi.png");
 	images.track_group = Image::load(tsunami->directory_static | "icons/track-group.png");
 
-	peak_thread = new PeakThread(song, peak_database.get());
-	peak_thread->messanger.out_changed >> in_redraw;
-	peak_thread->run();
 	draw_runner_id = -1;
 
 
@@ -313,7 +310,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 		enable(false);
 	});
 	song->out_before_change >> create_sink([this] {
-		peak_thread->stop_update();
+		peak_database->stop_update();
 	});
 	song->out_after_change >> create_sink([this] {
 		on_song_change();
@@ -333,11 +330,9 @@ AudioView::~AudioView() {
 	if (draw_runner_id >= 0)
 		hui::cancel_runner(draw_runner_id);
 
-	peak_thread->messanger.unsubscribe(this);
 	session->playback->unsubscribe(this);
 	song->unsubscribe(this);
 
-	peak_thread->hard_stop();
 	PerformanceMonitor::delete_channel(perf_channel);
 }
 
@@ -864,7 +859,6 @@ void AudioView::on_song_finished_loading() {
 			if (t->track->layers.num > 1)
 				implode_track(t->track);
 	}
-	update_peaks();
 	request_optimize_view();
 }
 
@@ -876,10 +870,8 @@ void AudioView::on_song_tracks_change() {
 
 void AudioView::on_song_change() {
 	session->debug("view", "song.after-change");
-	if (song->history_enabled()) {
+	if (song->history_enabled())
 		session->debug("view", "+++");
-		update_peaks();
-	}
 }
 
 void AudioView::on_stream_tick() {
@@ -1205,11 +1197,6 @@ void AudioView::update_menu() {
 	win->check("view-midi-linear", common_midi_mode == MidiMode::LINEAR);
 	win->check("view-midi-tab", common_midi_mode == MidiMode::TAB);
 	win->check("view-midi-classical", common_midi_mode == MidiMode::CLASSICAL);
-}
-
-void AudioView::update_peaks() {
-	session->debug("view", "-------------------- view update peaks");
-	peak_thread->start_update();
 }
 
 void AudioView::set_midi_view_mode(MidiMode mode) {

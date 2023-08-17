@@ -20,7 +20,6 @@ class Session;
 class Data : public Sharable<obs::Node<VirtualBase>> {
 public:
 	explicit Data(Session *session);
-	virtual ~Data();
 
 	obs::source out_start_loading{this, "start-loading"};
 	obs::source out_finished_loading{this, "finished-loading"};
@@ -41,7 +40,7 @@ public:
 	int file_time;
 	bool binary_file_format;
 
-	ActionManager *action_manager;
+	owned<ActionManager> action_manager;
 	bool history_enabled();
 
 
@@ -49,6 +48,9 @@ public:
 	void lock();
 	bool try_lock();
 	void unlock();
+	void lock_shared();
+	bool try_lock_shared();
+	void unlock_shared();
 
 
 	struct XMessageData {

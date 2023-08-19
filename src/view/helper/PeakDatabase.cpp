@@ -9,6 +9,7 @@
 #include "PeakThread.h"
 #include "../../data/audio/AudioBuffer.h"
 #include <math.h>
+#include <atomic>
 
 // AudioBuffer is only guaranteed to exist between acquire() and release()!
 
@@ -70,8 +71,6 @@ void PeakData::invalidate_peaks(const Range &_range) {
 
 	for (int i=i0; i<i1; i++)
 		peaks[pm][i] = 255;
-
-	spectrum.clear();
 }
 
 inline float fabsmax(float *p) {
@@ -186,6 +185,11 @@ int PeakData::_update_peaks_prepare() {
 	return n;
 }
 
+SpectrogramData::SpectrogramData(AudioBuffer &b) : buffer(b) {
+	version = buffer.version;
+	state = State::OUT_OF_SYNC;
+}
+
 PeakDatabase::PeakDatabase(Song *song) {
 	peak_thread = new PeakThread(song, this);
 	peak_thread->messenger.out_changed >> create_sink([this] { out_changed(); });
@@ -201,13 +205,12 @@ void PeakDatabase::invalidate_all() {
 	peak_data.clear();
 }
 
-PeakData& PeakDatabase::acquire_data(AudioBuffer &b) {
+PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 	for (auto p: weak(peak_data))
 		if (&(p->buffer) == &b) {
 			p->mtx.lock();
 			if (p->version != b.version) {
 				p->peaks.clear();
-				p->spectrum.clear();
 				p->version = b.version;
 			}
 			return *p;
@@ -222,28 +225,42 @@ PeakData& PeakDatabase::acquire_data(AudioBuffer &b) {
 	return *p;
 }
 
-PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
-	auto &p = acquire_data(b);
-	return p;
+SpectrogramData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
+	for (auto p: weak(spectrogram_data))
+		if (&(p->buffer) == &b) {
+			p->mtx.lock();
+			if (p->version != b.version) {
+				p->spectrogram.clear();
+				p->version = b.version;
+			}
+			return *p;
+		}
+
+	auto p = new SpectrogramData(b);
+	mtx.lock();
+	spectrogram_data.add(p);
+	mtx.unlock();
+
+	p->mtx.lock();
+	return *p;
 }
 
-PeakData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
-	auto &p = acquire_data(b);
-	return p;
+void PeakDatabase::release(PeakData& p) {
+	p.mtx.unlock();
 }
 
-void PeakDatabase::release_data(PeakData& p) {
+void PeakDatabase::release(SpectrogramData& p) {
 	p.mtx.unlock();
 }
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
-	auto &p = acquire_data(buf);
+	auto &p = acquire_peaks(buf);
 	int n = p._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
 		if (p._peaks_chunk_needs_update(i))
 			p._update_peaks_chunk(i);
-	release_data(p);
+	release(p);
 }
 
 void PeakDatabase::stop_update() {
@@ -254,18 +271,18 @@ void PeakDatabase::iterate() {
 	mtx.lock();
 
 	// new requests?
-	if (!update_request)
-		for (auto p: weak(peak_data)) {
-			if (p->dirty and !p->update_requested) {
-				p->update_requested = true;
-				update_request = p;
-			}
+	for (auto p: weak(peak_data)) {
+		if (p->state == PeakData::State::OUT_OF_SYNC) {
+			p->state = PeakData::State::UPDATE_REQUESTED;
+			requests.add({p, nullptr});
 		}
+	}
 
 	// collect old requests?
-	if (update_request) {
-
-	}
+	/*for (auto &r: requests)
+		if (r.p and r.p->state == PeakData::State::UPDATE_FINISHED) {
+			r.p->state = PeakData::State::OK;
+		}*/
 
 	mtx.unlock();
 

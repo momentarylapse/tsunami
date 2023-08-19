@@ -10,7 +10,10 @@
 
 #include "../../lib/base/base.h"
 #include "../../lib/base/pointer.h"
+#include "../../lib/base/optional.h"
 #include "../../lib/pattern/Observable.h"
+#include "../../data/audio/AudioBuffer.h"
+#include <atomic>
 #include <shared_mutex>
 
 class AudioBuffer;
@@ -27,18 +30,15 @@ public:
 	std::shared_timed_mutex mtx;
 	AudioBuffer &buffer;
 	Array<bytes> peaks;
-	bytes spectrum;
 	int version;
 
 	enum class State {
 		OK,
 		OUT_OF_SYNC,
-		UPDATE_REQUESTED_PEAKS,
-		UPDATE_REQUESTED_SPECTROGRAM,
+		UPDATE_REQUESTED,
 		UPDATE_FINISHED
 	};
-
-	State state;
+	std::atomic<State> state;
 
 	PeakData(AudioBuffer &b);
 
@@ -57,7 +57,34 @@ public:
 	void _truncate_peaks(int length);
 
 	// PeakThread
-	AudioBuffer temp;
+	struct Temp {
+		AudioBuffer buffer;
+		Array<bytes> peaks;
+	} temp;
+};
+
+class SpectrogramData {
+public:
+	std::shared_timed_mutex mtx;
+	AudioBuffer &buffer;
+	bytes spectrogram;
+	int version;
+
+	enum class State {
+		OK,
+		OUT_OF_SYNC,
+		UPDATE_REQUESTED,
+		UPDATE_FINISHED
+	};
+	State state;
+
+	SpectrogramData(AudioBuffer &b);
+
+	// PeakThread
+	struct Temp {
+		AudioBuffer buffer;
+		bytes spectrogram;
+	} temp;
 };
 
 class PeakDatabase : public obs::Node<VirtualBase> {
@@ -73,11 +100,12 @@ public:
 	std::shared_timed_mutex mtx;
 
 	owned_array<PeakData> peak_data;
+	owned_array<SpectrogramData> spectrogram_data;
 
-	PeakData& acquire_data(AudioBuffer &b);
 	PeakData& acquire_peaks(AudioBuffer &b);
-	PeakData& acquire_spectrogram(AudioBuffer &b);
-	void release_data(PeakData& p);
+	SpectrogramData& acquire_spectrogram(AudioBuffer &b);
+	void release(PeakData& p);
+	void release(SpectrogramData& p);
 
 
 	void update_peaks_now(AudioBuffer &buf);
@@ -89,7 +117,12 @@ public:
 
 	void iterate();
 
-	PeakData* update_request = nullptr;
+	struct Request {
+		PeakData *p;
+		SpectrogramData *s;
+	};
+
+	Array<Request> requests;
 };
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

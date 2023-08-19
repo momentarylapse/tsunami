@@ -104,8 +104,8 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		buf.mtx.unlock();
 		throw Exception("aaa4");
 	}
-	auto &p = db->acquire_data(buf);
-	db->release_data(p);
+	auto &p = db->acquire_peaks(buf);
+	db->release(p);
 	int n = p._update_peaks_prepare();
 	buf.mtx.unlock();
 

@@ -188,7 +188,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
 			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
 			c->set_antialiasing(false);
-			db->release_data(p);
+			db->release(p);
 			return;
 		}
 
@@ -220,7 +220,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 				}
 			}
 		}
-		db->release_data(p);
+		db->release(p);
 	} else {
 
 		// directly show every sample
@@ -230,8 +230,8 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
-bool prepare_spectrum(PeakData &p, float sample_rate) {
-	if (p.spectrum.num > 0)
+bool prepare_spectrum(SpectrogramData &p, float sample_rate) {
+	if (p.spectrogram.num > 0)
 		return false;
 
 	const float DB_RANGE = 50;
@@ -242,7 +242,7 @@ bool prepare_spectrum(PeakData &p, float sample_rate) {
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
 	p.buffer.mtx.lock();
-	p.spectrum.exchange(qspectrum);
+	p.spectrogram.exchange(qspectrum);
 	p.buffer.mtx.unlock();
 	return true;
 }
@@ -290,7 +290,7 @@ struct SpectrumImageEntry {
 };
 static Array<SpectrumImageEntry> spectrum_images;
 
-HorizontallyChunkedImage& get_spectrum_image(PeakData &p) {
+HorizontallyChunkedImage& get_spectrum_image(SpectrogramData &p) {
 	for (auto &si: spectrum_images)
 		if (si.buf == &p.buffer)
 			return si.image;
@@ -300,15 +300,15 @@ HorizontallyChunkedImage& get_spectrum_image(PeakData &p) {
 	return spectrum_images.back().image;
 }
 
-HorizontallyChunkedImage& render_spectrum_image(PeakData &p, float sample_rate) {
+HorizontallyChunkedImage& render_spectrum_image(SpectrogramData &p, float sample_rate) {
 	auto& im = get_spectrum_image(p);
 	if (prepare_spectrum(p, sample_rate)) {
-		int n = p.spectrum.num / SPECTRUM_N;
+		int n = p.spectrogram.num / SPECTRUM_N;
 		im.resize(n, SPECTRUM_N);
 
 		for (int i=0; i<n; i++) {
 			for (int k=0; k<SPECTRUM_N; k++) {
-				float f = Spectrogram::dequantize(p.spectrum[i * SPECTRUM_N + k]);
+				float f = Spectrogram::dequantize(p.spectrogram[i * SPECTRUM_N + k]);
 				im.set_pixel(i, SPECTRUM_N - 1 - k, color_heat_map(f));
 			}
 		}
@@ -319,7 +319,7 @@ HorizontallyChunkedImage& render_spectrum_image(PeakData &p, float sample_rate) 
 void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
 	auto &p = db->acquire_spectrogram(b);
 	auto& im = render_spectrum_image(p, this->view->session->sample_rate());
-	db->release_data(p);
+	db->release(p);
 
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);

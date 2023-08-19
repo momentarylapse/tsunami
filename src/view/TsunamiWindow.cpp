@@ -893,6 +893,7 @@ void TsunamiWindow::on_bottom_bar_update() {
 void TsunamiWindow::on_update() {
 	// "Clipboard", "AudioFile" or "AudioView"
 	update_menu();
+	view->force_redraw();
 }
 
 void TsunamiWindow::on_exit() {

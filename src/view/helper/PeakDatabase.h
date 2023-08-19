@@ -10,7 +10,7 @@
 
 #include "../../lib/base/base.h"
 #include "../../lib/base/pointer.h"
-#include "../../lib/base/optional.h"
+#include "../../lib/base/map.h"
 #include "../../lib/pattern/Observable.h"
 #include "../../data/audio/AudioBuffer.h"
 #include <atomic>
@@ -28,7 +28,7 @@ class Song;
 class PeakData {
 public:
 	std::shared_timed_mutex mtx;
-	AudioBuffer &buffer;
+	AudioBuffer* buffer;
 	Array<bytes> peaks;
 	int version;
 
@@ -40,7 +40,7 @@ public:
 	};
 	std::atomic<State> state;
 
-	PeakData(AudioBuffer &b);
+	PeakData(AudioBuffer& b);
 
 	static const int PEAK_CHUNK_EXP;
 	static const int PEAK_CHUNK_SIZE;
@@ -68,7 +68,7 @@ public:
 class SpectrogramData {
 public:
 	std::shared_timed_mutex mtx;
-	AudioBuffer &buffer;
+	AudioBuffer* buffer;
 	bytes spectrogram;
 	int version;
 
@@ -80,7 +80,7 @@ public:
 	};
 	State state;
 
-	SpectrogramData(AudioBuffer &b);
+	SpectrogramData(AudioBuffer& b);
 
 	// PeakThread
 	struct Temp {
@@ -101,8 +101,10 @@ public:
 
 	std::shared_timed_mutex mtx;
 
-	owned_array<PeakData> peak_data;
-	owned_array<SpectrogramData> spectrogram_data;
+	//owned_array<PeakData> peak_data;
+	//base::map<int, owned<PeakData>> peak_data;
+	base::map<int, PeakData*> peak_data;
+	base::map<int, SpectrogramData*> spectrogram_data;
 
 	PeakData& acquire_peaks(AudioBuffer &b);
 	SpectrogramData& acquire_spectrogram(AudioBuffer &b);

@@ -74,7 +74,7 @@ void PeakThread::on_run() {
 				//msg_write(":(    " + e.message());
 			}
 		}*/
-		printf(".\n");
+		//printf(".\n");
 
 		if (db->mtx.try_lock()) {
 			for (auto r: db->requests)
@@ -85,7 +85,7 @@ void PeakThread::on_run() {
 		}
 
 		for (auto p: peak_requests) {
-			printf("==>");
+			printf("==>\n");
 
 			int n = p->temp._update_peaks_prepare();
 

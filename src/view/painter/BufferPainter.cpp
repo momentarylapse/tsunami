@@ -237,13 +237,13 @@ bool prepare_spectrum(SpectrogramData &p, float sample_rate) {
 	const float DB_RANGE = 50;
 	const float DB_BOOST = 10;
 
-	auto pspectrum = Spectrogram::log_spectrogram(p.buffer, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
+	auto pspectrum = Spectrogram::log_spectrogram(*p.buffer, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
 	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
-	p.buffer.mtx.lock();
+	p.buffer->mtx.lock();
 	p.spectrogram.exchange(qspectrum);
-	p.buffer.mtx.unlock();
+	p.buffer->mtx.unlock();
 	return true;
 }
 
@@ -292,10 +292,10 @@ static Array<SpectrumImageEntry> spectrum_images;
 
 HorizontallyChunkedImage& get_spectrum_image(SpectrogramData &p) {
 	for (auto &si: spectrum_images)
-		if (si.buf == &p.buffer)
+		if (si.buf == p.buffer)
 			return si.image;
 	SpectrumImageEntry s;
-	s.buf = &p.buffer;
+	s.buf = p.buffer;
 	spectrum_images.add(s);
 	return spectrum_images.back().image;
 }

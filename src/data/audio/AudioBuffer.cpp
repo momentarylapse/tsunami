@@ -28,15 +28,9 @@ const int MAX_CHANNELS = 1024;
 #define MEM_CHANNELS  max(channels, MIN_CHANNELS)
 
 
-AudioBuffer::AudioBuffer() {
-	offset = 0;
-	length = 0;
-	channels = 0;
-	version = 0;
-	set_channels(2);
-}
 
 AudioBuffer::AudioBuffer(int _length, int _channels) {
+	uuid = rand();
 	offset = 0;
 	length = 0;
 	channels = 0;
@@ -45,8 +39,12 @@ AudioBuffer::AudioBuffer(int _length, int _channels) {
 	resize(_length);
 }
 
+AudioBuffer::AudioBuffer() : AudioBuffer(0, 2) {
+}
+
 // copy constructor
 AudioBuffer::AudioBuffer(const AudioBuffer &b) {
+	uuid = rand();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -56,11 +54,14 @@ AudioBuffer::AudioBuffer(const AudioBuffer &b) {
 }
 
 // move constructor
-AudioBuffer::AudioBuffer(AudioBuffer &&b) {
+AudioBuffer::AudioBuffer(AudioBuffer &&b)  noexcept {
+	uuid = b.uuid;
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
 	c = std::move(b.c);
+	b.length = 0;
+	b.channels = 0;
 	compressed = b.compressed;
 	version = b.version;
 }
@@ -74,6 +75,7 @@ void AudioBuffer::__delete__() {
 }
 
 void AudioBuffer::operator=(const AudioBuffer &b) {
+	msg_write("<cp>");
 	clear();
 	offset = b.offset;
 	length = b.length;
@@ -83,17 +85,19 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 	compressed = b.compressed;
 }
 
-void AudioBuffer::operator=(AudioBuffer &&b) {
+void AudioBuffer::operator=(AudioBuffer &&b) noexcept {
+	msg_write("<move>");
 	clear();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
 	c = std::move(b.c);
-	_data_was_changed();
+	b.length = 0;
+	b.channels = 0;
 	compressed = b.compressed;
+	uuid = b.uuid;
+	version = b.version;
 }
-
-AudioBuffer::~AudioBuffer() {}
 
 void AudioBuffer::clear() {
 	for (auto &cc: c)

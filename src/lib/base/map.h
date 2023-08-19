@@ -42,18 +42,24 @@ public:
 	bool contains(const T1 &key) const {
 		return find(key) >= 0;
 	}
+	T2 &by_index(int index) {
+		return ((Entry*)data)[index].value;
+	}
+	const T2 &by_index(int index) const {
+		return ((Entry*)data)[index].value;
+	}
 	const T2 &operator[] (const T1 &key) const {
 		//msg_write("const[]");
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
-		return ((Entry*)data)[n].value;
+		return by_index(n);
 	}
 	T2 &operator[] (const T1 &key) {
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
-		return ((Entry*)data)[n].value;
+		return by_index(n);
 	}
 	void drop(const T1 &key) {
 		int n = find(key);

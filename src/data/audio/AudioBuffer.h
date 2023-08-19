@@ -19,21 +19,22 @@ class AudioBuffer {
 public:
 	AudioBuffer();
 	AudioBuffer(const AudioBuffer &b);
-	AudioBuffer(AudioBuffer &&b);
+	AudioBuffer(AudioBuffer &&b) noexcept;
 	AudioBuffer(int length, int channels);
-	~AudioBuffer();
+	~AudioBuffer() = default;
 
 	void _cdecl __init__();
 	void _cdecl __delete__();
 
 	void operator=(const AudioBuffer &b);
-	void operator=(AudioBuffer &&b);
+	void operator=(AudioBuffer &&b) noexcept;
 	void __assign__(const AudioBuffer &other) { *this = other; }
 
 	int offset, length;
 	int channels;
 	Array<Array<float>> c;
 
+	int uuid;
 	int version;
 
 	std::shared_timed_mutex mtx;

@@ -21,8 +21,8 @@ const int PeakData::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
 const int PeakData::PEAK_MAGIC_LEVEL2 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP) * 2;
 
 
-PeakData::PeakData(AudioBuffer &b) : buffer(b) {
-	version = buffer.version;
+PeakData::PeakData(AudioBuffer& b) : buffer(&b) {
+	version = b.version;
 	state = State::OUT_OF_SYNC;
 }
 
@@ -50,7 +50,7 @@ unsigned char inline shrink_mean(unsigned char a, unsigned char b) {
 bool PeakData::_peaks_chunk_needs_update(int index) {
 	if (state != State::OK)
 		return true;
-	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
+	int pm = PEAK_MAGIC_LEVEL2 * buffer->channels;
 	if (peaks.num <= pm)
 		return true;
 	if (index >= peaks[pm].num)
@@ -201,8 +201,8 @@ int PeakData::Temp::_update_peaks_prepare() {
  * SpectrogramData
  */
 
-SpectrogramData::SpectrogramData(AudioBuffer &b) : buffer(b) {
-	version = buffer.version;
+SpectrogramData::SpectrogramData(AudioBuffer &b) : buffer(&b) {
+	version = b.version;
 	state = State::OUT_OF_SYNC;
 }
 
@@ -222,7 +222,20 @@ void PeakDatabase::invalidate_all() {
 }
 
 PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
-	for (auto p: weak(peak_data))
+	int index = peak_data.find(b.uuid);
+	if (index >= 0) {
+		auto p = peak_data.by_index(index);
+		p->mtx.lock();
+		p->buffer = &b;
+		if (p->version != b.version) {
+			msg_write(format("V  %x != %x", p->version, b.version));
+			p->version = b.version;
+			p->peaks.clear();
+			p->state = PeakData::State::OUT_OF_SYNC;
+		}
+		return *p;
+	}
+	/*for (auto p: weak(peak_data))
 		if (&(p->buffer) == &b) {
 			p->mtx.lock();
 			if (p->version != b.version) {
@@ -231,11 +244,11 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 				p->state = PeakData::State::OUT_OF_SYNC;
 			}
 			return *p;
-		}
+		}*/
 
 	auto p = new PeakData(b);
 	mtx.lock();
-	peak_data.add(p);
+	peak_data.set(b.uuid, p);
 	mtx.unlock();
 
 	p->mtx.lock();
@@ -243,20 +256,22 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 }
 
 SpectrogramData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
-	for (auto p: weak(spectrogram_data))
-		if (&(p->buffer) == &b) {
-			p->mtx.lock();
-			if (p->version != b.version) {
-				p->version = b.version;
-				p->spectrogram.clear();
-				p->state = SpectrogramData::State::OUT_OF_SYNC;
-			}
-			return *p;
+	int index = spectrogram_data.find(b.uuid);
+	if (index >= 0) {
+		auto p = spectrogram_data.by_index(index);
+		p->mtx.lock();
+		p->buffer = &b;
+		if (p->version != b.version) {
+			p->version = b.version;
+			p->spectrogram.clear();
+			p->state = SpectrogramData::State::OUT_OF_SYNC;
 		}
+		return *p;
+	}
 
 	auto p = new SpectrogramData(b);
 	mtx.lock();
-	spectrogram_data.add(p);
+	spectrogram_data.set(b.uuid, p);
 	mtx.unlock();
 
 	p->mtx.lock();
@@ -290,17 +305,19 @@ void PeakDatabase::iterate() {
 	mtx.lock();
 
 	// new requests?
-	for (auto p: weak(peak_data)) {
+	for (int i=0; i<peak_data.num; i++) {
+		auto p = peak_data.by_index(i);
 		if (p->state == PeakData::State::OUT_OF_SYNC) {
-			p->temp.buffer = p->buffer;
+			p->temp.buffer = *p->buffer;
 			p->state = PeakData::State::UPDATE_REQUESTED;
 			requests.add({p, nullptr});
-			msg_write("+ peak request");
+			msg_write(format("+ peak request  %x  %x", p->buffer->uuid, p->version));
 		}
 	}
-	for (auto p: weak(spectrogram_data)) {
+	for (int i=0; i<spectrogram_data.num; i++) {
+		auto p = spectrogram_data.by_index(i);
 		if (p->state == SpectrogramData::State::OUT_OF_SYNC) {
-			p->temp.buffer = p->buffer;
+			p->temp.buffer = *p->buffer;
 			p->state = SpectrogramData::State::UPDATE_REQUESTED;
 	//		requests.add({nullptr, p});
 			msg_write("+ spectrogram request");

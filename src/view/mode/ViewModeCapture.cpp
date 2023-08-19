@@ -9,6 +9,7 @@
 #include "../sidebar/captureconsolemodes/CaptureTrackData.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
+//#include "../audioview/graph/AudioViewTrack.h"
 #include "../painter/BufferPainter.h"
 #include "../helper/PeakDatabase.h"
 #include "../sidebar/SideBar.h"
@@ -51,6 +52,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 		if (d.type() == SignalType::AUDIO) {
 			auto *rec = d.audio_recorder();
 
+			//view->buffer_painter->set_context(l->area, l->vtrack()->audio_mode);//AudioViewMode(0));
 			view->buffer_painter->set_context(l->area, AudioViewMode(0));
 			view->buffer_painter->set_color(theme.capture_marker, l->background_color());
 

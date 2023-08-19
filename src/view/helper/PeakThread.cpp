@@ -91,7 +91,6 @@ void PeakThread::on_run() {
 
 		auto p = db->requests.pop().p;
 
-		printf("==>\n");
 		if (p->mode == AudioViewMode::PEAKS) {
 
 			int n = p->temp._update_peaks_prepare();

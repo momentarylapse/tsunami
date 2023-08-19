@@ -31,6 +31,8 @@ const float PeakData::SPECTRUM_MIN_FREQ = 60.0f;
 const float PeakData::SPECTRUM_MAX_FREQ = 3000.0f;
 
 
+#define dbo(m) //msg_write(m)
+
 PeakData::PeakData(AudioBuffer& b, AudioViewMode m) : buffer(&b) {
 	version = b.version;
 	state = State::OUT_OF_SYNC;
@@ -276,16 +278,13 @@ PeakData& PeakDatabase::acquire(AudioBuffer &b, AudioViewMode mode) {
 		p->ticks_since_last_usage = 0;
 		p->buffer = &b;
 		if (p->version != b.version) {
-			msg_write(format("%x   V  %x != %x", b.uid, p->version, b.version));
-			p->version = b.version;
-			p->peaks.clear();
-			p->spectrogram.clear();
+			dbo(format("%x   V  %x != %x", b.uid, p->version, b.version));
 			p->state = PeakData::State::OUT_OF_SYNC;
 		}
 		return *p;
 	}
 
-	msg_write(format("++ NEW BUFFER %x  %x", b.uid, b.version));
+	dbo(format("++ NEW BUFFER %x  %x", b.uid, b.version));
 	auto p = new PeakData(b, mode);
 	mtx.lock();
 	map->set(b.uid, p);
@@ -301,12 +300,28 @@ void PeakDatabase::release(PeakData& p) {
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
 	auto &p = acquire(buf, AudioViewMode::PEAKS);
-	int n = p.temp._update_peaks_prepare();
+	if (p.state == PeakData::State::OUT_OF_SYNC) {
 
-	for (int i=0; i<n; i++)
-		if (p.temp._peaks_chunk_needs_update(i))
-			p.temp._update_peaks_chunk(i);
-	p.peaks = p.temp.peaks;
+		if ((p.version & 0xffff0000) == (buf.version & 0xffff0000) and p.temp.buffer.length > 0) {
+			// incremental update
+			p.peaks.exchange(p.temp.peaks);
+			p.temp.buffer.append(buf.ref(p.temp.buffer.length, buf.length));
+		} else {
+			// full update
+			p.peaks.clear();
+			p.spectrogram.clear();
+			p.temp.buffer = buf;
+		}
+
+		int n = p.temp._update_peaks_prepare();
+		for (int i=0; i<n; i++)
+			if (p.temp._peaks_chunk_needs_update(i))
+				p.temp._update_peaks_chunk(i);
+
+		p.peaks.exchange(p.temp.peaks);
+		p.state = PeakData::State::OK;
+		p.version = buf.version;
+	}
 	release(p);
 }
 
@@ -318,16 +333,31 @@ void PeakDatabase::iterate_items(Map& map) {
 	for (auto&& [uid,p]: map) {
 		p->ticks_since_last_usage ++;
 		if (p->ticks_since_last_usage > 10) {
-			msg_write("DELETING OLD PEAKS...");
+			dbo("DELETING OLD PEAKS...");
 			delete p;
 			map.drop(uid);
 			// NOTE: we're abusing that map<> does not reallocate.
 			// we will only skip 1 element
 			//return;
 		} else if (p->state == PeakData::State::OUT_OF_SYNC) {
-			p->temp.buffer = *p->buffer;
+			if (requests.size() >= 4)
+				continue;
+
+			if ((p->version & 0xffff0000) == (p->buffer->version & 0xffff0000) and p->temp.buffer.length > 0) {
+				// incremental update
+				p->peaks.clear(); // TODO
+				p->spectrogram.clear(); // TODO
+				auto rr = p->buffer->ref(p->temp.buffer.length, p->buffer->length);
+				p->temp.buffer.append(rr);
+			} else {
+				// full update
+				p->peaks.clear();
+				p->spectrogram.clear();
+				p->temp.buffer = *p->buffer;
+			}
 			p->state = PeakData::State::UPDATE_REQUESTED;
-			msg_write(format("+ peak request  %x  %x", p->buffer->uid, p->version));
+			p->version = p->buffer->version;
+			dbo(format("+ peak request  %x  %x", p->buffer->uid, p->version));
 			requests.add({p});
 		}
 	}

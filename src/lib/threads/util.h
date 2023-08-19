@@ -28,6 +28,12 @@ public:
 		mtx.unlock();
 		return h;
 	}
+	int size() {
+		mtx.lock();
+		int s = buffer.num;
+		mtx.unlock();
+		return s;
+	}
 	T pop() {
 		mtx.lock();
 		T t;

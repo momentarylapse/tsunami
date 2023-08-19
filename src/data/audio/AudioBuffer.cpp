@@ -367,7 +367,7 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 
 
 AudioBuffer AudioBuffer::ref(int start, int end) {
-	if (end == (signed)0x81234567) // magical value (-_-)'
+	if (end == DynamicArray::MAGIC_END_INDEX)
 		end = length;
 	AudioBuffer r;
 	if (start < 0)

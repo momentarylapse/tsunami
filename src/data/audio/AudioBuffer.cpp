@@ -27,10 +27,19 @@ const int MAX_CHANNELS = 1024;
 
 #define MEM_CHANNELS  max(channels, MIN_CHANNELS)
 
-
+static int next_buffer_uid() {
+	static int state = 0;
+	return state ++;
+	//rand();
+}
+static int next_buffer_version() {
+	static int state = 0;
+	return state ++;
+	//rand();
+}
 
 AudioBuffer::AudioBuffer(int _length, int _channels) {
-	uuid = rand();
+	uuid = next_buffer_uid();
 	offset = 0;
 	length = 0;
 	channels = 0;
@@ -44,18 +53,18 @@ AudioBuffer::AudioBuffer() : AudioBuffer(0, 2) {
 
 // copy constructor
 AudioBuffer::AudioBuffer(const AudioBuffer &b) {
-	uuid = rand();
+	uuid = next_buffer_uid();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
 	c = b.c;
 	compressed = b.compressed;
-	version = b.version;
+	//version = b.version;
+	version = next_buffer_version();
 }
 
 // move constructor
 AudioBuffer::AudioBuffer(AudioBuffer &&b)  noexcept {
-	uuid = b.uuid;
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -63,7 +72,15 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b)  noexcept {
 	b.length = 0;
 	b.channels = 0;
 	compressed = b.compressed;
+#if 1
+	uuid = b.uuid;
 	version = b.version;
+#else
+	uuid = next_buffer_uid();
+	version = next_buffer_version();
+#endif
+	b.uuid = -1;
+	b.version = -1;
 }
 
 void AudioBuffer::__init__() {
@@ -75,8 +92,9 @@ void AudioBuffer::__delete__() {
 }
 
 void AudioBuffer::operator=(const AudioBuffer &b) {
-	msg_write("<cp>");
 	clear();
+	if (uuid < 0)
+		uuid = next_buffer_uid();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -86,7 +104,6 @@ void AudioBuffer::operator=(const AudioBuffer &b) {
 }
 
 void AudioBuffer::operator=(AudioBuffer &&b) noexcept {
-	msg_write("<move>");
 	clear();
 	offset = b.offset;
 	length = b.length;
@@ -95,8 +112,15 @@ void AudioBuffer::operator=(AudioBuffer &&b) noexcept {
 	b.length = 0;
 	b.channels = 0;
 	compressed = b.compressed;
+#if 1
 	uuid = b.uuid;
 	version = b.version;
+#else
+	uuid = next_buffer_uid();
+	version = next_buffer_version();
+#endif
+	b.uuid = -1;
+	b.version = -1;
 }
 
 void AudioBuffer::clear() {
@@ -621,5 +645,5 @@ void AudioBuffer::_data_was_changed() {
 	// invalidate compressed
 	compressed = nullptr;
 
-	version = rand();
+	version = next_buffer_version();
 }

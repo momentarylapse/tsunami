@@ -228,7 +228,7 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 		p->mtx.lock();
 		p->buffer = &b;
 		if (p->version != b.version) {
-			msg_write(format("V  %x != %x", p->version, b.version));
+			msg_write(format("%x   V  %x != %x", b.uuid, p->version, b.version));
 			p->version = b.version;
 			p->peaks.clear();
 			p->state = PeakData::State::OUT_OF_SYNC;
@@ -246,6 +246,7 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 			return *p;
 		}*/
 
+	msg_write(format("++ NEW BUFFER %x  %x", b.uuid, b.version));
 	auto p = new PeakData(b);
 	mtx.lock();
 	peak_data.set(b.uuid, p);

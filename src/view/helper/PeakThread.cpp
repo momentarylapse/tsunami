@@ -76,16 +76,26 @@ void PeakThread::on_run() {
 		}*/
 		//printf(".\n");
 
-		if (db->mtx.try_lock()) {
+		//os::sleep(0.05f);
+		os::sleep(1.0f);
+		Thread::cancelation_point();
+
+		if (!db->requests.has_data())
+			continue;
+
+		auto r = db->requests.pop();
+
+		/*if (db->mtx.try_lock()) {
 			for (auto r: db->requests)
 				if (r.p)
 					peak_requests.add(r.p);
 			db->requests.clear();
 			db->mtx.unlock();
-		}
+		}*/
 
-		for (auto p: peak_requests) {
+		//for (auto p: peak_requests) {
 			printf("==>\n");
+			auto p = r.p;
 
 			int n = p->temp._update_peaks_prepare();
 
@@ -101,18 +111,14 @@ void PeakThread::on_run() {
 				}
 			}
 			p->mtx.lock();
-			p->peaks = p->temp.peaks;
+			//p->peaks = p->temp.peaks;
 			p->temp.peaks.clear();
 			p->state = PeakData::State::OK;
 			p->mtx.unlock();
 			notify();
 		}
-		peak_requests.clear();
-
-		//os::sleep(0.05f);
-		os::sleep(1.0f);
-		Thread::cancelation_point();
-	}
+		//peak_requests.clear();
+	//}
 }
 
 void PeakThread::start_update() {

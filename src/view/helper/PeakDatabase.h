@@ -89,6 +89,35 @@ public:
 	} temp;
 };
 
+template<class T>
+class InterThreadFifoBuffer {
+	Array<T> buffer;
+	std::shared_timed_mutex mtx;
+
+public:
+	void add(const T& t) {
+		mtx.lock();
+		buffer.add(t);
+		mtx.unlock();
+	}
+	bool has_data() {
+		mtx.lock();
+		bool h = buffer.num > 0;
+		mtx.unlock();
+		return h;
+	}
+	T pop() {
+		mtx.lock();
+		T t;
+		if (buffer.num > 0) {
+			t = buffer[0];
+			buffer.erase(0);
+		}
+		mtx.unlock();
+		return t;
+	}
+};
+
 class PeakDatabase : public obs::Node<VirtualBase> {
 public:
 	PeakDatabase(Song *song);
@@ -126,7 +155,7 @@ public:
 		SpectrogramData *s;
 	};
 
-	Array<Request> requests;
+	InterThreadFifoBuffer<Request> requests;
 };
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

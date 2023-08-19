@@ -76,8 +76,8 @@ void PeakThread::on_run() {
 		}*/
 		//printf(".\n");
 
-		//os::sleep(0.05f);
-		os::sleep(1.0f);
+		os::sleep(0.05f);
+		//os::sleep(1.0f);
 		Thread::cancelation_point();
 
 		if (!db->requests.has_data())
@@ -111,7 +111,7 @@ void PeakThread::on_run() {
 				}
 			}
 			p->mtx.lock();
-			//p->peaks = p->temp.peaks;
+			p->peaks = p->temp.peaks;
 			p->temp.peaks.clear();
 			p->state = PeakData::State::OK;
 			p->mtx.unlock();

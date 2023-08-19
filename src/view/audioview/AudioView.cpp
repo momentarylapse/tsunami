@@ -167,6 +167,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	scene_graph->add_child(cpu_display);
 
 	peak_database = new PeakDatabase(song);
+	peak_database->out_changed >> in_redraw;
 
 	buffer_painter = new BufferPainter(this);
 	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);

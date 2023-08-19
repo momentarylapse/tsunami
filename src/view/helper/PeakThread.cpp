@@ -9,10 +9,6 @@
 #include "PeakDatabase.h"
 #include "../helper/Drawing.h" // color_heat_map
 #include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
-#include "../../data/Song.h"
-#include "../../data/Track.h"
-#include "../../data/TrackLayer.h"
-#include "../../data/Sample.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
@@ -119,8 +115,7 @@ void PeakThread::on_run() {
 		} else if (p->mode == AudioViewMode::SPECTRUM) {
 
 			PerformanceMonitor::start_busy(perf_channel);
-			float sample_rate = 44100;
-			prepare_spectrum(*p, sample_rate);
+			prepare_spectrum(*p, db->sample_rate);
 
 			int n = p->temp.spectrogram.num / PeakData::SPECTRUM_N;
 			auto& im = p->temp.image;

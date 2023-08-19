@@ -121,10 +121,11 @@ public:
 
 
 	owned<PeakThread> peak_thread;
+	std::atomic<float> sample_rate;
 
 	void stop_update();
 
-	void iterate();
+	void iterate(float sample_rate);
 	void iterate_items(Map& map);
 
 	struct Request {

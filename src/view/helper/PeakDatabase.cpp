@@ -7,12 +7,13 @@
 
 #include "PeakDatabase.h"
 #include "PeakThread.h"
+#include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
+#include "../../data/base.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/os/msg.h"
 #include "../../lib/math/rect.h"
 #include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
-#include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
 #include <math.h>
 #include <atomic>
 
@@ -252,6 +253,7 @@ void HorizontallyChunkedImage::draw(Painter *p, const rect &area) {
  */
 
 PeakDatabase::PeakDatabase() {
+	sample_rate = DEFAULT_SAMPLE_RATE;
 	peak_thread = new PeakThread(this);
 	peak_thread->messenger.out_changed >> create_sink([this] { out_changed(); });
 	peak_thread->run();
@@ -363,7 +365,8 @@ void PeakDatabase::iterate_items(Map& map) {
 	}
 }
 
-void PeakDatabase::iterate() {
+void PeakDatabase::iterate(float _sample_rate) {
+	sample_rate = _sample_rate;
 	mtx.lock();
 
 	// new requests?

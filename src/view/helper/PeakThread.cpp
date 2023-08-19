@@ -64,7 +64,7 @@ PeakThread::~PeakThread() {
 
 void PeakThread::on_run() {
 	while (allow_running) {
-		if (updating) {
+		/*if (updating) {
 			try {
 				update_song();
 				updating = false;
@@ -73,8 +73,44 @@ void PeakThread::on_run() {
 			} catch(Exception &e) {
 				//msg_write(":(    " + e.message());
 			}
+		}*/
+		printf(".\n");
+
+		if (db->mtx.try_lock()) {
+			for (auto r: db->requests)
+				if (r.p)
+					peak_requests.add(r.p);
+			db->requests.clear();
+			db->mtx.unlock();
 		}
-		os::sleep(0.05f);
+
+		for (auto p: peak_requests) {
+			printf("==>");
+
+			int n = p->temp._update_peaks_prepare();
+
+			Thread::cancelation_point();
+
+			for (int i=0; i<n; i++) {
+				if (p->temp._peaks_chunk_needs_update(i)) {
+					PerformanceMonitor::start_busy(perf_channel);
+					p->temp._update_peaks_chunk(i);
+					PerformanceMonitor::end_busy(perf_channel);
+					//notify();
+					Thread::cancelation_point();
+				}
+			}
+			p->mtx.lock();
+			p->peaks = p->temp.peaks;
+			p->temp.peaks.clear();
+			p->state = PeakData::State::OK;
+			p->mtx.unlock();
+			notify();
+		}
+		peak_requests.clear();
+
+		//os::sleep(0.05f);
+		os::sleep(1.0f);
 		Thread::cancelation_point();
 	}
 }
@@ -99,6 +135,7 @@ void PeakThread::hard_stop() {
 }
 
 void PeakThread::update_buffer(AudioBuffer &buf) {
+#if 0
 	buf.mtx.lock();
 	if (!updating) {
 		buf.mtx.unlock();
@@ -131,6 +168,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		if (!updating)
 			throw Exception("aaa2");
 	}
+#endif
 }
 
 // thread safe!

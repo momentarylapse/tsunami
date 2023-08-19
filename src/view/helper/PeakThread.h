@@ -16,6 +16,7 @@ class Song;
 class Track;
 class AudioBuffer;
 class PeakDatabase;
+class PeakData;
 
 class InterThreadMessenger : public obs::Node<VirtualBase> {
 public:
@@ -53,6 +54,8 @@ private:
 	void update_song();
 
 	void notify();
+
+	Array<PeakData*> peak_requests;
 };
 
 

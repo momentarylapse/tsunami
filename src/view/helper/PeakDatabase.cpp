@@ -8,6 +8,7 @@
 #include "PeakDatabase.h"
 #include "PeakThread.h"
 #include "../../data/audio/AudioBuffer.h"
+#include "../../lib/os/msg.h"
 #include <math.h>
 #include <atomic>
 
@@ -46,7 +47,18 @@ unsigned char inline shrink_mean(unsigned char a, unsigned char b) {
 	return _shrink_mean_table[a][b];
 }
 
-void PeakData::_truncate_peaks(int _length) {
+bool PeakData::_peaks_chunk_needs_update(int index) {
+	if (state != State::OK)
+		return true;
+	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
+	if (peaks.num <= pm)
+		return true;
+	if (index >= peaks[pm].num)
+		return true;
+	return (peaks[pm][index] == 255);
+}
+
+/*void PeakData::Temp::_truncate_peaks(int _length) {
 	int level4 = 0;
 	int n = 2*buffer.channels;
 	_length /= PEAK_FINEST_SIZE;
@@ -56,10 +68,9 @@ void PeakData::_truncate_peaks(int _length) {
 		level4 += n;
 		_length /= 2;
 	}
+}*/
 
-}
-
-void PeakData::invalidate_peaks(const Range &_range) {
+/*void PeakData::Temp::invalidate_peaks(const Range &_range) {
 	Range r = buffer.range() and _range;
 
 	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
@@ -71,7 +82,7 @@ void PeakData::invalidate_peaks(const Range &_range) {
 
 	for (int i=i0; i<i1; i++)
 		peaks[pm][i] = 255;
-}
+}*/
 
 inline float fabsmax(float *p) {
 	float a = fabs(*p ++);
@@ -85,7 +96,7 @@ inline float fabsmax(float *p) {
 	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
-void PeakData::_ensure_peak_size(int level4, int n, bool set_invalid) {
+void PeakData::Temp::_ensure_peak_size(int level4, int n, bool set_invalid) {
 	int dl = 2 * buffer.channels;
 	if (peaks.num < level4 + dl)
 		peaks.resize(level4 + dl);
@@ -102,7 +113,7 @@ void PeakData::_ensure_peak_size(int level4, int n, bool set_invalid) {
 	}*/
 }
 
-bool PeakData::_peaks_chunk_needs_update(int index) {
+bool PeakData::Temp::_peaks_chunk_needs_update(int index) {
 	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
 	if (peaks.num <= pm)
 		return true;
@@ -111,7 +122,7 @@ bool PeakData::_peaks_chunk_needs_update(int index) {
 	return (peaks[pm][index] == 255);
 }
 
-void PeakData::_update_peaks_chunk(int index) {
+void PeakData::Temp::_update_peaks_chunk(int index) {
 	// first level
 	int i0 = index * (PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE);
 	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, buffer.length / PEAK_FINEST_SIZE);
@@ -172,7 +183,7 @@ void PeakData::_update_peaks_chunk(int index) {
 	}
 }
 
-int PeakData::_update_peaks_prepare() {
+int PeakData::Temp::_update_peaks_prepare() {
 	if (!_shrink_table_created)
 		update_shrink_table();
 
@@ -184,6 +195,11 @@ int PeakData::_update_peaks_prepare() {
 
 	return n;
 }
+
+
+/*-----------------------------------------------------------
+ * SpectrogramData
+ */
 
 SpectrogramData::SpectrogramData(AudioBuffer &b) : buffer(b) {
 	version = buffer.version;
@@ -210,8 +226,9 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 		if (&(p->buffer) == &b) {
 			p->mtx.lock();
 			if (p->version != b.version) {
-				p->peaks.clear();
 				p->version = b.version;
+				p->peaks.clear();
+				p->state = PeakData::State::OUT_OF_SYNC;
 			}
 			return *p;
 		}
@@ -230,8 +247,9 @@ SpectrogramData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
 		if (&(p->buffer) == &b) {
 			p->mtx.lock();
 			if (p->version != b.version) {
-				p->spectrogram.clear();
 				p->version = b.version;
+				p->spectrogram.clear();
+				p->state = SpectrogramData::State::OUT_OF_SYNC;
 			}
 			return *p;
 		}
@@ -255,11 +273,12 @@ void PeakDatabase::release(SpectrogramData& p) {
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
 	auto &p = acquire_peaks(buf);
-	int n = p._update_peaks_prepare();
+	int n = p.temp._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
-		if (p._peaks_chunk_needs_update(i))
-			p._update_peaks_chunk(i);
+		if (p.temp._peaks_chunk_needs_update(i))
+			p.temp._update_peaks_chunk(i);
+	p.peaks = p.temp.peaks;
 	release(p);
 }
 
@@ -273,8 +292,18 @@ void PeakDatabase::iterate() {
 	// new requests?
 	for (auto p: weak(peak_data)) {
 		if (p->state == PeakData::State::OUT_OF_SYNC) {
+			p->temp.buffer = p->buffer;
 			p->state = PeakData::State::UPDATE_REQUESTED;
 			requests.add({p, nullptr});
+			msg_write("+ peak request");
+		}
+	}
+	for (auto p: weak(spectrogram_data)) {
+		if (p->state == SpectrogramData::State::OUT_OF_SYNC) {
+			p->temp.buffer = p->buffer;
+			p->state = SpectrogramData::State::UPDATE_REQUESTED;
+	//		requests.add({nullptr, p});
+			msg_write("+ spectrogram request");
 		}
 	}
 

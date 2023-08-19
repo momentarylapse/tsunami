@@ -297,31 +297,36 @@ void PeakDatabase::stop_update() {
 	peak_thread->stop_update();
 }
 
-template<class T>
-bool iterate_peak_db_item(T& p) {
-	p.ticks_since_last_usage ++;
-	if (p.ticks_since_last_usage > 10) {
-		return false;
+template<class T, typename F>
+void iterate_peak_db_items(base::map<int,T>& map, F create_request) {
+	for (auto&& [uid,p]: map) {
+		p->ticks_since_last_usage ++;
+		if (p->ticks_since_last_usage > 10) {
+			msg_write("DELETING OLD PEAKS...");
+			delete p;
+			map.drop(uid);
+			// NOTE: we're abusing that map<> does not reallocate.
+			// we will only skip 1 element
+			//return;
+		} else if (p->state == PeakData::State::OUT_OF_SYNC) {
+			p->temp.buffer = *p->buffer;
+			p->state = PeakData::State::UPDATE_REQUESTED;
+			msg_write(format("+ peak request  %x  %x", p->buffer->uid, p->version));
+			create_request(p);
+		}
 	}
-	if (p.state == PeakData::State::OUT_OF_SYNC) {
-		p.temp.buffer = *p.buffer;
-		p.state = PeakData::State::UPDATE_REQUESTED;
-		msg_write(format("+ peak request  %x  %x", p.buffer->uid, p.version));
-		return true;
-	}
-	return false;
 }
 
 void PeakDatabase::iterate() {
 	mtx.lock();
 
 	// new requests?
-	for (auto&& [uid,p]: peak_data)
-		if (iterate_peak_db_item(*p))
-			requests.add({p, nullptr});
-	for (auto&& [uid,p]: spectrogram_data)
-		if (iterate_peak_db_item(*p))
-			requests.add({nullptr, p});
+	iterate_peak_db_items(peak_data, [this] (PeakData* p) {
+		requests.add({p, nullptr});
+	});
+	iterate_peak_db_items(spectrogram_data, [this] (SpectrogramData* p) {
+		requests.add({nullptr, p});
+	});
 
 	// collect old requests?
 	/*for (auto &r: requests)

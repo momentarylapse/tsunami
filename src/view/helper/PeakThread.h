@@ -30,12 +30,11 @@ public:
 
 class PeakThread : public Thread {
 public:
-	Song *song;
 	PeakDatabase *db;
 	int perf_channel;
 	std::atomic<bool> allow_running;
 
-	PeakThread(Song *s, PeakDatabase *db);
+	PeakThread(PeakDatabase *db);
 	~PeakThread();
 	void on_run() override;
 
@@ -50,7 +49,6 @@ private:
 	std::atomic<bool> updating;
 
 	void update_buffer(AudioBuffer &buf);
-	void update_song();
 
 	void notify();
 };

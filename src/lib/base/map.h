@@ -6,14 +6,14 @@
 
 namespace base {
 
-template<class T1, class T2>
+template<class K, class V>
 struct MapEntry {
-	T1 key;
-	T2 value;
-	bool operator == (const MapEntry<T1, T2> &e) const {
+	K key;
+	V value;
+	bool operator == (const MapEntry<K, V> &e) const {
 		return key == e.key;
 	}
-	bool operator > (const MapEntry<T1, T2> &e) const {
+	bool operator > (const MapEntry<K, V> &e) const {
 		return key > e.key;
 	}
 };
@@ -23,91 +23,143 @@ public:
 	MapKeyError(): Exception("key not found"){}
 };
 
-template<class T1, class T2>
-class map : public set<MapEntry<T1, T2>> {
+template<class K, class V>
+class map : public set<MapEntry<K, V>> {
 public:
-	using Entry = MapEntry<T1, T2>;
+	using KeyType = K;
+	using ValueType = V;
+	using Entry = MapEntry<K, V>;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	void set(const T1 &key, const T2 &value) {
+	void set(const K &key, const V &value) {
 		int n = find(key);
 		if (n >= 0)
 			((Entry*)data)[n].value = value;
 		else
-			::base::set<MapEntry<T1, T2>>::add({key, value});
+			::base::set<MapEntry<K, V>>::add({key, value});
 	}
-	int find(const T1 &key) const {
-		return ::base::set<Entry>::find({key, T2()});
+	int find(const K &key) const {
+		return ::base::set<Entry>::find({key, V()});
 	}
-	bool contains(const T1 &key) const {
+	bool contains(const K &key) const {
 		return find(key) >= 0;
 	}
-	T2 &by_index(int index) {
+	V &by_index(int index) {
 		return ((Entry*)data)[index].value;
 	}
-	const T2 &by_index(int index) const {
+	const V &by_index(int index) const {
 		return ((Entry*)data)[index].value;
 	}
-	const T2 &operator[] (const T1 &key) const {
+	const V &operator[] (const K &key) const {
 		//msg_write("const[]");
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
 		return by_index(n);
 	}
-	T2 &operator[] (const T1 &key) {
+	V &operator[] (const K &key) {
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
 		return by_index(n);
 	}
-	void drop(const T1 &key) {
+	void drop(const K &key) {
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
-		Array<MapEntry<T1, T2> >::erase(n);
+		Array<MapEntry<K, V> >::erase(n);
 	}
-	Array<T1> keys() const {
-		Array<T1> keys;
+	Array<K> keys() const {
+		Array<K> keys;
 		for (int i=0; i<this->num; i++)
 			keys.add(((Entry*)data)[i].key);
 		return keys;
 	}
+
+	struct ConstIterator {
+		void operator ++()
+		{	index ++;	p ++;	}
+		void operator ++(int) // postfix
+		{	index ++;	p ++;	}
+		bool operator == (const ConstIterator &i) const
+		{	return p == i.p;	}
+		bool operator != (const ConstIterator &i) const
+		{	return p != i.p;	}
+		const std::pair<K&,V&> operator *()
+		{	return {p->key, p->value};	}
+		ConstIterator(const map<K, V> &m, int n) {
+			p = &m.by_index(n);
+			index = n;
+		}
+		int index;
+		const Entry* p;
+	};
+
+	struct Iterator {
+		void operator ++()
+		{	index ++;	p ++;	}
+		void operator ++(int) // postfix
+		{	index ++;	p ++;	}
+		bool operator == (const Iterator &i) const
+		{	return p == i.p;	}
+		bool operator != (const Iterator &i) const
+		{	return p != i.p;	}
+		std::pair<K&,V&> operator *()
+		{	return {p->key, p->value};	}
+		Iterator(map<K, V> &m, int n) {
+			p = &((Entry*)m.data)[n];
+			index = n;
+		}
+		int index;
+		Entry* p;
+	};
+	Iterator begin() const {
+		return ConstIterator(*this, 0);
+	}
+	Iterator end() const {
+		return ConstIterator(*this, this->num);
+	}
+	Iterator begin() {
+		return Iterator(*this, 0);
+	}
+	Iterator end() {
+		return Iterator(*this, this->num);
+	}
 };
 
-template<class T1, class T2>
+template<class K, class V>
 struct HashMapEntry {
-	T1 key;
+	K key;
 	int hash;
-	T2 value;
-	bool operator == (const HashMapEntry<T1, T2> &e) const {
+	V value;
+	bool operator == (const HashMapEntry<K, V> &e) const {
 		return hash == e.hash;
 	}
-	bool operator > (const HashMapEntry<T1, T2> &e) const {
+	bool operator > (const HashMapEntry<K, V> &e) const {
 		return hash > e.hash;
 	}
 };
 
-template<class T1, class T2>
-class hash_map : public set<HashMapEntry<T1, T2>> {
+template<class K, class V>
+class hash_map : public set<HashMapEntry<K, V>> {
 public:
-	typedef HashMapEntry<T1, T2> Entry;
+	typedef HashMapEntry<K, V> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int _cdecl add(const T1 &key, const T2 &value) {
-		HashMapEntry<T1, T2> e = {key, key.hash(), value};
-		return ::base::set<HashMapEntry<T1, T2>>::add(e);
+	int _cdecl add(const K &key, const V &value) {
+		HashMapEntry<K, V> e = {key, key.hash(), value};
+		return ::base::set<HashMapEntry<K, V>>::add(e);
 	}
-	const T2 &operator[] (const T1 &key) const {
+	const V &operator[] (const K &key) const {
 		//msg_write("const[]");
 		int hash = key.hash();
 		for (int i=0;i<num;i++)
 			if (((Entry*)data)[i].hash == hash)
 				return ((Entry*)data)[i].value;
 		throw MapKeyError();
-		//return T2();
+		//return V();
 	}
-	T2 &operator[] (const T1 &key) {
+	V &operator[] (const K &key) {
 		int hash = key.hash();
 		/*HashEntry e = {"", hash, EmptyVar};
 		int n = find(e);
@@ -120,7 +172,7 @@ public:
 			if (((Entry*)data)[i].hash == hash)
 				return ((Entry*)data)[i].value;
 		throw MapKeyError();
-		//return T2();
+		//return V();
 	}
 };
 

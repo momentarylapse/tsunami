@@ -310,10 +310,10 @@ string Any::repr() const {
 		return s + "]";
 	} else if (is_map()) {
 		string s = "{";
-		for (AnyMap::Entry &p: as_map()) {
+		for (auto&& [k,v]: as_map()) {
 			if (s.num > 1)
 				s += ", ";
-			s += minimal_key_repr(p.key) + ": " + p.value.repr();
+			s += minimal_key_repr(k) + ": " + v.repr();
 		}
 		return s + "}";
 	} else if (is_empty()) {

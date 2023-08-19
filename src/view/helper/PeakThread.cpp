@@ -50,8 +50,7 @@ void InterThreadMessenger::notify_x() {
 
 
 
-PeakThread::PeakThread(Song *s, PeakDatabase *_db) {
-	song = s;
+PeakThread::PeakThread(PeakDatabase *_db) {
 	db = _db;
 	allow_running = true;
 	updating = false;
@@ -64,17 +63,6 @@ PeakThread::~PeakThread() {
 
 void PeakThread::on_run() {
 	while (allow_running) {
-		/*if (updating) {
-			try {
-				update_song();
-				updating = false;
-				notify();
-				//msg_write(":D");
-			} catch(Exception &e) {
-				//msg_write(":(    " + e.message());
-			}
-		}*/
-		//printf(".\n");
 
 		os::sleep(0.05f);
 		//os::sleep(1.0f);
@@ -85,40 +73,29 @@ void PeakThread::on_run() {
 
 		auto r = db->requests.pop();
 
-		/*if (db->mtx.try_lock()) {
-			for (auto r: db->requests)
-				if (r.p)
-					peak_requests.add(r.p);
-			db->requests.clear();
-			db->mtx.unlock();
-		}*/
+		printf("==>\n");
+		auto p = r.p;
 
-		//for (auto p: peak_requests) {
-			printf("==>\n");
-			auto p = r.p;
+		int n = p->temp._update_peaks_prepare();
 
-			int n = p->temp._update_peaks_prepare();
+		Thread::cancelation_point();
 
-			Thread::cancelation_point();
-
-			for (int i=0; i<n; i++) {
-				if (p->temp._peaks_chunk_needs_update(i)) {
-					PerformanceMonitor::start_busy(perf_channel);
-					p->temp._update_peaks_chunk(i);
-					PerformanceMonitor::end_busy(perf_channel);
-					//notify();
-					Thread::cancelation_point();
-				}
+		for (int i=0; i<n; i++) {
+			if (p->temp._peaks_chunk_needs_update(i)) {
+				PerformanceMonitor::start_busy(perf_channel);
+				p->temp._update_peaks_chunk(i);
+				PerformanceMonitor::end_busy(perf_channel);
+				//notify();
+				Thread::cancelation_point();
 			}
-			p->mtx.lock();
-			p->peaks = p->temp.peaks;
-			p->temp.peaks.clear();
-			p->state = PeakData::State::OK;
-			p->mtx.unlock();
-			notify();
 		}
-		//peak_requests.clear();
-	//}
+		p->mtx.lock();
+		p->peaks = p->temp.peaks;
+		p->temp.peaks.clear();
+		p->state = PeakData::State::OK;
+		p->mtx.unlock();
+		notify();
+	}
 }
 
 void PeakThread::start_update() {
@@ -141,65 +118,9 @@ void PeakThread::hard_stop() {
 }
 
 void PeakThread::update_buffer(AudioBuffer &buf) {
-#if 0
-	buf.mtx.lock();
-	if (!updating) {
-		buf.mtx.unlock();
-		throw Exception("aaa4");
-	}
-	auto &p = db->acquire_peaks(buf);
-	db->release(p);
-	int n = p._update_peaks_prepare();
-	buf.mtx.unlock();
-
-	Thread::cancelation_point();
-	if (!updating)
-		throw Exception("aaa3");
-
-	for (int i=0; i<n; i++) {
-		if (p._peaks_chunk_needs_update(i)) {
-			while (!buf.mtx.try_lock()) {
-				Thread::cancelation_point();
-				os::sleep(0.01f);
-				if (!updating)
-					throw Exception("aaa");
-			}
-			PerformanceMonitor::start_busy(perf_channel);
-			p._update_peaks_chunk(i);
-			PerformanceMonitor::end_busy(perf_channel);
-			buf.mtx.unlock();
-			notify();
-			Thread::cancelation_point();
-		}
-		if (!updating)
-			throw Exception("aaa2");
-	}
-#endif
-}
-
-// thread safe!
-Array<AudioBuffer*> enum_buffers(Song *song) {
-	Array<AudioBuffer*> buffers;
-	song->lock_shared();
-	for (Track *t: weak(song->tracks))
-		for (TrackLayer *l: weak(t->layers))
-			for (AudioBuffer &b: l->buffers)
-				buffers.add(&b);
-	for (Sample *s: weak(song->samples))
-		if (s->buf)
-			buffers.add(s->buf);
-	song->unlock_shared();
-	return buffers;
-}
-
-void PeakThread::update_song() {
-	auto buffers = enum_buffers(song);
-	for (auto b: buffers)
-		update_buffer(*b);
 }
 
 void PeakThread::notify() {
 	messenger.notify_x();
-	//hui::run_later(0.01f, [this] { view->force_redraw(); });
 }
 

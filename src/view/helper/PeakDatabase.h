@@ -20,7 +20,6 @@
 class AudioBuffer;
 class Range;
 class PeakThread;
-class Song;
 
 #define NUM_PEAK_LEVELS		24
 #define PEAK_FACTOR			2
@@ -88,7 +87,7 @@ public:
 
 class PeakDatabase : public obs::Node<VirtualBase> {
 public:
-	PeakDatabase(Song *song);
+	PeakDatabase();
 	~PeakDatabase();
 
 	//bytes& get_peaks(AudioBuffer &b, int level4);

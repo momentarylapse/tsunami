@@ -219,17 +219,17 @@ void Configuration::save(const Path &filename) {
 	try {
 		auto f = new TextLinesFormatter(os::fs::open(filename, "wt"));
 		base::set<string> namespaces;
-		for (auto &e: map)
-			namespaces.add(config_get_namespace(e.key));
-		for (auto &e: map)
-			if (config_get_namespace(e.key) == "")
-				f->write_str(format("%s = %s", e.key, e.value.repr()));
+		for (auto&& [k,v]: map)
+			namespaces.add(config_get_namespace(k));
+		for (auto&& [key,value]: map)
+			if (config_get_namespace(key) == "")
+				f->write_str(format("%s = %s", key, value.repr()));
 		for (auto &n: namespaces)
 			if (n.num > 0) {
 				f->write_str(format("\n[%s]", n));
-				for (auto &e: map)
-					if (config_get_namespace(e.key) == n)
-						f->write_str(format("\t%s = %s", config_get_base(e.key), e.value.repr()));
+				for (auto&& [key,value]: map)
+					if (config_get_namespace(key) == n)
+						f->write_str(format("\t%s = %s", config_get_base(key), value.repr()));
 			}
 
 		if (comments.num > 0)

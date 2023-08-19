@@ -113,12 +113,19 @@ gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer 
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	int scale = get_screen_scale(GTK_WIDGET(area));
+#if GTK_CHECK_VERSION(4,12,0)
+	graphene_rect_t r;
+	if (gtk_widget_compute_bounds(GTK_WIDGET(area), GTK_WIDGET(area), &r)) {
+		da->panel->win->input.row = (int) (r.size.height * (float) scale);
+		da->panel->win->input.column = (int) (r.size.width * (float) scale);
+	}
+#else
 	GtkAllocation a;
 	gtk_widget_get_allocation(GTK_WIDGET(area), &a);
 	da->panel->win->input.row = a.height * scale;
 	da->panel->win->input.column = a.width * scale;
+#endif
 	da->panel->win->input.row_target = scale;
-
 
 	gtk_gl_context = context;
 	da->notify(EventID::DRAW_GL);

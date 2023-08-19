@@ -241,6 +241,9 @@ void on_gtk_list_item_setup(GtkListItemFactory *factory, GtkListItem *list_item,
 	m->widget = w;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
 void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
 	int column = base::find_index(list_view->factories, factory);
 	if (column < 0 or column >= list_view->effective_format.num)
@@ -267,7 +270,12 @@ void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, 
 		//gtk_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
 	} else if (f == 'i') {
 		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(s);
+//#if GTK_CHECK_VERSION(4,12,0)
+		// TODO use gtk paintable for images
+//		gtk_picture_set_paintable(GTK_PICTURE(w), p);
+//#else
 		gtk_picture_set_pixbuf(GTK_PICTURE(w), p);
+//#endif
 	} else if (f == 'T') {
 		gtk_editable_set_text(GTK_EDITABLE(w), s);
 	} else if (f == 'm') {
@@ -300,6 +308,8 @@ void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, 
 		msg_error("hui.ListView.bind: no map");
 	}
 }
+
+#pragma GCC diagnostic pop
 
 void on_gtk_column_view_activate(GtkColumnView* self, guint position, gpointer user_data) {
 	reinterpret_cast<Control*>(user_data)->notify(EventID::ACTIVATE);

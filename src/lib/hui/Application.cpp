@@ -60,7 +60,11 @@ void _init_global_css_classes_() {
 	auto *css_provider = gtk_css_provider_new();
 
 #if GTK_CHECK_VERSION(4,0,0)
+#if GTK_CHECK_VERSION(4,12,0)
+	gtk_css_provider_load_from_string(css_provider, css.c_str());
+#else
 	gtk_css_provider_load_from_data(css_provider, (char*)css.data, css.num);
+#endif
 	gtk_style_context_add_provider_for_display(gdk_display_get_default(), GTK_STYLE_PROVIDER(css_provider),  GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 #else
 	GError *error = nullptr;

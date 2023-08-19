@@ -32,18 +32,17 @@ static int next_buffer_uid() {
 	return state ++;
 	//rand();
 }
-static int next_buffer_version() {
-	static int state = 0;
-	return state ++;
-	//rand();
+
+static int next_buffer_version(int v) {
+	return v + 0x10000;
 }
 
 AudioBuffer::AudioBuffer(int _length, int _channels) {
-	uuid = next_buffer_uid();
+	uid = next_buffer_uid();
+	version = 0;
 	offset = 0;
 	length = 0;
 	channels = 0;
-	version = 0;
 	set_channels(_channels);
 	resize(_length);
 }
@@ -53,14 +52,13 @@ AudioBuffer::AudioBuffer() : AudioBuffer(0, 2) {
 
 // copy constructor
 AudioBuffer::AudioBuffer(const AudioBuffer &b) {
-	uuid = next_buffer_uid();
+	uid = next_buffer_uid();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
 	c = b.c;
 	compressed = b.compressed;
-	//version = b.version;
-	version = next_buffer_version();
+	version = 0;
 }
 
 // move constructor
@@ -73,13 +71,13 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b)  noexcept {
 	b.channels = 0;
 	compressed = b.compressed;
 #if 1
-	uuid = b.uuid;
+	uid = b.uid;
 	version = b.version;
 #else
-	uuid = next_buffer_uid();
-	version = next_buffer_version();
+	uid = next_buffer_uid();
+	version = 0;
 #endif
-	b.uuid = -1;
+	b.uid = -1;
 	b.version = -1;
 }
 
@@ -93,8 +91,8 @@ void AudioBuffer::__delete__() {
 
 void AudioBuffer::operator=(const AudioBuffer &b) {
 	clear();
-	if (uuid < 0)
-		uuid = next_buffer_uid();
+	if (uid < 0)
+		uid = next_buffer_uid();
 	offset = b.offset;
 	length = b.length;
 	channels = b.channels;
@@ -113,13 +111,13 @@ void AudioBuffer::operator=(AudioBuffer &&b) noexcept {
 	b.channels = 0;
 	compressed = b.compressed;
 #if 1
-	uuid = b.uuid;
+	uid = b.uid;
 	version = b.version;
 #else
-	uuid = next_buffer_uid();
+	uid = next_buffer_uid();
 	version = next_buffer_version();
 #endif
-	b.uuid = -1;
+	b.uid = -1;
 	b.version = -1;
 }
 
@@ -206,8 +204,12 @@ void AudioBuffer::swap_ref(AudioBuffer &b) {
 
 void AudioBuffer::append(const AudioBuffer &b) {
 	int num0 = length;
+	int v0 = version;
 	resize(length + b.length);
 	set(b, num0, 1.0f);
+
+	// incremental change!
+	version = v0 + 1;
 }
 
 void float_array_swap_values(Array<float> &a, Array<float> &b) {
@@ -645,5 +647,5 @@ void AudioBuffer::_data_was_changed() {
 	// invalidate compressed
 	compressed = nullptr;
 
-	version = next_buffer_version();
+	version = next_buffer_version(version);
 }

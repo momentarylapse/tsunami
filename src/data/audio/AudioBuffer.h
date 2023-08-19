@@ -34,7 +34,7 @@ public:
 	int channels;
 	Array<Array<float>> c;
 
-	int uuid;
+	int uid;
 	int version;
 
 	std::shared_timed_mutex mtx;

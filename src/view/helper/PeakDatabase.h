@@ -12,6 +12,7 @@
 #include "../../lib/base/pointer.h"
 #include "../../lib/base/map.h"
 #include "../../lib/pattern/Observable.h"
+#include "../../lib/threads/util.h"
 #include "../../data/audio/AudioBuffer.h"
 #include <atomic>
 #include <shared_mutex>
@@ -25,12 +26,14 @@ class Song;
 #define PEAK_FACTOR			2
 
 
-class PeakData {
+class BasePeakDatabaseItem {
 public:
+	BasePeakDatabaseItem(AudioBuffer& b);
+
 	std::shared_timed_mutex mtx;
 	AudioBuffer* buffer;
-	Array<bytes> peaks;
 	int version;
+	int ticks_since_last_usage;
 
 	enum class State {
 		OK,
@@ -39,8 +42,13 @@ public:
 		UPDATE_FINISHED
 	};
 	std::atomic<State> state;
+};
 
+class PeakData : public BasePeakDatabaseItem {
+public:
 	PeakData(AudioBuffer& b);
+
+	Array<bytes> peaks;
 
 	static const int PEAK_CHUNK_EXP;
 	static const int PEAK_CHUNK_SIZE;
@@ -65,57 +73,17 @@ public:
 	} temp;
 };
 
-class SpectrogramData {
+class SpectrogramData : public BasePeakDatabaseItem {
 public:
-	std::shared_timed_mutex mtx;
-	AudioBuffer* buffer;
-	bytes spectrogram;
-	int version;
-
-	enum class State {
-		OK,
-		OUT_OF_SYNC,
-		UPDATE_REQUESTED,
-		UPDATE_FINISHED
-	};
-	State state;
-
 	SpectrogramData(AudioBuffer& b);
+
+	bytes spectrogram;
 
 	// PeakThread
 	struct Temp {
 		AudioBuffer buffer;
 		bytes spectrogram;
 	} temp;
-};
-
-template<class T>
-class InterThreadFifoBuffer {
-	Array<T> buffer;
-	std::shared_timed_mutex mtx;
-
-public:
-	void add(const T& t) {
-		mtx.lock();
-		buffer.add(t);
-		mtx.unlock();
-	}
-	bool has_data() {
-		mtx.lock();
-		bool h = buffer.num > 0;
-		mtx.unlock();
-		return h;
-	}
-	T pop() {
-		mtx.lock();
-		T t;
-		if (buffer.num > 0) {
-			t = buffer[0];
-			buffer.erase(0);
-		}
-		mtx.unlock();
-		return t;
-	}
 };
 
 class PeakDatabase : public obs::Node<VirtualBase> {

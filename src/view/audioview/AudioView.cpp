@@ -1141,6 +1141,8 @@ void AudioView::draw_song(Painter *c) {
 	if (tip.num > 0)
 		draw_boxed_str(c, {song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 
+	peak_database->iterate();
+
 	if (log_notifier->progress(0.03f))
 		animating = true;
 

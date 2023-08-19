@@ -17,16 +17,16 @@
 #include "../../lib/os/time.h"
 
 
-InterThreadMessager::~InterThreadMessager() {
+InterThreadMessenger::~InterThreadMessenger() {
 	flush();
 }
 
-void InterThreadMessager::unsubscribe(VirtualBase *o) {
+void InterThreadMessenger::unsubscribe(VirtualBase *o) {
 	flush();
 	obs::Node<VirtualBase>::unsubscribe(o);
 }
 
-void InterThreadMessager::flush() {
+void InterThreadMessenger::flush() {
 	if (flushing.load())
 		return;
 	flushing = true;
@@ -36,7 +36,7 @@ void InterThreadMessager::flush() {
 }
 
 // call from any thread, will notify in main/GUI thread
-void InterThreadMessager::notify_x() {
+void InterThreadMessenger::notify_x() {
 	if (flushing.load())
 		return;
 	counter.fetch_add(1);
@@ -104,7 +104,8 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 		buf.mtx.unlock();
 		throw Exception("aaa4");
 	}
-	auto &p = db->get_data(buf);
+	auto &p = db->acquire_data(buf);
+	db->release_data(p);
 	int n = p._update_peaks_prepare();
 	buf.mtx.unlock();
 
@@ -154,7 +155,7 @@ void PeakThread::update_song() {
 }
 
 void PeakThread::notify() {
-	messanger.notify_x();
+	messenger.notify_x();
 	//hui::run_later(0.01f, [this] { view->force_redraw(); });
 }
 

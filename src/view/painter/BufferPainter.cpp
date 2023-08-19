@@ -179,7 +179,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	int pm = PeakData::PEAK_MAGIC_LEVEL2 * b.channels;
 	int l = view->prefered_buffer_layer * 2 * b.channels;
 	if (l >= 0) {
-		auto &p = db->get_data(b);
+		auto &p = db->acquire_peaks(b);
 		double bzf = view->buffer_zoom_factor;
 
 		// no peaks yet? -> show dummy
@@ -188,6 +188,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
 			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
 			c->set_antialiasing(false);
+			db->release_data(p);
 			return;
 		}
 
@@ -219,6 +220,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 				}
 			}
 		}
+		db->release_data(p);
 	} else {
 
 		// directly show every sample
@@ -315,8 +317,9 @@ HorizontallyChunkedImage& render_spectrum_image(PeakData &p, float sample_rate) 
 }
 
 void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
-	auto &p = db->get_data(b);
+	auto &p = db->acquire_spectrogram(b);
 	auto& im = render_spectrum_image(p, this->view->session->sample_rate());
+	db->release_data(p);
 
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);

@@ -10,7 +10,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <math.h>
 
-
+// AudioBuffer is only guaranteed to exist between acquire() and release()!
 
 const int PeakData::PEAK_CHUNK_EXP = 15;
 const int PeakData::PEAK_CHUNK_SIZE = 1<<PEAK_CHUNK_EXP;
@@ -21,6 +21,7 @@ const int PeakData::PEAK_MAGIC_LEVEL2 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP) * 2;
 
 PeakData::PeakData(AudioBuffer &b) : buffer(b) {
 	version = buffer.version;
+	state = State::OUT_OF_SYNC;
 }
 
 
@@ -187,12 +188,12 @@ int PeakData::_update_peaks_prepare() {
 
 PeakDatabase::PeakDatabase(Song *song) {
 	peak_thread = new PeakThread(song, this);
-	peak_thread->messanger.out_changed >> create_sink([this] { out_changed(); });
+	peak_thread->messenger.out_changed >> create_sink([this] { out_changed(); });
 	peak_thread->run();
 }
 
 PeakDatabase::~PeakDatabase() {
-	peak_thread->messanger.unsubscribe(this);
+	peak_thread->messenger.unsubscribe(this);
 	peak_thread->hard_stop();
 }
 
@@ -200,9 +201,10 @@ void PeakDatabase::invalidate_all() {
 	peak_data.clear();
 }
 
-PeakData& PeakDatabase::get_data(AudioBuffer &b) {
-	for (auto &p: weak(peak_data))
+PeakData& PeakDatabase::acquire_data(AudioBuffer &b) {
+	for (auto p: weak(peak_data))
 		if (&(p->buffer) == &b) {
+			p->mtx.lock();
 			if (p->version != b.version) {
 				p->peaks.clear();
 				p->spectrum.clear();
@@ -211,23 +213,61 @@ PeakData& PeakDatabase::get_data(AudioBuffer &b) {
 			return *p;
 		}
 
-	mtx.lock();
 	auto p = new PeakData(b);
+	mtx.lock();
 	peak_data.add(p);
 	mtx.unlock();
+
+	p->mtx.lock();
 	return *p;
 }
 
+PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
+	auto &p = acquire_data(b);
+	return p;
+}
+
+PeakData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
+	auto &p = acquire_data(b);
+	return p;
+}
+
+void PeakDatabase::release_data(PeakData& p) {
+	p.mtx.unlock();
+}
+
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
-	auto &p = get_data(buf);
+	auto &p = acquire_data(buf);
 	int n = p._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
 		if (p._peaks_chunk_needs_update(i))
 			p._update_peaks_chunk(i);
+	release_data(p);
 }
 
 void PeakDatabase::stop_update() {
 	peak_thread->stop_update();
+}
+
+void PeakDatabase::iterate() {
+	mtx.lock();
+
+	// new requests?
+	if (!update_request)
+		for (auto p: weak(peak_data)) {
+			if (p->dirty and !p->update_requested) {
+				p->update_requested = true;
+				update_request = p;
+			}
+		}
+
+	// collect old requests?
+	if (update_request) {
+
+	}
+
+	mtx.unlock();
+
 }
 

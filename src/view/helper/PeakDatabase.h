@@ -24,10 +24,21 @@ class Song;
 
 class PeakData {
 public:
+	std::shared_timed_mutex mtx;
 	AudioBuffer &buffer;
 	Array<bytes> peaks;
 	bytes spectrum;
 	int version;
+
+	enum class State {
+		OK,
+		OUT_OF_SYNC,
+		UPDATE_REQUESTED_PEAKS,
+		UPDATE_REQUESTED_SPECTROGRAM,
+		UPDATE_FINISHED
+	};
+
+	State state;
 
 	PeakData(AudioBuffer &b);
 
@@ -44,6 +55,9 @@ public:
 	void _update_peaks_chunk(int index);
 	bool _peaks_chunk_needs_update(int index);
 	void _truncate_peaks(int length);
+
+	// PeakThread
+	AudioBuffer temp;
 };
 
 class PeakDatabase : public obs::Node<VirtualBase> {
@@ -51,8 +65,8 @@ public:
 	PeakDatabase(Song *song);
 	~PeakDatabase();
 
-	bytes& get_peaks(AudioBuffer &b, int level4);
-	bytes& get_spectrogram(AudioBuffer &b);
+	//bytes& get_peaks(AudioBuffer &b, int level4);
+	//bytes& get_spectrogram(AudioBuffer &b);
 
 	void invalidate_all();
 
@@ -60,7 +74,10 @@ public:
 
 	owned_array<PeakData> peak_data;
 
-	PeakData& get_data(AudioBuffer &b);
+	PeakData& acquire_data(AudioBuffer &b);
+	PeakData& acquire_peaks(AudioBuffer &b);
+	PeakData& acquire_spectrogram(AudioBuffer &b);
+	void release_data(PeakData& p);
 
 
 	void update_peaks_now(AudioBuffer &buf);
@@ -69,6 +86,10 @@ public:
 	owned<PeakThread> peak_thread;
 
 	void stop_update();
+
+	void iterate();
+
+	PeakData* update_request = nullptr;
 };
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

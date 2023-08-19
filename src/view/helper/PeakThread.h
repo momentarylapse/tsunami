@@ -17,9 +17,9 @@ class Track;
 class AudioBuffer;
 class PeakDatabase;
 
-class InterThreadMessager : public obs::Node<VirtualBase> {
+class InterThreadMessenger : public obs::Node<VirtualBase> {
 public:
-	~InterThreadMessager();
+	~InterThreadMessenger();
 	void notify_x();
 	void flush();
 	std::atomic<int> counter{0};
@@ -44,7 +44,7 @@ public:
 	void stop_update();
 	void hard_stop();
 
-	InterThreadMessager messanger;
+	InterThreadMessenger messenger;
 
 private:
 	std::atomic<bool> updating;

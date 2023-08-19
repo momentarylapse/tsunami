@@ -208,8 +208,8 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 			for (int i=0; i<nn; i++) {
 				if (p._peaks_chunk_needs_update(i)) {
 					c->set_color(color::interpolate(col1, Red, 0.3f));
-					float xx0 = max((float)view->cam.sample2screen(offset + i*PeakData::PEAK_CHUNK_SIZE), x0);
-					float xx1 = min((float)view->cam.sample2screen(offset + (i+1)*PeakData::PEAK_CHUNK_SIZE), x1);
+					float xx0 = clamp((float)view->cam.sample2screen(offset + i*PeakData::PEAK_CHUNK_SIZE), x0, x1);
+					float xx1 = clamp((float)view->cam.sample2screen(offset + (i+1)*PeakData::PEAK_CHUNK_SIZE), x0, x1);
 					c->draw_rect(rect(xx0, xx1, area.y1, area.y1 + h));
 				}
 			}

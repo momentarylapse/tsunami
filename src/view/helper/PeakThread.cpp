@@ -26,21 +26,21 @@ void InterThreadMessenger::unsubscribe(VirtualBase *o) {
 }
 
 void InterThreadMessenger::flush() {
-	if (flushing.load())
+	if (flushing)
 		return;
 	flushing = true;
-	while (counter.load() > 0)
+	while (counter > 0)
 		hui::Application::do_single_main_loop();
 		//os::sleep(0.01f);
 }
 
 // call from any thread, will notify in main/GUI thread
 void InterThreadMessenger::notify_x() {
-	if (flushing.load())
+	if (flushing)
 		return;
 	counter.fetch_add(1);
 	hui::run_later(0.001f, [this] {
-		if (!flushing.load())
+		if (!flushing)
 			this->out_changed.notify();
 		counter.fetch_sub(1);
 	});
@@ -79,7 +79,6 @@ void PeakThread::on_run() {
 	while (allow_running) {
 
 		os::sleep(0.05f);
-		//os::sleep(1.0f);
 		Thread::cancelation_point();
 
 		if (!db->requests.has_data())
@@ -126,6 +125,8 @@ void PeakThread::on_run() {
 					float f = Spectrogram::dequantize(p->temp.spectrogram[i * PeakData::SPECTRUM_N + k]);
 					im.set_pixel(i, PeakData::SPECTRUM_N - 1 - k, color_heat_map(f));
 				}
+				if ((i & 0xff) == 0)
+					Thread::cancelation_point();
 			}
 			PerformanceMonitor::end_busy(perf_channel);
 

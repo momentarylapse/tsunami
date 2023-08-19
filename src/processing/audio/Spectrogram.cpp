@@ -11,8 +11,7 @@
 #include "../../lib/math/complex.h"
 #include "../../lib/math/math.h"
 #include "../../lib/fft/fft.h"
-
-#include "../../lib/os/msg.h"
+#include "../../lib/threads/Thread.h"
 
 namespace Spectrogram {
 
@@ -48,6 +47,7 @@ Array<float> spectrogram(AudioBuffer &b, int step_size, int window_size, WindowF
 		apply_window_function(chunk, wf);
 
 		all.append(power_spectrum(chunk));
+		Thread::cancelation_point();
 	}
 	return all;
 }
@@ -75,6 +75,7 @@ Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, f
 			float f = xmax(z.sub_ref(j0, j1));
 			rr.add(f);
 		}
+		Thread::cancelation_point();
 	}
 	return rr;
 }

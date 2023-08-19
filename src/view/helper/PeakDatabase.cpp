@@ -9,6 +9,10 @@
 #include "PeakThread.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/os/msg.h"
+#include "../../lib/math/rect.h"
+#include "../../lib/math/vec2.h"
+#include "../../lib/image/Painter.h"
+#include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
 #include <math.h>
 #include <atomic>
 
@@ -20,10 +24,17 @@ const int PeakData::PEAK_OFFSET_EXP = 3;
 const int PeakData::PEAK_FINEST_SIZE = 1<<PEAK_OFFSET_EXP;
 const int PeakData::PEAK_MAGIC_LEVEL2 = (PEAK_CHUNK_EXP - PEAK_OFFSET_EXP) * 2;
 
+const int PeakData::SPECTRUM_CHUNK = 1024;
+const int HorizontallyChunkedImage::CHUNK_SIZE = 4096;
+const int PeakData::SPECTRUM_N = 256;
+const float PeakData::SPECTRUM_MIN_FREQ = 60.0f;
+const float PeakData::SPECTRUM_MAX_FREQ = 3000.0f;
 
-BasePeakDatabaseItem::BasePeakDatabaseItem(AudioBuffer& b) : buffer(&b) {
+
+PeakData::PeakData(AudioBuffer& b, AudioViewMode m) : buffer(&b) {
 	version = b.version;
 	state = State::OUT_OF_SYNC;
+	mode = m;
 	ticks_since_last_usage = 0;
 }
 
@@ -57,6 +68,12 @@ bool PeakData::_peaks_chunk_needs_update(int index) {
 	if (index >= peaks[pm].num)
 		return true;
 	return (peaks[pm][index] == 255);
+}
+
+bool PeakData::has_spectrum() {
+	if (state != State::OK)
+		return false;
+	return true;
 }
 
 /*void PeakData::Temp::_truncate_peaks(int _length) {
@@ -199,10 +216,33 @@ int PeakData::Temp::_update_peaks_prepare() {
 
 
 
-PeakData::PeakData(AudioBuffer &b) : BasePeakDatabaseItem(b) {
+void HorizontallyChunkedImage::resize(int w, int h) {
+	width = w;
+	height = h;
+	chunks.clear();
+	while (w > 0) {
+		chunks.add(Image(min(w, CHUNK_SIZE), h, Black));
+		w -= CHUNK_SIZE;
+	}
 }
 
-SpectrogramData::SpectrogramData(AudioBuffer &b) : BasePeakDatabaseItem(b) {
+void HorizontallyChunkedImage::set_pixel(int x, int y, const color &c) {
+	chunks[x / CHUNK_SIZE].set_pixel(x % CHUNK_SIZE, y, c);
+}
+
+void HorizontallyChunkedImage::draw(Painter *p, const rect &area) {
+
+	float scale[] = {area.width() / width, 0.0f, 0.0f, area.height() / height};
+
+	p->set_transform(scale, vec2(area.x1, area.y1));
+
+	for (int i=0; i<chunks.num; i++) {
+		p->draw_image(vec2(i*CHUNK_SIZE, 0), &chunks[i]);
+	}
+
+	scale[0] = 1.0f;
+	scale[3] = 1.0f;
+	p->set_transform(scale, {0,0});
 }
 
 /*-----------------------------------------------------------
@@ -224,10 +264,14 @@ void PeakDatabase::invalidate_all() {
 	peak_data.clear();
 }
 
-PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
-	int index = peak_data.find(b.uid);
+PeakData& PeakDatabase::acquire(AudioBuffer &b, AudioViewMode mode) {
+	auto *map = &peak_data;
+	if (mode == AudioViewMode::SPECTRUM)
+		map = &spectrogram_data;
+
+	int index = map->find(b.uid);
 	if (index >= 0) {
-		auto p = peak_data.by_index(index);
+		auto p = map->by_index(index);
 		p->mtx.lock();
 		p->ticks_since_last_usage = 0;
 		p->buffer = &b;
@@ -235,39 +279,16 @@ PeakData& PeakDatabase::acquire_peaks(AudioBuffer &b) {
 			msg_write(format("%x   V  %x != %x", b.uid, p->version, b.version));
 			p->version = b.version;
 			p->peaks.clear();
+			p->spectrogram.clear();
 			p->state = PeakData::State::OUT_OF_SYNC;
 		}
 		return *p;
 	}
 
 	msg_write(format("++ NEW BUFFER %x  %x", b.uid, b.version));
-	auto p = new PeakData(b);
+	auto p = new PeakData(b, mode);
 	mtx.lock();
-	peak_data.set(b.uid, p);
-	mtx.unlock();
-
-	p->mtx.lock();
-	return *p;
-}
-
-SpectrogramData& PeakDatabase::acquire_spectrogram(AudioBuffer &b) {
-	int index = spectrogram_data.find(b.uid);
-	if (index >= 0) {
-		auto p = spectrogram_data.by_index(index);
-		p->mtx.lock();
-		p->ticks_since_last_usage = 0;
-		p->buffer = &b;
-		if (p->version != b.version) {
-			p->version = b.version;
-			p->spectrogram.clear();
-			p->state = SpectrogramData::State::OUT_OF_SYNC;
-		}
-		return *p;
-	}
-
-	auto p = new SpectrogramData(b);
-	mtx.lock();
-	spectrogram_data.set(b.uid, p);
+	map->set(b.uid, p);
 	mtx.unlock();
 
 	p->mtx.lock();
@@ -278,12 +299,8 @@ void PeakDatabase::release(PeakData& p) {
 	p.mtx.unlock();
 }
 
-void PeakDatabase::release(SpectrogramData& p) {
-	p.mtx.unlock();
-}
-
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
-	auto &p = acquire_peaks(buf);
+	auto &p = acquire(buf, AudioViewMode::PEAKS);
 	int n = p.temp._update_peaks_prepare();
 
 	for (int i=0; i<n; i++)
@@ -297,8 +314,7 @@ void PeakDatabase::stop_update() {
 	peak_thread->stop_update();
 }
 
-template<class T, typename F>
-void iterate_peak_db_items(base::map<int,T>& map, F create_request) {
+void PeakDatabase::iterate_items(Map& map) {
 	for (auto&& [uid,p]: map) {
 		p->ticks_since_last_usage ++;
 		if (p->ticks_since_last_usage > 10) {
@@ -312,7 +328,7 @@ void iterate_peak_db_items(base::map<int,T>& map, F create_request) {
 			p->temp.buffer = *p->buffer;
 			p->state = PeakData::State::UPDATE_REQUESTED;
 			msg_write(format("+ peak request  %x  %x", p->buffer->uid, p->version));
-			create_request(p);
+			requests.add({p});
 		}
 	}
 }
@@ -321,12 +337,8 @@ void PeakDatabase::iterate() {
 	mtx.lock();
 
 	// new requests?
-	iterate_peak_db_items(peak_data, [this] (PeakData* p) {
-		requests.add({p, nullptr});
-	});
-	iterate_peak_db_items(spectrogram_data, [this] (SpectrogramData* p) {
-		requests.add({nullptr, p});
-	});
+	iterate_items(peak_data);
+	iterate_items(spectrogram_data);
 
 	// collect old requests?
 	/*for (auto &r: requests)

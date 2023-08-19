@@ -20,12 +20,6 @@
 #include "../../Session.h"
 
 
-const int SPECTRUM_CHUNK = 1024;
-const int SPECTRUM_IMAGE_CHUNK = 4096;
-const int SPECTRUM_N = 256;
-const float MIN_FREQ = 60.0f;
-const float MAX_FREQ = 3000.0f;
-
 BufferPainter::BufferPainter(AudioView *_view) {
 	view = _view;
 	db = view->peak_database.get();
@@ -179,7 +173,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	int pm = PeakData::PEAK_MAGIC_LEVEL2 * b.channels;
 	int l = view->prefered_buffer_layer * 2 * b.channels;
 	if (l >= 0) {
-		auto &p = db->acquire_peaks(b);
+		auto &p = db->acquire(b, AudioViewMode::PEAKS);
 		double bzf = view->buffer_zoom_factor;
 
 		// no peaks yet? -> show dummy
@@ -230,101 +224,20 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	c->set_antialiasing(false);
 }
 
-bool prepare_spectrum(SpectrogramData &p, float sample_rate) {
-	if (p.spectrogram.num > 0)
-		return false;
-
-	const float DB_RANGE = 50;
-	const float DB_BOOST = 10;
-
-	auto pspectrum = Spectrogram::log_spectrogram(*p.buffer, sample_rate, SPECTRUM_CHUNK, MIN_FREQ, MAX_FREQ, SPECTRUM_N, WindowFunction::HANN);
-	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
-	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
-
-	p.buffer->mtx.lock();
-	p.spectrogram.exchange(qspectrum);
-	p.buffer->mtx.unlock();
-	return true;
-}
-
-
-// gtk/cairo does not like drawing huge images - let's split them into smaller chunks
-struct HorizontallyChunkedImage {
-	Array<Image> chunks;
-	int width = 0, height = 0;
-
-	void resize(int w, int h) {
-		width = w;
-		height = h;
-		chunks.clear();
-		while (w > 0) {
-			chunks.add(Image(min(w, SPECTRUM_IMAGE_CHUNK), h, Black));
-			w -= SPECTRUM_IMAGE_CHUNK;
-		}
-	}
-
-	void set_pixel(int x, int y, const color &c) {
-		chunks[x / SPECTRUM_IMAGE_CHUNK].set_pixel(x % SPECTRUM_IMAGE_CHUNK, y, c);
-	}
-
-	void draw(Painter *p, const rect &area) {
-
-		float scale[] = {area.width() / width, 0.0f, 0.0f, area.height() / height};
-
-		p->set_transform(scale, vec2(area.x1, area.y1));
-
-		for (int i=0; i<chunks.num; i++) {
-			p->draw_image(vec2(i*SPECTRUM_IMAGE_CHUNK, 0), &chunks[i]);
-		}
-
-		scale[0] = 1.0f;
-		scale[3] = 1.0f;
-		p->set_transform(scale, {0,0});
-	}
-};
-
-
-struct SpectrumImageEntry {
-	AudioBuffer *buf;
-	HorizontallyChunkedImage image;
-};
-static Array<SpectrumImageEntry> spectrum_images;
-
-HorizontallyChunkedImage& get_spectrum_image(SpectrogramData &p) {
-	for (auto &si: spectrum_images)
-		if (si.buf == p.buffer)
-			return si.image;
-	SpectrumImageEntry s;
-	s.buf = p.buffer;
-	spectrum_images.add(s);
-	return spectrum_images.back().image;
-}
-
-HorizontallyChunkedImage& render_spectrum_image(SpectrogramData &p, float sample_rate) {
-	auto& im = get_spectrum_image(p);
-	if (prepare_spectrum(p, sample_rate)) {
-		int n = p.spectrogram.num / SPECTRUM_N;
-		im.resize(n, SPECTRUM_N);
-
-		for (int i=0; i<n; i++) {
-			for (int k=0; k<SPECTRUM_N; k++) {
-				float f = Spectrogram::dequantize(p.spectrogram[i * SPECTRUM_N + k]);
-				im.set_pixel(i, SPECTRUM_N - 1 - k, color_heat_map(f));
-			}
-		}
-	}
-	return im;
-}
 
 void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
-	auto &p = db->acquire_spectrogram(b);
-	auto& im = render_spectrum_image(p, this->view->session->sample_rate());
-	db->release(p);
-
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);
 
-	im.draw(c, rect(x1, x2, area.y1, area.y2));
+	auto &p = db->acquire(b, AudioViewMode::SPECTRUM);
+	if (!p.has_spectrum()) {
+		// no spectrum yet? -> show dummy
+		c->set_color(color::interpolate(col1, Red, 0.3f));
+		c->draw_rect(rect(x1, x2, area.y1, area.y2));
+	} else {
+		p.image.draw(c, rect(x1, x2, area.y1, area.y2));
+	}
+	db->release(p);
 }
 
 void BufferPainter::draw_buffer_selection(Painter *c, AudioBuffer &b, int offset) {

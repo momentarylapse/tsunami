@@ -2358,6 +2358,9 @@
     <ClInclude Include="src\lib\threads\ThreadedWork.h">
       <Filter>src\lib\threads</Filter>
     </ClInclude>
+    <ClInclude Include="src\lib\threads\util.h">
+      <Filter>src\lib\threads</Filter>
+    </ClInclude>
     <ClInclude Include="src\lib\config.h">
       <Filter>src\lib</Filter>
     </ClInclude>

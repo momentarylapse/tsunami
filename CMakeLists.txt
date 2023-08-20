@@ -687,7 +687,6 @@ add_compile_definitions(INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 install(TARGETS tsunami DESTINATION bin)
 install(DIRECTORY "static/icons" DESTINATION share/tsunami)
-install(DIRECTORY "static/Midi Fonts" DESTINATION share/tsunami)
 install(DIRECTORY "static/SignalChains" DESTINATION share/tsunami)
 install(FILES "static/favorites_demo.txt" DESTINATION share/tsunami)
 install(FILES "static/hui_resources.txt" DESTINATION share/tsunami)

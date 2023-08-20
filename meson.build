@@ -610,7 +610,6 @@ sources = [
 executable('tsunami', sources, dependencies : deps, install : true)
 
 install_subdir('static/icons', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_subdir('static/Midi Fonts', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_subdir('static/SignalChains', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/favorites_demo.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/hui_resources.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))

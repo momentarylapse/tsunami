@@ -24,27 +24,27 @@ const int NUM_DRUM_CLEF_POSITIONS = 19;
 const DrumClefPosition DrumClefPositions[NUM_DRUM_CLEF_POSITIONS] =
 {
 	// drums
-	{DrumPitch::BASS, 1, NoteModifier::NONE},
+	{DrumPitch::BASS, 1, NoteModifier::NONE}, // "F"
 	{DrumPitch::BASS_ACCOUSTIC, 1, NoteModifier::NONE},
-	{DrumPitch::TOM_FLOOR_LOW, 2, NoteModifier::NONE},
+	{DrumPitch::TOM_FLOOR_LOW, 3, NoteModifier::NONE}, // "A"
 	{DrumPitch::TOM_FLOOR_HI, 3, NoteModifier::NONE},
-	{DrumPitch::TOM_LOW, 4, NoteModifier::NONE},
-	{DrumPitch::SNARE, 5, NoteModifier::NONE},
-	{DrumPitch::SNARE_ELECTRONIC, 5, NoteModifier::NONE},
+	{DrumPitch::TOM_LOW, 6, NoteModifier::NONE}, // "D"
 	{DrumPitch::TOM_LOW_MID, 6, NoteModifier::NONE},
-	{DrumPitch::TOM_HI_MID, 7, NoteModifier::NONE},
-	{DrumPitch::TOM_HI, 8, NoteModifier::NONE},
+	{DrumPitch::TOM_HI_MID, 7, NoteModifier::NONE}, // "E"
+	{DrumPitch::TOM_HI, 7, NoteModifier::NONE},
+	{DrumPitch::SNARE, 5, NoteModifier::NONE}, // "C"
+	{DrumPitch::SNARE_ELECTRONIC, 5, NoteModifier::NONE},
 
 	// cymbals
-	{DrumPitch::HIHAT_PEDAL, -1, NoteModifier::SHARP},
-	{DrumPitch::HIHAT_OPEN, 7, NoteModifier::SHARP},
-	{DrumPitch::HIHAT_CLOSED, 7, NoteModifier::FLAT},
-	{DrumPitch::RIDE_1, 8, NoteModifier::SHARP},
-	{DrumPitch::RIDE_2, 8, NoteModifier::SHARP},
+	{DrumPitch::HIHAT_PEDAL, -1, NoteModifier::NONE}, // "D"
+	{DrumPitch::HIHAT_OPEN, 9, NoteModifier::SHARP}, // "G"
+	{DrumPitch::HIHAT_CLOSED, 9, NoteModifier::FLAT},
+	{DrumPitch::RIDE_1, 8, NoteModifier::NONE}, // "F"
+	{DrumPitch::RIDE_2, 8, NoteModifier::NONE},
 	{DrumPitch::BELL_RIDE, 8, NoteModifier::FLAT},
-	{DrumPitch::CRASH_1, 9, NoteModifier::SHARP},
-	{DrumPitch::CRASH_2, 9, NoteModifier::SHARP},
-	{DrumPitch::CHINESE, 9, NoteModifier::FLAT},
+	{DrumPitch::CRASH_1, 10, NoteModifier::NONE}, // "A"
+	{DrumPitch::CRASH_2, 11, NoteModifier::NONE}, // "B"
+	{DrumPitch::CHINESE, 13, NoteModifier::NONE}, // "D"
 };
 
 /*

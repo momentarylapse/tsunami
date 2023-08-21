@@ -34,10 +34,11 @@ public:
 	Tsunami();
 	virtual ~Tsunami();
 
-	bool on_startup(const Array<string> &arg) override;
+	hui::AppStatus on_startup_before_gui_init(const Array<string> &arg) override;
+	hui::AppStatus on_startup(const Array<string> &arg) override;
 	void on_end() override;
 
-	bool handle_arguments(const Array<string> &arg);
+	hui::AppStatus handle_arguments(const Array<string> &arg);
 	void load_key_codes();
 
 	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);

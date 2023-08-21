@@ -114,10 +114,6 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 		set_property("logo", str(directory_static | "icon.png"));
 	else if (os::fs::exists(directory_static | "icon.ico"))
 		set_property("logo", str(directory_static | "icon.ico"));
-
-
-	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0)
-		_MakeUsable_();
 }
 
 Application::~Application() {
@@ -203,42 +199,56 @@ static bool keep_running = true;
 #endif
 
 int Application::run() {
-
-	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)
-		return g_application_run(G_APPLICATION(application), 0, nullptr);
+	return g_application_run(G_APPLICATION(application), 0, nullptr);
 #else
-		gtk_main();
-#endif
-	} else {
-		printf("hui: lazy gui initialization does not go well rith run()!\n");
-	}
-
+	gtk_main();
 	on_end();
 	return 0;
+#endif
 }
 
+
+static std::function<void()> _run_after_gui_init_func_;
 
 #if GTK_CHECK_VERSION(4,0,0)
 static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
 	auto app = reinterpret_cast<Application*>(user_data);
 	_init_global_css_classes_();
-	app->on_startup(app->_args);
+	if (_run_after_gui_init_func_)
+		_run_after_gui_init_func_();
+	else
+		app->on_startup(app->_args);
 }
 #endif
 
+AppStatus Application::on_startup_before_gui_init(const Array<string> &args) {
+	return AppStatus::RUN;
+}
 
+void Application::run_after_gui_init(std::function<void()> f) {
+	_run_after_gui_init_func_ = f;
+}
 
 int Application::try_execute(const Array<string> &args) {
-	if ((flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
+	auto status = on_startup_before_gui_init(args);
+	if (status == AppStatus::END)
+		return 0;
+	if (status == AppStatus::AUTO and !_run_after_gui_init_func_)
+		return 0;
+	_MakeUsable_();
 #if GTK_CHECK_VERSION(4,0,0)
-		g_signal_connect(application, "activate", G_CALLBACK(on_gtk_application_activate), this);
-		return g_application_run(G_APPLICATION(application), 0, nullptr);
-#endif
+	g_signal_connect(application, "activate", G_CALLBACK(on_gtk_application_activate), this);
+	return g_application_run(G_APPLICATION(application), 0, nullptr);
+#else
+	if (_run_after_gui_init_func_) {
+		_run_after_gui_init_func_();
+		return run();
 	}
-	if (on_startup(args))
+	if (on_startup(args) == AppStatus::RUN)
 		return run();
 	return 0;
+#endif
 }
 
 void Application::end() {

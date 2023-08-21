@@ -22,18 +22,26 @@ enum class Flags {
 	DONT_LOAD_RESOURCE = 1,
 	SILENT = 2,
 	NO_ERROR_HANDLER = 4,
-	LAZY_GUI_INITIALIZATION = 8,
 	UNIQUE = 16,
 };
 Flags operator|(Flags a, Flags b);
 int operator&(Flags a, Flags b);
+
+enum class AppStatus {
+	END,
+	RUN,
+	AUTO
+};
 
 class Application : public VirtualBase {
 public:
 	Application(const string &app_name, const string &def_lang, Flags flags);
 	~Application() override;
 
-	virtual bool on_startup(const Array<string> &arg) = 0;
+	virtual AppStatus on_startup_before_gui_init(const Array<string> &arg);
+	void run_after_gui_init(std::function<void()> f);
+
+	virtual AppStatus on_startup(const Array<string> &arg) = 0;
 	virtual void on_end() {}
 
 	static void end();

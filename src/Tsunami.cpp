@@ -48,7 +48,7 @@ bool ugly_hack_slow = false;
 
 
 Tsunami::Tsunami() :
-	hui::Application("tsunami", "English", hui::Flags::NO_ERROR_HANDLER | hui::Flags::LAZY_GUI_INITIALIZATION)
+	hui::Application("tsunami", "English", hui::Flags::NO_ERROR_HANDLER)
 {
 	device_manager = nullptr;
 	log = nullptr;
@@ -78,7 +78,11 @@ void Tsunami::on_end() {
 	session_manager = nullptr;
 }
 
-bool Tsunami::on_startup(const Array<string> &arg) {
+hui::AppStatus Tsunami::on_startup(const Array<string> &arg) {
+	return hui::AppStatus::RUN;
+}
+
+hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 	tsunami = this;
 
 	ErrorHandler::init();
@@ -102,20 +106,16 @@ bool Tsunami::on_startup(const Array<string> &arg) {
 
 	plugin_manager->link_app_data();
 
-	if (!handle_arguments(arg))
-		return false;
-
-	return true;
+	return handle_arguments(arg);
 }
 
 extern bool module_config_debug;
 
-bool Tsunami::handle_arguments(const Array<string> &args) {
+hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	Session *session = Session::GLOBAL;
 
 	string chain_file;
 	string plugin_file;
-	bool allow_window = false;
 	auto flags = Storage::Flags::NONE;
 
 	CommandLineParser p;
@@ -140,30 +140,31 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	});
 
 
-	p.cmd("", "[FILE]", "open a window and (optionally) load a file", [this, &session, &allow_window] (const Array<string> &a) {
-		Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
-		Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
+	p.cmd("", "[FILE]", "open a window and (optionally) load a file", [this, &session] (const Array<string> &a) {
+		run_after_gui_init([this, &session, a] {
+			Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
+			Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
-		device_manager->init();
-		session = session_manager->spawn_new_session();
+			device_manager->init();
+			session = session_manager->spawn_new_session();
 
-		session->win->show();
-		if (a.num > 0) {
-			session->storage->load(session->song.get(), a[0]);
-			session_manager->try_restore_matching_session(session);
-		} else {
-			// new file
-			session->song->add_track(SignalType::AUDIO_MONO);
+			session->win->show();
+			if (a.num > 0) {
+				session->storage->load(session->song.get(), a[0]);
+				session_manager->try_restore_matching_session(session);
+			} else {
+				// new file
+				session->song->add_track(SignalType::AUDIO_MONO);
 
-			// default tags
-			session->song->add_tag("title", _("New Audio File"));
-			session->song->add_tag("album", AppName);
-			session->song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
-			session->song->reset_history();
+				// default tags
+				session->song->add_tag("title", _("New Audio File"));
+				session->song->add_tag("album", AppName);
+				session->song->add_tag("artist", hui::config.get_str("DefaultArtist", AppName));
+				session->song->reset_history();
 
-			session->song->out_finished_loading.notify();
-		}
-		allow_window = true;
+				session->song->out_finished_loading.notify();
+			}
+		});
 	});
 	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {
 		p.show();
@@ -205,14 +206,18 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		delete song;
 	});
 	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {
-		device_manager->init();
-		session = session_manager->spawn_new_session();
-		session->win->hide();
-		session->die_on_plugin_stop = true;
-		session->execute_tsunami_plugin(a[0], a.sub_ref(1));
+		run_after_gui_init([this, &session, a] {
+			device_manager->init();
+			session = session_manager->spawn_new_session();
+			session->win->hide();
+			session->die_on_plugin_stop = true;
+			session->execute_tsunami_plugin(a[0], a.sub_ref(1));
+		});
 	});
 	p.cmd("session", "SESSION ...", "restore a saved session", [this, &session] (const Array<string> &a) {
-		session_manager->load_session(a[0]);
+		run_after_gui_init([this, &session, a] {
+			session_manager->load_session(a[0]);
+		});
 	});
 #ifndef NDEBUG
 	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
@@ -222,64 +227,72 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 		UnitTest::run_all(a[0]);
 	});
 	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
-		session = session_manager->spawn_new_session();
-		session->win->hide();
-		Module *m = nullptr;
-		if (a[0] == "fx") {
-			m = ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, a[1]);
-			configure_module(session->win.get(), m);
-		} else if (a[0] == "mfx") {
-			m = ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, a[1]);
-			configure_module(session->win.get(), m);
-		} else if (a[0] == "synth") {
-			m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
-			configure_module(session->win.get(), m);
-		} else if (a[0] == "vis") {
-			m = CreateAudioVisualizer(session, a[1]);
-			auto *dlg = new hui::Window("", 800, 600);
-			dlg->add_grid("", 0, 0, "root");
-			ConfigPanel::_hidden_parent_ = dlg;
-			auto *p = m->create_panel();
-			dlg->embed(p, "root", 0,0);
-			hui::fly(dlg);
-		} else {
-			msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
-		}
-	});
-	p.cmd("listview", "", "bla", [] (const Array<string> &a) {
-		auto dlg = new hui::Window("ListView", 800, 600);
-		dlg->from_source("ListView list 'a'");
-		dlg->add_string("list", "0");
-		dlg->add_string("list", "1");
-		dlg->add_string("list", "2");
-		if (a == Array<string>({"long"}))
-			for (int i=3; i<1000; i++)
-				dlg->add_string("list", i2s(i));
-		hui::run(dlg);
-	});
-	p.cmd("columnview", "", "bla", [] (const Array<string> &) {
-		auto dlg = new hui::Window("ColumnView", 800, 600);
-		dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
-		dlg->add_string("list", "true\\<b>test</b>\\x");
-		dlg->add_string("list", "false\\<i>more test</i>\\y");
-		dlg->event_x("list", "hui:change", [dlg] {
-			auto e = hui::get_event();
-			msg_write(format("edit: %d %d  %s", e->row, e->column, dlg->get_cell("list", e->row, e->column)));
+		run_after_gui_init([this, &session, a] {
+			session = session_manager->spawn_new_session();
+			session->win->hide();
+			Module *m = nullptr;
+			if (a[0] == "fx") {
+				m = ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, a[1]);
+				configure_module(session->win.get(), m);
+			} else if (a[0] == "mfx") {
+				m = ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, a[1]);
+				configure_module(session->win.get(), m);
+			} else if (a[0] == "synth") {
+				m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
+				configure_module(session->win.get(), m);
+			} else if (a[0] == "vis") {
+				m = CreateAudioVisualizer(session, a[1]);
+				auto *dlg = new hui::Window("", 800, 600);
+				dlg->add_grid("", 0, 0, "root");
+				ConfigPanel::_hidden_parent_ = dlg;
+				auto *p = m->create_panel();
+				dlg->embed(p, "root", 0,0);
+				hui::fly(dlg);
+			} else {
+				msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
+			}
 		});
-		dlg->event("button", [dlg] {
-			dlg->change_string("list", 0, "false\\bla\\z");
-		});
-		hui::run(dlg);
 	});
-	p.cmd("treeview", "", "bla", [] (const Array<string> &a) {
-		auto dlg = new hui::Window("TreeView", 400, 600);
-		dlg->from_source("TreeView list 'a'");
-		dlg->add_string("list", "0");
-		dlg->add_string("list", "1");
-		dlg->add_string("list", "2");
-		for (int i=3; i<30; i++)
-			dlg->add_child_string("list", i % 3, i2s(i));
-		hui::run(dlg);
+	p.cmd("listview", "", "bla", [this] (const Array<string> &a) {
+		run_after_gui_init([this, a] {
+			auto dlg = new hui::Window("ListView", 800, 600);
+			dlg->from_source("ListView list 'a'");
+			dlg->add_string("list", "0");
+			dlg->add_string("list", "1");
+			dlg->add_string("list", "2");
+			if (a == Array<string>({"long"}))
+				for (int i=3; i<1000; i++)
+					dlg->add_string("list", i2s(i));
+			hui::run(dlg);
+		});
+	});
+	p.cmd("columnview", "", "bla", [this] (const Array<string> &) {
+		run_after_gui_init([this] {
+			auto dlg = new hui::Window("ColumnView", 800, 600);
+			dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
+			dlg->add_string("list", "true\\<b>test</b>\\x");
+			dlg->add_string("list", "false\\<i>more test</i>\\y");
+			dlg->event_x("list", "hui:change", [dlg] {
+				auto e = hui::get_event();
+				msg_write(format("edit: %d %d  %s", e->row, e->column, dlg->get_cell("list", e->row, e->column)));
+			});
+			dlg->event("button", [dlg] {
+				dlg->change_string("list", 0, "false\\bla\\z");
+			});
+			hui::run(dlg);
+		});
+	});
+	p.cmd("treeview", "", "bla", [this] (const Array<string> &a) {
+		run_after_gui_init([this, a] {
+			auto dlg = new hui::Window("TreeView", 400, 600);
+			dlg->from_source("TreeView list 'a'");
+			dlg->add_string("list", "0");
+			dlg->add_string("list", "1");
+			dlg->add_string("list", "2");
+			for (int i=3; i<30; i++)
+				dlg->add_child_string("list", i % 3, i2s(i));
+			hui::run(dlg);
+		});
 	});
 #endif
 	p.parse(args);
@@ -299,7 +312,7 @@ bool Tsunami::handle_arguments(const Array<string> &args) {
 	}
 
 
-	return allow_window;
+	return hui::AppStatus::AUTO;
 }
 
 void Tsunami::load_key_codes() {

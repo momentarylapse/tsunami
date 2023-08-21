@@ -43,7 +43,7 @@ namespace hui
 {
 
 
-string Version = "0.7.2.0";
+string Version = "0.7.3.0";
 
 
 #ifdef OS_WINDOWS
@@ -190,8 +190,7 @@ void _MakeUsable_() {
 	if (_screen_opened_)
 		return;
 
-
-	if ((Application::flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
+	if (true) { //(Application::flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_ADWAITA
 		if (config.get_bool("hui.allow-libadwaita", true)) {
@@ -202,8 +201,8 @@ void _MakeUsable_() {
 			Application::adwaita_started = true;
 		}
 #endif
+		gtk_init();
 		Application::application = gtk_application_new(nullptr, G_APPLICATION_NON_UNIQUE);
-		//gtk_init();
 #else
 		gtk_init(nullptr, nullptr);
 		_init_global_css_classes_();

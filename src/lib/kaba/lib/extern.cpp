@@ -58,14 +58,16 @@ void ExternalLinkData::link(const string &name, void *pointer) {
 
 	auto names = name.explode(":");
 	string sname = decode_symbol_name(names[0]);
+	string package_name = sname.explode(".")[0];
 	for (auto p: context->packages)
-		for (auto&& [i,f]: enumerate(p->tree->functions))
-			if (f->cname(p->base_class()) == sname) {
-				if (names.num > 1)
-					if (name != function_link_name(f))
-						continue;
-				f->address = (int_p)pointer;
-			}
+		if (str(p->filename) == package_name)
+			for (auto&& [i,f]: enumerate(p->tree->functions))
+				if (f->cname(p->base_class()) == sname) {
+					if (names.num > 1)
+						if (name != function_link_name(f))
+							continue;
+					f->address = (int_p)pointer;
+				}
 }
 
 void *ExternalLinkData::get_link(const string &name) {

@@ -177,7 +177,7 @@ QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &q
 	});
 }
 
-hui::future<const string&> QuestionDialogString::ask(hui::Window *parent, const string &question, const string &options) {
+hui::future<string> QuestionDialogString::ask(hui::Window *parent, const string &question, const string &options) {
 	auto dlg = new QuestionDialogString(parent, question, options);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();

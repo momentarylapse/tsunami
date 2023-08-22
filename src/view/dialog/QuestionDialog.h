@@ -54,8 +54,8 @@ class QuestionDialogString : hui::Dialog {
 public:
 	QuestionDialogString(hui::Window *parent, const string &question, const string &options);
 	string result;
-	hui::promise<const string&> _promise;
-	static hui::future<const string&> ask(hui::Window *parent, const string &question, const string &options = "");
+	hui::promise<string> _promise;
+	static hui::future<string> ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
 #endif /* SRC_VIEW_DIALOG_QUESTIONDIALOG_H_ */

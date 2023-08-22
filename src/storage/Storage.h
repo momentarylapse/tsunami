@@ -45,7 +45,7 @@ public:
 	bool _cdecl save(Song *song, const Path &filename);
 	bool _cdecl _export(Song *song, const Path &filename);
 
-	using Future = hui::future<const Path&>;
+	using Future = hui::future<Path>;
 
 	Future ask_by_flags(hui::Window *win, const string &title, int flags, const Array<string> &opt = {});
 

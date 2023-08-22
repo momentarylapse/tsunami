@@ -16,9 +16,9 @@ namespace hui {
 
 class Window;
 
-using FileFuture = future<const Path&>;
-using ColorFuture = future<const color&>;
-using FontFuture = future<const string&>;
+using FileFuture = future<Path>;
+using ColorFuture = future<color>;
+using FontFuture = future<string>;
 using QuestionFuture = future<bool>;
 
 // file dialogs

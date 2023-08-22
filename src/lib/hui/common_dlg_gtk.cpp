@@ -85,7 +85,7 @@ static GtkWindow *get_window_save(Window *win) {
 	}
 #endif
 
-static promise<const Path&> cur_file_promise;
+static promise<Path> cur_file_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_file_dialog_open(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -326,7 +326,7 @@ FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, c
 }
 
 
-static promise<const string&> cur_font_promise;
+static promise<string> cur_font_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -395,7 +395,7 @@ color color_user_to_gtk(const color &c);
 GdkRGBA color_to_gdk(const color &c);
 color color_from_gdk(const GdkRGBA &gcol);
 
-static promise<const color&> cur_color_promise;
+static promise<color> cur_color_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {

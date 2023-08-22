@@ -28,13 +28,37 @@ typedef std::function<void(Painter*)> CallbackP;
 template<class T>
 struct future;
 
+
+template<class T>
+struct xparam {
+	using t = const T&;
+};
+template<>
+struct xparam<int> {
+	using t = int;
+};
+template<>
+struct xparam<float> {
+	using t = float;
+};
+template<>
+struct xparam<bool> {
+	using t = bool;
+};
+
 template<class T>
 struct xcallback {
-	using t = std::function<void(T)>;
+	using t = std::function<void(typename xparam<T>::t)>;
 };
 template<>
 struct xcallback<void> {
 	using t = std::function<void()>;
+};
+
+enum class PromiseState {
+	UNFINISHED,
+	SUCCEEDED,
+	FAILED
 };
 
 // internal
@@ -42,12 +66,19 @@ template<class T>
 struct promise : public Sharable<base::Empty> {
 	typename xcallback<T>::t cb_success;
 	Callback cb_fail;
+	PromiseState state;
+	mutable T result;
 
-	void operator() (T t) {
+	promise() {};
+
+	void operator() (typename xparam<T>::t t) {
+		state = PromiseState::SUCCEEDED;
+		result = t;
 		if (cb_success)
 			cb_success(t);
 	}
 	void fail() {
+		state = PromiseState::FAILED;
 		if (cb_fail)
 			cb_fail();
 	}
@@ -71,11 +102,19 @@ struct future {
 
 	future<T>& on(typename xcallback<T>::t cb) {
 		_promise.cb_success = cb;
+		if (_promise.state == PromiseState::SUCCEEDED) {
+			if constexpr (std::is_same<T, void>::value)
+				cb();
+			else
+				cb(_promise.result);
+		}
 		return *this;
 	}
 
 	future<T>& on_fail(Callback cb) {
 		_promise.cb_fail = cb;
+		if (_promise.state == PromiseState::FAILED)
+			cb();
 		return *this;
 	}
 };
@@ -85,12 +124,15 @@ template<>
 struct promise<void> : public Sharable<base::Empty> {
 	Callback cb_success;
 	Callback cb_fail;
+	PromiseState state;
 
 	void operator() () {
+		state = PromiseState::SUCCEEDED;
 		if (cb_success)
 			cb_success();
 	}
 	void fail() {
+		state = PromiseState::FAILED;
 		if (cb_fail)
 			cb_fail();
 	}

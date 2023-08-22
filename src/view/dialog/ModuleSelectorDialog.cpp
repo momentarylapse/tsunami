@@ -101,9 +101,9 @@ void ModuleSelectorDialog::on_toggle_favorite() {
 
 
 
-hui::future<const string&> ModuleSelectorDialog::choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name) {
+hui::future<string> ModuleSelectorDialog::choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
-	static hui::promise<const string&> static_promise;
+	static hui::promise<string> static_promise;
 
 	if (names.num == 1) {
 		hui::run_later(0.01f, [names] {

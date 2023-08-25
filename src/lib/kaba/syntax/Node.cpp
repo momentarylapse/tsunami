@@ -173,7 +173,7 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::ABSTRACT_OPERATOR)
 		return as_abstract_op()->name;
 	if (kind == NodeKind::BLOCK)
-		return "";//p2s(as_block());
+		return (type == TypeVoid) ? "" : t; //p2s(as_block());
 	if (kind == NodeKind::ADDRESS_SHIFT)
 		return i2s(link_no) + t;
 	if (kind == NodeKind::ARRAY)

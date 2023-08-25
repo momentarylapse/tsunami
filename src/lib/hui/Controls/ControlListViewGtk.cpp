@@ -390,15 +390,22 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 	// "model"
 	store = g_list_store_new(G_TYPE_OBJECT);
 
-	auto sel = gtk_single_selection_new(G_LIST_MODEL(store));
-	gtk_single_selection_set_autoselect(sel, false);
-	gtk_single_selection_set_can_unselect(sel, true);
-	selection_model = GTK_SELECTION_MODEL(sel);
+	// selection model
+	bool is_multi_sel = option_has(options, "multiline") or option_has(options, "selectmulti");
+	if (is_multi_sel) {
+		auto sel = gtk_multi_selection_new(G_LIST_MODEL(store));
+		selection_model = GTK_SELECTION_MODEL(sel);
+	} else {
+		auto sel = gtk_single_selection_new(G_LIST_MODEL(store));
+		gtk_single_selection_set_autoselect(sel, false);
+		gtk_single_selection_set_can_unselect(sel, true);
+		selection_model = GTK_SELECTION_MODEL(sel);
+	}
 
 	GtkWidget *view;
 	if (parts.num > 1) {
 		is_column_view = true;
-		view = gtk_column_view_new(GTK_SELECTION_MODEL(selection_model));
+		view = gtk_column_view_new(selection_model);
 
 		for (auto &p: parts) {
 			auto factory = gtk_signal_list_item_factory_new();

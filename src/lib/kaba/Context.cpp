@@ -172,15 +172,21 @@ void Context::execute_single_command(const string &cmd) {
 		func->block->show();
 	}
 	parser->con.concretify_node(func->block.get(), func->block.get(), func->name_space);
+
+	if (func->block->params.num == 0)
+		return;
+
+	auto node = func->block->params[0];
+	if (node->kind == NodeKind::STATEMENT and node->as_statement()->id == StatementID::BLOCK_RETURN)
+		node = node->params[0];
 	
 	// implicit print(...)?
-	if (func->block->params.num > 0 and func->block->params[0]->type != TypeVoid) {
-		auto n = parser->con.add_converter_str(func->block->params[0], true);
-		
-		auto f = tree->required_func_global("print");
+	if (node->type != TypeVoid) {
+		auto n_str = parser->con.add_converter_str(node, true);
+		auto f_print = tree->required_func_global("print");
 
-		auto cmd = add_node_call(f);
-		cmd->set_param(0, n);
+		auto cmd = add_node_call(f_print);
+		cmd->set_param(0, n_str);
 		func->block->params[0] = cmd;
 	}
 	for (auto *c: tree->owned_classes)

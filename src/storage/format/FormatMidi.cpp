@@ -71,16 +71,21 @@ static int read_var(BinaryFormatter *f) {
 
 static void write_var(BinaryFormatter *f, int i) {
 	string s;
+	int i0 = i;
+	if (i < 0)
+		throw Exception("VLQ < 0: " + str(i0));
 	s.add(i & 0x7f);
 	i >>= 7;
-	if (i >= 0) {
+	if (i > 0) {
 		s.add((i & 0x7f) | 0x80);
 		i >>= 7;
 	}
-	if (i >= 0) {
+	if (i > 0) {
 		s.add((i & 0x7f) | 0x80);
 		i >>= 7;
 	}
+	if (i > 0)
+		throw Exception("VLQ too large: " + str(i0));
 	f->write(s.reverse());
 }
 

@@ -13,6 +13,7 @@
 #include "../../lib/base/iter.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
+#include "../../data/TrackMarker.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"
 #include "../../data/rhythm/Bar.h"
@@ -404,6 +405,17 @@ void FormatMidi::save_song(StorageOperationData* od) {
 					f->write_byte(2); // 1/4  ...b->divisor
 					f->write_byte(0);
 					f->write_byte(0);
+
+					// part markers
+					for (auto m: od->song->get_parts()) {
+						if (abs(m->range.offset - b->offset) < 10) {
+							write_var(f, 0);
+							f->write_byte(0xff);
+							f->write_byte(0x01);
+							write_var(f, m->text.num);
+							f->write(m->text);
+						}
+					}
 				}
 
 				int bar_midi_ticks = b->total_sub_beats * ticks_per_beat;

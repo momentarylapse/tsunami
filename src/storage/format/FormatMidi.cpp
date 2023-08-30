@@ -17,6 +17,7 @@
 #include "../../data/base.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../lib/os/msg.h"
+#include "../../lib/math/math.h"
 
 static void dbo(const string &s) {
 	//msg_write(s);
@@ -377,47 +378,57 @@ void FormatMidi::save_song(StorageOperationData* od) {
 			f->write_byte(0xc0 + channel);
 			f->write_byte(t->instrument.midi_no());
 
-			if (od->song->bars.num > 0 and first_track) {
-				auto *b = od->song->bars[0].get();
-				float bpm = b->bpm(od->song->sample_rate);
-				usec_per_beat = 60000000.0f / bpm;
-				write_var(f, 0);
-				f->write_byte(0xff);
-				f->write_byte(0x51);
-				write_var(f, 3);
-				f->write_byte(usec_per_beat >> 16);
-				f->write_byte(usec_per_beat >> 8);
-				f->write_byte(usec_per_beat >> 0);
+			od->song->bars._update_offsets();
 
-				write_var(f, 0);
-				f->write_byte(0xff);
-				f->write_byte(0x58);
-				write_var(f, 4);
-				f->write_byte(b->beats.num);
-				f->write_byte(2); // 1/4
-				f->write_byte(0);
-				f->write_byte(0);
-			}
-			MidiEventBuffer events = t->layers[0]->midi.get_events(Range::ALL);
-			events.sort();
-			int moffset = 0;
-			for (MidiEvent& e: events) {
-				int v = (int) (((double) (e.pos) / (double) (usec_per_beat) * 1000000.0
-						/ (double) (od->song->sample_rate)
-						* (double) (ticks_per_beat)));
-				write_var(f, v - moffset);
-				moffset = v;
-				if (e.volume > 0) {
-					// on
-					f->write_byte(0x90 + channel);
-					f->write_byte((int) (e.pitch));
-					f->write_byte((int) (e.volume * 127.0f));
-				} else {
-					// off
-					f->write_byte(0x80 + channel);
-					f->write_byte((int) (e.pitch));
+			int moffset = 0; // current message midi tick position
+			int bar_midi_offset = 0;
+
+			for (auto b: weak(od->song->bars)) {
+				if (first_track) {
+					float bpm = b->bpm(od->song->sample_rate);// / b->divisor;
+					usec_per_beat = 60000000.0f / bpm;
+					write_var(f, bar_midi_offset - moffset);
+					moffset = bar_midi_offset;
+					f->write_byte(0xff);
+					f->write_byte(0x51);
+					write_var(f, 3);
+					f->write_byte(usec_per_beat >> 16);
+					f->write_byte(usec_per_beat >> 8);
+					f->write_byte(usec_per_beat >> 0);
+
+					write_var(f, 0);
+					f->write_byte(0xff);
+					f->write_byte(0x58);
+					write_var(f, 4);
+					f->write_byte(b->total_sub_beats);
+					f->write_byte(2); // 1/4  ...b->divisor
+					f->write_byte(0);
 					f->write_byte(0);
 				}
+
+				int bar_midi_ticks = b->total_sub_beats * ticks_per_beat;
+
+				MidiEventBuffer events = t->layers[0]->midi.get_events(b->range());
+				events.sort();
+				for (MidiEvent& e: events) {
+					// midi tick offset in bar
+					int v = (int)((double)(e.pos - b->offset) / (double)b->length * (double)bar_midi_ticks);
+					v = bar_midi_offset + clamp(v, 0, bar_midi_ticks);
+					write_var(f, v - moffset);
+					moffset = v;
+					if (e.volume > 0) {
+						// on
+						f->write_byte(0x90 + channel);
+						f->write_byte((int) (e.pitch));
+						f->write_byte((int) (e.volume * 127.0f));
+					} else {
+						// off
+						f->write_byte(0x80 + channel);
+						f->write_byte((int) (e.pitch));
+						f->write_byte(0);
+					}
+				}
+				bar_midi_offset += bar_midi_ticks;
 			}
 
 			// end of track

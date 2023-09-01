@@ -70,7 +70,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_ADWAITA=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_GTK3=1;HAS_LIB_ADWAITA=0;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -86,7 +86,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_ADWAITA=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_GTK3=1;HAS_LIB_ADWAITA=0;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -103,14 +103,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_ADWAITA=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_GTK3=1;HAS_LIB_ADWAITA=0;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_ADWAITA=0;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);HAS_LIB_GTK4=1;HAS_LIB_GTK3=1;HAS_LIB_ADWAITA=0;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>

@@ -12,11 +12,8 @@ mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')
 gtk4dep = dependency('gtk-4.0')
 add_project_arguments('-DHAS_LIB_GTK4=1', language : ['cpp'])
-zlibdep = dependency('zlib')
-add_project_arguments('-DHAS_LIB_ZLIB=1', language : ['cpp'])
-fftw3dep = dependency('fftw3f')
-add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])
-deps = [mdep, threaddep, gtk4dep, zlibdep, fftw3dep]
+gtk3dep = dependency('gtk+-3.0')
+add_project_arguments('-DHAS_LIB_GTK3=1', language : ['cpp'])
 
 # optional dependency: adwaita
 if 
@@ -25,6 +22,10 @@ if
 else
 	add_project_arguments('-DHAS_LIB_ADWAITA=0', language : ['cpp'])
 endif
+zlibdep = dependency('zlib')
+add_project_arguments('-DHAS_LIB_ZLIB=1', language : ['cpp'])
+fftw3dep = dependency('fftw3f')
+add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])
 
 # optional dependency: ogg
 d1 = cc.find_library('ogg', required : false)
@@ -100,6 +101,7 @@ if d.found()
 else
 	add_project_arguments('-DHAS_LIB_GL=0', language : ['cpp'])
 endif
+deps = [mdep, threaddep, gtk4dep, gtk3dep, zlibdep, fftw3dep]
 
 
 sources = [

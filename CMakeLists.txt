@@ -5,7 +5,7 @@ project(tsunami)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
-set(SOURCE 
+set(SOURCE
 	src/action/bar/Action__ScaleData.cpp
 	src/action/bar/Action__ShiftData.cpp
 	src/action/bar/ActionBar__Add.cpp
@@ -509,9 +509,13 @@ set(SOURCE
 	src/Tsunami.cpp
 )
 
+add_executable(tsunami ${SOURCE})
+
+
 find_package(PkgConfig REQUIRED)
 
-# gtk4 or gtk3 mandatory
+
+# lib: gtk4 or gtk3 (mandatory)
 set(GTK4_OR_GTK3 "gtk4" CACHE STRING "Use gtk4 or gtk3?")
 pkg_check_modules(GTK4 gtk4)
 if(GTK4_FOUND)
@@ -546,23 +550,7 @@ if(GTK4_OR_GTK3 STREQUAL "gtk3")
 	add_compile_definitions(HAS_LIB_GTK3=1)
 endif()
 
-# zlib mandatory
-pkg_check_modules(ZLIB REQUIRED zlib)
-include_directories(${ZLIB_INCLUDE_DIRS})
-link_directories(${ZLIB_LIBRARY_DIRS})
-list(APPEND DEPS ${ZLIB_LIBRARIES})
-add_definitions(${ZLIB_CFLAGS_OTHER})
-add_compile_definitions(HAS_LIB_ZLIB=1)
-
-# fftw3 mandatory
-pkg_check_modules(FFTW3 REQUIRED fftw3f)
-include_directories(${FFTW3_INCLUDE_DIRS})
-link_directories(${FFTW3_LIBRARY_DIRS})
-list(APPEND DEPS ${FFTW3_LIBRARIES})
-add_definitions(${FFTW3_CFLAGS_OTHER})
-add_compile_definitions(HAS_LIB_FFTW3=1)
-
-# adwaita (optional)
+# lib: adwaita (optional)
 pkg_check_modules(LIBADWAITA-1 libadwaita-1)
 if(LIBADWAITA-1_FOUND)
 	include_directories(${LIBADWAITA-1_INCLUDE_DIRS})
@@ -574,7 +562,23 @@ else()
 	add_compile_definitions(HAS_LIB_ADWAITA=0)
 endif()
 
-# ogg (optional)
+# lib: zlib mandatory
+pkg_check_modules(ZLIB REQUIRED zlib)
+include_directories(${ZLIB_INCLUDE_DIRS})
+link_directories(${ZLIB_LIBRARY_DIRS})
+list(APPEND DEPS ${ZLIB_LIBRARIES})
+add_definitions(${ZLIB_CFLAGS_OTHER})
+add_compile_definitions(HAS_LIB_ZLIB=1)
+
+# lib: fftw3 mandatory
+pkg_check_modules(FFTW3 REQUIRED fftw3f)
+include_directories(${FFTW3_INCLUDE_DIRS})
+link_directories(${FFTW3_LIBRARY_DIRS})
+list(APPEND DEPS ${FFTW3_LIBRARIES})
+add_definitions(${FFTW3_CFLAGS_OTHER})
+add_compile_definitions(HAS_LIB_FFTW3=1)
+
+# lib: ogg (optional)
 pkg_check_modules(OGG ogg)
 pkg_check_modules(VORBIS vorbis)
 pkg_check_modules(VORBISFILE vorbisfile)
@@ -601,7 +605,7 @@ else()
 	add_compile_definitions(HAS_LIB_OGG=0)
 endif()
 
-# flac (optional)
+# lib: flac (optional)
 pkg_check_modules(FLAC flac)
 if(FLAC_FOUND)
 	include_directories(${FLAC_INCLUDE_DIRS})
@@ -613,7 +617,7 @@ else()
 	add_compile_definitions(HAS_LIB_FLAC=0)
 endif()
 
-# alsa (optional)
+# lib: alsa (optional)
 pkg_check_modules(ALSA alsa)
 if(ALSA_FOUND)
 	include_directories(${ALSA_INCLUDE_DIRS})
@@ -625,7 +629,7 @@ else()
 	add_compile_definitions(HAS_LIB_ALSA=0)
 endif()
 
-# pulseaudio (optional)
+# lib: pulseaudio (optional)
 pkg_check_modules(LIBPULSE libpulse)
 if(LIBPULSE_FOUND)
 	include_directories(${LIBPULSE_INCLUDE_DIRS})
@@ -637,7 +641,7 @@ else()
 	add_compile_definitions(HAS_LIB_PULSEAUDIO=0)
 endif()
 
-# portaudio (optional)
+# lib: portaudio (optional)
 pkg_check_modules(PORTAUDIO-2.0 portaudio-2.0)
 if(PORTAUDIO-2.0_FOUND)
 	include_directories(${PORTAUDIO-2.0_INCLUDE_DIRS})
@@ -649,7 +653,7 @@ else()
 	add_compile_definitions(HAS_LIB_PORTAUDIO=0)
 endif()
 
-# unwind (optional)
+# lib: unwind (optional)
 pkg_check_modules(LIBUNWIND libunwind)
 if(LIBUNWIND_FOUND)
 	include_directories(${LIBUNWIND_INCLUDE_DIRS})
@@ -661,11 +665,11 @@ else()
 	add_compile_definitions(HAS_LIB_UNWIND=0)
 endif()
 
-# dl...
+# lib: dl...
 list(APPEND DEPS ${CMAKE_DL_LIBS})
 add_compile_definitions(HAS_LIB_DL=1)
 
-# gl (optional)
+# lib: gl (optional)
 pkg_check_modules(GL gl)
 if(GL_FOUND)
 	include_directories(${GL_INCLUDE_DIRS})
@@ -677,11 +681,11 @@ else()
 	add_compile_definitions(HAS_LIB_GL=0)
 endif()
 
-add_executable(tsunami ${SOURCE})
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(tsunami PRIVATE Threads::Threads ${DEPS})
+
+
 
 add_compile_definitions(INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
@@ -710,3 +714,4 @@ if(NOT XDG_MIME_EXECUTABLE STREQUAL "XDG_MIME_EXECUTABLE_NOTFOUND")
 	install(CODE "message(STATUS \"installing mime file\")")
 	install(CODE "execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-nami.xml)")
 endif()
+

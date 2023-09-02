@@ -1,4 +1,4 @@
-project('tsunami', 'cpp', default_options : ['cpp_std=c++17', 'warning_level=1', 'optimization=2', 'debug=true'])
+project('tsunami', 'cpp', default_options : ['cpp_std=c++20', 'warning_level=1', 'optimization=2', 'debug=true'])
 add_project_arguments('-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])
 
 #install_data

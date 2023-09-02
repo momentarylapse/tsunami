@@ -81,7 +81,7 @@ public:
 			preview_end();
 
 		progress = new ProgressCancelable(_("Preview"), win);
-		progress->out_cancel >> create_sink([=]{ on_progress_cancel(); });
+		progress->out_cancel >> create_sink([this]{ on_progress_cancel(); });
 
 		playback = new Playback(module->session);
 		auto c = playback->signal_chain.get();

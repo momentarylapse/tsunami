@@ -2,7 +2,7 @@
 
 cmake_minimum_required(VERSION 3.21)
 project(tsunami)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 set(SOURCE
@@ -510,7 +510,7 @@ set(SOURCE
 )
 
 add_executable(tsunami ${SOURCE})
-
+target_include_directories(tsunami PRIVATE src/lib)
 
 find_package(PkgConfig REQUIRED)
 
@@ -685,8 +685,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(tsunami PRIVATE Threads::Threads ${DEPS})
 
-
-
 add_compile_definitions(INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 
 install(TARGETS tsunami DESTINATION bin)
@@ -700,18 +698,14 @@ install(FILES "static/license.txt" DESTINATION share/tsunami)
 install(FILES "static/license_small.txt" DESTINATION share/tsunami)
 install(DIRECTORY "Plugins" DESTINATION share/tsunami)
 
+# install .desktop file
 set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 configure_file("static/michisoft-tsunami.desktop" /tmp/michisoft-tsunami.desktop NO_SOURCE_PERMISSIONS)
+install(FILES /tmp/michisoft-tsunami.desktop DESTINATION share/applications)
 
-find_program(XDG_DESKTOP_MENU_EXECUTABLE xdg-desktop-menu)
-if(NOT XDG_DESKTOP_MENU_EXECUTABLE STREQUAL "XDG_DESKTOP_MENU_EXECUTABLE_NOTFOUND")
-	install(CODE "message(STATUS \"installing desktop file\")")
-	install(CODE "execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install /tmp/michisoft-tsunami.desktop)")
-endif()
-
+# install mime
 find_program(XDG_MIME_EXECUTABLE xdg-mime)
 if(NOT XDG_MIME_EXECUTABLE STREQUAL "XDG_MIME_EXECUTABLE_NOTFOUND")
 	install(CODE "message(STATUS \"installing mime file\")")
 	install(CODE "execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-nami.xml)")
 endif()
-

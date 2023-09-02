@@ -636,6 +636,15 @@ void about_box(Window *win) {
 #if GTK_CHECK_VERSION(4,0,0)
 	auto *_logo = gdk_texture_new_from_file(g_file_new_for_path(Application::get_property("logo").c_str()), &error);
 	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(_logo));
+
+
+	/*auto icon_theme = gtk_icon_theme_get_for_display(gtk_widget_get_display(dlg));
+	gtk_icon_theme_add_search_path(icon_theme, str(Application::directory_static | "icons").c_str());
+
+	string icon = Application::get_property("icon");
+	auto p = gtk_icon_theme_lookup_icon(icon_theme, "tsunamix", nullptr, 128, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_REGULAR);
+
+	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(p));*/
 #else
 	auto *_logo = gdk_pixbuf_new_from_file(Application::get_property("logo").c_str(), &error);
 	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), _logo);

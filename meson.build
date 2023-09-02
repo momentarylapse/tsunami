@@ -615,8 +615,6 @@ install_subdir('static/icons', install_dir : join_paths(get_option('datadir'), '
 install_subdir('static/SignalChains', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/favorites_demo.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/hui_resources.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/icon.png', install_dir : join_paths(get_option('datadir'), 'tsunami'))
-install_data('static/icon.svg', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_data('static/license_small.txt', install_dir : join_paths(get_option('datadir'), 'tsunami'))
 install_subdir('Plugins', install_dir : join_paths(get_option('datadir'), 'tsunami'))

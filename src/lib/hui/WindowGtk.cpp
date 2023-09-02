@@ -23,7 +23,6 @@
 namespace hui
 {
 
-
 void DBDEL_START(const string &type, const string &id, void *p);
 void DBDEL_X(const string &m);
 void DBDEL_DONE();
@@ -186,8 +185,15 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 #endif
 
 	// icon
+#if GTK_CHECK_VERSION(4,0,0)
+
+	auto icon_theme = gtk_icon_theme_get_for_display(gtk_widget_get_display(window));
+	gtk_icon_theme_add_search_path(icon_theme, str(Application::directory_static | "icons").c_str());
+
+	string icon = Application::get_property("icon");
+	gtk_window_set_icon_name(GTK_WINDOW(window), icon.c_str());
+#else
 	string logo = Application::get_property("logo");
-#if !GTK_CHECK_VERSION(4,0,0)
 	if (logo.num > 0)
 		gtk_window_set_icon_from_file(GTK_WINDOW(window), sys_str_f(logo), nullptr);
 #endif

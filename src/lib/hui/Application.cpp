@@ -105,8 +105,11 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 		set_language(config.get_str("Language", def_lang));
 
 
+	// default "logo" used for "about" dialog (full path)
 #ifdef OS_LINUX
-	if (os::fs::exists(directory_static | "icon.svg"))
+	if (os::fs::exists(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")))
+		set_property("logo", str(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")));
+	else if (os::fs::exists(directory_static | "icon.svg"))
 		set_property("logo", str(directory_static | "icon.svg"));
 	else
 #endif
@@ -114,6 +117,10 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 		set_property("logo", str(directory_static | "icon.png"));
 	else if (os::fs::exists(directory_static | "icon.ico"))
 		set_property("logo", str(directory_static | "icon.ico"));
+
+
+	// default "icon" used for windows (just name)
+	set_property("icon", app_name);
 }
 
 Application::~Application() {

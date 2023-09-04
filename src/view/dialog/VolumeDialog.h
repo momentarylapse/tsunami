@@ -19,10 +19,10 @@ public:
 
 	owned<VolumeControl> volume_control;
 	float result;
-	hui::promise<float> _promise;
+	base::promise<float> _promise;
 
 	static bool maximize;
-	static hui::future<float> ask(hui::Window *parent, float value0, float min, float max);
+	static base::future<float> ask(hui::Window *parent, float value0, float min, float max);
 };
 
 

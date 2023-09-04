@@ -177,6 +177,10 @@ int ivec4::operator[](int index) const {
 	return vv[index];
 }
 
+string ivec4::str() const {
+	return format("(%d, %d, %d, %d)", i, j, k, l);
+}
+
 
 
 

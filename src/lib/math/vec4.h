@@ -61,5 +61,7 @@ public:
 	int find(int x) const;
 	int &operator[](int index);
 	int operator[](int index) const;
+
+	string str() const;
 };
 

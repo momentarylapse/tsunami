@@ -1037,6 +1037,11 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::STATIC | Flags::PURE);
 			func_add_param("in", TypeComplexList);
 			func_add_param("out", TypeFloatList, Flags::OUT);
+		class_add_func("c2c_2d", TypeVoid, fft_p(&fft::c2c_2d), Flags::STATIC | Flags::PURE);
+			func_add_param("in", TypeComplexList);
+			func_add_param("out", TypeComplexList, Flags::OUT);
+			func_add_param("n", TypeInt);
+			func_add_param("invers", TypeBool);
 
 
 	// int

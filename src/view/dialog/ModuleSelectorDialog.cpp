@@ -101,21 +101,21 @@ void ModuleSelectorDialog::on_toggle_favorite() {
 
 
 
-hui::future<string> ModuleSelectorDialog::choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name) {
+base::future<string> ModuleSelectorDialog::choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
-	static hui::promise<string> static_promise;
+	base::promise<string> static_promise;
 
 	if (names.num == 1) {
-		hui::run_later(0.01f, [names] {
+		hui::run_later(0.01f, [names, static_promise] () mutable {
 			static_promise(names[0]);
 		});
-		return static_promise.get_future();;
+		return static_promise.get_future();
 	}
 	if (names.num == 0) {
-		hui::run_later(0.01f, [names] {
+		hui::run_later(0.01f, [names, static_promise] () mutable {
 			static_promise.fail();
 		});
-		return static_promise.get_future();;
+		return static_promise.get_future();
 	}
 
 	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);

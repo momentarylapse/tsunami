@@ -31,7 +31,7 @@ QuestionDialogInt::QuestionDialogInt(hui::Window *_parent, const string &questio
 	});
 }
 
-hui::future<int> QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
+base::future<int> QuestionDialogInt::ask(hui::Window *parent, const string &question, const string &options) {
 	auto dlg = new QuestionDialogInt(parent, question, options);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
@@ -119,7 +119,7 @@ float QuestionDialogFloat::get_slider() {
 	return _min + get_float("slider") * (_max - _min);
 }
 
-hui::future<float> QuestionDialogFloat::ask(hui::Window *parent, const string &question, float value0, float min, float max, const string &options) {
+base::future<float> QuestionDialogFloat::ask(hui::Window *parent, const string &question, float value0, float min, float max, const string &options) {
 	auto dlg = new QuestionDialogFloat(parent, question, value0, min, max, options);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
@@ -149,7 +149,7 @@ QuestionDialogMultipleChoice::QuestionDialogMultipleChoice(hui::Window *parent, 
 	}
 }
 
-hui::future<int> QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
+base::future<int> QuestionDialogMultipleChoice::ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel) {
 	auto dlg = new QuestionDialogMultipleChoice(parent, title, text, options, tips, allow_cancel);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
@@ -177,7 +177,7 @@ QuestionDialogString::QuestionDialogString(hui::Window *_parent, const string &q
 	});
 }
 
-hui::future<string> QuestionDialogString::ask(hui::Window *parent, const string &question, const string &options) {
+base::future<string> QuestionDialogString::ask(hui::Window *parent, const string &question, const string &options) {
 	auto dlg = new QuestionDialogString(parent, question, options);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();

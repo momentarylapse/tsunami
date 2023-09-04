@@ -280,4 +280,21 @@ void c2r_inv(const Array<complex> &in, Array<float> &out) {
 }
 
 
+void c2c_2d(const Array<complex> &in, Array<complex> &out, int n, bool inverse) {
+	out.resize(in.num);
+	//align_stack
+
+#if HAS_LIB_FFTW3
+	planer_mtx.lock();
+	fftwf_plan plan = fftwf_plan_dft_2d(n, in.num / n, (float(*)[2])in.data, (float(*)[2])out.data, inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
+	planer_mtx.unlock();
+	fftwf_execute(plan);
+	planer_mtx.lock();
+	fftwf_destroy_plan(plan);
+	planer_mtx.unlock();
+#else
+	msg_error("can not perform 2d fft (program compiled without fftw3 support)");
+#endif
+}
+
 }

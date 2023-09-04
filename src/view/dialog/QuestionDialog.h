@@ -14,8 +14,8 @@ class QuestionDialogInt : hui::Dialog {
 public:
 	QuestionDialogInt(hui::Window *parent, const string &question, const string &options);
 	int result;
-	hui::promise<int> _promise;
-	static hui::future<int> ask(hui::Window *parent, const string &question, const string &options = "");
+	base::promise<int> _promise;
+	static base::future<int> ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
 
@@ -37,8 +37,8 @@ public:
 	void set_slider(float f);
 	float get_spin();
 	float get_slider();
-	hui::promise<float> _promise;
-	static hui::future<float> ask(hui::Window *parent, const string &question, float value0, float min, float max, const string& options = "");
+	base::promise<float> _promise;
+	static base::future<float> ask(hui::Window *parent, const string &question, float value0, float min, float max, const string& options = "");
 };
 
 
@@ -46,16 +46,16 @@ class QuestionDialogMultipleChoice : hui::Dialog {
 public:
 	QuestionDialogMultipleChoice(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel);
 	int result;
-	hui::promise<int> _promise;
-	static hui::future<int> ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel);
+	base::promise<int> _promise;
+	static base::future<int> ask(hui::Window *parent, const string &title, const string &text, const Array<string> &options, const Array<string> &tips, bool allow_cancel);
 };
 
 class QuestionDialogString : hui::Dialog {
 public:
 	QuestionDialogString(hui::Window *parent, const string &question, const string &options);
 	string result;
-	hui::promise<string> _promise;
-	static hui::future<string> ask(hui::Window *parent, const string &question, const string &options = "");
+	base::promise<string> _promise;
+	static base::future<string> ask(hui::Window *parent, const string &question, const string &options = "");
 };
 
 #endif /* SRC_VIEW_DIALOG_QUESTIONDIALOG_H_ */

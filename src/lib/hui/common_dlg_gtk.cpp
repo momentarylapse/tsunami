@@ -8,12 +8,6 @@
 namespace hui
 {
 
-template<class T>
-void reset_promise(promise<T> &p) {
-	p.cb_success = nullptr;
-	p.cb_fail = nullptr;
-}
-
 struct DialogParams {
 	string filter, show_filter;
 	base::optional<string> font;
@@ -85,7 +79,7 @@ static GtkWindow *get_window_save(Window *win) {
 	}
 #endif
 
-static promise<Path> cur_file_promise;
+static base::promise<Path> cur_file_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_file_dialog_open(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -154,7 +148,7 @@ static void add_filters(GtkWidget *dlg, const string &show_filter, const string 
 
 // choose a directory (<dir> will be selected initially)
 FileFuture file_dialog_dir(Window *win, const string &title, const Path &dir, const Array<string> &params) {
-	reset_promise(cur_file_promise);
+	cur_file_promise.reset();
 	auto p = DialogParams::parse(params);
 	GtkWindow *w = get_window_save(win);
 #if GTK_CHECK_VERSION(4,10,0)
@@ -199,7 +193,7 @@ FileFuture file_dialog_dir(Window *win, const string &title, const Path &dir, co
 
 // file selection for opening (filter should look like "*.txt")
 FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params) {
-	reset_promise(cur_file_promise);
+	cur_file_promise.reset();
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
 	GtkWindow *w = get_window_save(win);
@@ -263,7 +257,7 @@ FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, c
 
 // file selection for saving
 FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, const Array<string> &params) {
-	reset_promise(cur_file_promise);
+	cur_file_promise.reset();
 	auto p = DialogParams::parse(params);
 	DialogParams::STATIC_PARAMS = p;
 	GtkWindow *w = get_window_save(win);
@@ -326,7 +320,7 @@ FileFuture file_dialog_save(Window *win, const string &title, const Path &dir, c
 }
 
 
-static promise<string> cur_font_promise;
+static base::promise<string> cur_font_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_font(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -350,7 +344,7 @@ static void on_gtk_font_dialog_response(GtkDialog *self, gint response_id, gpoin
 #endif
 
 FontFuture select_font(Window *win, const string &title, const Array<string> &params) {
-	reset_promise(cur_font_promise);
+	cur_font_promise.reset();
 	auto p = DialogParams::parse(params);
 	GtkWindow *w = get_window_save(win);
 #if GTK_CHECK_VERSION(4,10,0)
@@ -395,7 +389,7 @@ color color_user_to_gtk(const color &c);
 GdkRGBA color_to_gdk(const color &c);
 color color_from_gdk(const GdkRGBA &gcol);
 
-static promise<color> cur_color_promise;
+static base::promise<color> cur_color_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -419,7 +413,7 @@ static void on_gtk_color_dialog_response(GtkDialog *self, gint response_id, gpoi
 #endif
 
 ColorFuture select_color(Window *win, const string &title, const color &c) {
-	reset_promise(cur_color_promise);
+	cur_color_promise.reset();
 	GdkRGBA gcol = color_to_gdk(color_user_to_gtk(c));
 	GtkWindow *w = get_window_save(win);
 #if GTK_CHECK_VERSION(4,10,0)
@@ -452,7 +446,7 @@ ColorFuture select_color(Window *win, const string &title, const color &c) {
 }
 
 
-static promise<bool> cur_question_promise;
+static base::promise<bool> cur_question_promise;
 
 #if GTK_CHECK_VERSION(4,10,0)
 static void on_question_reply(GObject* o, GAsyncResult* res, gpointer user_data) {
@@ -478,7 +472,7 @@ static void on_gtk_question_dialog_response(GtkDialog *self, gint response_id, g
 #endif
 
 QuestionFuture question_box(Window *win, const string &title, const string &text, bool allow_cancel) {
-	reset_promise(cur_question_promise);
+	cur_question_promise.reset();
 	GtkWindow *w = get_window_save(win);
 #if GTK_CHECK_VERSION(4,10,0)
 	auto dlg = gtk_alert_dialog_new("%s", sys_str(title));

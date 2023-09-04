@@ -96,7 +96,7 @@ void SampleSelectionDialog::on_cancel() {
 	request_destroy();
 }
 
-hui::future<Sample*> SampleSelectionDialog::select(Session *session, hui::Panel *parent, Sample *old) {
+base::future<Sample*> SampleSelectionDialog::select(Session *session, hui::Panel *parent, Sample *old) {
 	auto s = new SampleSelectionDialog(session, parent, old);
 	hui::fly(s);
 	return s->_promise.get_future();

@@ -33,9 +33,9 @@ public:
 	Session *session;
 	string list_id;
 
-	hui::promise<Sample*> _promise;
+	base::promise<Sample*> _promise;
 
-	static hui::future<Sample*> select(Session *session, hui::Panel *parent, Sample *old);
+	static base::future<Sample*> select(Session *session, hui::Panel *parent, Sample *old);
 };
 
 #endif /* SRC_VIEW_DIALOG_SAMPLESELECTIONDIALOG_H_ */

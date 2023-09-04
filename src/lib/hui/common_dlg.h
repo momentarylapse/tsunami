@@ -9,6 +9,7 @@
 #ifndef _COMMON_DLG_EXISTS_
 #define _COMMON_DLG_EXISTS_
 
+#include "../base/future.h"
 
 class color;
 
@@ -16,10 +17,10 @@ namespace hui {
 
 class Window;
 
-using FileFuture = future<Path>;
-using ColorFuture = future<color>;
-using FontFuture = future<string>;
-using QuestionFuture = future<bool>;
+using FileFuture = base::future<Path>;
+using ColorFuture = base::future<color>;
+using FontFuture = base::future<string>;
+using QuestionFuture = base::future<bool>;
 
 // file dialogs
 FileFuture file_dialog_open(Window *win, const string &title, const Path &dir, const Array<string> &params);

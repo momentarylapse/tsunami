@@ -34,10 +34,10 @@ public:
 	static Label split_label(const string &s);
 
 	base::optional<string> _return;
-	hui::promise<string> _promise;
+	base::promise<string> _promise;
 
 
-	static hui::future<string> choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name = base::None);
+	static base::future<string> choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name = base::None);
 };
 
 #endif /* SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_ */

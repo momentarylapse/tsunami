@@ -42,7 +42,7 @@ VolumeDialog::VolumeDialog(hui::Window *_parent, float value0, float min, float 
 	});
 }
 
-hui::future<float> VolumeDialog::ask(hui::Window *parent, float value0, float min, float max) {
+base::future<float> VolumeDialog::ask(hui::Window *parent, float value0, float min, float max) {
 	auto dlg = new VolumeDialog(parent, value0, min, max);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();

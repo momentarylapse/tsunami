@@ -124,19 +124,17 @@ public:
 	shared<Module> module;
 	owned<Progress> progress;
 	owned<Playback> playback;
-	hui::promise<void> _promise;
+	base::promise<void> _promise;
 };
 
-hui::future<void> configure_module(hui::Window *win, shared<Module> m) {
+base::future<void> configure_module(hui::Window *win, shared<Module> m) {
 	auto *config = m->get_config();
 	if (!config) {
-		static hui::promise<void> static_promise;
-		static_promise.cb_success = nullptr;
-		static_promise.cb_fail = nullptr;
-		hui::run_later(0.01f, [] {
-				static_promise();
+		base::promise<void> promise;
+		hui::run_later(0.01f, [promise] () mutable {
+				promise();
 		});
-		return static_promise.get_future();
+		return promise.get_future();
 	}
 
 	auto *dlg = new ConfigurationDialog(m, win);

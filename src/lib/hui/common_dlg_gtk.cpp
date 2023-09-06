@@ -636,7 +636,7 @@ void about_box(Window *win) {
 	gtk_icon_theme_add_search_path(icon_theme, str(Application::directory_static | "icons").c_str());
 
 	string icon = Application::get_property("icon");
-	auto p = gtk_icon_theme_lookup_icon(icon_theme, "tsunamix", nullptr, 128, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_REGULAR);
+	auto p = gtk_icon_theme_lookup_icon(icon_theme, icon.c_str(), nullptr, 128, 1, GTK_TEXT_DIR_NONE, GTK_ICON_LOOKUP_FORCE_REGULAR);
 
 	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(p));*/
 #else

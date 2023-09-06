@@ -51,6 +51,7 @@ class ControlGrid;
 class ControlRadioButton;
 class ControlGroup;
 class ControlExpander;
+class ControlBasicWindowLayout;
 
 class Window : public Panel {
 	friend class Toolbar;
@@ -96,6 +97,7 @@ public:
 	void _cdecl get_size(int &width, int &height);
 	void _cdecl set_size_desired(int width, int height);
 	void _cdecl get_size_desired(int &width, int &height);
+	void add_basic_layout(const string& layout);
 	void _cdecl set_menu(xfer<Menu> menu);
 	Menu* _cdecl get_menu();
 	Window* _cdecl get_parent();
@@ -133,36 +135,22 @@ public:
 	int mouse_offset_x, mouse_offset_y;
 	Control *main_input_control;
 
-	shared<Toolbar> toolbar[4];
-	Toolbar *_cdecl get_toolbar(int index){ return toolbar[index].get(); }
+	Toolbar *_cdecl get_toolbar(int index);
 
 private:
 
 
-#ifdef HUI_API_WIN
-	bool ready;
-	//hui_callback *NixGetInputFromWindow;
-	HWND statusbar, gl_hwnd;
-	RECT WindowBounds,WindowClient;
-	DWORD WindowStyle;
-	int cdx,cdy;
-#endif
 #ifdef HUI_API_GTK
 public:
 	GtkWidget *window;
-private:
 public:
-	GtkWidget *vbox, *hbox, *menubar;
 	shared<Control> header_bar;
-	Array<GtkWidget*> gtk_menu;
-	int gtk_num_menus;
 	void _add_headerbar();
+	ControlBasicWindowLayout *basic_layout = nullptr;
 #endif
 	
 protected:
-	owned<Menu> menu;
 	Menu *popup;
-	bool statusbar_enabled;
 	bool allowed, allow_keys;
 	Window *parent_window;
 	bool requested_destroy;

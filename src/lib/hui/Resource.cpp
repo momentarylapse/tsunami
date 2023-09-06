@@ -192,7 +192,8 @@ Window *create_resource_dialog(const string &id, Window *root) {
 
 	// toolbar?
 	if (toolbar_id.num > 0)
-		dlg->toolbar[TOOLBAR_TOP]->set_by_id(toolbar_id);
+		if (auto t = dlg->get_toolbar(TOOLBAR_TOP))
+			t->set_by_id(toolbar_id);
 
 	// controls
 	for (Resource &cmd: res->children)

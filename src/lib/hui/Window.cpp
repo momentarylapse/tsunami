@@ -69,12 +69,7 @@ void Window::_init_generic_(Window *_parent, bool _allow_root, int _mode) {
 	if (parent_window) {
 		parent_window->allowed = _allow_root;
 	}
-	menu = popup = nullptr;
-	statusbar_enabled = false;
-	toolbar[TOOLBAR_TOP] = new Toolbar(this);
-	toolbar[TOOLBAR_LEFT] = new Toolbar(this, true);
-	toolbar[TOOLBAR_RIGHT] = new Toolbar(this, true);
-	toolbar[TOOLBAR_BOTTOM] = new Toolbar(this);
+	popup = nullptr;
 	input.reset();
 
 	allow_input = false; // allow only if ->Show() was called
@@ -112,10 +107,6 @@ void Window::set_position_special(Window *win,int mode) {
 	if ((mode & HUI_BOTTOM) > 0)
 		cy = py + ph - ch - 2;
 	set_position(cx, cy);
-}
-
-Menu *Window::get_menu() {
-	return menu.get();
 }
 
 Window *Window::get_parent() {

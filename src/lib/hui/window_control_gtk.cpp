@@ -84,37 +84,46 @@ extern string OptionString, HuiFormatString;
 #endif
 
 void Panel::_insert_control_(shared<Control> c, int x, int y) {
-	GtkWidget *frame = c->get_frame();
+	auto child_widget = c->get_frame();
 	c->panel = this;
 	if (target_control) {
 		target_control->add_child(c, x, y);
-	} else {
-		root_control = c;
+	} else if (root_control) {
+		root_control->add_child(c, x, y);
+	} else if (this == win) {
 		// directly into the window...
-		//gtk_container_add(GTK_CONTAINER(plugable), frame);
-		if (plugable) {
-			// this = HuiWindow...
+		root_control = c;
+
 #if GTK_CHECK_VERSION(4,0,0)
-			gtk_box_append(GTK_BOX(plugable), frame);
-			//g_object_set(G_OBJECT(plugable), "margin-start", 40, nullptr);
-			gtk_widget_set_margin_bottom(plugable, border_width);
-			gtk_widget_set_margin_top(plugable, border_width);
-			gtk_widget_set_margin_start(plugable, border_width);
-			gtk_widget_set_margin_end(plugable, border_width);
+		gtk_window_set_child(GTK_WINDOW(win->window), child_widget);
+		//g_object_set(G_OBJECT(child_widget), "margin-start", 40, nullptr);
+		gtk_widget_set_margin_bottom(child_widget, border_width);
+		gtk_widget_set_margin_top(child_widget, border_width);
+		gtk_widget_set_margin_start(child_widget, border_width);
+		gtk_widget_set_margin_end(child_widget, border_width);
 #else
-			gtk_box_pack_start(GTK_BOX(plugable), frame, true, true, 0);
+		if (win->is_dialog()) {
+			auto plugable = gtk_dialog_get_content_area(GTK_DIALOG(win->window));
+			gtk_box_pack_start(GTK_BOX(plugable), child_widget, true, true, 0);
 			gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
-#endif
 		} else {
-			// sub-panel
-#if GTK_CHECK_VERSION(4,0,0)
-			gtk_widget_insert_action_group(c->widget, id.c_str(), G_ACTION_GROUP(action_group));
-#endif
+			gtk_container_add(GTK_CONTAINER(win->window), child_widget);
+			gtk_container_set_border_width(GTK_CONTAINER(win->window), border_width);
+			//gtk_container_set_border_width(GTK_CONTAINER(plugable), border_width);
+			gtk_widget_show(child_widget);
 		}
+#endif
+	} else {
+		// sub-panel
+		root_control = c;
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_insert_action_group(c->widget, id.c_str(), G_ACTION_GROUP(action_group));
+#endif
 	}
+
 #if !GTK_CHECK_VERSION(4,0,0)
-	if (frame != c->widget)
-		gtk_widget_show(frame);
+	if (child_widget != c->widget)
+		gtk_widget_show(child_widget);
 	gtk_widget_show(c->widget);
 #endif
 	c->enabled = true;

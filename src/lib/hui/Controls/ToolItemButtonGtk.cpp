@@ -28,6 +28,7 @@ ToolItemButton::ToolItemButton(const string &title, const string &image, const s
 		gtk_button_set_child(GTK_BUTTON(widget), im);
 	else
 		gtk_button_set_label(GTK_BUTTON(widget), sys_str(title));
+	gtk_button_set_has_frame(GTK_BUTTON(widget), false);
 	//gtk_tool_item_set_homogeneous(GTK_TOOL_ITEM(widget), true);
 	//gtk_widget_set_tooltip_text(widget, sys_str(get_lang(id, title)));
 	gtk_widget_set_can_focus(widget, false);

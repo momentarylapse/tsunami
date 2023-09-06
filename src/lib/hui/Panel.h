@@ -161,7 +161,6 @@ protected:
 #endif
 #ifdef HUI_API_GTK
 public:
-	GtkWidget *plugable;
 	struct SizeGroup {
 		GtkSizeGroup *group;
 		int mode;

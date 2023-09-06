@@ -261,17 +261,19 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("cursor-expand-right", hui::KEY_RIGHT + hui::KEY_SHIFT);
 
 
+	set_border_width(0);
+	set_spacing(0);
+
 	if (hui::config.get_bool("Window.HeaderBar", true)) {
 		header_bar = new HeaderBar(this);
 	} else {
+		add_basic_layout("menubar|toolbar-top");
 		set_menu(hui::create_resource_menu("menu", this));
 		app->plugin_manager->add_plugins_to_menu(this);
-		toolbar[0]->set_by_id("toolbar");
+		get_toolbar(0)->set_by_id("toolbar");
 	}
 
 	// table structure
-	set_border_width(0);
-	set_spacing(0);
 	set_target("");
 	add_grid("", 0, 0, "root-grid");
 	set_target("root-grid");

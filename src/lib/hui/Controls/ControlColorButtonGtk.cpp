@@ -11,15 +11,15 @@
 
 #ifdef HUI_API_GTK
 
-namespace hui
-{
+namespace hui {
 	// perform gamma corrections?
 	// (gtk uses sRGB internally)
 	bool color_button_linear = false;
 
 
-void OnGtkColorButtonChange(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void OnGtkColorButtonChange(GtkWidget *widget, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
 ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	Control(CONTROL_COLORBUTTON, id)
@@ -28,12 +28,14 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 #if GTK_CHECK_VERSION(4,10,0)
 	dialog = gtk_color_dialog_new();
 	widget = gtk_color_dialog_button_new(dialog);
+	//g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(&OnGtkColorButtonChange), this);
+	// FIXME how to listen to update signals?!?
 #else
 	widget = gtk_color_button_new();
-#endif
-	take_gtk_ownership();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);
 	g_signal_connect(G_OBJECT(widget), "color-set", G_CALLBACK(&OnGtkColorButtonChange), this);
+#endif
+	take_gtk_ownership();
 
 	_last_set = Black;
 }

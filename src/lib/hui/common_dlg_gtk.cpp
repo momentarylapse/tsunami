@@ -94,14 +94,14 @@ static void on_file_dialog_save(GObject* o, GAsyncResult* res, gpointer user_dat
 	if (auto f = gtk_file_dialog_save_finish(dlg, res, nullptr))
 		cur_file_promise(g_file_get_path(f));
 	else
-		cur_file_promise("");
+		cur_file_promise.fail();
 }
 static void on_file_dialog_dir(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_FILE_DIALOG(o);
 	if (auto f = gtk_file_dialog_select_folder_finish(dlg, res, nullptr))
 		cur_file_promise(g_file_get_path(f));
 	else
-		cur_file_promise("");
+		cur_file_promise.fail();
 }
 
 static void add_filters(GtkFileDialog *dlg, const DialogParams &p) {
@@ -127,7 +127,7 @@ static void on_gtk_file_dialog_response(GtkDialog *self, gint response_id, gpoin
 		cur_file_promise(DialogParams::STATIC_PARAMS.try_to_ensure_extension(g_file_get_path(fn)));
 	} else {
 		gtk_window_destroy(GTK_WINDOW(self));
-		cur_file_promise("");
+		cur_file_promise.fail();
 	}
 }
 #endif

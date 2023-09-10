@@ -37,6 +37,8 @@ public:
 
 	void _check();
 
+	void read(Image &image) const;
+
 	static FrameBuffer *DEFAULT;
 };
 

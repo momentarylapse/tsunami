@@ -11,6 +11,7 @@
 #include "nix.h"
 #include "nix_common.h"
 #include "../base/iter.h"
+#include "../image/image.h"
 #include "../os/msg.h"
 
 
@@ -128,6 +129,13 @@ void FrameBuffer::clear_color(int index, const color &c) {
 
 void FrameBuffer::clear_depth(float depth) {
 	glClearNamedFramebufferfv(frame_buffer, GL_DEPTH, 0, &depth);
+}
+
+void FrameBuffer::read(Image &image) const {
+	image.create(width, height, Black);
+	glNamedFramebufferReadBuffer(frame_buffer, GL_FRONT);
+	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, &image.data[0]);
+	image.flip_v();
 }
 
 void bind_frame_buffer(FrameBuffer *fb) {

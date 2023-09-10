@@ -142,6 +142,11 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 
 		if (!allow_parent)
 			gtk_window_set_modal(GTK_WINDOW(window), true);//false);
+
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
+#endif
+
 #ifndef OS_WINDOWS
 #if !GTK_CHECK_VERSION(3,0,0)
 		gtk_widget_hide(gtk_dialog_get_action_area(GTK_DIALOG(window)));
@@ -153,6 +158,7 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 		// dialog -> center on screen or root (if given)    ->  done by gtk....later
 		gtk_window_set_transient_for(GTK_WINDOW(window), GTK_WINDOW(parent_window->window));
 		gtk_window_set_resizable(GTK_WINDOW(window), false);
+
 	} else {
 #if GTK_CHECK_VERSION(4,0,0)
 		window = gtk_window_new();

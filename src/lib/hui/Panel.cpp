@@ -437,7 +437,9 @@ void Panel::embed(shared<Panel> panel, const string &parent_id, int x, int y) {
 
 #if GTK_CHECK_VERSION(4,0,0)
 	//msg_error("ATTACH ACTION GROUP  " + p2s(panel.get()));
-	gtk_widget_insert_action_group(win->window, p2s(panel.get()).c_str(), G_ACTION_GROUP(panel->action_group));
+	if (win) {
+		gtk_widget_insert_action_group(win->window, p2s(panel.get()).c_str(), G_ACTION_GROUP(panel->action_group));
+	}
 #endif
 }
 

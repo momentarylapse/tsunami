@@ -236,6 +236,8 @@ void SIAddPackageGl(Context *c) {
 		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update_x));
 			func_add_param("attachments", TypeTextureSharedNNList);
 			func_add_param("face", TypeInt);
+		class_add_func("read", TypeVoid, gl_p(&nix::FrameBuffer::read));
+			func_add_param("image", TypeImage, Flags::OUT);
 		class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
 		class_add_element("width", TypeInt, gl_p(&nix::FrameBuffer::width));
 		class_add_element("height", TypeInt, gl_p(&nix::FrameBuffer::height));

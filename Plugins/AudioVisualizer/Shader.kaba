@@ -347,6 +347,7 @@ void main() {
 
 class ShaderPanel extends ConfigPanel
 	var override c: ShaderVis&
+	var context: owned![Context]
 	var shader: owned[Shader]
 	var _time: float
 	var timer: Timer
@@ -354,6 +355,8 @@ class ShaderPanel extends ConfigPanel
 	var type: int
 	
 	func override __init__(_m: Module)
+		event_x("area", "hui:realize", on_realize)
+		event_x("area", "hui:unrealize", on_unrealize)
 		from_source("
 Grid ? '' vertical
 	ComboBox type 'Chladni by 386dx25\\Creation... by Danguafer\\Very fast procedural ocean by afl_ext\\Phantom Star by kasari39\\glowingMarblingBlack by nasana'
@@ -364,8 +367,6 @@ Grid ? '' vertical
 		type = 0
 	
 		event_x("area", "hui:draw-gl", on_draw)
-		event_x("area", "hui:realize", on_realize)
-		event_x("area", "hui:unrealize", on_unrealize)
 		event("type", on_type)
 	
 	func override __delete__()
@@ -391,7 +392,7 @@ Grid ? '' vertical
 	func mut update_shader()
 		var frag = SOURCE[type]
 		
-		shader = Shader.create("
+		shader = context.create_shader("
 <Layout>
 	version = 330 core
 </Layout>
@@ -415,7 +416,7 @@ uniform float iVolume;
 ")
 	
 	func mut on_realize()
-		gl.init()
+		context = gl.init([])
 		update_shader()
 		
 		id_runner = hui.run_repeated(0.03, on_step)
@@ -434,8 +435,8 @@ uniform float iVolume;
 		for s in shader
 			s.set_float("iTime", _time)
 			s.set_float("iVolume", volume)
-		gl.vb_temp.create_quad(rect.ID_SYM, rect.ID)
-		gl.draw_triangles(vb_temp)
+		context.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+		gl.draw_triangles(context.vb_temp)
 		#gl.end()
 
 class ShaderVis extends AudioVisualizer

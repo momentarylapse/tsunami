@@ -20,9 +20,6 @@ namespace nix {
 bool allow_separate_vertex_arrays = false;
 unsigned int global_vao = 0;
 
-VertexBuffer *vb_temp = NULL;
-VertexBuffer *vb_temp_i = NULL;
-
 bool gl_is_integer(unsigned int type) {
 	if ((type == GL_INT) or (type == GL_UNSIGNED_INT))
 		return true;
@@ -279,13 +276,13 @@ void bind_vertex_buffer(VertexBuffer *vb) {
 	glBindVertexArray(vb->vao);
 }
 
-void init_vertex_buffers() {
+void init_vertex_buffers(Context *ctx) {
 	if (!allow_separate_vertex_arrays) {
 		glCreateVertexArrays(1, &global_vao);
 	}
 
-	vb_temp = new VertexBuffer("3f,3fn,2f");
-	vb_temp_i = new VertexBuffer("3f,3fn,2f|i");
+	ctx->vb_temp = new VertexBuffer("3f,3fn,2f");
+	ctx->vb_temp_i = new VertexBuffer("3f,3fn,2f|i");
 }
 
 };

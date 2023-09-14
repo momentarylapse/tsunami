@@ -22,7 +22,7 @@
 
 namespace nix{
 
-string version = "0.13.11.1";
+string version = "0.14.0.0";
 // currently, requiring OpenGL 4.5
 
 
@@ -54,10 +54,17 @@ void TestGLError(const char *pos) {
 int target_width, target_height; // render target size (window/texture) but relative to viewport!
 rect target_rect;
 
+Context* Context::CURRENT = nullptr;
+
+xfer<Shader> Context::load_shader(const Path &filename) {
+	return Shader::load(this, filename);
+}
+xfer<Shader> Context::create_shader(const string &source) {
+	return Shader::create(this, source);
+}
 
 Fog fog;
 
-Array<string> extensions;
 
 
 
@@ -122,17 +129,32 @@ void message_callback(GLenum source, GLenum type, GLuint id, GLenum severity, GL
 	msg_error(format("%s, %s, %s, %d: %s", src_str, type_str, severity_str, id, message));
 }
 
-void init() {
-	//if (Usable)
-	//	return;
+xfer<Context> init(const Array<string>& flags) {
+	auto ctx = new Context;
 
-	msg_write("nix");
-	msg_right();
-	msg_write("[" + version + "]");
+	Context::CURRENT = ctx;
 
-	msg_write(string("OpenGL: ") + (char*)glGetString(GL_VERSION));
-	msg_write(string("Renderer: ") + (char*)glGetString(GL_RENDERER));
-	msg_write(string("GLSL: ") + (char*)glGetString(GL_SHADING_LANGUAGE_VERSION));
+	if (!sa_contains(flags, "silent"))
+		ctx->verbosity = 1;
+	if (sa_contains(flags, "verbose"))
+		ctx->verbosity = 2;
+
+	if (ctx->verbosity >= 1) {
+		msg_write("nix");
+		msg_right();
+		msg_write("[" + version + "]");
+	}
+
+	ctx->version = version;
+	ctx->gl_version = (char*)glGetString(GL_VERSION);
+	ctx->gl_renderer = (char*)glGetString(GL_RENDERER);
+	ctx->glsl_version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+
+	if (ctx->verbosity >= 1) {
+		msg_write("OpenGL: " + ctx->gl_version);
+		msg_write("Renderer: " + ctx->gl_renderer);
+		msg_write("GLSL: " + ctx->glsl_version);
+	}
 
 #ifdef OS_WINDOWS
 	GLenum err = glewInit();
@@ -145,7 +167,7 @@ void init() {
 	int num_extension = 0;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &num_extension);
 	for (int i = 0; i < num_extension; i++) {
-		extensions.add((char*)glGetStringi(GL_EXTENSIONS, i));
+		ctx->extensions.add((char*)glGetStringi(GL_EXTENSIONS, i));
 	}
 
 
@@ -159,9 +181,10 @@ void init() {
 	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 	glDebugMessageCallback(message_callback, nullptr);
 
-	init_textures();
-	init_shaders();
-	init_vertex_buffers();
+
+	init_textures(ctx);
+	init_shaders(ctx);
+	init_vertex_buffers(ctx);
 
 	set_cull(CullMode::DEFAULT);
 	set_wire(false);
@@ -169,22 +192,30 @@ void init() {
 	set_material(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
 	set_projection_perspective();
 	set_z(true, true);
-	set_shader(Shader::default_3d.get());
+	set_shader(ctx->default_3d.get());
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
-	FrameBuffer::DEFAULT->width = vp[2];
-	FrameBuffer::DEFAULT->height = vp[3];
+	ctx->default_framebuffer = new FrameBuffer();
+	ctx->default_framebuffer->width = vp[2];
+	ctx->default_framebuffer->height = vp[3];
 
 	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 
 
-	msg_ok();
-	msg_left();
+	if (ctx->verbosity >= 1) {
+		msg_ok();
+		msg_left();
+	}
+	return ctx;
 }
 
-void kill() {
+Context::~Context() {
 	msg_write("nix.kill");
+}
+
+void kill(Context *ctx) {
+	delete ctx;
 }
 
 void flush() {
@@ -196,7 +227,7 @@ void flush() {
 #define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
 #define GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX 0x9049
 
-int total_mem() {
+int Context::total_mem() const {
 	if (sa_contains(extensions, "GL_NVX_gpu_memory_info")) {
 		GLint total_mem_kb = 0;
 		glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &total_mem_kb);
@@ -207,7 +238,7 @@ int total_mem() {
 	return -1;
 }
 
-int available_mem() {
+int Context::available_mem() const {
 	if (sa_contains(extensions, "GL_NVX_gpu_memory_info")) {
 		GLint cur_avail_mem_kb = 0;
 		glGetIntegerv(GL_GPU_MEM_INFO_CURRENT_AVAILABLE_MEM_NVX, &cur_avail_mem_kb);

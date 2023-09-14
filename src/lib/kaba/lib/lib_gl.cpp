@@ -26,22 +26,14 @@ xfer<nix::Texture> __LoadTexture(const Path &filename) {
 	return nullptr;
 }
 
-xfer<nix::Shader> __LoadShader(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER(return nix::Shader::load(filename));
+xfer<nix::Shader> __ContextLoadShader(nix::Context *ctx, const Path &filename) {
+	KABA_EXCEPTION_WRAPPER(return ctx->load_shader(filename));
 	return nullptr;
 }
 
-xfer<nix::Shader> __CreateShader(const string &source) {
-	KABA_EXCEPTION_WRAPPER(return nix::Shader::create(source));
+xfer<nix::Shader> __ContextCreateShader(nix::Context *ctx, const string &source) {
+	KABA_EXCEPTION_WRAPPER(return ctx->create_shader(source));
 	return nullptr;
-}
-
-nix::Shader* __LoadShaderDefault3d() {
-	return nix::Shader::default_3d.get();
-}
-
-nix::Shader* __LoadShaderDefault2d() {
-	return nix::Shader::default_2d.get();
 }
 
 #pragma GCC pop_options
@@ -94,7 +86,10 @@ public:
 		int width, height;
 		int color_attachments, depth_buffer;
 	};
+	struct FakeContext {
+	};
 	namespace nix{
+		typedef FakeContext Context;
 		typedef int VertexBuffer;
 		typedef FakeTexture Texture;
 		typedef FakeTexture FrameBuffer;
@@ -111,18 +106,22 @@ extern const Class *TypeVec2;
 extern const Class *TypeImage;
 extern const Class *TypeFloatList;
 extern const Class *TypeFloatP;
+extern const Class *TypeStringList;
 extern const Class *TypeDynamicArray;
 extern const Class *TypePath;
 
 void SIAddPackageGl(Context *c) {
 	add_package(c, "gl");
-	
+
+	auto TypeContext = add_type("Context", sizeof(nix::Context));
+	auto TypeContextXfer = add_type_p_xfer(TypeContext);
 	auto TypeVertexBuffer = add_type("VertexBuffer", sizeof(nix::VertexBuffer));
 	auto TypeVertexBufferP = add_type_p_raw(TypeVertexBuffer);
 	auto TypeVertexBufferRef = add_type_ref(TypeVertexBuffer);
 	auto TypeTexture = add_type("Texture", sizeof(nix::Texture));
 	auto TypeTextureXfer = add_type_p_xfer(TypeTexture);
 	auto TypeTextureP = add_type_p_raw(TypeTexture);
+	auto TypeTextureRef = add_type_ref(TypeTexture);
 	auto TypeTextureSharedNN = add_type_p_shared_not_null(TypeTexture);
 	auto TypeTexturePList = add_type_list(TypeTextureP);
 	auto TypeTextureSharedNNList = add_type_list(TypeTextureSharedNN);
@@ -131,7 +130,7 @@ void SIAddPackageGl(Context *c) {
 	auto TypeDepthBuffer = add_type("DepthBuffer", sizeof(nix::Texture));
 	auto TypeDepthBufferP = add_type_p_raw(TypeDepthBuffer);
 	auto TypeFrameBuffer = add_type("FrameBuffer", sizeof(nix::FrameBuffer));
-	auto TypeFrameBufferP = add_type_p_raw(TypeFrameBuffer);
+	auto TypeFrameBufferRef = add_type_ref(TypeFrameBuffer);
 	auto TypeCubeMap = add_type("CubeMap", sizeof(nix::Texture));
 	auto TypeShader = add_type("Shader", sizeof(nix::Shader));
 	auto TypeShaderRef = add_type_ref(TypeShader);
@@ -150,6 +149,23 @@ void SIAddPackageGl(Context *c) {
 	lib_create_pointer_xfer(TypeShaderXfer);
 	lib_create_pointer_shared<nix::Texture>(TypeTextureSharedNN, TypeTextureXfer);
 	
+
+	add_class(TypeContext);
+		class_add_element("gl_version", TypeString, gl_p(&nix::Context::gl_version));
+		class_add_element("gl_renderer", TypeString, gl_p(&nix::Context::gl_renderer));
+		class_add_element("glsl_version", TypeString, gl_p(&nix::Context::glsl_version));
+		class_add_element("extensions", TypeStringList, gl_p(&nix::Context::extensions));
+		class_add_element("default_framebuffer", TypeFrameBufferRef, gl_p(&nix::Context::default_framebuffer));
+		class_add_element("tex_white", TypeTextureRef, gl_p(&nix::Context::tex_white));
+		class_add_element("default_shader_2d", TypeShaderRef, gl_p(&nix::Context::default_2d));
+		class_add_element("default_shader_3d", TypeShaderRef, gl_p(&nix::Context::default_3d));
+		class_add_element("vb_temp", TypeVertexBufferRef, gl_p(&nix::Context::vb_temp));
+		class_add_element("vb_temp_i", TypeVertexBufferRef, gl_p(&nix::Context::vb_temp_i));
+		class_add_func("load_shader", TypeShaderXfer, gl_p(&__ContextLoadShader), Flags::RAISES_EXCEPTIONS);
+			func_add_param("filename", TypePath);
+		class_add_func("create_shader", TypeShaderXfer, gl_p(&__ContextCreateShader), Flags::RAISES_EXCEPTIONS);
+			func_add_param("source", TypeString);
+
 	add_class(TypeVertexBuffer);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::VertexBuffer::__init__));
 			func_add_param("format", TypeString);
@@ -168,6 +184,9 @@ void SIAddPackageGl(Context *c) {
 
 
 	add_class(TypeTexture);
+		class_add_element("width", TypeInt, gl_p(&nix::Texture::width));
+		class_add_element("height", TypeInt, gl_p(&nix::Texture::height));
+		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::Texture::_pointer_ref_counter));
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init__));
 			func_add_param("width", TypeInt);
 			func_add_param("height", TypeInt);
@@ -185,9 +204,6 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("data", TypeFloatList);
 		class_add_func("load", TypeTextureXfer, gl_p(&__LoadTexture), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
-		class_add_element("width", TypeInt, gl_p(&nix::Texture::width));
-		class_add_element("height", TypeInt, gl_p(&nix::Texture::height));
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::Texture::_pointer_ref_counter));
 
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture);
@@ -238,7 +254,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("face", TypeInt);
 		class_add_func("read", TypeVoid, gl_p(&nix::FrameBuffer::read));
 			func_add_param("image", TypeImage, Flags::OUT);
-		class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
+		//class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
 		class_add_element("width", TypeInt, gl_p(&nix::FrameBuffer::width));
 		class_add_element("height", TypeInt, gl_p(&nix::FrameBuffer::height));
 		class_add_element("color_attachments", TypeTextureSharedNNList, gl_p(&nix::FrameBuffer::color_attachments));
@@ -288,12 +304,6 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
-		class_add_func("load", TypeShaderXfer, gl_p(&__LoadShader), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
-			func_add_param("filename", TypePath);
-		class_add_func("create", TypeShaderXfer, gl_p(&__CreateShader), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
-			func_add_param("source", TypeString);
-		class_add_func("get_default_3d", TypeShaderRef, gl_p(&__LoadShaderDefault3d), Flags::STATIC);
-		class_add_func("get_default_2d", TypeShaderRef, gl_p(&__LoadShaderDefault2d), Flags::STATIC);
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::Shader::_pointer_ref_counter));
 
 
@@ -319,13 +329,16 @@ void SIAddPackageGl(Context *c) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&nix::ShaderStorageBuffer::__init__));
 
 		// drawing
-	add_func("init", TypeVoid, gl_p(&nix::init), Flags::STATIC);
-	add_func("kill", TypeVoid, gl_p(&nix::kill), Flags::STATIC);
+	add_func("init", TypeContextXfer, gl_p(&nix::init), Flags::STATIC);
+		func_add_param("flags", TypeStringList);
+	//add_func("kill", TypeVoid, gl_p(&nix::kill), Flags::STATIC);
 #ifdef _X_USE_HUI_
 	add_func("start_frame_hui", TypeVoid, gl_p(&nix::start_frame_hui), Flags::STATIC);
+		func_add_param("ctx", TypeContext);
 	add_func("end_frame_hui", TypeVoid, gl_p(&nix::end_frame_hui), Flags::STATIC);
 #else
 	add_func("start_frame_hui", TypeVoid, nullptr, Flags::STATIC);
+		func_add_param("ctx", TypeContext);
 	add_func("end_frame_hui", TypeVoid, nullptr, Flags::STATIC);
 #endif
 	add_func("bind_frame_buffer", TypeVoid, gl_p(&nix::bind_frame_buffer), Flags::STATIC);
@@ -385,9 +398,7 @@ void SIAddPackageGl(Context *c) {
 		func_add_param("roughness", TypeFloat32);
 		func_add_param("metal", TypeFloat32);
 		func_add_param("emission", TypeColor);
-	add_func("set_texture", TypeVoid, gl_p(&nix::set_texture), Flags::STATIC);
-		func_add_param("t", TypeTextureP); // -> ref
-	add_func("set_textures", TypeVoid, gl_p(&nix::set_textures), Flags::STATIC);
+	add_func("bind_textures", TypeVoid, gl_p(&nix::set_textures), Flags::STATIC);
 		func_add_param("t", TypeTexturePList); // -> ref[]
 	add_func("bind_texture", TypeVoid, gl_p(&nix::bind_texture), Flags::STATIC);
 		func_add_param("binding", TypeInt);
@@ -448,7 +459,7 @@ void SIAddPackageGl(Context *c) {
 	lib_create_list<shared<nix::Texture>>(TypeTextureSharedNNList);
 
 
-	add_ext_var("vb_temp", TypeVertexBufferRef, gl_p(&nix::vb_temp));
+//	add_ext_var("vb_temp", TypeVertexBufferRef, gl_p(&nix::vb_temp));
 }
 
 };

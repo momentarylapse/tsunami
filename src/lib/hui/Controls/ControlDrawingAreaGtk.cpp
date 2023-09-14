@@ -132,12 +132,15 @@ gboolean on_gtk_gl_area_render(GtkGLArea *area, GdkGLContext *context, gpointer 
 	return false;
 }
 
+
+extern int allow_signal_level; // -> hui_window_control.cpp
+
 void on_gtk_gl_area_realize(GtkGLArea *area, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	gtk_gl_area_make_current(area);
 	if (gtk_gl_area_get_error(area) != nullptr){
-		printf("realize: gl area make current error...\n");
+		msg_error("hui: gtk_gl_area error");
 		return;
 	}
 

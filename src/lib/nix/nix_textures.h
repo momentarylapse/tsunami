@@ -16,7 +16,9 @@
 
 namespace nix{
 
-void init_textures();
+class Context;
+
+void init_textures(Context* ctx);
 
 
 class Texture : public Sharable<base::Empty> {
@@ -100,7 +102,7 @@ public:
 };
 
 
-void _cdecl set_texture(Texture *texture);
+//void _cdecl set_texture(Texture *texture);
 void _cdecl set_textures(const Array<Texture*> &textures);
 void bind_texture(int binding, Texture *t);
 void bind_image(int binding, Texture *t, int level, int layer, bool writable);

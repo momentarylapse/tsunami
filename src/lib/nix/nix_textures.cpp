@@ -22,7 +22,6 @@
 
 namespace nix{
 
-Texture *default_texture = nullptr;
 int tex_cube_level = -1;
 
 
@@ -41,8 +40,8 @@ Texture* create_white_texture() {
 	return t;
 }
 
-void init_textures() {
-	default_texture = create_white_texture();
+void init_textures(Context* ctx) {
+	ctx->tex_white = create_white_texture();
 }
 
 
@@ -292,7 +291,7 @@ void bind_image(int binding, Texture *t, int level, int layer, bool writable) {
 void bind_texture(int binding, Texture *t) {
 	//refresh_texture(t);
 	if (!t)
-		t = default_texture;
+		t = Context::CURRENT->tex_white.get();
 
 //	tex_cube_level = -1;
 	/*glActiveTexture(GL_TEXTURE0 + binding);
@@ -330,7 +329,7 @@ void set_textures(const Array<Texture*> &textures) {
 	for (int i=0; i<textures.num; i++) {
 		auto t = textures[i];
 		if (!t)
-			t = default_texture;
+			return;
 
 		if (t->type == Texture::Type::CUBE)
 			tex_cube_level = i;

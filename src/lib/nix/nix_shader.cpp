@@ -18,16 +18,6 @@ const int TYPE_LAYOUT = -41;
 const int TYPE_MODULE = -42;
 
 
-shared<Shader> Shader::default_2d;
-shared<Shader> Shader::default_3d;
-Shader *Shader::_current_ = nullptr;
-shared<Shader> Shader::default_load;
-
-string vertex_module_default = "vertex-default-nix";
-
-int current_program = 0;
-
-string shader_error;
 
 
 int create_empty_shader_program() {
@@ -42,17 +32,7 @@ struct ShaderSourcePart {
 	string source;
 };
 
-struct ShaderMetaData {
-	string version, name;
-};
-
-struct ShaderModule {
-	ShaderMetaData meta;
-	string source;
-};
-static Array<ShaderModule> shader_modules;
-
-Array<ShaderSourcePart> get_shader_parts(const string &source) {
+Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 	Array<ShaderSourcePart> parts;
 	bool has_vertex = false;
 	bool has_fragment = false;
@@ -101,8 +81,8 @@ Array<ShaderSourcePart> get_shader_parts(const string &source) {
 		parts.add(p);
 	}
 	if (has_fragment and !has_vertex) {
-		msg_write(" ...auto import " + vertex_module_default);
-		parts.add({GL_VERTEX_SHADER, format("#import %s\n", vertex_module_default)});
+		msg_write(" ...auto import " + ctx->vertex_module_default);
+		parts.add({GL_VERTEX_SHADER, format("#import %s\n", ctx->vertex_module_default)});
 	}
 	return parts;
 }
@@ -119,7 +99,7 @@ string get_inside_of_tag(const string &source, const string &tag) {
 	return source.sub(pos0, pos1);
 }
 
-string expand_shader_source(const string &source, ShaderMetaData &meta) {
+string expand_shader_source(Context *ctx, const string &source, ShaderMetaData &meta) {
 	string r = source;
 	while (true) {
 		int p = r.find("#import", 0);
@@ -130,7 +110,7 @@ string expand_shader_source(const string &source, ShaderMetaData &meta) {
 		//msg_error("import '" + imp + "'");
 
 		bool found = false;
-		for (auto &m: shader_modules)
+		for (auto &m: ctx->shader_modules)
 			if (m.meta.name == imp) {
 				//msg_error("FOUND " + imp);
 				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.sub(p2);
@@ -148,8 +128,8 @@ string expand_shader_source(const string &source, ShaderMetaData &meta) {
 	return intro + r;
 }
 
-int create_gl_shader(const string &_source, int type, ShaderMetaData &meta) {
-	string source = expand_shader_source(_source, meta);
+int create_gl_shader(Context* ctx, const string &_source, int type, ShaderMetaData &meta) {
+	string source = expand_shader_source(ctx, _source, meta);
 	if (source.num == 0)
 		return -1;
 	int gl_shader = glCreateShader(type);
@@ -167,11 +147,11 @@ int create_gl_shader(const string &_source, int type, ShaderMetaData &meta) {
 	glGetShaderiv(gl_shader, GL_COMPILE_STATUS, &status);
 	//msg_write(status);
 	if (status != GL_TRUE) {
-		shader_error.resize(16384);
+		ctx->shader_error.resize(16384);
 		int size;
-		glGetShaderInfoLog(gl_shader, shader_error.num, &size, (char*)shader_error.data);
-		shader_error.resize(size);
-		throw Exception("while compiling shader: " + shader_error);
+		glGetShaderInfoLog(gl_shader, ctx->shader_error.num, &size, (char*)ctx->shader_error.data);
+		ctx->shader_error.resize(size);
+		throw Exception("while compiling shader: " + ctx->shader_error);
 	}
 	return gl_shader;
 }
@@ -193,7 +173,7 @@ ShaderMetaData parse_meta(string source) {
 }
 
 void Shader::update(const string &source) {
-	auto parts = get_shader_parts(source);
+	auto parts = get_shader_parts(ctx, source);
 
 	if (parts.num == 0)
 		throw Exception("no shader tags found (<VertexShader>...</VertexShader> or <FragmentShader>...</FragmentShader>)");
@@ -207,13 +187,13 @@ void Shader::update(const string &source) {
 			ShaderModule m;
 			m.source = p.source;
 			m.meta = meta;
-			shader_modules.add(m);
+			ctx->shader_modules.add(m);
 			msg_write("new module '" + m.meta.name + "'");
 			return;
 		} else if (p.type == TYPE_LAYOUT) {
 			meta = parse_meta(p.source);
 		} else {
-			int shader = create_gl_shader(p.source, p.type, meta);
+			int shader = create_gl_shader(ctx, p.source, p.type, meta);
 			shaders.add(shader);
 			if (shader >= 0)
 				glAttachShader(prog, shader);
@@ -224,23 +204,23 @@ void Shader::update(const string &source) {
 	glLinkProgram(prog);
 	glGetProgramiv(prog, GL_LINK_STATUS, &status);
 	if (status != GL_TRUE) {
-		shader_error.resize(16384);
+		ctx->shader_error.resize(16384);
 		int size;
-		glGetProgramInfoLog(prog, shader_error.num, &size, (char*)shader_error.data);
-		shader_error.resize(size);
-		throw Exception("while linking the shader program: " + shader_error);
+		glGetProgramInfoLog(prog, ctx->shader_error.num, &size, (char*)ctx->shader_error.data);
+		ctx->shader_error.resize(size);
+		throw Exception("while linking the shader program: " + ctx->shader_error);
 	}
 
 	for (int shader: shaders)
 		glDeleteShader(shader);
 
 	program = prog;
-	shader_error = "";
+	ctx->shader_error = "";
 
 	find_locations();
 }
-xfer<Shader> Shader::create(const string &source) {
-	auto s = new Shader;
+xfer<Shader> Shader::create(Context* ctx, const string &source) {
+	auto s = new Shader(ctx);
 	s->update(source);
 	return s;
 }
@@ -273,25 +253,26 @@ void Shader::find_locations() {
 	link_uniform_block("Fog", 3);
 }
 
-xfer<Shader> Shader::load(const Path &filename) {
+xfer<Shader> Shader::load(Context *ctx, const Path &filename) {
 	//if (filename.is_empty())
 	//	return default_load;
 
 	msg_write("loading shader: " + filename.str());
 
 	string source = os::fs::read_text(filename);
-	Shader *shader = Shader::create(source);
+	Shader *shader = Shader::create(ctx, source);
 	if (shader)
 		shader->filename = filename;
 
 	return shader;
 }
 
-void select_default_vertex_module(const string &name) {
-	vertex_module_default = name;
+void select_default_vertex_module(Context *ctx, const string &name) {
+	ctx->vertex_module_default = name;
 }
 
-Shader::Shader() {
+Shader::Shader(Context *_ctx) {
+	ctx = _ctx;
 	filename = "-no file-";
 	program = -1;
 	for (int i=0; i<NUM_LOCATIONS; i++)
@@ -311,14 +292,14 @@ void set_shader(Shader *s) {
 		return;
 	}
 	//	s = Shader::default_3d;
-	Shader::_current_ = s;
-	current_program = s->program;
-	glUseProgram(current_program);
+	s->ctx->_current_ = s;
+	s->ctx->current_program = s->program;
+	glUseProgram(s->program);
 
 	//s->set_default_data();
 }
 
-int Shader::get_location(const string &name) {
+int Shader::get_location(const string &name) const {
 	return glGetUniformLocation(program, name.c_str());
 }
 
@@ -414,12 +395,14 @@ void Shader::dispatch(int nx, int ny, int nz) {
 }
 
 
-void init_shaders() {
+void init_shaders(Context *ctx) {
+	ctx->vertex_module_default = "vertex-default-nix";
+
 	try {
 
 
 		//ShaderModule
-		shader_modules.add({{"", vertex_module_default},
+		ctx->shader_modules.add({{"", ctx->vertex_module_default},
 R"foodelim(
 #extension GL_ARB_separate_shader_objects : enable
 
@@ -443,8 +426,7 @@ void main() {
 )foodelim"});
 
 
-
-	Shader::default_3d = nix::Shader::create(
+		ctx->default_3d = Shader::create(ctx,
 R"foodelim(
 <Layout>
 	version = 330 core
@@ -500,11 +482,11 @@ void main() {
 	out_color.a = material.albedo.a * tex_col.a;
 }
 </FragmentShader>)foodelim");
-	Shader::default_3d->filename = "-default 3d-";
+	ctx->default_3d->filename = "-default 3d-";
 
 
 
-	Shader::default_2d = nix::Shader::create(
+	ctx->default_2d = Shader::create(ctx,
 R"foodelim(<Layout>
 	version = 330 core
 </Layout>
@@ -541,12 +523,12 @@ void main() {
 	color *= in_color;
 }
 </FragmentShader>)foodelim");
-		Shader::default_2d->filename = "-default 2d-";
+		ctx->default_2d->filename = "-default 2d-";
 	} catch(Exception &e) {
 		msg_error(e.message());
 		throw e;
 	}
-	Shader::default_load = Shader::default_3d;
+	ctx->default_load = ctx->default_3d;
 }
 
 };

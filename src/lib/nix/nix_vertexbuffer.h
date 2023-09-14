@@ -64,7 +64,8 @@ public:
 	void create_cube(const vec3 &a, const vec3 &b);
 };
 
-void init_vertex_buffers();
+class Context;
+void init_vertex_buffers(Context* ctx);
 
 void bind_vertex_buffer(VertexBuffer *vb);
 

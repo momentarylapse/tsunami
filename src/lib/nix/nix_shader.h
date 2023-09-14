@@ -14,18 +14,28 @@
 
 namespace nix {
 
+
+struct ShaderMetaData {
+	string version, name;
+};
+
+struct ShaderModule {
+	ShaderMetaData meta;
+	string source;
+};
+
 class Shader : public Sharable<base::Empty> {
 public:
 	Path filename;
 	int program;
-	Shader();
+	Shader(Context *ctx);
 	~Shader();
 	void _cdecl set_float_l(int location, float f);
 	void _cdecl set_int_l(int location, int i);
 	void _cdecl set_floats_l(int location, const float *data, int num);
 	void _cdecl set_matrix_l(int location, const mat4 &m);
 	void _cdecl set_color_l(int location, const color &c);
-	int _cdecl get_location(const string &name);
+	int _cdecl get_location(const string &name) const;
 
 	void _cdecl set_float(const string &name, float f);
 	void _cdecl set_int(const string &name, int i);
@@ -55,21 +65,17 @@ public:
 	};
 
 	int location[NUM_LOCATIONS];
+	Context* ctx;
 
 
-	static xfer<Shader> _cdecl load(const Path &filename);
-	static xfer<Shader> _cdecl create(const string &source);
+	static xfer<Shader> _cdecl load(Context* ctx, const Path &filename);
+	static xfer<Shader> _cdecl create(Context* ctx, const string &source);
 	void _cdecl update(const string &source);
-
-
-	static shared<Shader> default_2d;
-	static shared<Shader> default_3d;
-	static shared<Shader> default_load;
-	static Shader *_current_;
 };
 
+class Context;
 
-void init_shaders();
+void init_shaders(Context* ctx);
 void _cdecl set_shader(Shader *s);
 
 

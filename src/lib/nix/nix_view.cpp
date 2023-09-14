@@ -136,39 +136,44 @@ void screen_shot_to_image(Image &image) {
 }
 
 #ifdef NIX_USE_HUI
-void start_frame_hui() {
+void start_frame_hui(Context *gl) {
+	Context::CURRENT = gl;
 	int fb;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
-	FrameBuffer::DEFAULT->frame_buffer = fb;
-	FrameBuffer::DEFAULT->width = hui::get_event()->column;
-	FrameBuffer::DEFAULT->height = hui::get_event()->row;
-	cur_framebuffer = FrameBuffer::DEFAULT;
-	set_viewport(FrameBuffer::DEFAULT->area());
+	// FIXME
+	gl->default_framebuffer->frame_buffer = fb;
+	gl->default_framebuffer->width = hui::get_event()->column;
+	gl->default_framebuffer->height = hui::get_event()->row;
+	cur_framebuffer = gl->default_framebuffer;
+	set_viewport(gl->default_framebuffer->area());
 }
 
 void end_frame_hui() {
-	FrameBuffer::DEFAULT->frame_buffer = 0;
+	Context::CURRENT->default_framebuffer->frame_buffer = 0;
 }
 #endif
 
 
 #if HAS_LIB_GLFW
-void start_frame_glfw(void *win) {
+
+static GLFWwindow* nix_glfw_window = nullptr;
+
+void start_frame_glfw(Context *gl, void *win) {
 	GLFWwindow* window = (GLFWwindow*)win;
+	nix_glfw_window = window;
 	glfwMakeContextCurrent(window);
 	int w, h;
 	glfwGetFramebufferSize(window, &w, &h);
-	FrameBuffer::DEFAULT->width = w;
-	FrameBuffer::DEFAULT->height = h;
-	cur_framebuffer = FrameBuffer::DEFAULT;
+	gl->default_framebuffer->width = w;
+	gl->default_framebuffer->height = h;
+	cur_framebuffer = gl->default_framebuffer;
 
-	set_viewport(FrameBuffer::DEFAULT->area());
+	set_viewport(gl->default_framebuffer->area());
 }
 
-void end_frame_glfw(void *win) {
+void end_frame_glfw() {
 	glFlush();
-	GLFWwindow* window = (GLFWwindow*)win;
-	glfwSwapBuffers(window);
+	glfwSwapBuffers(nix_glfw_window);
 }
 #endif
 

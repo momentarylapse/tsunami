@@ -21,8 +21,6 @@ namespace nix {
 FrameBuffer *cur_framebuffer = nullptr;
 
 
-FrameBuffer *FrameBuffer::DEFAULT = new FrameBuffer();
-
 FrameBuffer::FrameBuffer() {
 	depth_buffer = nullptr;
 	width = height = 0;

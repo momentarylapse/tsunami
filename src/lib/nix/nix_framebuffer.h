@@ -38,8 +38,6 @@ public:
 	void _check();
 
 	void read(Image &image) const;
-
-	static FrameBuffer *DEFAULT;
 };
 
 void bind_frame_buffer(FrameBuffer *fb);

@@ -49,6 +49,8 @@ void init_textures(Context* ctx) {
 unsigned int parse_format(const string &_format) {
 	if (_format == "r:i8")
 		return GL_R8;
+	if (_format == "rg:i8")
+		return GL_RG8;
 	if (_format == "rgb:i8")
 		return GL_RGB8;
 	if (_format == "srgb:i8")
@@ -61,6 +63,8 @@ unsigned int parse_format(const string &_format) {
 		return GL_RGBA4;
 	if (_format == "r:f32")
 		return GL_R32F;
+	if (_format == "rg:f32")
+		return GL_RG32F;
 	if (_format == "rgba:f32")
 		return GL_RGBA32F;
 	if (_format == "r:f16")
@@ -243,37 +247,40 @@ unsigned int _gl_channels_(int channels) {
 	return GL_RGBA;
 }
 
-void Texture::read_float(Array<float> &data) const {
+void Texture::read_float(DynamicArray &data) const {
 	int ch = channels();
-	data.resize(width * height * ch);
+	data.simple_resize(width * height * ch / (data.element_size / sizeof(float)));
 	int format = _gl_channels_(ch);
 
-	glGetTextureSubImage(texture, 0, 0, 0, 0, width, height, 1, format, GL_FLOAT, data.num * sizeof(float), data.data);
+	glGetTextureSubImage(texture, 0, 0, 0, 0, width, height, 1, format, GL_FLOAT, width * height * ch * sizeof(float), data.data);
 }
 
 int Texture::channels() const {
 	if ((internal_format == GL_R8) or (internal_format == GL_R32F))
 		return 1;
+	if ((internal_format == GL_RG8) or (internal_format == GL_RG32F))
+		return 2;
 	if ((internal_format == GL_RGB8) or (internal_format == GL_RGB32F))
 		return 3;
 	return 4;
 }
 
-void Texture::write_float(const Array<float> &data) {
+void Texture::write_float(const DynamicArray &data) {
 	int ch = channels();
-	int length_expected = width * height * ch;
+	int size_expected = width * height * ch * sizeof(float);
 	if (type == Type::VOLUME)
-		length_expected *= nz;
-	if (data.num != length_expected) {
-		msg_error(format("Texture.write_float: array of length %d given, but %d expected", data.num, length_expected));
+		size_expected *= nz;
+	int data_size = data.num * data.element_size;
+	if (data_size != size_expected) {
+		msg_error(format("Texture.write_float: array of size %d b given, but %d b expected", data_size, size_expected));
 		return;
 	}
 
 	int format = _gl_channels_(ch);
 	if (type == Type::VOLUME) {
-		glTextureSubImage3D(texture, 0, 0, 0, 0, width, height, nz, format, GL_FLOAT, &data[0]);
+		glTextureSubImage3D(texture, 0, 0, 0, 0, width, height, nz, format, GL_FLOAT, data.data);
 	} else {
-		glTextureSubImage2D(texture, 0, 0, 0, width, height, format, GL_FLOAT, &data[0]);
+		glTextureSubImage2D(texture, 0, 0, 0, width, height, format, GL_FLOAT, data.data);
 	}
 }
 

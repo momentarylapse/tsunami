@@ -48,8 +48,8 @@ public:
 
 	void _cdecl write(const Image &image);
 	void _cdecl read(Image &image) const;
-	void _cdecl read_float(Array<float> &data) const;
-	void _cdecl write_float(const Array<float> &data);
+	void _cdecl read_float(DynamicArray &data) const;
+	void _cdecl write_float(const DynamicArray &data);
 	void _cdecl reload();
 	void _cdecl unload();
 

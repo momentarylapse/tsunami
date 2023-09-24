@@ -5,8 +5,11 @@
 #include <string.h>
 #include <initializer_list>
 #include <stdlib.h>
-#include <functional>
-#include <ciso646>
+//#include <type_traits>
+#include <utility>
+//#include <functional>
+//#include <ciso646>
+//#include <concepts>
 
 // dynamic arrays
 
@@ -51,7 +54,7 @@ public:
 	int num, allocated, element_size;
 };
 
-template <class T>
+template<class T> //requires std::is_copy_assignable_v<T>
 class Array : public DynamicArray {
 public:
 	Array() {
@@ -59,7 +62,7 @@ public:
 	}
 
 	// copy constructor
-	Array(const Array &a) {
+	Array(const Array &a) /*requires std::is_copy_assignable_v<T>*/ {
 		init(sizeof(T));
 		(*this) = a;
 	}
@@ -89,7 +92,7 @@ public:
 		}
 		simple_clear();
 	}
-	void _cdecl add(const T &item) {
+	void _cdecl add(const T &item) /*requires std::is_copy_assignable_v<T>*/ {
 		resize(num + 1);
 		(*this)[num - 1] = item;
 	}
@@ -103,7 +106,7 @@ public:
 		}
 		return r;
 	}
-	void _cdecl append(const Array<T> &a) {
+	void _cdecl append(const Array<T> &a) /*requires std::is_copy_assignable_v<T>*/ {
 		int num0 = num;
 		resize(num + a.num);
 		for (int i=0; i<a.num; i++)
@@ -223,7 +226,8 @@ public:
 	}
 
 	// copy assignment
-	void operator = (const Array<T> &a) {
+	void operator = (const Array<T> &a) /*requires std::is_copy_assignable_v<T>*/ {
+		//static_assert(std::is_copy_assignable_v<T>);
 		if (this != &a) {
 			resize(a.num);
 			for (int i=0; i<num; i++)

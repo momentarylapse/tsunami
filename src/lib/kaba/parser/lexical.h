@@ -3,6 +3,7 @@
 #define SRC_LIB_KABA_PARSER_LEXICAL_H_
 
 #include "../../base/base.h"
+#include <functional>
 
 namespace kaba {
 

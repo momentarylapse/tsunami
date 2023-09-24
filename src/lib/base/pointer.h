@@ -163,8 +163,9 @@ public:
 	Sharable(Args... args) : T(args...) {}
 
 	// prevent copying
-	Sharable(const Sharable<T> &o) = delete;
-	void operator=(const Sharable<T> &o) = delete;
+	// WHY?!?!?
+//	Sharable(const Sharable<T> &o) = delete;
+//	void operator=(const Sharable<T> &o) = delete;
 
 	auto _pointer_ref() const {
 		_pointer_ref_counter ++;

@@ -9,6 +9,7 @@
 
 #include "../../../data/midi/MidiNote.h"
 #include "../../../lib/image/color.h"
+#include <functional>
 
 // rhythm quantization
 static const int QUARTER_PARTITION = 12;

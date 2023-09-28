@@ -19,10 +19,10 @@ public:
 	TemperamentDialog(Track *t, AudioView *view, hui::Window *parent);
 
 	void _cdecl on_draw(Painter *p) override;
-	void _cdecl on_left_button_down() override;
-	void _cdecl on_left_button_up() override;
-	void _cdecl on_mouse_move() override;
-	void _cdecl on_mouse_wheel() override;
+	void _cdecl on_left_button_down(const vec2& m) override;
+	void _cdecl on_left_button_up(const vec2& m) override;
+	void _cdecl on_mouse_move(const vec2& m) override;
+	void _cdecl on_mouse_wheel(const vec2& d) override;
 
 
 	void on_close();

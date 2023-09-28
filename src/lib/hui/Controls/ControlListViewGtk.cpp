@@ -479,6 +479,7 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 
 
 	allow_change_messages = true;
+	focusable = true;
 	row_target = -1;
 
 	// frame

@@ -108,21 +108,21 @@ public:
 	void _cdecl show_cursor(bool show);
 
 	// events by overwriting
-	virtual void _cdecl on_mouse_move(){}
-	virtual void _cdecl on_mouse_enter(){}
-	virtual void _cdecl on_mouse_leave(){}
-	virtual void _cdecl on_left_button_down(){}
-	virtual void _cdecl on_middle_button_down(){}
-	virtual void _cdecl on_right_button_down(){}
-	virtual void _cdecl on_left_button_up(){}
-	virtual void _cdecl on_middle_button_up(){}
-	virtual void _cdecl on_right_button_up(){}
-	virtual void _cdecl on_double_click(){}
-	virtual void _cdecl on_mouse_wheel(){}
+	virtual void _cdecl on_mouse_move(const vec2 &m) {}
+	virtual void _cdecl on_mouse_enter(const vec2 &m) {}
+	virtual void _cdecl on_mouse_leave() {}
+	virtual void _cdecl on_left_button_down(const vec2 &m) {}
+	virtual void _cdecl on_middle_button_down(const vec2 &m) {}
+	virtual void _cdecl on_right_button_down(const vec2 &m) {}
+	virtual void _cdecl on_left_button_up(const vec2 &m) {}
+	virtual void _cdecl on_middle_button_up(const vec2 &m) {}
+	virtual void _cdecl on_right_button_up(const vec2 &m) {}
+	virtual void _cdecl on_double_click(const vec2 &m) {}
+	virtual void _cdecl on_mouse_wheel(const vec2 &d) {}
 	virtual void _cdecl on_close_request();
-	virtual void _cdecl on_key_down(){}
-	virtual void _cdecl on_key_up(){}
-	virtual void _cdecl on_draw(::Painter *p){}
+	virtual void _cdecl on_key_down(int key) {}
+	virtual void _cdecl on_key_up(int key) {}
+	virtual void _cdecl on_draw(::Painter *p) {}
 
 	// input
 	bool _cdecl get_key(int key);

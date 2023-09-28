@@ -827,7 +827,6 @@ void Panel::_on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointe
 	string id = string(g_value_get_string(&value));
 	id = decode_gtk_action(id);
 	//msg_write("ACTION CALLBACK " + id);
-	//msg_write(id);
 	g_value_unset(&value);
 
 	panel->_set_cur_id_(id);

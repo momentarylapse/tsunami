@@ -476,17 +476,28 @@ void SIAddPackageHui(Context *c) {
 		class_add_func("get_key", TypeBool, hui_p(&hui::Window::get_key), Flags::CONST);
 			func_add_param("key", TypeInt);
 		class_add_func_virtual("on_mouse_move", TypeVoid, hui_p(&hui::Window::on_mouse_move)); // const or mutable?!?!?
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_mouse_wheel", TypeVoid, hui_p(&hui::Window::on_mouse_wheel));
+			func_add_param("d", TypeVec2);
 		class_add_func_virtual("on_left_button_down", TypeVoid, hui_p(&hui::Window::on_left_button_down));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_middle_button_down", TypeVoid, hui_p(&hui::Window::on_middle_button_down));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_right_button_down", TypeVoid, hui_p(&hui::Window::on_right_button_down));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_left_button_up", TypeVoid, hui_p(&hui::Window::on_left_button_up));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_middle_button_up", TypeVoid, hui_p(&hui::Window::on_middle_button_up));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_right_button_up", TypeVoid, hui_p(&hui::Window::on_right_button_up));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_double_click", TypeVoid, hui_p(&hui::Window::on_double_click));
+			func_add_param("pos", TypeVec2);
 		class_add_func_virtual("on_close_request", TypeVoid, hui_p(&hui::Window::on_close_request));
 		class_add_func_virtual("on_key_down", TypeVoid, hui_p(&hui::Window::on_key_down));
+			func_add_param("key", TypeInt);
 		class_add_func_virtual("on_key_up", TypeVoid, hui_p(&hui::Window::on_key_up));
+			func_add_param("key", TypeInt);
 		class_add_func_virtual("on_draw", TypeVoid, hui_p(&hui::Window::on_draw));
 			func_add_param("p", TypeHuiPainter);
 #ifdef KABA_EXPORT_HUI

@@ -61,6 +61,11 @@ Control::Control(int _type, const string &_id) {
 	panel = nullptr;
 	parent = nullptr;
 	enabled = true;
+	visible = true;
+	focusable = false;
+	basic_internal_key_handling = true;
+	user_key_handling = false;
+	allow_global_key_shortcuts = true;
 #ifdef HUI_API_WIN
 	hWnd = nullptr;
 #endif
@@ -68,7 +73,7 @@ Control::Control(int _type, const string &_id) {
 	widget = nullptr;
 	frame = nullptr;
 #endif
-	grab_focus = false;
+	focusable = false;
 	indent = -1;
 	min_width = -1;
 	min_height = -1;
@@ -121,7 +126,7 @@ GtkWidget *Control::get_frame() {
 void Control::enable(bool _enabled) {
 	enabled = _enabled;
 	if (widget)
-		gtk_widget_set_sensitive(widget, enabled);
+		gtk_widget_set_sensitive(widget, _enabled);
 	//msg_write("Control.enable " + (panel?panel->id:"") + ":" + id + "   " + b2s(enabled));
 
 #if GTK_CHECK_VERSION(4,0,0)
@@ -133,6 +138,7 @@ void Control::enable(bool _enabled) {
 }
 
 void Control::hide(bool hidden) {
+	visible = !hidden;
 #if GTK_CHECK_VERSION(4,0,0)
 	gtk_widget_set_visible(widget, !hidden);
 #else
@@ -266,10 +272,10 @@ void Control::set_options(const string &options) {
 			gtk_widget_set_margin_left(get_frame(), 0);
 		#endif
 		} else if (op == "grabfocus") {
-			grab_focus = val_is_positive(val, true);
+			focusable = val_is_positive(val, true);
 #if GTK_CHECK_VERSION(4,0,0)
-			gtk_widget_set_focusable(widget, grab_focus);
-			if (grab_focus) {
+			gtk_widget_set_focusable(widget, focusable);
+			if (focusable) {
 				gtk_widget_set_focus_on_click(widget, true);
 				// maybe the dialog should choose the focus...?
 				/*run_later(.01f, [this] {
@@ -277,10 +283,10 @@ void Control::set_options(const string &options) {
 				})*/;
 			}
 #else
-			gtk_widget_set_can_focus(widget, grab_focus);
+			gtk_widget_set_can_focus(widget, focusable);
 #endif
 		} else if (op == "ignorefocus") {
-			grab_focus = false;
+			focusable = false;
 #if GTK_CHECK_VERSION(4,0,0)
 			gtk_widget_set_focusable(widget, false);
 #else
@@ -457,41 +463,33 @@ void Control::notify(const string &message, bool is_default) {
 	panel->_send_event_(&e);
 
 	Window *win = panel->win;
-	if (this == win->main_input_control) {
-		if (message == EventID::MOUSE_MOVE) {
-			win->on_mouse_move();
-		} else if (message == EventID::MOUSE_WHEEL) {
-			win->on_mouse_wheel();
-		} else if (message == EventID::MOUSE_ENTER) {
-			win->on_mouse_enter();
-		} else if (message == EventID::MOUSE_LEAVE) {
-			win->on_mouse_leave();
-		} else if (message == EventID::LEFT_BUTTON_DOWN) {
-			win->on_left_button_down();
-		} else if (message == EventID::LEFT_BUTTON_UP) {
-			win->on_left_button_up();
-		} else if (message == EventID::MIDDLE_BUTTON_DOWN) {
-			win->on_middle_button_down();
-		} else if (message == EventID::MIDDLE_BUTTON_UP) {
-			win->on_middle_button_up();
-		} else if (message == EventID::RIGHT_BUTTON_DOWN) {
-			win->on_right_button_down();
-		} else if (message == EventID::RIGHT_BUTTON_UP) {
-			win->on_right_button_up();
-		} else if (message == EventID::KEY_DOWN) {
-			win->on_key_down();
-			win->_try_send_by_key_code_(get_event()->key_code);
-		} else if (message == "hui:key-up") {
-			win->on_key_up();
-		} else if (message == "hui:draw") {
-			Painter p(win, id);
-			win->on_draw(&p);
-		}
-	} else if (type == CONTROL_MULTILINEEDIT) {
-		if (message == "hui:key-down") {
-			if (reinterpret_cast<ControlMultilineEdit*>(this)->handle_keys)
-				win->_try_send_by_key_code_(get_event()->key_code);
-		}
+	if (message == EventID::MOUSE_MOVE) {
+		win->on_mouse_move(get_event()->m);
+	} else if (message == EventID::MOUSE_WHEEL) {
+		win->on_mouse_wheel(get_event()->m);
+	} else if (message == EventID::MOUSE_ENTER) {
+		win->on_mouse_enter(get_event()->m);
+	} else if (message == EventID::MOUSE_LEAVE) {
+		win->on_mouse_leave();
+	} else if (message == EventID::LEFT_BUTTON_DOWN) {
+		win->on_left_button_down(get_event()->m);
+	} else if (message == EventID::LEFT_BUTTON_UP) {
+		win->on_left_button_up(get_event()->m);
+	} else if (message == EventID::MIDDLE_BUTTON_DOWN) {
+		win->on_middle_button_down(get_event()->m);
+	} else if (message == EventID::MIDDLE_BUTTON_UP) {
+		win->on_middle_button_up(get_event()->m);
+	} else if (message == EventID::RIGHT_BUTTON_DOWN) {
+		win->on_right_button_down(get_event()->m);
+	} else if (message == EventID::RIGHT_BUTTON_UP) {
+		win->on_right_button_up(get_event()->m);
+	} else if (message == EventID::KEY_DOWN) {
+		win->on_key_down(get_event()->key_code);
+	} else if (message == EventID::KEY_UP) {
+		win->on_key_up(get_event()->key_code);
+	} else if (message == EventID::DRAW) {
+		Painter p(win, id);
+		win->on_draw(&p);
 	}
 }
 

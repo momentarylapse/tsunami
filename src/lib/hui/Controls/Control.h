@@ -37,11 +37,6 @@ public:
 	int type;
 	string id;
 
-#ifdef HUI_API_WIN
-	HWND hWnd, hWnd2;//,hWnd3;
-	//Array<HWND> _item_;
-	//int color[4]; // ColorButton...
-#endif
 #ifdef HUI_API_GTK
     GtkWidget *widget;
     GtkWidget *frame;
@@ -49,8 +44,14 @@ public:
     void take_gtk_ownership();
 	virtual void disable_event_handlers_rec();
 #endif
-	bool enabled;
-	bool grab_focus;
+
+	int enabled: 1;
+	int visible: 1;
+	int focusable: 1; // set_options("grabfocus=..."), default differs per type
+	int basic_internal_key_handling: 1; // e.g. allow text editing in widget
+	int user_key_handling: 1; // send hui:key-down etc.?
+	int allow_global_key_shortcuts: 1;
+
 	int indent;
 	Panel *panel;
 	Control *parent;

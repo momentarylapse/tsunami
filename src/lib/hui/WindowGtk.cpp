@@ -65,6 +65,10 @@ static gboolean on_gtk_window_close_request(GtkWidget *widget, gpointer user_dat
 	win->on_close_request();
 	return true;
 }
+
+static gboolean on_gtk_dialog_escape_pressed(GtkWidget* widget, GVariant* args, gpointer win) {
+	return on_gtk_window_close_request(widget, win);
+}
 #else
 static gboolean on_gtk_window_close(GtkWidget *widget, GdkEvent *event, gpointer user_data) {
 	//msg_write("close request...");
@@ -117,7 +121,6 @@ string get_gtk_action_name(const string &id, Panel *scope_panel) {
 	//return format("%shuiaction('%s')", with_scope ? "win." : "", id);
 }
 
-
 // general window
 
 void Window::_init_(const string &title, int width, int height, Window *_parent, bool allow_parent, int mode) {
@@ -145,6 +148,18 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
+
+		shortcut_controller = gtk_shortcut_controller_new ();
+		gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
+		gtk_widget_add_controller(window, shortcut_controller);
+
+		// catch [Esc] key
+		gtk_shortcut_controller_add_shortcut(
+				GTK_SHORTCUT_CONTROLLER(shortcut_controller),
+				gtk_shortcut_new(
+						gtk_keyval_trigger_new(GDK_KEY_Escape, (GdkModifierType)0),
+						gtk_callback_action_new(&on_gtk_dialog_escape_pressed, this, nullptr)));
+
 #endif
 
 #ifndef OS_WINDOWS
@@ -164,14 +179,14 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 		window = gtk_window_new();
 		if (Application::application) {
 			gtk_application_add_window(Application::application, GTK_WINDOW(window));
-
-			//g_action_map_add_action_entries(G_ACTION_MAP(group), entries, G_N_ELEMENTS(entries), this);
-			gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
-
-			shortcut_controller = gtk_shortcut_controller_new ();
-			gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
-			gtk_widget_add_controller(window, shortcut_controller);
 		}
+
+		//g_action_map_add_action_entries(G_ACTION_MAP(group), entries, G_N_ELEMENTS(entries), this);
+		gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
+
+		shortcut_controller = gtk_shortcut_controller_new ();
+		gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
+		gtk_widget_add_controller(window, shortcut_controller);
 #else
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 #endif

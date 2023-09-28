@@ -17,8 +17,9 @@ namespace hui
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 #endif
 
-void on_gtk_edit_changed(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void on_gtk_edit_changed(GtkWidget *widget, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
 ControlEdit::ControlEdit(const string &title, const string &id) :
 	Control(CONTROL_EDIT, id)
@@ -34,6 +35,7 @@ ControlEdit::ControlEdit(const string &title, const string &id) :
 	gtk_entry_set_activates_default(GTK_ENTRY(widget), true);
 	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&on_gtk_edit_changed), this);
+	focusable = true;
 }
 
 void ControlEdit::__set_string(const string &str) {

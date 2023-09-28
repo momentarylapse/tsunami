@@ -13,8 +13,7 @@
 namespace hui
 {
 
-class ControlMultilineEdit : public Control
-{
+class ControlMultilineEdit : public Control {
 public:
 	ControlMultilineEdit(const string &text, const string &id);
 	string get_string() override;
@@ -24,8 +23,6 @@ public:
 	void __set_option(const string &op, const string &value) override;
 
 	void set_tab_size(int tab_size);
-
-	bool handle_keys;
 };
 
 };

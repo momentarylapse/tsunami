@@ -174,40 +174,38 @@ float TemperamentDialog::y2relpitch(float y, float p0) {
 	return p0 + (1 - y*2/height) * RELATIVE_NUM_PITCHES;
 }
 
-void TemperamentDialog::on_left_button_down() {
+void TemperamentDialog::on_left_button_down(const vec2& m) {
 	if (hover >= 0) {
 		if (mode_relative) {
-			temperament.freq[hover] = pitch_to_freq(y2relpitch(hui::get_event()->m.y, hover));
+			temperament.freq[hover] = pitch_to_freq(y2relpitch(m.y, hover));
 		} else {
-			temperament.freq[hover] = pitch_to_freq(y2pitch(hui::get_event()->m.y));
+			temperament.freq[hover] = pitch_to_freq(y2pitch(m.y));
 		}
 		set_int("preset", 0);
 		redraw("detune_area");
 	}
 }
 
-void TemperamentDialog::on_left_button_up() {
+void TemperamentDialog::on_left_button_up(const vec2& m) {
 }
 
-void TemperamentDialog::on_mouse_move() {
+void TemperamentDialog::on_mouse_move(const vec2& m) {
 	hover = -1;
-	auto e = hui::get_event();
-	if ((e->m.x >= 0) and (e->m.x < width)) {
+	if ((m.x >= 0) and (m.x < width)) {
 		if (all_octaves)
-			hover = (e->m.x / width * 12);
+			hover = (m.x / width * 12);
 		else
-			hover = (e->m.x / width * MAX_PITCH);
+			hover = (m.x / width * MAX_PITCH);
 	}
 
 	redraw("detune_area");
 }
 
-void TemperamentDialog::on_mouse_wheel() {
+void TemperamentDialog::on_mouse_wheel(const vec2& scroll) {
 	if (hover >= 0) {
-		auto e = hui::get_event();
 		float speed = mode_relative ? 0.01f : 0.1f;
-		if (e->scroll.y != 0) {
-			float dpitch = speed * e->scroll.y;
+		if (scroll.y != 0) {
+			float dpitch = speed * scroll.y;
 			if (all_octaves) {
 				for (int i=(hover % 12); i<MAX_PITCH; i+=12)
 					temperament.freq[i] *= pitch_to_freq(dpitch) / pitch_to_freq(0);

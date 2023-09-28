@@ -40,6 +40,7 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 	take_gtk_ownership();
 
 	image_size = IconSize::REGULAR;
+	focusable = true;
 	set_options(get_option_from_title(title));
 
 //	SetImageById(this, id);

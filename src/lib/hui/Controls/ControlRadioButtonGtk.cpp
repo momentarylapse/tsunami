@@ -49,6 +49,7 @@ ControlRadioButton::ControlRadioButton(const string &title, const string &id, Pa
 #endif
 	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "toggled", G_CALLBACK(&on_gtk_radio_button_toggle), this);
+	focusable = true;
 	set_options(get_option_from_title(title));
 }
 

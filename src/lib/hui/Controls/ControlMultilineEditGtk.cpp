@@ -20,8 +20,9 @@ gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer us
 gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
 #endif
 
-void on_gtk_multiline_edit_change(GtkWidget *widget, gpointer data)
-{	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);	}
+void on_gtk_multiline_edit_change(GtkWidget *widget, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
 
 ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id) :
 	Control(CONTROL_MULTILINEEDIT, id)
@@ -56,7 +57,7 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 	gtk_widget_set_vexpand(widget, true);
 	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(tb), "changed", G_CALLBACK(&on_gtk_multiline_edit_change), this);
-	handle_keys = false;
+	focusable = true;
 	set_options(get_option_from_title(title));
 }
 
@@ -93,7 +94,9 @@ void ControlMultilineEdit::set_tab_size(int tab_size) {
 
 void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 	if (op == "handlekeys") {
-		handle_keys = true;
+		user_key_handling = true;
+		if (value == "exclusive")
+			basic_internal_key_handling = false;
 
 #if GTK_CHECK_VERSION(4,0,0)
 		auto handler_key = gtk_event_controller_key_new();

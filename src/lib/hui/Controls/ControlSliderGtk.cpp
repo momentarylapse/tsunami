@@ -39,6 +39,7 @@ ControlSlider::ControlSlider(const string &title, const string &id) :
 	gtk_scale_set_draw_value(GTK_SCALE(widget), false);
 	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "value-changed", G_CALLBACK(&on_gtk_slider_change), this);
+	focusable = true;
 	set_options(get_option_from_title(title));
 }
 

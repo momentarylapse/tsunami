@@ -430,7 +430,7 @@ void on_gtk_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double 
 		c->notify(EventID::RIGHT_BUTTON_DOWN, false);
 	}
 
-	if (c->grab_focus)
+	if (c->focusable)
 		gtk_widget_grab_focus(c->widget);
 }
 
@@ -604,8 +604,23 @@ gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, gui
 #endif
 	c->notify(EventID::KEY_DOWN, false);
 
-	// stop further gtk key handling
-	return c->grab_focus;
+	bool is_special = false;
+	if (key_code == KEY_CONTROL + KEY_C or key_code == KEY_CONTROL + KEY_V)
+		is_special = true;
+	if (key_code == KEY_CONTROL + KEY_Z or key_code == KEY_CONTROL + KEY_Y)
+		is_special = true;
+
+#if GTK_CHECK_VERSION(4,0,0)
+	if (c->allow_global_key_shortcuts and (!c->basic_internal_key_handling or is_special))
+		c->panel->win->_try_send_by_key_code_(key_code);
+#else
+	if (c->allow_global_key_shortcuts)
+		c->panel->win->_try_send_by_key_code_(key_code);
+#endif
+
+
+	// stop further gtk key handling (also multi line edit...)
+	return !c->basic_internal_key_handling or is_special;
 }
 
 void on_gtk_key_released(GtkEventControllerKey *controller, guint keyval, guint keycode, GdkModifierType state, gpointer user_data) {
@@ -675,7 +690,7 @@ bool area_process_key(GdkEventKey *event, Control *c, bool down) {
 	c->notify(down ? EventID::KEY_DOWN : EventID::KEY_UP, false);
 
 	// stop further gtk key handling
-	return c->grab_focus;
+	return !c->internal_key_handling;
 }
 
 gboolean on_gtk_area_key_down(GtkWidget *widget, GdkEventKey *event, gpointer user_data) {

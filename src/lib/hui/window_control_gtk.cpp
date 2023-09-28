@@ -229,9 +229,6 @@ void Panel::add_edit(const string &title, int x, int y, const string &id) {
 void Panel::add_multiline_edit(const string &title, int x, int y, const string &id) {
 	auto *m = new ControlMultilineEdit(title, id);
 	_insert_control_(m, x, y);
-	if (win)
-		if ((!win->main_input_control) and m->handle_keys)
-			win->main_input_control = m;
 }
 
 void Panel::add_spin_button(const string &title, int x, int y, const string &id) {

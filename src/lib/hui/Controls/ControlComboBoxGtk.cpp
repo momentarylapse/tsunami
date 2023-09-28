@@ -58,6 +58,7 @@ ControlComboBox::ControlComboBox(const string &title, const string &id) :
 	take_gtk_ownership();
 	g_signal_connect(G_OBJECT(widget), "changed", G_CALLBACK(&on_gtk_combo_box_change), this);
 #endif
+	focusable = true;
 }
 
 string ControlComboBox::get_string() {

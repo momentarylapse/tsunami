@@ -264,6 +264,7 @@ ControlTreeView::ControlTreeView(const string &title, const string &id, Panel *p
 #endif
 	gtk_widget_set_hexpand(widget, true);
 	gtk_widget_set_vexpand(widget, true);
+	focusable = true;
 	set_options(get_option_from_title(title));
 }
 

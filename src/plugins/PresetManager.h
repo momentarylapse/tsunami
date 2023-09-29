@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../lib/base/base.h"
+#include "../lib/base/future.h"
 #include "../data/midi/Instrument.h"
 
 class Path;
@@ -49,7 +50,7 @@ public:
 	void apply(Module *c, const string &name, bool notify);
 	void save(Module *c, const string &name);
 
-	void select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
+	base::future<string> select_name(hui::Window *win, Module *c, bool save);
 
 	struct TrackPreset {
 		string name;

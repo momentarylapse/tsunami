@@ -546,7 +546,7 @@ void MidiEditorConsole::on_quantize() {
 
 void MidiEditorConsole::on_apply_string() {
 	auto dlg = new SelectStringDialog(win, layer->track->instrument.string_pitch);
-	hui::fly(dlg, [this, dlg] {
+	hui::fly(dlg).on([this, dlg] {
 		if (dlg->result) {
 			song->begin_action_group("midi apply string");
 			auto notes = layer->midi.get_notes_by_selection(view->sel);

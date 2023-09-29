@@ -186,7 +186,7 @@ void FxListEditor::on_enabled() {
 
 void FxListEditor::on_copy_from_track() {
 	auto dlg = new TrackSelectionDialog(panel->win, track->song);
-	hui::fly(dlg, [this, dlg] {
+	hui::fly(dlg).on([this, dlg] {
 		if (dlg->selected and dlg->selected != track) {
 			track->song->begin_action_group("copy fx from track");
 			foreachb (auto *fx, weak(track->fx))

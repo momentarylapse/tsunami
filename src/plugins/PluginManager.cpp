@@ -1018,8 +1018,8 @@ void PluginManager::save_module_preset(Module *c, const string &name) {
 }
 
 
-void PluginManager::select_module_preset_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
-	presets->select_name(win, c, save, cb);
+base::future<string> PluginManager::select_module_preset_name(hui::Window *win, Module *c, bool save) {
+	return presets->select_name(win, c, save);
 }
 
 // always push the script... even if an error occurred

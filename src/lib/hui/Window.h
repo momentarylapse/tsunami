@@ -11,6 +11,7 @@
 
 #include "Event.h"
 #include "Panel.h"
+#include "../base/future.h"
 
 
 class rect;
@@ -167,7 +168,7 @@ protected:
 #endif
 
 public:
-	Callback end_run_callback;
+	base::promise<void> end_run_promise;
 
 	void _try_send_by_key_code_(int key_code);
 };
@@ -196,8 +197,8 @@ public:
 };
 
 
-void run(shared<Window> win, Callback cb = nullptr);
-void fly(shared<Window> win, Callback cb = nullptr);
+void run(shared<Window> win);
+base::future<void> fly(shared<Window> win);
 
 
 

@@ -54,9 +54,8 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	
 	bool ok = false;
 	auto dlg = new PdfConfigDialog(od, od->win);
-	hui::run(dlg, [dlg, &ok] {
-		ok = dlg->ok;
-	});
+	hui::run(dlg);
+	ok = dlg->ok;
 	return ok;
 }
 

@@ -283,8 +283,7 @@ namespace WindowFlightManager {
 	}
 	void request_destroy(Window *win) {
 		hui::run_later(0.01f, [win] {
-			if (win->end_run_callback)
-				win->end_run_callback();
+			win->end_run_promise();
 			remove(win);
 			//win->requested_destroy = false;
 		});
@@ -318,8 +317,7 @@ void Window::show() {
 
 void on_gtk_window_response(GtkDialog *self, gint response_id, gpointer user_data) {
 	auto win = reinterpret_cast<Window*>(user_data);
-	if (win->end_run_callback)
-		win->end_run_callback();
+	win->end_run_promise();
 	//gtk_window_destroy(GTK_WINDOW(self));
 	run_later(0.01f, [win] { delete win; });
 }
@@ -329,12 +327,10 @@ void on_gtk_window_response_fly(GtkDialog *self, gint response_id, gpointer user
 	WindowFlightManager::request_destroy(win);
 }
 
-void fly(shared<Window> win, Callback cb) {
+base::future<void> fly(shared<Window> win) {
 	win->show();
 
 	WindowFlightManager::add(win);
-
-	win->end_run_callback = cb;
 
 #if GTK_CHECK_VERSION(4,0,0)
 	//g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
@@ -343,6 +339,8 @@ void fly(shared<Window> win, Callback cb) {
 	if (win->is_dialog())
 		g_signal_connect(win->window, "response", G_CALLBACK(on_gtk_window_response_fly), win.get());
 #endif
+
+	return win->end_run_promise.get_future();
 }
 
 void Window::_wait_till_closed() {
@@ -352,10 +350,9 @@ void Window::_wait_till_closed() {
 	}
 }
 
-void run(shared<Window> win, Callback cb) {
+void run(shared<Window> win) {
 	win->show();
 	//int uid = unique_id;
-	//end_run_callback = cb;
 
 /*#if GTK_CHECK_VERSION(4,0,0)
 	msg_error("TODO: hui.run() gtk4");
@@ -370,8 +367,8 @@ void run(shared<Window> win, Callback cb) {
 		win->_wait_till_closed();
 //	}
 //#endif
-	if (cb)
-		cb();
+
+	win->end_run_promise();
 }
 class ControlBasicWindowLayout : public Control {
 public:

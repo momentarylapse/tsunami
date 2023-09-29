@@ -10,6 +10,7 @@
 
 #include "../lib/kaba/kaba.h"
 #include "../lib/base/optional.h"
+#include "../lib/base/future.h"
 
 class Plugin;
 class Module;
@@ -46,7 +47,7 @@ public:
 
 	void apply_module_preset(Module *c, const string &name, bool notify);
 	void save_module_preset(Module *c, const string &name);
-	void select_module_preset_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb);
+	base::future<string> select_module_preset_name(hui::Window *win, Module *c, bool save);
 
 	Array<string> find_module_sub_types(ModuleCategory type);
 	Array<string> find_module_sub_types_grouped(ModuleCategory type);

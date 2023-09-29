@@ -118,7 +118,7 @@ void NewTrackDialog::on_instrument() {
 
 void NewTrackDialog::on_edit_tuning() {
 	auto dlg = new EditStringsDialog(win, instrument.string_pitch);
-	hui::fly(dlg, [this, dlg] {
+	hui::fly(dlg).on([this, dlg] {
 		if (dlg->ok) {
 			instrument.string_pitch = dlg->strings;
 			update_strings();

@@ -40,9 +40,8 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 
 	bool ok = false;
 	auto dlg = new RawConfigDialog(od, od->win);
-	hui::run(dlg, [&ok,dlg] {
-		ok = dlg->ok;
-	});
+	hui::run(dlg);
+	ok = dlg->ok;
 	return ok;
 }
 

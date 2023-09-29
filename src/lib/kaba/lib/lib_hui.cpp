@@ -104,16 +104,6 @@ namespace kaba {
 	};
 	using KabaPathFuture = KabaFuture<Path>;
 	using KabaBoolFuture = KabaFuture<bool>;
-	base::future<void> hui_fly_kaba(shared<hui::Window> win) {
-		base::promise<void> promise;
-		hui::fly(win, [promise] () mutable { promise(); });
-		return promise.get_future();
-	}
-	base::future<void> hui_run_kaba(shared<hui::Window> win) {
-		base::promise<void> promise;
-		hui::run(win, [promise] () mutable { promise(); });
-		return promise.get_future();
-	}
 #else
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
@@ -582,9 +572,9 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("f", TypeCallback);
 	add_func("cancel_runner", TypeVoid, hui_p(&hui::cancel_runner), Flags::STATIC);
 		func_add_param("id", TypeInt);
-	add_func("fly", TypeHuiVoidFuture, hui_p(&hui_fly_kaba), Flags::STATIC);
+	add_func("fly", TypeHuiVoidFuture, hui_p(&hui::fly), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
-	add_func("run", TypeHuiVoidFuture, hui_p(&hui_run_kaba), Flags::STATIC);
+	add_func("run", TypeVoid, hui_p(&hui::run), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);
 		func_add_param("id", TypeString);

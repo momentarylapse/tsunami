@@ -201,7 +201,7 @@ void TrackConsole::on_instrument() {
 
 void TrackConsole::on_edit_strings() {
 	auto dlg = new EditStringsDialog(win, track->instrument.string_pitch);
-	hui::fly(dlg, [dlg, this] {
+	hui::fly(dlg).on([dlg, this] {
 		if (dlg->ok) {
 			Instrument i = track->instrument;
 			i.string_pitch = dlg->strings;

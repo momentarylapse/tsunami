@@ -474,7 +474,7 @@ void TsunamiWindow::on_buffer_make_movable() {
 
 void TsunamiWindow::on_buffer_compress() {
 	auto dlg = new BufferCompressionDialog(this);
-	hui::fly(dlg, [dlg, this] {
+	hui::fly(dlg).on([dlg, this] {
 		if (dlg->codec != "")
 			song_compress_buffers(song, view->sel, dlg->codec);
 	});

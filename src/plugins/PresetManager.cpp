@@ -244,11 +244,13 @@ void PresetManager::set(const ModulePreset &ff) {
 	module_presets.add(ff);
 }
 
-void PresetManager::select_name(hui::Window *win, Module *c, bool save, std::function<void(const string&)> cb) {
+base::future<string> PresetManager::select_name(hui::Window *win, Module *c, bool save) {
+	base::promise<string> promise;
 	auto dlg = new PresetSelectionDialog(win, get_list(c), save);
-	hui::fly(dlg, [dlg, cb] {
-		cb(dlg->selection);
+	hui::fly(dlg).on([dlg, promise] () mutable {
+		promise(dlg->selection);
 	});
+	return promise.get_future();
 }
 
 bool PresetManager::Favorite::operator==(const Favorite &o) const {

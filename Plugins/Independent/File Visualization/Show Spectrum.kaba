@@ -128,7 +128,7 @@ class ShowSpectrum extends TsunamiPlugin
 
 		dlg.on_type()
 
-		hui.fly(dlg, stop)
+		hui.fly(dlg).then(stop)
 
 	func override on_start()
 		if len(session.view.sel.range()) > 0

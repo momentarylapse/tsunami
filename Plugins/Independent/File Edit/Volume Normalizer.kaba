@@ -42,14 +42,14 @@ class VolumeChecker extends TsunamiPlugin
 		else
 			q += "decrease each track's volume by {{-amp2db(1/vol_max)|.1}} dB to stay below 100%?"
 	
-		var f = func(a: string)
-			if a == "hui:yes"
+		var f = func(answer: bool)
+			if answer
 				session.song.begin_action_group("set volume")
 				for t in session.song.tracks
 					t.set_volume(t.volume / vol_max * 0.999)
 				session.song.end_action_group()
 			stop()
-		hui.question_box(session.win, "Question", q, f, true)
+		hui.question_box(session.win, "Question", q, true).then_or_fail(f, stop)
 
 	func override on_start()
 		if check()

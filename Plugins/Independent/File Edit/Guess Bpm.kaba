@@ -254,4 +254,4 @@ class GuessBpm extends TsunamiPlugin
 		for t in session.song.tracks
 			for l in t.layers
 				for buf in l.buffers
-					hui.fly(new SelfCorrelationDialog(self, buf), stop)
+					hui.fly(new SelfCorrelationDialog(self, buf)).then(stop)

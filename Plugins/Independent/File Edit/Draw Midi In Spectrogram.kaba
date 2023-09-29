@@ -205,7 +205,7 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 		for d in dlg
 			d.redraw("drawing_area")
 
-		hui.fly(dlg, stop)
+		hui.fly(dlg).then(stop)
 
 	func override on_start()
 	

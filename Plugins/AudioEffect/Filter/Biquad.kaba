@@ -93,7 +93,7 @@ class BiquadGrid extends Grid
 		redraw()
 
 	func override on_right_button_down()
-		hui.fly(new PresetDialog(cp), nil)#lambda() print("aaa"))
+		hui.fly(new PresetDialog(cp))#.then(func() print("aaa"))
 
 class BiquadPanel extends ConfigPanel
 	var grid: BiquadGrid

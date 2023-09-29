@@ -8,10 +8,9 @@ class ImportNKI extends TsunamiPlugin
 	
 	func override on_start()
 		var f = func(p: Path)
-			if bool(p)
-				load_nki(p)
+			load_nki(p)
 			stop()
-		hui.file_dialog_open(session.win, "", "", ["filter=*.nki", "showfilter=*.nki"], f)
+		hui.file_dialog_open(session.win, "", "", ["filter=*.nki", "showfilter=*.nki"]).then_or_fail(f, stop)
 	func mut load_nki(filename: Path)
 		print(filename)
 		var dir = Path(str(filename)[:-4] + " Samples")

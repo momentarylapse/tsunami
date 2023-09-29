@@ -307,8 +307,10 @@ const Class *add_type_func(const Class *ret_type, const Array<const Class*> &par
 	__add_class__(ff, cur_package->tree->base_class);
 	cur_package->context->implicit_class_registry->add(ff);
 
+	// simple register parameter?
 	auto ptr_param = [] (const Class *p) {
-		return p->is_pointer_raw() or p->uses_call_by_reference();
+		// ...kind of everything except float...
+		return p->is_pointer_raw() or p->uses_call_by_reference() or (p == TypeBool) or (p == TypeInt);
 	};
 
 	add_class(ff);
@@ -328,6 +330,8 @@ const Class *add_type_func(const Class *ret_type, const Array<const Class*> &par
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*,void*)>::operator());
 				func_add_param("a", params[0]);
 				func_add_param("b", params[1]);
+		} else {
+			msg_error("NOT SURE HOW TO CREATE ..." + ff->long_name());
 		}
 	}
 	return cur_package->tree->request_implicit_class(name, Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {ff}, -1);

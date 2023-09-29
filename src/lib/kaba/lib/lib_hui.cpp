@@ -77,30 +77,42 @@ namespace kaba {
 			}
 		}
 	};
-	void hui_fly_kaba(shared<hui::Window> win, Callable<void()> *c) {
-		hui::fly(win, [c]{ if (c) (*c)(); });
+	template<class T>
+	struct KabaFuture : public base::future<T>
+	{
+		void then(Callable<void(typename base::xparam<T>::t)> &c) {
+			this->on([&c] (typename base::xparam<T>::t p) { c(p); });
+		}
+		void then_or_fail(Callable<void(typename base::xparam<T>::t)> &c, Callable<void()> &c_fail) {
+			this->on([&c] (typename base::xparam<T>::t p) { c(p); }).on_fail([&c_fail] { c_fail(); });
+		}
+		void __delete__() {
+			this->~KabaFuture<T>();
+		}
+	};
+	struct KabaVoidFuture : public base::future<void>
+	{
+		void then(Callable<void()> &c) {
+			this->on([&c] { c(); });
+		}
+		void then_or_fail(Callable<void()> &c, Callable<void()> &c_fail) {
+			this->on([&c] { c(); }).on_fail([&c_fail] { c_fail(); });
+		}
+		void __delete__() {
+			this->~KabaVoidFuture();
+		}
+	};
+	using KabaPathFuture = KabaFuture<Path>;
+	using KabaBoolFuture = KabaFuture<bool>;
+	base::future<void> hui_fly_kaba(shared<hui::Window> win) {
+		base::promise<void> promise;
+		hui::fly(win, [promise] () mutable { promise(); });
+		return promise.get_future();
 	}
-	void hui_run_kaba(shared<hui::Window> win, Callable<void()> *c) {
-		hui::run(win, [c]{ if (c) (*c)(); });
-	}
-	void hui_file_dialog_open_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_open(win, title, dir, params).on([&c] (const Path &p) { c(p); });
-	}
-	void hui_file_dialog_save_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_save(win, title, dir, params).on([&c] (const Path &p) { c(p); });
-	}
-	void hui_file_dialog_dir_kaba(hui::Window *win, const string &title, const Path &dir, const Array<string> &params, Callable<void(const Path &)> &c) {
-		hui::file_dialog_dir(win, title, dir, params).on([&c] (const Path &p) { c(p); });
-	}
-	void hui_question_box_kaba(hui::Window *win, const string &title, const string &text, Callable<void(const string &)> &c, bool allow_cancel) {
-		hui::question_box(win, title, text, allow_cancel).on([&c] (bool result) {
-			if (result)
-				c("hui:yes");
-			else
-				c("hui:no");
-		}).on_fail([&c] {
-			c("hui:cancel");
-		});
+	base::future<void> hui_run_kaba(shared<hui::Window> win) {
+		base::promise<void> promise;
+		hui::run(win, [promise] () mutable { promise(); });
+		return promise.get_future();
 	}
 #else
 	#define GetDAWindow(x)		0
@@ -122,11 +134,8 @@ extern const Class *TypeImage;
 extern const Class *TypeBasePainter;
 extern const Class *TypePath;
 extern const Class *TypeVec2;
-//extern const Class *TypeTimer;
 extern const Class* TypeCallback;
-extern const Class* TypeCallbackString;
 extern const Class* TypeOsConfiguration;
-extern const Class* TypeNone;
 const Class *TypeHuiWindowP;
 
 
@@ -152,8 +161,13 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiEventRef = add_type_ref(TypeHuiEvent);
 	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 
+	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(KabaPathFuture));
+	auto TypeHuiBoolFuture = add_type("future[bool]", sizeof(KabaBoolFuture));
+	auto TypeHuiVoidFuture = add_type("future[void]", sizeof(KabaVoidFuture));
+
 	auto TypeCallbackPainter = add_type_func(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
+	auto TypeCallbackBool = add_type_func(TypeVoid, {TypeBool});
 
 	lib_create_pointer_xfer(TypeHuiMenuXfer);
 	lib_create_pointer_xfer(TypeHuiPanelXfer);
@@ -161,6 +175,30 @@ void SIAddPackageHui(Context *c) {
 
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
+
+	add_class(TypeHuiPathFuture);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaPathFuture::__delete__));
+		class_add_func("then", TypeVoid, hui_p(&KabaPathFuture::then), Flags::CONST);
+			func_add_param("cb", TypeCallbackPath);
+		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaPathFuture::then_or_fail), Flags::CONST);
+			func_add_param("cb", TypeCallbackPath);
+			func_add_param("cb_fail", TypeCallback);
+
+	add_class(TypeHuiBoolFuture);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaBoolFuture::__delete__));
+		class_add_func("then", TypeVoid, hui_p(&KabaBoolFuture::then), Flags::CONST);
+			func_add_param("cb", TypeCallbackBool);
+		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaBoolFuture::then_or_fail), Flags::CONST);
+			func_add_param("cb", TypeCallbackBool);
+			func_add_param("cb_fail", TypeCallback);
+
+		add_class(TypeHuiVoidFuture);
+			class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaVoidFuture::__delete__));
+			class_add_func("then", TypeVoid, hui_p(&KabaVoidFuture::then), Flags::CONST);
+				func_add_param("cb", TypeCallback);
+			class_add_func("then_or_fail", TypeVoid, hui_p(&KabaVoidFuture::then_or_fail), Flags::CONST);
+				func_add_param("cb", TypeCallback);
+				func_add_param("cb_fail", TypeCallback);
 
 	add_class(TypeHuiMenu);
 		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Menu::__init__));
@@ -544,12 +582,10 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("f", TypeCallback);
 	add_func("cancel_runner", TypeVoid, hui_p(&hui::cancel_runner), Flags::STATIC);
 		func_add_param("id", TypeInt);
-	add_func("fly", TypeVoid, hui_p(&hui_fly_kaba), Flags::STATIC);
+	add_func("fly", TypeHuiVoidFuture, hui_p(&hui_fly_kaba), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
-		func_add_param_def("on_finish", TypeCallback, nullptr);
-	add_func("run", TypeVoid, hui_p(&hui_run_kaba), Flags::STATIC);
+	add_func("run", TypeHuiVoidFuture, hui_p(&hui_run_kaba), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
-		func_add_param_def("on_finish", TypeCallback, nullptr);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);
 		func_add_param("id", TypeString);
 		func_add_param("key_code", TypeInt);
@@ -559,31 +595,25 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("key_code", TypeInt);
 		func_add_param("func", TypeFunctionP);*/
 	add_func("get_event", TypeHuiEventRef, hui_p(&hui::get_event), Flags::STATIC);
-	/*add_func("HuiRun", TypeVoid, (void*)&hui::Run);
-	add_func("HuiEnd", TypeVoid, (void*)&hui::End, Flags::STATIC);*/
 	add_func("do_single_main_loop", TypeVoid, hui_p(&hui::Application::do_single_main_loop), Flags::STATIC);
-	add_func("file_dialog_open", TypeVoid, hui_p(&hui_file_dialog_open_kaba), Flags::STATIC);
+	add_func("file_dialog_open", TypeHuiPathFuture, hui_p(&hui::file_dialog_open), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-		func_add_param("cb", TypeCallbackPath);
-	add_func("file_dialog_save", TypeVoid, hui_p(&hui_file_dialog_save_kaba), Flags::STATIC);
+	add_func("file_dialog_save", TypeHuiPathFuture, hui_p(&hui::file_dialog_save), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-		func_add_param("cb", TypeCallbackPath);
-	add_func("file_dialog_dir", TypeVoid, hui_p(&hui_file_dialog_dir_kaba), Flags::STATIC);
+	add_func("file_dialog_dir", TypeVoid, hui_p(&hui::file_dialog_dir), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
-		func_add_param("cb", TypeCallbackPath);
-	add_func("question_box", TypeString, hui_p(&hui_question_box_kaba), Flags::STATIC);
+	add_func("question_box", TypeHuiBoolFuture, hui_p(&hui::question_box), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
-		func_add_param("cb", TypeCallbackString);
 		func_add_param("allow_cancel", TypeBool);
 	add_func("info_box", TypeVoid, hui_p(&hui::info_box), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);

@@ -129,7 +129,7 @@ class ShowSpectrogram extends TsunamiPlugin
 
 		dlg.redraw("drawing_area")
 
-		hui.fly(dlg, stop)
+		hui.fly(dlg).then(stop)
 
 	func override on_start()
 	

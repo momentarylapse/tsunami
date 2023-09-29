@@ -58,7 +58,7 @@ func choose_preset(plug: TsunamiPlugin, f: int->void)
 	var _dlg = weak(dlg)
 	var ff = func()
 		f(_dlg.selected)
-	hui.fly(dlg, ff)
+	hui.fly(dlg).then(ff)
 
 class XXX extends TsunamiPlugin
 	func override on_start()

@@ -23,7 +23,7 @@ class CueSplitter extends TsunamiPlugin
 		var f = func(p: Path)
 			if bool(p)
 				export_cue(p)
-		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"], f)
+		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"]).then(f)
 	
 	
 	

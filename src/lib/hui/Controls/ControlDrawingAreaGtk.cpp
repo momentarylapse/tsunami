@@ -609,9 +609,12 @@ gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, gui
 		is_special = true;
 	if (key_code == KEY_CONTROL + KEY_Z or key_code == KEY_CONTROL + KEY_Y)
 		is_special = true;
+	bool is_extra_special = false;
+	if (key_code == KEY_LEFT or key_code == KEY_RIGHT or key_code == KEY_UP or key_code == KEY_DOWN)
+		is_extra_special = true;
 
 #if GTK_CHECK_VERSION(4,0,0)
-	if (c->allow_global_key_shortcuts and (!c->basic_internal_key_handling or is_special))
+	if (c->allow_global_key_shortcuts and (!c->basic_internal_key_handling or is_special or is_extra_special))
 		c->panel->win->_try_send_by_key_code_(key_code);
 #else
 	if (c->allow_global_key_shortcuts)

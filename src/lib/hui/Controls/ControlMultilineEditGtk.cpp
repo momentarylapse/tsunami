@@ -45,7 +45,7 @@ ControlMultilineEdit::ControlMultilineEdit(const string &title, const string &id
 
 	// frame
 	frame = scroll;
-	if (option_has(get_option_from_title(title), "noframe")) { //(border_width > 0){
+	if (!option_has(get_option_from_title(title), "noframe")) { //(border_width > 0){
 		frame = gtk_frame_new(nullptr);
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_frame_set_child(GTK_FRAME(frame), scroll);
@@ -94,9 +94,12 @@ void ControlMultilineEdit::set_tab_size(int tab_size) {
 
 void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 	if (op == "handlekeys") {
+		if (value != "exclusive" and value != "")
+			msg_error("handlekeys=['',exclusive]");
 		user_key_handling = true;
 		if (value == "exclusive")
 			basic_internal_key_handling = false;
+			// disable arrow keys
 
 #if GTK_CHECK_VERSION(4,0,0)
 		auto handler_key = gtk_event_controller_key_new();

@@ -51,6 +51,7 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	win->set_target(":header:");
 	win->add_menu_button("!menu=header-menu,arrow=no", 2, 1, "menu-x");
 	win->set_image("menu-x", "hui:open-menu");
+	
 	win->add_button("!ignorefocus", 1, 1, "mode-edit-check");
 	win->set_image("mode-edit-check", "hui:edit");
 	win->add_grid("!box,linked", 0, 1, "sound-box");

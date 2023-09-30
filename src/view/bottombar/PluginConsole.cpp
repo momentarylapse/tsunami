@@ -12,6 +12,7 @@
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../plugins/PluginManager.h"
 #include "../../lib/base/algo.h"
+#include "../../lib/hui/Controls/Control.h"
 
 
 PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
@@ -50,6 +51,7 @@ void PluginConsole::on_add_button() {
 void PluginConsole::on_add_plugin() {
 	auto *plugin = session->last_plugin;
 	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FIXED_WIDTH | ConfigPanelMode::DELETE | ConfigPanelMode::PROFILES);
+	p->set_options(p->root_control->id, "class=card");
 	p->set_func_delete([this, plugin] {
 		plugin->stop_request();
 	});

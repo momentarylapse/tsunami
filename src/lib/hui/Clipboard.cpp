@@ -16,7 +16,7 @@ void copy(const string &buffer) {
 #ifdef HUI_API_GTK
 #if GTK_CHECK_VERSION(4,0,0)
 	GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default()); //gtk_widget_get_clipboard(widget);
-	  gdk_clipboard_set_text(clipboard, buffer.c_str());
+	gdk_clipboard_set_text(clipboard, buffer.c_str());
 #else
 	GtkClipboard *cb = gtk_clipboard_get_for_display(gdk_display_get_default(),GDK_SELECTION_CLIPBOARD);
 	gtk_clipboard_set_text(cb, (char*)buffer.data, buffer.num);

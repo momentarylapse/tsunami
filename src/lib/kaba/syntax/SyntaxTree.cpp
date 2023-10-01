@@ -321,6 +321,8 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 		for (auto *c: weak(ns->classes))
 			if (c->name == name)
 				return {add_node_class(c, token_id)};
+		if (name == Identifier::SELF_CLASS)
+			return {add_node_class(ns, token_id)};
 
 		// prefer class...
 		if (links.num > 0)
@@ -447,6 +449,9 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	for (auto *v: weak(f->name_space->static_variables))
 		if (v->name == name)
 			return {add_node_global(v)};
+
+	if (name == Identifier::RETURN_CLASS)
+		return {add_node_class(f->literal_return_type)};
 	return {};
 }
 

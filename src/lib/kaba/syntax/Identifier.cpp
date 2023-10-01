@@ -18,6 +18,8 @@ namespace Identifier {
 	const string MACRO = "macro";
 	const string SUPER = "super";
 	const string SELF = "self";
+	const string SELF_CLASS = "Self";
+	const string RETURN_CLASS = "Ret";
 	const string EXTENDS = "extends";
 	const string IMPLEMENTS = "implements";
 	const string STATIC = "static";

@@ -743,6 +743,7 @@
     <ClInclude Include="src\lib\base\array.h" />
     <ClInclude Include="src\lib\base\base.h" />
     <ClInclude Include="src\lib\base\callable.h" />
+    <ClInclude Include="src\lib\base\future.h" />
     <ClInclude Include="src\lib\base\iter.h" />
     <ClInclude Include="src\lib\base\macros.h" />
     <ClInclude Include="src\lib\base\map.h" />

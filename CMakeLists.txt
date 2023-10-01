@@ -698,7 +698,7 @@ install(DIRECTORY "Plugins" DESTINATION share/tsunami)
 
 # install .desktop file
 set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-configure_file("static/michisoft-tsunami.desktop" /tmp/michisoft-tsunami.desktop NO_SOURCE_PERMISSIONS)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-tsunami.desktop" /tmp/michisoft-tsunami.desktop NO_SOURCE_PERMISSIONS)
 install(FILES /tmp/michisoft-tsunami.desktop DESTINATION share/applications)
 
 # install mime

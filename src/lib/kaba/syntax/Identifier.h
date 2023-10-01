@@ -19,6 +19,8 @@ namespace Identifier {
 	extern const string MACRO;
 	extern const string SUPER;
 	extern const string SELF;
+	extern const string SELF_CLASS;
+	extern const string RETURN_CLASS;
 	extern const string EXTENDS;
 	extern const string IMPLEMENTS;
 	extern const string STATIC;

@@ -466,7 +466,7 @@ void Control::notify(const string &message, bool is_default) {
 	if (message == EventID::MOUSE_MOVE) {
 		win->on_mouse_move(get_event()->m);
 	} else if (message == EventID::MOUSE_WHEEL) {
-		win->on_mouse_wheel(get_event()->m);
+		win->on_mouse_wheel(get_event()->scroll);
 	} else if (message == EventID::MOUSE_ENTER) {
 		win->on_mouse_enter(get_event()->m);
 	} else if (message == EventID::MOUSE_LEAVE) {

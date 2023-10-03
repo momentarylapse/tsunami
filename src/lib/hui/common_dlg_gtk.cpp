@@ -354,8 +354,8 @@ FontFuture select_font(Window *win, const string &title, const Array<string> &pa
 	if (p.font)
 		f0 = pango_font_description_from_string((*p.font).c_str());
 	gtk_font_dialog_choose_font(dlg, w, f0, nullptr, &on_select_font, nullptr);
-	if (f0)
-		g_object_unref(f0);
+//	if (f0)
+//		g_object_unref(f0);
 #elif GTK_CHECK_VERSION(4,0,0)
 	GtkWidget *dlg = gtk_font_chooser_dialog_new(sys_str(title), w);
 	gtk_window_set_modal(GTK_WINDOW(dlg), true);

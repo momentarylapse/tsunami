@@ -612,6 +612,8 @@ gboolean on_gtk_key_pressed(GtkEventControllerKey *controller, guint keyval, gui
 	bool is_extra_special = false;
 	if (key_code == KEY_LEFT or key_code == KEY_RIGHT or key_code == KEY_UP or key_code == KEY_DOWN)
 		is_extra_special = true;
+	if (key_code == KEY_F7)
+		is_extra_special = true;
 
 #if GTK_CHECK_VERSION(4,0,0)
 	if (c->allow_global_key_shortcuts and (!c->basic_internal_key_handling or is_special or is_extra_special))

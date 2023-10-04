@@ -127,6 +127,11 @@ void ControlMultilineEdit::__set_option(const string &op, const string &value) {
 		gtk_widget_override_font(widget, font_desc);
 		pango_font_description_free(font_desc);
 #endif
+	} else if (op == "wrap") {
+		if (val_is_positive(value, true))
+			gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(widget), GTK_WRAP_WORD);
+		else
+			gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(widget), GTK_WRAP_NONE);
 	} else if (op == "tabsize") {
 		set_tab_size(value._int());
 	}

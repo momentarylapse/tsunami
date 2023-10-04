@@ -108,6 +108,9 @@ namespace kaba {
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
 	#define GetDAPanel(x) 0
+	struct KabaVoidFuture{};
+	struct KabaPathFuture{};
+	struct KabaBoolFuture{};
 #endif
 
 #ifdef KABA_EXPORT_HUI

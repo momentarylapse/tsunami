@@ -424,6 +424,7 @@ set(SOURCE
 	src/view/dialog/BarReplaceDialog.cpp
 	src/view/dialog/BufferCompressionDialog.cpp
 	src/view/dialog/ChannelMapperDialog.cpp
+	src/view/dialog/common.cpp
 	src/view/dialog/EditStringsDialog.cpp
 	src/view/dialog/HelpDialog.cpp
 	src/view/dialog/MarkerDialog.cpp

@@ -6,12 +6,12 @@
  */
 
 #include "PauseAddDialog.h"
+#include "common.h"
 #include "../audioview/AudioView.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 #include "../../data/base.h"
 
-extern bool bar_dialog_move_data;
 
 PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
 	hui::Dialog("pause_add_dialog", parent)

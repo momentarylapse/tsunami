@@ -8,6 +8,7 @@
 #include "SignalEditorModule.h"
 #include "SignalEditorTab.h"
 #include "SignalEditorPort.h"
+#include "SignalEditorBackground.h"
 #include "../../../module/Module.h"
 #include "../../../module/port/Port.h"
 #include "../../audioview/AudioView.h"
@@ -17,7 +18,6 @@
 
 const float MODULE_WIDTH = 140;
 const float MODULE_HEIGHT = 23;
-const float MODULE_GRID = 23;
 
 string module_header(Module *m) {
 	if (m->module_name.num > 0)

@@ -6,10 +6,9 @@
  */
 
 #include "PauseEditDialog.h"
+#include "common.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
-
-extern bool bar_dialog_move_data;
 
 PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 	hui::Dialog("pause_edit_dialog", parent)

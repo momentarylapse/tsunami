@@ -6,13 +6,10 @@
  */
 
 #include "BarEditSpeedDialog.h"
+#include "common.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
-extern bool bar_dialog_move_data;
-static bool bar_dialog_scale_audio = false;
-
-void set_bar_pattern(BarPattern &b, const string &pat);
 
 BarEditSpeedDialog::BarEditSpeedDialog(hui::Window *parent, Song *_song, const Array<int> &_bars):
 	hui::Dialog("bar-edit-speed-dialog", parent)

@@ -303,4 +303,13 @@ Array<Path> search(const Path &dir, const string &filter, const string &options)
 
 }
 
+#if defined (OS_LINUX) || defined(OS_MINGW)
+	#undef _open
+	#undef _read
+	#undef _write
+	#undef _lseek
+	#undef _close
+	#undef _rmdir
+	#undef _unlink
+#endif
 

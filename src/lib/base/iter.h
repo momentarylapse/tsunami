@@ -1,3 +1,13 @@
+/*
+ * iter.h
+ *
+ *  Created on: ???
+ *      Author: michi
+ */
+
+#ifndef SRC_LIB_BASE_ITER_H_
+#define SRC_LIB_BASE_ITER_H_
+
 #include "base.h"
 
 template<class T>
@@ -73,3 +83,5 @@ template<class T>
 auto enumerate(const Array<T> &array) -> ConstEnumeratedWrapper<T> {
 	return {array};
 }
+
+#endif

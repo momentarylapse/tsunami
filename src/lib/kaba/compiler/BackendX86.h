@@ -42,6 +42,9 @@ public:
 	CommandList pre_cmd;
 
 
+	static bool dist_fits_32bit(int64 a, void *b);
+
+
 	//static int reg_resize(int reg, int size);
 	void _resolve_deref_reg_shift_(SerialNodeParam &p, int i);
 

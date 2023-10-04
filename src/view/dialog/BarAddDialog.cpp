@@ -6,12 +6,12 @@
  */
 
 #include "BarAddDialog.h"
+#include "common.h"
 #include "../audioview/AudioView.h"
 #include "../../data/base.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
-bool bar_dialog_move_data = true;
 
 BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 	hui::Dialog("bar_add_dialog", parent)

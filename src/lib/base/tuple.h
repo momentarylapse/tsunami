@@ -5,7 +5,7 @@
  *      Author: michi
  */
 
-#once
+#pragma once
 
 
 template<class A, class B>

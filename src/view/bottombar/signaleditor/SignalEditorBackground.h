@@ -12,6 +12,7 @@
 
 class SignalEditorTab;
 
+extern const float MODULE_GRID;
 
 class SignalEditorBackground : public Scrollable<scenegraph::Node> {
 public:

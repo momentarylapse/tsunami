@@ -534,6 +534,7 @@
     <ClCompile Include="src\view\dialog\BarReplaceDialog.cpp" />
     <ClCompile Include="src\view\dialog\BufferCompressionDialog.cpp" />
     <ClCompile Include="src\view\dialog\ChannelMapperDialog.cpp" />
+    <ClCompile Include="src\view\dialog\common.cpp" />
     <ClCompile Include="src\view\dialog\EditStringsDialog.cpp" />
     <ClCompile Include="src\view\dialog\HelpDialog.cpp" />
     <ClCompile Include="src\view\dialog\MarkerDialog.cpp" />
@@ -1014,6 +1015,7 @@
     <ClInclude Include="src\view\dialog\BarReplaceDialog.h" />
     <ClInclude Include="src\view\dialog\BufferCompressionDialog.h" />
     <ClInclude Include="src\view\dialog\ChannelMapperDialog.h" />
+    <ClInclude Include="src\view\dialog\common.h" />
     <ClInclude Include="src\view\dialog\EditStringsDialog.h" />
     <ClInclude Include="src\view\dialog\HelpDialog.h" />
     <ClInclude Include="src\view\dialog\MarkerDialog.h" />

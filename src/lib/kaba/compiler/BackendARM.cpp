@@ -23,6 +23,7 @@ namespace kaba {
 
 #define reg_s0 param_preg(TypeFloat32, Asm::RegID::S0)
 #define reg_s1 param_preg(TypeFloat32, Asm::RegID::S1)
+#define VREG_ROOT(r) cmd.virtual_reg[r].reg_root
 
 //bool is_typed_function_pointer(const Class *c);
 
@@ -97,8 +98,6 @@ void BackendARM::_immediate_to_register_32(int val, int r) {
 void BackendARM::_immediate_to_register_8(int val, int r) {
 	insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, r), param_imm(TypeInt, val & 0xff));
 }
-
-#define VREG_ROOT(r) cmd.virtual_reg[r].reg_root
 
 void BackendARM::_register_to_local_32(int r, int offset) {
 	insert_cmd(Asm::InstID::STR, param_vreg(TypeInt, r), param_local(TypeInt, offset));
@@ -781,6 +780,7 @@ void BackendARM::do_mapping() {
 	serializer->cmd_list_out("map:e", "post var reg");
 }
 
+namespace armhelper {
 
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar) {
 	if ((p.kind == NodeKind::VAR_TEMP) and (p.p == v)) {
@@ -792,6 +792,8 @@ inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &s
 	}
 }
 
+}
+
 void BackendARM::map_remaining_temp_vars_to_stack() {
 	for (int i=cmd.temp_var.num-1;i>=0;i--) {
 		SerialNodeParam stackvar;
@@ -799,7 +801,7 @@ void BackendARM::map_remaining_temp_vars_to_stack() {
 		stack_max_size = max((int64)stack_max_size, stackvar.p + stackvar.type->size);
 		for (int j=0;j<cmd.cmd.num;j++) {
 			for (int k=0; k<SERIAL_NODE_NUM_PARAMS; k++)
-				try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
+				armhelper::try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
 		}
 		cmd.remove_temp_var(i);
 	}
@@ -910,4 +912,7 @@ void BackendARM::assemble() {
 }
 
 
+#undef reg_s0
+#undef reg_s1
+#undef VREG_ROOT
 

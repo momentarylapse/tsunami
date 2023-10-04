@@ -238,3 +238,14 @@ int FileStream::write_basic(const void *buffer, int size) {
 }
 
 }
+
+
+#ifdef OS_LINUX
+	#undef _open
+	#undef _read
+	#undef _write
+	#undef _lseek
+	#undef _close
+	#undef _rmdir
+	#undef _unlink
+#endif

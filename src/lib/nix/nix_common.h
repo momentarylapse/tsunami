@@ -4,6 +4,7 @@
 |                                                                              |
 | last update: 2010.03.11 (c) by MichiSoft TM                                  |
 \*----------------------------------------------------------------------------*/
+#pragma once
 #if HAS_LIB_GL
 
 #include <stdio.h>

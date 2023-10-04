@@ -6,11 +6,10 @@
  */
 
 #include "BarReplaceDialog.h"
+#include "common.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
-extern bool bar_dialog_move_data;
-static bool bar_dialog_scale_audio = false;
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 

@@ -179,13 +179,6 @@ void BackendAmd64::function_call_post(int push_size, const Array<SerialNodeParam
 	}
 }
 
-bool dist_fits_32bit(int64 a, void *b) {
-	int_p d = (int_p)a - (int_p)b;
-	if (d < 0)
-		d = -d;
-	return (d < 0x70000000);
-}
-
 void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
 	serializer->call_used = true;
 	int push_size = function_call_pre(params, ret, f->is_static());

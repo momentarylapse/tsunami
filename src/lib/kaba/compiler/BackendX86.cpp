@@ -54,6 +54,7 @@ void BackendX86::process(Function *f, int index) {
 	do_mapping();
 }
 
+namespace x86helper {
 static Asm::InstID trafo_inst_float(Asm::InstID inst, const Class *t) {
 	if (t == TypeFloat64) {
 		if (inst == Asm::InstID::FADD)
@@ -83,6 +84,7 @@ static bool inst_is_arithmetic(Asm::InstID i) {
 	if ((i == Asm::InstID::AND) or (i == Asm::InstID::OR) or (i == Asm::InstID::XOR))
 		return true;
 	return false;
+}
 }
 
 void BackendX86::correct() {
@@ -313,7 +315,7 @@ void BackendX86::correct_implement_commands() {
 			insert_cmd(Asm::InstID::MOV, param_vreg(type, vecx), p2);
 			insert_cmd(Asm::InstID::MOV, r, p1);
 			insert_cmd(inst, r, param_vreg(TypeChar, vecx, Asm::RegID::CL));
-		} else if (inst_is_arithmetic(c.inst)) {
+		} else if (x86helper::inst_is_arithmetic(c.inst)) {
 			if (c.p[2].kind == NodeKind::NONE) {
 				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 				continue;
@@ -380,7 +382,7 @@ void BackendX86::correct_implement_commands() {
 			auto p2 = c.p[1];
 			auto p3 = c.p[2];
 
-			inst = trafo_inst_float(inst, p1.type);
+			inst = x86helper::trafo_inst_float(inst, p1.type);
 			auto inst_mov = (p1.type == TypeFloat64) ? Asm::InstID::MOVSD : Asm::InstID::MOVSS;
 
 			if (p3.kind == NodeKind::NONE) {
@@ -627,8 +629,12 @@ void BackendX86::add_function_intro_params(Function *f) {
 }
 
 
-
-bool dist_fits_32bit(int64 a, void *b);
+bool BackendX86::dist_fits_32bit(int64 a, void *b) {
+	int_p d = (int_p)a - (int_p)b;
+	if (d < 0)
+		d = -d;
+	return (d < 0x70000000);
+}
 
 void BackendX86::correct_far_mem_access() {
 
@@ -707,6 +713,29 @@ void BackendX86::correct_unallowed_param_combis2(SerialNode &c) {
 		}
 }
 
+
+namespace x86helper {
+inline bool param_is_simple(SerialNodeParam &p) {
+	return ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::NONE));
+}
+
+inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNodeParam &p2) {
+//	if (inst >= Asm::inst_label)
+//		return true;
+	if ((!param_is_simple(p1)) and (!param_is_simple(p2)))
+		return false;
+	bool r1, w1, r2, w2;
+	Asm::get_instruction_param_flags(inst, r1, w1, r2, w2);
+	if (w1 and (p1.kind == NodeKind::IMMEDIATE))
+		return false;
+	if (w2 and (p2.kind == NodeKind::IMMEDIATE))
+		return false;
+	if ((p1.kind == NodeKind::IMMEDIATE) or (p2.kind == NodeKind::IMMEDIATE))
+		if (!Asm::get_instruction_allow_const(inst))
+			return false;
+	return true;
+}
+
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar) {
 	if ((p.kind == NodeKind::VAR_TEMP) and (p.p == v)) {
 		p.kind = NodeKind::LOCAL_MEMORY;//stackvar.kind;
@@ -716,7 +745,7 @@ inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &s
 		p.p = stackvar.p;
 	}
 }
-
+}
 
 void BackendX86::map_referenced_temp_vars_to_stack() {
 	for (SerialNode &c: cmd.cmd)
@@ -735,7 +764,7 @@ void BackendX86::map_referenced_temp_vars_to_stack() {
 		add_stack_var(cmd.temp_var[i], stackvar);
 		for (int j=0;j<cmd.cmd.num;j++) {
 			for (int k=0; k<SERIAL_NODE_NUM_PARAMS; k++)
-				try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
+				x86helper::try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
 		}
 		cmd.remove_temp_var(i);
 	}
@@ -754,7 +783,7 @@ void BackendX86::map_remaining_temp_vars_to_stack() {
 		add_stack_var(cmd.temp_var[i], stackvar);
 		for (int j=0;j<cmd.cmd.num;j++) {
 			for (int k=0; k<SERIAL_NODE_NUM_PARAMS; k++)
-				try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
+				x86helper::try_map_param_to_stack(cmd.cmd[j].p[k], i, stackvar);
 		}
 		//cmd.remove_temp_var(i); // nah, no need, it's faster to just clear them all!
 	}
@@ -807,26 +836,6 @@ void BackendX86::add_stack_var(TempVar &v, SerialNodeParam &p) {
 	p.shift = 0;
 }
 
-inline bool param_is_simple(SerialNodeParam &p) {
-	return ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::NONE));
-}
-
-inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNodeParam &p2) {
-//	if (inst >= Asm::inst_label)
-//		return true;
-	if ((!param_is_simple(p1)) and (!param_is_simple(p2)))
-		return false;
-	bool r1, w1, r2, w2;
-	Asm::get_instruction_param_flags(inst, r1, w1, r2, w2);
-	if (w1 and (p1.kind == NodeKind::IMMEDIATE))
-		return false;
-	if (w2 and (p2.kind == NodeKind::IMMEDIATE))
-		return false;
-	if ((p1.kind == NodeKind::IMMEDIATE) or (p2.kind == NodeKind::IMMEDIATE))
-		if (!Asm::get_instruction_allow_const(inst))
-			return false;
-	return true;
-}
 
 // mov [0x..] [0x...]  ->  mov eax, [0x..]   mov [0x..] eax    (etc)
 void BackendX86::correct_params_indirect_in() {
@@ -836,7 +845,7 @@ void BackendX86::correct_params_indirect_in() {
 			continue;
 
 		// bad?
-		if (param_combi_allowed(c.inst, c.p[0], c.p[1]))
+		if (x86helper::param_combi_allowed(c.inst, c.p[0], c.p[1]))
 			continue;
 
 #if !defined(NDEBUG)

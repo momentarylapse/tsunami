@@ -112,8 +112,6 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 extern bool module_config_debug;
 
 hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
-	Session *session = Session::GLOBAL;
-
 	string chain_file;
 	string plugin_file;
 	auto flags = Storage::Flags::NONE;
@@ -140,18 +138,20 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	});
 
 
-	p.cmd("", "[FILE]", "open a window and (optionally) load a file", [this, &session] (const Array<string> &a) {
-		run_after_gui_init([this, &session, a] {
+	p.cmd("", "[FILE]", "open a window and (optionally) load a file", [this, &chain_file, &plugin_file] (const Array<string> &a) {
+		run_after_gui_init([this, chain_file, plugin_file, a] {
 			Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 			Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
 			device_manager->init();
-			session = session_manager->spawn_new_session();
+			auto session = session_manager->spawn_new_session();
 
 			session->win->show();
 			if (a.num > 0) {
 				session->storage->load(session->song.get(), a[0]);
 				session_manager->try_restore_matching_session(session);
+				Storage::options_in = "";
+				Storage::options_out = "";
 			} else {
 				// new file
 				session->song->add_track(SignalType::AUDIO_MONO);
@@ -164,12 +164,21 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 
 				session->song->out_finished_loading.notify();
 			}
+
+			if (plugin_file != "")
+				session->execute_tsunami_plugin(plugin_file);
+
+			if (chain_file != "") {
+				session->add_signal_chain(SignalChain::load(session, chain_file));
+				session->set_mode(EditMode::XSignalEditor);
+			}
 		});
 	});
 	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {
 		p.show();
 	});
-	p.cmd("info", "FILE1 ...", "show information about the file", [session, &flags] (const Array<string> &a) {
+	p.cmd("info", "FILE1 ...", "show information about the file", [&flags] (const Array<string> &a) {
+		Session *session = Session::GLOBAL;
 		session->storage->allow_gui = false;
 		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -180,7 +189,8 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 				show_song(song);
 		delete song;
 	});
-	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [session, &flags] (const Array<string> &a) {
+	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [&flags] (const Array<string> &a) {
+		Session *session = Session::GLOBAL;
 		session->storage->allow_gui = false;
 		session->log->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
@@ -197,7 +207,8 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		delete song1;
 		delete song2;
 	});
-	p.cmd("export", "FILE_IN FILE_OUT", "convert a file", [session, &flags] (const Array<string> &a) {
+	p.cmd("export", "FILE_IN FILE_OUT", "convert a file", [&flags] (const Array<string> &a) {
+		Session *session = Session::GLOBAL;
 		session->storage->allow_gui = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
@@ -205,17 +216,17 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			session->storage->_export(song, a[1]);
 		delete song;
 	});
-	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this, &session] (const Array<string> &a) {
-		run_after_gui_init([this, &session, a] {
+	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this] (const Array<string> &a) {
+		run_after_gui_init([this, a] {
 			device_manager->init();
-			session = session_manager->spawn_new_session();
+			auto session = session_manager->spawn_new_session();
 			session->win->hide();
 			session->die_on_plugin_stop = true;
 			session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 		});
 	});
-	p.cmd("session", "SESSION ...", "restore a saved session", [this, &session] (const Array<string> &a) {
-		run_after_gui_init([this, &session, a] {
+	p.cmd("session", "SESSION ...", "restore a saved session", [this] (const Array<string> &a) {
+		run_after_gui_init([this, a] {
 			session_manager->load_session(a[0]);
 		});
 	});
@@ -226,9 +237,9 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	p.cmd("test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
 		UnitTest::run_all(a[0]);
 	});
-	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this, &session] (const Array<string> &a) {
-		run_after_gui_init([this, &session, a] {
-			session = session_manager->spawn_new_session();
+	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this] (const Array<string> &a) {
+		run_after_gui_init([this, a] {
+			auto session = session_manager->spawn_new_session();
 			session->win->hide();
 			Module *m = nullptr;
 			if (a[0] == "fx") {
@@ -296,20 +307,6 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	});
 #endif
 	p.parse(args);
-
-	Storage::options_in = "";
-	Storage::options_out = "";
-
-
-
-	if (plugin_file != "")
-		session->execute_tsunami_plugin(plugin_file);
-
-
-	if (chain_file != "") {
-		session->add_signal_chain(SignalChain::load(session, chain_file));
-		session->set_mode(EditMode::XSignalEditor);
-	}
 
 
 	return hui::AppStatus::AUTO;

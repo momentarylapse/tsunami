@@ -346,10 +346,12 @@ class BeatMidifier extends MidiSource
 	var volume: float
 
 class AudioAccumulator extends Module
+	func extern __init__()
 	var samples_skipped: int
 	var buffer: AudioBuffer
 
 class MidiAccumulator extends Module
+	func extern __init__()
 	var buffer: MidiEventBuffer
 
 struct TrackRenderBuffer

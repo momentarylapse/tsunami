@@ -141,21 +141,26 @@ public:
 };
 
 
- void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
+void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
 	ModuleSelectorDialog::choose(parent, session, type, old_name).on([&cb] (const base::optional<string> &name) {
 		cb(name);
 	}).on_fail([&cb] {
 		cb(base::None);
 	});
- }
+}
 
- void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
+void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
 	SampleSelectionDialog::select(session, parent, old).on([&cb] (Sample *s) {
 		cb(s);
 	}).on_fail([&cb, old] {
 		cb(old);
 	});
- }
+}
+
+template<class T>
+void generic__init__(T *me) {
+	new(me) T;
+}
 
 
 void PluginManager::link_app_data() {
@@ -718,10 +723,18 @@ void PluginManager::link_app_data() {
 		ext->link_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
 	}
 	
-	ext->declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
-	ext->declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buf);
+	{
+		ext->declare_class_size("AudioAccumulator", sizeof(AudioAccumulator));
+		ext->link_class_func("AudioAccumulator.__init__", &generic__init__<AudioAccumulator>);
+		ext->declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
+		ext->declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buf);
+	}
 
-	ext->declare_class_element("MidiAccumulator.buffer", &MidiAccumulator::buffer);
+	{
+		ext->declare_class_size("MidiAccumulator", sizeof(MidiAccumulator));
+		ext->link_class_func("MidiAccumulator.__init__", &generic__init__<MidiAccumulator>);
+		ext->declare_class_element("MidiAccumulator.buffer", &MidiAccumulator::buffer);
+	}
 
 	{
 		SignalChain chain(Session::GLOBAL, "");

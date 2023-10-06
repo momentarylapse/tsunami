@@ -154,7 +154,7 @@ xfer<Module> ModuleFactory::create(Session* session, ModuleCategory type, const 
 }
 
 xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class *type) {
-	//msg_error("CREATE MODULE");
+	//msg_error("CREATE MODULE BY CLASS");
 	//msg_write(type->long_name());
 	//msg_write(type->owner->module->filename.basename_no_ext());
 

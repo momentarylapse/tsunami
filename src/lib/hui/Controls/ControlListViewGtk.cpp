@@ -672,10 +672,24 @@ void ControlListView::__set_cell(int row, int column, const string& str) {
 	auto store_row = g_list_model_get_item(G_LIST_MODEL(store), row);
 	if (!store_row)
 		return;
-	g_list_store_remove(G_LIST_STORE(store_row), column);
+	/*g_list_store_remove(G_LIST_STORE(store_row), column);
 	auto obj = gtk_string_object_new(str.c_str());
 	g_list_store_insert(G_LIST_STORE(store_row), column, obj);
-	g_list_model_items_changed(G_LIST_MODEL(store), row, 0, 0);
+	//g_list_model_items_changed(G_LIST_MODEL(store), row, 1, 1);*/
+
+	// probably not a good strategy...
+	// FIXME do we really own items when get()ing them?!?
+	auto new_row = g_list_store_new(G_TYPE_OBJECT);
+	for (int i=0; i<columns.num; i++)
+		if (i == column) {
+			auto ob = gtk_string_object_new(str.c_str());
+			g_list_store_append(G_LIST_STORE(new_row), ob);
+		} else {
+			auto ob = g_list_model_get_item(G_LIST_MODEL(store_row), i);
+			g_list_store_append(G_LIST_STORE(new_row), ob);
+		}
+	g_list_store_remove(G_LIST_STORE(store), row);
+	g_list_store_insert(G_LIST_STORE(store), row, new_row);
 #else
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	GtkTreeIter iter;

@@ -282,6 +282,12 @@ namespace WindowFlightManager {
 				windows.erase(i);
 	}
 	void request_destroy(Window *win) {
+		bool is_registered = false;
+		for (auto w: weak(windows))
+			if (win == w)
+				is_registered = true;
+		if (!is_registered)
+			msg_error("destroying a window that is not registered via fly()");
 		hui::run_later(0.01f, [win] {
 			win->end_run_promise();
 			remove(win);

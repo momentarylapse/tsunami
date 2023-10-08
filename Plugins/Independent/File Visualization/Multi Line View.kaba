@@ -278,7 +278,7 @@ let AUTO_CONFIG_Y_OFFSET = "ignore"
 let AUTO_CONFIG_SHOW_WINDOW = ""
 
 class MultiLineView extends TsunamiPlugin
-	dlg: owned[MLVDialog]
+	dlg: shared[MLVDialog]
 	
 	class Config extends Module.Config
 		line_height = 50.0
@@ -309,6 +309,7 @@ class MultiLineView extends TsunamiPlugin
 		for d in dlg
 			session.playback.out_tick >> create_sink(func() d.on_preview_tick())
 			d.show()
+		fly(dlg)
 		
 	func override on_stop()
 		for d in dlg

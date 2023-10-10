@@ -599,10 +599,11 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-	add_func("file_dialog_dir", TypeVoid, hui_p(&hui::file_dialog_dir), Flags::STATIC);
+	add_func("file_dialog_dir", TypeHuiPathFuture, hui_p(&hui::file_dialog_dir), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
+		func_add_param("params", TypeStringList);
 	add_func("question_box", TypeHuiBoolFuture, hui_p(&hui::question_box), Flags::STATIC);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);

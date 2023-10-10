@@ -743,6 +743,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	Control(CONTROL_DRAWINGAREA, id)
 {
+	basic_internal_key_handling = false;
 #if STUPID_HACK
 	delay_timer = new Timer;
 #endif

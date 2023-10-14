@@ -85,19 +85,19 @@ void AudioEditorConsole::on_edit_mode(int m) {
 }
 
 void AudioEditorConsole::on_action_source() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_SOURCE).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_SOURCE).then([this] (const string &name) {
 		session->win->on_menu_execute_audio_source(name);
 	});
 }
 
 void AudioEditorConsole::on_action_effect() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_EFFECT).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_EFFECT).then([this] (const string &name) {
 		session->win->on_menu_execute_audio_effect(name);
 	});
 }
 
 void AudioEditorConsole::on_action_volume() {
-	VolumeDialog::ask(win, 1, 0, 8).on([this] (float f) {
+	VolumeDialog::ask(win, 1, 0, 8).then([this] (float f) {
 		song_apply_volume(session->song.get(), f, VolumeDialog::maximize, session->view->sel, win);
 	});
 

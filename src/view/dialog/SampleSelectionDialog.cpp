@@ -76,7 +76,7 @@ void SampleSelectionDialog::on_list() {
 }
 
 void SampleSelectionDialog::on_import() {
-	session->storage->ask_open_import(win).on([this] (const Path &filename) {
+	session->storage->ask_open_import(win).then([this] (const Path &filename) {
 		AudioBuffer buf;
 		if (!session->storage->load_buffer(&buf, filename))
 			return;

@@ -142,7 +142,7 @@ public:
 
 
 void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
-	ModuleSelectorDialog::choose(parent, session, type, old_name).on([&cb] (const base::optional<string> &name) {
+	ModuleSelectorDialog::choose(parent, session, type, old_name).then([&cb] (const base::optional<string> &name) {
 		cb(name);
 	}).on_fail([&cb] {
 		cb(base::None);
@@ -150,7 +150,7 @@ void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory 
 }
 
 void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
-	SampleSelectionDialog::select(session, parent, old).on([&cb] (Sample *s) {
+	SampleSelectionDialog::select(session, parent, old).then([&cb] (Sample *s) {
 		cb(s);
 	}).on_fail([&cb, old] {
 		cb(old);

@@ -78,25 +78,23 @@ namespace kaba {
 		}
 	};
 	template<class T>
-	struct KabaFuture : public base::future<T>
-	{
-		void then(Callable<void(typename base::xparam<T>::t)> &c) {
-			this->on([&c] (typename base::xparam<T>::t p) { c(p); });
+	struct KabaFuture : public base::future<T> {
+		void kaba_then(Callable<void(typename base::xparam<T>::t)> &c) {
+			this->then([&c] (typename base::xparam<T>::t p) { c(p); });
 		}
-		void then_or_fail(Callable<void(typename base::xparam<T>::t)> &c, Callable<void()> &c_fail) {
-			this->on([&c] (typename base::xparam<T>::t p) { c(p); }).on_fail([&c_fail] { c_fail(); });
+		void kaba_then_or_fail(Callable<void(typename base::xparam<T>::t)> &c, Callable<void()> &c_fail) {
+			this->then([&c] (typename base::xparam<T>::t p) { c(p); }).on_fail([&c_fail] { c_fail(); });
 		}
 		void __delete__() {
 			this->~KabaFuture<T>();
 		}
 	};
-	struct KabaVoidFuture : public base::future<void>
-	{
-		void then(Callable<void()> &c) {
-			this->on([&c] { c(); });
+	struct KabaVoidFuture : public base::future<void> {
+		void kaba_then(Callable<void()> &c) {
+			this->then([&c] { c(); });
 		}
-		void then_or_fail(Callable<void()> &c, Callable<void()> &c_fail) {
-			this->on([&c] { c(); }).on_fail([&c_fail] { c_fail(); });
+		void kaba_then_or_fail(Callable<void()> &c, Callable<void()> &c_fail) {
+			this->then([&c] { c(); }).on_fail([&c_fail] { c_fail(); });
 		}
 		void __delete__() {
 			this->~KabaVoidFuture();
@@ -171,25 +169,25 @@ void SIAddPackageHui(Context *c) {
 
 	add_class(TypeHuiPathFuture);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaPathFuture::__delete__));
-		class_add_func("then", TypeVoid, hui_p(&KabaPathFuture::then), Flags::CONST);
+		class_add_func("then", TypeVoid, hui_p(&KabaPathFuture::kaba_then), Flags::CONST);
 			func_add_param("cb", TypeCallbackPath);
-		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaPathFuture::then_or_fail), Flags::CONST);
+		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaPathFuture::kaba_then_or_fail), Flags::CONST);
 			func_add_param("cb", TypeCallbackPath);
 			func_add_param("cb_fail", TypeCallback);
 
 	add_class(TypeHuiBoolFuture);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaBoolFuture::__delete__));
-		class_add_func("then", TypeVoid, hui_p(&KabaBoolFuture::then), Flags::CONST);
+		class_add_func("then", TypeVoid, hui_p(&KabaBoolFuture::kaba_then), Flags::CONST);
 			func_add_param("cb", TypeCallbackBool);
-		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaBoolFuture::then_or_fail), Flags::CONST);
+		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaBoolFuture::kaba_then_or_fail), Flags::CONST);
 			func_add_param("cb", TypeCallbackBool);
 			func_add_param("cb_fail", TypeCallback);
 
 		add_class(TypeHuiVoidFuture);
 			class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaVoidFuture::__delete__));
-			class_add_func("then", TypeVoid, hui_p(&KabaVoidFuture::then), Flags::CONST);
+			class_add_func("then", TypeVoid, hui_p(&KabaVoidFuture::kaba_then), Flags::CONST);
 				func_add_param("cb", TypeCallback);
-			class_add_func("then_or_fail", TypeVoid, hui_p(&KabaVoidFuture::then_or_fail), Flags::CONST);
+			class_add_func("then_or_fail", TypeVoid, hui_p(&KabaVoidFuture::kaba_then_or_fail), Flags::CONST);
 				func_add_param("cb", TypeCallback);
 				func_add_param("cb_fail", TypeCallback);
 

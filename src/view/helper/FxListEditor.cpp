@@ -186,7 +186,7 @@ void FxListEditor::on_enabled() {
 
 void FxListEditor::on_copy_from_track() {
 	auto dlg = new TrackSelectionDialog(panel->win, track->song);
-	hui::fly(dlg).on([this, dlg] {
+	hui::fly(dlg).then([this, dlg] {
 		if (dlg->selected and dlg->selected != track) {
 			track->song->begin_action_group("copy fx from track");
 			foreachb (auto *fx, weak(track->fx))
@@ -199,7 +199,7 @@ void FxListEditor::on_copy_from_track() {
 }
 
 void FxListEditor::on_add() {
-	ModuleSelectorDialog::choose(panel->win, session(), ModuleCategory::AUDIO_EFFECT).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(panel->win, session(), ModuleCategory::AUDIO_EFFECT).then([this] (const string &name) {
 		auto effect = CreateAudioEffect(session(), name);
 		track->add_effect(effect);
 	});

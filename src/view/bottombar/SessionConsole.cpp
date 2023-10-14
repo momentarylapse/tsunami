@@ -71,9 +71,9 @@ void SessionConsole::on_save() {
 	if (!l.is_active())
 		return;
 
-	QuestionDialogString::ask(win, _("Session name")).on([this, s=l.session] (const string& name) {
+	QuestionDialogString::ask(win, _("Session name")).then([this, s=l.session] (const string& name) {
 		if (tsunami->session_manager->session_exists(name))
-			hui::question_box(win, _("Session already exists"), _("Do you want to overwrite?")).on([s, name=name] (bool answer) {
+			hui::question_box(win, _("Session already exists"), _("Do you want to overwrite?")).then([s, name=name] (bool answer) {
 				if (answer)
 					tsunami->session_manager->save_session(s, name);
 			});
@@ -87,7 +87,7 @@ void SessionConsole::on_delete() {
 	if (n < 0)
 		return;
 	auto l = session_labels[n];
-	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).on([l] (bool answer) {
+	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).then([l] (bool answer) {
 		if (answer) {
 			if (l.is_backup()) {
 				BackupManager::delete_old(l.uuid);

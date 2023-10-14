@@ -303,7 +303,7 @@ void SignalEditorTab::on_delete() {
 void SignalEditorTab::on_add(ModuleCategory type) {
 	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		ModuleSelectorDialog::choose(win, session, type).on([this, type] (const string &name) {
+		ModuleSelectorDialog::choose(win, session, type).then([this, type] (const string &name) {
 			auto m = chain->add(type, name);
 			m->module_x = graph->m.x;
 			m->module_y = graph->m.y;
@@ -327,7 +327,7 @@ void SignalEditorTab::on_reset() {
 }*/
 
 void SignalEditorTab::on_save() {
-	hui::file_dialog_save(win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).on([this] (const Path &filename) {
+	hui::file_dialog_save(win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).then([this] (const Path &filename) {
 		session->storage->current_chain_directory = filename.parent();
 		chain->save(filename);
 	});

@@ -433,7 +433,7 @@ public:
 		Sample *old = nullptr;
 		if (*value)
 			old = (*value)->origin.get();
-		SampleSelectionDialog::select(session, panel, old).on([this, old] (Sample *s) {
+		SampleSelectionDialog::select(session, panel, old).then([this, old] (Sample *s) {
 			if (s != old) {
 				*value = nullptr;
 				if (s)

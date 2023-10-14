@@ -546,7 +546,7 @@ void MidiEditorConsole::on_quantize() {
 
 void MidiEditorConsole::on_apply_string() {
 	auto dlg = new SelectStringDialog(win, layer->track->instrument.string_pitch);
-	hui::fly(dlg).on([this, dlg] {
+	hui::fly(dlg).then([this, dlg] {
 		if (dlg->result) {
 			song->begin_action_group("midi apply string");
 			auto notes = layer->midi.get_notes_by_selection(view->sel);
@@ -558,7 +558,7 @@ void MidiEditorConsole::on_apply_string() {
 }
 
 void MidiEditorConsole::on_apply_hand_position() {
-	QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), "range=0:99").on([this] (int hand_position) {
+	QuestionDialogInt::ask(win, _("Move selected notes to which hand position?"), "range=0:99").then([this] (int hand_position) {
 		auto &string_pitch = layer->track->instrument.string_pitch;
 
 		song->begin_action_group("midi apply hand position");
@@ -576,7 +576,7 @@ void MidiEditorConsole::on_apply_hand_position() {
 }
 
 void MidiEditorConsole::on_apply_pitch_shift() {
-	QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), "range=-99:99").on([this] (int delta) {
+	QuestionDialogInt::ask(win, _("Move selected notes up by how many semi tones?"), "range=-99:99").then([this] (int delta) {
 		song->begin_action_group("midi pitch shift");
 		auto notes = layer->midi.get_notes_by_selection(view->sel);
 		for (auto *n: weak(notes))
@@ -600,13 +600,13 @@ void MidiEditorConsole::on_apply_flags(int mask) {
 }
 
 void MidiEditorConsole::on_apply_effect() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_EFFECT).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_EFFECT).then([this] (const string &name) {
 		session->win->on_menu_execute_midi_effect(name);
 	});
 }
 
 void MidiEditorConsole::on_apply_source() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_SOURCE).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::MIDI_SOURCE).then([this] (const string &name) {
 		session->win->on_menu_execute_midi_source(name);
 	});
 }

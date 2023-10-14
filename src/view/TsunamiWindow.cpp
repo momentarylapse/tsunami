@@ -401,7 +401,7 @@ void TsunamiWindow::on_track_render() {
 	} else {
 		QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be rendered?"),
 				{_("All non-muted"), _("From selection")},
-				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true).on([this, range] (int answer) {
+				{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute")}, true).then([this, range] (int answer) {
 					if (answer == 1)
 						song_render_track(song, range, view->sel.layers(), this);
 					else
@@ -474,7 +474,7 @@ void TsunamiWindow::on_buffer_make_movable() {
 
 void TsunamiWindow::on_buffer_compress() {
 	auto dlg = new BufferCompressionDialog(this);
-	hui::fly(dlg).on([dlg, this] {
+	hui::fly(dlg).then([dlg, this] {
 		if (dlg->codec != "")
 			song_compress_buffers(song, view->sel, dlg->codec);
 	});
@@ -558,7 +558,7 @@ void TsunamiWindow::test_allow_termination(hui::Callback cb_yes, hui::Callback c
 			return;
 		}
 
-		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true).on([this, cb_yes, cb_no] (bool answer) {
+		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true).then([this, cb_yes, cb_no] (bool answer) {
 			if (answer) {
 				on_save();
 				if (song->action_manager->is_save())
@@ -605,7 +605,7 @@ void TsunamiWindow::on_paste_aligned_to_beats() {
 void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 	auto fx = CreateAudioEffect(session, name);
 
-	configure_module(this, fx).on([this, fx] {
+	configure_module(this, fx).then([this, fx] {
 		int n_layers = song_apply_audio_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
@@ -615,7 +615,7 @@ void TsunamiWindow::on_menu_execute_audio_effect(const string &name) {
 void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 	auto s = CreateAudioSource(session, name);
 
-	configure_module(this, s).on([s, this] {
+	configure_module(this, s).then([s, this] {
 		int n_layers = song_apply_audio_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no audio tracks selected"));
@@ -625,7 +625,7 @@ void TsunamiWindow::on_menu_execute_audio_source(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 	auto fx = CreateMidiEffect(session, name);
 
-	configure_module(this, fx).on([fx, this] {
+	configure_module(this, fx).then([fx, this] {
 		int n_layers = song_apply_midi_effect(song, fx, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
@@ -635,7 +635,7 @@ void TsunamiWindow::on_menu_execute_midi_effect(const string &name) {
 void TsunamiWindow::on_menu_execute_midi_source(const string &name) {
 	auto s = CreateMidiSource(session, name);
 
-	configure_module(this, s).on([s, this] {
+	configure_module(this, s).then([s, this] {
 		int n_layers = song_apply_midi_source(song, s, view->sel, this);
 		if (n_layers == 0)
 			session->e(_("no midi tracks selected"));
@@ -691,7 +691,7 @@ void TsunamiWindow::on_settings() {
 }
 
 void TsunamiWindow::on_track_import() {
-	session->storage->ask_open_import(this).on([this] (const Path &filename) {
+	session->storage->ask_open_import(this).then([this] (const Path &filename) {
 		Track *t = song->add_track(SignalType::AUDIO_STEREO);
 		session->storage->load_track(t->layers[0].get(), filename, view->cursor_pos());
 	});
@@ -913,7 +913,7 @@ void TsunamiWindow::on_new() {
 }
 
 void TsunamiWindow::on_open() {
-	session->storage->ask_open(this).on([this] (const Path &filename) {
+	session->storage->ask_open(this).then([this] (const Path &filename) {
 		auto *s = tsunami->session_manager->get_empty_session(session);
 		if (s->storage->load(s->song.get(), filename)) {
 			BackupManager::set_save_state(s);
@@ -975,7 +975,7 @@ void TsunamiWindow::on_save_as() {
 	if (song->filename == "")
 		def = _suggest_filename(song, session->storage->current_directory);
 
-	session->storage->ask_save(this, {"default=" + def}).on([this] (const Path &filename) {
+	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		if (session->storage->save(song, filename))
 			session->status(_("file saved"));
 	});
@@ -986,21 +986,21 @@ void TsunamiWindow::on_export() {
 	if (song->filename == "")
 		def = _suggest_filename(song, session->storage->current_directory);
 
-	session->storage->ask_save(this, {"default=" + def}).on([this] (const Path &filename) {
+	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		if (session->storage->_export(song, filename))
 			session->status(_("file exported"));
 	});
 }
 
 void TsunamiWindow::on_export_selection() {
-	session->storage->ask_save(this).on([this] (const Path &filename) {
+	session->storage->ask_save(this).then([this] (const Path &filename) {
 		if (view->get_playable_layers() == view->sel.layers()) {
 			if (export_selection(song, view->sel, filename))
 				session->status(_("file exported"));
 		} else {
 			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
 					{_("All non-muted"), _("All selected"), _("Only non-muted selected")},
-					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute"), _("only include if selected AND not muted")}, true).on([this, filename] (int answer) {
+					{_("respecting solo and mute, ignoring selection"), _("respecting selection, ignoring solo and mute"), _("only include if selected AND not muted")}, true).then([this, filename] (int answer) {
 						auto sel = view->sel;
 						bool force_unmute = false;
 						if (answer == 0) {

@@ -247,7 +247,7 @@ void PresetManager::set(const ModulePreset &ff) {
 base::future<string> PresetManager::select_name(hui::Window *win, Module *c, bool save) {
 	base::promise<string> promise;
 	auto dlg = new PresetSelectionDialog(win, get_list(c), save);
-	hui::fly(dlg).on([dlg, promise] () mutable {
+	hui::fly(dlg).then([dlg, promise] () mutable {
 		promise(dlg->selection);
 	});
 	return promise.get_future();

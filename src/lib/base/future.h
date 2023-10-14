@@ -119,7 +119,7 @@ struct future {
 	future(const future<T>& f) : core(f.core) {
 	}
 
-	future<T>& on(typename xcallback<T>::t cb) {
+	future<T>& then(typename xcallback<T>::t cb) {
 		core->cb_success = cb;
 		if (core->state == PromiseState::SUCCEEDED) {
 			if constexpr (std::is_same<T, void>::value)

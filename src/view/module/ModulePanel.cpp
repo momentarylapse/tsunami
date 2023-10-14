@@ -90,7 +90,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 }
 
 void ConfigPanelSocket::on_load() {
-	session->plugin_manager->select_module_preset_name(panel->win, module, false).on([this](const string &name) {
+	session->plugin_manager->select_module_preset_name(panel->win, module, false).then([this](const string &name) {
 		if (name.num == 0)
 			return;
 		session->plugin_manager->apply_module_preset(module, name, false);
@@ -102,7 +102,7 @@ void ConfigPanelSocket::on_load() {
 }
 
 void ConfigPanelSocket::on_save() {
-	session->plugin_manager->select_module_preset_name(panel->win, module, true).on([this](const string &name) {
+	session->plugin_manager->select_module_preset_name(panel->win, module, true).then([this](const string &name) {
 		if (name.num == 0)
 			return;
 		session->plugin_manager->save_module_preset(module, name);
@@ -116,7 +116,7 @@ void ConfigPanelSocket::on_enabled() {
 
 void ConfigPanelSocket::on_wetness() {
 	if (func_set_wetness)
-		QuestionDialogFloat::ask(panel->win, "Effect wetness", module_wetness(module) * 100, 0, 100).on([this] (float wetness) {
+		QuestionDialogFloat::ask(panel->win, "Effect wetness", module_wetness(module) * 100, 0, 100).then([this] (float wetness) {
 			func_set_wetness(clamp(wetness / 100, 0.0f, 1.0f));
 		});
 

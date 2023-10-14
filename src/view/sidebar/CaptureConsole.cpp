@@ -113,7 +113,7 @@ void CaptureConsole::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no)
 		return;
 	}
 
-	hui::question_box(win, _("Question"), _("Cancel recording?")).on([cb_yes, cb_no] (bool answer) {
+	hui::question_box(win, _("Question"), _("Cancel recording?")).then([cb_yes, cb_no] (bool answer) {
 		if (answer) {
 			cb_yes();
 		} else {

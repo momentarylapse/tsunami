@@ -32,7 +32,7 @@ hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *paren
 	auto *p = new ModulePanel(track->synth.get(), parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, track, session] {
-		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, track->synth->module_class).on([track, session] (const string &name) {
+		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, track->synth->module_class).then([track, session] (const string &name) {
 			track->set_synthesizer(CreateSynthesizer(session, name));
 		});
 	});
@@ -201,7 +201,7 @@ void TrackConsole::on_instrument() {
 
 void TrackConsole::on_edit_strings() {
 	auto dlg = new EditStringsDialog(win, track->instrument.string_pitch);
-	hui::fly(dlg).on([dlg, this] {
+	hui::fly(dlg).then([dlg, this] {
 		if (dlg->ok) {
 			Instrument i = track->instrument;
 			i.string_pitch = dlg->strings;

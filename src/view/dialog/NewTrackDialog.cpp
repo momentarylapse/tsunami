@@ -31,7 +31,7 @@ hui::Panel *create_synth_panel(Synthesizer *synth, Session *session, NewTrackDia
 	auto *p = new ModulePanel(synth, parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, session, synth] {
-		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, synth->module_class).on([parent, session] (const string &name) {
+		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, synth->module_class).then([parent, session] (const string &name) {
 			parent->set_synthesizer(CreateSynthesizer(session, name));
 		});
 	});
@@ -118,7 +118,7 @@ void NewTrackDialog::on_instrument() {
 
 void NewTrackDialog::on_edit_tuning() {
 	auto dlg = new EditStringsDialog(win, instrument.string_pitch);
-	hui::fly(dlg).on([this, dlg] {
+	hui::fly(dlg).then([this, dlg] {
 		if (dlg->ok) {
 			instrument.string_pitch = dlg->strings;
 			update_strings();
@@ -233,7 +233,7 @@ void NewTrackDialog::on_metronome() {
 }
 
 void NewTrackDialog::on_save_preset() {
-	QuestionDialogString::ask(this, _("Name of the track preset?")).on([this] (const string& name) {
+	QuestionDialogString::ask(this, _("Name of the track preset?")).then([this] (const string& name) {
 		PresetManager::TrackPreset p;
 		p.name = name;
 		p.type = type;

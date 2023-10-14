@@ -40,7 +40,7 @@ void PluginConsole::on_enter() {
 }
 
 void PluginConsole::on_add_button() {
-	ModuleSelectorDialog::choose(this, session, ModuleCategory::TSUNAMI_PLUGIN).on([this] (const string &name) {
+	ModuleSelectorDialog::choose(this, session, ModuleCategory::TSUNAMI_PLUGIN).then([this] (const string &name) {
 		session->execute_tsunami_plugin(name);
 		
 		// TODO: have PluginManager send notifications...?

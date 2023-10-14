@@ -199,7 +199,7 @@ void SampleManagerConsole::on_auto_delete() {
 }
 
 void SampleManagerConsole::on_import() {
-	session->storage->ask_open_import(win).on([this] (const Path &filename) {
+	session->storage->ask_open_import(win).then([this] (const Path &filename) {
 		AudioBuffer buf;
 		if (!session->storage->load_buffer(&buf, filename))
 			return;
@@ -213,7 +213,7 @@ void SampleManagerConsole::on_export() {
 	if (sel.num != 1)
 		return;
 
-	session->storage->ask_save_render_export(win).on([this, sel] (const Path &filename) {
+	session->storage->ask_save_render_export(win).then([this, sel] (const Path &filename) {
 		if (sel[0]->type == SignalType::AUDIO) {
 			BufferStreamer rr(sel[0]->buf);
 			session->storage->save_via_renderer(rr.port_out[0], filename, sel[0]->buf->length, {});

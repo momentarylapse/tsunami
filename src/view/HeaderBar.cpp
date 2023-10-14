@@ -10,6 +10,8 @@
 #include "sidebar/SideBar.h"
 #include "../Session.h"
 #include "../EditModes.h"
+#include "../Tsunami.h"
+#include "../stuff/SessionManager.h"
 
 HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	win = _win;
@@ -49,6 +51,13 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 		win->set_options("edit-menu", "menu=header-paste-menu");
 
 	win->set_target(":header:");
+	win->add_label("!style=success,bold\\\u2713Session", 3, 0, "session-indicator");
+	win->set_tooltip("session-indicator", "Persistent session - plugins and view state will be automatically saved and associated with the audio file");
+	win->hide_control("session-indicator", true);
+
+	//----- right side
+
+	win->set_target(":header:");
 	win->add_menu_button("!menu=header-menu,arrow=no", 2, 1, "menu-x");
 	win->set_image("menu-x", "hui:open-menu");
 	
@@ -74,5 +83,7 @@ void HeaderBar::update() {
 	bool recording = win->session->in_mode(EditMode::Capture);
 	win->hide_control("undo-redo-box", !win->side_bar->visible or recording);
 	win->hide_control("copy-paste-box", !editing);
+
+	win->hide_control("session-indicator", !tsunami->session_manager->is_persistent(win->session));
 }
 

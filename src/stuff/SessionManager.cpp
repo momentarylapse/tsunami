@@ -176,6 +176,13 @@ bool SessionManager::session_exists(const string& name) const {
 	return false;
 }
 
+bool SessionManager::is_persistent(Session *s) const {
+	for (const auto& l: enumerate_all_sessions())
+		if (l.session == s and l.is_persistent())
+			return true;
+	return false;
+}
+
 Session *SessionManager::load_session(const string &name, Session *session_caller) {
 	auto *session = get_empty_session(session_caller);
 	load_into_session(name, session);

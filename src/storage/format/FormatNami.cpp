@@ -398,7 +398,7 @@ public:
 			com->codec = f->read_str();
 			int n = f->read_int();
 			com->data = f->read(n);
-			cur_op(this)->session->storage->decompress(*this->me, com->codec, com->data);
+			*this->me = cur_op(this)->session->storage->decompress(com->codec, com->data);
 			this->me->compressed = com;
 			return;
 		}

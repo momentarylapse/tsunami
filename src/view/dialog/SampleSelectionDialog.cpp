@@ -77,11 +77,10 @@ void SampleSelectionDialog::on_list() {
 
 void SampleSelectionDialog::on_import() {
 	session->storage->ask_open_import(win).then([this] (const Path &filename) {
-		AudioBuffer buf;
-		if (!session->storage->load_buffer(&buf, filename))
-			return;
-		song->create_sample_audio(filename.basename_no_ext(), buf);
-		fill_list();
+		session->storage->load_buffer(filename).then([this, filename] (const AudioBuffer &buf) {
+			song->create_sample_audio(filename.basename_no_ext(), buf);
+			fill_list();
+		});
 	});
 }
 

@@ -184,9 +184,11 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
 		flags = flags | Storage::Flags::ONLY_METADATA;
-		for (string &filename: a)
-			if (session->storage->load_ex(song, filename, flags))
+		for (string &filename: a) {
+			base::await(session->storage->load_ex(song, filename, flags).then([song] {
 				show_song(song);
+			}));
+		}
 		delete song;
 	});
 	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [&flags] (const Array<string> &a) {
@@ -197,13 +199,13 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;
 		flags = flags | Storage::Flags::ONLY_METADATA;
-		if (session->storage->load_ex(song1, a[0], flags)) {
-			if (session->storage->load_ex(song2, a[1], flags)) {
+		base::await(session->storage->load_ex(song1, a[0], flags).then([=] {
+			base::await(session->storage->load_ex(song2, a[1], flags).then([=] {
 				auto r = diff_song(song1, song2);
 				if (r.num > 0)
 					msg_error("diffs: " + str(r));
-			}
-		}
+			}));
+		}));
 		delete song1;
 		delete song2;
 	});
@@ -212,8 +214,14 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		session->storage->allow_gui = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		if (session->storage->load(song, a[0]) or (flags & Storage::Flags::FORCE))
+		auto future = session->storage->load(song, a[0]);
+		future.then([=] {
 			session->storage->_export(song, a[1]);
+		}).on_fail([=] {
+			if (flags & Storage::Flags::FORCE)
+				session->storage->_export(song, a[1]);
+		});
+		base::await(future);
 		delete song;
 	});
 	p.cmd("execute", "PLUGIN ...", "just run a plugin", [this] (const Array<string> &a) {

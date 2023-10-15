@@ -75,7 +75,7 @@ void unmute_all(Song *s) {
 	}
 }
 
-bool export_selection(Song *song, const SongSelection& sel, const Path& filename, bool force_unmute) {
+base::future<void> export_selection(Song *song, const SongSelection& sel, const Path& filename, bool force_unmute) {
 	auto s = copy_song_from_selection(song, sel);
 	if (force_unmute)
 		unmute_all(s.get());

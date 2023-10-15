@@ -71,11 +71,11 @@ Storage::~Storage() {
 	formats.clear();
 }
 
-bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
+base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 	current_directory = filename.absolute().parent();
 	auto *d = get_format(filename.extension(), 0);
 	if (!d)
-		return false;
+		return base::failed<void>();
 
 	session->i(_("loading ") + filename.str());
 
@@ -85,7 +85,7 @@ bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 	od.only_load_metadata = (flags & Flags::ONLY_METADATA);
 	if (!f->get_parameters(&od, true)) {
 		delete f;
-		return false;
+		return base::failed<void>();
 	}
 
 	od.start_progress(_("loading ") + d->description);
@@ -110,18 +110,20 @@ bool Storage::load_ex(Song *song, const Path &filename, Flags flags) {
 	song->out_finished_loading.notify();
 
 	delete f;
-	return !od.errors_encountered;
+	if (od.errors_encountered)
+		return base::failed<void>();
+	return base::success();
 }
 
-bool Storage::load(Song *song, const Path &filename) {
+base::future<void> Storage::load(Song *song, const Path &filename) {
 	return load_ex(song, filename, Flags::NONE);
 }
 
-bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
+base::future<void> Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 	current_directory = filename.parent();
 	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
 	if (!d)
-		return false;
+		return base::failed<void>();
 
 	session->i(_("loading track ") + filename.str());
 
@@ -131,7 +133,7 @@ bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 	od.offset = offset;
 	if (!f->get_parameters(&od, true)) {
 		delete f;
-		return false;
+		return base::failed<void>();
 	}
 	od.start_progress(_("loading ") + d->description);
 
@@ -142,22 +144,27 @@ bool Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 	od.song->end_action_group();
 
 	delete f;
-	return !od.errors_encountered;
+	if (od.errors_encountered)
+		return base::failed<void>();
+	return base::success();
 }
 
-bool Storage::load_buffer(AudioBuffer *buf, const Path &filename) {
+base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 	session->i(_("loading buffer ") + filename.str());
 
 	Song *aa = new Song(session, session->sample_rate());
 	Track *t = aa->add_track(SignalType::AUDIO);
 	TrackLayer *l = t->layers[0].get();
-	bool ok = load_track(l, filename, 0);
-	if (l->buffers.num > 0){
-		buf->resize(l->buffers[0].length);
-		buf->set(l->buffers[0], 0, 1);
-	}
-	delete aa;
-	return ok;
+	base::promise<AudioBuffer> promise;
+	load_track(l, filename, 0).then([promise, l, aa] () mutable {
+		AudioBuffer buf = l->buffers[0];
+		delete aa;
+		promise(buf);
+	}).on_fail([promise, aa] () mutable {
+		delete aa;
+		promise.fail();
+	});
+	return promise.get_future();
 }
 
 Path Storage::temp_saving_file(const string &ext) {
@@ -170,12 +177,12 @@ Path Storage::temp_saving_file(const string &ext) {
 }
 
 // safety: first write to temp file, then (if successful) move
-bool Storage::save_ex(Song *song, const Path &filename, bool exporting) {
+base::future<void> Storage::save_ex(Song *song, const Path &filename, bool exporting) {
 	current_directory = filename.absolute().parent();
 
 	auto d = get_format(filename.extension(), 0);
 	if (!d)
-		return false;
+		return base::failed<void>();
 
 	auto temp_file = temp_saving_file(filename.extension());
 
@@ -187,7 +194,7 @@ bool Storage::save_ex(Song *song, const Path &filename, bool exporting) {
 	od.song = song;
 	if (!f->get_parameters(&od, true)) {
 		delete f;
-		return false;
+		return base::failed<void>();
 	}
 	od.start_progress(_("saving ") + d->description);
 
@@ -209,21 +216,23 @@ bool Storage::save_ex(Song *song, const Path &filename, bool exporting) {
 	}
 
 	delete f;
-	return !od.errors_encountered;
+	if (od.errors_encountered)
+		return base::failed<void>();
+	return base::success();
 }
 
-bool Storage::save(Song *song, const Path &filename) {
+base::future<void> Storage::save(Song *song, const Path &filename) {
 	return save_ex(song, filename, false);
 }
 
-bool Storage::_export(Song *song, const Path &filename) {
+base::future<void> Storage::_export(Song *song, const Path &filename) {
 	return save_ex(song, filename, true);
 }
 
-bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {
+base::future<void> Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {
 	auto d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
-		return false;
+		return base::failed<void>();
 
 	session->i(_("exporting ") + filename.str());
 
@@ -231,7 +240,7 @@ bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, 
 	auto od = StorageOperationData(session, f, filename);
 	if (!f->get_parameters(&od, true)) {
 		delete f;
-		return false;
+		return base::failed<void>();
 	}
 	od.start_progress(_("exporting"));
 	od.renderer = r;
@@ -239,10 +248,12 @@ bool Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, 
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
 	delete f;
-	return !od.errors_encountered;
+	if (od.errors_encountered)
+		return base::failed<void>();
+	return base::success();
 }
 
-bool Storage::render_export_selection(Song *song, const SongSelection &sel, const Path &filename) {
+base::future<void> Storage::render_export_selection(Song *song, const SongSelection &sel, const Path &filename) {
 	SongRenderer renderer(song);
 	renderer.set_range(sel.range());
 	renderer.allow_layers(sel.layers());
@@ -330,26 +341,32 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	BufferStreamer bs(&buffer);
 	Path filename = temp_saving_file(codec);
+	bytes r;
 
 	auto dir0 = this->current_directory;
-	if (!save_via_renderer(bs.port_out[0], filename, buffer.length, {}))
-		return {};
-	current_directory = dir0;
-
-	auto data = os::fs::read_binary(filename);
-	session->i(format("compressed buffer... %db   %.1f%%", data.num, 100.0f * (float)data.num / (float)(buffer.length * 2 * buffer.channels)));
-	os::fs::_delete(filename);
-	return data;
+	auto future = save_via_renderer(bs.port_out[0], filename, buffer.length, {});
+	future.then([this, &r, buffer, filename] {
+			r = os::fs::read_binary(filename);
+			session->i(format("compressed buffer... %db   %.1f%%", r.num, 100.0f * (float)r.num / (float)(buffer.length * 2 * buffer.channels)));
+			os::fs::_delete(filename);
+	});
+	base::await(future);
+	return r;
 }
 
-void Storage::decompress(AudioBuffer &buffer, const string &codec, const bytes &data) {
+AudioBuffer Storage::decompress(const string &codec, const bytes &data) {
 	Path filename = temp_saving_file(codec);
 	os::fs::write_binary(filename, data);
 
 	auto dir0 = this->current_directory;
-	load_buffer(&buffer, filename);
+	AudioBuffer r;
+	base::await(load_buffer(filename).then([&r] (const AudioBuffer &buf) {
+		r = buf;
+	}));
+
 	current_directory = dir0;
 	os::fs::_delete(filename);
+	return r;
 }
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b) {

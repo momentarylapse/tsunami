@@ -920,8 +920,10 @@ void TsunamiWindow::on_open() {
 		auto *s = tsunami->session_manager->get_empty_session(session);
 		if (s->session_manager->try_restore_session_for_song(session, filename)) {
 			BackupManager::set_save_state(s);
-		} else if (s->storage->load(s->song.get(), filename)) {
-			BackupManager::set_save_state(s);
+		} else {
+			s->storage->load(s->song.get(), filename).then([s] {
+				BackupManager::set_save_state(s);
+			});
 		}
 		/*} else {
 			auto *s = tsunami->session_manager->spawn_new_session();
@@ -936,10 +938,10 @@ void TsunamiWindow::on_save() {
 	if (song->filename == "") {
 		on_save_as();
 	} else {
-		if (session->storage->save(song, song->filename)) {
+		session->storage->save(song, song->filename).then([this] {
 			session->status(_("file saved"));
 			BackupManager::set_save_state(session);
-		}
+		});
 	}
 }
 
@@ -980,8 +982,9 @@ void TsunamiWindow::on_save_as() {
 		def = _suggest_filename(song, session->storage->current_directory);
 
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
-		if (session->storage->save(song, filename))
+		session->storage->save(song, filename).then([this] {
 			session->status(_("file saved"));
+		});
 	});
 }
 
@@ -991,16 +994,18 @@ void TsunamiWindow::on_export() {
 		def = _suggest_filename(song, session->storage->current_directory);
 
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
-		if (session->storage->_export(song, filename))
+		session->storage->_export(song, filename).then([this] {
 			session->status(_("file exported"));
+		});
 	});
 }
 
 void TsunamiWindow::on_export_selection() {
 	session->storage->ask_save(this).then([this] (const Path &filename) {
 		if (view->get_playable_layers() == view->sel.layers()) {
-			if (export_selection(song, view->sel, filename))
+			export_selection(song, view->sel, filename).then([this] {
 				session->status(_("file exported"));
+			});
 		} else {
 			QuestionDialogMultipleChoice::ask(this, _("Question"), _("Which tracks and layers should be exported?"),
 					{_("All non-muted"), _("All selected"), _("Only non-muted selected")},
@@ -1024,8 +1029,9 @@ void TsunamiWindow::on_export_selection() {
 						}
 						//for (auto l: sel.layers())
 						//	msg_write(l->track->nice_name() + "  v" + str(l->version_number()));
-						if (export_selection(song, sel, filename, force_unmute))
+						export_selection(song, sel, filename, force_unmute).then([this] {
 							session->status(_("file exported"));
+						});
 					});
 		}
 	});
@@ -1033,8 +1039,9 @@ void TsunamiWindow::on_export_selection() {
 
 void TsunamiWindow::on_quick_export() {
 	auto dir = Path(hui::config.get_str("QuickExportDir", hui::Application::directory.str()));
-	if (session->storage->save(song, dir | _suggest_filename(song, dir)))
+	session->storage->save(song, dir | _suggest_filename(song, dir)).then([this] {
 		session->status(_("file saved"));
+	});
 }
 
 int pref_bar_index(AudioView *view) {

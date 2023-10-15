@@ -35,15 +35,15 @@ public:
 		FORCE = 2
 	};
 
-	bool _cdecl load(Song *song, const Path &filename);
-	bool _cdecl load_ex(Song *song, const Path &filename, Flags flags);
-	bool _cdecl load_track(TrackLayer *t, const Path &filename, int offset = 0);
-	bool _cdecl load_buffer(AudioBuffer *buf, const Path &filename);
-	bool _cdecl save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags);
-	bool _cdecl render_export_selection(Song *song, const SongSelection &sel, const Path &filename);
-	bool _cdecl save_ex(Song *song, const Path &filename, bool exporting);
-	bool _cdecl save(Song *song, const Path &filename);
-	bool _cdecl _export(Song *song, const Path &filename);
+	base::future<void> load(Song *song, const Path &filename);
+	base::future<void> load_ex(Song *song, const Path &filename, Flags flags);
+	base::future<void> load_track(TrackLayer *t, const Path &filename, int offset = 0);
+	base::future<AudioBuffer> load_buffer(const Path &filename);
+	base::future<void> save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags);
+	base::future<void> render_export_selection(Song *song, const SongSelection &sel, const Path &filename);
+	base::future<void> save_ex(Song *song, const Path &filename, bool exporting);
+	base::future<void> save(Song *song, const Path &filename);
+	base::future<void> _export(Song *song, const Path &filename);
 
 	using Future = base::future<Path>;
 
@@ -70,7 +70,7 @@ public:
 	bool allow_gui = true;
 
 	bytes compress(AudioBuffer &buffer, const string &codec);
-	void decompress(AudioBuffer &buffer, const string &codec, const bytes &data);
+	AudioBuffer decompress(const string &codec, const bytes &data);
 };
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);

@@ -148,11 +148,8 @@ bool SideBar::is_active(int console) {
 }
 
 base::future<bool> SideBar::test_allow_close() {
-	if (!visible or active_console < 0) {
-		base::promise<bool> promise;
-		promise(true);
-		return promise.get_future();
-	}
+	if (!visible or active_console < 0)
+		return base::success<bool>(true);
 	return consoles[active_console]->test_allow_close();
 }
 
@@ -172,8 +169,6 @@ SideBarConsole::~SideBarConsole() {
 }
 
 base::future<bool> SideBarConsole::test_allow_close() {
-	base::promise<bool> promise;
-	promise(true);
-	return promise.get_future();
+	return base::success<bool>(true);
 }
 

@@ -8,14 +8,19 @@
 #include "SessionManager.h"
 #include "BackupManager.h"
 #include "../lib/base/base.h"
+#include "../lib/base/iter.h"
+#include "../lib/base/optional.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/doc/xml.h"
 #include "../data/base.h"
+#include "../data/Track.h"
 #include "../data/Song.h"
 #include "../data/SongSelection.h"
+#include "../data/midi/MidiData.h"
 #include "../plugins/TsunamiPlugin.h"
 #include "../storage/Storage.h"
 #include "../view/audioview/AudioView.h"
+#include "../view/audioview/graph/AudioViewTrack.h"
 #include "../view/TsunamiWindow.h"
 #include "../Tsunami.h"
 #include "../Session.h"
@@ -112,6 +117,46 @@ void SessionManager::end_session(Session *session) {
 		tsunami->end();
 }
 
+string midi_mode_str(MidiMode m) {
+	if (m == MidiMode::CLASSICAL)
+		return "classical";
+	if (m == MidiMode::TAB)
+		return "tab";
+	if (m == MidiMode::LINEAR)
+		return "linear";
+	if (m == MidiMode::DRUM)
+		return "drum";
+	return "?";
+}
+
+string audio_mode_str(AudioViewMode m) {
+	if (m == AudioViewMode::PEAKS)
+		return "peaks";
+	if (m == AudioViewMode::SPECTRUM)
+		return "spectrum";
+	return "?";
+}
+
+base::optional<MidiMode> parse_midi_mode(const string& s) {
+	if (s == "classical")
+		return MidiMode::CLASSICAL;
+	if (s == "tab")
+		return MidiMode::TAB;
+	if (s == "linear")
+		return MidiMode::LINEAR;
+	if (s == "drum")
+		return MidiMode::DRUM;
+	return base::None;
+}
+
+base::optional<AudioViewMode> parse_audio_mode(const string& s) {
+	if (s == "peaks")
+		return AudioViewMode::PEAKS;
+	if (s == "spectrum")
+		return AudioViewMode::SPECTRUM;
+	return base::None;
+}
+
 void SessionManager::save_session(Session *s, const string &name) {
 	os::fs::create_directory(directory());
 
@@ -134,6 +179,19 @@ void SessionManager::save_session(Session *s, const string &name) {
 			.witha("start", i2s(s->view->cam.range().start()))
 			.witha("end", i2s(s->view->cam.range().end()));
 	ev.add(ec);
+	auto ets = xml::Element("tracks");
+	for (auto&& [i,t]: enumerate(weak(s->song->tracks))) {
+		auto et = xml::Element("track").witha("index", i2s(i));
+		auto vt = s->view->get_track(t);
+		if (vt->solo)
+			et.witha("solo", "true");
+		if (t->type == SignalType::AUDIO)
+			et.witha("audio_mode", audio_mode_str(vt->audio_mode));
+		else if (t->type == SignalType::MIDI)
+			et.witha("midi_mode", midi_mode_str(vt->midi_mode_wanted));
+		ets.add(et);
+	}
+	e.add(ets);
 	e.add(ev);
 
 	// plugins
@@ -210,6 +268,21 @@ void SessionManager::load_into_session(const string &name, Session *session) {
 		session->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
 	}
 
+	if (auto ets = e.find("tracks")) {
+		for (auto& e: ets->elements) {
+			int index = e.value("index", "-1")._int();
+			if (index >= 0 and index < session->song->tracks.num) {
+				auto t = session->song->tracks[index].get();
+				auto vt = session->view->get_track(t);
+				vt->set_solo(e.value("solo", "false")._bool());
+				if (auto mm = parse_midi_mode(e.value("midi_mode")))
+					vt->set_midi_mode(*mm);
+				if (auto am = parse_audio_mode(e.value("audio_mode")))
+					vt->set_audio_mode(*am);
+			}
+		}
+	}
+
 	if (auto epp = e.find("plugins")) {
 		for (auto &ep: epp->elements) {
 			string _class = ep.value("class");
@@ -227,12 +300,13 @@ void SessionManager::load_into_session(const string &name, Session *session) {
 	out_changed.notify();
 }
 
-void SessionManager::try_restore_matching_session(Session *session) {
-	auto path = session->song->filename.absolute();
+bool SessionManager::try_restore_session_for_song(Session *session, const Path &song_filename) {
+	auto path = song_filename.absolute();
 	if (session_map.find(path) < 0)
-		return;
+		return false;
 	load_into_session(session_map[path], session);
 	session->i(_("session automatically restored: ") + session_map[path]);
+	return true;
 }
 
 void SessionManager::delete_saved_session(const string &name) {

@@ -84,6 +84,7 @@ void HeaderBar::update() {
 	win->hide_control("undo-redo-box", !win->side_bar->visible or recording);
 	win->hide_control("copy-paste-box", !editing);
 
-	win->hide_control("session-indicator", !tsunami->session_manager->is_persistent(win->session));
+	win->hide_control("session-indicator", win->session->persistent_name == "");
+	win->set_string("session-indicator", "\u2713 " + win->session->persistent_name);
 }
 

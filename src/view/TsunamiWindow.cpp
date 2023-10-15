@@ -918,9 +918,10 @@ void TsunamiWindow::on_new() {
 void TsunamiWindow::on_open() {
 	session->storage->ask_open(this).then([this] (const Path &filename) {
 		auto *s = tsunami->session_manager->get_empty_session(session);
-		if (s->storage->load(s->song.get(), filename)) {
+		if (s->session_manager->try_restore_session_for_song(session, filename)) {
 			BackupManager::set_save_state(s);
-			s->session_manager->try_restore_matching_session(s);
+		} else if (s->storage->load(s->song.get(), filename)) {
+			BackupManager::set_save_state(s);
 		}
 		/*} else {
 			auto *s = tsunami->session_manager->spawn_new_session();

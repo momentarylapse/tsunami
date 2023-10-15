@@ -41,7 +41,7 @@ public:
 	void save_session(Session *s, const string &name);
 	Session *load_session(const string &name, Session *session_caller = nullptr);
 	void load_into_session(const string &name, Session *session);
-	void try_restore_matching_session(Session *session);
+	bool try_restore_session_for_song(Session *session, const Path &song_filename);
 	void delete_saved_session(const string &name);
 
 	Path session_path(const string &name) const;

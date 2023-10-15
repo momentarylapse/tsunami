@@ -315,20 +315,4 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 void Tsunami::load_key_codes() {
 }
 
-
-void Tsunami::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
-	bool allowed = true;
-
-	for (auto *s: weak(session_manager->active_sessions)) {
-		s->win->test_allow_termination([] {}, [&allowed] { allowed = false; });
-		if (!allowed)
-			break;
-	}
-
-	if (allowed)
-		cb_yes();
-	else
-		cb_no();
-}
-
 HUI_EXECUTE(Tsunami);

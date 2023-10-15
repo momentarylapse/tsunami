@@ -127,7 +127,7 @@ public:
 	void on_menu_execute_tsunami_plugin(const string &name);
 	void on_exit();
 
-	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
+	base::future<bool> test_allow_termination();
 	bool save();
 
 	void update_menu();

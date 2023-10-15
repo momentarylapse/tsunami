@@ -551,30 +551,31 @@ string title_filename(const Path &filename) {
 	return _("No name");
 }
 
-void TsunamiWindow::test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no) {
-	side_bar->test_allow_close([this, cb_yes, cb_no] {
+base::future<bool> TsunamiWindow::test_allow_termination() {
+	base::promise<bool> promise;
+	side_bar->test_allow_close().then([this, promise] (bool allow) mutable {
+		if (!allow) {
+			promise(false);
+			return;
+		}
 		if (song->action_manager->is_save()) {
-			cb_yes();
+			promise(true);
 			return;
 		}
 
-		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true).then([this, cb_yes, cb_no] (bool answer) {
+		hui::question_box(this, _("Question"), format(_("'%s'\nSave file?"), title_filename(song->filename)), true).then([this, promise] (bool answer) mutable {
 			if (answer) {
 				on_save();
-				if (song->action_manager->is_save())
-					cb_yes();
-				else
-					cb_no();
+				promise(song->action_manager->is_save());
 			} else {
-				cb_yes();
+				promise(true);
 			}
-		}).on_fail([cb_no] {
+		}).on_fail([promise] () mutable {
 			// cancel
-			cb_no();
+			promise(false);
 		});
-	}, [cb_no] {
-		cb_no();
 	});
+	return promise.get_future();
 }
 
 void TsunamiWindow::on_copy() {
@@ -901,11 +902,13 @@ void TsunamiWindow::on_update() {
 }
 
 void TsunamiWindow::on_exit() {
-	test_allow_termination([this] {
-		BackupManager::set_save_state(session);
-		//request_destroy();
-		hui::run_later(0.01f, [this] { session->win = nullptr; });
-	}, [] {});
+	test_allow_termination().then([this] (bool allow) {
+		if (allow) {
+			BackupManager::set_save_state(session);
+			//request_destroy();
+			hui::run_later(0.01f, [this] { session->win = nullptr; });
+		}
+	});
 }
 
 void TsunamiWindow::on_new() {

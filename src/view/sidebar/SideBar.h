@@ -60,7 +60,7 @@ public:
 	int active_console;
 	bool visible;
 
-	void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no);
+	base::future<bool> test_allow_close();
 
 	SongConsole *song_console;
 	TrackConsole *track_console;
@@ -93,7 +93,7 @@ public:
 
 	virtual void on_enter() {}
 	virtual void on_leave() {}
-	virtual void test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) { cb_yes(); }
+	virtual base::future<bool> test_allow_close();
 };
 
 #endif /* BOTTOMBAR_H_ */

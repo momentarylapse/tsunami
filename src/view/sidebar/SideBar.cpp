@@ -92,10 +92,11 @@ void SideBar::add_console(SideBarConsole *c) {
 }
 
 void SideBar::on_close() {
-	test_allow_close([this] {
-		session->set_mode(EditMode::Default);
-		//_hide();
-	}, [] {});
+	test_allow_close().then([this] (bool allow) {
+		if (allow)
+			session->set_mode(EditMode::Default);
+			//_hide();
+	});
 }
 
 void SideBar::_show() {
@@ -146,12 +147,13 @@ bool SideBar::is_active(int console) {
 	return (active_console == console) and visible;
 }
 
-void SideBar::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
+base::future<bool> SideBar::test_allow_close() {
 	if (!visible or active_console < 0) {
-		cb_yes();
-		return;
+		base::promise<bool> promise;
+		promise(true);
+		return promise.get_future();
 	}
-	consoles[active_console]->test_allow_close(cb_yes, cb_no);
+	return consoles[active_console]->test_allow_close();
 }
 
 
@@ -167,5 +169,11 @@ SideBarConsole::SideBarConsole(const string &_title, const string &_id, Session 
 
 SideBarConsole::~SideBarConsole() {
 	on_leave();
+}
+
+base::future<bool> SideBarConsole::test_allow_close() {
+	base::promise<bool> promise;
+	promise(true);
+	return promise.get_future();
 }
 

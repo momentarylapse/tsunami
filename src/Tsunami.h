@@ -41,8 +41,6 @@ public:
 	hui::AppStatus handle_arguments(const Array<string> &arg);
 	void load_key_codes();
 
-	void test_allow_termination(hui::Callback cb_yes, hui::Callback cb_no);
-
 	owned<Log> log;
 	owned<SessionManager> session_manager;
 	owned<DeviceManager> device_manager;

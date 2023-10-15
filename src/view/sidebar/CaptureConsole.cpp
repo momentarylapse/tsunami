@@ -107,19 +107,17 @@ void CaptureConsole::on_leave() {
 	mode->leave();
 }
 
-void CaptureConsole::test_allow_close(hui::Callback cb_yes, hui::Callback cb_no) {
+base::future<bool> CaptureConsole::test_allow_close() {
+	base::promise<bool> promise;
 	if (!has_data()) {
-		cb_yes();
-		return;
+		promise(true);
+	} else {
+		hui::question_box(win, _("Question"), _("Cancel recording?")).then([promise] (bool answer) mutable {
+			promise(answer);
+		});
 	}
 
-	hui::question_box(win, _("Question"), _("Cancel recording?")).then([cb_yes, cb_no] (bool answer) {
-		if (answer) {
-			cb_yes();
-		} else {
-			cb_no();
-		}
-	});
+	return promise.get_future();
 }
 
 

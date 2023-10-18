@@ -1,12 +1,12 @@
-= Use of PulseAudio
+# Use of PulseAudio
 
-== Playback
+## Playback
 
     pa_buffer_attr.prebuf = 0
 
 * this prevents pausing during buffer underruns
 
-== Behaviour
+## Behaviour
 
     pa_stream_new()
     pa_stream_set_state_callback()

@@ -12,18 +12,20 @@ It was mostly developed for my personal home recording needs, i.e.
  * synthesizers
  * samples
  * plugin system
+ * persistent sessions
 
 ![tsunami1](https://user-images.githubusercontent.com/6715031/58601128-cc391680-8287-11e9-9a9f-3db9e57f763b.png)
 
 ### Plugin system
 
-Tsunami uses its own just-in-time compiler for plugin code. Currently this mostly works on x86/amd64 CPUs.
+Tsunami uses its own just-in-time compiler for plugin code. Currently, this mostly works on x86/amd64 CPUs.
 
 ## Getting started
 
-* [how to build and run](doc/how-to-build.md)
-* [how to use](doc/using/main.md)
-* [internal design](doc/design/main.md)
+* [how to build and run](docs/how-to-build.md)
+* [how to use](docs/using/main.md)
+* [internal design](docs/design/main.md)
+* [development plans, bugs etc.](docs/development.md)
 
 
 ## Authors

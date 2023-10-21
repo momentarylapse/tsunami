@@ -54,10 +54,9 @@ class SpecGrid extends Grid
 		c.set_line_width(3)
 		var z = get_mouse2()
 		var mouse_pitch: int = freq_to_pitch(z.y+0.5)
-		for _n in plugin.midi
-			for n in _n
-				var y = pitch_to_freq(n.pitch)
-				draw_line2(c, vec2(sample_to_x(n.range.offset), y), vec2(sample_to_x(n.range.end()), y), false, false)
+		for n in plugin.midi
+			var y = pitch_to_freq(n.pitch)
+			draw_line2(c, vec2(sample_to_x(n.range.offset), y), vec2(sample_to_x(n.range.end()), y), false, false)
 		if create_pitch >= 0
 			var y = pitch_to_freq(create_pitch)
 			draw_line2(c, vec2(create_x, y), vec2(z.x, y), false, true)

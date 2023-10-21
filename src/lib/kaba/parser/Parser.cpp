@@ -805,6 +805,7 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 	// variable name
 	int token0 = Exp.consume_token(); // for
+	bool is_shared = try_consume(Identifier::SHARED);
 	auto var = parse_abstract_token();
 
 	// index
@@ -857,6 +858,8 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 		cmd_for->set_param(2, array);
 		//cmd_for->set_uparam(3, loop_block);
 
+		if (is_shared)
+			flags_set(cmd_for->flags, Flags::SHARED);
 		return cmd_for;
 	}
 }

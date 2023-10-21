@@ -344,7 +344,7 @@ public:
 	}
 	void __delete__() {
 		msg_write("del Shared Pointer");
-		this->shared<C>::~shared<C>();
+		this->shared<C>::clear();
 	}
 	void assign(shared<C> o) {
 		msg_write("Shared Pointer ass1");

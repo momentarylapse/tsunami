@@ -700,19 +700,37 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> 
 
 	auto block_x = new Block(block->function, block);
 
-	auto t_out = TypeVoid;
-	/*if (t0->is_pointer_shared())
-		// TODO would be nice to simply have an alias here!
-		// ...add temp var fist, then delete and remap inside the block_x?
-		t_out = tree->request_implicit_class_shared_not_null(t0->param[0], node->token_id);
-	else*/
-		t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
+	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
 	auto *var = block_x->add_var(var_name, t_out);
-	/*if (t0->is_pointer_shared())
-		block_x->add(parser->con.link_operator_id(OperatorID::ASSIGN, add_node_local(var), expr->change_type(t_out)));
-	else*/
-		block_x->add(add_node_operator_by_inline(InlineID::POINTER_ASSIGN, add_node_local(var), expr->change_type(t_out)));
+	block_x->add(add_node_operator_by_inline(InlineID::POINTER_ASSIGN, add_node_local(var), expr->change_type(t_out)));
+
+	auto n_if = add_node_statement(StatementID::IF, node->token_id);
+	n_if->set_num_params(node->params.num - 2);
+	Function *f_p2b = tree->required_func_global("p2b", node->token_id);
+	auto n_p2b = add_node_call(f_p2b);
+	n_p2b->set_num_params(1);
+	n_p2b->set_param(0, add_node_local(var));
+	n_if->set_param(0, n_p2b);
+	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x), block_x, ns));
+	if (node->params.num >= 5)
+		n_if->set_param(2, concretify_node(cp_node(node->params[4], block_x), block_x, ns));
+	block_x->add(n_if);
+
+	return block_x;
+}
+
+shared<Node> Concretifier::concretify_statement_for_unwrap_pointer_shared(shared<Node> node, shared<Node> container, Block *block, const Class *ns) {
+	// [OUT-VAR, ---, EXPRESSION, TRUE-BLOCK, [FALSE-BLOCK]]
+	auto expr = container;//concretify_node(node->params[2], block, ns);
+	auto t0 = expr->type;
+	auto var_name = node->params[0]->as_token();
+
+	auto block_x = new Block(block->function, block);
+	auto t_out = tree->request_implicit_class_shared_not_null(t0->param[0], node->token_id);
+
+	auto *var = block_x->add_var(var_name, t_out);
+	block_x->add(parser->con.link_operator_id(OperatorID::ASSIGN, add_node_local(var), expr->change_type(t_out)));
 
 	auto n_if = add_node_statement(StatementID::IF, node->token_id);
 	n_if->set_num_params(node->params.num - 2);
@@ -818,15 +836,18 @@ shared<Node> Concretifier::concretify_statement_for_container(shared<Node> node,
 	// [VAR, INDEX, ARRAY, BLOCK]
 
 	auto container = force_concrete_type(concretify_node(node->params[2], block, ns));
+	container = deref_if_reference(container);
 	auto t_c = container->type;
-	if (t_c->is_pointer_shared() or t_c->is_pointer_shared_not_null() or t_c->is_pointer_owned() or t_c->is_pointer_owned_not_null() or t_c->is_pointer_raw())
-		// "*_not_null" only for convenience
+	if (t_c->is_pointer_shared() and flags_has(node->flags, Flags::SHARED))
+		return concretify_statement_for_unwrap_pointer_shared(node, container, block, ns);
+	else if (t_c->is_pointer_shared() or t_c->is_pointer_owned() or t_c->is_pointer_raw())
 		return concretify_statement_for_unwrap_pointer(node, container, block, ns);
 	else if (t_c->is_optional())
 		return concretify_statement_for_unwrap_optional(node, container, block, ns);
 	else if (t_c->usable_as_list() or t_c->is_array())
 		return concretify_statement_for_array(node, container, block, ns);
-	do_error("array/list/shared/owned/optional expected as second parameter in 'for . in .'", container);
+
+	do_error(format("unable to iterate over type '%s' - array/list/shared/owned/optional expected as second parameter in 'for . in .'", t_c->long_name()), container);
 	return nullptr;
 }
 
@@ -2003,9 +2024,10 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 		int offset = 0;
 
 		// "ref" parameter -> return mut/const depends on param!
-		if (f->num_params >= 1)
-			if (flags_has(f->var[0]->flags, Flags::REF))
+		if (f->num_params >= 1) {
+			if (flags_has(f->var[0]->flags, Flags::REF) or flags_has(f->flags, Flags::REF))
 				n->set_mutable(n->params[0]->is_mutable());
+		}
 
 		// const check
 		if (f->is_member()) {

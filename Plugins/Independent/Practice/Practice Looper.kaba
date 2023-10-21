@@ -106,13 +106,12 @@ class PracticeLooper extends TsunamiPlugin
 			reset()
 		if config.speed != current_speed
 			song.begin_action_group("set speed")
-			for i=>_b in song.bars
-				for b in _b
-					var bb: Bar
-					bb.beats = b.beats
-					bb.divisor = b.divisor
-					bb.length = int(b.length / config.speed)
-					song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
+			for i=>b in song.bars
+				var bb: Bar
+				bb.beats = b.beats
+				bb.divisor = b.divisor
+				bb.length = int(b.length / config.speed)
+				song.edit_bar(i, bb, Bar.EditMode.STRETCH_AND_SCALE_AUDIO)
 			song.end_action_group()
 	#		old_sel = session.view.sel.range_raw
 			session.view.cam.set_range(scale_range(session.view.cam.range(), 1. / config.speed))

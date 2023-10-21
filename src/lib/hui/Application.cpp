@@ -196,6 +196,12 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 			directory_static = prefix | "share" | app_name;
 		}
 
+		// inside an AppImage?
+		if (getenv("APPIMAGE")) {
+			installed = true;
+			directory_static = Path(getenv("APPDIR")) | "usr" | "share" | app_name;
+		}
+
 		directory = format("%s/.%s/", getenv("HOME"), app_name);
 		os::fs::create_directory(directory);
 	#endif

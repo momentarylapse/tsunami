@@ -17,7 +17,6 @@ class MAE extends TsunamiPlugin
 		var samples_per_frame = session.song.sample_rate / fps
 		var f = new TextLinesFormatter(fs.open("notes", "wt"))
 		var l = t.layers[0]
-		for _n in l.midi
-			for n in _n
-				f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
+		for n in l.midi
+			f << "{{int(n.pitch)}}:{{int(n.range.offset / samples_per_frame)}}:{{int(n.range.end() / samples_per_frame)}}"
 		stop()

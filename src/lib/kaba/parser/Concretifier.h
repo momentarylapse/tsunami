@@ -73,6 +73,7 @@ public:
 	shared<Node> concretify_statement_for_container(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_array(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_unwrap_pointer(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
+	shared<Node> concretify_statement_for_unwrap_pointer_shared(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_unwrap_optional(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_new(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_delete(shared<Node> node, Block *block, const Class *ns);

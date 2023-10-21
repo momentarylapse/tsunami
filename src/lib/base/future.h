@@ -37,6 +37,10 @@ template<>
 struct xparam<bool> {
 	using t = bool;
 };
+template<>
+struct xparam<void> {
+	using t = void;
+};
 
 template<class T>
 struct xcallback {
@@ -185,6 +189,31 @@ struct promise<void> {
 		return future<void>(core);
 	}
 };
+
+template<class T>
+inline future<T> success(typename xparam<T>::t t) {
+	base::promise<T> promise;
+	promise(t);
+	return promise.get_future();
+}
+
+inline future<void> success() {
+	base::promise<void> promise;
+	promise();
+	return promise.get_future();
+}
+
+template<class T>
+inline future<T> failed() {
+	base::promise<T> promise;
+	promise.fail();
+	return promise.get_future();
+}
+
+template<class T>
+inline void await(const future<T>& f) {
+	while (f.core->state == PromiseState::UNFINISHED) {}
+}
 
 }
 

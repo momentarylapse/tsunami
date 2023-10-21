@@ -29,8 +29,7 @@ struct MidiFont
 		load(session)
 		var ii: string[]
 		for s in song
-			for _t in s.tracks
-				for t in _t
+			for t in s.tracks
 					if t.type == SignalType.MIDI
 						ii.add(t.name)
 		return ii
@@ -39,15 +38,13 @@ struct MidiFont
 		load(session)
 		for _s in song
 			# match by name
-			for _t in _s.tracks
-				for t in _t
-					if t.type == SignalType.MIDI and t.name == name
-						return t.synth.copy() as xfer[Synthesizer]
+			for t in _s.tracks
+				if t.type == SignalType.MIDI and t.name == name
+					return t.synth.copy() as xfer[Synthesizer]
 			# fist midi track...
-			for _t in _s.tracks
-				for t in _t
-					if t.type == SignalType.MIDI
-						return t.synth.copy() as xfer[Synthesizer]
+			for t in _s.tracks
+				if t.type == SignalType.MIDI
+					return t.synth.copy() as xfer[Synthesizer]
 		return new Synthesizer()
 
 class FontList as @noauto

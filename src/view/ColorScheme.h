@@ -71,7 +71,7 @@ public:
 	color high_contrast_a, high_contrast_b;
 	
 
-	color blob_bg, blob_bg_hidden, blob_bg_selected;
+	color blob_bg, blob_bg_hidden, blob_bg_selected, blob_text, blob_text_soft;
 	color blob_bg_alt, blob_bg_alt_hidden, blob_bg_alt_selected;
 
 	color red, blue, green, white;

@@ -167,11 +167,10 @@ bool TrackHeader::playable() const {
 
 color TrackHeader::color_text() const {
 	if (playable())
-		return theme.text;
+		return theme.blob_text;
 	if (view->sel.has(vtrack->track))
-		return theme.text_soft1;
-	else
-		return theme.text_soft1.with_alpha(0.5f);
+		return theme.blob_text_soft;
+	return theme.blob_text_soft.with_alpha(0.5f);
 }
 
 

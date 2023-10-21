@@ -144,12 +144,10 @@ color LayerHeader::color_text() const {
 	auto *layer = vlayer->layer;
 	auto *view = vlayer->view;
 	if (playable())
-		return theme.text;
-	if (view->sel.has(layer)) {
-		return theme.text_soft1;
-	} else {
-		return theme.text_soft2;
-	}
+		return theme.blob_text;
+	if (view->sel.has(layer))
+		return theme.blob_text_soft;
+	return theme.blob_text_soft.with_alpha(0.5f);
 }
 
 void LayerHeader::update_geometry_recursive(const rect &target_area) {

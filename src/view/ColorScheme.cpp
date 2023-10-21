@@ -76,8 +76,8 @@ bool ColorScheme::is_dark() const {
 }
 
 void ColorScheme::auto_generate(bool keep_soft_text) {
-
-	if (text.r > background.r) {
+	bool _is_dark = is_dark();
+	if (_is_dark) {
 		high_contrast_a = White;
 		high_contrast_b = Black;
 	} else {
@@ -121,6 +121,8 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	blob_bg_hidden = color::interpolate(color::interpolate(selection, text_soft3, 0.6f), background_track_selected, 0.8f);
 	blob_bg = color::interpolate(color::interpolate(selection, text_soft2, 0.5f), background_track_selected, 0.6f);
 	blob_bg_selected = color::interpolate(color::interpolate(selection, text_soft2, 0.4f), background_track_selected, 0.3f);
+	blob_text = White;
+	blob_text_soft = color::interpolate(blob_text, Gray, _is_dark ? 0.25f : 0.07f);
 	color col_base_alt = color::interpolate(selection, Green, 0.8f);
 	blob_bg_alt_hidden = color::interpolate(color::interpolate(col_base_alt, text_soft3, 0.6f), background_track_selected, 0.8f);
 	blob_bg_alt = color::interpolate(color::interpolate(col_base_alt, text_soft2, 0.5f), background_track_selected, 0.6f);
@@ -138,8 +140,8 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	for (int i=0; i<12; i++) {
 		pitch[i] = PITCH_COLORS[i];
 		pitch_text[i] = color::interpolate(pitch[i], text, 0.2f);
-		pitch_soft1[i] = color::interpolate(pitch[i], background, 0.5f);
-		pitch_soft2[i] = color::interpolate(pitch[i], background, 0.75f);
+		pitch_soft1[i] = color::interpolate(pitch[i], background, _is_dark ? 0.5f : 0.3f);
+		pitch_soft2[i] = color::interpolate(pitch[i], background, _is_dark ? 0.75f : 0.5f);
 	}
 }
 
@@ -179,8 +181,8 @@ ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
 	//background = colors["bg_color"];
 	background = colors["base_color"];
 	text = colors["text_color"];
-	text = colors["fg_color"];
-	text = colors["selected_fg_color"];
+//	text = colors["fg_color"];
+//	text = colors["selected_fg_color"];
 
 	gamma = 1.0f;
 	if (text.r > background.r) // dark theme

@@ -141,23 +141,6 @@ public:
 #endif
 };
 
-
-void wrapper_choose_module(hui::Panel *parent, Session *session, ModuleCategory type, Callable<void(const base::optional<string>&)> &cb, const string &old_name) {
-	ModuleSelectorDialog::choose(parent, session, type, old_name).then([&cb] (const base::optional<string> &name) {
-		cb(name);
-	}).on_fail([&cb] {
-		cb(base::None);
-	});
-}
-
-void wrapper_select_sample(Session *session, hui::Panel *parent, Sample *old, Callable<void(Sample*)> &cb) {
-	SampleSelectionDialog::select(session, parent, old).then([&cb] (Sample *s) {
-		cb(s);
-	}).on_fail([&cb, old] {
-		cb(old);
-	});
-}
-
 template<class T>
 void generic__init__(T *me) {
 	new(me) T;
@@ -176,9 +159,6 @@ void PluginManager::link_app_data() {
 	//ext->link("view_input", &export_view_input);
 	ext->link("db2amp", (void*)&db2amplitude);
 	ext->link("amp2db", (void*)&amplitude2db);
-	/*ext->link("fft_c2c", (void*)&FastFourierTransform::fft_c2c);
-	ext->link("fft_r2c", (void*)&FastFourierTransform::fft_r2c);
-	ext->link("fft_c2r_inv", (void*)&FastFourierTransform::fft_c2r_inv);*/
 	ext->link("CreateModuleBasic", (void*)&ModuleFactory::create);
 	ext->link("CreateModuleX", (void*)&ModuleFactory::create_by_class);
 	ext->link("CreateSynthesizer", (void*)&CreateSynthesizer);
@@ -188,13 +168,19 @@ void PluginManager::link_app_data() {
 	ext->link("CreateMidiSource", (void*)&CreateMidiSource);
 	ext->link("CreateBeatSource", (void*)&CreateBeatSource);
 	ext->link("CreateBeatMidifier", (void*)&_CreateBeatMidifier);
-	ext->link("SelectSample", (void*)&wrapper_select_sample);
-	ext->link("ChooseModule", (void*)&wrapper_choose_module);
+	ext->link("SelectSample", (void*)&SampleSelectionDialog::select);
+	ext->link("ChooseModule", (void*)&ModuleSelectorDialog::choose);
 	ext->link("draw_boxed_str", (void*)&draw_boxed_str);
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
 
+	ext->link_class_func("future[string].__delete__", &kaba::KabaFuture<string>::__delete__);
+	ext->link_class_func("future[string].then", &kaba::KabaFuture<string>::kaba_then);
+	ext->link_class_func("future[string].then_or_fail", &kaba::KabaFuture<string>::kaba_then_or_fail);
+	ext->link_class_func("future[tsunami.Sample*].__delete__", &kaba::KabaFuture<void*>::__delete__);
+	ext->link_class_func("future[tsunami.Sample*].then", &kaba::KabaFuture<void*>::kaba_then);
+	ext->link_class_func("future[tsunami.Sample*].then_or_fail", &kaba::KabaFuture<void*>::kaba_then_or_fail);
 	ext->link_class_func("future[AudioBuffer].__delete__", &kaba::KabaFuture<AudioBuffer>::__delete__);
 	ext->link_class_func("future[AudioBuffer].then", &kaba::KabaFuture<AudioBuffer>::kaba_then);
 	ext->link_class_func("future[AudioBuffer].then_or_fail", &kaba::KabaFuture<AudioBuffer>::kaba_then_or_fail);

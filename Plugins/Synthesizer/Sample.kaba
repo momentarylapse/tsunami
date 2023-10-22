@@ -68,11 +68,10 @@ class SamplePanel extends ConfigPanel
 		for s in sc.samples[n]
 			old = &s.origin
 		let f = func(ss: Sample*)
-			if ss != old
-				for _s in ss
-					sc.samples[n] = _s.create_ref()
-				else
-					sc.samples[n] = nil
-				changed()
-				update()
-		SelectSample(c.session, self, old, f)
+			for _s in ss
+				sc.samples[n] = _s.create_ref()
+			else
+				sc.samples[n] = nil
+			changed()
+			update()
+		SelectSample(c.session, self, old).then(f)

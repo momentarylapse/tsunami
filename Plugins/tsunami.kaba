@@ -809,10 +809,10 @@ func extern CreateMidiSource(session: Session, name: string) -> xfer[MidiSource]
 func extern CreateMidiEffect(session: Session, name: string) -> xfer[MidiEffect]
 func extern CreateBeatMidifier(session: Session) -> xfer[BeatMidifier]
 func extern CreateBeatSource(session: Session, name: string) -> xfer[BeatSource]
-func extern SelectSample(session: Session, panel: Panel, old: Sample*, f: Sample*->void)
+func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> future[ptr[Sample]]
 #extern void SetTempBackupFilename(Path filename)
 
-func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, f: string?->void, old_name: string?)
+func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, old_name: string?) -> future[string]
 
 #extern void get_style_colors(Panel p, string id, color{} colors)
 func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])

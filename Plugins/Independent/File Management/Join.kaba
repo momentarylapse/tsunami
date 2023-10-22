@@ -9,16 +9,19 @@ class Join extends TsunamiPlugin
 		var offset = 0
 		var song = new Song(session, 44100)
 		var t = song.add_track(SignalType.AUDIO_STEREO, 0)
-		var layer = t.layers[0]
-		for f in args[1:]
-			print(f)
-			var part: AudioBuffer
-			session.storage.load_buffer(part, f)
+		var layer = weak(t.layers[0])
+		
 			
+		let f = func(part: AudioBuffer)
 			var buf: AudioBuffer
 			var a = layer.edit_buffers(buf, Range(offset, len(part)))
 			buf.set(part, 0, 1.0)
 			layer.edit_buffers_finish(a)
 			offset += len(part)
+		
+		for file in args[1:]
+			print(file)
+			session.storage.load_buffer(file).then(f)
+			
 		session.storage.save(song, args[0])
 	func override on_stop()

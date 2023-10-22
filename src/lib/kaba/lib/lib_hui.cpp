@@ -140,9 +140,9 @@ void SIAddPackageHui(Context *c) {
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
 
-	lib_create_future<Path>(TypeHuiPathFuture, TypeCallbackPath);
-	lib_create_future<bool>(TypeHuiBoolFuture, TypeCallbackBool);
-	lib_create_future<void>(TypeHuiVoidFuture, TypeCallback);
+	lib_create_future<Path>(TypeHuiPathFuture, TypePath, TypeCallbackPath);
+	lib_create_future<bool>(TypeHuiBoolFuture, TypeBool, TypeCallbackBool);
+	lib_create_future<void>(TypeHuiVoidFuture, TypeVoid, TypeCallback);
 
 	add_class(TypeHuiMenu);
 		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Menu::__init__));

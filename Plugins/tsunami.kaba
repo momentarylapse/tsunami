@@ -648,10 +648,10 @@ class AudioInput extends Module
 	func extern samples_recorded() -> int
 
 class Storage
-	func extern load(out s: Song, filename: Path) -> bool
-	func extern save(s: Song*, filename: Path) -> bool
-	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> bool
-	func extern load_buffer(out buf: AudioBuffer, filename: Path) -> bool
+	func extern load(out s: Song, filename: Path) -> future[void]
+	func extern save(s: Song*, filename: Path) -> future[void]
+	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> future[void]
+	func extern load_buffer(filename: Path) -> future[AudioBuffer]
 	var current_directory: Path
 
 # create via Session.add_signal_chain()

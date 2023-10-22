@@ -22,8 +22,7 @@ struct MidiFont
 		for s in sub
 			s.song = new Song(s, DEFAULT_SAMPLE_RATE)
 			song = weak(s.song)
-			for _s in song
-				s.storage.load(_s, hui.app_directory | "Midi Fonts/{{name}}.nami")
+			s.storage.load(s.song, hui.app_directory | "Midi Fonts/{{name}}.nami")
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)

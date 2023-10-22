@@ -66,6 +66,7 @@
 #include "../lib/base/callable.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/kaba/dynamic/exception.h"
+#include "../lib/kaba/lib/future.h"
 
 
 namespace hui {
@@ -193,6 +194,10 @@ void PluginManager::link_app_data() {
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
+
+	ext->link_class_func("future[AudioBuffer].__delete__", &kaba::KabaFuture<AudioBuffer>::__delete__);
+	ext->link_class_func("future[AudioBuffer].then", &kaba::KabaFuture<AudioBuffer>::kaba_then);
+	ext->link_class_func("future[AudioBuffer].then_or_fail", &kaba::KabaFuture<AudioBuffer>::kaba_then_or_fail);
 
 	ext->link_class_func("obs.source.__rshift__", &obs::source::subscribe);
 

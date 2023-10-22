@@ -15,6 +15,9 @@
 
 namespace kaba {
 
+
+extern Module *cur_package;
+extern const Class *TypeFutureT;
 extern const Class* TypeCallback;
 
 
@@ -50,8 +53,9 @@ struct KabaVoidFuture : public base::future<void> {
 };
 
 template<class T>
-void lib_create_future(const Class *tt, const Class *t_cb) {
+inline void lib_create_future(const Class *tt, const Class *pp, const Class *t_cb) {
 	auto t = const_cast<Class*>(tt);
+	t->param = {pp};
 
 	add_class(t);
 		//class_add_func(Identifier::Func::INIT, TypeVoid, &KabaFuture<T>::__init__);
@@ -61,11 +65,14 @@ void lib_create_future(const Class *tt, const Class *t_cb) {
 		class_add_func("then_or_fail", TypeVoid, &KabaFuture<T>::kaba_then_or_fail, Flags::CONST);
 			func_add_param("cb", t_cb);
 			func_add_param("cb_fail", TypeCallback);
+
+	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
 }
 
 template<>
-void lib_create_future<void>(const Class *tt, const Class *t_cb) {
+inline void lib_create_future<void>(const Class *tt, const Class *pp, const Class *t_cb) {
 	auto t = const_cast<Class*>(tt);
+	t->param = {pp};
 
 	add_class(t);
 		//class_add_func(Identifier::Func::INIT, TypeVoid, &KabaVoidFuture::__init__);
@@ -75,6 +82,8 @@ void lib_create_future<void>(const Class *tt, const Class *t_cb) {
 		class_add_func("then_or_fail", TypeVoid, &KabaVoidFuture::kaba_then_or_fail, Flags::CONST);
 			func_add_param("cb", t_cb);
 			func_add_param("cb_fail", TypeCallback);
+
+	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
 }
 
 }

@@ -71,7 +71,6 @@ Path absolute_module_path(const Path &filename) {
 
 Context::Context() {
 	template_manager = new TemplateManager(this);
-	implicit_class_registry = new ImplicitClassRegistry(this);
 	external = new ExternalLinkData(this);
 }
 
@@ -255,7 +254,6 @@ xfer<Context> Context::create() {
 	c->type_casts = _secret_lib_context_->type_casts;
 	//c->external = _secret_lib_context_->external;
 	c->template_manager->copy_from(_secret_lib_context_->template_manager.get());
-	c->implicit_class_registry->copy_from(_secret_lib_context_->implicit_class_registry.get());
 	c->global_operators = _secret_lib_context_->global_operators;
 	return c;
 }

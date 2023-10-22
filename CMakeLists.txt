@@ -266,6 +266,7 @@ set(SOURCE
 	src/lib/kaba/template/implicit_callable.cpp
 	src/lib/kaba/template/implicit_dict.cpp
 	src/lib/kaba/template/implicit_enum.cpp
+	src/lib/kaba/template/implicit_future.cpp
 	src/lib/kaba/template/implicit_list.cpp
 	src/lib/kaba/template/implicit_optional.cpp
 	src/lib/kaba/template/implicit_pointer.cpp

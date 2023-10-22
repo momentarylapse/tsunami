@@ -459,8 +459,8 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 	} else if (exp_kind == ExpKind::LETTER) {
 		for (int i=0;i<SCRIPT_MAX_NAME;i++) {
 			auto kind = GetKind(source[pos]);
-			// may contain letters and numbers
-			if ((kind != ExpKind::LETTER) and (kind != ExpKind::NUMBER))
+			// may contain letters and numbers and '!'
+			if ((kind != ExpKind::LETTER) and (kind != ExpKind::NUMBER) and (source[pos] != '!'))
 				break;
 			Temp[TempLength ++] = source[pos ++];
 		}

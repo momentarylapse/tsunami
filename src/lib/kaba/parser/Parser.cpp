@@ -582,15 +582,7 @@ shared<Node> Parser::parse_abstract_dict(Block *block) {
 }
 
 const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const Class*> &classes, int token_id) {
-	string name;
-	int size = 0;
-	for (auto &c: classes) {
-		size += c->size;
-		if (name != "")
-			name += ",";
-		name += c->name;
-	}
-	return tree->request_implicit_class("("+name+")", Class::Type::PRODUCT, size, -1, nullptr, classes, token_id);
+	return tree->module->context->template_manager->request_product(tree, classes, token_id);
 }
 
 shared<Node> Parser::parse_abstract_token() {
@@ -631,20 +623,6 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 		Exp.next();
 		operand->set_num_params(1);
 		operand->set_param(0, parse_abstract_operand(block));
-	} else if (try_consume(Identifier::RAW_POINTER)) {
-		operand = new Node(NodeKind::ABSTRACT_TYPE_POINTER, 0, TypeUnknown, Flags::NONE, Exp.cur_token());
-	} else if (try_consume(Identifier::SHARED)) {
-		if (try_consume("!"))
-			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL, 0, TypeUnknown, Flags::NONE, Exp.cur_token()-1);
-		else
-			operand = new Node(NodeKind::ABSTRACT_TYPE_SHARED, 0, TypeUnknown, Flags::NONE, Exp.cur_token());
-	} else if (try_consume(Identifier::OWNED)) {
-		if (try_consume("!"))
-			operand = new Node(NodeKind::ABSTRACT_TYPE_OWNED_NOT_NULL, 0, TypeUnknown, Flags::NONE, Exp.cur_token()-1);
-		else
-			operand = new Node(NodeKind::ABSTRACT_TYPE_OWNED, 0, TypeUnknown, Flags::NONE, Exp.cur_token());
-	} else if (try_consume(Identifier::XFER)) {
-		operand = new Node(NodeKind::ABSTRACT_TYPE_XFER, 0, TypeUnknown, Flags::NONE, Exp.cur_token());
 	} else {
 		operand = parse_abstract_token();
 	}
@@ -2052,7 +2030,7 @@ Function *Parser::parse_function_header(const Class *default_type, Class *name_s
 
 void Parser::post_process_function_header(Function *f, const Array<string> &template_param_names, Class *name_space, Flags flags) {
 	if (f->is_template()) {
-		context->template_manager->add_template(f, template_param_names);
+		context->template_manager->add_function_template(f, template_param_names);
 		name_space->add_template_function(tree, f, flags_has(flags, Flags::VIRTUAL), flags_has(flags, Flags::OVERRIDE));
 	} else {
 		con.concretify_function_header(f);

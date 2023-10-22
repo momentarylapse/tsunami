@@ -376,6 +376,7 @@
     <ClCompile Include="src\lib\kaba\template\implicit_callable.cpp" />
     <ClCompile Include="src\lib\kaba\template\implicit_dict.cpp" />
     <ClCompile Include="src\lib\kaba\template\implicit_enum.cpp" />
+    <ClCompile Include="src\lib\kaba\template\implicit_future.cpp" />
     <ClCompile Include="src\lib\kaba\template\implicit_list.cpp" />
     <ClCompile Include="src\lib\kaba\template\implicit_optional.cpp" />
     <ClCompile Include="src\lib\kaba\template\implicit_pointer.cpp" />
@@ -834,6 +835,7 @@
     <ClInclude Include="src\lib\kaba\dynamic\sorting.h" />
     <ClInclude Include="src\lib\kaba\lib\dict.h" />
     <ClInclude Include="src\lib\kaba\lib\extern.h" />
+    <ClInclude Include="src\lib\kaba\lib\future.h" />
     <ClInclude Include="src\lib\kaba\lib\lib.h" />
     <ClInclude Include="src\lib\kaba\lib\list.h" />
     <ClInclude Include="src\lib\kaba\lib\operators.h" />
@@ -857,6 +859,7 @@
     <ClInclude Include="src\lib\kaba\syntax\SyntaxTree.h" />
     <ClInclude Include="src\lib\kaba\syntax\Variable.h" />
     <ClInclude Include="src\lib\kaba\template\implicit.h" />
+    <ClInclude Include="src\lib\kaba\template\implicit_future.h" />
     <ClInclude Include="src\lib\kaba\template\template.h" />
     <ClInclude Include="src\lib\kaba\CompilerConfiguration.h" />
     <ClInclude Include="src\lib\kaba\Context.h" />

@@ -2,6 +2,7 @@
 #include "../../config.h"
 #include "lib.h"
 #include "shared.h"
+#include "future.h"
 #include "../../base/callable.h"
 
 #if __has_include("../../hui/hui.h")
@@ -77,38 +78,10 @@ namespace kaba {
 			}
 		}
 	};
-	template<class T>
-	struct KabaFuture : public base::future<T> {
-		void kaba_then(Callable<void(typename base::xparam<T>::t)> &c) {
-			this->then([&c] (typename base::xparam<T>::t p) { c(p); });
-		}
-		void kaba_then_or_fail(Callable<void(typename base::xparam<T>::t)> &c, Callable<void()> &c_fail) {
-			this->then([&c] (typename base::xparam<T>::t p) { c(p); }).on_fail([&c_fail] { c_fail(); });
-		}
-		void __delete__() {
-			this->~KabaFuture<T>();
-		}
-	};
-	struct KabaVoidFuture : public base::future<void> {
-		void kaba_then(Callable<void()> &c) {
-			this->then([&c] { c(); });
-		}
-		void kaba_then_or_fail(Callable<void()> &c, Callable<void()> &c_fail) {
-			this->then([&c] { c(); }).on_fail([&c_fail] { c_fail(); });
-		}
-		void __delete__() {
-			this->~KabaVoidFuture();
-		}
-	};
-	using KabaPathFuture = KabaFuture<Path>;
-	using KabaBoolFuture = KabaFuture<bool>;
 #else
 	#define GetDAWindow(x)		0
 	#define GetDAEvent(x)	0
 	#define GetDAPanel(x) 0
-	struct KabaVoidFuture{};
-	struct KabaPathFuture{};
-	struct KabaBoolFuture{};
 #endif
 
 #ifdef KABA_EXPORT_HUI
@@ -152,9 +125,9 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiEventRef = add_type_ref(TypeHuiEvent);
 	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 
-	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(KabaPathFuture));
-	auto TypeHuiBoolFuture = add_type("future[bool]", sizeof(KabaBoolFuture));
-	auto TypeHuiVoidFuture = add_type("future[void]", sizeof(KabaVoidFuture));
+	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(base::future<Path>));
+	auto TypeHuiBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
+	auto TypeHuiVoidFuture = add_type("future[void]", sizeof(base::future<void>));
 
 	auto TypeCallbackPainter = add_type_func(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
@@ -167,29 +140,9 @@ void SIAddPackageHui(Context *c) {
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
 
-	add_class(TypeHuiPathFuture);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaPathFuture::__delete__));
-		class_add_func("then", TypeVoid, hui_p(&KabaPathFuture::kaba_then), Flags::CONST);
-			func_add_param("cb", TypeCallbackPath);
-		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaPathFuture::kaba_then_or_fail), Flags::CONST);
-			func_add_param("cb", TypeCallbackPath);
-			func_add_param("cb_fail", TypeCallback);
-
-	add_class(TypeHuiBoolFuture);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaBoolFuture::__delete__));
-		class_add_func("then", TypeVoid, hui_p(&KabaBoolFuture::kaba_then), Flags::CONST);
-			func_add_param("cb", TypeCallbackBool);
-		class_add_func("then_or_fail", TypeVoid, hui_p(&KabaBoolFuture::kaba_then_or_fail), Flags::CONST);
-			func_add_param("cb", TypeCallbackBool);
-			func_add_param("cb_fail", TypeCallback);
-
-		add_class(TypeHuiVoidFuture);
-			class_add_func(Identifier::Func::DELETE, TypeVoid, hui_p(&KabaVoidFuture::__delete__));
-			class_add_func("then", TypeVoid, hui_p(&KabaVoidFuture::kaba_then), Flags::CONST);
-				func_add_param("cb", TypeCallback);
-			class_add_func("then_or_fail", TypeVoid, hui_p(&KabaVoidFuture::kaba_then_or_fail), Flags::CONST);
-				func_add_param("cb", TypeCallback);
-				func_add_param("cb_fail", TypeCallback);
+	lib_create_future<Path>(TypeHuiPathFuture, TypeCallbackPath);
+	lib_create_future<bool>(TypeHuiBoolFuture, TypeCallbackBool);
+	lib_create_future<void>(TypeHuiVoidFuture, TypeCallback);
 
 	add_class(TypeHuiMenu);
 		class_add_func(Identifier::Func::INIT, TypeVoid, hui_p(&hui::Menu::__init__));

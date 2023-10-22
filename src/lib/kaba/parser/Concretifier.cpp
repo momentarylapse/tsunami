@@ -455,31 +455,14 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 	if (node->params.num >= 3)
 		index2 = concretify_node(node->params[2], block, ns);
 
-	// ptr[X] / shared[X] / owned[X]
-	if (operand->kind == NodeKind::ABSTRACT_TYPE_POINTER) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_pointer(t, node->token_id), node->token_id);
-		do_error("type expected in 'ptr[...]'", index);
-	} else if (operand->kind == NodeKind::ABSTRACT_TYPE_SHARED) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_shared(t, node->token_id), node->token_id);
-		do_error("type expected in 'shared[...]'", index);
-	} else if (operand->kind == NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_shared_not_null(t, node->token_id), node->token_id);
-		do_error("type expected in 'shared![...]'", index);
-	} else if (operand->kind == NodeKind::ABSTRACT_TYPE_OWNED) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_owned(t, node->token_id), node->token_id);
-		do_error("type expected in 'owned[...]'", index);
-	} else if (operand->kind == NodeKind::ABSTRACT_TYPE_OWNED_NOT_NULL) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_owned_not_null(t, node->token_id), node->token_id);
-		do_error("type expected in 'owned![...]'", index);
-	} else if (operand->kind == NodeKind::ABSTRACT_TYPE_XFER) {
-		if (auto t = try_digest_type(tree, index))
-			return add_node_class(tree->request_implicit_class_xfer(t, node->token_id), node->token_id);
-		do_error("type expected in 'xfer[...]'", index);
+	if (operand->kind == NodeKind::CLASS) {
+		if (index->kind == NodeKind::CLASS) {
+			auto c1 = operand->as_class();
+			auto c2 = index->as_class();
+			if (auto cc = context->template_manager->request_instance(tree, c1, {c2}, block, ns, node->token_id)) {
+				return add_node_class(cc, node->token_id);
+			}
+		}
 	}
 
 	// int[3]
@@ -507,8 +490,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		auto t = index->as_class();
 		for (auto l: weak(links)) {
 			auto f = l->as_func();
-			auto ff = context->template_manager->get_instantiated(parser, f, {t}, block, ns, node->token_id);
-			if (ff) {
+			if (auto ff = context->template_manager->request_instance(tree, f, {t}, block, ns, node->token_id)) {
 				auto tf = add_node_func_name(ff);
 				tf->params = l->params; // in case we have a member instance
 				return tf;
@@ -1645,33 +1627,6 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		if (!t1)
 			do_error("type expected before '->'", node->params[1]);
 		return add_node_class(tree->request_implicit_class_callable_fp({t0}, t1, node->token_id), node->token_id);
-	} else if ((node->kind == NodeKind::ABSTRACT_TYPE_POINTER)
-			or (node->kind == NodeKind::ABSTRACT_TYPE_SHARED)
-			or (node->kind == NodeKind::ABSTRACT_TYPE_SHARED_NOT_NULL)
-			or (node->kind == NodeKind::ABSTRACT_TYPE_OWNED)
-			or (node->kind == NodeKind::ABSTRACT_TYPE_OWNED_NOT_NULL)
-			or (node->kind == NodeKind::ABSTRACT_TYPE_XFER)) {
-		return node;
-	/*} else if (node->kind == NodeKind::ABSTRACT_TYPE_SHARED) {
-		if (node->params.num == 0)
-			return node;
-		// TODO deprecate... use shared[X]
-		concretify_all_params(node, block, ns);
-		auto t = try_digest_type(tree, node->params[0]);
-		if (!t)
-			do_error("type expected after 'shared'", node->params[0]);
-		t = make_pointer_shared(tree, t, node->token_id);
-		return add_node_class(t, node->token_id);
-	} else if (node->kind == NodeKind::ABSTRACT_TYPE_OWNED) {
-		if (node->params.num == 0)
-			return node;
-		// TODO deprecate... use owned[X]
-		concretify_all_params(node, block, ns);
-		auto t = try_digest_type(tree, node->params[0]);
-		if (!t)
-			do_error("type expected after 'owned'", node->params[0]);
-		t = make_pointer_owned(tree, t, node->token_id);
-		return add_node_class(t, node->token_id);*/
 	} else if ((node->kind == NodeKind::ABSTRACT_TOKEN) or (node->kind == NodeKind::ABSTRACT_ELEMENT)) {
 		auto operands = concretify_node_multi(node, block, ns);
 		if (operands.num > 1) {
@@ -1864,7 +1819,7 @@ shared<Node> Concretifier::make_func_node_callable(const shared<Node> l) {
 
 shared<Node> Concretifier::match_template_params(const shared<Node> l, const shared_array<Node> &params, Block *block, const Class *ns) {
 	auto f0 = l->as_func();
-	auto ff = context->template_manager->get_instantiated_matching(parser, f0, params, block, ns, l->token_id);
+	auto ff = context->template_manager->request_instance_matching(tree, f0, params, block, ns, l->token_id);
 	auto r = l->shallow_copy();
 	r->link_no = (int_p)ff;
 	return r;

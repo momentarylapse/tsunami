@@ -16,6 +16,7 @@ const int FULL_CONSTRUCTOR_MAX_PARAMS = 4;
 AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 	parser = p;
 	tree = t;
+	context = tree->module->context;
 }
 
 shared<Node> AutoImplementer::node_false() {
@@ -262,7 +263,7 @@ bool AutoImplementer::class_can_equal(const Class *t) {
 	return false;
 }
 
-void AutoImplementer::add_missing_function_headers_for_class(Class *t) {
+void AutoImplementerInternal::add_missing_function_headers_for_class(Class *t) {
 	if (t->owner != tree)
 		return;
 	if (t->is_pointer_raw() or t->is_reference())
@@ -307,7 +308,7 @@ Function* AutoImplementer::prepare_auto_impl(const Class *t, Function *f) {
 }
 
 // completely create and implement
-void AutoImplementer::implement_functions(const Class *t) {
+void AutoImplementerInternal::implement_functions(const Class *t) {
 	if (t->owner != tree)
 		return;
 	if (t->is_pointer_raw() or t->is_reference())
@@ -352,7 +353,7 @@ void AutoImplementer::implement_functions(const Class *t) {
 extern const Class* TypeDynamicArray;
 extern const Class* TypeCallableBase;
 
-void AutoImplementer::complete_type(Class *t, int array_size, int token_id) {
+void AutoImplementerInternal::complete_type(Class *t, int array_size, int token_id) {
 
 	auto params = t->param;
 	// ->derive_from() will overwrite params!!!

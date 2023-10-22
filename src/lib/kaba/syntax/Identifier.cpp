@@ -53,6 +53,7 @@ namespace Identifier {
 	const string XFER = "xfer";
 	const string ALIAS = "@alias";
 	const string RAW_POINTER = "ptr";
+	const string FUTURE = "future";
 	const string TRUST_ME = "trust_me";
 	const string PURE = "pure";
 	const string NOAUTO = "@noauto";

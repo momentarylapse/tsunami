@@ -44,7 +44,6 @@ public:
     shared_array<Module> packages;
     Array<TypeCast> type_casts;
     owned<TemplateManager> template_manager;
-    owned<ImplicitClassRegistry> implicit_class_registry;
     owned<ExternalLinkData> external;
 
     shared_array<Operator> global_operators;

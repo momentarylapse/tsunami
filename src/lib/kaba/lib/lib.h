@@ -10,6 +10,7 @@
 
 #include "../CompilerConfiguration.h"
 #include "../syntax/Flags.h"
+#include "../template/template.h"
 #include "extern.h"
 #include "../../base/pointer.h"
 #include <cstddef>
@@ -83,7 +84,11 @@ const Class *add_type_dict(const Class *sub_type);
 const Class *add_type_func(const Class *ret_type, const Array<const Class*> &params);
 const Class *add_type_enum(const string &name, const Class *_namespace = nullptr);
 const Class *add_type_optional(const Class *sub_type);
+const Class *add_type_future(const Class *sub_type);
 void capture_implicit_type(const Class *t, const string &name);
+
+
+const Class *add_class_template(const string &name, const Array<string>& params, TemplateManager::ClassCreateF f);
 
 
 Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);

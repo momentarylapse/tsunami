@@ -139,7 +139,7 @@ public:
 	int next_asm_block = 0;
 
 	Concretifier con;
-	AutoImplementer auto_implementer;
+	AutoImplementerInternal auto_implementer;
 
 	int parser_loop_depth;
 	bool found_dynamic_param;

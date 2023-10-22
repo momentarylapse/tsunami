@@ -53,6 +53,7 @@ namespace Identifier {
 	extern const string XFER;
 	extern const string ALIAS;
 	extern const string RAW_POINTER;
+	extern const string FUTURE;
 	extern const string TRUST_ME;
 	extern const string PURE;
 	extern const string NOAUTO;

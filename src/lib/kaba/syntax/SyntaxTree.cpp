@@ -11,18 +11,11 @@ namespace kaba {
 //#define ScriptDebug
 
 
-extern const Class *TypeDynamicArray;
-extern const Class *TypeDictBase;
-extern const Class *TypeCallableBase;
 extern const Class *TypeMat4;
 extern const Class *TypeVec2;
 extern const Class *TypeSpecialFunctionRef;
 
 bool is_func(shared<Node> n);
-
-string class_name_might_need_parantheses(const Class *t);
-bool type_needs_alignment(const Class *t);
-
 
 static shared_array<Node> _transform_insert_before_;
 shared<Node> conv_break_down_med_level(SyntaxTree *tree, shared<Node> c);
@@ -34,36 +27,9 @@ const Class *SyntaxTree::request_implicit_class_callable_fp(Function *f, int tok
 	return request_implicit_class_callable_fp(f->literal_param_type, f->literal_return_type, token_id);
 }
 
-string make_callable_signature(const Array<const Class*> &params, const Class *ret) {
-	// maybe some day...
-	string signature;// = param->name;
-	for (int i=0; i<params.num; i++) {
-		if (i > 0)
-			signature += ",";
-		signature += class_name_might_need_parantheses(params[i]);
-	}
-	if (params.num == 0)
-		signature = "void";
-	if (params.num > 1)
-		signature = "(" + signature + ")";
-	if (params.num == 0 or (params.num == 1 and params[0] == TypeVoid)) {
-		signature = "void";
-	}
-	return signature + "->" + class_name_might_need_parantheses(ret);
-}
-
 // input {}->R  OR  void->void   BOTH create  void->R
 const Class *SyntaxTree::request_implicit_class_callable_fp(const Array<const Class*> &param, const Class *ret, int token_id) {
-	string name = make_callable_signature(param, ret);
-
-	auto params_ret = param;
-	if ((param.num == 1) and (param[0] == TypeVoid))
-		params_ret = {};
-	params_ret.add(ret);
-
-	auto ff = request_implicit_class("Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, token_id);
-	return request_implicit_class(name, Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {ff}, token_id);
-	//return make_class(name, Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
+	return module->context->template_manager->request_callable_fp(this, param, ret, token_id);
 }
 
 // inner callable: params [A,B,C,D,E]
@@ -74,41 +40,7 @@ const Class *SyntaxTree::request_implicit_class_callable_fp(const Array<const Cl
 //         f(a,x0,b,c,c1)
 // (A,C,D) -> R
 const Class *SyntaxTree::request_implicit_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id) {
-
-	string name = make_callable_signature(params, ret);
-
-	Array<const Class*> outer_params_ret;
-	//if ((params.num == 1) and (params[0] == TypeVoid))
-	//	outer_params_ret = {};
-	for (int i=0; i<params.num; i++)
-		if (!captures[i])
-			outer_params_ret.add(params[i]);
-	outer_params_ret.add(ret);
-
-	static int unique_bind_counter = 0;
-
-	auto t = (Class*)create_new_class(format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, outer_params_ret, base_class, token_id);
-	int offset = t->size;
-	for (auto [i,b]: enumerate(captures)) {
-		if (!b)
-			continue;
-		auto c = b;
-		if (capture_via_ref[i])
-			c = get_pointer(c, token_id);
-		if (type_needs_alignment(b))
-			offset = mem_align(offset, 4);
-		auto el = ClassElement(format("capture%d%s", i, capture_via_ref[i] ? "_ref" : ""), c, offset);
-		offset += c->size;
-		t->elements.add(el);
-	}
-	t->size = offset;
-
-	for (auto &e: t->elements)
-		if (e.name == "_fp")
-			e.type = request_implicit_class_callable_fp(params, ret, token_id);
-
-	add_missing_function_headers_for_class(t);
-	return t;
+	return module->context->template_manager->request_callable_bind(this, params, ret, captures, capture_via_ref, token_id);
 }
 
 SyntaxTree::SyntaxTree(Module *_module) {
@@ -496,7 +428,7 @@ Function *SyntaxTree::required_func_global(const string &name, int token_id) {
 
 
 void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
-	AutoImplementer a(nullptr, this);
+	AutoImplementerInternal a(nullptr, this);
 	a.add_missing_function_headers_for_class(t);
 }
 
@@ -536,95 +468,61 @@ Class *SyntaxTree::create_new_class_no_check(const string &name, Class::Type typ
 	ns->classes.add(t);
 	t->name_space = ns;
 	
-	AutoImplementer ai(nullptr, this);
+	AutoImplementerInternal ai(nullptr, this);
 	ai.complete_type(t, array_size, token_id);
 	return t;
 }
 
-// X[], X{}, X*, X shared, (X,Y,Z), X->Y
-const Class *SyntaxTree::request_implicit_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
-	//msg_write("make class " + name + " ns=" + ns->long_name());// + " params=" + param->long_name());
-
-	// check if it already exists
-	if (auto *tt = module->context->implicit_class_registry->find(name, type, array_size, params))
-		return tt;
-
-	// add new class
-	auto t = create_new_class_no_check(name, type, size, array_size, parent, params, implicit_symbols.get(), token_id);
-	module->context->implicit_class_registry->add(t);
-	return t;
-}
-
 const Class *SyntaxTree::get_pointer(const Class *base, int token_id) {
-//	return request_implicit_class(class_name_might_need_parantheses(base) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
 	return request_implicit_class_pointer(base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_pointer(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("ptr[..] not allowed for: " + base->long_name(), token_id); // TODO
-	return request_implicit_class(class_name_might_need_parantheses(base) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
-//	return request_implicit_class(format("%s[%s]", Identifier::RAW_POINTER, base->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_pointer(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_shared(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("shared[..] not allowed for: " + base->long_name(), token_id); // TODO
-	return request_implicit_class(format("%s[%s]", Identifier::SHARED, base->name), Class::Type::POINTER_SHARED, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_shared(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_shared_not_null(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("shared![..] not allowed for: " + base->long_name(), token_id); // TODO
-	return request_implicit_class(format("%s![%s]", Identifier::SHARED, base->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_shared_not_null(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_owned(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("owned[..] not allowed for: " + base->long_name(), token_id);
-	return request_implicit_class(format("%s[%s]", Identifier::OWNED, base->name), Class::Type::POINTER_OWNED, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_owned(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_owned_not_null(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("owned![..] not allowed for: " + base->long_name(), token_id);
-	return request_implicit_class(format("%s![%s]", Identifier::OWNED, base->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_owned_not_null(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_xfer(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("xfer[..] not allowed for: " + base->long_name(), token_id);
-	return request_implicit_class(format("%s[%s]", Identifier::XFER, base->name), Class::Type::POINTER_XFER, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_xfer(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_alias(const Class *base, int token_id) {
-	if (!base->name_space)
-		do_error("@alias[..] not allowed for: " + base->long_name(), token_id);
-	return request_implicit_class(format("%s[%s]", Identifier::ALIAS, base->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_alias(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_reference(const Class *base, int token_id) {
-	return request_implicit_class(class_name_might_need_parantheses(base) + "&", Class::Type::REFERENCE, config.target.pointer_size, 0, nullptr, {base}, token_id);
+	return module->context->template_manager->request_reference(this, base, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_list(const Class *element_type, int token_id) {
-	string name = class_name_might_need_parantheses(element_type) + "[]";
-	return request_implicit_class(name, Class::Type::LIST, config.target.dynamic_array_size, -1, TypeDynamicArray, {element_type}, token_id);
+	return module->context->template_manager->request_list(this, element_type, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_array(const Class *element_type, int num_elements, int token_id) {
-	string name = class_name_might_need_parantheses(element_type) + format("[%d]", num_elements);
-	return request_implicit_class(name, Class::Type::ARRAY, element_type->size * num_elements, num_elements, nullptr, {element_type}, token_id);
+	return module->context->template_manager->request_array(this, element_type, num_elements, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_dict(const Class *element_type, int token_id) {
-	string name = class_name_might_need_parantheses(element_type) + "{}";
-	return request_implicit_class(name, Class::Type::DICT, config.target.dynamic_array_size, 0, TypeDictBase, {element_type}, token_id);
+	return module->context->template_manager->request_dict(this, element_type, token_id);
 }
 
 const Class *SyntaxTree::request_implicit_class_optional(const Class *param, int token_id) {
-	string name = class_name_might_need_parantheses(param) + "?";
-	return request_implicit_class(name, Class::Type::OPTIONAL, param->size + 1, 0, nullptr, {param}, token_id);
+	return module->context->template_manager->request_optional(this, param, token_id);
 }
 
 shared<Node> SyntaxTree::conv_cbr(shared<Node> c, Variable *var) {
@@ -1410,7 +1308,6 @@ SyntaxTree::~SyntaxTree() {
 	delete_all_constants(base_class);
 
 	module->context->template_manager->clear_from_module(module);
-	module->context->implicit_class_registry->clear_from_module(module);
 }
 
 void SyntaxTree::show(const string &stage) {

@@ -25,7 +25,6 @@ public:
 
 	void do_error_implicit(Function *f, const string &msg);
 
-	void add_missing_function_headers_for_class(Class *t);
 	void _add_missing_function_headers_for_regular(Class *t);
 	void _add_missing_function_headers_for_array(Class *t);
 	void _add_missing_function_headers_for_list(Class *t);
@@ -86,7 +85,7 @@ public:
 	void implement_optional_equal_raw(Function *f, const Class *t);
 	void implement_product_equal(Function *f, const Class *t);
 	void implement_product_not_equal(Function *f, const Class *t);
-	void implement_functions(const Class *t);
+	void implement_future_constructor(Function *f, const Class *t);
 	void _implement_functions_for_array(const Class *t);
 	void _implement_functions_for_list(const Class *t);
 	void _implement_functions_for_dict(const Class *t);
@@ -134,11 +133,18 @@ public:
 	static Function* prepare_auto_impl(const Class *t, Function *f);
 
 
-	void complete_type(Class *t, int array_size, int token_id);
-
-
 	SyntaxTree *tree;
 	Parser *parser;
+	Context *context;
+};
+
+// TODO split
+class AutoImplementerInternal : public AutoImplementer {
+public:
+	AutoImplementerInternal(Parser *p, SyntaxTree *tree) : AutoImplementer(p, tree) {}
+	void implement_functions(const Class *t);
+	void add_missing_function_headers_for_class(Class *t);
+	void complete_type(Class *t, int array_size, int token_id);
 };
 
 }

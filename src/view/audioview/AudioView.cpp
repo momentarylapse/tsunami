@@ -66,6 +66,36 @@
 
 const int AudioView::SNAPPING_DIST = 8;
 
+class AddTrackButton : public scenegraph::Node {
+	AudioView *view;
+public:
+	explicit AddTrackButton(AudioView *_view) : scenegraph::Node(theme.TRACK_HANDLE_HEIGHT_SMALL, theme.TRACK_HANDLE_HEIGHT_SMALL) {
+		align.dz = 70;
+		/*align.horizontal = AlignData::Mode::LEFT;
+		align.vertical = AlignData::Mode::TOP;*/
+		view = _view;
+	}
+	void on_draw(Painter *c) override {
+		if (is_cur_hover()) {
+			draw_box(c, area, theme.blob_bg_selected);
+			c->set_color(theme.blob_text);
+		} else {
+			c->set_color(theme.text_soft3);
+		}
+		c->set_font("", theme.FONT_SIZE, true, false);
+		c->draw_str({area.x1 + 5, area.y1 + 5}, "+");
+	}
+	/*void update_geometry_recursive(const rect &target_area) override {
+
+	}*/
+	bool on_left_button_down(const vec2 &m) override {
+		view->win->on_add_new_track(SignalType::AUDIO);
+		return true;
+	}
+	string get_tip() const override {
+		return _("add new track");
+	}
+};
 
 AudioView::AudioView(Session *_session, const string &_id) :
 		in_solo_changed{this, [this] {
@@ -237,6 +267,9 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	log_notifier = new LogNotifier(this);
 	scene_graph->add_child(log_notifier);
+
+	add_track_button = new AddTrackButton(this);
+	scene_graph->add_child(add_track_button);
 
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
@@ -1065,6 +1098,9 @@ bool AudioView::update_scene_graph() {
 	for (auto *v: vlayers) {
 		v->update_header();
 	}
+
+	const auto a = vtracks.back()->area;
+	add_track_button->area = {a.x1, a.x1 + theme.TRACK_HANDLE_HEIGHT_SMALL, a.y2, a.y2 + theme.TRACK_HANDLE_HEIGHT_SMALL};
 
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {

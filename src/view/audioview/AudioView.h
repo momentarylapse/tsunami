@@ -57,6 +57,7 @@ namespace scenegraph {
 }
 class TimeScale;
 class Cursor;
+class AddTrackButton;
 class SelectionMarker;
 class MouseDelayPlanner;
 class MouseDelayAction;
@@ -293,6 +294,7 @@ public:
 	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
 	void update_onscreen_displays();
+	AddTrackButton *add_track_button;
 
 	owned<BufferPainter> buffer_painter;
 	owned<GridPainter> grid_painter;

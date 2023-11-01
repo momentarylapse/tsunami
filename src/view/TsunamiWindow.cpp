@@ -344,6 +344,13 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		});
 	}
 
+	hui::run_later(0.5f, [this] {
+		if (BackupManager::should_notify_found_backups()) {
+			session->q("Old recording backup found\nto load or delete, open the session manager in the bottom bar", {"show-session-console:yes"});
+			BackupManager::notify_found_backups_done();
+		}
+	});
+
 	update_menu();
 }
 

@@ -48,8 +48,6 @@
 #include "../../data/SampleRef.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
-#include "../../module/synthesizer/Synthesizer.h"
-#include "../../module/audio/PeakMeter.h"
 #include "../../module/SignalChain.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../lib/math/math.h"
@@ -57,7 +55,6 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/threads/Mutex.h"
 #include "../../stuff/PerformanceMonitor.h"
-#include "../../stuff/BackupManager.h"
 #include "../../Session.h"
 #include "../../Playback.h"
 #include "../../EditModes.h"
@@ -274,14 +271,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
 	m = {0,0};
-
-
-	hui::run_later(0.5f, [this] {
-		if (BackupManager::should_notify_found_backups()) {
-			session->q("Old recording backup found\nto load or delete, open the session manager in the bottom bar", {"show-session-console:yes"});
-			BackupManager::notify_found_backups_done();
-		}
-	});
 
 
 	// events

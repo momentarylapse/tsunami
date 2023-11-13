@@ -32,6 +32,9 @@
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
 	#include <windows.h>
 	#include "../../base/iter.h"
+	#ifdef DELETE
+	#undef DELETE
+	#endif
 #endif
 #include <errno.h>
 

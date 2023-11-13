@@ -7,6 +7,7 @@
 
 namespace hui
 {
+extern bool color_button_linear;
 
 struct DialogParams {
 	string filter, show_filter;
@@ -395,7 +396,7 @@ static base::promise<color> cur_color_promise;
 static void on_select_color(GObject* o, GAsyncResult* res, gpointer user_data) {
 	auto dlg = GTK_COLOR_DIALOG(o);
 	if (auto c = gtk_color_dialog_choose_rgba_finish(dlg, res, nullptr))
-		cur_color_promise(color_from_gdk(*c));
+		cur_color_promise(color_gtk_to_user(color_from_gdk(*c)));
 	else
 		cur_color_promise.fail();
 }

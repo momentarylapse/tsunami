@@ -63,6 +63,7 @@ Control::Control(int _type, const string &_id) {
 	enabled = true;
 	visible = true;
 	focusable = false;
+	main_window_control = false;
 	basic_internal_key_handling = true;
 	user_key_handling = false;
 	allow_global_key_shortcuts = true;
@@ -73,7 +74,6 @@ Control::Control(int _type, const string &_id) {
 	widget = nullptr;
 	frame = nullptr;
 #endif
-	focusable = false;
 	indent = -1;
 	min_width = -1;
 	min_height = -1;
@@ -292,6 +292,9 @@ void Control::set_options(const string &options) {
 #else
 			gtk_widget_set_can_focus(widget, false);
 #endif
+		} else if (op == "mainwindowcontrol") {
+			main_window_control = true;
+			set_options("grabfocus");
 		} else if (op == "big") {
 			add_css_class("hui-big-font");
 			__set_option(op, val);
@@ -461,6 +464,9 @@ void Control::notify(const string &message, bool is_default) {
 	//_SendGlobalCommand_(&e);
 	e.is_default = is_default;
 	panel->_send_event_(&e);
+
+	if (!main_window_control)
+		return;
 
 	Window *win = panel->win;
 	if (message == EventID::MOUSE_MOVE) {

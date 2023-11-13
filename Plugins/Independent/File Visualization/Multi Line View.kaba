@@ -33,7 +33,7 @@ class MLVDialog extends hui.Dialog
 		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar
 	Grid ? '' vertical
 		Grid ? ''
-			DrawingArea area '' expandx grabfocus
+			DrawingArea area '' mainwindowcontrol expandx
 			Grid config-grid '' noexpandx width=300 hidden
 				Grid ? ''
 					Label l-line-height 'Line height'

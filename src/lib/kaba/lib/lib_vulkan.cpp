@@ -186,7 +186,7 @@ public:
 
 class VulkanRenderPass : public vulkan::RenderPass {
 public:
-	void __init__(const Array<string> &formats, const string &options) {
+	void __init__(const Array<string> &formats, const Array<string> &options) {
 		new(this) vulkan::RenderPass(formats, options);
 	}
 	void __delete__() {
@@ -591,7 +591,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("clear_z", TypeFloat32, vul_p(&vulkan::RenderPass::clear_z));
 		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanRenderPass::__init__));
 			func_add_param("formats", TypeStringList);
-			func_add_param("options", TypeString);
+			func_add_param("options", TypeStringList);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanRenderPass::__delete__));
 		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::RenderPass::rebuild));
 		class_add_func("add_subpass", TypeVoid, vul_p(&vulkan::RenderPass::add_subpass));
@@ -615,6 +615,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_func("create_depth_buffer", TypeDepthBufferXfer, vul_p(&vulkan::SwapChain::create_depth_buffer));
 		class_add_func("create_render_pass", TypeRenderPassXfer, vul_p(&vulkan::SwapChain::create_render_pass));
 			func_add_param("depth_buffer", TypeDepthBufferP);
+			func_add_param("options", TypeStringList);
 		class_add_func("create_frame_buffers", TypeFrameBufferXferList, vul_p(&vulkan::SwapChain::create_frame_buffers));
 			func_add_param("render_pass", TypeRenderPassP);
 			func_add_param("depth_buffer", TypeDepthBufferP);

@@ -33,6 +33,7 @@ namespace nix {
 extern string version;
 
 enum class CullMode;
+enum class Orientation;
 enum class AlphaMode;
 enum class Alpha;
 enum class StencilOp;
@@ -80,11 +81,16 @@ xfer<Context> init(const Array<string>& = {});
 void kill(Context *ctx);
 void flush();
 
+void create_query_pool(int size);
+void query_timestamp(int index);
+Array<int64> get_timestamps(int first, int count);
+
 enum class FogMode;
 
 // engine properties
 void _cdecl set_wire(bool enabled);
 void _cdecl set_cull(CullMode mode);
+void _cdecl set_front(Orientation front);
 void _cdecl set_z(bool write, bool test);
 void _cdecl _set_alpha(AlphaMode mode);
 void _cdecl set_alpha(Alpha src, Alpha dst);

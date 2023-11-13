@@ -541,10 +541,8 @@ void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, doub
 	c->panel->win->input.scroll_x = (float)dx;
 	c->panel->win->input.scroll_y = (float)dy;
 
-#if GTK_CHECK_VERSION(4,0,0)
 	auto mod = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(controller));
 	win_correct_by_modifier(c->panel->win, mod);
-#endif
 
 	c->notify(EventID::MOUSE_WHEEL, false);
 }

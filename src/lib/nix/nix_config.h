@@ -85,9 +85,13 @@ enum class Alpha {
 
 enum class CullMode {
 	NONE,
-	CCW,
+	BACK,
+	FRONT
+};
+
+enum class Orientation {
 	CW,
-	DEFAULT = CCW
+	CCW
 };
 
 enum class StencilOp {

@@ -286,7 +286,7 @@ void Texture::write_float(const DynamicArray &data) {
 
 void Texture::unload() {
 	if (type != Type::NONE) {
-		msg_write("unloading texture: " + filename.str());
+		//msg_write("unloading texture: " + filename.str());
 		glDeleteTextures(1, &texture);
 	}
 }
@@ -336,7 +336,7 @@ void set_textures(const Array<Texture*> &textures) {
 	for (int i=0; i<textures.num; i++) {
 		auto t = textures[i];
 		if (!t)
-			return;
+			continue;
 
 		if (t->type == Texture::Type::CUBE)
 			tex_cube_level = i;

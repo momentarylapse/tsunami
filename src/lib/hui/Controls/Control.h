@@ -51,6 +51,7 @@ public:
 	int basic_internal_key_handling: 1; // e.g. allow text editing in widget
 	int user_key_handling: 1; // send hui:key-down etc.?
 	int allow_global_key_shortcuts: 1;
+	int main_window_control: 1; // send win->on_mouse_move() etc?
 
 	int indent;
 	Panel *panel;

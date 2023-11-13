@@ -281,7 +281,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	// main table
 	set_target("main-grid");
-	add_drawing_area("!grabfocus,gesture=zoom", 0, 0, "area");
+	add_drawing_area("!mainwindowcontrol,gesture=zoom", 0, 0, "area");
 	if (hui::config.get_bool("View.EventCompression", true) == false)
 		set_options("area", "noeventcompression");
 

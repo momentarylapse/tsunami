@@ -17,9 +17,15 @@ namespace hui {
 	bool color_button_linear = false;
 
 
+#if GTK_CHECK_VERSION(4,10,0)
+void on_gtk_color_button_rgba_change(GObject*, GParamSpec*, gpointer data) {
+	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
+}
+#else
 void OnGtkColorButtonChange(GtkWidget *widget, gpointer data) {
 	reinterpret_cast<Control*>(data)->notify(EventID::CHANGE);
 }
+#endif
 
 ControlColorButton::ControlColorButton(const string &title, const string &id) :
 	Control(CONTROL_COLORBUTTON, id)
@@ -28,8 +34,8 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 #if GTK_CHECK_VERSION(4,10,0)
 	dialog = gtk_color_dialog_new();
 	widget = gtk_color_dialog_button_new(dialog);
-	//g_signal_connect(G_OBJECT(widget), "activate", G_CALLBACK(&OnGtkColorButtonChange), this);
-	// FIXME how to listen to update signals?!?
+
+	g_signal_connect(G_OBJECT(widget), "notify::rgba", G_CALLBACK(on_gtk_color_button_rgba_change), this);
 #else
 	widget = gtk_color_button_new();
 	//g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&OnGtkButtonPress), this);

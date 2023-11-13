@@ -7,7 +7,7 @@ Dialog detune_synthesizer_dialog "Temperament" width=800 height=500 resizable he
 				ComboBox reference-pitch ""
 				SpinButton reference-freq "" range=100:1000:0.1
 				Label hz "Hz"
-			DrawingArea detune_area "" expandx expandy
+			DrawingArea detune_area "" mainwindowcontrol expandx expandy
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"
 			CheckBox relative "Relative" "tooltip=Only show detuning relative to the original pitch"

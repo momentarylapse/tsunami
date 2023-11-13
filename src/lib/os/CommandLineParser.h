@@ -49,6 +49,7 @@ public:
 	void info(const string &p, const string &i);
 	string _info;
 	string _program;
+	bool error = false;
 
 	void show();
 	//Array<string> arg;

@@ -145,10 +145,13 @@ void CommandLineParser::parse(const Array<string> &_arg) {
 		auto arg2 = parse_options(arg);
 		if (parse_commands(arg2))
 			return;
-		if (arg2.num > 0)
+		if (arg2.num > 0) {
 			msg_error("unhandled command");
+			error = true;
+		}
 		show();
 	} catch (Exception &e) {
+		error = true;
 		msg_error(e.message());
 	}
 /*

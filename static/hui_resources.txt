@@ -1176,7 +1176,7 @@ hz
 0
 DrawingArea
 detune_area
-expandx,expandy
+mainwindowcontrol,expandx,expandy
 1
 0
 0

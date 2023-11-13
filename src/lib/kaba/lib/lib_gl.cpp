@@ -452,8 +452,8 @@ void SIAddPackageGl(Context *c) {
 	// culling
 	add_class(TypeCullMode);
 		class_add_enum("NONE", TypeCullMode, gl_p(nix::CullMode::NONE));
-		class_add_enum("CW",   TypeCullMode, gl_p(nix::CullMode::CW));
-		class_add_enum("CCW",  TypeCullMode, gl_p(nix::CullMode::CCW));
+		class_add_enum("BACK",   TypeCullMode, gl_p(nix::CullMode::BACK));
+		class_add_enum("FRONT",  TypeCullMode, gl_p(nix::CullMode::FRONT));
 
 
 	lib_create_list<shared<nix::Texture>>(TypeTextureSharedNNList);

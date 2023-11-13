@@ -43,6 +43,8 @@ public:
 
 	int get_pos(int delta) const;
 	void set_pos(int pos);
+	int64 get_samples_produced() const;
+	int map_to_pos(int64 samples_played) const;
 
 	void _cdecl render(const Range &range, AudioBuffer &buf);
 	void _cdecl allow_layers(const base::set<const TrackLayer*> &allowed_layers);
@@ -65,11 +67,13 @@ private:
 	void update_tracks();
 	void _rebuild();
 	void _reset_all_synth();
+	void clear_track_data();
 
 	Song *song;
 	Range _range;
 	Range range_cur;
 	int pos;
+	int64 samples_produced;
 	int _previous_pos_delta;
 	base::set<const Track*> allowed_tracks;
 	base::set<const TrackLayer*> allowed_layers;
@@ -86,10 +90,15 @@ private:
 	shared<BarStreamer> bar_streamer;
 
 	void clear_data();
-	void build_data();
-	void _set_pos(int pos);
+	void build_data_once();
+	void _set_pos(int pos, bool reset_fx);
 
 	int channels;
+
+	struct SampleMappingOffset {
+		int64 sample_count, pos;
+	};
+	Array<SampleMappingOffset> sample_map;
 
 public:
 	shared<AudioEffect> preview_effect;

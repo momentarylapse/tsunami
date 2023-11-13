@@ -69,6 +69,7 @@ public:
 	void _cdecl set_prebuffer_size(int size);
 
 	base::optional<int64> estimate_samples_played();
+	int64 get_samples_requested() const;
 
 	base::optional<int> get_latency();
 

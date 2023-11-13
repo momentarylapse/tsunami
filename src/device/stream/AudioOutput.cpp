@@ -752,6 +752,11 @@ base::optional<int64> AudioOutput::estimate_samples_played() {
 	return base::None;
 }
 
+// requested by audio library (since last reset_state())
+int64 AudioOutput::get_samples_requested() const {
+	return samples_requested;
+}
+
 ModuleConfiguration *AudioOutput::get_config() const {
 	return (ModuleConfiguration*)&config;
 }

@@ -45,7 +45,6 @@ public:
 	bool looping();
 	void _sync_pos();
 	int _sync_counter = 0;
-	int64 _stream_offset = 0;
 	void set_pos(int pos);
 	void seek_relative(float dt);
 

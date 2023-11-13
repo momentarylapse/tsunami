@@ -76,11 +76,6 @@ void Playback::prepare(const Range &range, bool allow_loop) {
 	renderer->allow_loop = allow_loop;
 	renderer->set_range(range);
 	renderer->allow_layers(view()->get_playable_layers());
-	auto p0 = output_stream->estimate_samples_played();
-	if (p0.has_value())
-		_stream_offset = range.offset - *p0;
-	else
-		_stream_offset = range.offset;
 
 	signal_chain->command(ModuleCommand::PREPARE_START, 0);
 }
@@ -124,33 +119,31 @@ int Playback::get_pos() {
 	if (_sync_counter > 100)
 		_sync_pos();
 
-	int pos = _stream_offset;
+
+	[[maybe_unused]] auto available = output_stream->get_available();
+	[[maybe_unused]] auto requested = output_stream->get_samples_requested();
+	auto produced = renderer->get_samples_produced();
+	// (besides thread syncing...)   requested = produced - available
+
 	auto p0 = output_stream->estimate_samples_played();
-	if (p0.has_value())
-		pos += *p0;
-	if (looping() and renderer->allow_loop)
-		return loop_in_range(pos, renderer->range());
-	return pos;
+	if (p0)
+		return renderer->map_to_pos(*p0);
+	return renderer->map_to_pos(produced);
 }
 
 // crappy syncing....
 void Playback::_sync_pos() {
-	auto spos = output_stream->estimate_samples_played();
+	/*auto spos = output_stream->estimate_samples_played();
     auto lat = output_stream->get_latency();
     if (lat.has_value() and spos.has_value()) {
         int xpos = renderer->get_pos(-output_stream->get_available() - *lat);
         _stream_offset = xpos - *spos;
-    }
+    }*/
 	_sync_counter = 0;
 }
 
 void Playback::set_pos(int pos) {
 	renderer->set_pos(pos);
-	auto p0 = output_stream->estimate_samples_played();
-	if (p0.has_value())
-		_stream_offset = pos - *p0;
-	else
-		_stream_offset = pos;
 }
 
 void Playback::seek_relative(float dt) {

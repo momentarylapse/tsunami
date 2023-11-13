@@ -32,11 +32,12 @@ SongRenderer::SongRenderer(Song *s, bool _direct_mode) :
 	allow_loop = false; // are we allowed to loop (recording...)
 	loop = false; // do we want to loop (GUI)
 	pos = 0;
+	samples_produced = 0;
 	needs_rebuild = true;
 	needs_synth_reset = true;
 	_previous_pos_delta = 0;
 	if (song) {
-		build_data();
+		build_data_once();
 		set_range(song->range());
 		allow_layers(layer_set(song->layers()));
 		song->out_track_list_changed >> in_track_list_changed;
@@ -107,6 +108,7 @@ void SongRenderer::read_basic(AudioBuffer &buf) {
 	render_song_no_fx(buf);
 
 	pos += buf.length;
+	samples_produced += buf.length;
 }
 
 int SongRenderer::read(AudioBuffer &buf) {
@@ -120,6 +122,8 @@ int SongRenderer::read(AudioBuffer &buf) {
 	if (needs_synth_reset)
 		_reset_all_synth();
 
+	buf.offset = pos;
+
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
 		return Port::END_OF_STREAM;
@@ -129,14 +133,14 @@ int SongRenderer::read(AudioBuffer &buf) {
 	// in case, the metronome track is muted
 	bar_streamer->set_pos(pos);
 
-	buf.offset = pos;
+	auto r = buf.ref(0, size);
+	read_basic(r);
 
-	read_basic(buf);
-
+	// loop back?
 	if ((pos >= _range.end()) and allow_loop and loop) {
-		reset_state();
+		clear_track_data();
 		_previous_pos_delta = _range.length;
-		_set_pos(_range.offset);
+		_set_pos(_range.offset, false);
 	}
 	return size;
 }
@@ -195,8 +199,6 @@ void SongRenderer::_rebuild() {
 	for (auto *l: allowed_layers)
 		allowed_tracks.add(l->track);
 
-	_set_pos(pos);
-
 	needs_rebuild = false;
 }
 
@@ -208,8 +210,7 @@ void SongRenderer::clear_data() {
 	allowed_layers.clear();
 }
 
-
-void SongRenderer::reset_state() {
+void SongRenderer::clear_track_data() {
 	if (!song)
 		return;
 	if (preview_effect)
@@ -219,14 +220,20 @@ void SongRenderer::reset_state() {
 		t->reset_state();
 }
 
-void SongRenderer::build_data() {
+
+void SongRenderer::reset_state() {
+	samples_produced = 0;
+	clear_track_data();
+}
+
+void SongRenderer::build_data_once() {
 	bar_streamer = new BarStreamer(song->bars);
 	bar_streamer->perf_set_parent(this);
 
 	for (Track *t: weak(song->tracks))
 		tracks.add(new TrackRenderer(t, this));
 
-	_set_pos(0);
+	_set_pos(0, false);
 }
 
 int SongRenderer::get_num_samples() const {
@@ -236,15 +243,18 @@ int SongRenderer::get_num_samples() const {
 }
 
 void SongRenderer::set_pos(int _pos) {
-	pos = _pos;
-	needs_rebuild = true;
-	needs_synth_reset = true;
+	_set_pos(_pos, true);
 }
 
-void SongRenderer::_set_pos(int _pos) {
+void SongRenderer::_set_pos(int _pos, bool reset_fx) {
 	pos = _pos;
+	sample_map.add({samples_produced, pos});
+	while (sample_map.num > 16)
+		sample_map.erase(0);
 	for (auto &tr: tracks)
 		tr->set_pos(pos);
+	needs_rebuild = true;
+	needs_synth_reset = true;
 }
 
 // delta (negative): how much is rendered but not played yet (= available in buffer)?
@@ -254,6 +264,18 @@ int SongRenderer::get_pos(int delta) const {
 	if (p < r.offset)
 		p += _previous_pos_delta;
 	return p;//loopi(pos + delta, r.start(), r.end());
+}
+
+
+int64 SongRenderer::get_samples_produced() const {
+	return samples_produced;
+}
+
+int SongRenderer::map_to_pos(int64 samples_played) const {
+	for (int i=sample_map.num-1; i>=0; i--)
+		if (samples_played >= sample_map[i].sample_count)
+			return sample_map[i].pos + (samples_played - sample_map[i].sample_count);
+	return samples_played;
 }
 
 void SongRenderer::on_song_finished_loading() {

@@ -41,7 +41,7 @@ public:
 	// from AudioSource
 	int read(AudioBuffer &buf) override;
 
-	int get_pos(int delta) const;
+	int get_pos() const;
 	void set_pos(int pos);
 	int64 get_samples_produced() const;
 	int map_to_pos(int64 samples_played) const;

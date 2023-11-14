@@ -257,13 +257,8 @@ void SongRenderer::_set_pos(int _pos, bool reset_fx) {
 	needs_synth_reset = true;
 }
 
-// delta (negative): how much is rendered but not played yet (= available in buffer)?
-int SongRenderer::get_pos(int delta) const {
-	Range r = range();
-	int p = pos + delta;
-	if (p < r.offset)
-		p += _previous_pos_delta;
-	return p;//loopi(pos + delta, r.start(), r.end());
+int SongRenderer::get_pos() const {
+	return pos;
 }
 
 

@@ -621,7 +621,7 @@ class SongRenderer extends AudioSource
 	func extern override mut read(out b: AudioBuffer) -> int
 	#extern override void reset_state()
 	func extern range() -> Range
-	func extern get_pos(delta: int) -> int
+	func extern get_pos() -> int
 	func extern mut set_pos(pos: int)
 	func extern selfref get_beat_source() -> BeatSource*
 

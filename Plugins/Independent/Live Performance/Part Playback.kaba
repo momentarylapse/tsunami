@@ -66,7 +66,7 @@ class Looper extends TsunamiPlugin
 		mode = Mode.FORWARD
 	
 	func mut on_update()
-		var pos = renderer.get_pos(0)
+		let pos = renderer.get_pos()
 		var p = get_part(song, pos)
 		if p != cur_part
 			for cp in cur_part

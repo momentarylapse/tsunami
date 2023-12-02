@@ -1,0 +1,35 @@
+Dialog audio-scale-dialog "Scale audio" width=250 height=80 headerbar closebutton=no
+	Grid ? "" vertical
+		Group g-scale "Length"
+			Grid ? "" vertical
+				Grid ? ""
+					.
+					Label t-samples "Samples"
+					Label t-factor "Factor %"
+					---|
+					Label t-original "Original"
+					SpinButton samples-original "1" range=1: expandx disabled
+					---|
+					Label t-new "New"
+					SpinButton samples-new "1" range=1: expandx
+					SpinButton factor "0" range=0:1000:0.01 expandx
+				Grid ? ""
+					Label t-method "Method"
+					ComboBox method "Linear\\Cubic\\Sinc\\Fourier" expandx
+		Group g-pitch "Pitch"
+			Grid ? "" vertical
+				RadioButton pitch-mode:constant "Keep constant"
+				RadioButton pitch-mode:natural "Scale naturally with length"
+				RadioButton pitch-mode:arbitrary "Arbitrary shift"
+				Grid ? ""
+					Label ? "" width=40
+					SpinButton pitch-shift "" range=0:1000:0.01
+					Label /percent "%"
+					---|
+					.
+					SpinButton pitch-shift-semitones "" range=-100:100:0.01
+					Label t-semi-tones "semi tones"
+		Grid ? "" buttonbar
+			Button /cancel "Cancel" image=hui:cancel
+			---|
+			Button /ok "Ok" default image=hui:ok

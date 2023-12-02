@@ -29,6 +29,7 @@ Dialog audio-editor "Audio" width=300 height=516
 				Button action-effect "Apply effect..." expandx
 				---|
 				Button action-volume "Change volume..."
+				Button action-scale "Change speed/pitch..."
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

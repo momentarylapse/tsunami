@@ -529,6 +529,7 @@
     <ClCompile Include="src\view\bottombar\PluginConsole.cpp" />
     <ClCompile Include="src\view\bottombar\SessionConsole.cpp" />
     <ClCompile Include="src\view\bottombar\SignalEditor.cpp" />
+    <ClCompile Include="src\view\dialog\AudioScaleDialog.cpp" />
     <ClCompile Include="src\view\dialog\BarAddDialog.cpp" />
     <ClCompile Include="src\view\dialog\BarDeleteDialog.cpp" />
     <ClCompile Include="src\view\dialog\BarEditSpeedDialog.cpp" />
@@ -1012,6 +1013,7 @@
     <ClInclude Include="src\view\bottombar\PluginConsole.h" />
     <ClInclude Include="src\view\bottombar\SessionConsole.h" />
     <ClInclude Include="src\view\bottombar\SignalEditor.h" />
+    <ClInclude Include="src\view\dialog\AudioScaleDialog.h" />
     <ClInclude Include="src\view\dialog\BarAddDialog.h" />
     <ClInclude Include="src\view\dialog\BarDeleteDialog.h" />
     <ClInclude Include="src\view\dialog\BarEditSpeedDialog.h" />

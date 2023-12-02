@@ -518,6 +518,7 @@ sources = [
 	'src/view/bottombar/PluginConsole.cpp',
 	'src/view/bottombar/SessionConsole.cpp',
 	'src/view/bottombar/SignalEditor.cpp',
+	'src/view/dialog/AudioScaleDialog.cpp',
 	'src/view/dialog/BarAddDialog.cpp',
 	'src/view/dialog/BarDeleteDialog.cpp',
 	'src/view/dialog/BarEditSpeedDialog.cpp',

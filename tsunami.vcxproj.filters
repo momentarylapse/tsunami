@@ -1240,6 +1240,9 @@
     <ClCompile Include="src\view\bottombar\SignalEditor.cpp">
       <Filter>src\view\bottombar</Filter>
     </ClCompile>
+    <ClCompile Include="src\view\dialog\AudioScaleDialog.cpp">
+      <Filter>src\view\dialog</Filter>
+    </ClCompile>
     <ClCompile Include="src\view\dialog\BarAddDialog.cpp">
       <Filter>src\view\dialog</Filter>
     </ClCompile>
@@ -2684,6 +2687,9 @@
     </ClInclude>
     <ClInclude Include="src\view\bottombar\SignalEditor.h">
       <Filter>src\view\bottombar</Filter>
+    </ClInclude>
+    <ClInclude Include="src\view\dialog\AudioScaleDialog.h">
+      <Filter>src\view\dialog</Filter>
     </ClInclude>
     <ClInclude Include="src\view\dialog\BarAddDialog.h">
       <Filter>src\view\dialog</Filter>

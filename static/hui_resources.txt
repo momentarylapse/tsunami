@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-86
+87
 # Resource
 Menu
 menu_fake
@@ -176,7 +176,7 @@ Grid
 
 0
 0
-3
+4
 Button
 action-source
 expandx
@@ -193,6 +193,12 @@ Button
 action-volume
 
 0
+1
+0
+Button
+action-scale
+
+1
 1
 0
 Label
@@ -266,6 +272,181 @@ edit-track-curves
 link,ignorefocus
 8
 0
+0
+# Resource
+Dialog
+audio-scale-dialog
+width=250,height=80,headerbar,closebutton=no
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+3
+Group
+g-scale
+
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+?
+
+0
+0
+7
+Label
+t-samples
+
+1
+0
+0
+Label
+t-factor
+
+2
+0
+0
+Label
+t-original
+
+0
+1
+0
+SpinButton
+samples-original
+range=1:,expandx,disabled
+1
+1
+0
+Label
+t-new
+
+0
+2
+0
+SpinButton
+samples-new
+range=1:,expandx
+1
+2
+0
+SpinButton
+factor
+range=0:1000:0.01,expandx
+2
+2
+0
+Grid
+?
+
+1
+0
+2
+Label
+t-method
+
+0
+0
+0
+ComboBox
+method
+expandx
+1
+0
+0
+Group
+g-pitch
+
+1
+0
+1
+Grid
+?
+vertical
+0
+0
+4
+RadioButton
+pitch-mode:constant
+
+0
+0
+0
+RadioButton
+pitch-mode:natural
+
+1
+0
+0
+RadioButton
+pitch-mode:arbitrary
+
+2
+0
+0
+Grid
+?
+
+3
+0
+5
+Label
+?
+width=40
+0
+0
+0
+SpinButton
+pitch-shift
+range=0:1000:0.01
+1
+0
+0
+Label
+percent
+
+2
+0
+0
+SpinButton
+pitch-shift-semitones
+range=-100:100:0.01
+1
+1
+0
+Label
+t-semi-tones
+
+2
+1
+0
+Grid
+?
+buttonbar
+2
+0
+2
+Button
+cancel
+image=hui:cancel
+0
+0
+0
+Button
+ok
+default,image=hui:ok
+0
+1
 0
 # Resource
 Dialog
@@ -9032,7 +9213,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-785
+802
 # Text
 /bars-add
 Add bars...
@@ -9370,6 +9551,9 @@ Undo
 audio-editor/action-effect
 Apply effect...
 
+audio-editor/action-scale
+Change speed/pitch...
+
 audio-editor/action-source
 Fill from source...
 
@@ -9420,6 +9604,54 @@ Apply
 
 audio-editor/stretch-clear
 Clear
+
+audio-scale-dialog/audio-scale-dialog
+Scale audio
+
+audio-scale-dialog/factor
+0
+
+audio-scale-dialog/g-pitch
+Pitch
+
+audio-scale-dialog/g-scale
+Length
+
+audio-scale-dialog/method
+Linear\\Cubic\\Sinc\\Fourier
+
+audio-scale-dialog/pitch-mode:arbitrary
+Arbitrary shift
+
+audio-scale-dialog/pitch-mode:constant
+Keep constant
+
+audio-scale-dialog/pitch-mode:natural
+Scale naturally with length
+
+audio-scale-dialog/samples-new
+1
+
+audio-scale-dialog/samples-original
+1
+
+audio-scale-dialog/t-factor
+Factor %
+
+audio-scale-dialog/t-method
+Method
+
+audio-scale-dialog/t-new
+New
+
+audio-scale-dialog/t-original
+Original
+
+audio-scale-dialog/t-samples
+Samples
+
+audio-scale-dialog/t-semi-tones
+semi tones
 
 bar-edit-speed-dialog/bar-edit-speed-dialog
 Edit speed

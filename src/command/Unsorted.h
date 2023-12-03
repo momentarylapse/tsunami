@@ -29,6 +29,10 @@ namespace hui {
 	class Window;
 }
 
+namespace BufferInterpolator {
+	enum class Method;
+}
+
 Array<Track*> selected_tracks_sorted(AudioView *view);
 
 void song_compress_buffers(Song *song, const SongSelection &sel, const string &codec);
@@ -52,6 +56,8 @@ int song_apply_audio_effect(Song *song, AudioEffect *fx, const SongSelection &se
 int song_apply_audio_source(Song *song, AudioSource *s, const SongSelection &sel, hui::Window *win);
 int song_apply_midi_effect(Song *song, MidiEffect *fx, const SongSelection &sel, hui::Window *win);
 int song_apply_midi_source(Song *song, MidiSource *s, const SongSelection &sel, hui::Window *win);
+
+int song_audio_scale_pitch_shift(Song *song, int new_size, BufferInterpolator::Method method, float pitch_factor, const SongSelection &sel, hui::Window *win);
 
 void song_delete_shift(Song *song, const SongSelection &sel);
 

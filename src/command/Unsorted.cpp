@@ -13,6 +13,7 @@
 #include "../storage/Storage.h"
 #include "../view/helper/Progress.h"
 #include "../action/song/ActionSongMoveSelection.h"
+#include "../processing/audio/BufferPitchShift.h"
 #include "../Session.h"
 
 
@@ -332,4 +333,31 @@ void song_delete_shift(Song *song, const SongSelection &sel) {
 	a->set_param_and_notify(song, -sel.range().length);
 	song->execute(a);
 	song->end_action_group();
+}
+
+void layer_audio_scale_pitch_shift(TrackLayer *l, const Range &r, int new_size, BufferInterpolator::Method scaling_method, float pitch_factor, hui::Window *win) {
+	auto p = ownify(new Progress(_("applying scale/pitch"), win));
+
+	auto r_affected = Range(r.offset, max(r.length, new_size));
+
+	AudioBuffer buf;
+	auto *a = l->edit_buffers(buf, r_affected);
+
+	auto buf_edited = BufferPitchShift::scale_and_pitch_shift(buf.ref(0, r.length), new_size, scaling_method, pitch_factor);
+	buf.set(buf_edited, 0, 1.0f);
+
+	l->edit_buffers_finish(a);
+}
+
+int song_audio_scale_pitch_shift(Song *song, int new_size, BufferInterpolator::Method scaling_method, float pitch_factor, const SongSelection &sel, hui::Window *win) {
+	int n_layers = 0;
+	song->begin_action_group(_("audio scale/pitch"));
+	for (Track *t: weak(song->tracks))
+		for (auto *l: weak(t->layers))
+			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+				layer_audio_scale_pitch_shift(l, sel.range(), new_size, scaling_method, pitch_factor, win);
+				n_layers ++;
+			}
+	song->end_action_group();
+	return n_layers;
 }

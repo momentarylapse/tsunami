@@ -177,7 +177,7 @@ bool AudioBuffer::is_ref() const
 void fa_make_own(Array<float> &a) {
 	void *data = a.data;
 	int num = a.num;
-	a.clear();
+	a.forget();
 	a.resize(num);
 	memcpy(a.data, data, a.element_size * num);
 }
@@ -365,7 +365,6 @@ void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length
 		c[i].set_ref(source.c[i].sub_ref(_offset, _offset+_length));
 }
 
-
 AudioBuffer AudioBuffer::ref(int start, int end) {
 	if (end == DynamicArray::MAGIC_END_INDEX)
 		end = length;
@@ -378,6 +377,10 @@ AudioBuffer AudioBuffer::ref(int start, int end) {
 		end = length;
 	r.set_as_ref(*this, start, end - start);
 	return r;
+}
+
+AudioBuffer AudioBuffer::cref(int start, int end) const {
+	return const_cast<AudioBuffer*>(this)->ref(start, end);
 }
 
 inline int invert_16(int i) {

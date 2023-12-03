@@ -4,6 +4,7 @@
 #include "../mode/ViewModeEditAudio.h"
 #include "../dialog/VolumeDialog.h"
 #include "../dialog/ModuleSelectorDialog.h"
+#include "../dialog/AudioScaleDialog.h"
 #include "../TsunamiWindow.h"
 #include "../../command/Unsorted.h"
 #include "../../module/Module.h"
@@ -54,6 +55,9 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	event("action-volume", [this] {
 		on_action_volume();
 	});
+	event("action-scale", [this] {
+		on_action_scale();
+	});
 }
 
 void AudioEditorConsole::on_enter() {
@@ -100,7 +104,12 @@ void AudioEditorConsole::on_action_volume() {
 	VolumeDialog::ask(win, 1, 0, 8).then([this] (float f) {
 		song_apply_volume(session->song.get(), f, VolumeDialog::maximize, session->view->sel, win);
 	});
+}
 
+void AudioEditorConsole::on_action_scale() {
+	AudioScaleDialog::ask(win, session->view->sel.range().length).then([this] (const auto& data) {
+		song_audio_scale_pitch_shift(session->song.get(), data.new_size, data.method, data.pitch_scale, session->view->sel, win);
+	});
 }
 
 void AudioEditorConsole::clear() {

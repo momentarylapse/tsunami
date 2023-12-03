@@ -13,7 +13,7 @@ class AudioBuffer;
 
 namespace BufferInterpolator {
 
-enum class Method{
+enum class Method {
 	LINEAR,
 	CUBIC,
 	SINC,
@@ -22,12 +22,12 @@ enum class Method{
 
 double cubic_inter(double A, double B, double C, double D, float t);
 
-void interpolate_channel_linear(Array<float> &in, Array<float> &out);
-void interpolate_channel_cubic(Array<float> &in, Array<float> &out);
-void interpolate_channel_fourier(Array<float> &in, Array<float> &out);
+void interpolate_channel_linear(const Array<float> &in, Array<float> &out);
+void interpolate_channel_cubic(const Array<float> &in, Array<float> &out);
+void interpolate_channel_fourier(const Array<float> &in, Array<float> &out);
 
-void interpolate_channel(Array<float> &in, Array<float> &out, Method method);
-void interpolate(AudioBuffer &in, AudioBuffer &out, Method method);
+void interpolate_channel(const Array<float> &in, Array<float> &out, Method method);
+void interpolate(const AudioBuffer &in, AudioBuffer &out, Method method);
 
 }
 

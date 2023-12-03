@@ -12,7 +12,7 @@
 
 namespace BufferInterpolator {
 
-void interpolate_channel_linear(Array<float> &in, Array<float> &out) {
+void interpolate_channel_linear(const Array<float> &in, Array<float> &out) {
 	out[0] = in[0];
 	out.back() = in.back();
 
@@ -34,7 +34,7 @@ double cubic_inter(double A, double B, double C, double D, float t) {
 	return a*t*t*t + b*t*t + c*t + B;
 }
 
-void interpolate_channel_cubic(Array<float> &in, Array<float> &out) {
+void interpolate_channel_cubic(const Array<float> &in, Array<float> &out) {
 	if (in.num < 3) {
 		interpolate_channel_linear(in, out);
 		return;
@@ -57,7 +57,7 @@ void interpolate_channel_cubic(Array<float> &in, Array<float> &out) {
 }
 
 
-void interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
+void interpolate_channel_fourier(const Array<float> &in, Array<float> &out) {
 	Array<complex> z;
 
 	fft::r2c(in, z);
@@ -68,7 +68,7 @@ void interpolate_channel_fourier(Array<float> &in, Array<float> &out) {
 	out.resize(size);
 }
 
-void interpolate_channel(Array<float> &in, Array<float> &out, Method method) {
+void interpolate_channel(const Array<float> &in, Array<float> &out, Method method) {
 	if (method == Method::LINEAR) {
 		interpolate_channel_linear(in, out);
 	} else if (method == Method::CUBIC) {
@@ -80,7 +80,7 @@ void interpolate_channel(Array<float> &in, Array<float> &out, Method method) {
 	}
 }
 
-void interpolate(AudioBuffer &in, AudioBuffer &out, Method method) {
+void interpolate(const AudioBuffer &in, AudioBuffer &out, Method method) {
 	out.set_channels(in.channels);
 	out.offset = in.offset;
 	for (int i=0; i<in.channels; i++)

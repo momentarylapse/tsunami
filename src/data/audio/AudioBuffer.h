@@ -58,7 +58,8 @@ public:
 	void _cdecl add(const AudioBuffer &source, int offset, float volume = 1.0f);
 	void _cdecl set_as_ref(const AudioBuffer &source, int offset, int length);
 
-	AudioBuffer _cdecl ref(int start, int end);
+	AudioBuffer ref(int start, int end);
+	AudioBuffer cref(int start, int end) const;
 
 	void _cdecl import(void *data, int channels, SampleFormat format, int samples);
 	bool _cdecl _export(void *data, int channels, SampleFormat format, bool align32) const;

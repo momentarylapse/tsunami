@@ -11,9 +11,15 @@
 #include "../../lib/base/base.h"
 class AudioBuffer;
 
+namespace BufferInterpolator {
+	enum class Method;
+}
+
 namespace BufferPitchShift {
 
 void pitch_shift(AudioBuffer &buf, float factor);
+
+AudioBuffer scale_and_pitch_shift(const AudioBuffer &buf, int new_size, BufferInterpolator::Method scaling_method, float pitch_factor);
 
 }
 

@@ -54,7 +54,7 @@ void AudioScaleDialog::update() {
 		enable("pitch-shift", false);
 		enable("pitch-shift-semitones", false);
 	} else if (is_checked("pitch-mode:natural")) {
-		set_pitch(factor);
+		set_pitch(1.0f / factor);
 		enable("pitch-shift", false);
 		enable("pitch-shift-semitones", false);
 	} else {

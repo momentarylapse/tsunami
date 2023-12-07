@@ -81,6 +81,8 @@ void apply_fade_out(AudioBuffer &buf) {
 
 AudioBuffer dummy_stretch_equal_pitch(const AudioBuffer &buf, int new_size) {
 	int CHUNK_SIZE = 1024;
+	if (buf.length > 4096 and new_size > 4096)
+		CHUNK_SIZE = 2048;
 	AudioBuffer buf_out(new_size, buf.channels);
 	for (int i0=0; i0<new_size; i0+=CHUNK_SIZE) {
 		int j0 = (int)((float)i0 * (float)buf.length / (float)new_size);
@@ -102,12 +104,12 @@ AudioBuffer dummy_stretch_equal_pitch(const AudioBuffer &buf, int new_size) {
 
 
 AudioBuffer scale_and_pitch_shift(const AudioBuffer &buf, int new_size, BufferInterpolator::Method scaling_method, float pitch_factor) {
-	const float natural_pitch_factor = (float)new_size / (float)buf.length;
+	const float natural_pitch_factor = (float)buf.length / (float)new_size;
 	const float EPSILON = 0.0001f;
 
 	AudioBuffer buf_out(new_size, buf.channels);
 	if (std::abs(pitch_factor - natural_pitch_factor) > EPSILON) {
-		auto buf_pitched = dummy_stretch_equal_pitch(buf, buf.length * pitch_factor);
+		auto buf_pitched = dummy_stretch_equal_pitch(buf, (int)((float)buf.length * (pitch_factor / natural_pitch_factor)));
 		BufferInterpolator::interpolate(buf_pitched, buf_out, scaling_method);
 	} else {
 		BufferInterpolator::interpolate(buf, buf_out, scaling_method);

@@ -106,6 +106,10 @@ enum {
 	MENU_ITEM_SEPARATOR,
 };
 
+#ifdef HUGE
+#undef HUGE
+#endif
+
 enum IconSize {
 	SMALL,
 	REGULAR,

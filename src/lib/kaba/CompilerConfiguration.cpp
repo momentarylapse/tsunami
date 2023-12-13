@@ -29,8 +29,9 @@ Asm::InstructionSet extract_instruction_set(Abi abi) {
 		return Asm::InstructionSet::ARM32;
 	if (abi == Abi::ARM64_GNU)
 		return Asm::InstructionSet::ARM64;
-	//if (abi == Abi::NATIVE)
-	return Asm::InstructionSet::NATIVE;
+	if (abi == Abi::NATIVE)
+		return Asm::InstructionSet::NATIVE;
+	return Asm::InstructionSet::UNKNOWN;
 }
 
 Abi guess_native_abi() {
@@ -98,7 +99,6 @@ CompilerConfiguration::Target CompilerConfiguration::Target::get_for_abi(Abi abi
 	t.stack_mem_align = 8;
 	t.function_align = 2 * t.pointer_size;
 	t.stack_frame_align = 2 * t.pointer_size;
-
 	return t;
 }
 

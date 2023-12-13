@@ -7,6 +7,7 @@ namespace Asm
 
 // instruction sets
 enum class InstructionSet {
+	UNKNOWN = -2,
 	NATIVE = -1,
 	X86,
 	AMD64,

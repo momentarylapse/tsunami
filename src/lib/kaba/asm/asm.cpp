@@ -736,8 +736,7 @@ InstructionSet guess_native_instruction_set() {
 #ifdef CPU_ARM32
 	return InstructionSet::ARM;
 #endif
-	msg_error("Asm: unknown instruction set");
-	return InstructionSet::X86;
+	return InstructionSet::UNKNOWN;
 }
 
 
@@ -751,20 +750,23 @@ void init(InstructionSet set) {
 	if ((set == InstructionSet::AMD64) || (set == InstructionSet::ARM64))
 		instruction_set.pointer_size = 8;
 
-	for (int i=0;i<(int)RegRoot::COUNT;i++)
-		for (int j=0;j<=MAX_REG_SIZE;j++)
+	for (int i=0; i<(int)RegRoot::COUNT; i++)
+		for (int j=0; j<=MAX_REG_SIZE; j++)
 			reg_from_root[i][j] = RegID::INVALID;
 
 
 	// self check
-	for (int i=0;i<(int)InstID::NUM_INSTRUCTION_NAMES;i++)
+	for (int i=0; i<(int)InstID::NUM_INSTRUCTION_NAMES; i++)
 		if (instruction_names[i].inst != (InstID)i)
-			msg_error(string(instruction_names[i].name) + "  " + i2s((int)instruction_names[i].inst) + "  !=   " + i2s(i));
+			msg_error(format("%s  %d  !=  %d", instruction_names[i].name, (int)instruction_names[i].inst, i));
 
 	if ((set == InstructionSet::ARM32) || (set == InstructionSet::ARM64))
 		arm_init();
-	else
+	else if ((set == InstructionSet::X86) || (set == InstructionSet::AMD64))
 		x86_init();
+
+	if (set == InstructionSet::UNKNOWN)
+		msg_error("kaba/asm: unsupported CPU instruction set");
 }
 
 InstructionParam::InstructionParam() {

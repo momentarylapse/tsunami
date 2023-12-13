@@ -78,6 +78,10 @@ namespace hui {
 PluginManager::PluginManager() {
 	presets = new PresetManager;
 
+	kaba::init();
+	kaba::config.show_compiler_stats = false;
+	kaba::config.compile_silently = true;
+
 	find_plugins();
 
 	package = kaba::default_context->create_empty_module("<tsunami-internal>");
@@ -953,9 +957,6 @@ void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const stri
 }
 
 void PluginManager::find_plugins() {
-	kaba::init();
-	kaba::config.show_compiler_stats = false;
-	kaba::config.compile_silently = true;
 
 	// "AudioSource"
 	find_plugins_in_dir("AudioSource", "", ModuleCategory::AUDIO_SOURCE);

@@ -16,8 +16,13 @@
 	#define OS_WINDOWS
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 	#define OS_MINGW
-#else
+#elif defined(__APPLE__)
+	#define OS_MAC
+#elif defined(__linux__)
 	#define OS_LINUX
+#else
+	#define OS_UNKNOWN
+	#warning "failed to determine your operating system"
 #endif
 
 
@@ -40,8 +45,15 @@
 	#define CPU_ARM32
 #elif defined(__amd64__) || defined(__x86_64__) || defined(_M_AMD64) || defined(_M_X64)
 	#define CPU_AMD64
-#else // _M_IX86
+#elif defined(_M_IX86)
 	#define CPU_X86
+#elif defined(__powerpc) || defined(__powerpc__) || defined(__POWERPC__) || defined(__ppc__) || defined(__PPC__) || defined(_ARCH_PPC)
+	#define CPU_POWERPC
+#elif defined(__PPC64__) || defined(__ppc64__) || defined(_ARCH_PPC64) || defined(__powerpc64__)
+	#define CPU_POWERPC64
+#else
+	#define CPU_UNKNOWN
+	#warning "CPU architecture unknown"
 #endif
 
 

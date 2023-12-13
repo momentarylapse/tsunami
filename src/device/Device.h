@@ -14,7 +14,8 @@ enum class DeviceType {
 	AUDIO_OUTPUT,
 	AUDIO_INPUT,
 	MIDI_OUTPUT,
-	MIDI_INPUT
+	MIDI_INPUT,
+	NONE = -1
 };
 
 class Device {

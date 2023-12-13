@@ -344,6 +344,8 @@ void AudioInput::_pause() {
 void AudioInput::_create_dev() {
 	if (state != State::NO_DEVICE)
 		return;
+	if (!session->device_manager->audio_api_initialized())
+		return;
 
 	session->debug("input", "create device");
 

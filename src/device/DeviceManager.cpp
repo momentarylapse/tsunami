@@ -191,7 +191,7 @@ DeviceManager::DeviceManager(Session *_session) {
 	alsa_midi_handle = nullptr;
 #endif
 
-	dummy_device = new Device((DeviceType)-1, "dummy");
+	dummy_device = new Device(DeviceType::NONE, "dummy");
 
 	msg_index = -1;
 	msg_type = DeviceType::AUDIO_INPUT;
@@ -218,7 +218,8 @@ void DeviceManager::lock() {
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE) {
 		//printf("-lock...\n");
-		pa_threaded_mainloop_lock(pulse_mainloop);
+		if (pulse_mainloop)
+			pa_threaded_mainloop_lock(pulse_mainloop);
 		//printf("...ok-\n");
 	}
 #endif
@@ -228,14 +229,27 @@ void DeviceManager::unlock() {
 #if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE) {
 		//printf("-unlock...\n");
-		pa_threaded_mainloop_unlock(pulse_mainloop);
+		if (pulse_mainloop)
+			pa_threaded_mainloop_unlock(pulse_mainloop);
 		//printf("...ok-\n");
 	}
 #endif
 }
 
+bool DeviceManager::audio_api_initialized() const {
+#if HAS_LIB_PULSEAUDIO
+	if (audio_api == ApiType::PULSE)
+		return pulse_fully_initialized;
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (audio_api == ApiType::PORTAUDIO)
+		return portaudio_fully_initialized;
+#endif
+	return false;
+}
+
 void DeviceManager::remove_device(DeviceType type, int index) {
-	Array<Device*> &devices = device_list(type);
+	auto &devices = device_list(type);
 	if ((index < 0) or (index >= devices.num))
 		return;
 	if (devices[index]->present)
@@ -279,8 +293,9 @@ void DeviceManager::update_devices(bool serious) {
 
 
 void DeviceManager::_update_devices_audio_pulse() {
-
 #if HAS_LIB_PULSEAUDIO
+	if (!pulse_fully_initialized)
+		return;
 
 	for (Device *d: output_devices)
 		d->present = false;
@@ -341,6 +356,8 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 
 void DeviceManager::_update_devices_audio_portaudio() {
 #if HAS_LIB_PORTAUDIO
+	if (!pulse_fully_initialized)
+		return;
 	for (Device *d: output_devices)
 		d->present = false;
 	for (Device *d: input_devices)
@@ -444,15 +461,17 @@ void DeviceManager::init() {
 	//output_volume = hui::Config.get_float("Output.Volume", 1.0f);
 
 	// audio
-	if (audio_api == ApiType::PULSE)
-		_init_audio_pulse();
-	else if (audio_api == ApiType::PORTAUDIO)
-		_init_audio_portaudio();
+	if (audio_api == ApiType::PULSE) {
+		pulse_fully_initialized = _init_audio_pulse();
+	} else if (audio_api == ApiType::PORTAUDIO) {
+		portaudio_fully_initialized = _init_audio_portaudio();
+	}
 
 
 	// midi
-	if (midi_api == ApiType::ALSA)
+	if (midi_api == ApiType::ALSA) {
 		_init_midi_alsa();
+	}
 
 	update_devices(true);
 
@@ -464,24 +483,23 @@ void DeviceManager::init() {
 	initialized = true;
 }
 
-void DeviceManager::_init_audio_pulse() {
-
+bool DeviceManager::_init_audio_pulse() {
 #if HAS_LIB_PULSEAUDIO
 	pulse_mainloop = pa_threaded_mainloop_new();
 	if (!pulse_mainloop) {
 		session->e("pa_threaded_mainloop_new failed");
-		return;
+		return false;
 	}
 
 	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(pulse_mainloop);
-	if (!pulse_mainloop) {
+	if (!mainloop_api) {
 		session->e("pa_threaded_mainloop_get_api failed");
-		return;
+		return false;
 	}
 
 	pulse_context = pa_context_new(mainloop_api, "tsunami");
 	if (_pulse_test_error(session, "pa_context_new"))
-		return;
+		return false;
 
 	pa_context_set_state_callback(pulse_context, &pulse_state_callback, this);
 
@@ -490,19 +508,19 @@ void DeviceManager::_init_audio_pulse() {
 	pa_threaded_mainloop_start(pulse_mainloop);
 	if (_pulse_test_error(session, "pa_threaded_mainloop_start")) {
 		unlock();
-		return;
+		return false;
 	}
 
 	pa_context_connect(pulse_context, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
 	if (_pulse_test_error(session, "pa_context_connect")) {
 		unlock();
-		return;
+		return false;
 	}
 
 	if (!pulse_wait_context_ready()) {
 		session->e("pulse audio context does not turn 'ready'");
 		unlock();
-		return;
+		return false;
 	}
 
 	pa_context_set_subscribe_callback(pulse_context, &pulse_subscription_callback, this);
@@ -511,29 +529,38 @@ void DeviceManager::_init_audio_pulse() {
 	_pulse_test_error(session, "pa_context_subscribe");
 	
 	unlock();
+	return true;
+#else
+	return false;
 #endif
 }
 
-void DeviceManager::_init_audio_portaudio() {
-
+bool DeviceManager::_init_audio_portaudio() {
 #if HAS_LIB_PORTAUDIO
 	PaError err = Pa_Initialize();
 	_portaudio_test_error(err, session, "Pa_Initialize");
+	if (err != paNoError)
+		return false;
 
 	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
+	return true;
+#else
+	return false;
 #endif
 }
 
-void DeviceManager::_init_midi_alsa() {
-
+bool DeviceManager::_init_midi_alsa() {
 #if HAS_LIB_ALSA
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0) {
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
-		return;
+		return false;
 	}
 
 	snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
+	return true;
+#else
+	return false;
 #endif
 }
 
@@ -543,24 +570,30 @@ void DeviceManager::kill_library() {
 
 	// audio
 #if HAS_LIB_PULSEAUDIO
-	if (audio_api == ApiType::PULSE and pulse_context) {
+	if (audio_api == ApiType::PULSE) {
+		pulse_fully_initialized = false;
 		
-		pa_threaded_mainloop_stop(pulse_mainloop);
+		if (pulse_mainloop)
+			pa_threaded_mainloop_stop(pulse_mainloop);
 		//_pulse_test_error(session, "pa_threaded_mainloop_stop");
 		
-		pa_context_disconnect(pulse_context);
+		if (pulse_context)
+			pa_context_disconnect(pulse_context);
 		//_pulse_test_error(session, "pa_context_disconnect");
 		
-		pa_context_unref(pulse_context);
+		if (pulse_context)
+			pa_context_unref(pulse_context);
 		//_pulse_test_error(session, "pa_context_unref"); // would require a context...
 		
-		pa_threaded_mainloop_free(pulse_mainloop);
+		if (pulse_mainloop)
+			pa_threaded_mainloop_free(pulse_mainloop);
 		//_pulse_test_error(session, "pa_threaded_mainloop_free");
 	}
 #endif
 
 #if HAS_LIB_PORTAUDIO
 	if (audio_api == ApiType::PORTAUDIO) {
+		portaudio_fully_initialized = false;
 		PaError err = Pa_Terminate();
 		_portaudio_test_error(err, session, "Pa_Terminate");
 	}

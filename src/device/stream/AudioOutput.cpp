@@ -256,6 +256,8 @@ void AudioOutput::__delete__() {
 void AudioOutput::_create_dev() {
 	if (has_device())
 		return;
+	if (!device_manager->audio_api_initialized())
+		return;
 	session->debug("out", "create device");
 	dev_sample_rate = session->sample_rate();
 	device_manager->lock();

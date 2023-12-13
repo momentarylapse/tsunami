@@ -54,9 +54,9 @@ public:
 	void init();
 	void kill_library();
 
-	void _init_audio_pulse();
-	void _init_audio_portaudio();
-	void _init_midi_alsa();
+	bool _init_audio_pulse();
+	bool _init_audio_portaudio();
+	bool _init_midi_alsa();
 
 	enum class ApiType {
 		ALSA,
@@ -68,6 +68,8 @@ public:
 	ApiType audio_api;
 	ApiType midi_api;
 	
+	bool audio_api_initialized() const;
+
 	void lock();
 	void unlock();
 
@@ -96,6 +98,7 @@ public:
 #if HAS_LIB_PULSEAUDIO
 	pa_context *pulse_context;
 	pa_threaded_mainloop *pulse_mainloop;
+	bool pulse_fully_initialized = false;
 	bool _pulse_test_error(Session *session, const string &msg);
 	bool pulse_wait_context_ready();
 	static void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata);
@@ -104,6 +107,7 @@ public:
 #endif
 #if HAS_LIB_PORTAUDIO
 	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);
+	bool portaudio_fully_initialized = false;
 #endif
 
 #if HAS_LIB_ALSA

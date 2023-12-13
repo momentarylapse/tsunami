@@ -258,7 +258,6 @@ const Class *add_type_list(const Class *sub_type) {
 const Class *add_type_dict(const Class *sub_type) {
 	string name = sub_type->name + "{}";
 	Class *t = new Class(Class::Type::DICT, name, config.target.dynamic_array_size, cur_package->tree.get(), nullptr, {sub_type});
-	lib_make_dict(t);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), t, TypeDictT, {sub_type});
 	return t;

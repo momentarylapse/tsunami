@@ -140,20 +140,6 @@ public:
 	}
 };
 
-class AnyDict : public base::map<string,Any> {
-public:
-	void __delete__() {
-		this->~AnyDict();
-	}
-	void assign(AnyDict &o) {
-		*this = o;
-	}
-	Any get_item(const string &k)
-	{ KABA_EXCEPTION_WRAPPER(return (*this)[k]); return Any(); }
-	string str()
-	{ return var2str(this, TypeAnyDict); }
-};
-
 template<class T>
 Array<T> kaba_range(T start, T end, T step) {
 	if (end == DynamicArray::MAGIC_END_INDEX) {
@@ -1220,18 +1206,7 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("other", TypeAnyList);
 
 	TypeAnyDict = add_type_dict(TypeAny);
-	add_class(TypeAnyDict);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XDict<Any>::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &AnyDict::__delete__);
-		class_add_func(Identifier::Func::SET, TypeVoid, &AnyDict::set);
-			func_add_param("key", TypeString);
-			func_add_param("x", TypeAny);
-		class_add_func(Identifier::Func::GET, TypeAny, &AnyDict::get_item, Flags::RAISES_EXCEPTIONS);
-			func_add_param("key", TypeString);
-		class_add_func("clear", TypeVoid, &AnyDict::clear);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &AnyDict::assign);
-			func_add_param("other", TypeAny);
-		class_add_func(Identifier::Func::STR, TypeString, &AnyDict::str);
+	lib_create_dict<Any>(TypeAnyDict);
 
 
 	add_class(TypeAny);

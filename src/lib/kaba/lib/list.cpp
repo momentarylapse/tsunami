@@ -19,7 +19,7 @@ public:
 	}
 };
 
-void lib_make_list(Class *t, SyntaxTree *ps) {
+void lib_make_list(Class *t, SyntaxTree *__ps) {
 	const Class *p = t->param[0];
 	t->derive_from(TypeDynamicArray, DeriveFlags::SET_SIZE);
 	t->param = {p};

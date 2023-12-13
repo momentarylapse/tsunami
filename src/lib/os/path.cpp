@@ -71,10 +71,14 @@ int icomparex(const string &a, const string &b) {
 }
 
 // * compare literally!
-// * NOPE: ignore / at the end
+// * ignore / at the end
 // * NOPE: ignore recursion
 int Path::compare(const Path &p) const {
 	//return icomparex(canonical().as_dir().s, p.canonical().as_dir().s);
+	if (has_dir_ending() and !p.has_dir_ending())
+		return icomparex(s.sub_ref(0, -1), p.s);
+	if (!has_dir_ending() and p.has_dir_ending())
+		return icomparex(s, p.s.sub_ref(0, -1));
 	return icomparex(s, p.s);
 }
 

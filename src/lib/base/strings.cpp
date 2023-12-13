@@ -737,6 +737,9 @@ template<> string str(const bool& b) {
 template<> string str(const Array<string> &a) {
 	return sa2s(a);
 }
+template<> string repr(const string& s) {
+	return s.repr();
+}
 
 
 struct xf_format_data {

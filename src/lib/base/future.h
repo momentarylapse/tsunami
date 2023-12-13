@@ -21,21 +21,36 @@ template<class T>
 struct future;
 
 
+// automatic call-by-value/reference type
+// default: call-by-reference
 template<class T>
 struct xparam {
 	using t = const T&;
 };
+// explicit call-by-value
 template<>
 struct xparam<int> {
 	using t = int;
+};
+template<>
+struct xparam<int64> {
+	using t = int64;
 };
 template<>
 struct xparam<float> {
 	using t = float;
 };
 template<>
+struct xparam<double> {
+	using t = double;
+};
+template<>
 struct xparam<bool> {
 	using t = bool;
+};
+template<>
+struct xparam<char> {
+	using t = char;
 };
 template<>
 struct xparam<void> {

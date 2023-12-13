@@ -71,9 +71,18 @@ public:
 	}
 	Array<K> keys() const {
 		Array<K> keys;
-		for (int i=0; i<this->num; i++)
-			keys.add(((Entry*)data)[i].key);
+		for (auto && [k,v]: *this)
+			keys.add(k);
 		return keys;
+	}
+	string str() const {
+		string r;
+		for (auto && [k,v]: *this) {
+			if (r.num > 0)
+				r += ", ";
+			r += repr(k) + ": " + repr(v);
+		}
+		return "{" + r + "}";
 	}
 
 	struct ConstIterator {
@@ -85,10 +94,11 @@ public:
 		{	return p == i.p;	}
 		bool operator != (const ConstIterator &i) const
 		{	return p != i.p;	}
-		const std::pair<K&,V&> operator *()
+		const std::pair<const K&,const V&> operator *()
 		{	return {p->key, p->value};	}
 		ConstIterator(const map<K, V> &m, int n) {
-			p = &m.by_index(n);
+			p = &((const Entry*)m.data)[n];
+			//p = &m.by_index(n);
 			index = n;
 		}
 		int index;
@@ -113,10 +123,10 @@ public:
 		int index;
 		Entry* p;
 	};
-	Iterator begin() const {
+	ConstIterator begin() const {
 		return ConstIterator(*this, 0);
 	}
-	Iterator end() const {
+	ConstIterator end() const {
 		return ConstIterator(*this, this->num);
 	}
 	Iterator begin() {

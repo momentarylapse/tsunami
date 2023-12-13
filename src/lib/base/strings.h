@@ -195,17 +195,23 @@ template<> string str(const float& f);
 template<> string str(const double& d);
 template<> string str(const bool& b);
 
+
+template<class T>
+string repr(const T &t) {
+	return str(t);
+}
+template<> string repr(const string& s);
+
 template<class T>
 string str(const Array<T> &a) {
 	string r;
 	for (int i=0; i<a.num; i++) {
 		if (i > 0)
 			r += ", ";
-		r += str(a[i]);
+		r += repr(a[i]);
 	}
 	return "[" + r + "]";
 }
-template<> string str(const Array<string> &a);
 
 
 int _cdecl s2i(const string &s);

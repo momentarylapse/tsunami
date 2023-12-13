@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "lib.h"
 #include "list.h"
+#include "dict.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 #include "../dynamic/sorting.h"
@@ -435,6 +436,11 @@ void SIAddPackageBase(Context *c) {
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
 	TypeExceptionXfer	= add_type_p_xfer(TypeException);
+
+
+	lib_create_dict<int>(TypeIntDict);
+	lib_create_dict<float>(TypeFloatDict);
+	lib_create_dict<string>(TypeStringDict);
 
 
 	add_class(TypeCallableBase);

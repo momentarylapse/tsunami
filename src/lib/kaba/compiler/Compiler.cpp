@@ -139,10 +139,12 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 	}
 #else
 	int prot = PROT_READ | PROT_WRITE;
-	int flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_FIXED_NOREPLACE;
+	int flags = MAP_PRIVATE | MAP_ANON | MAP_FIXED_NOREPLACE;
 	if (executable) {
 		prot |= PROT_EXEC;
+#if !defined(OS_MAC)
 		flags |= MAP_EXECUTABLE;
+#endif
 	}
 #endif
 
@@ -169,6 +171,9 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 		}
 		if (i > 5000) {
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
+#elif defined(OS_MAC)
+			prot |= PROT_EXEC;
+			flags |= MAP_FIXED;
 #else
 			prot |= PROT_EXEC;
 			flags |= MAP_EXECUTABLE | MAP_FIXED;

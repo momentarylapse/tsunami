@@ -138,7 +138,7 @@ string TextLinesFormatter::read_str() {
 	while(true) {
 		char c = read_char();
 
-		#ifdef OS_LINUX
+		#if defined(OS_LINUX) || defined(OS_MAC)
 			// windows read-function does this on its own... (O_O)
 			if (c == '\r')
 				continue;

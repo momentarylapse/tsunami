@@ -6,7 +6,7 @@
 #ifdef OS_WINDOWS
 	#include <windows.h>
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	#include <pthread.h>
 	#include <unistd.h>
 #endif
@@ -18,7 +18,7 @@ struct ThreadInternal
 	ThreadInternal()
 	{	thread = nullptr;	}
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	pthread_t thread;
 	ThreadInternal()
 	{
@@ -41,7 +41,7 @@ int Thread::get_num_cores()
 	GetSystemInfo(&siSysInfo);
 	return siSysInfo.dwNumberOfProcessors;
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	return ::sysconf(_SC_NPROCESSORS_ONLN);
 #endif
 	return 1;
@@ -147,7 +147,7 @@ Thread *Thread::get_self()
 }
 
 
-#else //OS_LINUX/MINGW
+#else //OS_LINUX/MAC/MINGW
 
 [[maybe_unused]] static void __thread_cleanup_func(void *p)
 {

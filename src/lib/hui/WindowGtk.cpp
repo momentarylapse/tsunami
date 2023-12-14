@@ -12,7 +12,7 @@
 #ifdef OS_WINDOWS
 	#include <gdk/win32/gdkwin32.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 #if !GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_XLIB
 	#include <gdk/gdkx.h>

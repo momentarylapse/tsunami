@@ -6,7 +6,7 @@
 	#include <signal.h>
 	#include <windows.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#include <unistd.h>
 #endif
 

@@ -13,7 +13,7 @@
 	#include <io.h>
 	#include <direct.h>
 #endif
-#if defined (OS_LINUX) || defined(OS_MINGW)
+#if defined (OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	#include <unistd.h>
 	#include <dirent.h>
 	//#include <sys/timeb.h>
@@ -32,7 +32,7 @@
 		return c;
 	}
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	int _stricmp(const char*a,const char*b) {
 		unsigned char a_low = to_low(*a);
 		unsigned char b_low = to_low(*b);
@@ -102,7 +102,7 @@ void create_directory(const Path &dir) {
 	if (_mkdir(dir.str().c_str()) != 0)
 #elif defined(OS_MINGW)
 	if (mkdir(dir.str().c_str()) != 0)
-#else // defined(OS_LINUX)
+#else // defined(OS_LINUX) || defined(OS_MAC)
 	if (mkdir(dir.str().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 #endif
 		throw FileError(format("can not create directory '%s'", dir));
@@ -120,7 +120,7 @@ Path current_directory() {
 	static_cast<void>(_getcwd(tmp, sizeof(tmp)));
 	str = tmp;
 	str += "\\";
-#else // defined(OS_LINUX) || defined(OS_MINGW)
+#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	static_cast<void>(getcwd(tmp, sizeof(tmp)));
 	str = tmp;
 	str += "/";
@@ -133,7 +133,7 @@ void set_current_directory(const Path &dir) {
 #ifdef OS_WINDOWS
 	_chdir(dir.str().c_str());
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	static_cast<void>(chdir(dir.str().c_str()));
 #endif
 }
@@ -178,7 +178,7 @@ void copy(const Path &source, const Path &target) {
 	int ht = ::_creat(target.str().c_str(),_S_IREAD | _S_IWRITE);
 	_setmode(hs,_O_BINARY);
 	_setmode(ht,_O_BINARY);
-#else // defined(OS_LINUX) || defined(OS_MINGW)
+#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	int ht = ::creat(target.str().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	if (ht < 0){
@@ -232,7 +232,7 @@ void search_single(const Path &dir, const string &filter, Array<Path> &dir_list,
 		}
 		e = _findnext(handle,&t);
 	}
-#else // defined(OS_LINUX) || defined(OS_MINGW)
+#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	DIR *_dir;
 	_dir = opendir(dir.str().c_str());
 	if (!_dir)
@@ -303,7 +303,7 @@ Array<Path> search(const Path &dir, const string &filter, const string &options)
 
 }
 
-#if defined (OS_LINUX) || defined(OS_MINGW)
+#if defined (OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	#undef _open
 	#undef _read
 	#undef _write

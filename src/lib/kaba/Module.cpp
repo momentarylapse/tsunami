@@ -12,7 +12,7 @@
 #include "../os/file.h"
 #include "../os/msg.h"
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#include <sys/mman.h>
 #endif
 #if defined(OS_WINDOWS) || defined(OS_MINGW)

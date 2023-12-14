@@ -106,7 +106,7 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 
 
 	// default "logo" used for "about" dialog (full path)
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	if (os::fs::exists(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")))
 		set_property("logo", str(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")));
 	else if (os::fs::exists(directory_static | "icon.svg"))
@@ -166,7 +166,7 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 
 
 	// executable file
-#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 	if (arg.num > 0)
 		filename = arg[0];
 #else // OS_WINDOWS
@@ -189,7 +189,7 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 	Path prefix = "/usr/local";
 #endif
 
-	#if defined(OS_LINUX) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
+	#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
 		// installed version?
 		if (filename.is_in(prefix) or (filename.str().find("/") < 0)) {
 			installed = true;

@@ -37,7 +37,7 @@
 	#include <winbase.h>
 	#include <winnt.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <stdarg.h>
@@ -78,7 +78,7 @@ bool FileStream::is_end() {
 #ifdef OS_WINDOWS
 	return _eof(handle);
 #endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	int pos = lseek(handle,0,SEEK_CUR);
 	struct stat stat;
 	fstat(handle, &stat);
@@ -109,14 +109,14 @@ FileStream *open(const Path &filename, const string &mode) {
 #ifdef OS_WINDOWS
 		handle = _creat(filename.c_str(), _S_IREAD | _S_IWRITE);
 #endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 		handle = ::creat(filename.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	} else if (mode.find("a") >= 0) {
 #ifdef OS_WINDOWS
 		handle = _open(filename.c_str(), O_WRONLY | O_APPEND | O_CREAT, _S_IREAD | _S_IWRITE);
 #endif
-#if defined(OS_LINUX) or defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 		handle = ::open(filename.c_str(), O_WRONLY | O_APPEND | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 #endif
 	} else {
@@ -240,7 +240,7 @@ int FileStream::write_basic(const void *buffer, int size) {
 }
 
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#undef _open
 	#undef _read
 	#undef _write

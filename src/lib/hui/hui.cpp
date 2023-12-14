@@ -27,7 +27,7 @@
 	#include <tchar.h>
 	#pragma warning(disable : 4995)
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 #if HAS_LIB_XLIB
 #if !GTK_CHECK_VERSION(4,0,0)
 	#include <gdk/gdkx.h>
@@ -53,7 +53,7 @@ string Version = "0.7.6.2";
 	HFONT hui_win_default_font;
 	HICON hui_win_main_icon;
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 #if !GTK_CHECK_VERSION(4,0,0)
 	Display* x_display;
 #endif
@@ -160,7 +160,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 #endif
 
 #endif
-#if  defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 
 int main(int num_args, char *args[]) {
 	return hui_main(hui::make_args(num_args, args));
@@ -218,7 +218,7 @@ void _MakeUsable_() {
 	}
 
 
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 #if !GTK_CHECK_VERSION(4,0,0)
 #if HAS_LIB_XLIB
 		x_display = XOpenDisplay(0);

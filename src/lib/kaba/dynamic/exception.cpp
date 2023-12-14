@@ -181,7 +181,7 @@ void* rbp2 = nullptr;
 #ifdef CPU_AMD64
 
 void relink_return(void *rip, void *rbp, void *rsp) {
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
 	// ARGH....
 	asm volatile(	"mov %1, %%rsp\n\t"
@@ -302,7 +302,7 @@ void just_die(KabaException *kaba_exception, const Class *ex_type, const Array<S
 }
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	// get stack frame base pointer rbp
 	void **rbp = nullptr;
 	void **rsp = nullptr;

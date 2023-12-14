@@ -20,7 +20,7 @@
 	#pragma comment(lib,"wsock32.lib")
 
 	static WSADATA wsaData;
-#else //OS_LINUX
+#else //OS_LINUX/MAC
 	#include <stdio.h>
 	//#include <stdio.h>
 	#include <string.h>

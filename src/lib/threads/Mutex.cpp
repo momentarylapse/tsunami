@@ -5,7 +5,7 @@
 #ifdef OS_WINDOWS
 	#include <windows.h>
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	#include <pthread.h>
 #endif
 
@@ -19,7 +19,7 @@ struct MutexInternal
 #ifdef OS_WINDOWS
 	HANDLE mutex;
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	pthread_mutex_t mutex;
 #endif
 };
@@ -61,7 +61,7 @@ bool Mutex::tryLock()
 }
 
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 
 Mutex::~Mutex()
 {

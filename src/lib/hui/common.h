@@ -42,7 +42,7 @@
 	#include <gtk/gtk.h>
 	#include <gdk/gdkkeysyms.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#define _cdecl
 #endif
 

@@ -23,7 +23,7 @@ void print(const string &s) {
 }
 
 string shell_execute(const string &cmd) {
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	// thread safe...
 	char *s = new char[cmd.num + 1];
 	memcpy(s, cmd.data, cmd.num);

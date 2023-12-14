@@ -18,7 +18,7 @@
 	#include <winbase.h>
 	#include <winnt.h>
 #endif
-#if defined(OS_LINUX) || defined(OS_MINGW)
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
 	#include <unistd.h>
 	#include <dirent.h>
 	#include <stdarg.h>

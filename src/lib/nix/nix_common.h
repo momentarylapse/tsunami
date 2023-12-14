@@ -17,7 +17,7 @@
 	//#include <gl\glext.h>
 	//#include <gl\wglext.h>
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#define GL_GLEXT_PROTOTYPES
 	#include <GL/glx.h>
 	#include <GL/gl.h>

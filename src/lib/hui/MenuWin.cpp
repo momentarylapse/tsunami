@@ -17,7 +17,7 @@
 	#pragma comment(lib,"winmm.lib")
 	#pragma warning(disable : 4995)
 #endif
-#ifdef OS_LINUX
+#if defined(OS_LINUX) || defined(OS_MAC)
 	#include <string.h>
 	#include <unistd.h>
 	#include <sys/time.h>

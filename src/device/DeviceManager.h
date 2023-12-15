@@ -101,6 +101,7 @@ public:
 	bool pulse_fully_initialized = false;
 	bool _pulse_test_error(Session *session, const string &msg);
 	bool pulse_wait_context_ready();
+	void _update_devices_audio_pulse();
 	static void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata);
 	static void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata);
 	static void pulse_state_callback(pa_context* context, void* userdata);
@@ -108,18 +109,17 @@ public:
 #if HAS_LIB_PORTAUDIO
 	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);
 	bool portaudio_fully_initialized = false;
+	void _update_devices_audio_portaudio();
 #endif
 
 #if HAS_LIB_ALSA
 	_snd_seq *alsa_midi_handle;
+	void _update_devices_midi_alsa();
 #endif
 
 	float output_volume;
 
 	void update_devices(bool serious);
-	void _update_devices_midi_alsa();
-	void _update_devices_audio_pulse();
-	void _update_devices_audio_portaudio();
 	Array<Device*> empty_device_list;
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;

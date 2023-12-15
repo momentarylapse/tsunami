@@ -200,7 +200,8 @@ DeviceManager::DeviceManager(Session *_session) {
 }
 
 DeviceManager::~DeviceManager() {
-	hui::cancel_runner(hui_rep_id);
+	if (hui_rep_id >= 0)
+		hui::cancel_runner(hui_rep_id);
 
 	for (Device *d: output_devices)
 		delete d;
@@ -277,23 +278,28 @@ void DeviceManager::write_config() {
 
 // don't poll pulse too much... it will send notifications anyways
 void DeviceManager::update_devices(bool serious) {
+#if HAS_LIB_PULSEAUDIO
 	if (audio_api == ApiType::PULSE) {
 		if (serious)
 			_update_devices_audio_pulse();
-	}else if (audio_api == ApiType::PORTAUDIO) {
+	}
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (audio_api == ApiType::PORTAUDIO) {
 		_update_devices_audio_portaudio();
 	}
-
+#endif
+#if HAS_LIB_ALSA
 	if (midi_api == ApiType::ALSA)
 		_update_devices_midi_alsa();
+#endif
 
 	write_config();
 	out_changed.notify();
 }
 
-
-void DeviceManager::_update_devices_audio_pulse() {
 #if HAS_LIB_PULSEAUDIO
+void DeviceManager::_update_devices_audio_pulse() {
 	if (!pulse_fully_initialized)
 		return;
 
@@ -327,9 +333,8 @@ void DeviceManager::_update_devices_audio_pulse() {
 	pulse_wait_op(session, op);
 
 	unlock();
-
-#endif
 }
+#endif
 
 #if HAS_LIB_PORTAUDIO
 void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
@@ -354,9 +359,9 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 }
 #endif
 
-void DeviceManager::_update_devices_audio_portaudio() {
 #if HAS_LIB_PORTAUDIO
-	if (!pulse_fully_initialized)
+void DeviceManager::_update_devices_audio_portaudio() {
+	if (!portaudio_fully_initialized)
 		return;
 	for (Device *d: output_devices)
 		d->present = false;
@@ -372,12 +377,11 @@ void DeviceManager::_update_devices_audio_portaudio() {
 		_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, i);
 		_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, i);
 	}
-#endif
 }
+#endif
 
-void DeviceManager::_update_devices_midi_alsa() {
 #if HAS_LIB_ALSA
-
+void DeviceManager::_update_devices_midi_alsa() {
 	if (!alsa_midi_handle)
 		return;
 
@@ -420,8 +424,8 @@ void DeviceManager::_update_devices_midi_alsa() {
 			changed = true;
 	if (changed)
 		out_changed.notify();
-#endif
 }
+#endif
 
 
 static int select_api(const string &preferred_name, int mode) {
@@ -461,30 +465,37 @@ void DeviceManager::init() {
 	//output_volume = hui::Config.get_float("Output.Volume", 1.0f);
 
 	// audio
-	if (audio_api == ApiType::PULSE) {
+
+#if HAS_LIB_PULSEAUDIO
+	if (audio_api == ApiType::PULSE)
 		pulse_fully_initialized = _init_audio_pulse();
-	} else if (audio_api == ApiType::PORTAUDIO) {
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (audio_api == ApiType::PORTAUDIO)
 		portaudio_fully_initialized = _init_audio_portaudio();
-	}
+#endif
 
 
 	// midi
-	if (midi_api == ApiType::ALSA) {
+#if HAS_LIB_ALSA
+	if (midi_api == ApiType::ALSA)
 		_init_midi_alsa();
-	}
+#endif
 
 	update_devices(true);
 
 
+#if HAS_LIB_ALSA
 	// only updating alsa makes sense...
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
 	hui_rep_id = hui::run_repeated(2.0f, [this] { _update_devices_midi_alsa(); });
+#endif
 
 	initialized = true;
 }
 
-bool DeviceManager::_init_audio_pulse() {
 #if HAS_LIB_PULSEAUDIO
+bool DeviceManager::_init_audio_pulse() {
 	pulse_mainloop = pa_threaded_mainloop_new();
 	if (!pulse_mainloop) {
 		session->e("pa_threaded_mainloop_new failed");
@@ -530,13 +541,11 @@ bool DeviceManager::_init_audio_pulse() {
 	
 	unlock();
 	return true;
-#else
-	return false;
-#endif
 }
+#endif
 
-bool DeviceManager::_init_audio_portaudio() {
 #if HAS_LIB_PORTAUDIO
+bool DeviceManager::_init_audio_portaudio() {
 	PaError err = Pa_Initialize();
 	_portaudio_test_error(err, session, "Pa_Initialize");
 	if (err != paNoError)
@@ -544,13 +553,11 @@ bool DeviceManager::_init_audio_portaudio() {
 
 	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
 	return true;
-#else
-	return false;
-#endif
 }
+#endif
 
-bool DeviceManager::_init_midi_alsa() {
 #if HAS_LIB_ALSA
+bool DeviceManager::_init_midi_alsa() {
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0) {
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
@@ -559,10 +566,8 @@ bool DeviceManager::_init_midi_alsa() {
 
 	snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
 	return true;
-#else
-	return false;
-#endif
 }
+#endif
 
 void DeviceManager::kill_library() {
 	if (!initialized)

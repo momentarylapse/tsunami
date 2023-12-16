@@ -145,6 +145,11 @@ public:
 	bool found_dynamic_param;
 
 	Array<Function*> function_needs_parsing;
+
+	struct NamespaceFix {
+		const Class *_class, *_namespace;
+	};
+	Array<NamespaceFix> restore_namespace_mapping;
 };
 
 } /* namespace kaba */

@@ -1586,16 +1586,26 @@ Class::Type parse_class_type(const string& e) {
 Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 	offset0 = 0;
 	auto class_type = parse_class_type(Exp.consume()); // class/struct/interface
+	bool overriding = try_consume(Identifier::OVERRIDE);
 	string name = Exp.cur;
-	int token_id = Exp.consume_token();
 
-	// create class
-	Class *_class = const_cast<Class*>(tree->find_root_type_by_name(name, _namespace, false));
-	// already created...
-	if (!_class)
-		tree->module->do_error_internal("class declaration ...not found " + name);
-	_class->token_id = token_id;
-	_class->type = class_type;
+	Class *_class = nullptr;
+	if (overriding) {
+		// class override X
+		_class = const_cast<Class*>(parse_type(_namespace));
+		offset0 = _class->size;
+		restore_namespace_mapping.add({_class, _class->name_space});
+		_class->name_space = _namespace;
+	} else {
+		int token_id = Exp.consume_token();
+		// create class
+		_class = const_cast<Class*>(tree->find_root_type_by_name(name, _namespace, false));
+		// already created...
+		if (!_class)
+			tree->module->do_error_internal("class declaration ...not found " + name);
+		_class->token_id = token_id;
+		_class->type = class_type;
+	}
 
 	// parent class
 	if (try_consume(Identifier::EXTENDS)) {
@@ -1693,6 +1703,10 @@ bool Parser::parse_class(Class *_namespace) {
 
 void Parser::post_process_newly_parsed_class(Class *_class, int size) {
 	auto external = context->external.get();
+
+	for (const auto [c,n]: restore_namespace_mapping)
+		if (c == _class)
+			_class->name_space = n;
 
 	// virtual functions?     (derived -> _class->num_virtual)
 //	_class->vtable = cur_virtual_index;
@@ -2090,8 +2104,8 @@ void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
 		if ((Exp.cur_line->indent == indent0) and (Exp.cur_line->tokens.num >= 2)) {
 			if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE)) {
 				Exp.next();
-//				if (Exp.cur.num == 1)
-//					do_error("class names must be at least 2 characters long", Exp.cur_token());
+				if (Exp.cur == Identifier::OVERRIDE)
+					continue;
 				Class *t = tree->create_new_class(Exp.cur, Class::Type::REGULAR, 0, 0, nullptr, {}, ns, Exp.cur_token());
 				flags_clear(t->flags, Flags::FULLY_PARSED);
 

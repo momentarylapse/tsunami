@@ -80,8 +80,10 @@ Control::Control(int _type, const string &_id) {
 }
 
 void Control::take_gtk_ownership() {
-	if (auto f = get_frame())
+	if (auto f = frame)
 		g_object_ref(f);
+	if (auto w = widget)
+		g_object_ref(w);
 }
 
 void Control::disable_event_handlers_rec() {
@@ -102,8 +104,10 @@ Control::~Control() {
 	DBDEL_START(i2s(type), id, this);
 	if (widget)
 		g_signal_handlers_disconnect_by_data(widget, this);
-	if (auto f = get_frame())
+	if (auto f = frame)
 		g_object_unref(f);
+	if (auto w = widget)
+		g_object_unref(w);
 
 	auto _children = weak(children);
 

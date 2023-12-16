@@ -273,6 +273,7 @@ void Window::__delete__() {
 
 namespace WindowFlightManager {
 	static shared_array<Window> windows;
+	static Array<Window*> destroy_requests;
 	void add(shared<Window> win) {
 		windows.add(win);
 	}
@@ -280,14 +281,23 @@ namespace WindowFlightManager {
 		for (int i=0; i<windows.num; i++)
 			if (windows[i] == win)
 				windows.erase(i);
+		for (int i=0; i<destroy_requests.num; i++)
+			if (destroy_requests[i] == win)
+				destroy_requests.erase(i);
 	}
-	void request_destroy(Window *win) {
-		bool is_registered = false;
+	bool is_registered(Window *win) {
 		for (auto w: weak(windows))
 			if (win == w)
-				is_registered = true;
-		if (!is_registered)
+				return true;
+		return false;
+	}
+	void request_destroy(Window *win) {
+		if (destroy_requests.find(win) >= 0)
+			return;
+		if (!is_registered(win))
 			msg_error("destroying a window that is not registered via fly()");
+
+		destroy_requests.add(win);
 		hui::run_later(0.01f, [win] {
 			win->end_run_promise();
 			remove(win);

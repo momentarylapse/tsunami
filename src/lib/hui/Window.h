@@ -154,10 +154,10 @@ protected:
 	Menu *popup;
 	bool allowed, allow_keys;
 	Window *parent_window;
-	bool requested_destroy;
 
 	Array<EventKeyCode> event_key_codes;
 public:
+	bool requested_destroy;
 	void _cdecl set_key_code(const string &id, int key_code, const string &image = "");
 	void _cdecl add_action_checkable(const string &id);
 	Array<EventKeyCode> get_event_key_codes() const { return event_key_codes; }

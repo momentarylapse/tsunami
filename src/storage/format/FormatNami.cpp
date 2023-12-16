@@ -274,7 +274,8 @@ public:
 };
 
 #if HAS_LIB_FLAC == 0
-void uncompress_buffer(AudioBuffer &b, string &data, FileChunkBasic *p) {
+void uncompress_buffer(AudioBuffer &b, bytes &data, FileChunkBasic *p) {
+	Session::GLOBAL->e("failed to uncompress audio chunks - program was compiled without lib flac");
 }
 
 #else

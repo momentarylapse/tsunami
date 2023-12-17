@@ -1,0 +1,73 @@
+use common
+use modules
+use streams
+use song
+use os
+use kaba
+
+
+class Playback
+	var renderer: shared![SongRenderer]
+	var signal_chain: shared![SignalChain]
+	var output_stream: shared![AudioOutput]
+	var out_changed: obs.source
+	var out_state_changed: obs.source
+	var out_tick: obs.source
+	func extern mut unsubscribe(handler: Object)
+	func extern mut prepare(r: Range, allow_loop: bool)
+	func extern mut play()
+	func extern is_active() -> bool
+	func extern is_paused() -> bool
+	func extern get_pos() -> int
+	func extern mut set_pos(pos: int)
+	func extern mut set_loop(loop: bool)
+
+
+class SongRenderer extends AudioSource
+	func extern __init__(s: Song)
+	func extern override __delete__()
+	func extern mut render(r: Range, out buf: AudioBuffer)
+	func extern mut set_range(r: Range)
+	func extern mut set_loop(l: bool)
+	func extern override mut read(out b: AudioBuffer) -> int
+	#extern override void reset_state()
+	func extern range() -> Range
+	func extern get_pos() -> int
+	func extern mut set_pos(pos: int)
+	func extern selfref get_beat_source() -> BeatSource*
+
+
+
+class Storage
+	func extern load(out s: Song, filename: Path) -> future[void]
+	func extern save(s: Song&, filename: Path) -> future[void]
+	func extern save_via_renderer(source: Module.Port, filename: Path, num_samples: int, tags: Tag[]) -> future[void]
+	func extern load_buffer(filename: Path) -> future[AudioBuffer]
+	var current_directory: Path
+
+
+# create via Session.add_signal_chain()
+class SignalChain extends Module
+	func extern __init__(session: Session, name: string)
+	func extern override __delete__()
+	func extern mut __del_override__()
+	func extern override mut command(cmd: Module.Command, param: int) -> int
+	func extern override mut reset_state()
+	func extern mut add_basic(type: Module.Type, name: string) -> shared![Module]
+	func mut add_basic_as[M](type: Module.Type, name: string) -> shared![M]
+		return add_basic(type, name) as shared![M]
+	func mut add_basic_as_syn(type: Module.Type, name: string) -> shared![Synthesizer]
+		return add_basic(type, name) as shared![Synthesizer]
+	func extern mut _add(type: kaba.Class*) -> shared![Module]
+	func mut add[M]() -> shared![M]
+		return weak(_add(M)) as xfer[M]
+	func extern mut add_existing(m: shared![Module]) -> shared![Module]
+	func extern mut delete(m: Module*)
+	func extern mut connect(source: Module*, source_port: int, target: Module*, target_port: int)
+	func extern mut disconnect(source: Module*, source_port: int, target: Module*, target_port: int)
+	func extern mut start()
+	func extern mut stop()
+	func extern is_prepared() -> bool
+	func extern is_active() -> bool
+	func extern mut set_update_dt(dt: float)
+	func extern mut set_buffer_size(size: int)

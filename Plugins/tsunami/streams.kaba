@@ -1,0 +1,24 @@
+use common
+use modules
+
+class AudioOutput extends Module
+	func extern __init__(session: Session)
+	func extern override __delete__()
+	func extern mut stop()
+	func extern mut start()
+	func extern is_playing() -> bool
+	func extern get_volume() -> float
+	func extern mut set_volume(volume: float)
+	func extern samples_played() -> int
+
+
+class AudioInput extends Module
+	var current_buffer: RingBuffer
+	var buffer: AudioBuffer
+	func extern __init__(session: Session)
+	func extern override __delete__()
+	func extern mut start() -> bool
+	func extern mut stop()
+	func extern is_capturing() -> bool
+	func extern sample_rate() -> int
+	func extern samples_recorded() -> int

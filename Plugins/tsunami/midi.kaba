@@ -1,0 +1,64 @@
+use tsunami.common
+
+let MAX_PITCH = 128
+
+
+struct MidiNote as shared
+	var range: Range
+	var pitch: float
+	var volume: float
+	var stringno = -1
+	var clef_position = -1
+	var modifier = 0
+	var flags = 0
+	func __init__()
+	func __init__(r: Range, _pitch: float, _volume: float)
+		range = r
+		pitch = _pitch
+		volume = _volume
+	func extern mut set(mask: int)
+	func extern is(mask: int) -> bool
+	func extern copy(offset: int) -> xfer[MidiNote]
+
+struct MidiEvent
+	var pos: int
+	var pitch: float
+	var volume: float
+	var flags = 0
+	var stringno = -1
+	var clef_position = -1
+	func __init__()
+	func __init__(_pos: int, _pitch: float, _volume: float)
+		pos = _pos
+		pitch = _pitch
+		volume = _volume
+	func __str__() -> string
+		return "({{pos}}, {{pitch}}, {{volume}})"
+
+struct MidiEventBuffer extends MidiEvent[]
+	var samples: int
+	func extern override __init__()
+	func extern get_notes(r: Range) -> MidiNoteBuffer
+	func extern get_events(r: Range) -> MidiEvent[]
+	func extern get_range() -> Range
+	func mut add_note(n: MidiNote)
+		add(MidiEvent(n.range.offset, n.pitch, n.volume))
+		add(MidiEvent(n.range.end(), n.pitch, 0))
+	func extern mut add_metronome_click(pos: int, level: int, volume: float)
+
+struct MidiNoteBuffer extends shared![MidiNote][]
+	var samples: int
+	func extern override __init__()
+	func extern override __delete__()
+	#extern selfref MidiNoteBuffer get_notes(Range r)
+	func extern selfref get_notes(r: Range) -> MidiNote&[]
+	func extern selfref get_events(r: Range) -> MidiEvent[]
+	func extern get_range() -> Range
+
+
+struct Instrument
+	var type: int
+	var string_pitch: int[]
+	func __init__()
+	func extern name() -> string
+	func extern static enumerate() -> Instrument[]

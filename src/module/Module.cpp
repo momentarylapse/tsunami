@@ -94,7 +94,7 @@ ModuleConfiguration *Module::get_config() const {
 	if (!kaba_class)
 		return nullptr;
 	for (auto &e: kaba_class->elements)
-		if ((e.name == "config") and (e.type->get_root()->long_name() == "tsunami.Module.Config")) {
+		if ((e.name == "config") and (e.type->get_root()->long_name() == "modules.Module.Config")) {
 			auto *config = reinterpret_cast<ModuleConfiguration*>((char*)this + e.offset);
 			config->kaba_class = e.type;
 			return config;

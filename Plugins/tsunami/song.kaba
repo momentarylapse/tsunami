@@ -1,0 +1,147 @@
+use os
+use common
+use midi
+use beats
+use modules
+
+
+
+
+struct TrackMarker as shared
+	func __init__(r: Range, t: string)
+		range = r
+		text = t
+	var range: Range
+	var text: string
+	var fx: shared![AudioEffect][]
+
+
+class Sample extends Object as shared # TODO
+	var name: string
+	var type: int
+	var buf: owned![AudioBuffer]
+	var midi: MidiNoteBuffer
+	var volume: float
+	var uid: int
+	var ref_count: int
+	var tags: Tag[]
+	func extern __init__(name: string, buf: AudioBuffer)
+	func extern mut create_ref() -> xfer[SampleRef]
+	func extern get_value(key: string) -> string
+	func extern mut set_value(key: string, value: string)
+
+
+class SampleRef as shared
+	var origin: Sample&
+	func extern __init__(sam: Sample&)
+	func extern virtual __delete__()
+
+
+class TrackLayer extends Object as shared
+	var type: SignalType
+	var track: Track&
+	var buffers: AudioBuffer[]
+	var midi: MidiNoteBuffer
+	var samples: shared![SampleRef][]
+	var markers: shared![TrackMarker][]
+	
+	func extern mut get_buffers(out buf: AudioBuffer, r: Range)
+	func extern mut read_buffers(out buf: AudioBuffer, r: Range, allow_ref: bool)
+	func extern mut edit_buffers(out buf: AudioBuffer, r: Range) -> void*
+	func extern mut edit_buffers_finish(a: void*)
+	func extern mut insert_midi_data(offset: int, midi: MidiNoteBuffer)
+	func extern mut add_midi_note(n: shared![MidiNote])
+	#extern void add_midi_notes(MidiNoteBuffer midi)
+	func extern mut delete_midi_note(n: MidiNote*)
+	func extern mut add_sample_ref(pos: int, sample: Sample*) -> shared![SampleRef]
+	func extern mut delete_sample_ref(s: SampleRef*)
+	func extern mut edit_sample_ref(s: SampleRef*, volume: float, mute: bool)
+	func extern mut add_marker(m: shared![TrackMarker]) -> shared![TrackMarker]
+	func extern mut delete_marker(marker: TrackMarker*)
+	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)
+
+
+class Track as shared
+	var type: SignalType
+	var name: string
+	var layers: shared![TrackLayer][]
+
+	var volume, panning: float
+	var muted: bool
+	
+	var fx: shared![AudioEffect][]
+	var midi_fx: shared![MidiEffect][]
+	
+	var synth: shared![Synthesizer]
+	var instrument: Instrument
+
+	# editing
+	var song: Song&
+	
+	func extern nice_name() -> string
+
+	#TrackRenderBuffer render_r[NUM_PEAK_LEVELS], render_l[NUM_PEAK_LEVELS]
+	
+	func extern mut set_name(name: string)
+	func extern mut set_muted(muted: bool)
+	func extern mut set_volume(volume: float)
+	func extern mut set_panning(panning: float)
+	func extern mut add_effect(effect: shared![AudioEffect])
+	func extern mut delete_effect(effect: AudioEffect&)
+	func extern mut edit_effect(effect: AudioEffect&)
+	func extern mut enable_effect(effect: AudioEffect&, enabled: bool)
+	func extern mut set_effect_wetness(effect: AudioEffect&, enabled: bool)
+	func extern mut set_synthesizer(synth: shared![Synthesizer])
+
+struct Tag
+	var key, value: string
+
+class Song extends Object as shared
+	var filename: Path
+	var tags: Tag[]
+	var sample_rate: int
+
+	var volume: float
+	
+	var tracks: shared![Track][]
+	var samples: shared![Sample][]
+	
+	var bars: BarCollection
+
+	var secret_data: any
+	
+	func extern __init__(session: Session, sample_rate: int)
+	func extern override __delete__()
+	
+	func extern range() -> Range
+	func extern selfref time_track() -> Track*
+	func extern selfref layers() -> TrackLayer&[]
+	
+	func extern mut add_track(type: SignalType, index: int) -> shared![Track]
+	func extern mut delete_track(index: int)
+	func extern mut add_bar(index: int, b: Bar, mode: Bar.EditMode)
+	func extern mut add_pause(index: int, length: int, mode: Bar.EditMode)
+	func extern mut edit_bar(index: int, b: Bar, mode: Bar.EditMode)
+	func extern mut delete_bar(index: int, affect_midi: bool)
+	func extern mut add_sample(s: Sample)
+	func extern mut delete_sample(s: Sample)
+	
+	func extern mut undo() -> bool
+	func extern mut redo() -> bool
+	func extern mut reset_history()
+	func extern mut begin_action_group(name: string)
+	func extern mut end_action_group()
+	
+	func extern get_time_str(t: int) -> string
+	func extern get_time_str_fuzzy(t: int, dt: float) -> string
+	func extern get_time_str_long(t: int) -> string
+
+
+struct SongSelection
+	var range_raw: Range
+	func extern range() -> Range
+	func extern has_track(t: Track) -> bool
+	func extern has_layer(t: TrackLayer) -> bool
+	func extern has_marker(m: TrackMarker) -> bool
+	func extern has_note(n: MidiNote) -> bool
+	func extern has_bar(b: Bar) -> bool

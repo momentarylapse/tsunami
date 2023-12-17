@@ -182,9 +182,9 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("future[string].__delete__", &kaba::KabaFuture<string>::__delete__);
 	ext->link_class_func("future[string].then", &kaba::KabaFuture<string>::kaba_then);
 	ext->link_class_func("future[string].then_or_fail", &kaba::KabaFuture<string>::kaba_then_or_fail);
-	ext->link_class_func("future[tsunami.Sample*].__delete__", &kaba::KabaFuture<void*>::__delete__);
-	ext->link_class_func("future[tsunami.Sample*].then", &kaba::KabaFuture<void*>::kaba_then);
-	ext->link_class_func("future[tsunami.Sample*].then_or_fail", &kaba::KabaFuture<void*>::kaba_then_or_fail);
+	ext->link_class_func("future[song.Sample*].__delete__", &kaba::KabaFuture<void*>::__delete__);
+	ext->link_class_func("future[song.Sample*].then", &kaba::KabaFuture<void*>::kaba_then);
+	ext->link_class_func("future[song.Sample*].then_or_fail", &kaba::KabaFuture<void*>::kaba_then_or_fail);
 	ext->link_class_func("future[AudioBuffer].__delete__", &kaba::KabaFuture<AudioBuffer>::__delete__);
 	ext->link_class_func("future[AudioBuffer].then", &kaba::KabaFuture<AudioBuffer>::kaba_then);
 	ext->link_class_func("future[AudioBuffer].then_or_fail", &kaba::KabaFuture<AudioBuffer>::kaba_then_or_fail);

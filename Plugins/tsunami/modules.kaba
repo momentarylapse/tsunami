@@ -1,0 +1,271 @@
+use common
+use midi
+use beats
+import hui
+import kaba
+
+# requires FIXME
+class Session extends Object as shared
+	var id: int
+	#var win: TsunamiWindow*
+	var win: hui.Window&
+	var song: shared![Session] # shared![Song]
+	var view: void&            # AudioView&
+	var storage: void&         # Storage&
+	var playback: owned![int]  # owned![Playback]
+	
+	func extern sample_rate() -> int
+	
+	func extern create_child() -> xfer[Session]
+#	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
+#	func extern mut load_signal_chain(filename: Path) -> shared[SignalChain]
+#	func extern mut remove_signal_chain(chain: SignalChain*)
+
+	# logging
+	func extern i(msg: string)
+	func extern w(msg: string)
+	func extern e(msg: string)
+
+
+
+class ConfigPanel extends hui.Panel
+	func extern __init__(c: Module)
+	func extern override __delete__()
+	func extern virtual mut update()
+	func extern virtual mut set_large(large: bool)
+	func extern changed()
+	func extern mut create_sink(f: void->void) -> obs.sink&
+	var c: Module&
+
+
+class Module extends Object as shared
+
+	enum Command
+		START
+		STOP
+		PREPARE_START
+		ACCUMULATION_START
+		ACCUMULATION_STOP
+		ACCUMULATION_CLEAR
+		ACCUMULATION_GET_SIZE
+		SUCK
+
+	enum Type
+		AUDIO_SOURCE
+		AUDIO_EFFECT
+		MIDI_SOURCE
+		MIDI_EFFECT
+		SYNTHESIZER
+		BEAT_SOURCE
+		AUDIO_VISUALIZER
+		STREAM
+		PITCH_DETECTOR
+		PLUMBING
+		SIGNAL_CHAIN
+
+	var name: string
+	var session: Session&
+	var port_out: owned![Port][]
+	var out_changed: obs.source
+	var out_state_changed: obs.source
+	var out_play_end_of_stream: obs.source
+	var out_read_end_of_stream: obs.source
+	var out_tick: obs.source
+	func extern __init__(type: Type, sub_type: string)
+	func extern override __delete__()
+	func extern mut reset_config()
+	func extern virtual mut reset_state()
+	func extern mut changed()
+	func extern virtual mut command(cmd: Command, param: int) -> int
+	func extern mut plug_in(in_port: int, source: Module*, out_port: int)
+	func extern mut unplug_in(in_port: int)
+	func extern mut create_sink(f: void->void) -> obs.sink&
+	func extern mut unsubscribe(handler: Object)
+	func extern copy() -> xfer[Module]
+	
+	class Port
+		func extern __init__()
+		func extern virtual __delete__()
+		func extern virtual mut read_audio(out buf: AudioBuffer) -> int
+		func extern virtual mut read_midi(out midi: MidiEventBuffer) -> int
+		func extern virtual mut read_beats(out beats: Beat[], samples: int) -> int
+		
+	class Config
+		func extern __init__()
+		func extern virtual __delete__()
+		func extern virtual mut reset()
+		func extern to_string() -> string
+		func extern mut from_string(s: string, session: Session)
+		func extern virtual auto_conf(name: string) -> string
+
+	func extern virtual create_panel() -> xfer[ConfigPanel]
+	func extern virtual mut on_config()
+	func extern virtual get_config() -> Module.Config*
+	func extern config_to_string() -> string
+	func extern config_to_any() -> any
+	func extern mut config_from_string(version: int, s: string)
+	func extern mut config_from_any(version: int, a: any)
+
+	let VERSION_LATEST = -1
+	let VERSION_LEGACY = -2
+
+
+class AudioEffect extends Module
+	var apply_to_whole_buffer: bool
+	var wetness: float
+	var source: Module.Port&
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut process(out buf: AudioBuffer)
+	func extern virtual mut read(out buf: AudioBuffer) -> int
+
+
+class MidiEffect extends Module
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut process(out midi: MidiEventBuffer)
+
+
+class AudioVisualizer extends Module
+	var chunk_size: int
+	var ring_buffer: RingBuffer&
+	var next_writing: int
+	var current_reading: int
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut process(out buf: AudioBuffer)
+	func extern mut set_chunk_size(chunk_size: int)
+	func extern mut lock()
+	func extern mut unlock()
+	func extern mut flip()
+
+
+
+
+# general "interface"
+
+class AudioSource extends Module
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut read(out buf: AudioBuffer) -> int
+
+
+struct MidiProduceData
+	var bar: Bar*
+	var beat_no: int
+
+
+class MidiSource extends Module
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut read(out midi: MidiEventBuffer) -> int
+	# crappy experimental note api:
+	func extern virtual mut on_produce(data: MidiProduceData) -> bool
+	func extern mut note(pitch: float, volume: float, beats: int)
+	func extern mut skip(beats: int)
+	func extern mut note_x(pitch: float, volume: float, beats: int, sub_beats: int, beat_partition: int)
+	func extern mut skip_x(beats: int, sub_beats: int, beat_partition: int)
+	var bh_midi: MidiEventBuffer*
+	#extern void set_beat_source(BeatPort *source)
+
+
+class PitchDetector extends MidiSource
+	var frequency, volume: float
+	var pitch: int
+	var loud_enough: bool
+	func extern override __init__()
+	func extern override mut read(out midi: MidiEventBuffer) -> int
+	func extern virtual mut process(out midi: MidiEventBuffer, buf: AudioBuffer)
+
+
+class PitchRenderer as @noauto
+	func extern __init__(synth: Synthesizer, pitch: int)
+	func extern virtual __delete__()
+	func extern virtual mut render(out buf: AudioBuffer) -> bool
+	#extern virtual void on_event(MidiEvent e)
+	func extern virtual mut on_start(volume: float)
+	func extern virtual mut on_end()
+	func extern virtual mut on_config()
+	var pitch: int
+	var delta_phi: float
+	var synth: Synthesizer&
+
+
+class Synthesizer extends Module
+	var sample_rate: int
+	var keep_notes: int
+	var freq: float[MAX_PITCH]
+	var delta_phi: float[MAX_PITCH]
+	var active_pitch: int[]
+	var auto_generate_stereo: bool
+	var render_by_ref: bool
+	var events: MidiEventBuffer
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut render(out buf: AudioBuffer)
+	func extern override mut on_config()
+	func extern override mut reset_state()
+	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
+	func extern mut set_sample_rate(sample_rate: int)
+
+
+class DummySynthesizer extends Synthesizer
+	func extern override __init__()
+	#extern overwrite void __delete__()
+	func extern override mut render(out buf: AudioBuffer)
+	func extern override mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
+
+
+struct EnvelopeADSR
+	func extern __init__()
+	func extern mut set(t_attack: float, t_decay: float, sustain: float, t_release: float, sample_rate: int)
+	func extern mut set2(initial: float, peak: float)
+	func extern mut reset()
+	func extern mut start(volume: float)
+	func extern mut end()
+	func extern mut get() -> float
+	func extern mut read(n: int) -> float[]
+	var just_killed: bool
+
+
+class BeatSource extends Module
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut read(out beats: Beat[], samples: int) -> int
+	func extern virtual beats_per_bar() -> int
+	func extern virtual cur_beat() -> int
+	func extern virtual cur_bar() -> int
+	func extern virtual beat_fraction() -> float
+
+
+class BeatMidifier extends MidiSource
+	func extern override __init__()
+	#extern override void __delete__()
+	func extern override mut read(out midi: MidiEventBuffer) -> int
+	var volume: float
+
+
+class AudioAccumulator extends Module
+	func extern __init__()
+	var samples_skipped: int
+	var buffer: AudioBuffer
+
+
+class MidiAccumulator extends Module
+	func extern __init__()
+	var buffer: MidiEventBuffer
+
+
+
+func extern CreateModuleBasic(session: Session, type: Module.Type, name: string) -> xfer[Module]
+func extern CreateModuleX(session: Session, type: kaba.Class*) -> xfer[Module]
+func CreateModule[T](session: Session) -> xfer[T]
+	return CreateModuleX(session, T) as xfer[T]
+func extern CreateSynthesizer(session: Session, name: string) -> xfer[Synthesizer]
+func extern CreateAudioSource(session: Session, name: string) -> xfer[AudioSource]
+func extern CreateAudioEffect(session: Session, name: string) -> xfer[AudioEffect]
+func extern CreateMidiSource(session: Session, name: string) -> xfer[MidiSource]
+func extern CreateMidiEffect(session: Session, name: string) -> xfer[MidiEffect]
+func extern CreateBeatMidifier(session: Session) -> xfer[BeatMidifier]
+func extern CreateBeatSource(session: Session, name: string) -> xfer[BeatSource]
+

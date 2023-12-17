@@ -1,0 +1,140 @@
+use hui
+use common
+use midi
+use song
+
+
+let NUM_PEAK_LEVELS = 24
+
+
+struct ColorScheme as @noauto
+	var background: color
+	var background_track: color
+	var background_track_selected: color
+	var text: color
+	var text_soft1: color
+	var text_soft2: color
+	var text_soft3: color
+	var grid: color
+	var selection: color
+	var hover: color
+	var blob_bg: color
+	var blob_bg_selected: color
+	var blob_bg_hidden: color
+	var pitch: color[12]
+	func extern static pitch_color(p: int) -> color
+	func extern hoverify(c: color) -> color
+
+
+class SceneGraph
+	class Node as shared
+		var area: rect
+
+
+class AudioView extends Object
+	class ViewPort
+		func extern __init__()
+		func extern range() -> Range
+		func extern mut set_range(r: Range)
+		func extern sample2screen64(s: float64) -> float64
+		func extern sample2screen(s: float) -> float
+		func extern screen2sample64(s: float64) -> float64
+		func extern screen2sample(s: float) -> float
+		var area: rect
+	
+	class Layer extends SceneGraph.Node
+		var layer: TrackLayer&
+		
+	var sel: SongSelection
+	var cam: ViewPort
+	var mouse_wheel_speed: float
+	func extern mut unsubscribe(handler: Object)
+	func extern mut optimize_view()
+	func extern cur_vlayer() -> Layer&
+	func extern cur_vtrack() -> void*
+	func extern mut update_selection()
+
+
+
+class Slider extends Object
+	func extern __init__(panel: Panel, id_slider: string, id_edit: string, on_update: void->void)
+	func extern override __delete__()
+	func extern get() -> float
+	func extern mut set(f: float)
+	func extern set_range(v_min: float, v_max: float, step: float)
+	func extern set_slider_range(v_min: float, v_max: float)
+	func extern set_scale(factor: float)
+	func extern enable(enabled: bool)
+
+#class Progress
+#	extern void __init__(string title, Window *parent)
+#	virtual extern void __delete__()
+#	extern void set(string msg, float progress)
+class ProgressX
+	func extern __init__(title: string, parent: Window)
+	func extern virtual __delete__()
+	func extern mut set(msg: string, progress: float)
+	func extern mut cancel()
+	func extern is_cancelled() -> bool
+
+class Clipboard
+	var temp: Song&
+	func extern has_data() -> bool
+	func extern mut prepare_layer_map(view: AudioView, out sources: TrackLayer&[], out targets: TrackLayer&[]) -> bool
+
+
+enum MidiMode
+	MIDI_LINEAR
+	TAB
+	CLASSICAL
+	DRUM
+	DONT_CARE
+
+
+struct HoverData
+	
+
+class MidiPainter
+	#extern void __init__(AudioView* view)
+	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
+	func extern mut set_context(area: rect, i: Instrument, playable: bool, mode: MidiMode)
+	func extern mut draw(p: Painter, midi: MidiNoteBuffer)
+	func extern mut draw_background(c: Painter)
+	var cam: AudioView.ViewPort&
+
+
+class GridColors
+	var bg, bg_sel: color
+	var fg, fg_sel: color
+
+
+class GridPainter
+	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
+	func extern mut set_context(area: rect, col: GridColors)
+	func extern mut draw_empty_background(p: Painter)
+	func extern mut draw_bars(p: Painter, partition: int)
+	func extern mut draw_bar_numbers(p: Painter)
+	func extern mut draw_time(p: Painter)
+	func extern mut draw_time_numbers(p: Painter)
+
+
+class MultiLinePainter
+	func extern __init__(song: Song, c: ColorScheme)
+	func extern __delete__()
+	func extern mut set_context(conf: any, page_width: float, avg_samples_per_line: float)
+	func extern mut set(conf: any)
+	func extern mut draw_next_line(p: Painter, out offset: int, pos: vec2) -> float
+	func extern mut next_line_samples(offset: int) -> int
+	func extern mut get_line_dy() -> float
+
+
+#extern PluginContext plugin_context
+var extern colors: ColorScheme
+
+var extern clipboard: Clipboard&
+
+#extern void get_style_colors(Panel p, string id, color{} colors)
+func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])
+
+
+

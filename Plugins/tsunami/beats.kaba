@@ -1,0 +1,44 @@
+use common
+
+
+#struct BarPattern
+#	int length
+#	int divisor
+#	int[] beats
+
+struct Bar as shared
+	var beats: int[]
+	var divisor: int
+	var total_sub_beats: int
+	var index: int
+	var index_text: int
+	var length: int
+	var offset: int
+	func __init__()
+	func extern __init__(length: int, beats: int, sub_beats: int)
+	func extern bpm(sample_rate: float) -> float
+	func extern range() -> Range
+	enum EditMode
+		IGNORE
+		INSERT_SILENCE
+		STRETCH
+		STRETCH_AND_SCALE_AUDIO
+
+
+struct Beat
+	var range: Range
+	var bar_index: int
+	var bar_no = 0
+	var beat_no = 0
+	var level: int
+
+	func __init__()
+	func __init__(_offset: int, _level: int)
+		range = Range(_offset, 0)
+		level = _level
+
+struct BarCollection extends shared![Bar][]
+	func extern selfref get_bars(r: Range) -> Bar&[]
+	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
+	func extern get_next_beat(pos: int) -> int
+	func extern get_prev_beat(pos: int) -> int

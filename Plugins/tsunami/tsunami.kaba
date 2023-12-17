@@ -1,0 +1,66 @@
+#----------------------------------------------------------------------#
+#                                                                      #
+# header for Tsunami plugin api                                        #
+#                                                                      #
+#    (c) by MichiSoft TM 2010                                          #
+#                                                                      #
+# Don't even think of changing anything within this file!              #
+#    (unless you dare dying a cruel death)                             #
+#                                                                      #
+#----------------------------------------------------------------------#
+
+use common
+use beats
+use midi
+use modules
+use song
+use streams
+use other
+use ui
+
+let EXPORT_IMPORTS = true
+
+use hui
+import kaba
+use os
+
+
+struct TrackRenderBuffer
+	var dummy: int
+
+
+class override Session
+	var override song: shared![Song]
+	var override view: AudioView&
+	var override storage: Storage&
+	var override playback: owned![Playback]
+	
+	#DeviceManager* device_manager
+	#PluginManager* plugin_manager
+	
+	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
+	func extern mut load_signal_chain(filename: Path) -> shared[SignalChain]
+	func extern mut remove_signal_chain(chain: SignalChain*)
+
+
+#class PluginContext
+#	Song *song
+#	Track *track
+#	int track_no
+#	int layer
+#	Range range
+
+class TsunamiPlugin extends Module
+	func extern __init__()
+	func extern override __delete__()
+	func extern virtual mut on_start()
+	func extern virtual mut on_stop()
+	func extern virtual mut on_draw_post(p: Painter)
+	func extern mut stop()
+	var args: string[]
+
+
+func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> future[ptr[Sample]]
+#extern void SetTempBackupFilename(Path filename)
+
+func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, old_name: string?) -> future[string]

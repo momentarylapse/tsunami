@@ -1,0 +1,89 @@
+
+let DEFAULT_SAMPLE_RATE = 44100
+
+enum SignalType
+	AUDIO
+	TIME
+	MIDI
+	AUDIO_MONO
+	AUDIO_STEREO
+	GROUP
+
+
+func extern db2amp(db: float) -> float
+func extern amp2db(amp: float) -> float
+
+
+class obs
+	class source
+		func extern __rshift__(s: sink)
+	
+	class sink
+
+
+struct Range
+	var offset, length: int
+	func extern start() -> int
+	func extern end() -> int
+	func inside(pos: int) -> bool
+		return pos >= offset and pos < offset + length
+	func extern overlaps(o: Range) -> bool
+	func extern covers(o: Range) -> bool
+	func extern __and__(o: Range) -> Range
+	func extern __str__() -> string
+	#	return "({{offset}}:{{end()}})"
+	#const Range ALL = Range(-1000000000, 2000000000)
+func RangeTo(start: int, end: int) -> Range
+	return Range(start, end - start)
+
+
+struct AudioBuffer
+	var offset, length: int
+	var channels: int
+	#var l, r: float[]
+	var c: float[][]
+	var peaks: string[]
+	func extern __init__()
+	func extern __delete__()
+	func extern mut __assign__(other: AudioBuffer)
+	func extern mut clear()
+	func extern range() -> Range
+	func extern mut resize(length: int)
+	func extern mut set_channels(channels: int)
+	func extern mut set(source: AudioBuffer, target_offset: int, volume: float)
+	func extern mut add(source: AudioBuffer, offset: int, volume: float)
+	#extern void mix_stereo(float volume, float panning)
+	func extern mut set_as_ref(source: AudioBuffer, offset: int, length: int)
+	func extern selfref __subarray__(start: int, end: int) -> AudioBuffer
+	func extern get_spectrum(out spec_r: complex[], out spec_l: complex[], samples: int)
+	func mut scale(factor: float)
+		for cc in c
+			cc *= factor
+	func mut __imul__(f: float[])
+		for cc in c
+			cc *= f
+	func mut auto_generate_channels()
+		if channels > 1
+			c[1] = c[0]
+
+
+func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
+
+
+struct RingBuffer as @noauto
+	enum PeekMode
+		FORWARD_REF
+		FORWARD_COPY_WRAP
+		BACKWARD_REF
+		BACKWARD_COPY_WRAP
+
+	func extern __init__(size: int)
+	func extern available() -> int
+	func extern mut read(out b: AudioBuffer)
+	func extern mut write(b: AudioBuffer)
+	func extern mut read_ref(out b: AudioBuffer, size: int)
+	func extern mut read_ref_done(b: AudioBuffer)
+	func extern mut peek(out b: AudioBuffer, size: int, mode: PeekMode)
+	func extern mut write_ref(b: AudioBuffer, size: int)
+	func extern mut write_ref_done(b: AudioBuffer)
+	func extern mut clear()

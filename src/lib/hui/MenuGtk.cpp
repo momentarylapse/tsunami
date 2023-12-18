@@ -6,6 +6,9 @@
 #include "internal.h"
 #ifdef HUI_API_GTK
 
+#ifdef HUGE
+#undef HUGE
+#endif
 
 namespace hui
 {

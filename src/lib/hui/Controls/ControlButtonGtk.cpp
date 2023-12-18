@@ -8,6 +8,10 @@
 #include "ControlButton.h"
 #include "../hui.h"
 
+#ifdef HUGE
+#undef HUGE
+#endif
+
 namespace hui
 {
 

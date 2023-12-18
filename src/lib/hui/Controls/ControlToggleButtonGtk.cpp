@@ -8,6 +8,10 @@
 #include "ControlToggleButton.h"
 #include "../Event.h"
 
+#ifdef HUGE
+#undef HUGE
+#endif
+
 #ifdef HUI_API_GTK
 
 namespace hui

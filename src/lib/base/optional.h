@@ -28,6 +28,12 @@ public:
 	optional(const T &o) : optional() {
 		*this = o;
 	}
+	optional(const optional<T> &o) : optional() {
+		*this = o;
+	}
+	optional(optional<T> &&o) : optional() {
+		*this = std::move(o);
+	}
 	~optional() {
 		clear();
 	}
@@ -57,6 +63,8 @@ public:
 		_init();
 		value() = o.value();
 	}
+	/*void operator=(optional<T> &&o) {  TODO
+	}*/
 	void operator=(const Empty &o) {
 		clear();
 	}

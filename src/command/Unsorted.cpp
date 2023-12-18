@@ -16,6 +16,8 @@
 #include "../processing/audio/BufferPitchShift.h"
 #include "../Session.h"
 
+#include <stdio.h>
+
 
 void song_compress_buffers(Song *song, const SongSelection &sel, const string &codec) {
 	for (auto l: song->layers())
@@ -200,16 +202,16 @@ void layer_apply_volume(TrackLayer *l, const Range &r, float f, hui::Window *win
 	AudioBuffer buf;
 	auto *a = l->edit_buffers(buf, r);
 
-	int chunk_size = 2048 * 16;
+	const int CHUNK_SIZE = 2048 * 16;
 	int done = 0;
 	while (done < r.length) {
 		p->set((float) done / (float) r.length);
 
-		auto ref = buf.ref(done, min(done + chunk_size, r.length));
+		auto ref = buf.ref(done, min(done + CHUNK_SIZE, r.length));
 		for (auto& c: ref.c)
 			for (int i=0; i<ref.length; i++)
 				c[i] *= f;
-		done += chunk_size;
+		done += CHUNK_SIZE;
 	}
 
 	l->edit_buffers_finish(a);
@@ -223,14 +225,14 @@ void source_process_layer(TrackLayer *l, const Range &r, AudioSource *fx, hui::W
 	auto *a = l->edit_buffers(buf, r);
 	buf.set_zero();
 
-	int chunk_size = 2048;
+	const int CHUNK_SIZE = 2048;
 	int done = 0;
 	while (done < r.length) {
 		p->set((float) done / (float) r.length);
 
-		auto ref = buf.ref(done, min(done + chunk_size, r.length));
+		auto ref = buf.ref(done, min(done + CHUNK_SIZE, r.length));
 		fx->read(ref);
-		done += chunk_size;
+		done += CHUNK_SIZE;
 	}
 
 	l->edit_buffers_finish(a);
@@ -340,11 +342,25 @@ void layer_audio_scale_pitch_shift(TrackLayer *l, const Range &r, int new_size, 
 
 	auto r_affected = Range(r.offset, max(r.length, new_size));
 
-	AudioBuffer buf;
-	auto *a = l->edit_buffers(buf, r_affected);
+	AudioBuffer buf_layer;
+	auto *a = l->edit_buffers(buf_layer, r_affected);
+	AudioBuffer buf_in = buf_layer;
+	buf_in.make_own();
 
-	auto buf_edited = BufferPitchShift::scale_and_pitch_shift(buf.ref(0, r.length), new_size, scaling_method, pitch_factor);
-	buf.set(buf_edited, 0, 1.0f);
+
+	const int CHUNK_SIZE = 2048 * 4;
+	int done_in = 0;
+	int done_out = 0;
+	BufferPitchShift::Operator op;
+	op.reset((float)new_size / (float)r.length, scaling_method, pitch_factor);
+
+	while (max(done_in, done_out) < r.length) {
+		auto buf_edited = op.process(buf_in.ref(done_in, done_in + CHUNK_SIZE));
+		buf_layer.ref(done_out, 10000000).set(buf_edited, 0, 1.0f);
+		done_in += CHUNK_SIZE;
+		done_out += buf_edited.length;
+		p->set((float)max(done_in, done_out) / (float)r.length);
+	}
 
 	l->edit_buffers_finish(a);
 }

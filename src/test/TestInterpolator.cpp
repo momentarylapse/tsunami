@@ -9,6 +9,7 @@
 
 #include "TestInterpolator.h"
 #include "../processing/audio/BufferInterpolator.h"
+#include "../processing/audio/BufferPitchShift.h"
 
 TestInterpolator::TestInterpolator() : UnitTest("interpolator")
 {
@@ -21,6 +22,8 @@ Array<UnitTest::Test> TestInterpolator::tests() {
 	list.add({"linear", TestInterpolator::test_linear});
 	list.add({"cubic", TestInterpolator::test_cubic});
 	list.add({"fourier", TestInterpolator::test_fourier});
+	list.add({"operator", TestInterpolator::test_operator});
+	list.add({"pitch-operator", TestInterpolator::test_pitch_operator});
 	return list;
 }
 
@@ -58,6 +61,25 @@ void TestInterpolator::test_cubic() {
 }
 
 void TestInterpolator::test_fourier() {
+}
+
+void TestInterpolator::test_operator() {
+	BufferInterpolator::Operator op;
+	op.method = BufferInterpolator::Method::LINEAR;
+	op.reset(2.0f);
+
+	AudioBuffer buf(1024*8, 2);
+	assert_equal(op.process(buf).length, 16384);
+	assert_equal(op.process(buf).length, 16384);
+}
+
+void TestInterpolator::test_pitch_operator() {
+	BufferPitchShift::Operator op;
+	op.reset(2.0f, BufferInterpolator::Method::LINEAR, 1.0f);
+
+	AudioBuffer buf(1024*8, 2);
+	assert_equal(op.process(buf).length, 14336);
+	assert_equal(op.process(buf).length, 16384);
 }
 
 #endif

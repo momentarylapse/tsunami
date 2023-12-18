@@ -10,6 +10,7 @@
 
 #include "../../lib/base/base.h"
 class AudioBuffer;
+//class RingBuffer;
 
 namespace BufferInterpolator {
 
@@ -28,6 +29,16 @@ void interpolate_channel_fourier(const Array<float> &in, Array<float> &out);
 
 void interpolate_channel(const Array<float> &in, Array<float> &out, Method method);
 void interpolate(const AudioBuffer &in, AudioBuffer &out, Method method);
+
+struct Operator {
+	Method method = Method::LINEAR;
+	float factor = 1.0f;
+	int64 consumed = 0;
+	int64 produced = 0;
+
+	void reset(float factor);
+	AudioBuffer process(const AudioBuffer &buf);
+};
 
 }
 

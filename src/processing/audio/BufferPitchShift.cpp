@@ -3,6 +3,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
+#include <stdio.h>
 
 namespace BufferPitchShift {
 
@@ -115,6 +116,70 @@ AudioBuffer scale_and_pitch_shift(const AudioBuffer &buf, int new_size, BufferIn
 		BufferInterpolator::interpolate(buf, buf_out, scaling_method);
 	}
 	return buf_out;
+}
+
+
+void DummyStretchOperator::reset(float length_factor) {
+	factor = length_factor;
+	offset_in = produced = 0;
+	lin_buffer.clear();
+	ring_buffer.clear();
+}
+
+AudioBuffer DummyStretchOperator::process(const AudioBuffer &buf_in) {
+	ring_buffer.write(buf_in);
+	lin_buffer.append(buf_in);
+
+	constexpr int CHUNK_SIZE = 2048;
+	//int req = (int)((float)CHUNK_SIZE * factor);
+	//if (buf.available() < req)
+//		return AudioBuffer();
+
+
+	AudioBuffer buf_out(0, 2);
+	//for (int i0=0; i0<new_size; i0+=CHUNK_SIZE) {
+	while (true) {
+		int64 j0 = (int64)((float)produced / factor) - offset_in;
+		int64 j1 = (int64)((float)(produced + CHUNK_SIZE) / factor) - CHUNK_SIZE - offset_in;
+		//printf("%lld:%lld    %lld:%lld     (%d)\n", j0, j0 + CHUNK_SIZE, j1, j1 + CHUNK_SIZE, lin_buffer.length);
+//		if (j0 + CHUNK_SIZE > ring_buffer.available() or j1 + CHUNK_SIZE > ring_buffer.available())
+//			break;
+		if (j0 + CHUNK_SIZE > lin_buffer.length or j1 + CHUNK_SIZE > lin_buffer.length)
+				break;
+		j0 = max(j0, (int64)0);
+		j1 = max(j1, (int64)0);
+	//	ring_buffer.peek(t0, CHUNK_SIZE, RingBuffer::PeekMode::FORWARD_REF)
+		auto t0 = lin_buffer.cref(j0, j0 + CHUNK_SIZE);
+		auto t1 = lin_buffer.cref(j1, j1 + CHUNK_SIZE);
+		t0.make_own();
+		t1.make_own();
+		apply_fade_out(t0);
+		apply_fade_in(t1);
+
+		t0.add(t1, 0, 1.0f);
+
+		buf_out.append(t0);
+
+		produced += CHUNK_SIZE;
+		//offset_in += ...
+	}
+	return buf_out;
+}
+
+
+Operator::Operator() : buf_between(65536) {}
+
+void Operator::reset(float length_factor, BufferInterpolator::Method _scaling_method, float pitch_factor) {
+	op_stretch.reset(pitch_factor * length_factor);
+	op_inter.method = _scaling_method;
+	op_inter.reset(1.0f / pitch_factor);
+	consumed = 0;
+	produced = 0;
+}
+
+AudioBuffer Operator::process(const AudioBuffer &buf) {
+	auto a = op_stretch.process(buf);
+	return op_inter.process(a);
 }
 
 }

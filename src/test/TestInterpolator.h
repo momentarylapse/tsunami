@@ -20,6 +20,8 @@ public:
 	static void test_linear_short();
 	static void test_cubic();
 	static void test_fourier();
+	static void test_operator();
+	static void test_pitch_operator();
 };
 
 #endif /* SRC_TEST_TESTINTERPOLATOR_H_ */

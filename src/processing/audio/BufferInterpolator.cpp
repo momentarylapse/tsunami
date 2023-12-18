@@ -7,8 +7,11 @@
 
 #include "BufferInterpolator.h"
 #include "../../data/audio/AudioBuffer.h"
+#include "../../data/audio/RingBuffer.h"
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
+
+#include <stdio.h>
 
 namespace BufferInterpolator {
 
@@ -85,6 +88,22 @@ void interpolate(const AudioBuffer &in, AudioBuffer &out, Method method) {
 	out.offset = in.offset;
 	for (int i=0; i<in.channels; i++)
 		interpolate_channel(in.c[i], out.c[i], method);
+}
+
+
+void Operator::reset(float _factor) {
+	factor = _factor;
+	consumed = produced = 0;
+}
+
+AudioBuffer Operator::process(const AudioBuffer &buf) {
+	int out_length = (int)((float)buf.length * factor);
+	AudioBuffer r;
+	if (out_length > 0) {
+		r.resize(out_length);
+		interpolate(buf, r, method);
+	}
+	return r;
 }
 
 }

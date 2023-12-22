@@ -27,6 +27,7 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/rhythm/Bar.h"
 #include "../processing/audio/BufferInterpolator.h"
+#include "../processing/audio/BufferPitchShift.h"
 #include "../module/ModuleFactory.h"
 #include "../module/SignalChain.h"
 #include "../module/ModuleConfiguration.h"
@@ -150,6 +151,11 @@ void generic__init__(T *me) {
 	new(me) T;
 }
 
+template<class T>
+void generic__delete__(T *me) {
+	me->T::~T();
+}
+
 
 void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
@@ -178,6 +184,14 @@ void PluginManager::link_app_data() {
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
+
+
+	ext->declare_class_size("BufferPitchShift.Operator", sizeof(BufferPitchShift::Operator));
+	ext->link_class_func("BufferPitchShift.Operator.__init__", &generic__init__<BufferPitchShift::Operator>);
+	ext->link_class_func("BufferPitchShift.Operator.__delete__", &generic__delete__<BufferPitchShift::Operator>);
+	ext->link_class_func("BufferPitchShift.Operator.reset", &BufferPitchShift::Operator::reset);
+	ext->link_class_func("BufferPitchShift.Operator.process", &BufferPitchShift::Operator::process);
+
 
 	ext->link_class_func("future[string].__delete__", &kaba::KabaFuture<string>::__delete__);
 	ext->link_class_func("future[string].then", &kaba::KabaFuture<string>::kaba_then);

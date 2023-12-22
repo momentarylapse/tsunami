@@ -67,9 +67,6 @@ struct AudioBuffer
 			c[1] = c[0]
 
 
-func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
-
-
 struct RingBuffer as @noauto
 	enum PeekMode
 		FORWARD_REF

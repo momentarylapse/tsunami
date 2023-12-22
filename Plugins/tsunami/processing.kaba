@@ -1,0 +1,11 @@
+use common
+
+func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
+
+
+class BufferPitchShift
+	class Operator
+		func extern __init__()
+		func extern __delete__()
+		func extern reset(length_factor: float, mode: int, pitch_factor: float)
+		func extern process(b: AudioBuffer) -> AudioBuffer

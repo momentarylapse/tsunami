@@ -334,6 +334,14 @@ int product_class_size(const Array<const Class*> &classes) {
 	return size;
 }
 
+static int _make_optional_size(const Class *t) {
+	if (t->size >= 8)
+		return mem_align(t->size, 8) + 1;
+	if (t->size >= 4)
+		return mem_align(t->size, 4) + 1;
+	return t->size + 1;
+}
+
 const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id) {
 	if (config.verbose)
 		msg_write("INSTANTIATE TEMPLATE CLASS  " + t._class->name + " ... " + params[0]->name);
@@ -382,7 +390,7 @@ const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, co
 	else if (c0 == TypeDictT)
 		c = create_class(class_name_might_need_parantheses(params[0]) + "{}", Class::Type::DICT, config.target.dynamic_array_size, -1, TypeDictBase, params, token_id);
 	else if (c0 == TypeOptionalT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "?", Class::Type::OPTIONAL, params[0]->size + 1, 0, nullptr, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "?", Class::Type::OPTIONAL, _make_optional_size(params[0]), 0, nullptr, params, token_id);
 	else if (c0 == TypeProductT)
 		c = create_class(product_class_name(params), Class::Type::PRODUCT, product_class_size(params), 0, nullptr, params, token_id);
 	else if (c0 == TypeFutureT) {

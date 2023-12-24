@@ -7,13 +7,15 @@ class SlowPlayback extends TsunamiPlugin
 	var slow: shared![AudioEffect]
 	func override on_start()
 		chain = session.playback.signal_chain
-		slow = chain.add_basic(Module.Type.AUDIO_EFFECT, "Slow") as shared![AudioEffect]
-		chain.connect(session.playback.renderer, 0, slow, 0)
+		slow = chain.add_basic(Module.Type.AUDIO_EFFECT, "Change Speed") as shared![AudioEffect]
 		# FIXME auto downcast shared![SongRenderer]  ->  Module&
-		for r in chain.find_connected(weak(session.playback.renderer), 0, 0)
+		for r in chain.find_connected(weak(session.playback.renderer), 0, 1)
+			chain.connect(session.playback.renderer, 0, slow, 0)
 			next = r[0]
 			next_port = r[1]
 			chain.connect(slow, 0, r[0], r[1])
+		else
+			session.e("SongRenderer is not connected to anything in the signalchain")
 
 	func override on_stop()
 		for n in next

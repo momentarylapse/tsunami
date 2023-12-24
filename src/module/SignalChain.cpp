@@ -230,7 +230,7 @@ base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(M
 		for (Module *target: weak(modules))
 			for (auto &&[i,p]: enumerate(target->port_in))
 				if ((*p.port) == m->port_out[port])
-					return {{target, i}};
+					return ConnectionQueryResult{target, i};
 	} else if (direction == 0 and port < m->port_in.num and m->port_in[port].port) {
 		for (Module *target: weak(modules))
 			for (auto &&[i,p]: enumerate(weak(target->port_out)))

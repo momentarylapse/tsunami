@@ -65,6 +65,7 @@ class SignalChain extends Module
 	func extern mut delete(m: Module*)
 	func extern mut connect(source: Module*, source_port: int, target: Module*, target_port: int)
 	func extern mut disconnect(source: Module*, source_port: int, target: Module*, target_port: int)
+	func extern find_connected(m: Module&, port: int, direction: int) -> (Module&,int)?
 	func extern mut start()
 	func extern mut stop()
 	func extern is_prepared() -> bool

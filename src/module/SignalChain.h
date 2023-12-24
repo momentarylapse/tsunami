@@ -9,6 +9,7 @@
 #define SRC_MODULE_SIGNALCHAIN_H_
 
 #include "Module.h"
+#include "../lib/base/optional.h"
 #include <mutex>
 
 class ConfigPanel;
@@ -72,6 +73,13 @@ public:
 
 	void disconnect_out(Module *source, int port);
 	void disconnect_in(Module *target, int port);
+
+	struct ConnectionQueryResult {
+		Module *m;
+		int port;
+	};
+
+	base::optional<ConnectionQueryResult> find_connected(Module *m, int port, int direction) const;
 
 	void on_module_play_end_of_stream();
 

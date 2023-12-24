@@ -761,6 +761,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("SignalChain.delete", &SignalChain::delete_module);
 		ext->link_class_func("SignalChain.connect", &XSignalChain::x_connect);
 		ext->link_class_func("SignalChain.disconnect", &SignalChain::disconnect);
+		ext->link_class_func("SignalChain.find_connected", &SignalChain::find_connected);
 		ext->link_class_func("SignalChain.set_update_dt", &SignalChain::set_tick_dt);
 		ext->link_class_func("SignalChain.set_buffer_size", &SignalChain::set_buffer_size);
 		ext->link_class_func("SignalChain.is_prepared", &SignalChain::is_prepared);

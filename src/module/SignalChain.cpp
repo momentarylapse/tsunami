@@ -16,6 +16,7 @@
 #include "beats/BeatSource.h"
 #include "../Session.h"
 #include "../plugins/PluginManager.h"
+#include "../lib/base/iter.h"
 #include "../lib/os/file.h"
 #include "../lib/os/time.h"
 #include "../lib/doc/xml.h"
@@ -220,6 +221,23 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 		*(tp.port) = nullptr;
 	}
 	out_delete_cable.notify();
+}
+
+base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(Module *m, int port, int direction) const {
+	if (port < 0)
+		return base::None;
+	if (direction == 1 and port < m->port_out.num) {
+		for (Module *target: weak(modules))
+			for (auto &&[i,p]: enumerate(target->port_in))
+				if ((*p.port) == m->port_out[port])
+					return {{target, i}};
+	} else if (direction == 0 and port < m->port_in.num and m->port_in[port].port) {
+		for (Module *target: weak(modules))
+			for (auto &&[i,p]: enumerate(weak(target->port_out)))
+				if (p == *m->port_in[port].port)
+					return {{target, i}};
+	}
+	return base::None;
 }
 
 void SignalChain::save(const Path& filename) {

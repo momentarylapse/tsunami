@@ -485,7 +485,7 @@ bool AudioInput::is_capturing() {
 	return state == State::CAPTURING;
 }
 
-int AudioInput::command(ModuleCommand cmd, int param) {
+int64 AudioInput::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;

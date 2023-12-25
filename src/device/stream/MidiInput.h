@@ -101,7 +101,7 @@ private:
 	double offset;
 
 public:
-	int command(ModuleCommand cmd, int param) override;
+	int64 command(ModuleCommand cmd, int64 param) override;
 };
 
 #endif /* SRC_DEVICE_STREAM_MIDIINPUT_H_ */

@@ -27,7 +27,7 @@ public:
 
 	void _accumulate(bool enable);
 
-	int command(ModuleCommand cmd, int param) override;
+	int64 command(ModuleCommand cmd, int64 param) override;
 
 	Port *source;
 	MidiEventBuffer buffer;

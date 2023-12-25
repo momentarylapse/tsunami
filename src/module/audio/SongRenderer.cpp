@@ -226,6 +226,14 @@ void SongRenderer::reset_state() {
 	clear_track_data();
 }
 
+int64 SongRenderer::command(ModuleCommand cmd, int64 param) {
+	if (cmd == ModuleCommand::SAMPLE_COUNT_MODE)
+		return (int)SampleCountMode::TRANSLATOR;
+	if (cmd == ModuleCommand::GET_SAMPLE_COUNT)
+		return map_to_pos(param);
+	return COMMAND_NOT_HANDLED;
+}
+
 void SongRenderer::build_data_once() {
 	bar_streamer = new BarStreamer(song->bars);
 	bar_streamer->perf_set_parent(this);

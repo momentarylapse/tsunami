@@ -96,7 +96,7 @@ void AudioChannelSelector::apply(const AudioBuffer &buf_in, AudioBuffer &buf_out
 	}
 }
 
-int AudioChannelSelector::command(ModuleCommand cmd, int param) {
+int64 AudioChannelSelector::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
 		config.channels = param;
 		peak_meter->command(cmd, param);

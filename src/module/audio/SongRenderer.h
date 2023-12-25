@@ -37,6 +37,7 @@ public:
 
 	// from Module
 	void reset_state() override ;
+	int64 command(ModuleCommand cmd, int64 param) override;
 
 	// from AudioSource
 	int read(AudioBuffer &buf) override;

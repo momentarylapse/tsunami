@@ -438,7 +438,7 @@ bool SignalChain::is_prepared() {
 	return state != State::UNPREPARED;
 }
 
-int SignalChain::command(ModuleCommand cmd, int param) {
+int64 SignalChain::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -449,7 +449,7 @@ int SignalChain::command(ModuleCommand cmd, int param) {
 		prepare_start();
 		return 0;
 	} else {
-		int r = COMMAND_NOT_HANDLED;
+		int64 r = COMMAND_NOT_HANDLED;
 		for (Module *m: weak(modules))
 			r = max(r, m->command(cmd, param));
 		return r;

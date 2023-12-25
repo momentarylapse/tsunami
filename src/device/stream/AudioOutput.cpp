@@ -678,7 +678,7 @@ void AudioOutput::reset_state() {
 	_clear_data_state();
 }
 
-int AudioOutput::command(ModuleCommand cmd, int param) {
+int64 AudioOutput::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -696,6 +696,13 @@ int AudioOutput::command(ModuleCommand cmd, int param) {
 			return 0;
 		//printf("suck %d    av %d\n", param, ring_buf.available());
 		return _read_stream(param);
+	} else if (cmd == ModuleCommand::SAMPLE_COUNT_MODE) {
+		return (int)SampleCountMode::CONSUMER;
+	} else if (cmd == ModuleCommand::GET_SAMPLE_COUNT) {
+		auto s = estimate_samples_played();
+		if (s)
+			return *s;
+		return 0;
 	}
 	return COMMAND_NOT_HANDLED;
 }

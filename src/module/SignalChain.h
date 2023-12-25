@@ -88,7 +88,7 @@ public:
 	int hui_runner;
 	float tick_dt;
 	void _cdecl set_tick_dt(float dt);
-	int command(ModuleCommand cmd, int param) override;
+	int64 command(ModuleCommand cmd, int64 param) override;
 	void prepare_start();
 	void start();
 	void stop();

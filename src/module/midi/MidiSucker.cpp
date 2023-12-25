@@ -18,7 +18,7 @@ MidiSucker::MidiSucker() :
 	source = nullptr;
 }
 
-int MidiSucker::command(ModuleCommand cmd, int param) {
+int64 MidiSucker::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::SUCK) {
 		return update(param);
 	}

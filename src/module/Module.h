@@ -65,6 +65,15 @@ enum class ModuleCommand {
 	ACCUMULATION_GET_SIZE,
 	SUCK,
 	SET_INPUT_CHANNELS,
+	SAMPLE_COUNT_MODE,
+	GET_SAMPLE_COUNT,
+};
+
+enum class SampleCountMode {
+	NONE,
+	CONSUMER,
+	PRODUCER,
+	TRANSLATOR
 };
 
 class Module : public Sharable<obs::Node<VirtualBase>> {
@@ -131,7 +140,7 @@ public:
 
 
 	static const int COMMAND_NOT_HANDLED;
-	virtual int command(ModuleCommand cmd, int param) { return COMMAND_NOT_HANDLED; }
+	virtual int64 command(ModuleCommand cmd, int64 param) { return COMMAND_NOT_HANDLED; }
 
 
 

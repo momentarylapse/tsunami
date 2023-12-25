@@ -104,7 +104,7 @@ void AudioBackup::stop() {
 	}
 }
 
-int AudioBackup::command(ModuleCommand cmd, int param) {
+int64 AudioBackup::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;

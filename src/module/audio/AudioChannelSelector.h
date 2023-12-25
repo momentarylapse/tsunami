@@ -30,7 +30,7 @@ public:
 
 	void apply(const AudioBuffer &buf_in, AudioBuffer &buf_out);
 
-	int command(ModuleCommand cmd, int param) override;
+	int64 command(ModuleCommand cmd, int64 param) override;
 
 	ConfigPanel *create_panel() override;
 

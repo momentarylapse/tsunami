@@ -126,7 +126,7 @@ protected:
 #endif
 
 public:
-	int command(ModuleCommand cmd, int param) override;
+	int64 command(ModuleCommand cmd, int64 param) override;
 
 };
 

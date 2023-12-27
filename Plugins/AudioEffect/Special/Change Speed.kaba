@@ -21,6 +21,13 @@ class ChangeSpeed extends AudioEffect
 	func override on_config()
 		op.reset(1.0/config.speed, 0, 1.0)
 	
+	func override command(cmd: Module.Command, param: int64) -> int64
+		if cmd == Module.Command.SAMPLE_COUNT_MODE
+			return int(Module.SampleCountMode.TRANSLATOR)
+		if cmd == Module.Command.GET_SAMPLE_COUNT
+			return int64(int(float(int(param)) * config.speed))
+		return 0xdeaddead
+	
 	func override read(out buf: AudioBuffer) -> int
 		let n_out = len(buf)
 		

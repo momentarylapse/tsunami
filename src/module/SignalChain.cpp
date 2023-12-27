@@ -250,9 +250,14 @@ void SignalChain::_rebuild_position_estimation_graph() {
 }
 
 base::optional<int64> SignalChain::estimate_pos() const {
-	if (!position_estimation_graph.consumer)
+	auto &g = position_estimation_graph;
+	if (!g.consumer)
 		return base::None;
-	return base::None;
+
+	auto p0 = g.consumer->command(ModuleCommand::GET_SAMPLE_COUNT, 0);
+	for (auto m: g.mappers)
+		p0 = m->command(ModuleCommand::GET_SAMPLE_COUNT, p0);
+	return p0;
 }
 
 base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(Module *m, int port, int direction) const {

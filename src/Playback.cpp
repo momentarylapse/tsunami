@@ -119,6 +119,11 @@ int Playback::get_pos() {
 	if (_sync_counter > 100)
 		_sync_pos();
 
+	auto r = signal_chain->estimate_pos();
+	if (r)
+		return (int)*r;
+
+	// obsolete:
 
 	[[maybe_unused]] auto available = output_stream->get_available();
 	[[maybe_unused]] auto requested = output_stream->get_samples_requested();

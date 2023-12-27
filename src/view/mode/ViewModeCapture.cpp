@@ -66,8 +66,8 @@ void ViewModeCapture::draw_post(Painter *c) {
 		}
 	}
 	
-	int l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	view->draw_time_line(c, offset + l, theme.capture_marker, false, true);
+	if (auto l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0))
+		view->draw_time_line(c, offset + *l, theme.capture_marker, false, true);
 }
 
 base::set<Track*> ViewModeCapture::prevent_playback() {

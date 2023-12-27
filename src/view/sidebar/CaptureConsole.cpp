@@ -189,8 +189,8 @@ void CaptureConsole::on_new_version() {
 void CaptureConsole::update_time() {
 	if (!chain)
 		return;
-	int s = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0);
-	set_string("time", song->get_time_str_long(s));
+	if (auto s = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0))
+		set_string("time", song->get_time_str_long((int)*s));
 }
 
 void CaptureConsole::on_output_end_of_stream() {

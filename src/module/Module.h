@@ -11,6 +11,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
+#include "../lib/base/optional.h"
 #include "../lib/pattern/Observable.h"
 
 namespace kaba {
@@ -139,8 +140,7 @@ public:
 	virtual void _cdecl reset_state() {}
 
 
-	static const int COMMAND_NOT_HANDLED;
-	virtual int64 command(ModuleCommand cmd, int64 param) { return COMMAND_NOT_HANDLED; }
+	virtual base::optional<int64> command(ModuleCommand cmd, int64 param) { return base::None; }
 
 
 

@@ -20,7 +20,7 @@ public:
 
 	Port *source;
 
-	int64 command(ModuleCommand cmd, int64 param) override;
+	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };
 
 #endif /* SRC_MODULE_MIDI_MIDISUCKER_H_ */

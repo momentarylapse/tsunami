@@ -104,7 +104,7 @@ void AudioBackup::stop() {
 	}
 }
 
-int64 AudioBackup::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> AudioBackup::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -118,9 +118,9 @@ int64 AudioBackup::command(ModuleCommand cmd, int64 param) {
 		accumulating = false;
 		return 0;
 	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
-		config.channels = param;
+		config.channels = (int)param;
 		changed();
 		return 0;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }

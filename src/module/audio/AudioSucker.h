@@ -21,7 +21,7 @@ public:
 
 	Port *source;
 
-	int64 command(ModuleCommand cmd, int64 param) override;
+	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 
 	void set_channels(int channels);
 

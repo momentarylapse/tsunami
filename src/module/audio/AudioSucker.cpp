@@ -65,13 +65,13 @@ void AudioSucker::set_channels(int _channels) {
 	changed();
 }
 
-int64 AudioSucker::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> AudioSucker::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::SUCK)
 		return do_suck(param);
 	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
 		set_channels(param);
 		return 0;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }
 

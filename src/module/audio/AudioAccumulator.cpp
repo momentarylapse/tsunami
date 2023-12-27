@@ -98,7 +98,7 @@ void AudioAccumulator::on_config() {
 	buf.set_channels(config.channels);
 }
 
-int64 AudioAccumulator::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> AudioAccumulator::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::ACCUMULATION_START) {
 		_accumulate(true);
 		return 0;
@@ -116,5 +116,5 @@ int64 AudioAccumulator::command(ModuleCommand cmd, int64 param) {
 		set_channels(param);
 		return 0;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }

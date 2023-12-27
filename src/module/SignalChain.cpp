@@ -231,16 +231,16 @@ void SignalChain::_rebuild_position_estimation_graph() {
 	position_estimation_graph = {};
 
 	for (auto m: weak(modules)) {
-		auto mode = (SampleCountMode)m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
-		if (mode == SampleCountMode::CONSUMER) {
+		auto mode = m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
+		if (mode == (int64)SampleCountMode::CONSUMER) {
 			position_estimation_graph.consumer = m;
 			while (true) {
 				auto r = find_connected(m, 0, 0);
 				if (!r)
 					break;
 				m = (*r).m;
-				mode = (SampleCountMode)m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
-				if (mode == SampleCountMode::TRANSLATOR) {
+				mode = m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
+				if (mode == (int64)SampleCountMode::TRANSLATOR) {
 					position_estimation_graph.mappers.add(m);
 				}
 			}
@@ -256,7 +256,8 @@ base::optional<int64> SignalChain::estimate_pos() const {
 
 	auto p0 = g.consumer->command(ModuleCommand::GET_SAMPLE_COUNT, 0);
 	for (auto m: g.mappers)
-		p0 = m->command(ModuleCommand::GET_SAMPLE_COUNT, p0);
+		if (p0)
+			p0 = m->command(ModuleCommand::GET_SAMPLE_COUNT, *p0);
 	return p0;
 }
 
@@ -476,7 +477,7 @@ bool SignalChain::is_prepared() {
 	return state != State::UNPREPARED;
 }
 
-int64 SignalChain::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> SignalChain::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -487,12 +488,19 @@ int64 SignalChain::command(ModuleCommand cmd, int64 param) {
 		prepare_start();
 		return 0;
 	} else {
-		int64 r = COMMAND_NOT_HANDLED;
+		base::optional<int64> r;
+		auto opt_max = [] (base::optional<int64> a, base::optional<int64> b) -> base::optional<int64> {
+			if (a and b)
+				return max(*a, *b);
+			if (a)
+				return a;
+			return b;
+		};
 		for (Module *m: weak(modules))
-			r = max(r, m->command(cmd, param));
+			r = opt_max(r, m->command(cmd, param));
 		return r;
 	}
-	return Module::COMMAND_NOT_HANDLED;
+	return base::None;
 }
 
 bool SignalChain::is_active() {
@@ -543,8 +551,8 @@ int SignalChain::do_suck() {
 	PerformanceMonitor::start_busy(perf_channel);
 	int s = Port::END_OF_STREAM;
 	for (auto *m: weak(modules)) {
-		int r = m->command(ModuleCommand::SUCK, buffer_size);
-		s = max(s, r);
+		if (auto r = m->command(ModuleCommand::SUCK, buffer_size))
+			s = max(s, (int)*r);
 	}
 	PerformanceMonitor::end_busy(perf_channel);
 	return s;

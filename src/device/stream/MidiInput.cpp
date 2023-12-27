@@ -291,7 +291,7 @@ int MidiInput::get_delay() {
 void MidiInput::reset_sync() {
 }
 
-int64 MidiInput::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> MidiInput::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START){
 		start();
 		return 0;
@@ -299,9 +299,9 @@ int64 MidiInput::command(ModuleCommand cmd, int64 param) {
 		stop();
 		return 0;
 	} else if (cmd == ModuleCommand::SUCK){
-		return do_capturing();
+		return (int64)do_capturing();
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }
 
 ModuleConfiguration *MidiInput::get_config() const {

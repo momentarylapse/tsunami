@@ -31,9 +31,9 @@ class _StreamTest extends TsunamiPlugin
 			acc = !acc
 			if acc
 				print("-------start")
-				chain.command(Module.Command.ACCUMULATION_START, 0)
+				let r = chain.command(Module.Command.ACCUMULATION_START, 0)
 			else
 				print("-------stop")
-				chain.command(Module.Command.ACCUMULATION_STOP, 0)
-				chain.command(Module.Command.ACCUMULATION_CLEAR, 0)
+				let r1 = chain.command(Module.Command.ACCUMULATION_STOP, 0)
+				let r2 = chain.command(Module.Command.ACCUMULATION_CLEAR, 0)
 			nn = 0

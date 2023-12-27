@@ -49,7 +49,6 @@ struct Operator {
 	int64 consumed = 0;
 	int64 produced = 0;
 
-	int _requires(int size) const;
 	AudioBuffer process(const AudioBuffer &buf);
 };
 }

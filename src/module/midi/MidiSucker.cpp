@@ -18,11 +18,11 @@ MidiSucker::MidiSucker() :
 	source = nullptr;
 }
 
-int64 MidiSucker::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> MidiSucker::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::SUCK) {
-		return update(param);
+		return (int64)update((int)param);
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }
 
 int MidiSucker::update(int buffer_size) {

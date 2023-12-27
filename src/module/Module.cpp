@@ -20,8 +20,6 @@
 #include "../view/module/ConfigPanel.h"
 #include "../view/module/AutoConfigPanel.h"
 
-const int Module::COMMAND_NOT_HANDLED = 0xdeaddead;
-
 
 string guess_nice_module_name(const string &_class) {
 	if (_class.head(5) == "Audio")

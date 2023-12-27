@@ -678,7 +678,7 @@ void AudioOutput::reset_state() {
 	_clear_data_state();
 }
 
-int64 AudioOutput::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> AudioOutput::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -695,16 +695,16 @@ int64 AudioOutput::command(ModuleCommand cmd, int64 param) {
 		if (ring_buf.available() >= prebuffer_size)
 			return 0;
 		//printf("suck %d    av %d\n", param, ring_buf.available());
-		return _read_stream(param);
+		return (int64)_read_stream((int)param);
 	} else if (cmd == ModuleCommand::SAMPLE_COUNT_MODE) {
-		return (int)SampleCountMode::CONSUMER;
+		return (int64)SampleCountMode::CONSUMER;
 	} else if (cmd == ModuleCommand::GET_SAMPLE_COUNT) {
 		auto s = estimate_samples_played();
 		if (s)
 			return *s;
 		return 0;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }
 
 bool AudioOutput::is_playing() {

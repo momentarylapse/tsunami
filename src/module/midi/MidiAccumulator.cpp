@@ -42,7 +42,7 @@ void MidiAccumulator::_accumulate(bool enable) {
 	accumulating = enable;
 }
 
-int64 MidiAccumulator::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> MidiAccumulator::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::ACCUMULATION_START) {
 		_accumulate(true);
 		return 0;
@@ -55,5 +55,5 @@ int64 MidiAccumulator::command(ModuleCommand cmd, int64 param) {
 	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
 		return buffer.samples;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }

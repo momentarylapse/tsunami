@@ -485,7 +485,7 @@ bool AudioInput::is_capturing() {
 	return state == State::CAPTURING;
 }
 
-int64 AudioInput::command(ModuleCommand cmd, int64 param) {
+base::optional<int64> AudioInput::command(ModuleCommand cmd, int64 param) {
 	if (cmd == ModuleCommand::START) {
 		start();
 		return 0;
@@ -497,7 +497,7 @@ int64 AudioInput::command(ModuleCommand cmd, int64 param) {
 			_create_dev();
 		return 0;
 	}
-	return COMMAND_NOT_HANDLED;
+	return base::None;
 }
 
 base::optional<int64> AudioInput::samples_recorded() {

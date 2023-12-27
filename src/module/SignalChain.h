@@ -117,6 +117,14 @@ public:
 	std::mutex mutex;
 
 	void mark_all_modules_as_system();
+
+
+	struct PositionEstimationGraph {
+		Module *consumer = nullptr;
+		Array<Module *> mappers;
+	} position_estimation_graph;
+	void _rebuild_position_estimation_graph();
+	base::optional<int64> estimate_pos() const;
 };
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

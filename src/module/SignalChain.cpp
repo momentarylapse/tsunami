@@ -150,6 +150,7 @@ void SignalChain::delete_module(Module *m) {
 		disconnect_out(m, i);
 
 	modules.erase(index);
+    _rebuild_position_estimation_graph();
 	out_delete_module.notify();
 }
 
@@ -192,6 +193,7 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 		std::lock_guard<std::mutex> lock(mutex);
 		target->_plug_in(target_port, source, source_port);
 	}
+    _rebuild_position_estimation_graph();
 	out_add_cable.notify();
 }
 
@@ -209,6 +211,7 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 					std::lock_guard<std::mutex> lock(mutex);
 					*p.port = nullptr;
 				}
+                _rebuild_position_estimation_graph();
 				out_delete_cable.notify();
 			}
 		}
@@ -220,7 +223,36 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 		std::lock_guard<std::mutex> lock(mutex);
 		*(tp.port) = nullptr;
 	}
+    _rebuild_position_estimation_graph();
 	out_delete_cable.notify();
+}
+
+void SignalChain::_rebuild_position_estimation_graph() {
+	position_estimation_graph = {};
+
+	for (auto m: weak(modules)) {
+		auto mode = (SampleCountMode)m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
+		if (mode == SampleCountMode::CONSUMER) {
+			position_estimation_graph.consumer = m;
+			while (true) {
+				auto r = find_connected(m, 0, 0);
+				if (!r)
+					break;
+				m = (*r).m;
+				mode = (SampleCountMode)m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
+				if (mode == SampleCountMode::TRANSLATOR) {
+					position_estimation_graph.mappers.add(m);
+				}
+			}
+			return;
+		}
+	}
+}
+
+base::optional<int64> SignalChain::estimate_pos() const {
+	if (!position_estimation_graph.consumer)
+		return base::None;
+	return base::None;
 }
 
 base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(Module *m, int port, int direction) const {
@@ -333,6 +365,7 @@ xfer<SignalChain> SignalChain::load(Session *session, const Path &filename) {
 			chain->_ports_out.add(p);
 		}
 		chain->update_ports();
+        chain->_rebuild_position_estimation_graph();
 	} catch(Exception &e) {
 		session->e(e.message());
 	}

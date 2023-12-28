@@ -357,12 +357,12 @@ void AudioBuffer::set(const AudioBuffer &source, int target_offset, float volume
 // this[:] = source[offset:offset+length] ???
 void AudioBuffer::set_as_ref(const AudioBuffer &source, int _offset, int _length) {
 	clear();
-	length = _length;
 	offset = _offset + source.offset;
 	channels = source.channels;
 	c.resize(MEM_CHANNELS);
 	for (int i=0; i<MEM_CHANNELS; i++)
 		c[i].set_ref(source.c[i].sub_ref(_offset, _offset+_length));
+	length = c[0].num; // might be smaller than _length
 }
 
 AudioBuffer AudioBuffer::ref(int start, int end) {

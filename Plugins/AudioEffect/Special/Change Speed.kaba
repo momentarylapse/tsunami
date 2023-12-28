@@ -1,6 +1,6 @@
 use tsunami
 
-let AutoConfigSpeed = "range=0.01:2:0.001,scale=100,unit=%"
+let AutoConfigSpeed = "range=0.1:2:0.001,scale=100,unit=%"
 
 class Config extends Module.Config
 	var speed: float
@@ -12,9 +12,11 @@ class SampleCounter
 	var produced: int64 = 0
 	var consumed: int64 = 0
 	
-	func mut reset(speed: float)
-		#consumed = 0
-		#produced = 0
+	func mut reset(speed: float, hard: bool)
+		if hard
+			consumed = 0
+			produced = 0
+			map.clear()
 		map.add([consumed, produced, speed])
 	func mut produce(s_in: int, s_out: int, speed: float)
 		consumed += s_in
@@ -41,10 +43,11 @@ class ChangeSpeed extends AudioEffect
 	
 	func override reset_state()
 		op.reset(1.0/config.speed, 0, 1.0)
-		counter.reset(config.speed)
+		counter.reset(config.speed, true)
 	
 	func override on_config()
-		reset_state()
+		op.reset(1.0/config.speed, 0, 1.0)
+		counter.reset(config.speed, false)
 	
 	func override command(cmd: Module.Command, param: int64) -> int64?
 		if cmd == Module.Command.SAMPLE_COUNT_MODE

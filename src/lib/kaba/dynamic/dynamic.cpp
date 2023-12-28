@@ -168,7 +168,9 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 //	msg_write(type->name);
 	// fixed
 	if (type == TypeInt) {
-		return str(*reinterpret_cast<const int*>(p));
+		return str(*reinterpret_cast<const int *>(p));
+	} if (type == TypeInt64) {
+		return str(*reinterpret_cast<const int64*>(p));
 	} else if (type == TypeFloat32) {
 		return f2s(*reinterpret_cast<const float*>(p), 6);
 	} else if (type == TypeFloat64) {

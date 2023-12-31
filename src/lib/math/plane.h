@@ -17,6 +17,7 @@ public:
 	plane(){}
 	plane(const vec3 &n, float d);
 	string _cdecl str() const;
+	bool operator==(const plane& o) const;
 
 	bool _cdecl intersect_line(const vec3 &l1, const vec3 &l2, vec3 &i) const;
 	float _cdecl distance(const vec3 &p) const;

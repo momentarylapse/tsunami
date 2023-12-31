@@ -256,22 +256,6 @@ public:
 	}
 };
 
-class PathList : public Array<Path> {
-public:
-	void _cdecl assign(const PathList &s) {
-		*this = s;
-	}
-	bool __contains__(const Path &s) const {
-		return this->find(s) >= 0;
-	}
-	Array<Path> __add__(const Array<Path> &o) const {
-		return *this + o;
-	}
-	void __adds__(const Array<Path> &o) {
-		append(o);
-	}
-};
-
 void SIAddPackageOSPath(Context *c) {
 	add_package(c, "os");
 
@@ -319,16 +303,7 @@ void SIAddPackageOSPath(Context *c) {
 	add_class(TypePath);
 		class_add_func("all_parents", TypePathList, &Path::all_parents, Flags::PURE);
 
-	add_class(TypePathList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<Path>::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &Array<Path>::clear);
-		class_add_func("clear", TypeVoid, &Array<Path>::clear);
-		class_add_func("add", TypeVoid, &Array<Path>::add);
-			func_add_param("p", TypePath);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypePathList, TypePathList, InlineID::NONE, &PathList::assign);
-		add_operator(OperatorID::IN, TypeBool, TypePathList, TypePath, InlineID::NONE, &PathList::__contains__);
-		add_operator(OperatorID::ADD, TypePathList, TypePathList, TypePathList, InlineID::NONE, &PathList::__add__);
-		add_operator(OperatorID::ADDS, TypeVoid, TypePathList, TypePathList, InlineID::NONE, &PathList::__adds__);
+	lib_create_list<Path>(TypePathList);
 }
 
 

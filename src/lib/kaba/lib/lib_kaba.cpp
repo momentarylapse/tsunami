@@ -75,6 +75,8 @@ void SIAddPackageKaba(Context *c) {
 	TypeClassRef = add_type_ref(TypeClass);
 	auto TypeClassPList = add_type_list(TypeClassP);
 	auto TypeClassRefList = add_type_list(TypeClassRef);
+	lib_create_list<Class*>(TypeClassPList);
+	lib_create_list<Class*>(TypeClassRefList);
 
 	TypeFunction = add_type  ("Function", sizeof(Function));
 	auto TypeFunctionP = add_type_p_raw(TypeFunction);
@@ -89,6 +91,9 @@ void SIAddPackageKaba(Context *c) {
 	auto TypeStatement = add_type  ("Statement", sizeof(Statement));
 	auto TypeStatementRef = add_type_ref(TypeStatement);
 	auto TypeStatementRefList = add_type_list(TypeStatementRef);
+	lib_create_list<Function*>(TypeFunctionRefList);
+	lib_create_list<SpecialFunction*>(TypeSpecialFunctionRefList);
+	lib_create_list<Statement*>(TypeStatementRefList);
 		
 
 	auto TypeModule = add_type  ("Module", sizeof(Module));
@@ -97,6 +102,8 @@ void SIAddPackageKaba(Context *c) {
 	auto TypeModuleSharedList = add_type_list(TypeModuleShared);
 	auto TypeModuleRef = add_type_ref(TypeModule);
 	auto TypeModuleRefList = add_type_list(TypeModuleRef);
+	lib_create_list<shared<Module>>(TypeModuleSharedList);
+	lib_create_list<Module*>(TypeModuleRefList);
 
 	auto TypeContext = add_type  ("Context", sizeof(Context));
 	auto TypeContextRef = add_type_ref(TypeContext);
@@ -111,6 +118,9 @@ void SIAddPackageKaba(Context *c) {
 	auto TypeConstant = add_type("Constant", sizeof(Constant));
 	auto TypeConstantRef = add_type_ref(TypeConstant);
 	auto TypeConstantRefList = add_type_list(TypeConstantRef);
+	lib_create_list<ClassElement>(TypeClassElementList);
+	lib_create_list<Variable*>(TypeVariableRefList);
+	lib_create_list<Constant*>(TypeConstantRefList);
 	
 	lib_create_pointer_xfer(TypeContextXfer);
 	lib_create_pointer_shared<Module>(TypeModuleShared, TypeModuleXfer);
@@ -212,13 +222,6 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("id", TypeInt, &SpecialFunction::id);
 		class_add_element("min_params", TypeInt, &SpecialFunction::min_params);
 		class_add_element("max_params", TypeInt, &SpecialFunction::max_params);
-		
-	add_class(TypeModuleSharedList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XSharedArray<Module>::__init__);
-
-	add_class(TypeClassElementList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<ClassElement>::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &Array<ClassElement>::clear);
 
 	add_class(TypeContext);
 		class_add_element("packages", TypeModuleRefList, &Context::packages);

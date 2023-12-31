@@ -413,6 +413,12 @@ void SIAddPackageMath(Context *c) {
 		}
 	}
 
+	lib_create_list<complex>(TypeComplexList);
+	lib_create_list<vec2>(TypeVec2List);
+	lib_create_list<vec3>(TypeVec3List);
+	lib_create_list<plane>(TypePlaneList);
+	lib_create_list<color>(TypeColorList);
+
 
 	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray3, TypeFloatArray3, InlineID::CHUNK_ASSIGN, &FloatN<3>::__assign__);
 	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray4, TypeFloatArray4, InlineID::CHUNK_ASSIGN, &FloatN<4>::__assign__);

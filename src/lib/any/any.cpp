@@ -709,3 +709,7 @@ void Any::map_drop(const string &key) {
 		throw Exception("not a map: " + type_name(type));
 	as_map().drop(key);
 }
+
+template<> string repr(const Any& a) {
+	return a.repr();
+}

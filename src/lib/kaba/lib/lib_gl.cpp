@@ -144,6 +144,7 @@ void SIAddPackageGl(Context *c) {
 	auto TypeStencilOp = add_type_enum("StencilOp");
 	auto TypeFogMode = add_type_enum("FogMode");
 	auto TypeCullMode = add_type_enum("CullMode");
+	lib_create_list<nix::Texture*>(TypeTexturePList);
 
 	lib_create_pointer_xfer(TypeTextureXfer);
 	lib_create_pointer_xfer(TypeShaderXfer);
@@ -204,6 +205,10 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("data", TypeFloatList);
 		class_add_func("load", TypeTextureXfer, gl_p(&__LoadTexture), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("filename", TypePath);
+
+
+	lib_create_list<shared<nix::Texture>>(TypeTextureSharedNNList);
+
 
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture);
@@ -455,8 +460,6 @@ void SIAddPackageGl(Context *c) {
 		class_add_enum("BACK",   TypeCullMode, gl_p(nix::CullMode::BACK));
 		class_add_enum("FRONT",  TypeCullMode, gl_p(nix::CullMode::FRONT));
 
-
-	lib_create_list<shared<nix::Texture>>(TypeTextureSharedNNList);
 
 
 //	add_ext_var("vb_temp", TypeVertexBufferRef, gl_p(&nix::vb_temp));

@@ -25,6 +25,7 @@ public:
 	ClassElement(const string &name, const Class *type, int64 offset);
 	string signature(bool include_class) const;
 	bool hidden() const;
+	string str() const;
 };
 
 class ClassInitializers {

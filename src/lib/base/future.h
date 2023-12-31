@@ -52,6 +52,10 @@ template<>
 struct xparam<char> {
 	using t = char;
 };
+template<class T>
+struct xparam<T*> {
+	using t = T*;
+};
 template<>
 struct xparam<void> {
 	using t = void;

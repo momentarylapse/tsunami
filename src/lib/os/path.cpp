@@ -294,3 +294,7 @@ template<> string _xf_str_(const string &f, const Path &value) {
 }
 
 template<> string _xf_str_(const string &f, Path value) { return _xf_str_<const Path&>(f, value); }
+
+template<> string repr(const Path& p) {
+	return p.repr();
+}

@@ -30,6 +30,10 @@ string ClassElement::signature(bool include_class) const {
 	return type->name + " " + name;
 }
 
+string ClassElement::str() const {
+	return format("(%d, %s, %s)", offset, name.repr(), type->long_name());
+}
+
 bool ClassElement::hidden() const {
 	return (name[0] == '_') or (name[0] == '-');
 }

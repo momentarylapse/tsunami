@@ -437,6 +437,14 @@ void SIAddPackageBase(Context *c) {
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
 	TypeExceptionXfer	= add_type_p_xfer(TypeException);
 
+	lib_create_list<void*>(TypePointerList);
+	lib_create_list<bool>(TypeBoolList);
+	lib_create_list<int>(TypeIntList);
+	lib_create_list<float>(TypeFloatList);
+	lib_create_list<double>(TypeFloat64List);
+	lib_create_list<char>(TypeString);
+	lib_create_list<string>(TypeStringList);
+
 
 	lib_create_dict<int>(TypeIntDict);
 	lib_create_dict<float>(TypeFloatDict);

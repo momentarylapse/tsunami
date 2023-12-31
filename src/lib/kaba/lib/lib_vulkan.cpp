@@ -374,6 +374,13 @@ void SIAddPackageVulkan(Context *c) {
 
 	auto TypeIntOptional = add_type_optional(TypeInt);
 
+	lib_create_list<vulkan::Texture*>(TypeTexturePList);
+	lib_create_list<shared<vulkan::Texture>>(TypeTextureSharedNNList);
+	lib_create_list<vulkan::Texture*>(TypeTextureXferList);
+	lib_create_list<vulkan::FrameBuffer*>(TypeFrameBufferXferList);
+	lib_create_list<vulkan::Shader*>(TypeShaderPList);
+	lib_create_list<vulkan::Semaphore*>(TypeSemaphorePList);
+
 	lib_create_pointer_xfer(TypeDeviceXfer);
 	lib_create_pointer_xfer(TypeInstanceXfer);
 	lib_create_pointer_xfer(TypeTextureXfer);

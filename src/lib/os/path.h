@@ -63,5 +63,7 @@ private:
 	Path _canonical_remove(int n_remove, bool keep_going, bool as_dir) const;
 };
 
+template<> string repr(const Path& p);
+
 
 #endif /* SRC_LIB_OS_PATH_H_ */

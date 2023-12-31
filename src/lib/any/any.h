@@ -114,6 +114,8 @@ public:
 	static bool allow_simple_output;
 };
 
+template<> string repr(const Any& a);
+
 
 
 

@@ -8,6 +8,10 @@ plane::plane(const vec3 &_n, float _d) {
 	d = _d;
 }
 
+bool plane::operator==(const plane& o) const {
+	return n == o.n and d == o.d;
+}
+
 string plane::str() const {
 	return format("(%f, %f, %f, %f)", n.x, n.y, n.z, d);
 }

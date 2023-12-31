@@ -198,9 +198,11 @@ template<> string str(const bool& b);
 
 template<class T>
 string repr(const T &t) {
-	return str(t);
+	if constexpr (std::is_same_v<T, string>)
+		return t.repr();
+	else
+		return str(t);
 }
-template<> string repr(const string& s);
 
 template<class T>
 string str(const Array<T> &a) {

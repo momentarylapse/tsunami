@@ -33,7 +33,7 @@ class Context;
 enum class DeriveFlags;
 
 
-void lib_make_list(Class *t, SyntaxTree *ps = nullptr);
+//void lib_make_list(const Class *t);
 
 
 

@@ -133,8 +133,7 @@ var extern colors: ColorScheme
 
 var extern clipboard: Clipboard&
 
-#extern void get_style_colors(Panel p, string id, color{} colors)
-func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])
+func extern get_style_colors(p: Panel, id: string) -> color{}
 
 
 

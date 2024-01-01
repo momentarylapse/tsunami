@@ -71,7 +71,7 @@
 
 
 namespace hui {
-	void get_style_colors(Panel *p, const string &id, base::map<string,color> &colors);
+	base::map<string,color> get_style_colors(Panel *p, const string &id);
 }
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )

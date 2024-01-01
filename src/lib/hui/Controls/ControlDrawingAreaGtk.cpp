@@ -38,10 +38,11 @@ color color_from_gdk(const GdkRGBA &gcol);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
-void get_style_colors(Panel *p, const string &id, base::map<string,color> &colors) {
+base::map<string,color> get_style_colors(Panel *p, const string &id) {
+	base::map<string,color> colors;
 	auto c = p->_get_control_(id);
 	if (!c)
-		return;
+		return colors;
 	GtkStyleContext *sc = gtk_widget_get_style_context(c->widget);
 	Array<string> names = {"base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders", "warning_wolor", "error_color", "success_color"};
 	for (auto &name: names) {
@@ -51,6 +52,7 @@ void get_style_colors(Panel *p, const string &id, base::map<string,color> &color
 		else if (gtk_style_context_lookup_color(sc, name.c_str(), &cc))
 			colors.set(name, color_from_gdk(cc));
 	}
+	return colors;
 }
 
 #pragma GCC diagnostic pop

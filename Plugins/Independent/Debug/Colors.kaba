@@ -13,26 +13,20 @@ Grid ? '' vertical
 	func on_draw(p: Painter)
 		var w = float(p.width)
 		var h = float(p.height)
-		#color{} cols
-#		print("aaa")
-		var cols: (string,color)[]
-#		print("aaa2")
-		get_style_colors(self, "b", cols)
-#		print("aaa3")
-#		print(cols.num)
+		let cols = get_style_colors(self, "b")
+	#	print(cols)
+	#	print(cols.keys())
 		#let names = ["base_color", "text_color", "fg_color", "bg_color", "selected_fg_color", "selected_bg_color", "insensitive_fg_color", "insensitive_bg_color", "borders", "unfocused_borders"]
 		#for k,i in names
-		for i=>c in cols
-			p.set_color(c.e1)
+		var i = 0
+		for k=>c in cols
+			p.set_color(c)
 			p.draw_rect(rect(0,w, i*20,i*20 + 20))
 			p.set_color(color.BLACK)
-			p.draw_str([0,i*20], c.e0)
+			p.draw_str([0,i*20], k)
 			p.set_color(color.WHITE)
-			p.draw_str([200,i*20], c.e0)
-#		find_colors(self, "area", cols)
-#		for c,i in cols
-#			p.set_color(c)
-#			p.draw_rect(rect(w/2,w, i*20,i*20 + 20))
+			p.draw_str([200,i*20], k)
+			i ++
 
 class XX extends TsunamiPlugin
 	func override create_panel() -> xfer[ConfigPanel]

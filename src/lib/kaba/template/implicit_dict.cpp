@@ -12,6 +12,9 @@
 namespace kaba {
 
 	extern const Class *TypeNoValueError;
+	extern const Class *TypeStringList;
+
+	Array<string> dict_get_keys(const DynamicArray& a);
 
 	static shared<Node> sa_num(shared<Node> node) {
 		return node->shift(config.target.pointer_size, TypeInt);
@@ -29,6 +32,9 @@ void AutoImplementer::_add_missing_function_headers_for_dict(Class *t) {
 	add_func_header(t, Identifier::Func::GET, t_value, {TypeString}, {"key"});
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 	add_func_header(t, Identifier::Func::CONTAINS, TypeBool, {TypeString}, {"key"});
+
+	add_class(t);
+		class_add_func("keys", TypeStringList, &dict_get_keys, Flags::PURE);
 
 	[[maybe_unused]] auto t_row = tree->create_new_class_no_check("Row", Class::Type::REGULAR, dict_row_size(t_value), 0, nullptr, {}, t, -1);
 }

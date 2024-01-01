@@ -828,8 +828,10 @@ shared<Node> Concretifier::concretify_statement_for_container(shared<Node> node,
 		return concretify_statement_for_unwrap_optional(node, container, block, ns);
 	else if (t_c->usable_as_list() or t_c->is_array())
 		return concretify_statement_for_array(node, container, block, ns);
+	else if (t_c->is_dict())
+		return concretify_statement_for_dict(node, container, block, ns);
 
-	do_error(format("unable to iterate over type '%s' - array/list/shared/owned/optional expected as second parameter in 'for . in .'", t_c->long_name()), container);
+	do_error(format("unable to iterate over type '%s' - array/list/dict/shared/owned/optional expected as second parameter in 'for . in .'", t_c->long_name()), container);
 	return nullptr;
 }
 
@@ -848,6 +850,32 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	if (node->params[1])
 		index_name = node->params[1]->as_token();
 	auto index = block->add_var(index_name, TypeInt);
+	node->set_param(1, add_node_local(index));
+
+	// block
+	node->params[3] = concretify_node(node->params[3], block, ns);
+	parser->post_process_for(node);
+
+	node->type = TypeVoid;
+	return node;
+}
+
+shared<Node> Concretifier::concretify_statement_for_dict(shared<Node> node, shared<Node> container, Block *block, const Class *ns) {
+	// variable...
+	node->params[2] = container;
+
+	auto var_name = node->params[0]->as_token();
+	auto var_type = tree->request_implicit_class_alias(container->type->get_array_element(), node->params[0]->token_id);
+	auto key_type = tree->request_implicit_class_alias(TypeString, node->params[0]->token_id);
+	auto var = block->add_var(var_name, var_type);
+	if (!container->is_mutable())
+		flags_set(var->flags, Flags::CONST);
+	node->set_param(0, add_node_local(var));
+
+	string key_name = format("-for_key_%d-", for_index_count ++);
+	if (node->params[1])
+		key_name = node->params[1]->as_token();
+	auto index = block->add_var(key_name, key_type);
 	node->set_param(1, add_node_local(index));
 
 	// block

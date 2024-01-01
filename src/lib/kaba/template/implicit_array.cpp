@@ -28,15 +28,14 @@ void AutoImplementer::implement_array_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	auto te = t->get_array_element();
-	auto *f_el_init = te->get_default_constructor();
-	if (te->needs_constructor() and !f_el_init)
-		do_error_implicit(f, format("missing default constructor for %s", te->long_name()));
-	if (f_el_init) {
+	if (auto *f_el_init = te->get_default_constructor()) {
 		for (int i=0; i<t->array_length; i++) {
 			// self[i].__init__()
 			f->block->add(add_node_member_call(f_el_init,
 					self->shift(te->size * i, te)));
 		}
+	} else if (te->needs_constructor()) {
+		do_error_implicit(f, format("missing default constructor for %s", te->long_name()));
 	}
 }
 
@@ -46,8 +45,7 @@ void AutoImplementer::implement_array_destructor(Function *f, const Class *t) {
 	auto te = t->get_array_element();
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
-	auto *f_el_del = te->get_destructor();
-	if (f_el_del) {
+	if (auto *f_el_del = te->get_destructor()) {
 		for (int i=0; i<t->array_length; i++) {
 			// self[i].__delete__()
 			f->block->add(add_node_member_call(f_el_del,

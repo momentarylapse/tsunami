@@ -20,6 +20,7 @@ bool is_func(shared<Node> n);
 static shared_array<Node> _transform_insert_before_;
 shared<Node> conv_break_down_med_level(SyntaxTree *tree, shared<Node> c);
 
+int dict_row_size(const Class *t_val);
 
 
 
@@ -1042,9 +1043,10 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// [VAR, INDEX, ARRAY, BLOCK]
 		auto var = n->params[0];
-		auto index = n->params[1];
+		auto key = n->params[1];
 		auto array = n->params[2];
 		auto block = n->params[3];
+		auto index = key;
 		
 		
 		// array needs execution?
@@ -1062,6 +1064,12 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		nn->set_num_params(4);
 		// [INIT, CMP, BLOCK, INC]
 
+		if (array->type->is_dict()) {
+			static int for_index_count = 0;
+			string index_name = format("-for_dict_index_%d-", for_index_count++);
+			index = add_node_local(b->add_var(index_name, TypeInt));
+		}
+
 
 		// 0
 		auto val0 = add_node_const(add_constant_int(0));
@@ -1071,7 +1079,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		nn->set_param(0, add_node_operator_by_inline(InlineID::INT_ASSIGN, index, val0));
 
 		shared<Node> val1;
-		if (array->type->usable_as_list()) {
+		if (array->type->usable_as_list() or array->type->is_dict()) {
 			// array.num
 			val1 = array->shift(config.target.pointer_size, TypeInt, array->token_id);
 		} else {
@@ -1088,17 +1096,38 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// ...for_index += 1
 		nn->set_param(3, add_node_operator_by_inline(InlineID::INT_INCREASE, index, nullptr));
 
-		// array[index]
-		shared<Node> el;
-		if (array->type->usable_as_list()) {
-			el = add_node_dyn_array(array, index);
-		} else {
-			el = add_node_array(array, index);
-		}
+		if (array->type->is_dict()) {
 
-		// &for_var = &array[index]
-		auto cmd_var_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, var, el->ref(this));
-		block->params.insert(cmd_var_assign, 0);
+			auto row = add_node_operator_by_inline(__get_pointer_add_int(),
+					array->change_type(TypeReference),
+					add_node_operator_by_inline(InlineID::INT_MULTIPLY,
+							index,
+							add_node_const(add_constant_int(dict_row_size(array->type->param[0])))),
+					n->token_id,
+					TypeReference)->deref();
+
+
+			// &for_var = &row.value
+			auto cmd_var_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, var, row->shift(TypeString->size, array->type->param[0])->ref(this));
+			block->params.insert(cmd_var_assign, 0);
+
+			// &for_var = &row.value
+			auto cmd_key_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, key, row->change_type(TypeString)->ref(this));
+			block->params.insert(cmd_key_assign, 0);
+		} else {
+
+			// array[index]
+			shared<Node> el;
+			if (array->type->usable_as_list()) {
+				el = add_node_dyn_array(array, index);
+			} else {
+				el = add_node_array(array, index);
+			}
+
+			// &for_var = &array[index]
+			auto cmd_var_assign = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, var, el->ref(this));
+			block->params.insert(cmd_var_assign, 0);
+		}
 
 		return nn;
 	} else if (n->kind == NodeKind::ARRAY_BUILDER_FOR) {

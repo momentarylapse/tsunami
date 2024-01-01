@@ -59,6 +59,11 @@ public:
 	void implement_list_equal(Function *f, const Class *t);
 	void implement_list_give(Function *f, const Class *t);
 	void implement_dict_constructor(Function *f, const Class *t);
+	void implement_dict_clear(Function *f, const Class *t);
+	void implement_dict_assign(Function *f, const Class *t);
+	void implement_dict_get(Function *f, const Class *t);
+	void implement_dict_set(Function *f, const Class *t);
+	void implement_dict_contains(Function *f, const Class *t);
 	void implement_shared_constructor(Function *f, const Class *t);
 	void implement_shared_destructor(Function *f, const Class *t);
 	void implement_shared_assign(Function *f, const Class *t);

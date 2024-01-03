@@ -19,7 +19,7 @@ Dialog track_dialog "Track" width=380 height=516
 						---|
 						Grid ? ""
 							Label tuning "" expandx
-							Button edit_tuning "" image=hui:edit flat ignorefocus
+							Button edit-tuning "" image=hui:edit flat ignorefocus
 				Group g-fx-external "Effects"
 					Grid ? ""
 						Button link-to-fx "Fx" link ignorefocus

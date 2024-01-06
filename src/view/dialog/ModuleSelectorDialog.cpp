@@ -16,7 +16,7 @@ ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 	l.full = s;
 	auto ss = s.explode("/");
 	l.name = ss.back();
-	l.group = implode(ss.sub_ref(0, -1), "/");
+	l.group = implode(ss.sub_ref(0, -1), "/").replace("-", " ");
 	return l;
 }
 

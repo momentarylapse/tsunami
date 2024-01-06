@@ -1,5 +1,5 @@
 use tsunami
-use PitchDetector.Test
+use pitch_detector.Test
 use hui
 
 class SNRPanel extends ConfigPanel

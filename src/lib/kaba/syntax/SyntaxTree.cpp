@@ -22,6 +22,50 @@ shared<Node> conv_break_down_med_level(SyntaxTree *tree, shared<Node> c);
 
 int dict_row_size(const Class *t_val);
 
+shared_array<Node> Scope::find(const string &name, int token_id) const {
+	shared_array<Node> r;
+	for (auto &e: entries)
+		if (e.name == name) {
+			if (e.kind == NodeKind::CLASS)
+				r.add(add_node_class(reinterpret_cast<const Class *>(e.p), token_id));
+			if (e.kind == NodeKind::FUNCTION)
+				r.add(add_node_func_name(reinterpret_cast<const Function *>(e.p), token_id));
+			if (e.kind == NodeKind::VAR_GLOBAL)
+				r.add(add_node_global(reinterpret_cast<const Variable *>(e.p), token_id));
+			if (e.kind == NodeKind::CONSTANT)
+				r.add(add_node_const(reinterpret_cast<const Constant *>(e.p), token_id));
+		}
+	return r;
+}
+
+bool Scope::add_class(const string &name, const Class *c) {
+	if (find(name, -1).num > 0)
+		return false;
+	entries.add(Entry{name, NodeKind::CLASS, c});
+	return true;
+}
+
+bool Scope::add_function(const string &name, const Function *f) {
+	//if (find(name, -1).num > 0)
+	//	msg_error("NAME ALREADY IN SCOPE (func): " + name);
+	entries.add(Entry{name, NodeKind::FUNCTION, f});
+	return true;
+}
+
+bool Scope::add_variable(const string &name, const Variable *v) {
+	if (find(name, -1).num > 0)
+		return false;
+	entries.add(Entry{name, NodeKind::VAR_GLOBAL, v});
+	return true;
+}
+
+bool Scope::add_const(const string &name, const Constant *c) {
+	if (find(name, -1).num > 0)
+		return false;
+	entries.add(Entry{name, NodeKind::CONSTANT, c});
+	return true;
+}
+
 
 
 const Class *SyntaxTree::request_implicit_class_callable_fp(Function *f, int token_id) {
@@ -53,7 +97,6 @@ SyntaxTree::SyntaxTree(Module *_module) {
 
 	base_class = new Class(Class::Type::REGULAR, "-base-", 0, this);
 	_base_class = base_class;
-	imported_symbols = new Class(Class::Type::REGULAR, "-imported-", 0, this);
 	implicit_symbols = new Class(Class::Type::REGULAR, "-implicit-", 0, this);
 	root_of_all_evil = new Function("-root-", TypeVoid, base_class, Flags::STATIC);
 }
@@ -61,7 +104,7 @@ SyntaxTree::SyntaxTree(Module *_module) {
 void SyntaxTree::default_import() {
 	for (auto p: module->context->packages)
 		if (p->used_by_default)
-			import_data(p, false, "");
+			import_data_all(p->base_class(), -1);
 }
 
 void SyntaxTree::digest() {
@@ -413,8 +456,7 @@ shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, c
 		return {new Node(NodeKind::ABSTRACT_OPERATOR, (int_p)w, TypeUnknown, Flags::NONE, token_id)};
 
 	// in include files (only global)...
-	links.append(get_existence_global(name, imported_symbols.get(), token_id));
-
+	links.append(global_scope.find(name, token_id));
 
 	// ...unknown
 	return links;
@@ -440,9 +482,10 @@ const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class 
 		if (name == c->name)
 			return c;
 	if (_namespace == base_class) {
-		for (auto *c: weak(imported_symbols->classes))
-			if (name == c->name)
-				return c;
+		// FIXME double checking non-imported...
+		for (auto n: global_scope.find(name, -1))
+			if (n->kind == NodeKind::CLASS)
+				return n->as_class();
 	} else if (_namespace->name_space and allow_recursion) {
 		// parent namespace
 		return find_root_type_by_name(name, _namespace->name_space, true);

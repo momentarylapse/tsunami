@@ -1,5 +1,5 @@
 use hui
-use tsunami
+use tsunami.*
 
 # t in [0,1]
 func step(t: float) -> float

@@ -1,6 +1,6 @@
 # Image = hui:clear
 # Title[Deutsch] = Kanal Löschen R
-use tsunami
+use tsunami.*
 
 
 class ClearR extends AudioEffect

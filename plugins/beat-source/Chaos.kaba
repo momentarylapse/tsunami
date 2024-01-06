@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 class ChaosSource extends BeatSource
 	var offset: int

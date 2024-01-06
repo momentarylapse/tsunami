@@ -1,6 +1,6 @@
-use tsunami
-use grid
-use filter
+use tsunami.*
+use grid.*
+use filter.*
 
 
 class BiquadGainCurve extends Curve

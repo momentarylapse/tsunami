@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Supernova
 use hui
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 #const int freq = 44100
 const f_min = 50
@@ -56,10 +56,10 @@ func get_note(f: float) -> string
 	#loopf(fl, 0, 1)
 	#note = i2s(n)
 
-class SuperNovaWindow extends Window
+class SuperNovaWindow extends hui.Window
 	var hover: int
 	var w, h: float
-	var c: Painter*
+	var c: hui.Painter*
 	func __init__()
 		super.__init__("Supernova", -1, -1, 1024, 600)
 		addGrid("", 0, 0, "table1")
@@ -169,7 +169,7 @@ class SuperNovaWindow extends Window
 		c.setFontSize(24)
 		c.drawStr(w - 300, h - 50, TotalScore.str2(0) + " Punkte")
 
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		c = p
 		c.setColor(color.WHITE)
 		c.setFontSize(12)
@@ -182,7 +182,7 @@ class SuperNovaWindow extends Window
 		else if Mode == ModeLesson
 			drawLesson()
 		
-	func override on_mouse_move()
+	func override on_mouse_move(m: vec2)
 		if Mode != ModeConfig
 			return
 		hover = -1
@@ -192,7 +192,7 @@ class SuperNovaWindow extends Window
 			if mx >= 100 and mx < 400 and my >= 35 + i * 40 and my <= 70 + i * 40
 				hover = i
 		redraw("drawing")
-	func override on_left_button_down()
+	func override on_left_button_down(m: vec2)
 		if Mode != ModeConfig
 			return
 		if hover >= 0

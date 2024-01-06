@@ -1,8 +1,8 @@
-use tsunami
+use tsunami.*
 use hui
 
 class DrawTest extends TsunamiPlugin
-	func override on_draw_post(p: Painter)
+	func override on_draw_post(p: hui.Painter)
 		p.set_color(color.RED)
 		p.draw_rect(rect(100,200, 100, 200))
 		p.draw_str([200, 200], str(session.view.cam.sample2screen(0.0)))

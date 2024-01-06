@@ -1,5 +1,5 @@
-use tsunami
-use AudioSource.Silence
+use tsunami.*
+use audiosource.Silence.*
 use hui
 
 class _StreamTest extends TsunamiPlugin

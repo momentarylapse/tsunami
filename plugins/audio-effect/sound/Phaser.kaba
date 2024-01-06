@@ -1,5 +1,5 @@
-use tsunami
-use helper.filter
+use tsunami.*
+use helper.filter.*
 
 let AUTO_CONFIG_FMIN = "range=0:10000,unit=Hz"
 let AUTO_CONFIG_FMAX = "range=0:10000,unit=Hz"

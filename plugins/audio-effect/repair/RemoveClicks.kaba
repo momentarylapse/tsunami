@@ -1,6 +1,6 @@
 # Image = hui:clear
 # Title[Deutsch] = Klicks Entfernen
-use tsunami
+use tsunami.*
 
 const MAX_CLICK_SAMPLES = 128
 const CLICK_ABS_THRESHOLD = 0.8

@@ -1,12 +1,12 @@
 # Image = hui:properties
 # Title[Deutsch] = Equalizer
 use hui
-use tsunami
-use helper.grid
-use helper.tone.kaba
-use helper.filter
-use helper.curves
-use helper.draw
+use tsunami.*
+use helper.grid.*
+use helper.tone.*
+use helper.filter.*
+use helper.curves.*
+use helper.draw.*
 
 
 
@@ -115,7 +115,7 @@ class EqualizerGrid extends Grid
 	var hover, selected: (HoverType, int)
 	var spectrum: SpectrumCurve
 	
-	var menu: owned[Menu]
+	var menu: owned[hui.Menu]
 	
 	func mut init2()
 		panel.event("add-peak", on_add_peak)
@@ -128,7 +128,7 @@ class EqualizerGrid extends Grid
 		hover = (HoverType.NONE, -1)
 		selected = hover
 
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -197,7 +197,7 @@ class EqualizerGrid extends Grid
 		
 		selected = hover
 		
-		var m = new Menu(cp)
+		var m = new hui.Menu(cp)
 		if selected.e0 == HoverType.PEAK or selected.e0 == HoverType.PEAK_LABEL
 			if c.peaks[selected.e1].enabled
 				m.add("disable", "peak-toggle-enabled")
@@ -278,7 +278,7 @@ class EqualizerGrid extends Grid
 
 	# [Delete] -> remove point
 	func override on_key_down()
-		if hui.get_event().key == KEY_DELETE
+		if hui.get_event().key == hui.KEY_DELETE
 			on_peak_delete()
 
 	func mut set_buffer(buf: AudioBuffer)

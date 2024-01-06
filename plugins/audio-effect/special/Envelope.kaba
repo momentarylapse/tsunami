@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_A = "range=0:1:0.0001"
 let AUTO_CONFIG_B = "range=0:1:0.0001"

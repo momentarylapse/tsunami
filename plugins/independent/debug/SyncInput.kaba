@@ -1,7 +1,7 @@
 use hui
-use tsunami
+use tsunami.*
 
-var dlg: Window*
+var dlg: hui.Window*
 
 const SAMPLE_RATE = 44100
 const offset_out = 20000

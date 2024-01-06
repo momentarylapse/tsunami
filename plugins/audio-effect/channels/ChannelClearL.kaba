@@ -1,6 +1,6 @@
 # Image = hui:clear
 # Title[Deutsch] = Kanal Löschen L
-use tsunami
+use tsunami.*
 
 class ClearL extends AudioEffect
 	func override process(out buf: AudioBuffer)

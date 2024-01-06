@@ -1,5 +1,5 @@
 use hui
-use tsunami
+use tsunami.*
 
 class VolumeChecker extends TsunamiPlugin
 

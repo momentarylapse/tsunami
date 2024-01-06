@@ -1,6 +1,6 @@
 # Image = hui:properties
 # Title[Deutsch] = Band Pass Filter
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_FREQUENCY = "range=0:5000:0.1,unit=Hz"
 

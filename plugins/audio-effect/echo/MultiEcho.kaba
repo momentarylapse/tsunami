@@ -1,9 +1,9 @@
 # Image = hui:copy
 # Title[Deutsch] = Echo
 use hui
-use tsunami
-use helper.grid
-use helper.draw
+use tsunami.*
+use helper.grid.*
+use helper.draw.*
 
 
 class MultiEcho extends AudioEffect
@@ -72,15 +72,15 @@ class MultiEchoGrid extends Grid
 	var cp: ConfigPanel&
 	var hover: int?
 	var selected: int?
-	var menu_bg: owned![Menu]
-	var menu_point: owned![Menu]
+	var menu_bg: owned![hui.Menu]
+	var menu_point: owned![hui.Menu]
 	
 	
 	func mut post_init()
-		menu_bg = new Menu(cp)
+		menu_bg = new hui.Menu(cp)
 		menu_bg.add("add reflection", "reflection-add")
 		
-		menu_point = new Menu(cp)
+		menu_point = new hui.Menu(cp)
 		menu_point.add("Reflection", "label")
 		menu_point.enable("label", false)
 		menu_point.add("delete", "reflection-delete")
@@ -91,7 +91,7 @@ class MultiEchoGrid extends Grid
 		cp.event("reflection-add", on_add_reflection)
 		cp.event("reflection-delete", on_delete_reflection)
 
-	func draw_hull_curve(p: Painter, r: MultiEcho.Config.Reflector, index: int)
+	func draw_hull_curve(p: hui.Painter, r: MultiEcho.Config.Reflector, index: int)
 		let col = cool_color(index)
 		#if hover
 		#	col2 = colors.hoverify(col2)
@@ -117,7 +117,7 @@ class MultiEchoGrid extends Grid
 		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
 	
-	func draw_peaks(c: Painter, r: MultiEcho.Config.Reflector, index: int)
+	func draw_peaks(c: hui.Painter, r: MultiEcho.Config.Reflector, index: int)
 		let col = cool_color(index)
 		var v = r.volume
 		var t = r.delay
@@ -141,7 +141,7 @@ class MultiEchoGrid extends Grid
 			t += r.delay
 		c.set_line_width(1)
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 	
 		c.set_line_width(1)
 		for i=>r in config.refl
@@ -156,7 +156,7 @@ class MultiEchoGrid extends Grid
 		for h in hover
 			draw_details(c, config.refl[h])
 			
-	func draw_details(p: Painter, r: MultiEcho.Config.Reflector)
+	func draw_details(p: hui.Painter, r: MultiEcho.Config.Reflector)
 		p.set_font_size(8)
 		p.set_color(colors.text_soft2)
 		let x = x_axis.project(r.delay)
@@ -173,7 +173,7 @@ class MultiEchoGrid extends Grid
 
 	# [Delete] -> remove point
 	func override on_key_down()
-		if hui.get_event().key == KEY_DELETE
+		if hui.get_event().key == hui.KEY_DELETE
 			on_delete_reflection()
 
 	func mut on_delete_reflection()

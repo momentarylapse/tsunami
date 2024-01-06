@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 use hui
 use time
 
@@ -7,6 +7,6 @@ class XXX extends TsunamiPlugin
 		var prog = new ProgressX("generating sound font", session.win)
 		for i in 0:100
 			prog.set("remove samples", i*0.01)
-			sleep(0.2)
+			time.sleep(0.2)
 		stop()
 		

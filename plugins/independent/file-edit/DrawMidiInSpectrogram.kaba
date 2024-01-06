@@ -1,10 +1,10 @@
 # Image = hui:find
 # Title[Deutsch] = Midi in Spektrum malen
 use hui
-use image
-use tsunami
-use helper.grid
-use helper.tone
+use image.*
+use tsunami.*
+use helper.grid.*
+use helper.tone.*
 
 ##show
 ##disasm
@@ -28,7 +28,7 @@ class SpecGrid extends Grid
 		return s / x_scale
 	var create_pitch: int
 	var create_x: float
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 		var r = plot_area
 		var w = int(r.width())
 		var h = int(r.height())
@@ -87,7 +87,7 @@ class SpecGrid extends Grid
 		redraw()
 		
 
-class SpectrumDialog extends Dialog
+class SpectrumDialog extends hui.Dialog
 	var grid: SpecGrid
 	var song: shared![Song]
 	var tracks: shared![Track][]

@@ -1,8 +1,8 @@
 use hui
-use tsunami
-use helper.tone
-use helper.grid
-use helper.filter
+use tsunami.*
+use helper.tone.*
+use helper.grid.*
+use helper.filter.*
 
 const NUM_HARMONICS = 9
 const HARMONIC_FREQS = [0.5, 1.0, 1.498823530, 2.0, 2.997647060, 4.0, 5.040941178, 5.995294120, 8.0]
@@ -35,7 +35,7 @@ class HammondGrid extends Grid
 	var p: HammondPanel&
 	var selected, hover: int
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 	
 		# points
 		for n=>i in hc.intensity

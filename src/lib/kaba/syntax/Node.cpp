@@ -419,7 +419,7 @@ shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 
 
 
-shared<Node> add_node_constructor(Function *f, int token_id) {
+shared<Node> add_node_constructor(const Function *f, int token_id) {
 	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space, Flags::MUTABLE);
 	auto n = add_node_member_call(f, dummy, token_id); // temp var added later...
 	n->kind = NodeKind::CONSTRUCTOR_AS_FUNCTION;
@@ -427,7 +427,7 @@ shared<Node> add_node_constructor(Function *f, int token_id) {
 	return n;
 }
 
-shared<Node> add_node_const(Constant *c, int token_id) {
+shared<Node> add_node_const(const Constant *c, int token_id) {
 	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), Flags::CONST, token_id);
 }
 
@@ -456,7 +456,7 @@ shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, 
 }
 
 // virtual call, if func is virtual
-shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
+shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
 	if ((f->virtual_index >= 0) and !force_non_virtual) {
 		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
@@ -471,14 +471,14 @@ shared<Node> add_node_member_call(Function *f, const shared<Node> inst, int toke
 }
 
 // non-member!
-shared<Node> add_node_call(Function *f, int token_id) {
+shared<Node> add_node_call(const Function *f, int token_id) {
 	// FIXME: literal_return_type???
 	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
 		c->set_num_params(f->num_params);
 	return c;
 }
 
-shared<Node> add_node_func_name(Function *f, int token_id) {
+shared<Node> add_node_func_name(const Function *f, int token_id) {
 	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, Flags::CONST, token_id);
 }
 
@@ -487,7 +487,7 @@ shared<Node> add_node_class(const Class *c, int token_id) {
 }
 
 
-shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
+shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
 	if (!override_type)
 		override_type = op->return_type;
 	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, Flags::CONST, token_id);
@@ -503,15 +503,15 @@ shared<Node> add_node_operator(Operator *op, const shared<Node> p1, const shared
 }
 
 
-shared<Node> add_node_local(Variable *v, const Class *type, int token_id) {
+shared<Node> add_node_local(const Variable *v, const Class *type, int token_id) {
 	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->flags, token_id);
 }
 
-shared<Node> add_node_local(Variable *v, int token_id) {
+shared<Node> add_node_local(const Variable *v, int token_id) {
 	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->flags, token_id);
 }
 
-shared<Node> add_node_global(Variable *v, int token_id) {
+shared<Node> add_node_global(const Variable *v, int token_id) {
 	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->flags, token_id);
 }
 

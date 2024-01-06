@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Tonerkennung
 use hui
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 const freq = 44100
 const f_min = 50
@@ -14,7 +14,7 @@ const threshold = 5.0
 const buf_size = 4096
 var buf: float[]
 
-var win: Window*
+var win: hui.Window*
 
 var played: int[]
 
@@ -33,7 +33,7 @@ func get_note(f: float) -> string
 	#loopf(fl, 0, 1)
 	#note = i2s(n)
 
-func DrawVolume(c: Painter)
+func DrawVolume(c: hui.Painter)
 	c.set_color(color(0.8, 0.8, 0.8, 1))
 	var y0 = 30.0
 	var y1 = float(c.height) - 5
@@ -42,7 +42,7 @@ func DrawVolume(c: Painter)
 	c.set_color(color(0.6, 0.6, 0.6, 1))
 	c.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
-func Draw(c: Painter)
+func Draw(c: hui.Painter)
 	c.set_color(color.WHITE)
 	c.set_font_size(12)
 	var w = c.width

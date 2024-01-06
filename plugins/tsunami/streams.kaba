@@ -1,5 +1,5 @@
-use common
-use modules
+use common.*
+use modules.*
 
 class AudioOutput extends Module
 	func extern __init__(session: Session)

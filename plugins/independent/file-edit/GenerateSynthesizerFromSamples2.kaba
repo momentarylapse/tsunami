@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 use hui
 
 class XXX extends TsunamiPlugin

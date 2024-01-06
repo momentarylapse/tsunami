@@ -1,7 +1,7 @@
 # Image = hui:media-play
 # Title[Deutsch] = Metronom
 use hui
-use tsunami
+use tsunami.*
 
 enum AnimationMode
 	CIRCLE
@@ -25,7 +25,7 @@ class BlurredDot
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	func mut draw(p: Painter, c: color, r: float)
+	func mut draw(p: hui.Painter, c: color, r: float)
 		if has_prev
 			var dt = 1.0 / MOTION_BLUR_COUNT
 			var cc = c
@@ -49,7 +49,7 @@ class MetronomePanel extends ConfigPanel
 	var allow_blink_background: bool
 	var allow_blink_number: bool
 	var mode: AnimationMode
-	var popup_menu: owned![Menu]
+	var popup_menu: owned![hui.Menu]
 	var sr_id = -1
 	
 	var dot: BlurredDot
@@ -73,10 +73,10 @@ Grid ? '' vertical
 		allow_blink_background = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkBackground", true)
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
-		popup_menu = new Menu(&self)
+		popup_menu = new hui.Menu(&self)
 		popup_menu.add_checkable("Blink background", "blink-background")
 		popup_menu.add_checkable("Blink number", "blink-number")
-		var sub_mode = new Menu(&self)
+		var sub_mode = new hui.Menu(&self)
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
@@ -102,7 +102,7 @@ Grid ? '' vertical
 	func override __delete__()
 		hui.cancel_runner(sr_id)
 	
-	func mut on_draw(p: Painter)
+	func mut on_draw(p: hui.Painter)
 		var w: float = p.width
 		var h: float = p.height
 		var x0 = w / 2

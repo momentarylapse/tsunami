@@ -1,10 +1,10 @@
 # Image = hui:find
 # Title[Deutsch] = Tonerkennung
 use hui
-use tsunami
-use helper.tone
-use midi_source.Click
-use audio_effect.special.ClickCounter
+use tsunami.*
+use helper.tone.*
+use midisource.Click.*
+use audioeffect.special.ClickCounter.*
 
 
 class ClickCounterPanel extends ConfigPanel
@@ -33,7 +33,7 @@ class ClickCounterPanel extends ConfigPanel
 	
 
 
-	func draw_volume(p: Painter)
+	func draw_volume(p: hui.Painter)
 		p.set_color(colors.text_soft3)
 		var y0: float = 30
 		var y1: float = p.height - 5
@@ -42,7 +42,7 @@ class ClickCounterPanel extends ConfigPanel
 		p.set_color(colors.text_soft2)
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
-	func on_draw(p: Painter)
+	func on_draw(p: hui.Painter)
 		p.set_color(colors.background)
 		p.set_font_size(12)
 		p.draw_rect([0, p.width, 0, p.height])

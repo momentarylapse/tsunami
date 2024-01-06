@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_SHIFT = "range=-50:50"
 

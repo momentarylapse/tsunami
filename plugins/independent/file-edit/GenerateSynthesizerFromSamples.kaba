@@ -1,6 +1,6 @@
-use tsunami
-use synthesizer.Sample
-use audioeffect.pitch.PitchShift
+use tsunami.*
+use synthesizer.Sample.*
+use audioeffect.pitch.PitchShift.*
 use hui
 
 func get_instruments(p: any, i: any) -> int

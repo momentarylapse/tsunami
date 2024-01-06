@@ -1,5 +1,5 @@
-use tsunami
-use Special.Envelope
+use tsunami.*
+use special.Envelope.*
 
 let AUTO_CONFIG_ATTACK = "range=-1:10:0.01,scale=100,unit=%"
 let AUTO_CONFIG_SUSTAIN = "range=-1:10:0.01,scale=100,unit=%"

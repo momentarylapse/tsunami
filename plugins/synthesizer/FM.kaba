@@ -1,7 +1,7 @@
 use hui
-use tsunami
-use helper.tone
-use helper.draw
+use tsunami.*
+use helper.tone.*
+use helper.draw.*
 
 let NUM_OSCILLATORS = 6
 
@@ -69,8 +69,8 @@ class FMPanel extends ConfigPanel
 	override c: FMSynthesizer&
 	fc: FMConfig&
 	chosen: int
-	menu_top: owned![Menu]
-	menu_osci: owned![Menu]
+	menu_top: owned![hui.Menu]
+	menu_osci: owned![hui.Menu]
 	
 	width, height: float
 	p_osci: vec2[NUM_OSCILLATORS]
@@ -106,7 +106,7 @@ Grid ? ''
 		chosen = 0
 		hover = -1
 		
-		menu_top = new Menu(&self)
+		menu_top = new hui.Menu(&self)
 		menu_top.add("Topology", "label-top")
 		menu_top.enable("label-top", false)
 		add_top("o", "x")
@@ -122,7 +122,7 @@ Grid ? ''
 		add_top("o-o-o   o-o   o", "x01x3x")
 		add_top("o-(o   o)   o-(o   o)", "x00x33")
 
-		menu_osci = new Menu(&self)
+		menu_osci = new hui.Menu(&self)
 		menu_osci.add("Oscillator", "label")
 		menu_osci.enable("label", false)
 		menu_osci.add("sine", "type-sine")
@@ -178,7 +178,7 @@ Grid ? ''
 			return p_out
 		return p_osci[index]
 
-	func draw_type(p: Painter, z: vec2, type: OsciType, _dx: float, amp: float)
+	func draw_type(p: hui.Painter, z: vec2, type: OsciType, _dx: float, amp: float)
 		let dx = _dx / pi
 		var v0 = 0.0
 		var t0 = -pi
@@ -196,7 +196,7 @@ Grid ? ''
 			t0 = t
 			v0 = v
 	
-	func draw_osci(p: Painter, index: int)
+	func draw_osci(p: hui.Painter, index: int)
 		let z = osci_pos(index)
 		var bg = colors.blob_bg
 		var col = colors.text_soft1
@@ -216,7 +216,7 @@ Grid ? ''
 		#p.set_color(colors.text_soft1)
 		p.draw_str([z.x-4, z.y+6], "x{{f}}")
 	
-	func draw_link(p: Painter, a: int, b: int)
+	func draw_link(p: hui.Painter, a: int, b: int)
 		p.set_color(colors.text_soft1)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
@@ -236,7 +236,7 @@ Grid ? ''
 		return sqr(max(x,0) / width / 0.7)
 	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
-	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_exp(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		let e = log(v1/v0)
 		var cc: vec2[]
 		for a in 0:1.01:0.05
@@ -251,7 +251,7 @@ Grid ? ''
 		cc.add([t2x(t0), v2y(0)])
 		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
-	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_lin(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		var cc: vec2[]
 		cc.add([t2x(t0), v2y(v0)])
 		cc.add([t2x(t1), v2y(v1)])
@@ -264,7 +264,7 @@ Grid ? ''
 		p.set_color(col.with_alpha(0.2))
 		p.draw_polygon(cc)
 	
-	func draw_grabber(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
+	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
 		var col2 = col
 		p.set_line_width(2.0)
 		if hover
@@ -274,7 +274,7 @@ Grid ? ''
 		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
 		p.set_line_width(1)
 	
-	func draw_envelope(p: Painter, o: OscillatorConfig)
+	func draw_envelope(p: hui.Painter, o: OscillatorConfig)
 		let t0 = 0.0
 		let t1 = t0 + o.attack
 		let t2 = t1 + o.decay
@@ -299,7 +299,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
-	func mut on_draw(p: Painter)
+	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)

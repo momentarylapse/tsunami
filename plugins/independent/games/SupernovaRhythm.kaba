@@ -1,5 +1,5 @@
-use tsunami
-use pitch_detector.Test
+use tsunami.*
+use pitchdetector.Test.*
 use hui
 
 class SNRPanel extends ConfigPanel
@@ -33,7 +33,7 @@ Grid ? ''
 	
 	func on_button()
 	
-	func mut on_draw(p: Painter)
+	func mut on_draw(p: hui.Painter)
 		var r = rect(0, p.width, 0, p.height)
 		cam.area = r
 		var pos = c.recorder.buffer.samples

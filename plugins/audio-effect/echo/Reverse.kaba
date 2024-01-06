@@ -1,6 +1,6 @@
 # Image = hui:back
 # Title[Deutsch] = Rückwärts
-use tsunami
+use tsunami.*
 
 class Reverse extends AudioEffect
 	func override __init__()

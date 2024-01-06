@@ -1,7 +1,7 @@
 use hui
-use tsunami
-use helper.tone
-use helper.grid
+use tsunami.*
+use helper.tone.*
+use helper.grid.*
 
 const NUM_HARMONICS = 10
 
@@ -21,7 +21,7 @@ class HarmonicGrid extends Grid
 	var p: HarmonicPanel&
 	var Selected, Hover: int
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 	
 		# points
 		for n=>i in hc.intensity

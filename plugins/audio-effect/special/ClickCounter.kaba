@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 const THRESHOLD1 = 0.20
 const THRESHOLD2 = 0.15

@@ -1,9 +1,9 @@
 # Image = hui:find
 # Title[Deutsch] = Spektrum zeigen
 use hui
-use image
-use tsunami
-use helper.grid
+use image.*
+use tsunami.*
+use helper.grid.*
 
 ##show
 ##disasm
@@ -19,7 +19,7 @@ const MAX_VOL = 0.0
 var im0: Image
 
 class SpecGrid extends Grid
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 		let r = plot_area
 		let w = r.width()
 		let h = r.height()
@@ -42,7 +42,7 @@ class SpecGrid extends Grid
 #		c.DrawImage(r.x1, r.y1, *im)
 #		delete(im)
 
-class SpectrumDialog extends Dialog
+class SpectrumDialog extends hui.Dialog
 	var grid: SpecGrid
 	func __init__(plugin: ShowSpectrogram, song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)

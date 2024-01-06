@@ -1,6 +1,6 @@
 use hui
-use tsunami
-use AudioVisualizer.Shader
+use tsunami.*
+use audiovisualizer.Shader.*
 
 enum Mode
 	FORWARD
@@ -40,7 +40,7 @@ class Looper extends TsunamiPlugin
 	var cur_part: TrackMarker*
 	var shader_vis: shared![ShaderVis]
 	var shader_panel: shared![ShaderPanel]
-	var shader_win: owned![Dialog]
+	var shader_win: owned![hui.Dialog]
 	
 	func override on_start()
 		cur_part = nil
@@ -54,7 +54,7 @@ class Looper extends TsunamiPlugin
 		chain.connect(renderer, 0, shader_vis, 0)
 		chain.connect(shader_vis, 0, session.playback.output_stream, 0) # almost ...
 		
-		shader_win = new Dialog("Shader", 800, 800, session.win, true)
+		shader_win = new hui.Dialog("Shader", 800, 800, session.win, true)
 		shader_panel = shader_vis.create_panel() as xfer[ShaderPanel]
 		shader_win.embed(shader_panel, "", 0,0)
 		shader_win.show()

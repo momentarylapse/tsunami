@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_SCALE = "range=0:2:0.01,scale=100,unit=%"
 

@@ -1,6 +1,6 @@
 use hui
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 const MAX_VOICES = 15
 
@@ -84,7 +84,7 @@ Grid ? ''
 		return sqr(max(x,0) / width / 0.7)
 	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
-	func draw_curve_exp(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_exp(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		var e = log(v1/v0)
 		var cc: vec2[]
 		for a in 0:1.01:0.05
@@ -101,7 +101,7 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
-	func draw_curve_lin(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_lin(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
 		var cc: vec2[]
 		cc.add(vec2(t2x(t0), v2y(v0)))
 		cc.add(vec2(t2x(t1), v2y(v1)))
@@ -116,7 +116,7 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	
-	func draw_grabber(p: Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
+	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
 		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
 		if hover
 			col2 = colors.hoverify(col2)
@@ -125,7 +125,7 @@ Grid ? ''
 		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
 		p.set_line_width(1)
 	
-	func draw_envelope(p: Painter, o: UnisonConfig)
+	func draw_envelope(p: hui.Painter, o: UnisonConfig)
 		var t0: float = 0
 		var t1 = t0 + o.attack
 		var t2 = t1 + o.decay
@@ -150,7 +150,7 @@ Grid ? ''
 		else if hover == -13
 			p.draw_str([width - 100, height - 20], "sustain {{o.sustain * 100|.0}} %")
 		
-	func mut on_draw(p: Painter)
+	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
 		p.set_color(colors.background)

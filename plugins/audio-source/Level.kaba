@@ -1,5 +1,5 @@
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 let AUTO_CONFIG_LEVEL = "range=-1:1:0.01,scale=100,unit=%"
 

@@ -1,8 +1,8 @@
 # Image = hui:media-play
 # Title[Deutsch] = Oszilloskop
 use hui
-use tsunami
-use helper.grid
+use tsunami.*
+use helper.grid.*
 
 const NUM_SAMPLES = 4096
 const MIN_FREQ = 20.0
@@ -59,7 +59,7 @@ class SpecGrid extends Grid
 			y_axis.set(db_min, db_max, false, "db")
 		create_lines()
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 		draw_curve_b(c, pr, true, color.RED)
 		draw_curve_b(c, pl, true, color.BLUE)
 

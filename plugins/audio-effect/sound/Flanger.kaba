@@ -1,7 +1,7 @@
 # Image = hui:copy
 # Title[Deutsch] = Flanger
 
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_DELAY = "range=0:0.02:0.0001,scale=1000,unit=ms"
 let AUTO_CONFIG_SPEED = "range=0:2:0.01,unit=Hz"

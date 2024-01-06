@@ -1,7 +1,7 @@
 use hui
 use gl
-use time
-use tsunami
+use time.*
+use tsunami.*
 
 #extern void NixKill()
 
@@ -347,12 +347,12 @@ void main() {
 
 class ShaderPanel extends ConfigPanel
 	var override c: ShaderVis&
-	var context: owned![Context]
-	var shader: owned[Shader]
-	var _time: float
+	var context: owned![gl.Context]
+	var shader: owned[gl.Shader]
+	var _time = 0.0
 	var timer: Timer
 	var id_runner: int
-	var type: int
+	var type = 0
 	
 	func override __init__(_m: Module)
 		event_x("area", "hui:realize", on_realize)
@@ -362,10 +362,6 @@ Grid ? '' vertical
 	ComboBox type 'Chladni by 386dx25\\Creation... by Danguafer\\Very fast procedural ocean by afl_ext\\Phantom Star by kasari39\\glowingMarblingBlack by nasana'
 	DrawingArea area '' height=200 expandy opengl")
 		
-		shader = nil
-		_time = 0
-		type = 0
-	
 		event_x("area", "hui:draw-gl", on_draw)
 		event("type", on_type)
 	

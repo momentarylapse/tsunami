@@ -15,6 +15,7 @@
 #include "Identifier.h"
 #include "Inline.h"
 #include "Statement.h"
+#include "../../base/map.h"
 
 
 namespace Asm {
@@ -35,6 +36,20 @@ struct AsmBlock {
 	int line;
 };
 
+struct Scope {
+	struct Entry {
+		string name;
+		NodeKind kind;
+		const void *p;
+	};
+	//base::map<string, Entry> entries;
+	Array<Entry> entries;
+	shared_array<Node> find(const string &name, int token_id) const;
+	bool add_class(const string &name, const Class *c);
+	bool add_function(const string &name, const Function *f);
+	bool add_variable(const string &name, const Variable *v);
+	bool add_const(const string &name, const Constant *c);
+};
 
 
 // data structures (uncompiled)
@@ -44,7 +59,8 @@ public:
 	~SyntaxTree();
 
 	void default_import();
-	void import_data(shared<Module> s, bool indirect, const string &as_name);
+	void import_data_all(const Class *source, int token_id);
+	void import_data_selective(const Class *cl, const Function *f, const Variable *v, const Constant *cn, const string &as_name, int token_id);
 
 	void do_error(const string &msg, int override_token_id = -1);
 	
@@ -138,7 +154,7 @@ public:
 
 	Class *base_class;
 	shared<Class> _base_class;
-	shared<Class> imported_symbols;
+	Scope global_scope;
 	shared<Class> implicit_symbols;
 	Array<const Class*> owned_classes;
 	shared_array<Module> includes;

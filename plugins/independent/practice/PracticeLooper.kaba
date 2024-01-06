@@ -1,5 +1,5 @@
 use hui
-use tsunami
+use tsunami.*
 
 
 func get_part(s: Song, offset: int) -> TrackMarker*

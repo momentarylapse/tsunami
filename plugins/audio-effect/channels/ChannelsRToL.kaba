@@ -1,6 +1,6 @@
 # Image = hui:back
 # Title[Deutsch] = Kanäle L <- R
-use tsunami
+use tsunami.*
 
 class RToL extends AudioEffect
 	func override process(out buf: AudioBuffer)

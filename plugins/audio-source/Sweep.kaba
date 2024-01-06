@@ -1,5 +1,5 @@
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 let AUTO_CONFIG_VOLUME = "range=0:1:0.001,scale=100,unit=%"
 let AUTO_CONFIG_FREQMIN = "range=1:40000,unit=Hz,square"

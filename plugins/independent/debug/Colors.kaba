@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 use hui
 
 class XPanel extends ConfigPanel
@@ -10,7 +10,7 @@ Grid ? '' vertical
 	Button b ''
 	DrawingArea area ''")
 		event_x("area", "hui:draw", on_draw)
-	func on_draw(p: Painter)
+	func on_draw(p: hui.Painter)
 		var w = float(p.width)
 		var h = float(p.height)
 		let cols = get_style_colors(self, "b")

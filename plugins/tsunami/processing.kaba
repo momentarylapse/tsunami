@@ -1,4 +1,4 @@
-use common
+use common.*
 
 func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: int)
 

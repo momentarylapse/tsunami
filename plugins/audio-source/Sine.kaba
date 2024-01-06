@@ -1,5 +1,5 @@
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 let AUTO_CONFIG_PITCH = "pitch" #"0:10000:0.1:1:Hz"
 let AUTO_CONFIG_VOLUME = "volume,range=0:1"

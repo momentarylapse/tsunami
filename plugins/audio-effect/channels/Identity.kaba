@@ -1,6 +1,6 @@
 # Title[Deutsch] = nichts tun
 
-use tsunami
+use tsunami.*
 
 class Identity extends AudioEffect
 	func override process(out buf: AudioBuffer)

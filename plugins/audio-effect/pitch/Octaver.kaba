@@ -1,6 +1,6 @@
 # Image = hui:bottom
 # Title[Deutsch] = Oktavieren
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_LEVEL = "range=0:1:0.001,scale=100,unit=%"
 

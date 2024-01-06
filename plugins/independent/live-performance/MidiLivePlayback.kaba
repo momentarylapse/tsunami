@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 class MLPPanel extends ConfigPanel
 	var override c: MidiLivePlayback&

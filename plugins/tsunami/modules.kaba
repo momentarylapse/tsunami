@@ -1,8 +1,8 @@
-use common
-use midi
-use beats
-import hui
-import kaba
+use common.*
+use midi.*
+use beats.*
+use hui
+use kaba
 
 # requires FIXME
 class Session extends Object as shared

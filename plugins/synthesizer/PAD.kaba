@@ -1,7 +1,7 @@
 use hui
-use tsunami
-use helper.tone
-use helper.grid
+use tsunami.*
+use helper.tone.*
+use helper.grid.*
 
 const N = 4096*16
 
@@ -106,7 +106,7 @@ class PADGrid extends Grid
 	var selected = -1
 	var hover = -1
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 		pc.A.resize(8)
 	
 		# curve + area below

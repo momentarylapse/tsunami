@@ -1,6 +1,6 @@
 # Image = hui:forward
 # Title[Deutsch] = Kanäle L -> R
-use tsunami
+use tsunami.*
 
 class LToR extends AudioEffect
 	func override process(out buf: AudioBuffer)

@@ -1,8 +1,8 @@
 use os
-use common
-use midi
-use beats
-use modules
+use common.*
+use midi.*
+use beats.*
+use modules.*
 
 
 
@@ -97,7 +97,7 @@ struct Tag
 	var key, value: string
 
 class Song extends Object as shared
-	var filename: Path
+	var filename: os.Path
 	var tags: Tag[]
 	var sample_rate: int
 

@@ -1,4 +1,4 @@
-use linalg
+use linalg.*
 
 
 struct Node

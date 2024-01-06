@@ -1,6 +1,6 @@
 # Image = hui:media-play
 # Title[Deutsch] = Stimmgabel
-use tsunami
+use tsunami.*
 
 class PitchFork extends TsunamiPlugin
 	var chain: shared![SignalChain]

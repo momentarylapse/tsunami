@@ -9,20 +9,20 @@
 #                                                                      #
 #----------------------------------------------------------------------#
 
-use common
-use beats
-use midi
-use modules
-use song
-use streams
-use other
-use ui
-use processing
+use common.*
+use beats.*
+use midi.*
+use modules.*
+use song.*
+use streams.*
+use other.*
+use ui.*
+use processing.*
 
 let EXPORT_IMPORTS = true
 
 use hui
-import kaba
+use kaba
 use os
 
 
@@ -40,7 +40,7 @@ class override Session
 	#PluginManager* plugin_manager
 	
 	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
-	func extern mut load_signal_chain(filename: Path) -> shared[SignalChain]
+	func extern mut load_signal_chain(filename: os.Path) -> shared[SignalChain]
 	func extern mut remove_signal_chain(chain: SignalChain*)
 
 
@@ -56,12 +56,12 @@ class TsunamiPlugin extends Module
 	func extern override __delete__()
 	func extern virtual mut on_start()
 	func extern virtual mut on_stop()
-	func extern virtual mut on_draw_post(p: Painter)
+	func extern virtual mut on_draw_post(p: hui.Painter)
 	func extern mut stop()
 	var args: string[]
 
 
-func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> future[ptr[Sample]]
+func extern SelectSample(session: Session, panel: hui.Panel, old: Sample*) -> future[ptr[Sample]]
 #extern void SetTempBackupFilename(Path filename)
 
-func extern ChooseModule(parent: Panel, session: Session, type: Module.Type, old_name: string?) -> future[string]
+func extern ChooseModule(parent: hui.Panel, session: Session, type: Module.Type, old_name: string?) -> future[string]

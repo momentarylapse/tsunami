@@ -1,6 +1,6 @@
 
 use hui
-use tsunami
+use tsunami.*
 
 #class LoopSource extends AudioSource
 #	int offset

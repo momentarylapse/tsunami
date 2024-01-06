@@ -1,8 +1,8 @@
 # Image = hui:add
 # Title[Deutsch] = Metronom
 
-use tsunami
-use midisource.Metronome
+use tsunami.*
+use midisource.Metronome.*
 
 
 func CreateMidiSourceX[T](session: Session, name: string) -> xfer[T]

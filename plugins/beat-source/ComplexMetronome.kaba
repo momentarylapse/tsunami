@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_BPM = "range=1:360:1,sliderrange=10:200,unit=/min"
 let AUTO_CONFIG_BEATS = ""

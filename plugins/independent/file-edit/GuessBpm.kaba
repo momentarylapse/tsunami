@@ -1,6 +1,6 @@
-use tsunami
+use tsunami.*
 use hui
-use helper.grid
+use helper.grid.*
 
 const FRAME_SIZE = 1024
 const FRAME_STEP = 512/2
@@ -86,7 +86,7 @@ class CorrelationGrid extends Grid
 		return imax
 		
 	
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		if hover_peak >= 0
 			p.set_color([1,1,1, 0.1])
 			var x0 = x_axis.project(curve[max(hover_peak-10, 0)].x)
@@ -142,7 +142,7 @@ func optimize_parable(p0: float[], yy: float[]) -> float[]
 			p[d] -= epsilon
 	return p
 
-class SelfCorrelationDialog extends Dialog
+class SelfCorrelationDialog extends hui.Dialog
 	var grid: owned![CorrelationGrid]
 	var beats_per_bar = 4
 	var discrete = true

@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 use hui
 
 func smooth(t: float) -> float
@@ -197,7 +197,7 @@ class MLVDialog extends hui.Dialog
 		return [0,0]
 		
 
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		let window_size_prev = window_size
 		get_size(window_size[0], window_size[1])
 		if window_size != window_size_prev
@@ -309,7 +309,7 @@ class MultiLineView extends TsunamiPlugin
 		for d in dlg
 			session.playback.out_tick >> create_sink(func() d.on_preview_tick())
 			d.show()
-		fly(dlg)
+		hui.fly(dlg)
 		
 	func override on_stop()
 		for d in dlg

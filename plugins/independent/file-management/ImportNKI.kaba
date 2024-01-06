@@ -1,7 +1,7 @@
 # Image = hui:cut
-use os
+use os.*
 use hui
-use tsunami
+use tsunami.*
 
 
 class ImportNKI extends TsunamiPlugin

@@ -1,5 +1,5 @@
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 const MIN_DETECT_PITCH = 40
 const MAX_DETECT_PITCH = 100

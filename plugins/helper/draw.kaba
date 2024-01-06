@@ -1,12 +1,12 @@
 use hui
-use tsunami
+use tsunami.*
 
 # c(t) = A*t³ + B*t² + C*t + D
 # c(0) = p0
 # c'(0) = t0
 # c(1) = p1
 # c'(1) = t1
-func draw_spline(p: Painter, p0: vec2, t0: vec2, p1: vec2, t1: vec2)
+func draw_spline(p: hui.Painter, p0: vec2, t0: vec2, p1: vec2, t1: vec2)
 	var cc: vec2[]
 	var A = t1+t0+2*(p0-p1)
 	var B = -2*t0-t1 + 3*(p1-p0)
@@ -38,7 +38,7 @@ enum Align
 	CENTER = 0
 	RIGHT = 1
 
-func extern draw_boxed_str(p: Painter, pos: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
+func extern draw_boxed_str(p: hui.Painter, pos: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
 
-func extern draw_arrow(p: Painter, start: vec2, end: vec2)
+func extern draw_arrow(p: hui.Painter, start: vec2, end: vec2)
 

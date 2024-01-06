@@ -1,8 +1,8 @@
 # Image = hui:copy
 # Title[Deutsch] = Echo
 
-use tsunami
-use helper.grid
+use tsunami.*
+use helper.grid.*
 
 let AUTO_CONFIG_DELAY = "range=0:1:0.001,scale=1000,unit=ms"
 let AUTO_CONFIG_VOLUME = "volume,range=0:2"

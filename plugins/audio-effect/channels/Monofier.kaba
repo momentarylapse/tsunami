@@ -1,6 +1,6 @@
 # Image = hui:back
 # Title[Deutsch] = Monofizieren
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_PANNING = "range=-1:1:0.01,scale=100,unit=%"
 let AUTO_CONFIG_DISTANCE = "range=-2:2:0.001,scale=100,unit=cm"

@@ -1,8 +1,8 @@
 # Image = hui:properties
 # Title[Deutsch] = Kompressor
 use hui
-use tsunami
-use helper.grid
+use tsunami.*
+use helper.grid.*
 
 let MIN_DB = -60.0
 let MAX_DB = 0.0
@@ -94,7 +94,7 @@ class CompressorGrid extends Grid
 	var config: Compressor.Config&
 	var cp: ConfigPanel&
 
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		var fi: FloatInterpolator
 		config.fill_inter(fi)
 	
@@ -156,7 +156,7 @@ class CompressorGrid extends Grid
 		let k = hui.get_event().key
 
 		# [Delete] -> remove point
-		if (k == KEY_DELETE) and bool(selected)
+		if (k == hui.KEY_DELETE) and bool(selected)
 			for s in selected
 				if (s > 0) and (s < len(config.curve) - 1)
 					config.curve.remove(s)

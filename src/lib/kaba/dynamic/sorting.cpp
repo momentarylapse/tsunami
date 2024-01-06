@@ -166,7 +166,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 					if (f->num_params != 1)
 						kaba_raise_exception(new KabaException("can only sort by a member function without parameters"));
 					by_type = f->literal_return_type;
-					sfunc = f;
+					sfunc = const_cast<Function*>(f);
 				}
 			if (!sfunc)
 				kaba_raise_exception(new KabaException("type '" + rel->name + "' does not have an element '" + by + "'"));

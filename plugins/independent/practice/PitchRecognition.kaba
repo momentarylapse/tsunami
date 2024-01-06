@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Tonerkennung
 use hui
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 
 class PitchRecognitionPanel extends ConfigPanel
@@ -31,7 +31,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		#loopf(fl, 0, 1)
 		#note = i2s(n)
 
-	func draw_volume(p: Painter)
+	func draw_volume(p: hui.Painter)
 		p.set_color(color(0.8, 0.8, 0.8, 1))
 		let y0 = 30.0
 		let y1 = float(p.height) - 5
@@ -40,7 +40,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		p.set_color(color(0.6, 0.6, 0.6, 1))
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
-	func on_draw(p: Painter)
+	func on_draw(p: hui.Painter)
 		p.set_color(colors.background)
 		p.set_font_size(12)
 		p.draw_rect([0, p.width, 0, p.height])

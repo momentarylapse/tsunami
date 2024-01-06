@@ -1,5 +1,5 @@
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 use hui
 
 func next_ending(notes: shared![MidiNote][]) -> int
@@ -56,7 +56,7 @@ func track_harmony(midi: MidiNoteBuffer) -> Harmony[]
 	return r
 
 class TellHarmony extends TsunamiPlugin
-	func override on_draw_post(p: Painter)
+	func override on_draw_post(p: hui.Painter)
 		var v = session.view.cur_vlayer()
 		
 	#	var midi = v.layer.midi.get_notes(session.view.cam.range())

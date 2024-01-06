@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 class ClickSource extends MidiSource
 	var emit_click: bool

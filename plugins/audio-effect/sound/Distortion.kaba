@@ -1,6 +1,6 @@
 # Image = hui:properties
 # Title[Deutsch] = Verzerrer
-use tsunami
+use tsunami.*
 
 let AUTO_CONFIG_GAIN = "range=0:1:0.001,scale=100,unit=%"
 

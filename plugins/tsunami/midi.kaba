@@ -1,4 +1,4 @@
-use tsunami.common
+use common.*
 
 let MAX_PITCH = 128
 

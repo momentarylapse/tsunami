@@ -1,7 +1,7 @@
 use os
 use hui
-use tsunami
-use helper.tone
+use tsunami.*
+use helper.tone.*
 
 # a single file
 struct MidiFont
@@ -70,7 +70,7 @@ class FontList as @noauto
 
 	#string[] find_drumsets()
 	func mut update()
-		let list = fs.search(hui.app_directory | "Midi Fonts", "*.nami", "f")
+		let list = os.fs.search(hui.app_directory | "Midi Fonts", "*.nami", "f")
 		for e in list
 			let name = str(e)[:-5]
 			for x in find(name)

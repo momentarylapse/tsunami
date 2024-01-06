@@ -292,9 +292,10 @@ void Compiler::align_opcode() {
 
 static int OCORA;
 void Compiler::CompileOsEntryPoint() {
-	if (!module->base_class()->get_func("main", TypeVoid, {}))
+	tree->do_error("FIXME: compile os... main()");
+	/*if (!module->base_class()->get_func("main", TypeVoid, {}))
 		if (!tree->imported_symbols->get_func("main", TypeVoid, {}))
-			module->do_error("os entry point: no 'void main()' found");
+			module->do_error("os entry point: no 'void main()' found");*/
 
 	// call
 	Asm::add_instruction(module->opcode, module->opcode_size, Asm::InstID::CALL, Asm::param_imm(0, 4));
@@ -414,8 +415,9 @@ void Compiler::map_address_constants_to_opcode() {
 
 void Compiler::LinkOsEntryPoint() {
 	auto *f = module->base_class()->get_func("main", TypeVoid, {});
-	if (!f)
-		f = tree->imported_symbols->get_func("main", TypeVoid, {});
+	tree->do_error("FIXME: compile os... main()");
+	/*if (!f)
+		f = tree->imported_symbols->get_func("main", TypeVoid, {});*/
 	if (!f)
 		module->do_error_internal("os entry point missing...");
 
@@ -705,8 +707,10 @@ void Compiler::_compile() {
 	link_functions();
 	link_virtual_functions_into_vtable(tree->base_class);
 	link_virtual_functions_into_vtable(tree->implicit_symbols.get());
-	if (config.compile_os)
-		link_virtual_functions_into_vtable(tree->imported_symbols.get());
+	if (config.compile_os) {
+		tree->do_error("FIXME: compile os... vtable in imported?");
+		//link_virtual_functions_into_vtable(tree->imported_symbols.get());
+	}
 
 
 

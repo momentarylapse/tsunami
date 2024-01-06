@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 func db_to_factor(db: float) -> float
 	return pow(10, db/20)

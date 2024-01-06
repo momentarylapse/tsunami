@@ -1,4 +1,4 @@
-use tsunami
+use tsunami.*
 
 class SilenceSource extends AudioSource
 	var offset: int

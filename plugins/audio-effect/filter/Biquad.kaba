@@ -1,9 +1,9 @@
 use hui
-use tsunami
-use helper.grid
-use helper.tone
-use helper.filter
-use helper.curves
+use tsunami.*
+use helper.grid.*
+use helper.tone.*
+use helper.filter.*
+use helper.curves.*
 
 
 
@@ -72,7 +72,7 @@ class BiquadGrid extends Grid
 	func override __init__()
 	func override __delete__()
 
-	func override on_draw(p: Painter)
+	func override on_draw(p: hui.Painter)
 		draw_curve_c(p, spectrum, false)
 	
 		# curve + area below
@@ -147,7 +147,7 @@ Grid ? '' vertical
 		c.config.b2 = get_float("b2")
 		c.changed()
 
-class PresetDialog extends Dialog
+class PresetDialog extends hui.Dialog
 	var bp: BiquadPanel&
 	func __init__(_p: BiquadPanel)
 		super.__init__("preset", 400, 100, _p.win, false)

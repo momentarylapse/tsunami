@@ -1,5 +1,5 @@
-use tsunami
-use helper.filter
+use tsunami.*
+use helper.filter.*
 use hui
 
 func lufs_to_color(l: float) -> color
@@ -98,7 +98,7 @@ class Loudness extends TsunamiPlugin
 		return -0.691 + 10 * log(gated_z_sum / n_gated) / log(10)
 			
 		
-	func override on_draw_post(p: Painter)
+	func override on_draw_post(p: hui.Painter)
 		let v = session.view.cur_vlayer()
 		for i=>l in loudness
 			let x0 = session.view.cam.sample2screen(i*dT)

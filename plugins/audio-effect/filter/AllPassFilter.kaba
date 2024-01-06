@@ -1,7 +1,7 @@
 # Image = hui:properties
 # Title[Deutsch] = Hochpass Filter
-use tsunami
-use helper.filter
+use tsunami.*
+use helper.filter.*
 
 let AUTO_CONFIG_Z = "range=0:100:0.1"
 let AUTO_CONFIG_PHI = "range=0:6.3:0.1"

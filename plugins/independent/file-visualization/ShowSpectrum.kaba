@@ -1,8 +1,8 @@
 # Image = hui:find
 # Title[Deutsch] = Spektrum zeigen
 use hui
-use tsunami
-use helper.grid
+use tsunami.*
+use helper.grid.*
 
 let N = 512
 let MIN_FREQ = 20.0
@@ -55,11 +55,11 @@ class SpecGrid extends Grid
 			y_axis.set(vol_min, vol_max, false, "db")
 		create_lines()
 
-	func override on_draw(c: Painter)
+	func override on_draw(c: hui.Painter)
 		draw_curve_b(c, pr, true, color.RED)
 		draw_curve_b(c, pl, true, color.BLUE)
 
-class SpectrumDialog extends Dialog
+class SpectrumDialog extends hui.Dialog
 	var grid: SpecGrid
 	func __init__(plugin: TsunamiPlugin)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)

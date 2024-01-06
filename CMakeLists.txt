@@ -737,7 +737,7 @@ install(FILES "static/favorites_demo.txt" DESTINATION share/tsunami)
 install(FILES "static/hui_resources.txt" DESTINATION share/tsunami)
 install(FILES "static/license.txt" DESTINATION share/tsunami)
 install(FILES "static/license_small.txt" DESTINATION share/tsunami)
-install(DIRECTORY "Plugins" DESTINATION share/tsunami)
+install(DIRECTORY "plugins" DESTINATION share/tsunami)
 
 # install .desktop file
 set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")

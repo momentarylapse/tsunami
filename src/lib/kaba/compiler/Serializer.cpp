@@ -950,6 +950,14 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, 0 * 4, TypeFloat32), param_shift(param[0], 0 * 4, TypeFloat32), param[1]);
 			cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, 1 * 4, TypeFloat32), param_shift(param[0], 1 * 4, TypeFloat32), param[1]);
 			break;
+		case InlineID::VEC2_MULTIPLY_ASSIGN:
+			for (int i=0;i<2;i++)
+				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param[1]);
+			break;
+		case InlineID::VEC2_DIVIDE_ASSIGN:
+			for (int i=0;i<2;i++)
+				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
+			break;
 // complex
 		case InlineID::COMPLEX_MULTIPLY:{
 			auto t1 = add_temp(TypeFloat32);
@@ -968,39 +976,39 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, 4, TypeFloat32), t1, t2);
 			}break;
 // vector
-		case InlineID::VECTOR_ADD_ASSIGN:
+		case InlineID::VEC3_ADD_ASSIGN:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FADD, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VECTOR_MULTIPLY_ASSIGN:
+		case InlineID::VEC3_MULTIPLY_ASSIGN:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VECTOR_DIVIDE_ASSIGN:
+		case InlineID::VEC3_DIVIDE_ASSIGN:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VECTOR_SUBTARCT_ASSIGN:
+		case InlineID::VEC3_SUBTARCT_ASSIGN:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FSUB, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VECTOR_ADD:
+		case InlineID::VEC3_ADD:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VECTOR_SUBTRACT:
+		case InlineID::VEC3_SUBTRACT:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FSUB, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VECTOR_MULTIPLY_VF:
+		case InlineID::VEC3_MULTIPLY_VF:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VECTOR_MULTIPLY_FV:
+		case InlineID::VEC3_MULTIPLY_FV:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, i * 4, TypeFloat32), param[0], param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VECTOR_MULTIPLY_VV:{
+		case InlineID::VEC3_MULTIPLY_VV:{
 			cmd.add_cmd(Asm::InstID::FMUL, ret, param_shift(param[0], 0 * 4, TypeFloat32), param_shift(param[1], 0 * 4, TypeFloat32));
 			auto t = add_temp(TypeFloat32);
 			for (int i=1;i<3;i++) {
@@ -1008,11 +1016,11 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				cmd.add_cmd(Asm::InstID::FADD, ret, t);
 			}
 			}break;
-		case InlineID::VECTOR_DIVIDE_VF:
+		case InlineID::VEC3_DIVIDE_VF:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VECTOR_NEGATIVE:
+		case InlineID::VEC3_NEGATIVE:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt, 0x80000000));
 			break;

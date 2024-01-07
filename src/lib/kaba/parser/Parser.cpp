@@ -5,6 +5,7 @@
 #include "../../base/algo.h"
 #include "../../base/iter.h"
 #include "Parser.h"
+#include "import.h"
 #include "../template/template.h"
 
 
@@ -1432,63 +1433,6 @@ void Parser::parse_abstract_complete_command(Block *block) {
 	}
 
 	expect_new_line();
-}
-
-struct ImportSource {
-	shared<Module> module;
-	const Class *_class = nullptr;
-	const Function *func = nullptr;
-	const Variable *var = nullptr;
-	const Constant *_const = nullptr;
-};
-
-ImportSource resolve_import_sub(ImportSource source, const string &name) {
-
-	ImportSource r = source;
-	if (source._class) {
-		for (auto c: weak(source._class->classes))
-			if (c->name == name) {
-				r._class = c;
-				return r;
-			}
-		for (auto f: weak(source._class->functions))
-			if (name == f->name) {
-				r.func = f;
-				r._class = nullptr;
-				return r;
-			}
-		for (auto v: weak(source._class->static_variables))
-			if (name == v->name) {
-				r.var = v;
-				r._class = nullptr;
-				return r;
-			}
-		for (auto c: weak(source._class->constants))
-			if (name == c->name) {
-				r._const = c;
-				r._class = nullptr;
-				return r;
-			}
-	}
-	return source;
-}
-
-ImportSource resolve_import_source(Parser *parser, const Array<string> &name, int token) {
-	ImportSource source;
-
-	for (int i=0; i<name.num; i++) {
-		if (source.module) {
-			if (source._class)
-				source = resolve_import_sub(source, name[i]);
-
-		} else if (auto m = get_import_module(parser, implode(name.sub_ref(0, i+1), "."), token)) {
-			source.module = m;
-			source._class = m->base_class();
-		}
-	}
-	if (!source.module)
-		parser->do_error(format("can not find import '%s'", implode(name, ".")), token);
-	return source;
 }
 
 void Parser::parse_import() {

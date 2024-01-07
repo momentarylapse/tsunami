@@ -7,6 +7,7 @@
 
 #include "../kaba.h"
 #include "Parser.h"
+#include "import.h"
 #include "../../os/filesystem.h"
 #include "../../os/msg.h"
 
@@ -145,6 +146,68 @@ shared<Module> get_import_module(Parser *parser, const string &name, int token_i
 	return include;
 }
 
+
+ImportSource resolve_import_sub(ImportSource source, const string &name) {
+
+	ImportSource r = source;
+	if (source._class) {
+		for (auto c: weak(source._class->classes))
+			if (c->name == name) {
+				r._class = c;
+				return r;
+			}
+		for (auto f: weak(source._class->functions))
+			if (name == f->name) {
+				r.func = f;
+				r._class = nullptr;
+				return r;
+			}
+		for (auto v: weak(source._class->static_variables))
+			if (name == v->name) {
+				r.var = v;
+				r._class = nullptr;
+				return r;
+			}
+		for (auto c: weak(source._class->constants))
+			if (name == c->name) {
+				r._const = c;
+				r._class = nullptr;
+				return r;
+			}
+	}
+	return {};
+}
+
+ImportSource resolve_import_source(Parser *parser, const Array<string> &name, int token) {
+	ImportSource source;
+
+	// find (longest possible) module path
+	int i_module = -1;
+	for (int i=name.num-1; i>=0; i--) {
+		if (auto m = get_import_module(parser, implode(name.sub_ref(0, i+1), "."), token)) {
+			source.module = m;
+			source._class = m->base_class();
+			i_module = i;
+			break;
+		}
+	}
+	if (!source.module)
+		parser->do_error(format("can not find import '%s'", implode(name, ".")), token);
+
+	for (int i=i_module+1; i<name.num; i++) {
+		if (source._class) {
+			source = resolve_import_sub(source, name[i]);
+			if (!source.module)
+				parser->do_error(format("can not use '%s' from module '%s'",
+						implode(name.sub_ref(i_module, i), "."),
+						implode(name.sub_ref(0, i_module), ".")), token);
+		} else {
+			parser->do_error(format("can not use '%s' from non-class '%s'", name[i],
+					implode(name.sub_ref(0, i), ".")), token);
+		}
+	}
+	return source;
+}
 
 [[maybe_unused]] static bool _class_contains(const Class *c, const string &name) {
 	for (auto *cc: weak(c->classes))

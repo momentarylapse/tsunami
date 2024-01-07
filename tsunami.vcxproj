@@ -844,6 +844,7 @@
     <ClInclude Include="src\lib\kaba\lib\shared.h" />
     <ClInclude Include="src\lib\kaba\parser\abstract.h" />
     <ClInclude Include="src\lib\kaba\parser\Concretifier.h" />
+    <ClInclude Include="src\lib\kaba\parser\import.h" />
     <ClInclude Include="src\lib\kaba\parser\lexical.h" />
     <ClInclude Include="src\lib\kaba\parser\Parser.h" />
     <ClInclude Include="src\lib\kaba\parser\Transformer.h" />

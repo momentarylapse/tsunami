@@ -511,8 +511,8 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::DIVIDE, TypeVec2, TypeVec2, TypeFloat32, InlineID::VEC2_DIVIDE_VS, &KabaVector<vec2>::div_f);
 		add_operator(OperatorID::ADDS, TypeVoid, TypeVec2, TypeVec2, InlineID::VEC2_ADD_ASSIGN, &vec2::operator+=);
 		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec2, TypeVec2, InlineID::VEC2_SUBTARCT_ASSIGN, &vec2::operator-=);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec2, TypeFloat32, InlineID::COMPLEX_MULTIPLY_ASSIGN, &vec2::operator*=);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec2, TypeFloat32, InlineID::COMPLEX_DIVIDE_ASSIGN, &vec2::operator/=);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec2, TypeFloat32, InlineID::VEC2_MULTIPLY_ASSIGN, &vec2::operator*=);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec2, TypeFloat32, InlineID::VEC2_DIVIDE_ASSIGN, &vec2::operator/=);
 		add_operator(OperatorID::NEGATIVE, TypeVec2, nullptr, TypeVec2, InlineID::VEC2_NEGATIVE, &KabaVector<vec2>::negate);
 
 	add_class(TypeVec2List);
@@ -570,17 +570,17 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("EZ", TypeVec3, &vec3::EZ);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVec3, TypeVec3, InlineID::CHUNK_ASSIGN, &KabaVector<vec3>::assign);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeVec3, TypeVec3, InlineID::CHUNK_EQUAL, &vec3::operator==);
-		add_operator(OperatorID::ADD, TypeVec3, TypeVec3, TypeVec3, InlineID::VECTOR_ADD, &vec3::operator+);
-		add_operator(OperatorID::SUBTRACT, TypeVec3, TypeVec3, TypeVec3, InlineID::VECTOR_SUBTRACT, (decltype(&vec3::operator+)) &vec3::operator-);
-		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVec3, TypeVec3, InlineID::VECTOR_MULTIPLY_VV, &KabaVector<vec3>::mul_vv);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeVec3, TypeFloat32, InlineID::VECTOR_MULTIPLY_VF, &KabaVector<vec3>::mul_vf);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeFloat32, TypeVec3, InlineID::VECTOR_MULTIPLY_FV, &KabaVector<vec3>::mul_fv);
-		add_operator(OperatorID::DIVIDE, TypeVec3, TypeVec3, TypeFloat32, InlineID::VECTOR_DIVIDE_VF, &KabaVector<vec3>::div_f);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeVec3, TypeVec3, InlineID::VECTOR_ADD_ASSIGN, &vec3::operator+=);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec3, TypeVec3, InlineID::VECTOR_SUBTARCT_ASSIGN, &vec3::operator-=);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec3, TypeFloat32, InlineID::VECTOR_MULTIPLY_ASSIGN, &vec3::operator*=);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec3, TypeFloat32, InlineID::VECTOR_DIVIDE_ASSIGN, &vec3::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVec3, nullptr, TypeVec3, InlineID::VECTOR_NEGATIVE, &KabaVector<vec3>::negate);
+		add_operator(OperatorID::ADD, TypeVec3, TypeVec3, TypeVec3, InlineID::VEC3_ADD, &vec3::operator+);
+		add_operator(OperatorID::SUBTRACT, TypeVec3, TypeVec3, TypeVec3, InlineID::VEC3_SUBTRACT, (decltype(&vec3::operator+)) &vec3::operator-);
+		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVec3, TypeVec3, InlineID::VEC3_MULTIPLY_VV, &KabaVector<vec3>::mul_vv);
+		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeVec3, TypeFloat32, InlineID::VEC3_MULTIPLY_VF, &KabaVector<vec3>::mul_vf);
+		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeFloat32, TypeVec3, InlineID::VEC3_MULTIPLY_FV, &KabaVector<vec3>::mul_fv);
+		add_operator(OperatorID::DIVIDE, TypeVec3, TypeVec3, TypeFloat32, InlineID::VEC3_DIVIDE_VF, &KabaVector<vec3>::div_f);
+		add_operator(OperatorID::ADDS, TypeVoid, TypeVec3, TypeVec3, InlineID::VEC3_ADD_ASSIGN, &vec3::operator+=);
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec3, TypeVec3, InlineID::VEC3_SUBTARCT_ASSIGN, &vec3::operator-=);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec3, TypeFloat32, InlineID::VEC3_MULTIPLY_ASSIGN, &vec3::operator*=);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec3, TypeFloat32, InlineID::VEC3_DIVIDE_ASSIGN, &vec3::operator/=);
+		add_operator(OperatorID::NEGATIVE, TypeVec3, nullptr, TypeVec3, InlineID::VEC3_NEGATIVE, &KabaVector<vec3>::negate);
 	
 	add_class(TypeVec3List);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<vec3>::__init__);

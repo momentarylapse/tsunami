@@ -24,19 +24,18 @@ void SIAddPackageTime(Context *c) {
 		class_add_func(Identifier::Func::STR, TypeString, &Date::str, Flags::PURE);
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &Date::__assign__);
 			func_add_param("o", TypeDate);
-		class_add_func("now", TypeDate, &Date::now, Flags::STATIC);
 
 
 	add_class(TypeTimer);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &os::Timer::reset);
 		class_add_func("get", TypeFloat32, &os::Timer::get);
 		class_add_func("reset", TypeVoid, &os::Timer::reset);
-		class_add_func("peek", TypeFloat32, &os::Timer::peek);
-
+		class_add_func("peek", TypeFloat32, &os::Timer::peek, Flags::CONST);
 
 
 	add_func("sleep", TypeVoid, &os::sleep, Flags::STATIC);
 		func_add_param("duration", TypeFloat32);
+	add_func("now", TypeDate, &Date::now, Flags::STATIC);
 }
 
 };

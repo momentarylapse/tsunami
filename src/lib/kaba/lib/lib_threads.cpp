@@ -24,10 +24,10 @@ namespace kaba {
 void SIAddPackageThread(Context *c) {
 	add_package(c, "thread");
 
-	const Class *TypeThread       = add_type("Thread", sizeof(Thread));
-	const Class *TypeThreadP      = add_type_p_raw(TypeThread);
-	const Class *TypeMutex        = add_type("Mutex", sizeof(Mutex));
-	const Class *TypeThreadedWork = add_type("ThreadedWork", sizeof(ThreadedWork));
+	const Class *TypeThread    = add_type("Thread", sizeof(Thread));
+	const Class *TypeThreadP   = add_type_p_raw(TypeThread);
+	const Class *TypeMutex     = add_type("Mutex", sizeof(Mutex));
+	const Class *TypeScheduler = add_type("Scheduler", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
 		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&Thread::__init__));
@@ -37,8 +37,6 @@ void SIAddPackageThread(Context *c) {
 		class_add_func("is_done", TypeBool, thread_p(&Thread::is_done));
 		class_add_func("kill", TypeVoid, thread_p(&Thread::kill));
 		class_add_func("join", TypeVoid, thread_p(&Thread::join));
-		class_add_func("get_num_cores", TypeInt, thread_p(&Thread::get_num_cores), Flags::STATIC);
-		class_add_func("exit", TypeVoid, thread_p(&Thread::exit), Flags::STATIC);
 		class_add_func("self", TypeThreadP,thread_p(&Thread::get_self), Flags::STATIC);
 #ifdef KABA_EXPORT_THREADS
 		class_set_vtable(Thread);
@@ -50,7 +48,7 @@ void SIAddPackageThread(Context *c) {
 		class_add_func("lock", TypeVoid, thread_p(&Mutex::lock));
 		class_add_func("unlock", TypeVoid, thread_p(&Mutex::unlock));
 
-	add_class(TypeThreadedWork);
+	add_class(TypeScheduler);
 		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&ThreadedWork::__init__));
 		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, thread_p(&ThreadedWork::__delete__));
 		class_add_func("run", TypeBool, thread_p(&ThreadedWork::run));
@@ -65,6 +63,10 @@ void SIAddPackageThread(Context *c) {
 #ifdef KABA_EXPORT_THREADS
 		class_set_vtable(ThreadedWork);
 #endif
+
+
+	add_func("get_num_cores", TypeInt, thread_p(&Thread::get_num_cores), Flags::STATIC);
+	add_func("exit", TypeVoid, thread_p(&Thread::exit), Flags::STATIC);
 }
 
 };

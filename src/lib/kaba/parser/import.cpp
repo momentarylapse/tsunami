@@ -129,7 +129,7 @@ shared<Module> get_import_module(Parser *parser, const string &name, int token_i
 	msg_right();
 	shared<Module> include;
 	try {
-		include = parser->context->load_module(filename, parser->tree->module->just_analyse or config.compile_os);
+		include = parser->context->load_module(filename, parser->tree->module->just_analyse or config.fully_linear_output);
 		// os-includes will be appended to syntax_tree... so don't compile yet
 	} catch (kaba::Exception &e) {
 		msg_left();

@@ -36,8 +36,8 @@ public:
 	void allocate_memory();
 	void assemble_function(int index, Function *f, Asm::InstructionWithParamsList *list);
 	void compile_functions(char *oc, int &ocs);
-	void CompileOsEntryPoint();
-	void LinkOsEntryPoint();
+	void compile_os_entry_point();
+	void link_os_entry_point();
 	void link_functions();
 	void link_virtual_functions_into_vtable(const Class *c);
 

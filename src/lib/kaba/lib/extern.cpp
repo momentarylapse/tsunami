@@ -32,18 +32,48 @@ void ExternalLinkData::reset() {
 
 extern const Class *TypeStringAutoCast;
 
+static const string LIB_LINK_PREFIX = "/";
 
-string decode_symbol_name(const string &name) {
-	return name.replace("lib__", "").replace("@list", "[]").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
+string decode_symbol_name(const string &_name) {
+	string name = _name.replace("lib__", "");
+	return name.replace("@list", "[]").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
+}
+
+string class_link_name(const Class *c) {
+	if (c == TypeStringAutoCast)
+		return "string";
+	if (c->owner->module->is_system_module())
+		return c->long_name();
+	return decode_symbol_name(c->cname(c->owner->base_class));
 }
 
 string function_link_name(Function *f) {
-	string name = decode_symbol_name(f->cname(f->owner()->base_class));
-	if (!f->is_static())
-		name += ":" + decode_symbol_name(f->name_space->name);
+	string name = f->cname(f->owner()->base_class);
+
+	// internal lib?
+	if (f->owner()->module->is_system_module()) {
+		if (f->owner()->module->filename != "base")
+			name = str(f->owner()->module->filename) + "." + name;
+		name = LIB_LINK_PREFIX + name;
+	} else {
+		if (name.head(5) == "lib__")
+			name = LIB_LINK_PREFIX + name;
+		name = decode_symbol_name(name);
+	}
+
+	// parameters
 	for (auto &p: f->literal_param_type)
-		name += ":" + decode_symbol_name(p->name);
+		name += ":" + class_link_name(p);
 	return name;
+}
+
+Module *link_most_likely_internal_lib_module(Context *context, const string &name) {
+	auto names = name.sub_ref(1).replace(":", ".").explode(".");
+
+	for (auto p: weak(context->packages))
+		if (str(p->filename) == names[0])
+			return p;
+	return context->packages[0].get(); // base
 }
 
 // program variables - specific to the surrounding program, can't always be there...
@@ -55,19 +85,20 @@ void ExternalLinkData::link(const string &name, void *pointer) {
 		msg_error("probably a virtual function: " + name);
 	external_links.add(l);
 
+	// lib linking override?
+	if (name.head(LIB_LINK_PREFIX.num) != LIB_LINK_PREFIX)
+		return;
 
-	auto names = name.explode(":");
-	string sname = decode_symbol_name(names[0]);
-	string package_name = sname.explode(".")[0];
-	for (auto p: context->packages)
-		if (str(p->filename) == package_name)
-			for (auto&& [i,f]: enumerate(p->tree->functions))
-				if (f->cname(p->base_class()) == sname) {
-					if (names.num > 1)
-						if (name != function_link_name(f))
-							continue;
-					f->address = (int_p)pointer;
-				}
+	auto names = name.sub_ref(1).explode(":");
+	if (auto p = link_most_likely_internal_lib_module(context, name))
+		for (auto f: p->tree->functions) {
+			if (name != function_link_name(f))
+					continue;
+			//	msg_write("LINK  " + name + "   >>   " + f->long_name());
+				f->address = (int_p)pointer;
+				return;
+			}
+	//msg_error("can not override internal link: " + name);
 }
 
 void *ExternalLinkData::get_link(const string &name) {

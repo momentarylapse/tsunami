@@ -52,7 +52,7 @@ public:
 		bool interpreted;
 		bool is_native;
 
-		int64 pointer_size;
+		int pointer_size;
 		int dynamic_array_size;
 
 		int stack_mem_align;
@@ -63,30 +63,30 @@ public:
 		bool is_x86() const; // 32 or 64 bit
 	} target, native_target;
 
-	bool allow_std_lib;
-	bool allow_simplification;
-	bool allow_registers;
-	bool allow_simplify_consts;
+	bool allow_std_lib = true;
+	bool allow_simplification = true;
+	bool allow_registers = true;
+	bool allow_simplify_consts = true;
 
 	Path directory;
-	bool verbose;
+	bool verbose = false;
 	string verbose_func_filter;
 	string verbose_stage_filter;
-	bool allow_output(const Function *f, const string &stage);
-	bool allow_output_func(const Function *f);
-	bool allow_output_stage(const string &stage);
-	bool compile_silently;
-	bool show_compiler_stats;
+	bool allow_output(const Function *f, const string &stage) const;
+	bool allow_output_func(const Function *f) const;
+	bool allow_output_stage(const string &stage) const;
+	bool compile_silently = false;
+	bool show_compiler_stats = true;
 
-	bool compile_os;
-	bool remove_unused;
-	bool add_entry_point;
-	bool override_variables_offset;
-	int64 variables_offset;
-	bool override_code_origin;
-	int64 code_origin;
+	bool fully_linear_output = false;
+	bool remove_unused = false;
+	bool add_entry_point = false;
+	bool override_variables_offset = false;
+	int64 variables_offset = 0;
+	bool override_code_origin = false;
+	int64 code_origin = 0;
 
-	int function_address_offset;
+	int function_address_offset = 0;
 
 	Path default_filename; // for create_for_source()
 };

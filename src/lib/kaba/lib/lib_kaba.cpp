@@ -12,6 +12,8 @@ extern const Class* TypePath;
 extern const Class* TypeSpecialFunction;
 extern const Class* TypeSpecialFunctionRef;
 
+string function_link_name(Function *f);
+
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
@@ -243,6 +245,9 @@ void SIAddPackageKaba(Context *c) {
 		func_add_param("length", TypeInt);
 		func_add_param("comments", TypeBool);
 	add_func("show_func", TypeVoid, &show_func, Flags::STATIC);
+		func_add_param("f", TypeFunction);
+
+	add_func("link_name", TypeString, &function_link_name, Flags::STATIC);
 		func_add_param("f", TypeFunction);
 
 	add_ext_var("default_context", TypeContextRef, (void*)&default_context);

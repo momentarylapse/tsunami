@@ -99,7 +99,7 @@ string SerialNodeParam::str(Serializer *ser) const {
 		else if (kind == NodeKind::CONSTANT)
 			n = ((Constant*)p)->str();
 		else if (kind == NodeKind::CONSTANT_BY_ADDRESS) {
-			if (config.compile_os)
+			if (config.fully_linear_output)
 				n = "@" + p2s((void*)(int_p)p);
 			else
 				n = var_repr((void*)(int_p)(p + shift), type) + " @" + p2s((void*)(int_p)p);

@@ -241,7 +241,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 		return p;
 	} else if (com->kind == NodeKind::ADDRESS) {
 		//p.p = com->link_no;
-		if (config.compile_os)
+		if (config.fully_linear_output)
 			p.p = com->link_no; // by map_address_constants_to_opcode()
 		else
 			p.p = (int_p)&com->link_no;
@@ -598,7 +598,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 		case StatementID::RAW_FUNCTION_POINTER: {
 			auto ret = add_temp(com->type, false);
 			// only from callable can reach here!
-			if (config.compile_os)
+			if (config.fully_linear_output)
 				do_error("implicit raw_function_pointer() for os not implemented yet (i.e. don't use callables/function pointers)");
 			auto func = serialize_node(com->params[0].get(), block, index);
 			auto t1 = add_temp(TypePointer);

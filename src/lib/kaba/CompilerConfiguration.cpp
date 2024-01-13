@@ -71,7 +71,7 @@ string abi_name(Abi abi) {
 }
 
 CompilerConfiguration::Target CompilerConfiguration::Target::get_native() {
-	Target t;
+	Target t{};
 	t.is_native = true;
 	t.abi = guess_native_abi();
 	t.instruction_set = extract_instruction_set(t.abi);
@@ -86,7 +86,7 @@ CompilerConfiguration::Target CompilerConfiguration::Target::get_native() {
 
 
 CompilerConfiguration::Target CompilerConfiguration::Target::get_for_abi(Abi abi) {
-	Target t;
+	Target t{};
 	t.is_native = (abi == guess_native_abi());
 	t.abi = abi;
 	t.instruction_set = extract_instruction_set(abi);
@@ -111,32 +111,18 @@ bool CompilerConfiguration::Target::is_x86() const {
 }
 
 CompilerConfiguration::CompilerConfiguration() {
-	allow_std_lib = true;
-
-	allow_simplification = true;
-	allow_registers = true;
-	allow_simplify_consts = true;
-
-	compile_silently = false;
-	verbose = false;
+	target = {};
+	native_target = {};
 	verbose_func_filter = "*";
 	verbose_stage_filter = "*";
 	show_compiler_stats = true;
-
-	compile_os = false;
-	remove_unused = false;
-	override_variables_offset = false;
-	variables_offset = 0;
-	override_code_origin = false;
-	code_origin = 0;
-	add_entry_point = false;
 
 	function_address_offset = element_offset(&Function::address); // offsetof(Function, address);
 }
 
 
 
-bool CompilerConfiguration::allow_output_func(const Function *f) {
+bool CompilerConfiguration::allow_output_func(const Function *f) const {
 	if (!verbose)
 		return false;
 	if (!f)
@@ -148,7 +134,7 @@ bool CompilerConfiguration::allow_output_func(const Function *f) {
 	return false;
 }
 
-bool CompilerConfiguration::allow_output_stage(const string &stage) {
+bool CompilerConfiguration::allow_output_stage(const string &stage) const {
 	if (!verbose)
 		return false;
 	auto filters = verbose_stage_filter.explode(",");
@@ -158,7 +144,7 @@ bool CompilerConfiguration::allow_output_stage(const string &stage) {
 	return false;
 }
 
-bool CompilerConfiguration::allow_output(const Function *f, const string &stage) {
+bool CompilerConfiguration::allow_output(const Function *f, const string &stage) const {
 	if (!verbose)
 		return false;
 	if (!allow_output_func(f))

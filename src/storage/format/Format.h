@@ -14,8 +14,11 @@ class StorageOperationData;
 class Port;
 class Format;
 class Song;
-class FileStream;
-class BinaryFormatter;
+namespace os::fs {
+	class FileStream;
+}
+class Stream;
+//class BinaryFormatter;
 enum class SampleFormat;
 
 const int CHUNK_SIZE = 1 << 18;
@@ -62,7 +65,7 @@ public:
 	
 	virtual bool get_parameters(StorageOperationData *od, bool save) { return true; }
 
-	FileStream *f;
+	os::fs::FileStream *f;
 };
 
 #endif /* FORMAT_H_ */

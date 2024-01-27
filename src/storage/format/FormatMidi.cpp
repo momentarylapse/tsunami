@@ -31,14 +31,14 @@ FormatDescriptorMidi::FormatDescriptorMidi() :
 {
 }
 
-static string read_chunk_name(BinaryFormatter *f) {
+static string read_chunk_name(Stream *f) {
 	string s;
 	s.resize(4);
 	*(int*)s.data = f->read_int();
 	return s;
 }
 
-static void write_chunk_name(BinaryFormatter *f, const string &name) {
+static void write_chunk_name(Stream *f, const string &name) {
 	string s = name;
 	s.resize(4);
 	f->write(s);
@@ -52,16 +52,16 @@ static int int16_reverse(int i) {
 	return ((i & 255) << 8) + ((i >> 8) & 255);
 }
 
-static int read_int(BinaryFormatter *f) {
+static int read_int(Stream *f) {
 	int i = f->read_int();
 	return int_reverse(i);
 }
 
-static void write_int(BinaryFormatter *f, int i) {
+static void write_int(Stream *f, int i) {
 	f->write_int(int_reverse(i));
 }
 
-static int read_var(BinaryFormatter *f) {
+static int read_var(Stream *f) {
 	unsigned char c0;
 	int i = 0;
 	do {
@@ -71,7 +71,7 @@ static int read_var(BinaryFormatter *f) {
 	return i;
 }
 
-static void write_var(BinaryFormatter *f, int i) {
+static void write_var(Stream *f, int i) {
 	string s;
 	int i0 = i;
 	if (i < 0)
@@ -104,9 +104,9 @@ static string ascii2utf8(const string &s) {
 }
 
 void FormatMidi::load_song(StorageOperationData *od) {
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 
 		string hn = read_chunk_name(f);
 		int hsize = read_int(f);
@@ -206,7 +206,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 		for (int i=0; i<num_tracks; i++) {
 			string tn = read_chunk_name(f);
 			int tsize = read_int(f);
-			int pos0 = f->get_pos();
+			int pos0 = f->pos();
 			if (tn != "MTrk")
 				throw Exception(format("invalid midi track header found: '%s' (expected 'MTrk')", tn));
 			dbo("----------------------- track");
@@ -216,7 +216,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 			int last_status = 0;
 
 			int midi_clock_offset = 0;
-			while (f->get_pos() < pos0 + tsize) {
+			while (f->pos() < pos0 + tsize) {
 				int midi_dticks = read_var(f);
 				midi_clock_offset += midi_dticks;
 				//dbo(format("  <offset=%d", midi_dticks) + "   " + Range(midi_clock_offset - midi_dticks, midi_dticks).str());
@@ -339,9 +339,9 @@ void FormatMidi::load_song(StorageOperationData *od) {
 }
 
 void FormatMidi::save_song(StorageOperationData* od) {
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
+		f = os::fs::open(od->filename, "wb");
 
 		int num_tracks = 0;
 		for (Track *t: weak(od->song->tracks))
@@ -361,7 +361,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 			if (t->type != SignalType::MIDI)
 				continue;
 			write_chunk_name(f, "MTrk");
-			int pos0 = f->get_pos();
+			int pos0 = f->pos();
 			write_int(f, 0); // size (will be replaced later)
 
 			// track name
@@ -449,7 +449,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 			f->write_byte(0x2f);
 			f->write_byte(0x00);
 
-			int pos = f->get_pos();
+			int pos = f->pos();
 			f->set_pos(pos0);
 			write_int(f, pos - pos0 - 4);
 			f->set_pos(pos);

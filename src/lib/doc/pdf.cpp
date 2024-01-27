@@ -327,7 +327,7 @@ void Parser::save(const Path &filename) {
 	pos.resize(id_xref);
 
 	auto write_obj = [&](FileStream *f, int id, const string &contents) {
-		pos[id] = f->get_pos();
+		pos[id] = f->pos();
 		f->write(format("%d 0 obj\n", id));
 		f->write(contents + "\n");
 		f->write("endobj\n");
@@ -423,7 +423,7 @@ void Parser::save(const Path &filename) {
 		write_obj(f, fd.id, mk_dict(dict));
 	}
 
-	int xref_pos = f->get_pos();
+	int xref_pos = f->pos();
 	f->write("xref\n");
 	f->write(format("0 %d\n", id_xref));
 	f->write("0000000000 65535 f\n");

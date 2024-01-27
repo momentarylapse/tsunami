@@ -65,7 +65,7 @@ Date time2date(time_t t);
 namespace os::fs {
 
 
-FileStream::FileStream(int h) {
+FileStream::FileStream(int h, Mode mode) : Stream(mode) {
 	handle = h;
 }
 
@@ -74,7 +74,7 @@ FileStream::~FileStream() {
 		close();
 }
 
-bool FileStream::is_end() {
+bool FileStream::is_end() const {
 #ifdef OS_WINDOWS
 	return _eof(handle);
 #endif
@@ -123,7 +123,7 @@ FileStream *open(const Path &filename, const string &mode) {
 		throw FileError(format("mode unhandled: '%s'", mode));
 	}
 
-	if (handle <= 0)
+	if (handle < 0)
 		throw FileError(format("failed opening file '%s'", filename));
 
 
@@ -133,7 +133,7 @@ FileStream *open(const Path &filename, const string &mode) {
 	else
 		set_mode_bin(handle);
 
-	return new FileStream(handle);
+	return new FileStream(handle, (mode.find("t") >= 0) ? Stream::Mode::TEXT : Stream::Mode::BINARY);
 }
 
 
@@ -183,14 +183,7 @@ void FileStream::seek(int delta) {
 }
 
 // retrieve the size of the opened(!) file
-int FileStream::get_size32() {
-	struct stat _stat;
-	fstat(handle, &_stat);
-	return _stat.st_size;
-}
-
-// retrieve the size of the opened(!) file
-int64 FileStream::get_size() {
+int64 FileStream::size() const {
 	struct stat s;
 	fstat(handle, &s);
 	return s.st_size;
@@ -215,7 +208,7 @@ Date FileStream::atime() {
 }
 
 // where is the current reading position in the file?
-int FileStream::get_pos() {
+int FileStream::pos() const {
 	return _lseek(handle, 0, SEEK_CUR);
 }
 

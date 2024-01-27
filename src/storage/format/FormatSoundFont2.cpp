@@ -114,14 +114,14 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	od = _od;
 	song = od->song;
 
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 
 	sample_offset = -1;
 
 	song->add_track(SignalType::AUDIO);
 
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 		read_chunk(f);
 		if (sample_offset > 0)
 			read_samples(f);
@@ -170,7 +170,7 @@ void FormatSoundFont2::sfSample::print() {
 	msg_write(sample_type);
 }
 
-string read_str(BinaryFormatter *f, int l) {
+string read_str(Stream *f, int l) {
 	string s = f->read(l);
 	int p0 = s.find(string("\0", 1), 0);
 	if (p0 >= 0)
@@ -208,10 +208,10 @@ string FormatSoundFont2::sfGenerator::str() const {
 	return s;
 }
 
-void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
+void FormatSoundFont2::read_chunk(Stream *f) {
 	string name = read_str(f, 4).upper();
 	int l = f->read_int();
-	int after_pos = f->get_pos() + l;
+	int after_pos = f->pos() + l;
 
 	od->session->debug("sf2", format("chunk: %s (%d)", name, l));
 
@@ -227,14 +227,14 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 	} else if (name == "LIST") {
 		string aaa = read_str(f, 4);
 		od->session->debug("sf2", format("list type: %s", aaa));
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			read_chunk(f);
 		}
 	} else if (name == "SMPL") {
-		sample_offset = f->get_pos();
+		sample_offset = f->pos();
 		sample_count = l / 2;
 	} else if (name == "SHDR") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfSample s;
 			read_sample_header(f, s);
 			if (s.name == "EOS")
@@ -262,7 +262,7 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 	} else if (sa_contains({"IFIL", "PMOD", "IMOD"}, name)) {
 		// ignore
 	} else if (name == "PHDR") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfPresetHeader p;
 			p.name = read_str(f, 20);
 			p.preset = f->read_word();
@@ -279,7 +279,7 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 			presets.add(p);
 		}
 	} else if (name == "INST") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfInstrument i;
 			i.name = read_str(f, 20);
 			i.zone_start = f->read_word();
@@ -291,7 +291,7 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 			instruments.add(i);
 		}
 	} else if (name == "PBAG") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfZone p;
 			p.gen_start = f->read_word();
 			p.gen_end = -1;
@@ -301,7 +301,7 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 			preset_zones.add(p);
 		}
 	} else if (name == "IBAG") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfZone p;
 			p.gen_start = f->read_word();
 			p.gen_end = -1;
@@ -311,14 +311,14 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 			instrument_zones.add(p);
 		}
 	} else if (name == "PGEN") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfGenerator g;
 			g.op = f->read_word();
 			g.amount = f->read_word();
 			preset_generators.add(g);
 		}
 	} else if (name == "IGEN") {
-		while (f->get_pos() < after_pos - 3) {
+		while (f->pos() < after_pos - 3) {
 			sfGenerator g;
 			g.op = f->read_word();
 			g.amount = f->read_word();
@@ -332,7 +332,7 @@ void FormatSoundFont2::read_chunk(BinaryFormatter *f) {
 	f->set_pos(after_pos);
 }
 
-void FormatSoundFont2::read_sample_header(BinaryFormatter *f, FormatSoundFont2::sfSample &s) {
+void FormatSoundFont2::read_sample_header(Stream *f, FormatSoundFont2::sfSample &s) {
 	s.name = read_str(f, 20);
 	s.start = f->read_int();
 	s.end = f->read_int();
@@ -345,7 +345,7 @@ void FormatSoundFont2::read_sample_header(BinaryFormatter *f, FormatSoundFont2::
 	s.sample_type = f->read_word();
 }
 
-void FormatSoundFont2::read_samples(BinaryFormatter *f) {
+void FormatSoundFont2::read_samples(Stream *f) {
 	int samples_all = 0;
 	int samples_read = 0;
 	for (auto &s : samples)

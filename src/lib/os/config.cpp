@@ -115,7 +115,7 @@ bool Configuration::has(const string& name) const {
 
 bool Configuration::load(const Path &filename) {
 	try {
-		auto f = new TextLinesFormatter(os::fs::open(filename, "rt"));
+		auto f = os::fs::open(filename, "rt");
 		map.clear();
 
 		string t = f->read_str();
@@ -130,8 +130,8 @@ bool Configuration::load(const Path &filename) {
 			}
 		} else if (t.head(3) == "// ") {
 			// semi old format
-			f->stream->set_pos(0);
-			while (!f->stream->is_end()) {
+			f->set_pos(0);
+			while (!f->is_end()) {
 				string temp = f->read_str();
 				if (temp == "#")
 					break;
@@ -141,9 +141,9 @@ bool Configuration::load(const Path &filename) {
 			}
 		} else {
 			// new format
-			f->stream->set_pos(0);
+			f->set_pos(0);
 			string _namespace;
-			while (!f->stream->is_end()) {
+			while (!f->is_end()) {
 				string s = f->read_str();
 				if (s.num == 0)
 					continue;
@@ -217,7 +217,7 @@ string config_get_base(const string &key) {
 void Configuration::save(const Path &filename) {
 	os::fs::create_directory(filename.parent());
 	try {
-		auto f = new TextLinesFormatter(os::fs::open(filename, "wt"));
+		auto f = os::fs::open(filename, "wt");
 		base::set<string> namespaces;
 		for (auto&& [k,v]: map)
 			namespaces.add(config_get_namespace(k));

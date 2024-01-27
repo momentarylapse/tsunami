@@ -48,7 +48,7 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 void FormatRaw::save_via_renderer(StorageOperationData *od) {
 	Port *r = od->renderer;
 
-	auto f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
+	auto f = os::fs::open(od->filename, "wb");
 	
 	int offset = od->parameters["offset"]._int();
 	int channels = od->parameters["channels"]._int();
@@ -83,16 +83,16 @@ void FormatRaw::load_track(StorageOperationData *od) {
 	auto format = format_from_code(od->parameters["format"].str());
 
 	bytes data;
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 
 	od->suggest_samplerate(sample_rate);
 	od->suggest_channels(channels);
 
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 
 		int byte_per_sample = (format_get_bits(format) / 8) * channels;
-		int64 size = f->get_size() - offset;
+		int64 size = f->size() - offset;
 		//int samples = size / byte_per_sample;
 
 		if (offset > 0)

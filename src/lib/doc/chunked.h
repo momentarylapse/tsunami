@@ -8,7 +8,7 @@
 #ifndef SRC_LIB_XFILE_CHUNKED_H_
 #define SRC_LIB_XFILE_CHUNKED_H_
 
-#include "../os/formatter.h"
+#include "../os/stream.h"
 
 class Path;
 
@@ -49,7 +49,7 @@ public:
 		int end();
 		string str();
 
-		BinaryFormatter *f;
+		Stream *f;
 		Array<Layer> layers;
 	};
 	Context context;
@@ -61,8 +61,8 @@ public:
 	FileChunkBasic(const string &_name);
 	virtual ~FileChunkBasic();
 	virtual void define_children() {};
-	virtual void read(BinaryFormatter *f) = 0;
-	virtual void write(BinaryFormatter *f) = 0;
+	virtual void read(Stream *f) = 0;
+	virtual void write(Stream *f) = 0;
 	virtual void write_subs() {}
 	virtual void create();
 	string name;
@@ -88,8 +88,8 @@ public:
 	void write_sub(const string &name, void *p);
 	void write_sub_parray(const string &name, const DynamicArray &a);
 	void write_sub_array(const string &name, const DynamicArray &a);
-	void write_begin_chunk(BinaryFormatter *f);
-	void write_end_chunk(BinaryFormatter *f);
+	void write_begin_chunk(Stream *f);
+	void write_end_chunk(Stream *f);
 	void write_complete();
 	void write_contents();
 	string read_header();

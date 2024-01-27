@@ -26,47 +26,47 @@ FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
 }
 
 
-static void write_str1(BinaryFormatter *f, const string &s) {
+static void write_str1(Stream *f, const string &s) {
 	f->write_byte(s.num);
-	f->stream->write(s);
+	f->write(s);
 }
 
-static void write_str1c(BinaryFormatter *f, const string &s, int size) {
+static void write_str1c(Stream *f, const string &s, int size) {
 	f->write_byte(s.num);
 	string t = s;
 	t.resize(size);
-	f->stream->write(t);
+	f->write(t);
 }
 
-static void write_str4(BinaryFormatter *f, const string &s) {
+static void write_str4(Stream *f, const string &s) {
 	f->write_int(s.num);
-	f->stream->write(s);
+	f->write(s);
 }
 
-static void write_str41(BinaryFormatter *f, const string &s) {
+static void write_str41(Stream *f, const string &s) {
 	f->write_int(s.num + 1);
 	write_str1(f, s);
 }
 
-static string read_str1(BinaryFormatter *f){
+static string read_str1(Stream *f){
 	int l = f->read_byte();
 	//msg_write(l);
 	return f->read(l);
 }
 
-static string read_str1c(BinaryFormatter *f, int size) {
+static string read_str1c(Stream *f, int size) {
 	int l = f->read_byte();
 	string s = f->read(size);
 	s.resize(l);
 	return s;
 }
 
-static string read_str4(BinaryFormatter *f) {
+static string read_str4(Stream *f) {
 	int l = f->read_int();
 	return f->read(l);
 }
 
-static string read_str41(BinaryFormatter *f) {
+static string read_str41(Stream *f) {
 	[[maybe_unused]] int l = f->read_int();
 	/*msg_write(l);
 	string s;
@@ -82,7 +82,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	song = od->song;
 	char data[16];
 
-	f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
+	f = os::fs::open(od->filename, "wb");
 	string ext = od->filename.extension();
 	if (ext == "gp3")
 		version = 300;
@@ -137,7 +137,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 
 	if (version >= 400){
 		f->write_byte(0); // key signature
-		f->stream->write(data, 3);
+		f->write(data, 3);
 		f->write_byte(0); // octave
 	}else{
 		f->write_int(0); // key
@@ -146,7 +146,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	write_channels();
 
 	if (version >= 500)
-		f->stream->seek(42);
+		f->seek(42);
 
 	f->write_int(bars.num);
 	f->write_int(tracks.num);
@@ -173,7 +173,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 	measures.clear();
 
 	try{
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 
 		string s = read_str1c(f, 30);
 		msg_write("version: " + s);
@@ -211,7 +211,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 
 		if (version >= 400){
 			f->read_byte(); // key signature
-			f->stream->seek(3);
+			f->seek(3);
 			f->read_byte(); // octave
 		}else{
 			f->read_int(); // key
@@ -220,7 +220,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 		read_channels();
 
 		if (version >= 500)
-			f->stream->seek(42);
+			f->seek(42);
 
 		int num_measures = f->read_int();
 		int num_tracks = f->read_int();
@@ -339,7 +339,7 @@ void FormatGuitarPro::read_channels()
 		f->read_byte(); // phaser
 		f->read_byte(); // tremolo
 		//if (i == 9) -> percussion
-		f->stream->seek(2);
+		f->seek(2);
 	}
 }
 
@@ -357,7 +357,7 @@ void FormatGuitarPro::write_channels()
 		f->write_byte(0); // phaser
 		f->write_byte(0); // tremolo
 		//if (i == 9) -> percussion
-		f->stream->seek(2);
+		f->seek(2);
 	}
 }
 
@@ -507,12 +507,12 @@ void FormatGuitarPro::read_track()
 	f->read_int(); // offset
 	f->read_int(); // color
 	if (version > 500){
-		f->stream->seek(49);
+		f->seek(49);
 		read_str41(f);
 		read_str41(f);
 	}
 	if (version == 500)
-		f->stream->seek(45);
+		f->seek(45);
 }
 
 void FormatGuitarPro::write_track(GpTrack *t, int index)
@@ -541,12 +541,12 @@ void FormatGuitarPro::write_track(GpTrack *t, int index)
 	f->write_int(0); // offset
 	f->write_int(0); // color
 	if (version > 500){
-		f->stream->seek(49);
+		f->seek(49);
 		write_str41(f, "");
 		write_str41(f, "");
 	}
 	if (version == 500)
-		f->stream->seek(45);
+		f->seek(45);
 }
 
 void FormatGuitarPro::read_measure(GpMeasure &m, GpTrack &t, int offset)
@@ -879,10 +879,10 @@ void FormatGuitarPro::read_chord()
 			}
 		}
 	}else{
-		f->stream->seek(16);
+		f->seek(16);
 		string name = read_str1c(f, 21);
 		msg_write("chord: " + name);
-		f->stream->seek(4);
+		f->seek(4);
 		[[maybe_unused]] int first_fret = f->read_int();
 		for (int i=0; i<7; i++){
 			[[maybe_unused]] int fret = f->read_int();
@@ -890,7 +890,7 @@ void FormatGuitarPro::read_chord()
 				chord.addFretValue(i,fret);
 			}*/
 		}
-		f->stream->seek(32);
+		f->seek(32);
 	}
 }
 
@@ -902,7 +902,7 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 		[[maybe_unused]] int noteType = f->read_byte();
 	}
 	if (((flags & 0x01) != 0) and (version < 500))
-		f->stream->seek(2);
+		f->seek(2);
 	if ((flags & 0x10) != 0)
 		n->volume = 0.1f + 0.9f * (float)f->read_byte() / 10.0f;
 	if ((flags & 0x20) != 0) {
@@ -915,10 +915,10 @@ void FormatGuitarPro::read_note(GpTrack &t, int string_no, int start, int length
 		n->stringno = t.tuning.num - string_no - 1;
 	}
 	if ((flags & 0x80) != 0)
-		f->stream->seek(2);
+		f->seek(2);
 	if (version >= 500){
 		if ((flags & 0x01) != 0)
-			f->stream->seek(8);
+			f->seek(8);
 		f->read_byte();
 	}
 	if ((flags & 0x08) != 0) {
@@ -938,7 +938,7 @@ void FormatGuitarPro::read_note_fx()
 		flags2 = f->read_byte();
 	if ((flags1 & 0x01) != 0) {
 		// bend
-		f->stream->seek(5);
+		f->seek(5);
 		int points = f->read_int();
 		for (int i=0; i<points; i++){
 			[[maybe_unused]] int position = f->read_int();
@@ -1100,7 +1100,7 @@ void FormatGuitarPro::read_beat_fx()
 	}
 	if ((flags2 & 0x04) != 0) {
 		// tremolo
-		f->stream->seek(5);
+		f->seek(5);
 		int points = f->read_int();
 		//msg_write(points);
 		for (int i=0; i<points; i++){

@@ -19,25 +19,28 @@ static void read_buffer_asserted(Stream *s, void *buf, int size) {
 	}
 }
 
-Formatter::Formatter(shared<Stream> s) {
+Formatter::Formatter(Stream* s) {
 	stream = s;
 }
 
-BinaryFormatter::BinaryFormatter(shared<Stream> s) : Formatter(s) {
+Formatter::~Formatter() {
 }
 
-TextLinesFormatter::TextLinesFormatter(shared<Stream> s) : Formatter(s) {}
+BinaryFormatter::BinaryFormatter(Stream* s) : Formatter(s) {
+}
+
+TextLinesFormatter::TextLinesFormatter(Stream* s) : Formatter(s) {}
 
 // read a single character (1 byte)
 char BinaryFormatter::read_char() {
 	char c;
-	read_buffer_asserted(stream.get(), &c, 1);
+	read_buffer_asserted(stream, &c, 1);
 	return c;
 }
 char TextLinesFormatter::read_char() {
 	char c = 0x0d;
 	while (c == 0x0d)
-		read_buffer_asserted(stream.get(), &c, 1);
+		read_buffer_asserted(stream, &c, 1);
 	return c;
 }
 
@@ -66,7 +69,7 @@ void TextLinesFormatter::read_comment() {
 // read a word (2 bytes in binary mode)
 unsigned int BinaryFormatter::read_word() {
 	unsigned int i = 0;
-	read_buffer_asserted(stream.get(), &i, 2);
+	read_buffer_asserted(stream, &i, 2);
 	return i;
 }
 
@@ -84,7 +87,7 @@ unsigned int BinaryFormatter::read_word_reversed() {
 // read an integer (4 bytes in binary mode)
 int BinaryFormatter::read_int() {
 	int i;
-	read_buffer_asserted(stream.get(), &i, 4);
+	read_buffer_asserted(stream, &i, 4);
 	return i;
 }
 
@@ -95,7 +98,7 @@ int TextLinesFormatter::read_int() {
 // read a float (4 bytes in binary mode)
 float BinaryFormatter::read_float() {
 	float f;
-	read_buffer_asserted(stream.get(), &f, 4);
+	read_buffer_asserted(stream, &f, 4);
 	return f;
 }
 
@@ -106,7 +109,7 @@ float TextLinesFormatter::read_float() {
 // read a boolean (1 byte in binary mode)
 bool BinaryFormatter::read_bool() {
 	char bb = 0;
-	read_buffer_asserted(stream.get(), &bb, 1);
+	read_buffer_asserted(stream, &bb, 1);
 	return (bb == '1') or (bb == 0x01); // sigh, old style booleans
 }
 
@@ -127,7 +130,7 @@ string BinaryFormatter::read_str() {
 
 	string str;
 	str.resize(l + 16); // prevents "uninitialized" bytes in syscall parameter... (valgrind)
-	read_buffer_asserted(stream.get(), str.data, l);
+	read_buffer_asserted(stream, str.data, l);
 	str.resize(l);
 	return str;
 }
@@ -148,27 +151,6 @@ string TextLinesFormatter::read_str() {
 			break;
 		str.add(c);
 	}
-	return str;
-}
-
-// read a null-terminated string
-string BinaryFormatter::read_str_nt() {
-	string str;
-	while (true) {
-		char c = read_char();
-		if (c == 0)
-			break;
-		str.add(c);
-	}
-	return str;
-}
-
-// read a string having reversed byte as length in binary mode
-string BinaryFormatter::read_str_rw() {
-	int l = read_word_reversed();
-	string str;
-	str.resize(l);
-	read_buffer_asserted(stream.get(), str.data, l);
 	return str;
 }
 
@@ -278,38 +260,6 @@ void TextLinesFormatter::write_vector(const void *v) {
 	write_float(((float*)v)[0]);
 	write_float(((float*)v)[1]);
 	write_float(((float*)v)[2]);
-}
-
-void Formatter::set_pos(int pos) {
-	stream->set_pos(pos);
-}
-
-void Formatter::seek(int delta) {
-	stream->seek(delta);
-}
-
-int Formatter::get_size32() {
-	return stream->get_size32();
-}
-
-int64 Formatter::get_size() {
-	return stream->get_size();
-}
-
-int Formatter::get_pos() {
-	return stream->get_pos();
-}
-
-int Formatter::read_basic(void *buffer, int size) {
-	return stream->read_basic(buffer, size);
-}
-
-int Formatter::write_basic(const void *buffer, int size) {
-	return stream->write_basic(buffer, size);
-}
-
-bool Formatter::is_end() {
-	return stream->is_end();
 }
 // read a single character followed by the file-format-version-number
 /*int File::ReadFileFormatVersion()

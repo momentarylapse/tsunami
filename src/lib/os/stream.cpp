@@ -6,6 +6,17 @@
  */
 
 #include "stream.h"
+#include "formatter.h"
+
+Stream::Stream(Stream::Mode mode) {
+	if (mode == Mode::TEXT)
+		formatter = new TextLinesFormatter(this);
+	else if (mode == Mode::BINARY)
+		formatter = new BinaryFormatter(this);
+}
+
+Stream::~Stream() {
+}
 
 int Stream::read(void *data, int size) {
 	return read_basic(data, size);
@@ -45,6 +56,84 @@ bytes Stream::read_complete() {
 	};
 	return buf;
 }
+
+
+unsigned char Stream::read_byte() {
+	return formatter->read_byte();
+}
+
+char Stream::read_char() {
+	return formatter->read_char();
+}
+
+unsigned int Stream::read_word() {
+	return formatter->read_word();
+}
+
+unsigned int Stream::read_word_reversed() {
+	return formatter->read_word_reversed();
+}
+
+int Stream::read_int() {
+	return formatter->read_int();
+}
+
+float Stream::read_float() {
+	return formatter->read_float();
+}
+
+bool Stream::read_bool() {
+	return formatter->read_bool();
+}
+
+string Stream::read_str() {
+	return formatter->read_str();
+}
+
+void Stream::read_vector(void *v) {
+	formatter->read_vector(v);
+}
+
+void Stream::write_byte(unsigned char b) {
+	formatter->write_byte(b);
+}
+
+void Stream::write_char(char c) {
+	formatter->write_char(c);
+}
+
+void Stream::write_bool(bool b) {
+	formatter->write_bool(b);
+}
+
+void Stream::write_word(unsigned int w) {
+	formatter->write_word(w);
+}
+
+void Stream::write_int(int i) {
+	formatter->write_int(i);
+}
+
+void Stream::write_float(float f) {
+	formatter->write_float(f);
+}
+
+void Stream::write_str(const string& s) {
+	formatter->write_str(s);
+}
+
+void Stream::write_vector(const void *v) {
+	formatter->write_vector(v);
+}
+
+void Stream::read_comment() {
+	formatter->read_comment();
+}
+
+void Stream::write_comment(const string &str) {
+	formatter->write_comment(str);
+}
+
 
 
 

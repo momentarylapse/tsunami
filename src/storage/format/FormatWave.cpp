@@ -36,7 +36,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	int bytes_per_sample = bit_depth / 8 * channels;
 	int samples = od->num_samples;
 
-	auto f = new BinaryFormatter(os::fs::open(od->filename, "wb"));
+	auto f = os::fs::open(od->filename, "wb");
 
 	f->write("RIFF", 4);
 	f->write_int(samples * bytes_per_sample + 44);
@@ -69,7 +69,7 @@ void FormatWave::save_via_renderer(StorageOperationData *od) {
 	delete f;
 }
 
-static string read_chunk_name(BinaryFormatter *f) {
+static string read_chunk_name(Stream *f) {
 	return f->read(4);
 }
 
@@ -99,15 +99,15 @@ void FormatWave::load_track(StorageOperationData *od) {
 	Track *t = od->track;
 
 	char *data = new char[CHUNK_SIZE];
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 
 	if (read_chunk_name(f) != "RIFF")
 		throw Exception("wave file does not start with \"RIFF\"");
 	int stated_file_size = f->read_int();
-	int real_file_size = f->get_size();
+	int real_file_size = f->size();
 	if (stated_file_size > real_file_size)
 		od->warn(format("wave file gives wrong size: %d  (real: %d)", stated_file_size, real_file_size));
 		// sometimes 0x2400ff7f
@@ -125,7 +125,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 	auto format = SampleFormat::INT_16;
 
 	// read chunks
-	while (f->get_pos() < real_file_size - 8) {
+	while (f->pos() < real_file_size - 8) {
 		string chunk_name = read_chunk_name(f);
 		int chunk_size = f->read_int();
 
@@ -161,7 +161,7 @@ void FormatWave::load_track(StorageOperationData *od) {
 
 			if ((chunk_size > real_file_size - 44) or (chunk_size < 0)){
 				od->warn(::format("wave file gives wrong data size (given: %d,  by file size: %d)", chunk_size, real_file_size));
-				chunk_size = real_file_size - f->get_pos();
+				chunk_size = real_file_size - f->pos();
 			}
 
 		//	int samples = chunk_size / byte_per_sample;

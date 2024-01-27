@@ -20,8 +20,8 @@ public:
 	void load_song(StorageOperationData *od) override;
 	void save_song(StorageOperationData *od) override {}
 
-	void read_chunk(BinaryFormatter *f);
-	void read_samples(BinaryFormatter *f);
+	void read_chunk(Stream *f);
+	void read_samples(Stream *f);
 
 	int sample_offset;
 	int sample_count;
@@ -70,7 +70,7 @@ public:
 	};
 	Array<sfGenerator> preset_generators, instrument_generators;
 
-	void read_sample_header(BinaryFormatter *f, sfSample &s);
+	void read_sample_header(Stream *f, sfSample &s);
 };
 
 class FormatDescriptorSoundFont2 : public FormatDescriptor {

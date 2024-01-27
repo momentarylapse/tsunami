@@ -39,20 +39,19 @@ public:
 
 class FileStream : public Stream {
 public:
-	FileStream(int handle);
+	FileStream(int handle, Mode mode);
 	~FileStream();
 
 	// meta
 	void set_pos(int pos) override;
 	void seek(int delta) override;
-	int get_size32() override;
-	int64 get_size() override;
-	int get_pos() override;
+	int64 size() const override;
+	int pos() const override;
 	Date ctime();
 	Date mtime();
 	Date atime();
 
-	bool is_end() override;
+	bool is_end() const override;
 	void close();
 
 	int read_basic(void *buffer, int size) override;

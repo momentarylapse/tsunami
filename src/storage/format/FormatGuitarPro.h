@@ -45,7 +45,7 @@ public:
 	};
 	GpChannel channels[64];
 
-	BinaryFormatter *f;
+	os::fs::FileStream *f;
 	StorageOperationData *od;
 	Song *song;
 

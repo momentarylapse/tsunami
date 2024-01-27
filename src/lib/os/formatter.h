@@ -13,50 +13,61 @@
 
 
 
-class Formatter : public Stream {
+class Formatter : Sharable<VirtualBase> {
 public:
-	Formatter(shared<Stream> s);
+	Formatter(Stream* s);
+	~Formatter();
 
-	void set_pos(int pos) override;
-	void seek(int delta) override;
-	int get_size32() override;
-	int64 get_size() override;
-	int get_pos() override;
+	virtual unsigned char read_byte() = 0;
+	virtual char read_char() = 0;
+	virtual unsigned int read_word() = 0;
+	virtual unsigned int read_word_reversed() { return read_word(); }; // for antique versions!!
+	virtual int read_int() = 0;
+	virtual float read_float() = 0;
+	virtual bool read_bool() = 0;
+	virtual string read_str() = 0;
+	virtual void read_vector(void *v) = 0;
 
-	int read_basic(void *buffer, int size) override;
-	int write_basic(const void *buffer, int size) override;
-	bool is_end() override;
+	virtual void write_byte(unsigned char) = 0;
+	virtual void write_char(char) = 0;
+	virtual void write_bool(bool) = 0;
+	virtual void write_word(unsigned int) = 0;
+	virtual void write_int(int) = 0;
+	virtual void write_float(float) = 0;
+	virtual void write_str(const string&) = 0;
+	virtual void write_vector(const void *v) = 0;
 
-	shared<Stream> stream;
+	virtual void read_comment() {}
+	virtual void write_comment(const string &str) {}
+
+	Stream* stream;
 };
 
 class BinaryFormatter : public Formatter {
 public:
-	BinaryFormatter(shared<Stream> s);
+	BinaryFormatter(Stream* s);
 
-	unsigned char read_byte();
-	char read_char();
-	unsigned int read_word();
-	unsigned int read_word_reversed(); // for antique versions!!
-	int read_int();
-	float read_float();
-	bool read_bool();
-	string read_str();
-	string read_str_nt();
-	string read_str_rw(); // for antique versions!!
-	void read_vector(void *v);
+	unsigned char read_byte() override;
+	char read_char() override;
+	unsigned int read_word() override;
+	unsigned int read_word_reversed() override; // for antique versions!!
+	int read_int() override;
+	float read_float() override;
+	bool read_bool() override;
+	string read_str() override;
+	void read_vector(void *v) override;
 
-	void write_byte(unsigned char);
-	void write_char(char);
-	void write_bool(bool);
-	void write_word(unsigned int);
-	void write_int(int);
-	void write_float(float);
-	void write_str(const string&);
-	void write_vector(const void *v);
+	void write_byte(unsigned char) override;
+	void write_char(char) override;
+	void write_bool(bool) override;
+	void write_word(unsigned int) override;
+	void write_int(int) override;
+	void write_float(float) override;
+	void write_str(const string&) override;
+	void write_vector(const void *v) override;
 
-	void read_comment();
-	void write_comment(const string &str);
+	void read_comment() override;
+	void write_comment(const string &str) override;
 
 	//int read_file_format_version();
 	//void write_file_format_version(int v);
@@ -64,31 +75,28 @@ public:
 
 class TextLinesFormatter : public Formatter {
 public:
-	TextLinesFormatter(shared<Stream> s);
+	TextLinesFormatter(Stream* s);
 
-	unsigned char read_byte();
-	char read_char();
-	unsigned int read_word();
-	unsigned int read_word_reversed(); // for antique versions!!
-	int read_int();
-	float read_float();
-	bool read_bool();
-	string read_str();
-	string read_str_nt();
-	string read_str_rw(); // for antique versions!!
-	void read_vector(void *v);
+	unsigned char read_byte() override;
+	char read_char() override;
+	unsigned int read_word() override;
+	int read_int() override;
+	float read_float() override;
+	bool read_bool() override;
+	string read_str() override;
+	void read_vector(void *v) override;
 
-	void write_byte(unsigned char);
-	void write_char(char);
-	void write_bool(bool);
-	void write_word(unsigned int);
-	void write_int(int);
-	void write_float(float);
-	void write_str(const string&);
-	void write_vector(const void *v);
+	void write_byte(unsigned char) override;
+	void write_char(char) override;
+	void write_bool(bool) override;
+	void write_word(unsigned int) override;
+	void write_int(int) override;
+	void write_float(float) override;
+	void write_str(const string&) override;
+	void write_vector(const void *v) override;
 
-	void read_comment();
-	void write_comment(const string &str);
+	void read_comment() override;
+	void write_comment(const string &str) override;
 
 	//int read_file_format_version();
 	//void write_file_format_version(int v);

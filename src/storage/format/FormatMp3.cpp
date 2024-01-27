@@ -23,14 +23,14 @@ FormatDescriptorMp3::FormatDescriptorMp3() :
 }
 
 // (-_-) 4*7bit big endian
-static int read_mp3_28bit(BinaryFormatter *f) {
+static int read_mp3_28bit(Stream *f) {
 	unsigned char d[4];
 	f->read(d, 4);
 
 	return (d[3] & 0x7f) | ((d[2] & 0x7f) << 7) | ((d[1] & 0x7f) << 14) | ((d[0] & 0x7f) << 21);
 }
 
-static int read_32bit_be(BinaryFormatter *f) {
+static int read_32bit_be(Stream *f) {
 	unsigned char d[4];
 	f->read(d, 4);
 
@@ -58,14 +58,14 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 	//unsigned char *data = new unsigned char[4096];
 	bytes data;
-	BinaryFormatter *f = nullptr;
+	os::fs::FileStream *f = nullptr;
 
 	try {
-		f = new BinaryFormatter(os::fs::open(od->filename, "rb"));
+		f = os::fs::open(od->filename, "rb");
 
 
 		while(true) {
-			int pos0 = f->get_pos();
+			int pos0 = f->pos();
 			data = f->read(4);
 			if ((data[0] == 0xff) and ((data[1] & 0xfe) == 0xfa)) {
 				msg_write("== mp3-header ==");
@@ -181,7 +181,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 				bytes temp = f->read(4096*5 - data.num);
 				//msg_write(format("R  %d", size));
 				data += temp;
-				od->set((float)f->get_pos() / (float)f->get_size());
+				od->set((float)f->pos() / (float)f->size());
 			}
 
 			mp3dec_frame_info_t info;

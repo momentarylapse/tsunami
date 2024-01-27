@@ -105,7 +105,7 @@ void FormatFlac::load_track(StorageOperationData *od)
 	try{
 
 		auto *f = os::fs::open(od->filename, "rb");
-		flac_file_size = f->get_size();
+		flac_file_size = f->size();
 		delete f;
 
 		flac_offset = od->offset;

@@ -50,7 +50,7 @@ Resource *Resource::get_node(const string &id) const {
 	return nullptr;
 }
 
-void load_resource_command7(TextLinesFormatter *f, Resource *c) {
+void load_resource_command7(Stream *f, Resource *c) {
 	c->type = f->read_str();
 	c->id = f->read_str();
 	if (c->id == "?")
@@ -91,7 +91,7 @@ void load_resource(const Path &filename) {
 	_languages_.clear();
 
 	try{
-		auto f = new TextLinesFormatter(os::fs::open(filename, "rt"));
+		auto f = os::fs::open(filename, "rt");
 		int ffv = f->read_str().sub_ref(1)._int();
 		if (ffv != 7) {
 			delete f;

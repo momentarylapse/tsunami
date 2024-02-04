@@ -8,9 +8,9 @@ class Config extends Module.Config
 		speed = 0.5
 
 class SampleCounter
-	var map: (int64,int64,float)[]
-	var produced: int64 = 0
-	var consumed: int64 = 0
+	var map: (i64,i64,float)[]
+	var produced: i64 = 0
+	var consumed: i64 = 0
 	
 	func mut reset(speed: float, hard: bool)
 		if hard
@@ -24,11 +24,11 @@ class SampleCounter
 		map.add([consumed, produced, speed])
 		while len(map) > 20
 			map.remove(0)
-	func map_sample(s: int64) -> int64
+	func map_sample(s: i64) -> i64
 		for i in 0:len(map)
 			let m = map[len(map) - i - 1]
 			if s > m[1]
-				let d = int64(int(float(int(s - m[1])) * m[2]))
+				let d = i64(int(float(int(s - m[1])) * m[2]))
 				return m[0] + d
 		return 0
 
@@ -49,7 +49,7 @@ class ChangeSpeed extends AudioEffect
 		op.reset(1.0/config.speed, 0, 1.0)
 		counter.reset(config.speed, false)
 	
-	func override command(cmd: Module.Command, param: int64) -> int64?
+	func override command(cmd: Module.Command, param: i64) -> i64?
 		if cmd == Module.Command.SAMPLE_COUNT_MODE
 			return int(Module.SampleCountMode.TRANSLATOR)
 		if cmd == Module.Command.GET_SAMPLE_COUNT

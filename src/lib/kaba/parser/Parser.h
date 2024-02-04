@@ -79,6 +79,7 @@ public:
 
 	shared<Node> parse_abstract_operand_extension(shared<Node> operands, Block *block, bool prefer_class);
 	shared<Node> parse_abstract_operand_extension_element(shared<Node> operand);
+	shared<Node> parse_abstract_operand_extension_definitely(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_array(shared<Node> operand, Block *block);
 	shared<Node> parse_abstract_operand_extension_pointer(shared<Node> operand);
 	shared<Node> parse_abstract_operand_extension_reference(shared<Node> operand);

@@ -19,7 +19,7 @@ func pitch_from_octave_and_rel(rel: int, octave: int) -> int
 func pitch_to_rel(pitch: int) -> int
 	return pitch % 12
 
-func char_to_rel_pitch(c: char) -> int
+func char_to_rel_pitch(c: i8) -> int
 	if c == 'c'
 		return 0
 	if c == 'd'
@@ -150,7 +150,7 @@ struct Chord
 				c.base_tone = char_to_rel_pitch(a) + 48
 			else if a >= 'A' and a <= 'H'
 				c.type = Type.MAJOR
-				c.base_tone = char_to_rel_pitch(a + char(32)) + 48
+				c.base_tone = char_to_rel_pitch(a + 32) + 48
 			else
 				continue
 			if i < len(s) - 1

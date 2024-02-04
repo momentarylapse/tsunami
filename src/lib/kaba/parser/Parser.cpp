@@ -85,7 +85,7 @@ void Parser::parse_buffer(const string &buffer, bool just_analyse) {
 const Class *Parser::get_constant_type(const string &str) {
 	// character '...'
 	if ((str[0] == '\'') and (str.back() == '\''))
-		return TypeChar;
+		return TypeInt8;
 
 	// string "..."
 	if ((str[0] == '"') and (str.back() == '"'))
@@ -115,6 +115,8 @@ const Class *Parser::get_constant_type(const string &str) {
 	}
 	if (type == TypeInt) {
 		if (hex) {
+			if (str.num == 4)
+				type = TypeInt8;
 			if (str.num > 10)
 				type = TypeInt64;
 		} else {
@@ -128,8 +130,11 @@ const Class *Parser::get_constant_type(const string &str) {
 void Parser::get_constant_value(const string &str, Value &value) {
 	value.init(get_constant_type(str));
 // literal
-	if (value.type == TypeChar) {
-		value.as_int() = str.unescape()[1];
+	if (value.type == TypeInt8) {
+		if (str[0] == '\'') // 'bla'
+			value.as_int() = str.unescape()[1];
+		else // 0x12
+			value.as_int() = (int)s2i2(str);
 	} else if (value.type == TypeString) {
 		value.as_string() = str.sub(1, -1).unescape();
 	} else if (value.type == TypeCString) {
@@ -183,6 +188,14 @@ shared<Node> Parser::parse_abstract_operand_extension_element(shared<Node> opera
 	el->set_param(0, operand);
 	el->set_param(1, parse_abstract_token());
 	return el;
+}
+
+shared<Node> Parser::parse_abstract_operand_extension_definitely(shared<Node> operand) {
+	auto node = new Node(NodeKind::DEFINITELY, 0, TypeUnknown);
+	node->token_id = Exp.consume_token(); // "!"
+	node->set_num_params(1);
+	node->set_param(0, operand);
+	return node;
 }
 
 shared<Node> Parser::parse_abstract_operand_extension_dict(shared<Node> operand) {
@@ -343,6 +356,9 @@ shared<Node> Parser::parse_abstract_operand_extension(shared<Node> operand, Bloc
 	} else if (Exp.cur == "->") {
 		// A->B?
 		return parse_abstract_operand_extension(parse_abstract_operand_extension_callable(operand, block), block, true);
+	} else if (Exp.cur == "!") {
+		// definitely?
+		return parse_abstract_operand_extension(parse_abstract_operand_extension_definitely(operand), block, prefer_class);
 	} else if (Exp.cur == "?") {
 		// optional?
 		return parse_abstract_operand_extension(parse_abstract_operand_extension_optional(operand), block, true);
@@ -1584,6 +1600,8 @@ void parser_class_add_element(Parser *p, Class *_class, const string &name, cons
 Class::Type parse_class_type(const string& e) {
 	if (e == Identifier::INTERFACE)
 		return Class::Type::INTERFACE;
+	if (e == Identifier::NAMESPACE)
+		return Class::Type::NAMESPACE;
 	if (e == Identifier::STRUCT)
 		return Class::Type::STRUCT;
 	return Class::Type::REGULAR;
@@ -1668,7 +1686,7 @@ bool Parser::parse_class(Class *_namespace) {
 
 		if (Exp.cur == Identifier::ENUM) {
 			parse_enum(_class);
-		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE)) {
+		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE) or (Exp.cur == Identifier::NAMESPACE)) {
 			int cur_token = Exp.cur_token();
 			if (!parse_class(_class)) {
 				sub_class_token_ids.add(cur_token);
@@ -1678,6 +1696,8 @@ bool Parser::parse_class(Class *_namespace) {
 			auto flags = Flags::CONST;
 			if (_class->is_interface())
 				flags_set(flags, Flags::VIRTUAL);
+			if (_class->is_namespace())
+				flags_set(flags, Flags::STATIC);
 			auto f = parse_function_header(TypeVoid, _class, flags);
 			expect_new_line("newline expected after parameter list");
 			skip_parsing_function_body(f);
@@ -1846,6 +1866,8 @@ void Parser::parse_class_variable_declaration(const Class *ns, Block *block, int
 
 	int token0 = Exp.cur_token();
 	Flags flags = parse_flags(flags0);
+	if (ns->is_namespace())
+		flags_set(flags, Flags::STATIC);
 
 	auto names = parse_comma_sep_list(this);
 	const Class *type = nullptr;
@@ -2108,7 +2130,7 @@ void Parser::parse_abstract_function_body(Function *f) {
 void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
 	while (!Exp.end_of_file()) {
 		if ((Exp.cur_line->indent == indent0) and (Exp.cur_line->tokens.num >= 2)) {
-			if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE)) {
+			if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE) or (Exp.cur == Identifier::NAMESPACE)) {
 				Exp.next();
 				if (Exp.cur == Identifier::OVERRIDE)
 					continue;
@@ -2205,7 +2227,7 @@ void Parser::parse_top_level() {
 			parse_enum(tree->base_class);
 
 		// class
-		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE)) {
+		} else if ((Exp.cur == Identifier::CLASS) or (Exp.cur == Identifier::STRUCT) or (Exp.cur == Identifier::INTERFACE) or (Exp.cur == Identifier::NAMESPACE)) {
 			parse_class(tree->base_class);
 
 		// func

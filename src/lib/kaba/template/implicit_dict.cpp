@@ -222,13 +222,13 @@ void AutoImplementer::implement_dict_set(Function *f, const Class *t) {
 
 	{
 		// __mem_resize__(self.num + 1)
-		auto cmd_add = add_node_operator_by_inline(InlineID::INT_ADD, sa_num(self), const_int(1));
+		auto cmd_add = add_node_operator_by_inline(InlineID::INT32_ADD, sa_num(self), const_int(1));
 		auto cmd_resize = add_node_member_call(t->get_member_func("__mem_resize__", TypeVoid, {TypeInt}), self);
 		cmd_resize->set_param(1, cmd_add);
 		f->block->add(cmd_resize);
 	}
 	auto t_row = t->classes[0].get();
-	auto cmd_sub = add_node_operator_by_inline(InlineID::INT_SUBTRACT, sa_num(self), const_int(1));
+	auto cmd_sub = add_node_operator_by_inline(InlineID::INT32_SUBTRACT, sa_num(self), const_int(1));
 	auto back_row = add_node_parray(self->change_type(tree->get_pointer(t_row, -1)), cmd_sub, t_row);
 	auto back_key = back_row->change_type(TypeString);
 	auto back_value = back_row->shift(TypeString->size, te, -1);

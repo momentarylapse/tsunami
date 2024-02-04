@@ -14,11 +14,11 @@ namespace kaba {
 extern const Class *TypeNoValueError;
 extern const Class *TypeNone;
 
-static shared<Node> op_has_value(shared<Node> node) {
+shared<Node> AutoImplementer::optional_has_value(shared<Node> node) {
 	return node->shift(node->type->size - 1, TypeBool);
 }
 
-static shared<Node> op_data(shared<Node> node) {
+shared<Node> AutoImplementer::optional_data(shared<Node> node) {
 	return node->change_type(node->type->param[0]);
 }
 
@@ -33,7 +33,7 @@ void AutoImplementer::_add_missing_function_headers_for_optional(Class *t) {
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"});
 	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
 	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
-//	add_func_header(t, Identifier::Func::CALL, t->param[0], {}, {}, nullptr, Flags::REF);
+	add_func_header(t, "_value", t->param[0], {}, {});
 	//add_func_header(t, "_get_p", t->param[0], {}, {}, nullptr, Flags::REF);
 	if (t->param[0]->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})) {
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
@@ -46,8 +46,8 @@ void AutoImplementer::implement_optional_constructor(Function *f, const Class *t
 
 	// self.has_value = false
 	f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-			op_has_value(self),
-			node_false()));
+											  optional_has_value(self),
+											  node_false()));
 }
 
 void AutoImplementer::implement_optional_constructor_wrap(Function *f, const Class *t) {
@@ -57,14 +57,14 @@ void AutoImplementer::implement_optional_constructor_wrap(Function *f, const Cla
 	if (auto f_con = t->param[0]->get_default_constructor()) {
 		// self.data.__init__()
 		f->block->add(add_node_member_call(f_con,
-				op_data(self)));
+										   optional_data(self)));
 	}
 
 	{
 		// self.data = value
 		if (auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				op_data(self),
-				value))
+													   optional_data(self),
+													   value))
 			f->block->add(assign);
 		else
 			do_error_implicit(f, format("no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
@@ -73,8 +73,8 @@ void AutoImplementer::implement_optional_constructor_wrap(Function *f, const Cla
 	{
 		// self.has_value = true
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				op_has_value(self),
-				node_true()));
+												  optional_has_value(self),
+												  node_true()));
 	}
 }
 
@@ -90,17 +90,8 @@ void AutoImplementer::implement_optional_destructor(Function *f, const Class *t)
 	{
 		// if self.has_value
 		//     self.value.__delete()
-		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, op_has_value(self));
-
-		auto b = new Block(f, f->block.get());
-
-		// self.data.__delete__()
-		b->add(add_node_member_call(f_des,
-				op_data(self)));
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto n_del = add_node_member_call(f_des, optional_data(self));
+		f->block->add(node_if(optional_has_value(self), n_del));
 	}
 }
 
@@ -111,17 +102,9 @@ void AutoImplementer::implement_optional_assign(Function *f, const Class *t) {
 	if (auto f_des = t->param[0]->get_destructor()) {
 		// if self.has_value
 		//     self.value.__delete()
-		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, op_has_value(self));
 
-		auto b = new Block(f, f->block.get());
-
-		// self.data.__delete__()
-		b->add(add_node_member_call(f_des,
-				op_data(self)));
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto n_del = add_node_member_call(f_des, optional_data(self));
+		f->block->add(node_if(optional_has_value(self), n_del));
 	}
 
 
@@ -129,32 +112,29 @@ void AutoImplementer::implement_optional_assign(Function *f, const Class *t) {
 		// if other.has_value
 		//     self.data.__init__()
 		//     self.data = other.data
-		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, op_has_value(other));
 
 		auto b = new Block(f, f->block.get());
 
 		if (auto f_con = t->param[0]->get_default_constructor()) {
 			// self.data.__init__()
 			b->add(add_node_member_call(f_con,
-					op_data(self)));
+										optional_data(self)));
 		}
 
 		if (auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				op_data(self), op_data(other)))
+													   optional_data(self), optional_data(other)))
 			b->add(assign);
 		else
 			do_error_implicit(f, format("no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
 
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		f->block->add(node_if(optional_has_value(other), b));
 	}
 
 	{
 		// self.has_value = other.has_value
 		auto assign = add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				op_has_value(self),
-				op_has_value(other));
+												  optional_has_value(self),
+												  optional_has_value(other));
 		f->block->add(assign);
 	}
 }
@@ -166,25 +146,16 @@ void AutoImplementer::implement_optional_assign_raw(Function *f, const Class *t)
 	if (auto f_con = t->param[0]->get_default_constructor()) {
 		// if not self.has_value
 		//     self.value.__init__()
-		auto cmd_if = add_node_statement(StatementID::IF);
-		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NOT, op_has_value(self), nullptr);
-		cmd_if->set_param(0, cmd_not);
-
-		auto b = new Block(f, f->block.get());
-
-		// self.data.__init__()
-		b->add(add_node_member_call(f_con,
-				op_data(self)));
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto cmd_not = node_not(optional_has_value(self));
+		auto n_init = add_node_member_call(f_con, optional_data(self));
+		f->block->add(node_if(cmd_not, n_init));
 	}
 
 	{
 		// self.data = other
 		if (auto assign = parser->con.link_operator_id(OperatorID::ASSIGN,
-				op_data(self),
-				other))
+													   optional_data(self),
+													   other))
 			f->block->add(assign);
 		else
 			do_error_implicit(f, format("no operator %s = %s found", t->param[0]->long_name(), t->param[0]->long_name()));
@@ -193,8 +164,8 @@ void AutoImplementer::implement_optional_assign_raw(Function *f, const Class *t)
 	{
 		// self.has_value = true
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				op_has_value(self),
-				node_true()));
+												  optional_has_value(self),
+												  node_true()));
 	}
 }
 
@@ -204,24 +175,16 @@ void AutoImplementer::implement_optional_assign_null(Function *f, const Class *t
 	if (auto f_des = t->param[0]->get_destructor()) {
 		// if self.has_value
 		//     self.data.__delete()
-		auto cmd_if = add_node_statement(StatementID::IF);
-		cmd_if->set_param(0, op_has_value(self));
 
-		auto b = new Block(f, f->block.get());
-
-		// self.data.__delete__()
-		b->add(add_node_member_call(f_des,
-				op_data(self)));
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto n_del = add_node_member_call(f_des, optional_data(self));
+		f->block->add(node_if(optional_has_value(self), n_del));
 	}
 
 	{
 		// self.has_value = false
 		f->block->add(add_node_operator_by_inline(InlineID::BOOL_ASSIGN,
-				op_has_value(self),
-				node_false()));
+												  optional_has_value(self),
+												  node_false()));
 	}
 }
 
@@ -229,50 +192,23 @@ void AutoImplementer::implement_optional_has_value(Function *f, const Class *t) 
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	// return self.has_value
-	auto ret = add_node_statement(StatementID::RETURN, -1);
-	ret->set_num_params(1);
-	ret->set_param(0, op_has_value(self));
-	f->block->add(ret);
+	f->block->add(node_return(optional_has_value(self)));
 }
 
-// deprecated!
 void AutoImplementer::implement_optional_value(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	{
 		// if not self.has_value
 		//     raise(new NoValueError())
-		auto cmd_if = add_node_statement(StatementID::IF);
-		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NOT, op_has_value(self), nullptr);
-		cmd_if->set_param(0, cmd_not);
-
-		auto b = new Block(f, f->block.get());
-
-		auto f_ex = TypeNoValueError->get_default_constructor();
-		auto cmd_call_ex = add_node_call(f_ex, -1);
-		cmd_call_ex->set_num_params(1);
-		cmd_call_ex->set_param(0, new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));
-
-		auto cmd_new = add_node_statement(StatementID::NEW);
-		cmd_new->set_num_params(1);
-		cmd_new->set_param(0, cmd_call_ex);
-		cmd_new->type = TypeExceptionXfer;
-
-		auto cmd_raise = add_node_call(tree->required_func_global("raise"));
-		cmd_raise->set_param(0, cmd_new);
-		b->add(cmd_raise);
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto cmd_not = node_not(optional_has_value(self));
+		f->block->add(node_if(cmd_not, node_raise_no_value()));
 	}
 
 
 	{
 		// return self.data
-		auto ret = add_node_statement(StatementID::RETURN, -1);
-		ret->set_num_params(1);
-		ret->set_param(0, op_data(self));
-		f->block->add(ret);
+		f->block->add(node_return(optional_data(self)));
 	}
 }
 
@@ -285,31 +221,16 @@ void AutoImplementer::implement_optional_equal_raw(Function *f, const Class *t) 
 	{
 		// if not self.has_value
 		//     return false
-		auto cmd_if = add_node_statement(StatementID::IF);
-		auto cmd_not = add_node_operator_by_inline(InlineID::BOOL_NOT, op_has_value(self), nullptr);
-		cmd_if->set_param(0, cmd_not);
-
-		auto b = new Block(f, f->block.get());
-
-		auto cmd_ret = add_node_statement(StatementID::RETURN);
-		cmd_ret->set_num_params(1);
-		cmd_ret->set_param(0, node_false());
-		b->add(cmd_ret);
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		auto cmd_not = node_not(optional_has_value(self));
+		f->block->add(node_if(cmd_not, node_return(node_false())));
 	}
 
 	{
 		// return self.data == other
-
-		auto cmd_ret = add_node_statement(StatementID::RETURN);
-		cmd_ret->set_num_params(1);
-		if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, op_data(self), other))
-			cmd_ret->set_param(0, n_eq);
+		if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, optional_data(self), other))
+			f->block->add(node_return(n_eq));
 		else
 			do_error_implicit(f, format("no operator %s == %s found", t->param[0]->long_name(), t->param[0]->long_name()));
-		f->block->add(cmd_ret);
 	}
 }
 
@@ -322,31 +243,18 @@ void AutoImplementer::implement_optional_equal(Function *f, const Class *t) {
 	{
 		// if self.has_value and other.has_value
 		//     return self.data == other.data
-		auto cmd_if = add_node_statement(StatementID::IF);
-		auto cmd_and = add_node_operator_by_inline(InlineID::BOOL_AND, op_has_value(self), op_has_value(other));
-		cmd_if->set_param(0, cmd_and);
+		auto cmd_and = add_node_operator_by_inline(InlineID::BOOL_AND, optional_has_value(self), optional_has_value(other));
 
-		auto b = new Block(f, f->block.get());
-
-		auto cmd_ret = add_node_statement(StatementID::RETURN);
-		cmd_ret->set_num_params(1);
-		if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, op_data(self), op_data(other)))
-			cmd_ret->set_param(0, n_eq);
+		if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, optional_data(self), optional_data(other)))
+			f->block->add(node_if(cmd_and, node_return(n_eq)));
 		else
 			do_error_implicit(f, format("no operator %s == %s found", t->param[0]->long_name(), t->param[0]->long_name()));
-		b->add(cmd_ret);
-
-		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
 	}
 
 	{
 		// return self.has_value == other.has_value
-		auto n_eq = add_node_operator_by_inline(InlineID::BOOL_EQUAL, op_has_value(self), op_has_value(other));
-		auto cmd_ret = add_node_statement(StatementID::RETURN);
-		cmd_ret->set_num_params(1);
-		cmd_ret->set_param(0, n_eq);
-		f->block->add(cmd_ret);
+		auto n_eq = add_node_operator_by_inline(InlineID::BOOL_EQUAL, optional_has_value(self), optional_has_value(other));
+		f->block->add(node_return(n_eq));
 	}
 }
 
@@ -360,7 +268,7 @@ void AutoImplementer::_implement_functions_for_optional(const Class *t) {
 	implement_optional_assign_null(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {TypeNone})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func("__bool__", TypeBool, {})), t);
-//	implement_optional_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::CALL, t->param[0], {})), t);
+	implement_optional_value(prepare_auto_impl(t, t->get_member_func("_value", t->param[0], {})), t);
 	implement_optional_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t);
 	implement_optional_equal_raw(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})), t);
 }

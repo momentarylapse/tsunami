@@ -77,6 +77,8 @@ string kind2str(NodeKind kind) {
 		return "dereferencing";
 	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
 		return "deref address shift";
+	if (kind == NodeKind::DEFINITELY)
+		return "definitely";
 	if (kind == NodeKind::CLASS)
 		return "class";
 	if (kind == NodeKind::ARRAY_BUILDER)
@@ -173,6 +175,8 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::REFERENCE)
 		return t;
 	if (kind == NodeKind::DEREFERENCE)
+		return t;
+	if (kind == NodeKind::DEFINITELY)
 		return t;
 	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
 		return i2s(link_no) + t;

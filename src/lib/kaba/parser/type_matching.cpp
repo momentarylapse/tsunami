@@ -71,7 +71,7 @@ bool type_match_generic_pointer(const Class *given, const Class *wanted) {
 		return true;
 
 	// any xfer[..]?
-	if ((wanted->is_pointer_xfer() and wanted->param[0] == TypeVoid) and given->is_pointer_xfer())
+	if ((wanted->is_pointer_xfer_not_null() and wanted->param[0] == TypeVoid) and given->is_pointer_xfer_not_null())
 		return true;
 
 	return false;
@@ -157,7 +157,7 @@ shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted)
 		node->type = wanted;
 		return node;
 	}
-	if (wanted->is_pointer_xfer() and type->is_reference()) {
+	if (wanted->is_pointer_xfer_not_null() and type->is_reference()) {
 		node->type = wanted;
 		return node;
 	}
@@ -247,14 +247,14 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 
 	// xfer  ->  shared(!)
 	/*auto can_sharify = [] (const Class *w, const Class *g) {
-		if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null()) and given->is_pointer_xfer())
+		if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null()) and given->is_pointer_xfer_not_null())
 			return true;
 		if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null()) and given->is_pointer_raw_not_null())
 			return true;
 		return false;
 	};*/
 	if ((wanted->is_pointer_shared() or wanted->is_pointer_shared_not_null())
-			and given->is_pointer_xfer()) {
+			and given->is_pointer_xfer_not_null()) {
 		if (type_match_up(given->param[0], wanted->param[0])) {
 			auto t_xfer = tree->request_implicit_class_xfer(wanted->param[0], -1);
 			cd.penalty = 10;

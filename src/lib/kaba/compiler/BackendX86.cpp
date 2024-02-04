@@ -34,7 +34,7 @@ BackendX86::BackendX86(Serializer *s) : Backend(s) {
 	p_ax = param_preg(TypeReg16, Asm::RegID::AX);
 	p_al = param_preg(TypeReg8, Asm::RegID::AL);
 	p_al_bool = param_preg(TypeBool, Asm::RegID::AL);
-	p_al_char = param_preg(TypeChar, Asm::RegID::AL);
+	p_al_char = param_preg(TypeInt8, Asm::RegID::AL);
 	p_xmm0 = param_preg(TypeReg128, Asm::RegID::XMM0);
 	p_xmm1 = param_preg(TypeReg128, Asm::RegID::XMM1);
 }
@@ -199,7 +199,7 @@ void BackendX86::implement_mov_chunk(const SerialNodeParam &p1, const SerialNode
 	for (int j=0; j<size/4; j++)
 		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 4, TypeInt), param_shift(p2, j * 4, TypeInt));
 	for (int j=4*(size/4); j<size; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeChar), param_shift(p2, j, TypeChar));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeInt8), param_shift(p2, j, TypeInt8));
 }
 
 void BackendX86::correct_implement_commands() {
@@ -231,7 +231,7 @@ void BackendX86::correct_implement_commands() {
 				auto preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::InstID::MOVSXD, param_vreg(p1.type, reg, preg_x), param_vreg(p2.type, reg));
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg_x));
-			} else if (p1.type == TypeInt and p2.type == TypeChar) {
+			} else if (p1.type == TypeInt and p2.type == TypeInt8) {
 				// int <- char
 				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, max(p1.type->size, p2.type->size));
 				auto preg = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
@@ -262,8 +262,8 @@ void BackendX86::correct_implement_commands() {
 				int veax = cmd.add_virtual_reg(Asm::RegID::EAX);
 				int vedx = cmd.add_virtual_reg(Asm::RegID::EDX);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, veax), p1);
-				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, vedx), param_vreg(TypeInt, veax));
-				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt, vedx), param_imm(TypeChar, 0x1f));
+				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, vedx), param_vreg(TypeInt32, veax));
+				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt, vedx), param_imm(TypeInt8, 0x1f));
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt, veax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt, vedx));
 			} else { // int64
@@ -271,7 +271,7 @@ void BackendX86::correct_implement_commands() {
 				int vrdx = cmd.add_virtual_reg(Asm::RegID::RDX);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt64, vrax), p1);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt64, vrdx), param_vreg(TypeInt64, vrax));
-				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt64, vrdx), param_imm(TypeChar, 0x3f));
+				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt64, vrdx), param_imm(TypeInt8, 0x3f));
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt64, vrax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt64, vrdx));
 			}
@@ -287,8 +287,8 @@ void BackendX86::correct_implement_commands() {
 				int veax = cmd.add_virtual_reg(Asm::RegID::EAX);
 				int vedx = cmd.add_virtual_reg(Asm::RegID::EDX);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, veax), p1);
-				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, vedx), param_vreg(TypeInt, veax));
-				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt, vedx), param_imm(TypeChar, 0x1f));
+				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt, vedx), param_vreg(TypeInt32, veax));
+				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt, vedx), param_imm(TypeInt8, 0x1f));
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt, veax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt, veax));
 			} else { // int64
@@ -296,7 +296,7 @@ void BackendX86::correct_implement_commands() {
 				int vrdx = cmd.add_virtual_reg(Asm::RegID::RDX);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt64, vrax), p1);
 				insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt64, vrdx), param_vreg(TypeInt64, vrax));
-				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt64, vrdx), param_imm(TypeChar, 0x3f));
+				insert_cmd(Asm::InstID::SAR, param_vreg(TypeInt64, vrdx), param_imm(TypeInt8, 0x3f));
 				insert_cmd(Asm::InstID::IDIV, param_vreg(TypeInt64, vrax), p2);
 				insert_cmd(Asm::InstID::MOV, r, param_vreg(TypeInt64, vrax));
 			}
@@ -314,7 +314,7 @@ void BackendX86::correct_implement_commands() {
 			}
 			insert_cmd(Asm::InstID::MOV, param_vreg(type, vecx), p2);
 			insert_cmd(Asm::InstID::MOV, r, p1);
-			insert_cmd(inst, r, param_vreg(TypeChar, vecx, Asm::RegID::CL));
+			insert_cmd(inst, r, param_vreg(TypeInt8, vecx, Asm::RegID::CL));
 		} else if (x86helper::inst_is_arithmetic(c.inst)) {
 			if (c.p[2].kind == NodeKind::NONE) {
 				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
@@ -461,7 +461,7 @@ void BackendX86::function_call_post(int push_size, const Array<SerialNodeParam> 
 	if (push_size > 127)
 		insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::ESP), param_imm(TypeInt, push_size));
 	else if (push_size > 0)
-		insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::ESP), param_imm(TypeChar, push_size));
+		insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::ESP), param_imm(TypeInt8, push_size));
 
 	// return > 4b already got copied to [ret] by the function!
 	if ((type != TypeVoid) and !type->uses_return_by_memory()) {

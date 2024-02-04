@@ -138,7 +138,7 @@ bool Class::is_some_pointer() const {
 			or type == Type::POINTER_OWNED
 			or type == Type::POINTER_OWNED_NOT_NULL
 			or type == Type::REFERENCE
-			or type == Type::POINTER_XFER
+			or type == Type::POINTER_XFER_NOT_NULL
 			or type == Type::POINTER_ALIAS;
 }
 
@@ -169,8 +169,8 @@ bool Class::is_pointer_owned_not_null() const {
 	return type == Type::POINTER_OWNED_NOT_NULL;
 }
 
-bool Class::is_pointer_xfer() const {
-	return type == Type::POINTER_XFER;
+bool Class::is_pointer_xfer_not_null() const {
+	return type == Type::POINTER_XFER_NOT_NULL;
 }
 
 bool Class::is_pointer_alias() const {
@@ -183,6 +183,10 @@ bool Class::is_reference() const {
 
 bool Class::is_enum() const {
 	return type == Type::ENUM;
+}
+
+bool Class::is_namespace() const {
+	return type == Type::NAMESPACE;
 }
 
 bool Class::is_interface() const {

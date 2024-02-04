@@ -27,7 +27,7 @@ extern const Class *TypeSpecialFunction;
 void var_assign(void *pa, const void *pb, const Class *type) {
 	if ((type == TypeInt) or (type == TypeFloat32)) {
 		*(int*)pa = *(int*)pb;
-	} else if ((type == TypeBool) or (type == TypeChar)) {
+	} else if ((type == TypeBool) or (type == TypeInt8)) {
 		*(char*)pa = *(char*)pb;
 	} else if (type->is_pointer_raw()) {
 		*(void**)pa = *(void**)pb;
@@ -167,8 +167,10 @@ string callable_repr(const void *p, const Class *type) {
 string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 //	msg_write(type->name);
 	// fixed
-	if (type == TypeInt) {
+	if (type == TypeInt32) {
 		return str(*reinterpret_cast<const int *>(p));
+	} if (type == TypeInt8) {
+		return format("0x%02x", (int)*reinterpret_cast<const char *>(p));
 	} if (type == TypeInt64) {
 		return str(*reinterpret_cast<const int64*>(p));
 	} else if (type == TypeFloat32) {

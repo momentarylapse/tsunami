@@ -66,9 +66,9 @@ void BackendARM::implement_mov_chunk(kaba::SerialNode &c, int i, int size) {
 	//msg_error("CORRECT MOV " + p1.type->name);
 
 	for (int j=0; j<size/4; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 4, TypeInt), param_shift(p2, j * 4, TypeInt));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 4, TypeInt32), param_shift(p2, j * 4, TypeInt32));
 	for (int j=4*(size/4); j<size; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeChar), param_shift(p2, j, TypeChar));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeInt8), param_shift(p2, j, TypeInt8));
 }
 
 int first_bit(int i) {
@@ -104,7 +104,7 @@ void BackendARM::_register_to_local_32(int r, int offset) {
 }
 
 void BackendARM::_register_to_local_8(int r, int offset) {
-	insert_cmd(Asm::InstID::STRB, param_vreg(TypeChar, r), param_local(TypeChar, offset));
+	insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, r), param_local(TypeInt8, offset));
 }
 
 void BackendARM::_register_to_global_32(int r, int64 addr) {
@@ -116,7 +116,7 @@ void BackendARM::_register_to_global_32(int r, int64 addr) {
 void BackendARM::_register_to_global_8(int r, int64 addr) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::STRB, param_vreg(TypeChar, r), param_deref_vreg(TypeChar, reg));
+	insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, r), param_deref_vreg(TypeInt8, reg));
 }
 
 void BackendARM::_local_to_register_32(int offset, int r) {
@@ -124,7 +124,7 @@ void BackendARM::_local_to_register_32(int offset, int r) {
 }
 
 void BackendARM::_local_to_register_8(int offset, int r) {
-	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeChar, r), param_local(TypeChar, offset));
+	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeInt8, r), param_local(TypeInt8, offset));
 }
 
 void BackendARM::_global_to_register_32(int64 addr, int r) {
@@ -136,7 +136,7 @@ void BackendARM::_global_to_register_32(int64 addr, int r) {
 void BackendARM::_global_to_register_8(int64 addr, int r) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeChar, r), param_deref_vreg(TypeChar, reg));
+	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeInt8, r), param_deref_vreg(TypeInt8, reg));
 }
 
 int BackendARM::_to_register_32(const SerialNodeParam &p, int offset, int force_register) {
@@ -226,7 +226,7 @@ int BackendARM::_to_register_8(const SerialNodeParam &p, int offset, int force_r
 	} else if (p.kind == NodeKind::DEREF_LOCAL_MEMORY) {
 		int reg2 = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(reg));
 		_local_to_register_32(p.p + offset, reg2);
-		insert_cmd(Asm::InstID::LDR, param_vreg(TypeChar, reg), param_deref_vreg(TypeChar, reg2));
+		insert_cmd(Asm::InstID::LDR, param_vreg(TypeInt8, reg), param_deref_vreg(TypeInt8, reg2));
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
 		_local_to_register_8(p.p + offset, reg);
 	/*} else if (p.kind == NodeKind::GLOBAL_LOOKUP) {
@@ -262,7 +262,7 @@ void BackendARM::_from_register_8(int reg, const SerialNodeParam &p, int offset)
 		// reg2 = mem
 		_local_to_register_32(p.p, reg2);
 		// [reg2] = reg
-		insert_cmd(Asm::InstID::STRB, param_vreg(TypeChar, reg), param_deref_vreg(TypeChar, reg2));
+		insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, reg), param_deref_vreg(TypeInt8, reg2));
 	} else {
 		do_error("evil write target..." + kind2str(p.kind));
 	}
@@ -538,7 +538,7 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 }
 
 bool arm_type_uses_int_register(const Class *t) {
-	return (t == TypeInt) /*or (t == TypeInt64)*/ or (t == TypeChar) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == TypeInt) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
@@ -569,7 +569,7 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> float_param;
 	for (SerialNodeParam &p: params) {
-		if ((p.type == TypeInt) /*or (p.type == TypeInt64)*/ or (p.type == TypeChar) or (p.type == TypeBool) or p.type->is_some_pointer()) {
+		if ((p.type == TypeInt) /*or (p.type == TypeInt64)*/ or (p.type == TypeInt8) or (p.type == TypeBool) or p.type->is_some_pointer()) {
 			if (reg_param.num < max_reg_params) {
 				reg_param.add(p);
 			} else {
@@ -590,7 +590,7 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	if (push_size > 127)
 		insert_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegID::RSP), param_const(TypeInt, (void*)push_size));
 	else if (push_size > 0)
-		insert_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegID::RSP), param_const(TypeChar, (void*)push_size));
+		insert_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegID::RSP), param_const(TypeInt8, (void*)push_size));
 	foreachb(SerialCommandParam &p, stack_param)
 		insert_cmd(Asm::inst_push, p);
 	max_push_size = max(max_push_size, push_size);*/
@@ -721,7 +721,7 @@ void BackendARM::add_function_intro_params(Function *f) {
 	Array<Variable*> stack_param;
 	Array<Variable*> float_param;
 	for (Variable *p: param) {
-		if ((p->type == TypeInt) or (p->type == TypeChar) or (p->type == TypeBool) or p->type->is_some_pointer()) {
+		if ((p->type == TypeInt) or (p->type == TypeInt8) or (p->type == TypeBool) or p->type->is_some_pointer()) {
 			if (reg_param.num < 4) {
 				reg_param.add(p);
 			} else {

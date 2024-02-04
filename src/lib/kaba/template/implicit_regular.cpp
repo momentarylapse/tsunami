@@ -125,7 +125,7 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 	if (flags_has(t->flags, Flags::SHARED)) {
 		for (auto &e: t->elements)
 			if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt) {
-				f->block->add(add_node_operator_by_inline(InlineID::INT_ASSIGN,
+				f->block->add(add_node_operator_by_inline(InlineID::INT32_ASSIGN,
 						n_self->shift(e.offset, e.type),
 						add_node_const(tree->add_constant_int(0))));
 			}

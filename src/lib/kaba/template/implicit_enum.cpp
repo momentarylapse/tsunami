@@ -38,13 +38,13 @@ void AutoImplementer::_add_missing_function_headers_for_enum(Class *t) {
         class_add_func("all", TypeDynamicArray, &enum_all, Flags::STATIC | Flags::PURE);
             func_add_param("type", TypeClassRef);
     }
-	add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT_ASSIGN);
-	add_operator(OperatorID::ADD, t, t, t, InlineID::INT_ADD, &op_int_add);
-	add_operator(OperatorID::ADDS, TypeVoid, t, t, InlineID::INT_ADD_ASSIGN);
-	add_operator(OperatorID::EQUAL, TypeBool, t, t, InlineID::INT_EQUAL, &op_int_eq);
-	add_operator(OperatorID::NOT_EQUAL, TypeBool, t, t, InlineID::INT_NOT_EQUAL, &op_int_neq);
-	add_operator(OperatorID::BIT_AND, t, t, t, InlineID::INT_AND);
-	add_operator(OperatorID::BIT_OR, t, t, t, InlineID::INT_OR);
+	add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT32_ASSIGN);
+	add_operator(OperatorID::ADD, t, t, t, InlineID::INT32_ADD, &op_int_add);
+	add_operator(OperatorID::ADDS, TypeVoid, t, t, InlineID::INT32_ADD_ASSIGN);
+	add_operator(OperatorID::EQUAL, TypeBool, t, t, InlineID::INT32_EQUAL, &op_int_eq);
+	add_operator(OperatorID::NOT_EQUAL, TypeBool, t, t, InlineID::INT32_NOT_EQUAL, &op_int_neq);
+	add_operator(OperatorID::BIT_AND, t, t, t, InlineID::INT32_AND);
+	add_operator(OperatorID::BIT_OR, t, t, t, InlineID::INT32_OR);
 
 	for (auto f: weak(t->functions)) {
 		if (f->name == "parse") {

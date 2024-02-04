@@ -110,10 +110,17 @@ public:
 	shared<Node> node_nil();
 	shared<Node> const_int(int i);
 
-	void db_add_print_node(shared<Block> block, shared<Node> node);
-	void db_add_print_p2s_node(shared<Block> block, shared<Node> node);
-	void db_add_print_label(shared<Block> block, const string &s);
-	void db_add_print_label_node(shared<Block> block, const string &s, shared<Node> node);
+	static shared<Node> node_not(shared<Node> n);
+	static shared<Node> node_return(shared<Node> n);
+	static shared<Node> node_block_return(shared<Node> n);
+	static shared<Node> node_if(shared<Node> n_test, shared<Node> n_true);
+	static shared<Node> node_if_else(shared<Node> n_test, shared<Node> n_true, shared<Node> n_false);
+	shared<Node> node_raise_no_value();
+
+	shared<Node> db_print_node(shared<Node> node);
+	shared<Node> db_print_p2s_node(shared<Node> node);
+	shared<Node> db_print_label(const string &s);
+	shared<Node> db_print_label_node(const string &s, shared<Node> node);
 
 	shared<Node> add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
 	shared<Node> add_assign(Function *f, const string &ctx, const string &msg, shared<Node> a, shared<Node> b);
@@ -121,6 +128,9 @@ public:
 	shared<Node> add_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
 	shared<Node> add_not_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b);
 
+
+	static shared<Node> optional_has_value(shared<Node> node);
+	static shared<Node> optional_data(shared<Node> node);
 
 	static bool needs_new(Function *f);
 	static Array<string> class_func_param_names(Function *cf);

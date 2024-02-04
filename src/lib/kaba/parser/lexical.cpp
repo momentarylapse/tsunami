@@ -460,8 +460,14 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 		for (int i=0;i<SCRIPT_MAX_NAME;i++) {
 			auto kind = GetKind(source[pos]);
 			// may contain letters and numbers and '!'
-			if ((kind != ExpKind::LETTER) and (kind != ExpKind::NUMBER) and (source[pos] != '!'))
-				break;
+			if ((kind != ExpKind::LETTER) and (kind != ExpKind::NUMBER)) {
+				if (source[pos] != '!')
+					break;
+				// allow '!' only in some special words
+				string t = string(Temp, TempLength);
+				if (t != "shared" and t != "owned" and t != "xfer")
+					break;
+			}
 			Temp[TempLength ++] = source[pos ++];
 		}
 

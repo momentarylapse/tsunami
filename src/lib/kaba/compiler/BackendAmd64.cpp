@@ -135,7 +135,7 @@ void BackendAmd64::implement_mov_chunk(const SerialNodeParam &p1, const SerialNo
 	for (int offset=8*(size/8); offset<size-3; offset+=4)
 		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt), param_shift(p2, offset, TypeInt));
 	for (int offset=4*(size/4); offset<size; offset++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeChar), param_shift(p2, offset, TypeChar));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt8), param_shift(p2, offset, TypeInt8));
 }
 
 
@@ -224,7 +224,7 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 }
 
 bool amd64_type_uses_int_register(const Class *t) {
-	return (t == TypeInt) or (t == TypeInt64) or (t == TypeChar) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == TypeInt) or (t == TypeInt64) or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
@@ -293,7 +293,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 		if (push_size > 127)
 			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt, push_size));
 		else if (push_size > 0)
-			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeChar, push_size));
+			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt8, push_size));
 		//}
 		foreachb (SerialNodeParam &p, stack_param) {
 			insert_cmd(Asm::InstID::MOV, param_preg(p.type, get_reg(Asm::RegRoot::A, p.type->size)), p);
@@ -301,7 +301,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 		}
 		if (config.target.abi == Abi::AMD64_WINDOWS) {
 			push_size -= 32;
-			insert_cmd(Asm::InstID::SUB, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeChar, 32));
+			insert_cmd(Asm::InstID::SUB, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt8, 32));
 		}
 	}
 	max_push_size = max(max_push_size, (int)push_size);

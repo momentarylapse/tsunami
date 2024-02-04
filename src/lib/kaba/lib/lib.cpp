@@ -42,12 +42,14 @@ const Class *TypeNone; // nil
 const Class *TypeObject;
 const Class *TypeObjectP;
 const Class *TypeBool;
+const Class *TypeInt8;
+const Class *TypeInt16;
+const Class *TypeInt32;
 const Class *TypeInt;
 const Class *TypeInt64;
 const Class *TypeFloat;
 const Class *TypeFloat32;
 const Class *TypeFloat64;
-const Class *TypeChar;
 const Class *TypeString = nullptr;
 const Class *TypeStringAutoCast;
 const Class *TypeCString;
@@ -226,7 +228,7 @@ const Class *add_type_p_shared_not_null(const Class *sub_type) {
 
 const Class *add_type_p_xfer(const Class *sub_type) {
 	string name = format("%s[%s]", Identifier::XFER, sub_type->name);
-	Class *t = new Class(Class::Type::POINTER_XFER, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	Class *t = new Class(Class::Type::POINTER_XFER_NOT_NULL, name, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
 	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), t, TypeXferT, {sub_type});

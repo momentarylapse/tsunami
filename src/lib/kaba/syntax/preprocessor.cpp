@@ -208,7 +208,7 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 		auto *f = c->as_func();
 		//if (!f->is_pure or !f->address_preprocess)
 		//	return c;
-		if ((f->inline_no != InlineID::INT64_ADD_INT) and (f->inline_no != InlineID::INT_ADD))
+		if ((f->inline_no != InlineID::INT64_ADD_INT32) and (f->inline_no != InlineID::INT32_ADD))
 			return c;
 		if (c->params[1]->kind != NodeKind::CONSTANT)
 			return c;

@@ -564,7 +564,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 			auto l = add_node_special_function_call(SpecialFunctionID::LEN, index->token_id, index->type);
 			l->set_param(0, operand);
 			l = concretify_special_function_len(l, block, ns);
-			index = add_node_operator_by_inline(InlineID::INT_ADD, l, index, index->token_id);
+			index = add_node_operator_by_inline(InlineID::INT32_ADD, l, index, index->token_id);
 		}
 	}
 
@@ -1400,7 +1400,7 @@ shared<Node> Concretifier::concretify_operator(shared<Node> node, Block *block, 
 }
 
 const Class *type_ownify_xfer(SyntaxTree *tree, const Class *t) {
-	if (t->is_pointer_xfer())
+	if (t->is_pointer_xfer_not_null())
 		return tree->request_implicit_class_owned_not_null(t->param[0], -1);
 	if (t->is_list())
 		return tree->request_implicit_class_list(type_ownify_xfer(tree, t->param[0]), -1);
@@ -1413,8 +1413,9 @@ bool is_non_owning_pointer(const Class *t) {
 
 shared<Node> Concretifier::concretify_block(shared<Node> node, Block *block, const Class *ns) {
 	for (int i=0; i<node->params.num; i++) {
+
 		node->params[i] = concretify_node(node->params[i], node->as_block(), ns);
-		if (node->params[i]->type->is_pointer_xfer())
+		if (node->params[i]->type->is_pointer_xfer_not_null())
 			do_error("xfer[..] values must not be discarded", node->params[i]);
 	}
 	//concretify_all_params(node, node->as_block(), ns, this);
@@ -1451,7 +1452,7 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 			do_error("variable declaration requires a type", node->params[0]);
 		if (type->is_some_pointer_not_null() and node->params.num < 3)
 			do_error("variables of reference type must be initialized", node->params[0]);
-		if (type->is_pointer_xfer())
+		if (type->is_pointer_xfer_not_null())
 			do_error("no variables of type xfer[..] allowed", node->params[0]);
 	} else {
 		//assert(node->params[2]);
@@ -1482,7 +1483,7 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 	if (node->params.num == 3) {
 		auto rhs = concretify_node(node->params[2]->params[1], block, ns);
 		node->params[2]->params[1] = rhs;
-		//if (type->is_some_pointer_not_null() and !rhs->type->is_pointer_xfer()) {
+		//if (type->is_some_pointer_not_null() and !rhs->type->is_pointer_xfer_not_null()) {
 		if (is_non_owning_pointer(type)) {
 			if (rhs->type != vars[0]->type)
 				if (rhs->type != TypeNone)
@@ -1679,6 +1680,34 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 	} else if (node->kind == NodeKind::CALL_FUNCTION) {
 		concretify_all_params(node, block, ns);
 		node->type = node->as_func()->literal_return_type;
+	} else if (node->kind == NodeKind::DEFINITELY) {
+		concretify_all_params(node, block, ns);
+		auto sub = node->params[0];
+		auto t = sub->type;
+		if (t->is_optional()) {
+			// optional?
+			if (block->is_trust_me()) {
+				return sub->change_type(t->param[0]);
+			} else {
+				if (auto f = t->get_member_func("_value", t->param[0], {}))
+					return add_node_member_call(f, sub);
+				do_error(format("missing: %s._value()", t->long_name()), node);
+			}
+		} else if (t->is_pointer_raw() or t->is_pointer_owned() or t->is_pointer_shared()) {
+			// null-able pointer?
+			auto t_def = tree->request_implicit_class_reference(t->param[0], node->token_id);
+			if (block->is_trust_me()) {
+				return sub->change_type(t_def);
+			} else {
+				auto n = add_node_call(tree->required_func_global("@pointer_definitely", node->token_id), node->token_id);
+				n->set_num_params(1);
+				n->set_param(0, sub);
+				n->type = t_def;
+				return n;
+			}
+		} else {
+			do_error("'!' only allowed for optional values and null-able pointers", node);
+		}
 	} else {
 		node->show();
 		do_error("INTERNAL ERROR: unexpected node", node);
@@ -1885,7 +1914,7 @@ shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *para
 }
 
 shared_array<Node> Concretifier::turn_class_into_constructor(const Class *t, const shared_array<Node> &params, int token_id) {
-	if (((t == TypeInt) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeChar)) and (params.num == 1))
+	if (((t == TypeInt) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeInt8)) and (params.num == 1))
 		return {tree->make_fake_constructor(t, params[0]->type, token_id)};
 
 	// constructor

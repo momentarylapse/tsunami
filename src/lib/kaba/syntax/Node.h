@@ -60,6 +60,7 @@ enum class NodeKind {
 	REFERENCE,          // = &
 	DEREFERENCE,        // = *
 	DEREF_ADDRESS_SHIFT,// = ->
+	DEFINITELY,         // = x!
 	CONSTANT_BY_ADDRESS,
 	ADDRESS,            // &global (for pre processing address shifts)
 	MEMORY,             // global (but LinkNr = address)

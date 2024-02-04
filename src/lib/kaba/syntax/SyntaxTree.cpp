@@ -95,9 +95,9 @@ SyntaxTree::SyntaxTree(Module *_module) {
 	module = _module;
 	asm_meta_info = new Asm::MetaInfo(config.target.pointer_size);
 
-	base_class = new Class(Class::Type::REGULAR, "-base-", 0, this);
+	base_class = new Class(Class::Type::NAMESPACE, "-base-", 0, this);
 	_base_class = base_class;
-	implicit_symbols = new Class(Class::Type::REGULAR, "-implicit-", 0, this);
+	implicit_symbols = new Class(Class::Type::NAMESPACE, "-implicit-", 0, this);
 	root_of_all_evil = new Function("-root-", TypeVoid, base_class, Flags::STATIC);
 }
 
@@ -751,8 +751,8 @@ void SyntaxTree::simplify_shift_deref() {
 
 InlineID __get_pointer_add_int() {
 	if (config.target.instruction_set == Asm::InstructionSet::AMD64)
-		return InlineID::INT64_ADD_INT;
-	return InlineID::INT_ADD;
+		return InlineID::INT64_ADD_INT32;
+	return InlineID::INT32_ADD;
 }
 
 
@@ -781,7 +781,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
 				c->params[0]->ref(this), // array
-				add_node_operator_by_inline(InlineID::INT_MULTIPLY,
+				add_node_operator_by_inline(InlineID::INT32_MULTIPLY,
 						c->params[1], // ref
 						add_node_const(add_constant_int(el_type->size))),
 				c->token_id,
@@ -800,7 +800,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
 				c->params[0], // ref array
-				add_node_operator_by_inline(InlineID::INT_MULTIPLY,
+				add_node_operator_by_inline(InlineID::INT32_MULTIPLY,
 						c->params[1], // index
 						add_node_const(add_constant_int(el_type->size))),
 				c->token_id,
@@ -1061,10 +1061,10 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// [INIT, CMP, BLOCK, INC]
 
 		// assign
-		nn->set_param(0, add_node_operator_by_inline(InlineID::INT_ASSIGN, var, val0));
+		nn->set_param(0, add_node_operator_by_inline(InlineID::INT32_ASSIGN, var, val0));
 
 		// while(for_var < val1)
-		nn->set_param(1, add_node_operator_by_inline(InlineID::INT_SMALLER, var, val1));
+		nn->set_param(1, add_node_operator_by_inline(InlineID::INT32_SMALLER, var, val1));
 
 		nn->set_param(2, block);
 
@@ -1073,11 +1073,11 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		shared<Node> cmd_inc;
 		if (var->type == TypeInt) {
 			if (step->as_const()->as_int() == 1)
-				cmd_inc = add_node_operator_by_inline(InlineID::INT_INCREASE, var, nullptr);
+				cmd_inc = add_node_operator_by_inline(InlineID::INT32_INCREASE, var, nullptr);
 			else
-				cmd_inc = add_node_operator_by_inline(InlineID::INT_ADD_ASSIGN, var, step);
+				cmd_inc = add_node_operator_by_inline(InlineID::INT32_ADD_ASSIGN, var, step);
 		} else {
-			cmd_inc = add_node_operator_by_inline(InlineID::FLOAT_ADD_ASSIGN, var, step);
+			cmd_inc = add_node_operator_by_inline(InlineID::FLOAT32_ADD_ASSIGN, var, step);
 		}
 		nn->set_param(3, cmd_inc); // add to loop-block
 
@@ -1119,7 +1119,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// implement
 		// for_index = 0
-		nn->set_param(0, add_node_operator_by_inline(InlineID::INT_ASSIGN, index, val0));
+		nn->set_param(0, add_node_operator_by_inline(InlineID::INT32_ASSIGN, index, val0));
 
 		shared<Node> val1;
 		if (array->type->usable_as_list() or array->type->is_dict()) {
@@ -1131,19 +1131,19 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		}
 
 		// while(for_index < val1)
-		nn->set_param(1, add_node_operator_by_inline(InlineID::INT_SMALLER, index, val1));
+		nn->set_param(1, add_node_operator_by_inline(InlineID::INT32_SMALLER, index, val1));
 
 		// ...block
 		nn->set_param(2, block);
 
 		// ...for_index += 1
-		nn->set_param(3, add_node_operator_by_inline(InlineID::INT_INCREASE, index, nullptr));
+		nn->set_param(3, add_node_operator_by_inline(InlineID::INT32_INCREASE, index, nullptr));
 
 		if (array->type->is_dict()) {
 
 			auto row = add_node_operator_by_inline(__get_pointer_add_int(),
 					array->change_type(TypeReference),
-					add_node_operator_by_inline(InlineID::INT_MULTIPLY,
+					add_node_operator_by_inline(InlineID::INT32_MULTIPLY,
 							index,
 							add_node_const(add_constant_int(dict_row_size(array->type->param[0])))),
 					n->token_id,

@@ -360,6 +360,7 @@ void SIAddPackageOS(Context *c) {
 //	auto TypeBinaryFormatter = add_type("BinaryFormatter", sizeof(BinaryFormatter));
 //	auto TypeTextLinesFormatter = add_type("TextLinesFormatter", sizeof(TextLinesFormatter));
 	auto TypeFilesystem = add_type("fs", 0);
+	const_cast<Class*>(TypeFilesystem)->type = Class::Type::NAMESPACE;
 	auto TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	//Class *TypeFileNotFoundError= add_type  ("FileError", sizeof(KabaFileNotFoundError));
 	//Class *TypeFileNotWritableError= add_type  ("FileError", sizeof(KabaFileNotWritableError));

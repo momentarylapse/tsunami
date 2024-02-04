@@ -154,6 +154,10 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("is_list", TypeBool, &Class::is_list, Flags::PURE);
 		class_add_func("is_array", TypeBool, &Class::is_array, Flags::PURE);
 		class_add_func("is_dict", TypeBool, &Class::is_dict, Flags::PURE);
+		class_add_func("is_enum", TypeBool, &Class::is_enum, Flags::PURE);
+		class_add_func("is_namespace", TypeBool, &Class::is_namespace, Flags::PURE);
+		class_add_func("is_interface", TypeBool, &Class::is_interface, Flags::PURE);
+		class_add_func("is_struct", TypeBool, &Class::is_struct, Flags::PURE);
 		class_add_func("get_func", TypeFunctionP, &Class::get_func, Flags::PURE); // selfref
 			func_add_param("name", TypeString);
 			func_add_param("return_type", TypeClassP);

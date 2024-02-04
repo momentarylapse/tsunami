@@ -17,6 +17,7 @@
 
 namespace kaba {
 
+	extern const Class *TypeNone;
 
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
@@ -39,14 +40,14 @@ public:
 	void __delete__() {
 		this->XOptional<T>::~XOptional();
 	}
-	/*T get() const {
+	T _value() const {
 		try {
 			return this->value();
 		} catch(::Exception &e) {
 			kaba_raise_exception(new KabaException(e.message()));
 			return T();
 		}
-	}*/
+	}
 	void __assign__(const base::optional<T>& o) {
 		*((base::optional<T>*)this) = o;
 	}
@@ -79,7 +80,7 @@ void lib_create_optional(const Class *tt) {
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &XOptional<T>::__delete__);
 		class_add_func(Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, &XOptional<T>::has_value, Flags::PURE);
 		class_add_func("__bool__", TypeBool, &XOptional<T>::has_value, Flags::PURE);
-		//class_add_func(Identifier::Func::CALL, tt->param[0], &XOptional<T>::get, Flags::REF | Flags::RAISES_EXCEPTIONS);
+		class_add_func("_value", tt->param[0], &XOptional<T>::_value, Flags::REF | Flags::RAISES_EXCEPTIONS);
 
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XOptional<T>::__assign__);
 			func_add_param("x", tt);

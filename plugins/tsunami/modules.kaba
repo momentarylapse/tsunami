@@ -85,7 +85,7 @@ class Module extends Object as shared
 	func extern mut reset_config()
 	func extern virtual mut reset_state()
 	func extern mut changed()
-	func extern virtual mut command(cmd: Command, param: int64) -> int64?
+	func extern virtual mut command(cmd: Command, param: i64) -> i64?
 	func extern mut plug_in(in_port: int, source: Module*, out_port: int)
 	func extern mut unplug_in(in_port: int)
 	func extern mut create_sink(f: void->void) -> obs.sink&

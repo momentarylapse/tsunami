@@ -36,9 +36,9 @@ class AudioView extends Object
 		func extern __init__()
 		func extern range() -> Range
 		func extern mut set_range(r: Range)
-		func extern sample2screen64(s: float64) -> float64
+		func extern sample2screen64(s: f64) -> f64
 		func extern sample2screen(s: float) -> float
-		func extern screen2sample64(s: float64) -> float64
+		func extern screen2sample64(s: f64) -> f64
 		func extern screen2sample(s: float) -> float
 		var area: rect
 	

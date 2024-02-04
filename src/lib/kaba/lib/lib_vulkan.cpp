@@ -3,7 +3,6 @@
 #include "../../base/optional.h"
 #include "lib.h"
 #include "shared.h"
-#include "optional.h"
 #include "list.h"
 #include "../dynamic/exception.h"
 
@@ -14,6 +13,7 @@
 
 namespace kaba {
 
+	extern const Class *TypeIntOptional;
 
 
 #ifdef KABA_EXPORT_VULKAN
@@ -372,8 +372,6 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypeAccessFlags = add_type_enum("AccessFlags");
 	auto TypePipelineBindPoint = add_type_enum("BindPoint", TypePipeline);
 
-	auto TypeIntOptional = add_type_optional(TypeInt);
-
 	lib_create_list<vulkan::Texture*>(TypeTexturePList);
 	lib_create_list<shared<vulkan::Texture>>(TypeTextureSharedNNList);
 	lib_create_list<vulkan::Texture*>(TypeTextureXferList);
@@ -392,8 +390,6 @@ void SIAddPackageVulkan(Context *c) {
 	lib_create_pointer_xfer(TypeRenderPassXfer);
 	lib_create_pointer_xfer(TypeAccelerationStructureXfer);
 	lib_create_pointer_shared<vulkan::Texture>(TypeTextureSharedNN, TypeTextureXfer);
-
-	lib_create_optional<int>(TypeIntOptional);
 
 
 	add_class(TypeInstance);

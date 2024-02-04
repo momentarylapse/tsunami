@@ -116,19 +116,15 @@ void AutoImplementer::implement_shared_assign(Function *f, const Class *t) {
 
 	// if other
 	//     other.count ++
-	auto cmd_if = add_node_statement(StatementID::IF);
 
 	// if other
 	auto ff = tree->required_func_global("p2b");
 	auto cmd_cmp = add_node_call(ff);
 	cmd_cmp->set_param(0, other);
-	cmd_if->set_param(0, cmd_cmp);
 
 	auto b = new Block(f, f->block.get());
-	cmd_if->set_param(1, b);
 
-
-	f->block->add(cmd_if);
+	f->block->add(node_if(cmd_cmp, b));
 
 	auto tt = self->type->param[0];
 	bool found = false;
@@ -136,7 +132,7 @@ void AutoImplementer::implement_shared_assign(Function *f, const Class *t) {
 		if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt) {
 			// count ++
 			auto count = SHARED_P(self)->deref()->shift(e.offset, e.type);
-			auto inc = add_node_operator_by_inline(InlineID::INT_INCREASE, count, nullptr);
+			auto inc = add_node_operator_by_inline(InlineID::INT32_INCREASE, count, nullptr);
 			b->add(inc);
 			found = true;
 		}
@@ -155,13 +151,12 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 	//         del self.p
 	//     self.p = nil
 
-	auto cmd_if = add_node_statement(StatementID::IF);
+	//auto cmd_if = add_node_statement(StatementID::IF);
 
 	// if self.p
 	auto ff = tree->required_func_global("p2b");
 	auto cmd_cmp = add_node_call(ff);
 	cmd_cmp->set_param(0, SHARED_P(self));
-	cmd_if->set_param(0, cmd_cmp);
 
 	auto b = new Block(f, f->block.get());
 
@@ -174,14 +169,14 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 		do_error_implicit(f, format("class '%s' is not a shared class (declare with '%s class' or add an element 'int %s')", tt->long_name(), Identifier::SHARED, Identifier::SHARED_COUNT));
 
 	// count --
-	auto dec = add_node_operator_by_inline(InlineID::INT_DECREASE, count, nullptr);
+	auto dec = add_node_operator_by_inline(InlineID::INT32_DECREASE, count, nullptr);
 	b->add(dec);
 
 
 	auto cmd_if_del = add_node_statement(StatementID::IF);
 
 	// if count == 0
-	auto cmp = add_node_operator_by_inline(InlineID::INT_EQUAL, count, const_int(0));
+	auto cmp = add_node_operator_by_inline(InlineID::INT32_EQUAL, count, const_int(0));
 	cmd_if_del->set_param(0, cmp);
 
 	auto b2 = new Block(f, b);
@@ -199,8 +194,7 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 	auto n_op = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, SHARED_P(self), node_nil());
 	b->add(n_op);
 
-	cmd_if->set_param(1, b);
-	f->block->add(cmd_if);
+	f->block->add(node_if(cmd_cmp, b));
 }
 
 
@@ -219,12 +213,7 @@ void AutoImplementer::implement_shared_create(Function *f, const Class *t) {
 	}
 
 	// return r
-	{
-		auto ret = add_node_statement(StatementID::RETURN);
-		ret->set_num_params(1);
-		ret->set_param(0, r);
-		f->block->add(ret);
-	}
+	f->block->add(node_return(r));
 }
 
 void AutoImplementer::implement_owned_constructor(Function *f, const Class *t) {
@@ -307,13 +296,12 @@ void AutoImplementer::implement_owned_clear(Function *f, const Class *t) {
 	//     del self.p
 	//     self.p = nil
 
-	auto cmd_if = add_node_statement(StatementID::IF);
+	//auto cmd_if = add_node_statement(StatementID::IF);
 
 	// if self.p
 	auto ff = tree->required_func_global("p2b");
 	auto cmd_cmp = add_node_call(ff);
 	cmd_cmp->set_param(0, SHARED_P(self));
-	cmd_if->set_param(0, cmd_cmp);
 
 	auto b = new Block(f, f->block.get());
 
@@ -328,8 +316,7 @@ void AutoImplementer::implement_owned_clear(Function *f, const Class *t) {
 	auto n_op = add_node_operator_by_inline(InlineID::POINTER_ASSIGN, SHARED_P(self), node_nil());
 	b->add(n_op);
 
-	cmd_if->set_param(1, b);
-	f->block->add(cmd_if);
+	f->block->add(node_if(cmd_cmp, b));
 }
 
 void AutoImplementer::implement_owned_give(Function *f, const Class *t) {
@@ -350,12 +337,7 @@ void AutoImplementer::implement_owned_give(Function *f, const Class *t) {
 	}
 
 	// return r
-	{
-		auto ret = add_node_statement(StatementID::RETURN);
-		ret->set_num_params(1);
-		ret->set_param(0, r);
-		f->block->add(ret);
-	}
+	f->block->add(node_return(r));
 }
 
 void AutoImplementer::_implement_functions_for_shared(const Class *t) {

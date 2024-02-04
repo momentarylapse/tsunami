@@ -58,10 +58,11 @@ public:
 		POINTER_SHARED_NOT_NULL,
 		POINTER_OWNED,
 		POINTER_OWNED_NOT_NULL,
-		POINTER_XFER,
+		POINTER_XFER_NOT_NULL,
 		POINTER_ALIAS,
 		REFERENCE,
 		ENUM,
+		NAMESPACE,
 		FUNCTION,
 		DICT,
 		PRODUCT, // (a,b) in (A x B)
@@ -94,10 +95,11 @@ public:
 	bool is_pointer_shared_not_null() const;
 	bool is_pointer_owned() const;
 	bool is_pointer_owned_not_null() const;
-	bool is_pointer_xfer() const;
+	bool is_pointer_xfer_not_null() const;
 	bool is_pointer_alias() const;
 	bool is_reference() const;
 	bool is_enum() const;
+	bool is_namespace() const;
 	bool is_interface() const;
 	bool is_product() const;
 	bool is_optional() const;
@@ -163,11 +165,14 @@ extern const Class *TypeVoid;
 extern const Class *TypePointer;
 extern const Class *TypeReference;
 extern const Class *TypeBool;
-extern const Class *TypeInt;
+extern const Class *TypeInt8;
+extern const Class *TypeInt16;
+extern const Class *TypeInt32;
 extern const Class *TypeInt64;
+extern const Class *TypeInt;
 extern const Class *TypeFloat32;
 extern const Class *TypeFloat64;
-extern const Class *TypeChar;
+extern const Class *TypeFloat;
 extern const Class *TypeCString;
 extern const Class *TypeString;
 

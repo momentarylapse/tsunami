@@ -380,7 +380,7 @@ const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, co
 	else if (c0 == TypeOwnedNotNullT)
 		c = create_class(format("%s![%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeXferT)
-		c = create_class(format("%s[%s]", Identifier::XFER, params[0]->name), Class::Type::POINTER_XFER, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::XFER, params[0]->name), Class::Type::POINTER_XFER_NOT_NULL, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeAliasT)
 		c = create_class(format("%s[%s]", Identifier::ALIAS, params[0]->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeArrayT)

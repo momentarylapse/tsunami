@@ -112,35 +112,35 @@ int Interpreter::run_command(int index, SerialNode &n, Serializer *ser, Frame &f
 			*(int*)get_param(0) = *(int*)get_param(1) + *(int*)get_param(2);
 		else if (n.p[0].type == TypeInt64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) + *(int64*)get_param(2);
-		else if (n.p[0].type == TypeChar)
+		else if (n.p[0].type == TypeInt8)
 			*(char*)get_param(0) = *(char*)get_param(1) + *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::SUB) {
 		if (n.p[0].type == TypeInt)
 			*(int*)get_param(0) = *(int*)get_param(1) - *(int*)get_param(2);
 		else if (n.p[0].type == TypeInt64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) - *(int64*)get_param(2);
-		else if (n.p[0].type == TypeChar)
+		else if (n.p[0].type == TypeInt8)
 			*(char*)get_param(0) = *(char*)get_param(1) - *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::IMUL) {
 		if (n.p[0].type == TypeInt)
 			*(int*)get_param(0) = *(int*)get_param(1) * *(int*)get_param(2);
 		else if (n.p[0].type == TypeInt64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) * *(int64*)get_param(2);
-		else if (n.p[0].type == TypeChar)
+		else if (n.p[0].type == TypeInt8)
 			*(char*)get_param(0) = *(char*)get_param(1) * *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::IDIV) {
 		if (n.p[0].type == TypeInt)
 			*(int*)get_param(0) = *(int*)get_param(1) / *(int*)get_param(2);
 		else if (n.p[0].type == TypeInt64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) / *(int64*)get_param(2);
-		else if (n.p[0].type == TypeChar)
+		else if (n.p[0].type == TypeInt8)
 			*(char*)get_param(0) = *(char*)get_param(1) / *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::MODULO) {
 		if (n.p[0].type == TypeInt)
 			*(int*)get_param(0) = *(int*)get_param(1) % *(int*)get_param(2);
 		else if (n.p[0].type == TypeInt64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) % *(int64*)get_param(2);
-		else if (n.p[0].type == TypeChar)
+		else if (n.p[0].type == TypeInt8)
 			*(char*)get_param(0) = *(char*)get_param(1) % *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::CALL) {
 		auto *f = ((Function*)n.p[1].p);

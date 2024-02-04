@@ -51,7 +51,7 @@ class SignalChain extends Module
 	func extern __init__(session: Session, name: string)
 	func extern override __delete__()
 	func extern mut __del_override__()
-	func extern override mut command(cmd: Module.Command, param: int64) -> int64?
+	func extern override mut command(cmd: Module.Command, param: i64) -> i64?
 	func extern override mut reset_state()
 	func extern mut add_basic(type: Module.Type, name: string) -> shared![Module]
 	func mut add_basic_as[M](type: Module.Type, name: string) -> shared![M]

@@ -180,7 +180,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			if (ptype[0] == TypeInt or ptype[0]->is_enum()) {
 				call1<int,int>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeChar) {
+			} else if (ptype[0] == TypeInt8) {
 				call1<int,char>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
@@ -195,7 +195,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call1<int64,int>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeBool or return_type == TypeChar) {
+		} else if (return_type == TypeBool or return_type == TypeInt8) {
 			if (ptype[0] == TypeInt) {
 				call1<char,int>(ff, ret, param);
 				return true;

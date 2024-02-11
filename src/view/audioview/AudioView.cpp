@@ -63,6 +63,8 @@
 
 const int AudioView::SNAPPING_DIST = 8;
 
+extern Synthesizer* CreateSynthesizer(Session *session, const string &name);
+
 class AddTrackButton : public scenegraph::Node {
 	AudioView *view;
 public:
@@ -171,8 +173,10 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
 	metronome_overlay_vlayer->align.dz = 80;
-	dummy_vtrack = new AudioViewTrack(this, nullptr);
-	dummy_vlayer = new AudioViewLayer(this, nullptr);
+	dummy_track = new Track(song, SignalType::AUDIO, CreateSynthesizer(session, ""));
+	dummy_layer = new TrackLayer(dummy_track.get());
+	dummy_vtrack = new AudioViewTrack(this, dummy_track.get());
+	dummy_vlayer = new AudioViewLayer(this, dummy_layer.get());
 
 
 	scene_graph->add_child(vbox);
@@ -946,13 +950,6 @@ AudioViewLayer *AudioView::get_layer(TrackLayer *layer) {
 	return dummy_vlayer.get();
 }
 
-AudioViewTrack *get_vtrack_x(AudioView *v, Track *t) {
-	for (auto vt: v->vtracks)
-		if (vt->track == t)
-			return vt;
-	return nullptr;
-}
-
 void AudioView::update_tracks() {
 	int cur_layer_index = vlayers.find(cur_vlayer());
 
@@ -1088,8 +1085,10 @@ bool AudioView::update_scene_graph() {
 		v->update_header();
 	}
 
-	const auto a = vtracks.back()->area;
-	add_track_button->area = {a.x1, a.x1 + theme.TRACK_HANDLE_HEIGHT_SMALL, a.y2, a.y2 + theme.TRACK_HANDLE_HEIGHT_SMALL};
+	if (vtracks.num > 0) {
+		const auto a = vtracks.back()->area;
+		add_track_button->area = {a.x1, a.x1 + theme.TRACK_HANDLE_HEIGHT_SMALL, a.y2, a.y2 + theme.TRACK_HANDLE_HEIGHT_SMALL};
+	}
 
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);
 	if (!metronome_overlay_vlayer->hidden) {
@@ -1351,10 +1350,6 @@ void AudioView::set_current(const HoverData &h) {
 }
 
 Track *AudioView::cur_track() {
-	if (!cur_vlayer())
-		return nullptr;
-	if (!cur_vlayer()->layer)
-		return nullptr;
 	return cur_vlayer()->layer->track;
 }
 
@@ -1362,18 +1357,16 @@ AudioViewTrack *AudioView::cur_vtrack() {
 	for (auto *t: vtracks)
 		if (t->track == cur_track())
 			return t;
-	return nullptr;
+	return dummy_vtrack.get();
 }
 
 TrackLayer *AudioView::cur_layer() {
-	if (!cur_vlayer())
-		return nullptr;
-	//if (song->layers().find(cur_vlayer->layer) < 0)
-	//	return nullptr;
 	return cur_vlayer()->layer;
 }
 
 AudioViewLayer *AudioView::cur_vlayer() {
+	if (!cur_selection.vlayer)
+		return dummy_vlayer.get();
 	return cur_selection.vlayer;
 }
 
@@ -1685,76 +1678,56 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	auto vl = cur_vlayer();//hover().vlayer;
 	auto vt = cur_vtrack();//hover().vtrack;
 
-	auto l = vl ? vl->layer : nullptr;
-	auto t = vt ? vt->track : nullptr;
+	auto l = vl->layer;
+	auto t = vt->track;
 
 	// midi mode
-	if (t) {
-		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
-		menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
-		menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
-	}
-	if (vt) {
-		menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
-		menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
-		menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
-		menu->check("track-audio-mode-peaks", vt->audio_mode == AudioViewMode::PEAKS);
-		menu->check("track-audio-mode-spectrum", vt->audio_mode == AudioViewMode::SPECTRUM);
-	}
+	menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
+	menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
+	menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
+	menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
+	menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
+	menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
+	menu->check("track-audio-mode-peaks", vt->audio_mode == AudioViewMode::PEAKS);
+	menu->check("track-audio-mode-spectrum", vt->audio_mode == AudioViewMode::SPECTRUM);
 	
 	// mute/solo
-	if (t)
-		menu->check("track-muted", t->muted);
-	if (vt)
-		menu->check("track-solo", vt->solo);
-	if (l)
-		menu->check("layer-muted", l->muted);
-	if (vl)
-		menu->check("layer-solo", vl->solo);
-	if (vt and t) {
-		menu->check("track-explode", !vt->imploded);
-		menu->enable("track-explode", t->layers.num > 1);
-	}
+	menu->check("track-muted", t->muted);
+	menu->check("track-solo", vt->solo);
+	menu->check("layer-muted", l->muted);
+	menu->check("layer-solo", vl->solo);
+	menu->check("track-explode", !vt->imploded);
+	menu->enable("track-explode", t->layers.num > 1);
 
-	if (t) {
-		menu->enable("track-edit-midi", t->type == SignalType::MIDI);
-		menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
-	}
+	menu->enable("track-edit-midi", t->type == SignalType::MIDI);
+	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
 
 	// convert
-	if (t) {
-		menu->enable("menu-convert", t->type == SignalType::AUDIO);
-		//menu->enable("track-convert-mono", t->type == SignalType::AUDIO);
-		//menu->enable("track-convert-stereo", t->type == SignalType::AUDIO);
-		menu->enable("track-convert-stereo", t->channels == 1 and t->type == SignalType::AUDIO);
-		menu->enable("track-convert-mono", t->channels == 2 and t->type == SignalType::AUDIO);
-	}
+	menu->enable("menu-convert", t->type == SignalType::AUDIO);
+	//menu->enable("track-convert-mono", t->type == SignalType::AUDIO);
+	//menu->enable("track-convert-stereo", t->type == SignalType::AUDIO);
+	menu->enable("track-convert-stereo", t->channels == 1 and t->type == SignalType::AUDIO);
+	menu->enable("track-convert-mono", t->channels == 2 and t->type == SignalType::AUDIO);
 	// view
-	if (t) {
-		menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
-		menu->enable("track-audio-mode-peaks", t->type == SignalType::AUDIO);
-		menu->enable("track-audio-mode-spectrum", t->type == SignalType::AUDIO);
-		menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
-		menu->enable("track-midi-mode-linear", t->type == SignalType::MIDI);
-		menu->enable("track-midi-mode-tab", t->type == SignalType::MIDI);
-		menu->enable("track-midi-mode-classical", t->type == SignalType::MIDI);
-	}
-	if (l) {
-		menu->enable("layer-merge", t->layers.num > 1);
-		menu->enable("layer-mark-dominant", t->layers.num > 1);// and sel.layers.num == 1);
-		menu->enable("layer-add-dominant", t->layers.num > 1);// and sel.layers.num == 1);
-		menu->enable("layer-make-track", t->layers.num > 1);
-		//menu->enable("layer-delete", !l->is_main());
-	}
+	menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
+	menu->enable("track-audio-mode-peaks", t->type == SignalType::AUDIO);
+	menu->enable("track-audio-mode-spectrum", t->type == SignalType::AUDIO);
+	menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
+	menu->enable("track-midi-mode-linear", t->type == SignalType::MIDI);
+	menu->enable("track-midi-mode-tab", t->type == SignalType::MIDI);
+	menu->enable("track-midi-mode-classical", t->type == SignalType::MIDI);
+	menu->enable("layer-merge", t->layers.num > 1);
+	menu->enable("layer-mark-dominant", t->layers.num > 1);// and sel.layers.num == 1);
+	menu->enable("layer-add-dominant", t->layers.num > 1);// and sel.layers.num == 1);
+	menu->enable("layer-make-track", t->layers.num > 1);
+	//menu->enable("layer-delete", !l->is_main());
 
 	// group
-	if (t) {
-		bool any_in_group = false;
-		for (auto t: sel.tracks())
-			if (t->send_target)
-				any_in_group = true;
-		menu->enable("track-ungroup", any_in_group);
-	}
+	bool any_in_group = false;
+	for (auto t: sel.tracks())
+		if (t->send_target)
+			any_in_group = true;
+	menu->enable("track-ungroup", any_in_group);
 
 	menu->check("play-loop", looping());
 	menu->check("playback-range-lock", playback_range_locked);

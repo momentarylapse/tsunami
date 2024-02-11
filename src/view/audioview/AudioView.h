@@ -302,6 +302,8 @@ public:
 	Array<AudioViewTrack*> vtracks;
 	Array<AudioViewLayer*> vlayers;
 	AudioViewLayer *metronome_overlay_vlayer;
+	shared<Track> dummy_track;
+	shared<TrackLayer> dummy_layer;
 	shared<AudioViewTrack> dummy_vtrack;
 	shared<AudioViewLayer> dummy_vlayer;
 	AudioViewTrack *get_track(Track *track);

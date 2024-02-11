@@ -9,7 +9,7 @@ class AudioOutput extends Module
 	func extern is_playing() -> bool
 	func extern get_volume() -> float
 	func extern mut set_volume(volume: float)
-	func extern samples_played() -> int
+	func extern samples_played() -> i64?
 
 
 class AudioInput extends Module

@@ -36,7 +36,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain = session.create_signal_chain("midi-live")
 		m_in = chain.add_basic(Module.Type.STREAM, "MidiInput")
 		m_out = chain.add_basic(Module.Type.STREAM, "AudioOutput")
-		synth = chain.add_basic_as_syn(Module.Type.SYNTHESIZER, "")
+		synth = chain.add_synth("")
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		chain.start()
@@ -46,7 +46,7 @@ class MidiLivePlayback extends TsunamiPlugin
 		chain.reset_state()
 		chain.delete(synth)
 		
-		synth = chain.add_basic_as[Synthesizer](Module.Type.SYNTHESIZER, name)
+		synth = chain.add_synth(name)
 		chain.connect(m_in, 0, synth, 0)
 		chain.connect(synth, 0, m_out, 0)
 		

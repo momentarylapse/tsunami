@@ -218,6 +218,7 @@ class Synthesizer extends Module
 	var freq: float[MAX_PITCH]
 	var delta_phi: float[MAX_PITCH]
 	var active_pitch: int[]
+	var instrument: Instrument
 	var auto_generate_stereo: bool
 	var render_by_ref: bool
 	var events: MidiEventBuffer
@@ -228,6 +229,7 @@ class Synthesizer extends Module
 	func extern override mut reset_state()
 	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 	func extern mut set_sample_rate(sample_rate: int)
+	func extern mut set_instrument(i: Instrument)
 
 
 class DummySynthesizer extends Synthesizer

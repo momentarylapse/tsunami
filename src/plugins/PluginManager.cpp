@@ -504,6 +504,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Synthesizer.events", &Synthesizer::events);
 	ext->declare_class_element("Synthesizer.keep_notes", &Synthesizer::keep_notes);
 	ext->declare_class_element("Synthesizer.active_pitch", &Synthesizer::active_pitch);
+	ext->declare_class_element("Synthesizer.instrument", &Synthesizer::instrument);
 	ext->declare_class_element("Synthesizer.temperament", &Synthesizer::temperament);
 	ext->_declare_class_element("Synthesizer.freq", _offsetof(Synthesizer, temperament.freq));
 	ext->declare_class_element("Synthesizer.delta_phi", &Synthesizer::delta_phi);
@@ -516,6 +517,7 @@ void PluginManager::link_app_data() {
 	ext->link_virtual("Synthesizer.on_config", &Synthesizer::on_config, &synth);
 	ext->link_virtual("Synthesizer.reset_state", &Synthesizer::reset_state, &synth);
 	ext->link_class_func("Synthesizer.set_sample_rate", &Synthesizer::set_sample_rate);
+	ext->link_class_func("Synthesizer.set_instrument", &Synthesizer::set_instrument);
 	//}
 
 	{

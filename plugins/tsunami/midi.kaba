@@ -62,3 +62,9 @@ struct Instrument
 	func __init__()
 	func extern name() -> string
 	func extern static enumerate() -> Instrument[]
+	func static get(name: string) -> Instrument
+		# good enough :P
+		for i in enumerate()
+			if i.name() == name
+				return i
+		return Instrument()

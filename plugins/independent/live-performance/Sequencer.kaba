@@ -1,0 +1,150 @@
+use tsunami.*
+use hui
+
+let TYPE_PITCH = [36, 38, 42, 43, 44, 45, 46, 47]
+let NUM_TYPES = 8 #len(TYPE_PITCH)
+let NUM_SUBBEATS = 16
+let UPDATE_DT = 0.03
+
+struct Pattern
+	struct Note
+		pos: int
+		type: int
+		volume: float
+	notes: Note[]
+	
+	func index(pos: int, type: int) -> int?
+		for i=>n in notes
+			if n.pos == pos and n.type == type
+				return i
+		return nil
+
+class Config extends Module.Config
+	pattern: Pattern
+	bpm: float
+	func override reset()
+		pattern = Pattern()
+		bpm = 90
+	
+	func pos2sample(p: int) -> int
+		return p * DEFAULT_SAMPLE_RATE / 4.0 * 60 / bpm
+	
+	func total_samples() -> int
+		return DEFAULT_SAMPLE_RATE * 4 * 60 / bpm
+	
+	func create_midi() -> MidiEventBuffer
+		var r: Ret
+		r.samples = total_samples()
+		for n in pattern.notes
+			r.add_note([RangeTo(pos2sample(n.pos), pos2sample(n.pos + 1)), TYPE_PITCH[n.type], n.volume])
+		return r
+
+
+class SequencerPanel extends ConfigPanel
+	var override c: Sequencer&
+	var width = 0
+	var height = 0
+	var sr_id = -1
+	
+	func __init__(_seq: Sequencer)
+		super.__init__(_seq)
+		add_drawing_area("", 0, 0, "area")
+		
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", on_left_button_down)
+		sr_id = hui.run_repeated(UPDATE_DT, on_update)
+	
+	func override __delete__()
+		hui.cancel_runner(sr_id)
+	
+	func type2y(t: int) -> float
+		return height - t * float(height) / NUM_TYPES
+	
+	func pos2x(p: int) -> float
+		return p * float(width) / 16.0
+		
+	func mut on_draw(p: hui.Painter)
+		width = p.width
+		height = p.height
+		
+		p.set_color(colors.background)
+		p.draw_rect([0,width, 0,height])
+		
+		# grid
+		p.set_color(colors.grid.with_alpha(0.5))
+		for t in 1:NUM_TYPES
+			let y = type2y(t)
+			p.draw_line([0,y], [width, y])
+		
+		for pos in 1:16
+			let x = pos2x(pos)
+			if (pos%4) == 0
+				p.set_color(colors.grid)
+			else
+				p.set_color(colors.grid.with_alpha(0.5))
+			p.draw_line([x,0], [x,height])
+			
+		
+		let w = float(width) / 16.0
+		let h = float(height) / NUM_TYPES
+		for n in c.config.pattern.notes
+			p.set_color(colors.text)
+			p.draw_rect([w * n.pos, w * (n.pos + 1), height - h * n.type, height - h * (n.type + 1)])
+			
+		for s in c.output.samples_played()
+			let total = c.config.total_samples()
+			let x = float(int(s) % total) / total * width
+			p.set_color(color.GREEN)
+			p.draw_line([x, 0], [x, height])
+		
+	func mut on_left_button_down()
+		let m = hui.get_event().mouse
+		let w = float(width) / 16.0
+		let h = float(height) / NUM_TYPES
+		let pos = int(m.x / w)
+		let type = int((height - m.y) / h)
+		if pos >= 0 and pos < 16 and type >= 0 and type < NUM_TYPES
+			for index in c.config.pattern.index(pos, type)
+				c.config.pattern.notes.remove(index)
+			else
+				c.config.pattern.notes.add([pos, type, 1.0])
+			changed()
+			redraw("area")
+	
+	func mut on_update()
+		redraw("area")
+			
+
+class Sequencer extends TsunamiPlugin
+	var chain: shared![SignalChain]
+	var source: shared![MidiEventStreamer]
+	var output: shared![AudioOutput]
+	var running = false
+	
+	var config: Config
+	
+	func override on_start()
+		chain = session.create_signal_chain("sequencer")
+		source = chain.add[MidiEventStreamer]()
+		var synth = chain.add_synth("")
+		output = chain.add_basic_as[AudioOutput](Module.Type.STREAM, "AudioOutput")
+		
+		synth.set_instrument(Instrument.get("Drums"))
+		
+		source.set_data(config.create_midi())
+		source.loop = true
+		
+		chain.connect(source, 0, synth, 0)
+		chain.connect(synth, 0, output, 0)
+		
+		chain.set_buffer_size(1024)
+		#chain.set_update_dt(UPDATE_DT)
+		chain.start()
+		running = true
+	
+	func override on_config()
+		if running
+			source.set_data(config.create_midi())
+
+	func override create_panel() -> xfer[ConfigPanel]
+		return new SequencerPanel(self)

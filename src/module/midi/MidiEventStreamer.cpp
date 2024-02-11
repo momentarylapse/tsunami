@@ -10,19 +10,24 @@
 #include "../beats/BeatSource.h"
 
 
-MidiEventStreamer::MidiEventStreamer(const MidiEventBuffer& _midi) {
+MidiEventStreamer::MidiEventStreamer() {
 	module_class = "MidiEventStreamer";
-	midi = _midi;
+	module_category = ModuleCategory::MIDI_SOURCE;
 	offset = 0;
 	ignore_end = false;
+	loop = false;
 }
 
 int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 	int n = min(midi.samples - offset, _midi.samples);
 	if (ignore_end)
 		n = _midi.samples;
-	if ((n <= 0) and !ignore_end)
-		return Port::END_OF_STREAM;
+	if (n <= 0) {
+		if (loop)
+			offset = 0;
+		else if (!ignore_end)
+			return Port::END_OF_STREAM;
+	}
 
 	Range r = Range(offset, n);
 	//midi.read(_midi, r);
@@ -33,7 +38,7 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 	return n;
 }
 
-void MidiEventStreamer::reset() {
+void MidiEventStreamer::reset_state() {
 	offset = 0;
 }
 
@@ -45,7 +50,7 @@ void MidiEventStreamer::set_pos(int pos) {
 	offset = pos;
 }
 
-int MidiEventStreamer::get_pos() {
+int MidiEventStreamer::get_pos() const {
 	return offset;
 }
 

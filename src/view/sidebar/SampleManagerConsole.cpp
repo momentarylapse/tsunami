@@ -341,7 +341,8 @@ void SampleManagerConsole::on_preview() {
 		preview.stream = preview.chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput").get();
 		preview.chain->connect(preview.renderer, 0, preview.stream, 0);
 	} else { // MIDI
-		preview.midi_streamer = new MidiEventStreamer(midi_notes_to_events(preview.sample->midi));
+		preview.midi_streamer = new MidiEventStreamer();
+		preview.midi_streamer->set_data(midi_notes_to_events(preview.sample->midi));
 		preview.chain->_add(preview.midi_streamer);
 		auto synth = preview.chain->add(ModuleCategory::SYNTHESIZER, "").get();
 		preview.stream = preview.chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput").get();

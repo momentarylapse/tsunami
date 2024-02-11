@@ -30,7 +30,6 @@ public:
 	};
 
 	virtual int _cdecl read(MidiEventBuffer &midi);
-	virtual void _cdecl reset() {}
 
 	int produce_pos;
 	int read_pos;

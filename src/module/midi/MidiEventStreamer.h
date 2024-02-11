@@ -14,19 +14,20 @@
 
 class MidiEventStreamer : public MidiSource {
 public:
-	MidiEventStreamer(const MidiEventBuffer &midi);
+	MidiEventStreamer();
 
 	int read(MidiEventBuffer &midi) override;
-	void reset() override;
+	void reset_state() override;
 
-	void _cdecl set_data(const MidiEventBuffer &midi);
+	void set_data(const MidiEventBuffer &midi);
 
 	void set_pos(int pos);
-	int get_pos();
+	int get_pos() const;
 
 	MidiEventBuffer midi;
 	int offset;
 	bool ignore_end;
+	bool loop;
 };
 
 

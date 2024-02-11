@@ -38,11 +38,12 @@
 #include "../module/audio/SongRenderer.h"
 #include "../module/audio/AudioVisualizer.h"
 #include "../module/audio/PitchDetector.h"
+#include "../module/midi/MidiEffect.h"
+#include "../module/midi/MidiEventStreamer.h"
 #include "../module/midi/MidiSource.h"
 #include "../module/audio/AudioEffect.h"
 #include "../module/beats/BeatSource.h"
 #include "../module/beats/BeatMidifier.h"
-#include "../module/midi/MidiEffect.h"
 #include "../view/module/ConfigPanel.h"
 #include "../view/helper/Progress.h"
 #include "../storage/Storage.h"
@@ -464,12 +465,25 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("MidiSource.__init__", &MidiSource::__init__);
 		ext->link_virtual("MidiSource.__delete__", &MidiSource::__delete__, &msource);
 		ext->link_virtual("MidiSource.read", &MidiSource::read, &msource);
-		ext->link_virtual("MidiSource.reset", &MidiSource::reset, &msource);
 		ext->link_virtual("MidiSource.on_produce", &MidiSource::on_produce, &msource);
 		ext->link_class_func("MidiSource.note", &MidiSource::note);
 		ext->link_class_func("MidiSource.skip", &MidiSource::skip);
 		ext->link_class_func("MidiSource.note_x", &MidiSource::note_x);
 		ext->link_class_func("MidiSource.skip_x", &MidiSource::skip_x);
+	}
+
+	{
+		MidiEventStreamer mstreamer;
+		ext->declare_class_size("MidiEventStreamer", sizeof(MidiEventStreamer));
+		ext->declare_class_element("MidiEventStreamer.loop", &MidiEventStreamer::loop);
+		ext->declare_class_element("MidiEventStreamer.offset", &MidiEventStreamer::offset);
+		ext->declare_class_element("MidiEventStreamer.midi", &MidiEventStreamer::midi);
+		ext->link_class_func("MidiEventStreamer.__init__", &generic__init__<MidiEventStreamer>);
+		// TODO delete
+		ext->link_virtual("MidiEventStreamer.read", &MidiEventStreamer::read, &mstreamer);
+		ext->link_virtual("MidiEventStreamer.reset_state", &MidiEventStreamer::reset_state, &mstreamer);
+		ext->link_class_func("MidiEventStreamer.set_pos", &MidiEventStreamer::set_pos);
+		ext->link_class_func("MidiEventStreamer.set_data", &MidiEventStreamer::set_data);
 	}
 
 
@@ -479,7 +493,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("BeatMidifier.__init__", &BeatMidifier::__init__);
 		//ext->link_virtual("BeatMidifier.__delete__", &MidiSource::__delete__, &bmidifier);
 		ext->link_virtual("BeatMidifier.read", &BeatMidifier::read, &bmidifier);
-		ext->link_virtual("BeatMidifier.reset", &BeatMidifier::reset, &bmidifier);
+		ext->link_virtual("BeatMidifier.reset_state", &BeatMidifier::reset_state, &bmidifier);
 		ext->declare_class_element("BeatMidifier.volume", &BeatMidifier::volume);
 	}
 

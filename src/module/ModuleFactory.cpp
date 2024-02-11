@@ -16,6 +16,7 @@
 #include "audio/PeakMeter.h"
 #include "audio/AudioSucker.h"
 #include "midi/MidiEffect.h"
+#include "midi/MidiEventStreamer.h"
 #include "midi/MidiJoiner.h"
 #include "midi/MidiSource.h"
 #include "midi/MidiSucker.h"
@@ -63,6 +64,9 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 	} else if (category == ModuleCategory::MIDI_EFFECT) {
 		if (_class == "Dummy" or _class == "")
 			return new MidiEffect;
+	} else if (category == ModuleCategory::MIDI_SOURCE) {
+		if (_class == "MidiEventStreamer")
+			return new MidiEventStreamer;
 	} else if (category == ModuleCategory::SYNTHESIZER) {
 		if (_class == "Dummy" or _class == "")
 			return new DummySynthesizer;
@@ -159,8 +163,10 @@ xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class 
 	//msg_write(type->owner->module->filename.basename_no_ext());
 
 	auto m = reinterpret_cast<Module*>(type->create_instance());
-	if (!m)
+	if (!m) {
+		session->e("failed to instanciate class: " + type->long_name());
 		m = new Module(ModuleCategory::OTHER, "");
+	}
 
 	m->set_session_etc(session, type->owner->module->filename.basename_no_ext());
 

@@ -107,7 +107,8 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	//midi.add(t, t->midi);
 	if (t->type == SignalType::MIDI) {
 		MidiEventBuffer raw;
-		midi_streamer = new MidiEventStreamer(raw);
+		midi_streamer = new MidiEventStreamer();
+		midi_streamer->set_data(raw);
 		midi_streamer->perf_set_parent(this);
 		synth->_plug_in(0, midi_streamer.get(), 0);
 		fill_midi_streamer();

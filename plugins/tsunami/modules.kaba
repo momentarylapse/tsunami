@@ -178,6 +178,18 @@ class MidiSource extends Module
 	#extern void set_beat_source(BeatPort *source)
 
 
+class MidiEventStreamer extends MidiSource
+	func extern override __init__()
+	func extern override read(out midi: MidiEventBuffer) -> int
+	func extern override reset_state()
+	func extern mut set_data(midi: MidiEventBuffer)
+	func extern mut set_pos(offset: int)
+	
+	var loop: bool
+	var offset: int
+	var midi: MidiEventBuffer
+
+
 class PitchDetector extends MidiSource
 	var frequency, volume: float
 	var pitch: int

@@ -6,6 +6,6 @@ class InverseSynthesizer extends Synthesizer
 	func override render(out buf: AudioBuffer)
 		sub.set_sample_rate(sample_rate)
 		sub.events = events
-		for e in sub.events
+		for mut e in sub.events
 			e.pitch = 150 - e.pitch
 		sub.render(buf)

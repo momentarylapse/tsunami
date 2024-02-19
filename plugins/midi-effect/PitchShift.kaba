@@ -12,5 +12,5 @@ class PitchShift extends MidiEffect
 	var config: Config
 	
 	func override process(out midi: MidiEventBuffer)
-		for e in midi
+		for mut e in midi
 			e.pitch += config.shift

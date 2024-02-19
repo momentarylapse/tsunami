@@ -98,16 +98,16 @@ Function *add_func(const string &name, const Class *return_type, T func, Flags f
 }
 
 void func_set_inline(InlineID index);
-void func_add_param(const string &name, const Class *type, Flags flags = Flags::CONST);
-void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags = Flags::CONST);
+void func_add_param(const string &name, const Class *type, Flags flags = Flags::NONE);
+void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags = Flags::NONE);
 template<class T>
-void func_add_param_def(const string &name, const Class *type, T p, Flags flags = Flags::CONST) {
+void func_add_param_def(const string &name, const Class *type, T p, Flags flags = Flags::NONE) {
 	func_add_param_def_x(name, type, &p, flags);
 }
 Class *add_class(const Class *root_type);
-void class_add_element_x(const string &name, const Class *type, int offset, Flags flag = Flags::NONE);
+void class_add_element_x(const string &name, const Class *type, int offset, Flags flag = Flags::MUTABLE);
 template<class T>
-void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::NONE) {
+void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::MUTABLE) {
 	// allows &Class::element
 	if constexpr (std::is_integral<T>::value)
 		class_add_element_x(name, type, p, flag);

@@ -184,6 +184,14 @@ string kaba_int_format(int i, const string &fmt) {
 	}
 }
 
+string kaba_i16_to_str(unsigned short w) {
+	return str((int)w);
+}
+
+void kaba_i16_from_i32(unsigned short& w, int i) {
+	w = i;
+}
+
 string kaba_float2str(float f) {
 	return f2s(f, 6);
 }
@@ -225,30 +233,46 @@ string kaba_int8_to_str(char c) {
 
 class KabaString : public string {
 public:
-	string format(const string& fmt) const {
+	string format(const string &fmt) const {
 		try {
-			return _xf_str_<const string&>(fmt + "s", *this);
-		} catch (::Exception& e) {
+			return _xf_str_<const string &>(fmt + "s", *this);
+		} catch (::Exception &e) {
 			return "{ERROR: " + e.message() + "}";
 		}
 	}
+
 	bool contains_s(const string &s) const {
 		return find(s, 0) >= 0;
 	}
-	bool contains_c(char c) const {
-		for (auto &cc: *this)
-			if (cc == c)
-				return true;
-		return false;
-	}
-	base::optional<int> _find(const string& s, int pos0) const {
+
+	base::optional<int> _find(const string &s, int pos0) const {
 		int r = find(s, pos0);
 		if (r < 0)
 			return base::None;
 		return r;
 	}
+
+	bytes encode() const {
+		return *(bytes*)this;
+	}
+	static string decode(const bytes& b) {
+		return string(b);
+	}
 };
 
+class KabaBytes : public bytes {
+public:
+	string utf8() const {
+		return *(string*)this;
+	}
+
+	base::optional<int> _find(const bytes &s, int pos0) const {
+		int r = reinterpret_cast<const string*>(this)->find(s, pos0);
+		if (r < 0)
+			return base::None;
+		return r;
+	}
+};
 
 
 class _VirtualBase : public VirtualBase {
@@ -330,42 +354,42 @@ void SIAddPackageBase(Context *c) {
 
 
 	add_class(TypeObject);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &_VirtualBase::__init__);
-		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &VirtualBase::__delete__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &_VirtualBase::__init__, Flags::MUTABLE);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &VirtualBase::__delete__, Flags::MUTABLE);
 		class_set_vtable(VirtualBase);
 
 	add_class(TypeDynamicArray);
 		class_add_element("num", TypeInt, config.target.pointer_size);
-		class_add_func("swap", TypeVoid, &DynamicArray::simple_swap);
+		class_add_func("swap", TypeVoid, &DynamicArray::simple_swap, Flags::MUTABLE);
 			func_add_param("i1", TypeInt);
 			func_add_param("i2", TypeInt);
 		class_add_func(Identifier::Func::SUBARRAY, TypeDynamicArray, &DynamicArray::ref_subarray, Flags::REF);
 			func_add_param("start", TypeInt);
 			func_add_param("end", TypeInt);
 		// low level operations
-		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init);
+		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init, Flags::MUTABLE);
 			func_add_param("element_size", TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear);
-		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget);
-		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize);
+		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear, Flags::MUTABLE);
+		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget, Flags::MUTABLE);
+		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize, Flags::MUTABLE);
 			func_add_param("size", TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single);
+		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single, Flags::MUTABLE);
 			func_add_param("index", TypeInt);
 
 	add_class(TypeDictBase);
 		class_add_element("num", TypeInt, config.target.pointer_size);
 		// low level operations
-		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init);
+		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init, Flags::MUTABLE);
 			func_add_param("element_size", TypeInt);
-		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear);
-		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget);
-		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize);
+		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear, Flags::MUTABLE);
+		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget, Flags::MUTABLE);
+		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize, Flags::MUTABLE);
 			func_add_param("size", TypeInt);
-		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single);
+		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single, Flags::MUTABLE);
 			func_add_param("index", TypeInt);
 
 	add_class(TypeSharedPointer);
-		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr);
+		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
 			func_set_inline(InlineID::SHARED_POINTER_INIT);
 
 
@@ -455,12 +479,14 @@ void SIAddPackageBase(Context *c) {
 	TypeFloatP      = add_type_p_raw(TypeFloat);
 	TypeFloatList   = add_type_list(TypeFloat);
 	TypeFloat64List = add_type_list(TypeFloat64);
+	TypeBytes      = add_type_list(TypeInt8);
 	TypeCString     = add_type_array(TypeInt8, 256);
-	capture_implicit_type(TypeCString, "cstring"); // cstring := char[256]
+	capture_implicit_type(TypeCString, "cstring"); // cstring := i8[256]
 	TypeString      = add_type_list(TypeInt8);
-	capture_implicit_type(TypeString, "string"); // string := char[]
-	TypeStringAutoCast = add_type("<string-auto-cast>", config.target.dynamic_array_size);	// string := char[]
+	capture_implicit_type(TypeString, "string"); // string := i8[]
+	TypeStringAutoCast = add_type("<string-auto-cast>", config.target.dynamic_array_size);	// string := i8[]
 	TypeStringList  = add_type_list(TypeString);
+	capture_implicit_type(TypeBytes, "bytes"); // bytes := i8[]
 
 	TypeIntDict     = add_type_dict(TypeInt);
 	TypeFloatDict   = add_type_dict(TypeFloat);
@@ -475,6 +501,7 @@ void SIAddPackageBase(Context *c) {
 	lib_create_list<float>(TypeFloatList);
 	lib_create_list<double>(TypeFloat64List);
 	lib_create_list<char>(TypeString);
+	lib_create_list<u_int8_t>(TypeBytes);
 	lib_create_list<string>(TypeStringList);
 
 
@@ -490,9 +517,9 @@ void SIAddPackageBase(Context *c) {
 		class_add_element("_fp", TypePointer, &KabaCallableBase::fp);
 		class_add_element("_pp", TypePointer, &KabaCallableBase::pp);
 		//class_add_func(Identifier::Func::INIT, TypeVoid, &KabaCallableBase::__init__);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, nullptr);
+		class_add_func(Identifier::Func::ASSIGN, TypeVoid, nullptr, Flags::MUTABLE);
 			func_set_inline(InlineID::CHUNK_ASSIGN);
-		class_add_func_virtual("call", TypeVoid, &KabaCallableBase::operator(), Flags::CONST);
+		class_add_func_virtual("call", TypeVoid, &KabaCallableBase::operator());
 	
 
 
@@ -526,7 +553,7 @@ void SIAddPackageBase(Context *c) {
 		class_add_func(Identifier::Func::STR, TypeString, &kaba_int8_to_str, Flags::PURE);
 		//class_add_func(Identifier::Func::REPR, TypeString, &kaba_char_repr, Flags::PURE);
 		class_add_func("__int__", TypeInt, &kaba_cast<char,int>, Flags::PURE);
-		func_set_inline(InlineID::INT8_TO_INT32);
+			func_set_inline(InlineID::INT8_TO_INT32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt8, TypeInt8, InlineID::INT8_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeInt8, TypeInt8, InlineID::INT8_EQUAL);
 		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeInt8, TypeInt8, InlineID::INT8_NOT_EQUAL);
@@ -546,7 +573,13 @@ void SIAddPackageBase(Context *c) {
 	add_class(TypeInt16);
 		class_add_element("low", TypeInt8, 0);
 		class_add_element("high", TypeInt8, 1);
-		//class_add_func(Identifier::Func::STR, TypeString, &i2s, Flags::PURE);
+		class_add_func(Identifier::Func::STR, TypeString, &kaba_i16_to_str, Flags::PURE);
+		class_add_func("__int__", TypeInt, &kaba_cast<unsigned short,int>, Flags::PURE);
+		//	func_set_inline(InlineID::INT16_TO_INT32);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt16, InlineID::CHUNK_ASSIGN);
+		//add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt32, InlineID::INT16_ASSIGN_INT32);
+		class_add_func("__assign__", TypeVoid, &kaba_i16_from_i32, Flags::MUTABLE);
+			func_add_param("o", TypeInt);
 
 
 	add_class(TypeInt32);
@@ -700,9 +733,8 @@ void SIAddPackageBase(Context *c) {
 		class_add_func("upper", TypeString, &string::upper, Flags::PURE);
 		class_add_func("reverse", TypeString, &string::reverse, Flags::PURE);
 		class_add_func("hash", TypeInt, &string::hash, Flags::PURE);
-		class_add_func("md5", TypeString, &string::md5, Flags::PURE);
 		class_add_func("hex", TypeString, &string::hex, Flags::PURE);
-		class_add_func("unhex", TypeString, &string::unhex, Flags::PURE);
+		class_add_func("unhex", TypeBytes, &string::unhex, Flags::PURE);
 		class_add_func("match", TypeBool, &string::match, Flags::PURE);
 			func_add_param("glob", TypeString);
 		class_add_func("__int__", TypeInt, &string::_int, Flags::PURE);
@@ -714,14 +746,30 @@ void SIAddPackageBase(Context *c) {
 		class_add_func("unescape", TypeString, &string::unescape, Flags::PURE);
 		class_add_func("utf8_to_utf32", TypeIntList, &string::utf8_to_utf32, Flags::PURE);
 		class_add_func("utf8_length", TypeInt, &string::utf8len, Flags::PURE);
+		class_add_func("encode", TypeBytes, &KabaString::encode, Flags::PURE);
+		class_add_func("decode", TypeString, &KabaString::decode, Flags::PURE | Flags::STATIC);
+			func_add_param("b", TypeBytes);
 		class_add_func(Identifier::Func::REPR, TypeString, &string::repr, Flags::PURE);
 		class_add_func(Identifier::Func::FORMAT, TypeString, &KabaString::format, Flags::PURE);
 			func_add_param("fmt", TypeString);
 		class_add_func(Identifier::Func::CONTAINS, TypeBool, &KabaString::contains_s, Flags::PURE);
 			func_add_param("s", TypeString);
-		class_add_func(Identifier::Func::CONTAINS, TypeBool, &KabaString::contains_c, Flags::PURE);
-			func_add_param("c", TypeInt8);
 
+
+	add_class(TypeBytes);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeBytes, TypeBytes, InlineID::NONE, &bytes::operator==);
+		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeBytes, TypeBytes, InlineID::NONE, &bytes::operator!=);
+		class_add_func("reverse", TypeString, &bytes::reverse, Flags::PURE);
+		class_add_func("hash", TypeInt, &bytes::hash, Flags::PURE);
+		class_add_func("md5", TypeString, &bytes::md5, Flags::PURE);
+		class_add_func("hex", TypeString, &bytes::hex, Flags::PURE);
+		class_add_func("utf8", TypeString, &KabaBytes::utf8, Flags::PURE);
+		class_add_func("find", TypeIntOptional, &KabaBytes::_find, Flags::PURE);
+			func_add_param("str", TypeBytes);
+			func_add_param_def("start", TypeInt, 0);
+		//class_add_func(Identifier::Func::REPR, TypeString, &bytes::hex, Flags::PURE);
+	//	class_add_func(Identifier::Func::FORMAT, TypeString, &KabaString::format, Flags::PURE);
+	//		func_add_param("fmt", TypeString);
 
 
 	add_class(TypeBoolList);
@@ -838,14 +886,14 @@ void SIAddPackageBase(Context *c) {
 
 
 	add_class(TypeStringList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &StringList::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &StringList::clear);
-		class_add_func("add", TypeVoid, &StringList::add);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &StringList::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &StringList::clear, Flags::MUTABLE);
+		class_add_func("add", TypeVoid, &StringList::add, Flags::MUTABLE);
 			func_add_param("x", TypeString);
-		class_add_func("clear", TypeVoid, &StringList::clear);
-		class_add_func("remove", TypeVoid, &StringList::erase);
+		class_add_func("clear", TypeVoid, &StringList::clear, Flags::MUTABLE);
+		class_add_func("remove", TypeVoid, &StringList::erase, Flags::MUTABLE);
 			func_add_param("index", TypeInt);
-		class_add_func("resize", TypeVoid, &StringList::resize);
+		class_add_func("resize", TypeVoid, &StringList::resize, Flags::MUTABLE);
 			func_add_param("num", TypeInt);
 		class_add_func("join", TypeString, &StringList::join, Flags::PURE);
 			func_add_param("glue", TypeString);
@@ -870,17 +918,17 @@ void SIAddPackageBase(Context *c) {
 
 
 	add_class(TypeException);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaException::__init__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaException::__init__, Flags::MUTABLE);
 			func_add_param("message", TypeString);
-		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaException::__delete__);
+		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaException::__delete__, Flags::MUTABLE);
 		class_add_func_virtual(Identifier::Func::STR, TypeString, &KabaException::message);
 		class_add_element("_text", TypeString, config.target.pointer_size);
 		class_set_vtable(KabaException);
 
 	add_class(TypeNoValueError);
 		class_derive_from(TypeException);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaNoValueError::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaNoValueError::__delete__, Flags::OVERRIDE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaNoValueError::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaNoValueError::__delete__, Flags::OVERRIDE | Flags::MUTABLE);
 		class_set_vtable(KabaNoValueError);
 
 	add_func(Identifier::RAISE, TypeVoid, &kaba_raise_exception, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
@@ -902,7 +950,7 @@ void SIAddPackageBase(Context *c) {
 	add_func("print", TypeVoid, &os::terminal::print, Flags::STATIC);
 		func_add_param("str", TypeStringAutoCast);//, (Flags)((int)Flags::CONST | (int)Flags::AUTO_CAST));
 	add_ext_var("_print_postfix", TypeString, &os::terminal::_print_postfix_);
-	add_func("as_binary", TypeString, &kaba_binary, Flags::STATIC);
+	add_func("as_binary", TypeBytes, &kaba_binary, Flags::STATIC);
 		func_add_param("p", TypeReference, Flags::REF);
 		func_add_param("length", TypeInt);
 	// memory

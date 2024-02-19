@@ -94,7 +94,7 @@ Variable *Function::add_param(const string &name, const Class *type, Flags flags
 	if (flags_has(flags, Flags::OUT))
 		flags_set(v->flags, Flags::OUT);
 	else
-		flags_set(v->flags, Flags::CONST);
+		flags_clear(v->flags, Flags::MUTABLE);
 	literal_param_type.add(type);
 	num_params ++;
 	return v;
@@ -174,10 +174,8 @@ void Function::update_parameters_after_parsing() {
 
 void Function::add_self_parameter() {
 	auto _flags = Flags::NONE;
-	if (flags_has(flags, Flags::CONST))
-		flags_set(_flags, Flags::CONST);
-	else
-		flags_set(_flags, Flags::OUT);
+	if (flags_has(flags, Flags::MUTABLE))
+		flags_set(_flags, Flags::OUT | Flags::MUTABLE);
 	if (flags_has(flags, Flags::REF))
 		flags_set(_flags, Flags::REF);
 	block->insert_var(0, Identifier::SELF, name_space, _flags);
@@ -235,7 +233,7 @@ bool Function::is_member() const {
 }
 
 bool Function::is_mutable() const {
-	return !flags_has(flags, Flags::CONST);
+	return flags_has(flags, Flags::MUTABLE);
 
 	// hmmm, might be better, to use self:
 	if (is_static())

@@ -187,8 +187,7 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
-		auto v = f->block->add_var(param_names[i], p);
-		flags_set(v->flags, Flags::CONST);
+		auto v = f->block->add_var(param_names[i], p, Flags::NONE);
 		f->num_params ++;
 	}
 	f->default_parameters = def_params;
@@ -232,7 +231,7 @@ void AutoImplementer::redefine_inherited_constructors(Class *t) {
 	for (auto *pcc: t->parent->get_constructors()) {
 		auto c = t->get_same_func(Identifier::Func::INIT, pcc);
 		if (needs_new(c)) {
-			add_func_header(t, Identifier::Func::INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::NONE, pcc->default_parameters);
+			add_func_header(t, Identifier::Func::INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::MUTABLE, pcc->default_parameters);
 		}
 	}
 }
@@ -246,7 +245,7 @@ void AutoImplementer::add_full_constructor(Class *t) {
 			types.add(e.type);
 		}
 	}
-	auto f = add_func_header(t, Identifier::Func::INIT, TypeVoid, types, names);
+	auto f = add_func_header(t, Identifier::Func::INIT, TypeVoid, types, names, nullptr, Flags::MUTABLE);
 	flags_set(f->flags, Flags::__INIT_FILL_ALL_PARAMS);
 }
 

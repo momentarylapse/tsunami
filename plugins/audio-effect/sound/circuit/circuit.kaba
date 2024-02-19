@@ -138,9 +138,9 @@ class Diode extends Edge
 		i_low = I_sch(u_low) - u_low*g_low
 	func override param_names() -> string[]
 		return ["V_t", "ln(I_s)", "q"]
-	func const I_sch(u: float) -> float
+	func I_sch(u: float) -> float
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	func const I_id(u: float) -> float
+	func I_id(u: float) -> float
 		if u > u_high
 			return u*g_high + i_high
 		if u < u_low
@@ -189,7 +189,7 @@ class Circuit as @noauto
 		nodes.add(Node((0.2, 0.7)))
 	
 	func mut reset_state()
-		for e in edges
+		for mut e in edges
 			e.reset_state()
 	
 	func quick_out()
@@ -247,7 +247,7 @@ class Circuit as @noauto
 		for i in 0:n
 			nodes[i+1].phi = u[i]
 		# update edges
-		for e in edges
+		for mut e in edges
 			e.update(nodes, dt)
 	
 	func mut time_step(I_in: float, dt: float)
@@ -257,7 +257,7 @@ class Circuit as @noauto
 			optimizer_step(I_in, dt)
 		
 		# update edges
-		for e in edges
+		for mut e in edges
 			e.iterate(dt)
 	
 	func get_xxxx() -> float
@@ -343,7 +343,7 @@ class Circuit as @noauto
 			
 	func mut add_default(n: int[], t: EdgeType) -> Edge&
 		edges.add(_create_default(n, t))
-		return &(edges[len(edges)-1])
+		return &edges[len(edges)-1]
 
 func _main()
 	var c: Circuit

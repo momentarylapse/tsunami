@@ -23,13 +23,13 @@ extern const Class* TypeNone;
 
 void AutoImplementer::_add_missing_function_headers_for_shared(Class *t) {
 	auto t_xfer = tree->request_implicit_class_xfer(t->param[0], -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {});
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 	// do we really need this, or can we use auto cast xfer[X] -> shared[X]?!?
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t_xfer}, {"p"}, nullptr, Flags::STATIC);
 }
 
@@ -53,16 +53,16 @@ struct XX {
 void AutoImplementer::_add_missing_function_headers_for_owned(Class *t) {
 	[[maybe_unused]] auto t_p = tree->get_pointer(t->param[0]);
 	auto t_xfer = tree->request_implicit_class_xfer(t->param[0], -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 //	f->address_preprocess = mf(&XX::__del__);
 //	f->address = (int_p)f->address_preprocess;
-	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {});
+	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 	//f->address_preprocess = mf(&XX::__del__);
 	//f->address = (int_p)f->address_preprocess;
-	add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer, {}, {});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"});
+	add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
 	//auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 	//flags_set(assign->var.back()->flags, Flags::OUT);
 	//add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t->param[0]->get_pointer()}, {"p"}, nullptr, Flags::STATIC);

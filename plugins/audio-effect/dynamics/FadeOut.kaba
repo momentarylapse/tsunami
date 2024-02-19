@@ -7,6 +7,6 @@ class FadeOut extends AudioEffect
 	func override process(out buf: AudioBuffer)
 		for i in 0:len(buf)
 			var vol = 1 - float(i) / len(buf)
-			for c in buf.c
+			for mut c in buf.c
 				c[i] = c[i] * vol
 

@@ -95,6 +95,8 @@ string kind2str(NodeKind kind) {
 		return "tuple extract";
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return "constructor function";
+	if (kind == NodeKind::SLICE)
+		return "slice";
 	if (kind == NodeKind::VAR_TEMP)
 		return "temp";
 	if (kind == NodeKind::DEREF_VAR_TEMP)
@@ -150,6 +152,8 @@ string Node::signature(const Class *ns) const {
 		return as_func()->signature(ns);
 	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
 		return as_func()->signature(ns);
+	if (kind == NodeKind::SLICE)
+		return t;
 	if (kind == NodeKind::STATEMENT)
 		return as_statement()->name + t;
 	if (kind == NodeKind::CALL_SPECIAL_FUNCTION)
@@ -235,13 +239,14 @@ Node::~Node() {
 }
 
 bool Node::is_mutable() const {
-	return !flags_has(flags, Flags::CONST);
+	return flags_has(flags, Flags::MUTABLE);
 }
 
 void Node::set_mutable(bool _mutable) {
-	flags_clear(flags, Flags::CONST);
-	if (!_mutable)
-		flags_set(flags, Flags::CONST);
+	if (_mutable)
+		flags_set(flags, Flags::MUTABLE);
+	else
+		flags_clear(flags, Flags::MUTABLE);
 }
 
 bool Node::is_call() const {
@@ -359,7 +364,7 @@ shared<Node> Node::shallow_copy() const {
 }
 
 shared<Node> Node::ref(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, Flags::NONE, token_id);
+	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -432,7 +437,7 @@ shared<Node> add_node_constructor(const Function *f, int token_id) {
 }
 
 shared<Node> add_node_const(const Constant *c, int token_id) {
-	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), Flags::CONST, token_id);
+	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), Flags::NONE, token_id);
 }
 
 /*shared<Node> add_node_block(Block *b) {
@@ -455,7 +460,7 @@ shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id, 
 
 shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, const Class *type) {
 	auto *s = special_function_from_id(id);
-	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, Flags::CONST, token_id);
+	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, Flags::NONE, token_id);
 	return c;
 }
 
@@ -463,9 +468,9 @@ shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, 
 shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
 	if ((f->virtual_index >= 0) and !force_non_virtual) {
-		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
 	} else {
-		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(inst);
@@ -477,24 +482,24 @@ shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, in
 // non-member!
 shared<Node> add_node_call(const Function *f, int token_id) {
 	// FIXME: literal_return_type???
-	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST, token_id);
+	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
 		c->set_num_params(f->num_params);
 	return c;
 }
 
 shared<Node> add_node_func_name(const Function *f, int token_id) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, Flags::CONST, token_id);
+	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, Flags::NONE, token_id);
 }
 
 shared<Node> add_node_class(const Class *c, int token_id) {
-	return new Node(NodeKind::CLASS, (int_p)c, TypeClassRef, Flags::CONST, token_id);
+	return new Node(NodeKind::CLASS, (int_p)c, TypeClassRef, Flags::NONE, token_id);
 }
 
 
 shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
 	if (!override_type)
 		override_type = op->return_type;
-	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, Flags::CONST, token_id);
+	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, Flags::NONE, token_id);
 	if (op->abstract->is_binary()) {
 		cmd->set_num_params(2); // binary
 		cmd->set_param(0, p1);
@@ -543,6 +548,14 @@ shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class 
 	el->set_param(0, array);
 	el->set_param(1, index);
 	return el;
+}
+
+shared<Node> add_node_slice(shared<Node> start, shared<Node> end) {
+	auto n = new Node(NodeKind::SLICE, 0, TypeUnknown);
+	n->set_num_params(2);
+	n->set_param(0, start);
+	n->set_param(1, end);
+	return n;
 }
 
 shared<Node> make_constructor_static(shared<Node> n, const string &name) {

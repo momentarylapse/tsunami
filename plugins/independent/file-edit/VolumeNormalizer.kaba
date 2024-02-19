@@ -45,7 +45,7 @@ class VolumeChecker extends TsunamiPlugin
 		var f = func(answer: bool)
 			if answer
 				session.song.begin_action_group("set volume")
-				for t in session.song.tracks
+				for mut t in session.song.tracks
 					t.set_volume(t.volume / vol_max * 0.999)
 				session.song.end_action_group()
 			stop()

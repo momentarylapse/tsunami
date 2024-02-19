@@ -35,7 +35,7 @@ struct OscillatorConfig
 		decay = 0.4
 		release = 0.4
 		type = OsciType.SINE
-		for t in target
+		for mut t in target
 			t = false
 		target_out = false
 	func active() -> bool
@@ -54,14 +54,14 @@ class FMConfig extends Module.Config
 	#link: OscillatorLink[]
 	func override reset()
 		#link.clear()
-		for o in osc
+		for mut o in osc
 			o.reset()
 		osc[0].factor = 1
 		osc[0].amplitude = 0.5
 		osc[0].target_out = true
 	func mut clear_links()
-		for o in osc
-			for t in o.target
+		for mut o in osc
+			for mut t in o.target
 				t = false
 			o.target_out = false
 
@@ -135,7 +135,7 @@ Grid ? ''
 	func mut update_osci_pos()
 		# initial
 		p_out = vec2(40, 60)
-		for i=>p in p_osci
+		for mut i=>p in p_osci
 			var p_parent = vec2(1000, 1000)
 			if fc.osc[i].target_out
 				p_parent = p_out
@@ -447,12 +447,12 @@ class FMRenderer extends PitchRenderer
 	override synth: FMSynthesizer&
 
 	func override on_end()
-		for oi=>o in osc
+		for mut oi=>o in osc
 			o.env.end()
 
 	func override on_start(_volume: float)
 		num_osc_active = len(osc)
-		for o in osc
+		for mut o in osc
 			# TODO: volume should only effect "output" oscs
 			o.env.start(_volume * o.conf.amplitude)
 
@@ -473,7 +473,7 @@ class FMRenderer extends PitchRenderer
 	func override render(out buf: AudioBuffer) -> bool
 		for i in 0:len(buf)
 
-			for o in osc
+			for mut o in osc
 				o.volume = o.env.get()
 				if o.env.just_killed
 					num_osc_active --

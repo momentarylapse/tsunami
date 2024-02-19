@@ -7,10 +7,10 @@ func step(t: float) -> float
 
 class SoftPaste extends TsunamiPlugin
 	func soft_paste(source: AudioBuffer, out dest: TrackLayer, r: Range)
-		var l = min(len(source), len(r))
+		let l = min(len(source), len(r))
 		var buf: AudioBuffer
 		var a = dest.edit_buffers(buf, Range(r.offset, l))
-		var ll = min(2000, l/4)
+		let ll = min(2000, l/4)
 		for i in 0:l
 			var x: float = 1
 			if i < ll
@@ -30,7 +30,7 @@ class SoftPaste extends TsunamiPlugin
 		
 	
 	func override on_start()
-		if !check_clipboard()
+		if not check_clipboard()
 			session.e("'Soft Paste': needs a single audio track in clipboard!")
 			stop()
 			return
@@ -40,9 +40,9 @@ class SoftPaste extends TsunamiPlugin
 			return
 
 		var n = 0
-		for t in session.song.tracks
+		for mut t in session.song.tracks
 			if t.type == SignalType.AUDIO
-				for l in t.layers
+				for mut l in t.layers
 					if session.view.sel.has_layer(l)
 						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
 						n ++

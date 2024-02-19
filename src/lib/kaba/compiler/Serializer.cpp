@@ -685,8 +685,20 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			}
 			break;
 		case InlineID::CHUNK_NOT_EQUAL:
-			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
-			cmd.add_cmd(Asm::InstID::SETNZ, ret);
+			if (param[0].type->size > config.target.pointer_size) {
+				// chunk cmp
+				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
+				for (int k=0; k<param[0].type->size/4; k++) {
+					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt), param_shift(param[1], k*4, TypeInt));
+					cmd.add_cmd(Asm::InstID::SETNZ, ret);
+					if (k < param[0].type->size/4 - 1)
+						cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_cmp));
+				}
+				cmd.add_label(label_after_cmp);
+			} else {
+				cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
+				cmd.add_cmd(Asm::InstID::SETNZ, ret);
+			}
 			break;
 		case InlineID::PASSTHROUGH:
 			cmd.add_cmd(Asm::InstID::MOV, ret, param[0]);

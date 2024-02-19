@@ -36,7 +36,7 @@ static const string LIB_LINK_PREFIX = "/";
 
 string decode_symbol_name(const string &_name) {
 	string name = _name.replace("lib__", "");
-	return name.replace("@list", "[]").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
+	return name.replace("@list", "[]").replace("@optional", "?").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
 }
 
 string class_link_name(const Class *c) {

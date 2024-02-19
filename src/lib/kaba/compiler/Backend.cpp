@@ -83,7 +83,7 @@ Asm::RegID Backend::reg_resize(Asm::RegID reg, int size) {
 
 Asm::RegID Backend::get_reg(Asm::RegRoot root, int size) {
 #if 1
-	if ((size != 1) and (size != 4) and (size != 8)) {
+	if ((size != 1) and (size != 2) and (size != 4) and (size != 8)) {
 		msg_write(msg_get_trace());
 		throw Asm::Exception("get_reg: bad reg size: " + i2s(size), "...", 0, 0);
 	}

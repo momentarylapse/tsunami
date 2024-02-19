@@ -30,6 +30,19 @@ bool type_match_up(const Class *given, const Class *wanted);
 
 const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const Class*> &classes, int token_id);
 
+string type_list_to_str(const Array<const Class*> &tt) {
+	string s;
+	for (auto *t: tt) {
+		if (s.num > 0)
+			s += ", ";
+		if (t)
+			s += t->long_name();
+		else
+			s += "<nil>";
+	}
+	return s;
+}
+
 
 shared<Node> __digest_type(SyntaxTree *tree, shared<Node> n) {
 	if (!is_type_tuple(n))
@@ -440,6 +453,10 @@ shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *bl
 	}
 
 	base = deref_if_reference(base);
+
+	if (base->type->is_some_pointer() and !base->type->is_some_pointer_not_null())
+		do_error("can not implicitly dereference a pointer that can be null. Use '!' or 'for . in .'", node);
+
 	auto links = tree->get_element_of(base, el, token_id);
 	if (links.num > 0)
 		return links;
@@ -451,9 +468,6 @@ shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *bl
 shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, const Class *ns) {
 	auto operand = concretify_node(node->params[0], block, ns);
 	auto index = concretify_node(node->params[1], block, ns);
-	shared<Node> index2;
-	if (node->params.num >= 3)
-		index2 = concretify_node(node->params[2], block, ns);
 
 	if (operand->kind == NodeKind::CLASS) {
 		if (index->kind == NodeKind::CLASS) {
@@ -479,24 +493,31 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		int array_size = index->as_const()->as_int();
 		auto t = tree->request_implicit_class_array(operand->as_class(), array_size, operand->token_id);
 		return add_node_class(t);
-
 	}
 
 	// min[float]()
 	if (operand->kind == NodeKind::FUNCTION) {
 		auto links = concretify_node_multi(node->params[0], block, ns);
-		if (index->kind != NodeKind::CLASS)
+		Array<const Class*> tt;
+		if (index->kind == NodeKind::TUPLE and index->params.num == 2) {
+			if (index->params[0]->kind != NodeKind::CLASS or index->params[1]->kind != NodeKind::CLASS)
+				do_error("functions can only be indexed by a type", index);
+			tt.add(index->params[0]->as_class());
+			tt.add(index->params[1]->as_class());
+		} else if (index->kind == NodeKind::CLASS) {
+			tt.add(index->as_class());
+		} else {
 			do_error("functions can only be indexed by a type", index);
-		auto t = index->as_class();
+		}
 		for (auto l: weak(links)) {
 			auto f = l->as_func();
-			if (auto ff = context->template_manager->request_instance(tree, f, {t}, block, ns, node->token_id)) {
+			if (auto ff = context->template_manager->request_instance(tree, f, tt, block, ns, node->token_id)) {
 				auto tf = add_node_func_name(ff);
 				tf->params = l->params; // in case we have a member instance
 				return tf;
 			}
 		}
-		do_error(format("function has no version [%s]", t->name), index);
+		do_error(format("function has no version [%s]", type_list_to_str(tt)), index);
 	}
 
 	operand = force_concrete_type(operand);
@@ -509,16 +530,17 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 
 
 	// __subarray__() ?
-	if (index2) {
-		auto *cf = operand->type->get_member_func(Identifier::Func::SUBARRAY, operand->type, {index->type, index->type});
-		if (cf) {
+	if (index->kind == NodeKind::SLICE) {
+		auto t1 = index->params[0]->type;
+		auto t2 = index->params[1]->type;
+		if (auto *cf = operand->type->get_member_func(Identifier::Func::SUBARRAY, operand->type, {t1, t2})) {
 			auto f = add_node_member_call(cf, operand, operand->token_id);
 			f->set_mutable(operand->is_mutable());
-			f->set_param(1, index);
-			f->set_param(2, index2);
+			f->set_param(1, index->params[0]);
+			f->set_param(2, index->params[1]);
 			return f;
 		} else {
-			do_error(format("function '%s.%s(int,int) -> %s' required by '[a:b]' missing", operand->type->name, Identifier::Func::SUBARRAY, operand->type->name), index);
+			do_error(format("function '%s.%s(%s,%s) -> %s' required by '[a:b]' not found", operand->type->name, Identifier::Func::SUBARRAY, t1->long_name(), t2->long_name(), operand->type->name), index);
 		}
 	}
 
@@ -539,8 +561,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 	}
 
 	// __get__() ?
-	auto *cf = operand->type->get_get(index->type);
-	if (cf) {
+	if (auto *cf = operand->type->get_get(index->type)) {
 		auto f = add_node_member_call(cf, operand, operand->token_id);
 		f->set_mutable(operand->is_mutable());
 		f->set_param(1, index);
@@ -842,8 +863,12 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	auto var_name = node->params[0]->as_token();
 	auto var_type = tree->request_implicit_class_alias(container->type->get_array_element(), node->params[0]->token_id);
 	auto var = block->add_var(var_name, var_type);
-	if (!container->is_mutable())
-		flags_set(var->flags, Flags::CONST);
+	if (node->is_mutable()) {
+		if (!container->is_mutable())
+			do_error("can not iterate mutating over a constant container", node);
+	} else {
+		flags_clear(var->flags, Flags::MUTABLE);
+	}
 	node->set_param(0, add_node_local(var));
 
 	string index_name = format("-for_index_%d-", for_index_count ++);
@@ -869,7 +894,7 @@ shared<Node> Concretifier::concretify_statement_for_dict(shared<Node> node, shar
 	auto key_type = tree->request_implicit_class_alias(TypeString, node->params[0]->token_id);
 	auto var = block->add_var(var_name, var_type);
 	if (!container->is_mutable())
-		flags_set(var->flags, Flags::CONST);
+		flags_clear(var->flags, Flags::MUTABLE);
 	node->set_param(0, add_node_local(var));
 
 	string key_name = format("-for_key_%d-", for_index_count ++);
@@ -1402,8 +1427,11 @@ shared<Node> Concretifier::concretify_operator(shared<Node> node, Block *block, 
 const Class *type_ownify_xfer(SyntaxTree *tree, const Class *t) {
 	if (t->is_pointer_xfer_not_null())
 		return tree->request_implicit_class_owned_not_null(t->param[0], -1);
-	if (t->is_list())
-		return tree->request_implicit_class_list(type_ownify_xfer(tree, t->param[0]), -1);
+	if (t->is_list()) {
+		auto tt = type_ownify_xfer(tree, t->param[0]);
+		if (tt != t->param[0])
+			return tree->request_implicit_class_list(tt, -1);
+	}
 	return t;
 }
 
@@ -1440,7 +1468,7 @@ shared<Node> Concretifier::concretify_block(shared<Node> node, Block *block, con
 
 shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *block, const Class *ns) {
 	// [TYPE?, VAR, =[VAR,EXPR]]
-	bool as_const = (node->link_no == 1);
+	bool as_mutable = node->is_mutable();
 
 	// type?
 	const Class *type = nullptr;
@@ -1493,9 +1521,9 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 			node = concretify_node(node->params[2], block, ns);
 		}
 	}
-	if (as_const)
+	if (!as_mutable)
 		for (auto v: vars)
-			flags_set(v->flags, Flags::CONST);
+			flags_clear(v->flags, Flags::MUTABLE);
 	return node;
 }
 
@@ -1590,6 +1618,7 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		concretify_all_params(node, block, ns);
 		auto sub = node->params[0];
 		node->type = tree->request_implicit_class_reference(sub->type, node->token_id);
+		node->set_mutable(sub->is_mutable());
 	} else if (node->kind == NodeKind::ABSTRACT_CALL) {
 		return concretify_call(node, block, ns);
 	} else if (node->kind == NodeKind::ARRAY) {
@@ -1680,6 +1709,10 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 	} else if (node->kind == NodeKind::CALL_FUNCTION) {
 		concretify_all_params(node, block, ns);
 		node->type = node->as_func()->literal_return_type;
+	} else if (node->kind == NodeKind::SLICE) {
+		concretify_all_params(node, block, ns);
+		node->type = TypeVoid;
+		return node;
 	} else if (node->kind == NodeKind::DEFINITELY) {
 		concretify_all_params(node, block, ns);
 		auto sub = node->params[0];
@@ -1887,10 +1920,10 @@ shared<Node> Concretifier::make_func_pointer_node_callable(const shared<Node> l)
 
 	shared<Node> c;
 	if (f->virtual_index >= 0) {
-		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::CONST);
+		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type);
 	} else {
 		do_error("function pointer call should be virtual???", l);
-		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::CONST);
+		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type);
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(l->deref());
@@ -2056,19 +2089,6 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 	return n;
 }
 
-string type_list_to_str(const Array<const Class*> &tt) {
-	string s;
-	for (auto *t: tt) {
-		if (s.num > 0)
-			s += ", ";
-		if (t)
-			s += t->long_name();
-		else
-			s += "<nil>";
-	}
-	return "(" + s + ")";
-}
-
 shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &_params) {
 	//force_concrete_types(params);
 	// no, keep params FLEXIBLE
@@ -2126,7 +2146,7 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 		//available += format("\n * %s for %s", type_list_to_str(p), link->sig(tree->base_class));
 		available += format("\n * %s", link->signature(tree->base_class));
 	}
-	do_error(format("invalid function parameters: %s given, possible options:%s", found, available), links[0]);
+	do_error(format("invalid function parameters: (%s) given, possible options:%s", found, available), links[0]);
 	return shared<Node>();
 }
 
@@ -2201,7 +2221,7 @@ shared<Node> Concretifier::try_build_pipe_map_array(const shared<Node> &input, N
 	string viname = format("<map-index-%d>", map_counter);
 	string vname = format("<map-var-%d>", map_counter++);
 	auto var = block->add_var(vname, tree->request_implicit_class_reference(el_type, token_id));
-	flags_set(var->flags, Flags::CONST);
+	flags_clear(var->flags, Flags::MUTABLE);
 	n_for->set_param(0, add_node_local(var));
 	auto index = block->add_var(viname, TypeInt);
 	n_for->set_param(1, add_node_local(index));

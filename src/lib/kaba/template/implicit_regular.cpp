@@ -27,14 +27,14 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			}
 			if (t->get_constructors().num == 0) {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
 				if (class_can_fully_construct(t))
 					add_full_constructor(t);
 			}
 			if (needs_new(t->get_destructor()))
-				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor());
+				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor(), Flags::MUTABLE);
 			if (needs_new(t->get_assign()))
-				add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
+				add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign(), Flags::MUTABLE);
 
 		}
 		if (t->get_assign() and t->can_memcpy()) {
@@ -49,7 +49,7 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			if (has_user_constructors(t)) {
 			} else {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
 				/*if (!flags_has(t->flags, Flags::NOAUTO))
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
@@ -66,13 +66,13 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			}
 			if (t->get_constructors().num == 0) {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor());
+					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
 				/*if (!flags_has(t->flags, Flags::NOAUTO))
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
 			}
 			if (needs_new(t->get_destructor()))
-				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor());
+				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor(), Flags::MUTABLE);
 		}
 
 		/*if (!flags_has(t->flags, Flags::NOAUTO) and needs_new(t->get_assign())) {

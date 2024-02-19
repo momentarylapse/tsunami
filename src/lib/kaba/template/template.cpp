@@ -17,6 +17,8 @@
 
 namespace kaba {
 
+string type_list_to_str(const Array<const Class*> &params);
+
 TemplateManager::TemplateManager(Context *c) {
 	context = c;
 	implicit_class_registry = new ImplicitClassRegistry(c);
@@ -252,7 +254,7 @@ Function *TemplateManager::instantiate(SyntaxTree *tree, FunctionTemplate &t, co
 		msg_write("INSTANTIATE TEMPLATE");
 	Function *f0 = t.func;
 	auto f = full_copy(tree, f0);
-	f->name += format("[%s]", params[0]->long_name());
+	f->name += format("[%s]", type_list_to_str(params));
 
 	// replace in parameters/return type
 	for (int i=0; i<f->num_params; i++) {

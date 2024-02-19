@@ -42,9 +42,9 @@ func unclick(out b: float[], out l: TrackLayer, offset: int)
 class FindClicks extends TsunamiPlugin
 
 	func override on_start()
-		for t in session.song.tracks
-			for l in t.layers
-				for buf in l.buffers
-					for c in buf.c
+		for mut t in session.song.tracks
+			for mut l in t.layers
+				for mut buf in l.buffers
+					for mut c in buf.c
 						unclick(c, l, buf.offset)
 		stop()

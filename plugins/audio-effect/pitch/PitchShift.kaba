@@ -55,7 +55,7 @@ class PitchShift extends AudioEffect
 		b /= N
 
 	func mut process_chunk(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			shift_buf(c, config.factor)
 			
 		let other = 1 - prev_no

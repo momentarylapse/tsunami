@@ -13,6 +13,6 @@ class FlipFlopSource extends AudioSource
 	var config: Config
 
 	func override read(out buf: AudioBuffer) -> int
-		for c in buf.c
+		for mut c in buf.c
 			c = config.level
 		return len(buf)

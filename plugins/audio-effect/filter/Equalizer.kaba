@@ -83,7 +83,7 @@ class Equalizer extends AudioEffect
 			p.create_filter(filter[stage], session.sample_rate())
 	
 	func override reset_state()
-		for f in filter
+		for mut f in filter
 			f.reset()
 
 	func override process(out buf: AudioBuffer)
@@ -91,7 +91,7 @@ class Equalizer extends AudioEffect
 		buf.scale(db_to_factor(config.gain))
 		
 		# eq
-		for f in filter
+		for mut f in filter
 			f.apply(buf)
 		
 		# visualization

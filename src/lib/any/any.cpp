@@ -531,6 +531,28 @@ void Any::operator += (const Any &a) {
 		throw Exception(format("%s += %s not allowed", type_name(type), type_name(a.type)));
 }
 
+bool Any::operator == (const Any& a) const {
+	if (type != a.type)
+		return false;
+	if (is_int())
+		return as_int() == a.as_int();
+	if (is_float())
+		return as_float() == a.as_float();
+	if (is_bool())
+		return as_bool() == a.as_bool();
+	if (is_string())
+		return as_string() == a.as_string();
+	if (is_array())
+		return as_array() == a.as_array();
+	if (is_map())
+		return false;//as_map() == a.as_map();
+	return false;
+}
+
+bool Any::operator != (const Any& a) const {
+	return !(*this == a);
+}
+
 void Any::add(const Any &a) {
 	if (parent) {
 		parent->add(a);

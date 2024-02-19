@@ -1,4 +1,5 @@
 use tsunami.*
+use helper.draw.*
 use hui
 
 let TYPE_PITCH = [36, 38, 42, 43, 44, 45, 46, 47]
@@ -45,6 +46,7 @@ class SequencerPanel extends ConfigPanel
 	var width = 0
 	var height = 0
 	var sr_id = -1
+	var current_pos = -1
 	
 	func __init__(_seq: Sequencer)
 		super.__init__(_seq)
@@ -87,13 +89,21 @@ class SequencerPanel extends ConfigPanel
 		
 		let w = float(width) / 16.0
 		let h = float(height) / NUM_TYPES
+		let b = w * 0.1
 		for n in c.config.pattern.notes
-			p.set_color(colors.text)
-			p.draw_rect([w * n.pos, w * (n.pos + 1), height - h * n.type, height - h * (n.type + 1)])
+			let c0 = cool_color(n.type)
+			
+			if n.pos == current_pos
+				p.set_color(c0)
+			else
+				p.set_color(color.interpolate(c0, colors.text_soft2, 0.8))
+			p.draw_rect([w * n.pos + b, w * (n.pos + 1) - b, height - h * (n.type + 1) + b, height - h * n.type - b])
 			
 		for s in c.output.samples_played()
 			let total = c.config.total_samples()
-			let x = float(int(s) % total) / total * width
+			let rel = float(int(s) % total) / total
+			let x = rel * width
+			current_pos = int(rel * 16.0)
 			p.set_color(color.GREEN)
 			p.draw_line([x, 0], [x, height])
 		

@@ -63,7 +63,7 @@ class Folding extends AudioEffect
 		buf_overlap.set_channels(buf.channels)
 		
 		# apply
-		for i=>c in buf.c
+		for mut i=>c in buf.c
 			do(c, buf_overlap.c[i])
 	
 	func override reset_state()

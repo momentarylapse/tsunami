@@ -14,9 +14,9 @@ class Distortion extends AudioEffect
 
 
 	func override process(out buf: AudioBuffer)
-		var a = max(10000 * pow(config.gain, 2), 0.01)
-		var b = 1 / atan(a)
+		let a = max(10000 * pow(config.gain, 2), 0.01)
+		let b = 1 / atan(a)
 	
-		for c in buf.c
-			for x in c
+		for mut c in buf.c
+			for mut x in c
 				x = b * atan(x * a)

@@ -64,7 +64,7 @@ class TellHarmony extends TsunamiPlugin
 		
 #		p.set_color(color.RED)
 		var harm = track_harmony(v.layer.midi)#midi)
-		for i=>h in harm
+		for mut i=>h in harm
 			h.calc()
 			var c = colors.pitch_color(h.chord.base_tone)
 			c.a = 0.15

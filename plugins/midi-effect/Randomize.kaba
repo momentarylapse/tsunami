@@ -20,7 +20,7 @@ class Randomize extends MidiEffect
 	func override process(out midi: MidiEventBuffer)
 		let delay = session.sample_rate() * config.TimeDelay
 		let variation = session.sample_rate() * config.TimeVariation
-		for e in midi
+		for mut e in midi
 			if e.volume > 0
 				let dt = int(rand(variation*2) - variation + delay)
 				e.pos += dt

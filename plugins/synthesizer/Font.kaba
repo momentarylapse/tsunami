@@ -29,8 +29,8 @@ struct MidiFont
 		var ii: string[]
 		for s in song
 			for t in s.tracks
-					if t.type == SignalType.MIDI
-						ii.add(t.name)
+				if t.type == SignalType.MIDI
+					ii.add(t.name)
 		return ii
 	
 	func mut get_synth(session: Session, name: string) -> xfer[Synthesizer]
@@ -63,7 +63,7 @@ class FontList as @noauto
 		return list
 		
 	func mut instruments(session: Session, name: string) -> string[]
-		for f in fonts
+		for mut f in fonts
 			if f.name == name
 				return f.instruments(session)
 		return []

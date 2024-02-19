@@ -37,12 +37,12 @@ void SIAddPackageDoc(Context *c) {
 
 
 	add_class(TypePdfParser);
-		class_add_func(Identifier::Func::INIT, TypeVoid, pdf_p(&pdf::Parser::__init__));
-		class_add_func(Identifier::Func::DELETE, TypeVoid, pdf_p(&pdf::Parser::__delete__));
-		class_add_func("set_page_size", TypeVoid, pdf_p(&pdf::Parser::add_page));
+		class_add_func(Identifier::Func::INIT, TypeVoid, pdf_p(&pdf::Parser::__init__), Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, pdf_p(&pdf::Parser::__delete__), Flags::MUTABLE);
+		class_add_func("set_page_size", TypeVoid, pdf_p(&pdf::Parser::set_page_size), Flags::MUTABLE);
 			func_add_param("width", TypeFloat32);
 			func_add_param("height", TypeFloat32);
-		class_add_func("add_page", TypeBasePainterXfer, pdf_p(&pdf::Parser::add_page));
+		class_add_func("add_page", TypeBasePainterXfer, pdf_p(&pdf::Parser::add_page), Flags::MUTABLE);
 		class_add_func("save", TypeVoid, pdf_p(&pdf::Parser::save));
 			func_add_param("filename", TypePath);
 

@@ -22,12 +22,12 @@ class Tremolo extends AudioEffect
 	
 		var f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
-		for i=>bb in b
+		for mut i=>bb in b
 			var f = 1 - (1 + cos(i * f_c)) * config.depth * 0.5
 	
 			# old value
 			bb *= f
 	
 	func override process(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			apply(c)

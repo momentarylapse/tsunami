@@ -586,18 +586,18 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			//f->flags = orig->flags;
 			// don't copy __INIT_FILL_ALL_PARAMS etc...
 			// better copy one-by-one for now
-			if (flags_has(orig->flags, Flags::CONST))
-				flags_set(f->flags, Flags::CONST);
+			if (flags_has(orig->flags, Flags::MUTABLE))
+				flags_set(f->flags, Flags::MUTABLE);
 			else
-				flags_clear(f->flags, Flags::CONST);
+				flags_clear(f->flags, Flags::MUTABLE);
 			if (flags_has(orig->flags, Flags::REF))
 				flags_set(f->flags, Flags::REF);
 
 			if (auto self = f->__get_var(Identifier::SELF)) {
-				if (flags_has(f->flags, Flags::CONST))
-					flags_set(self->flags, Flags::CONST);
+				if (flags_has(f->flags, Flags::MUTABLE))
+					flags_set(self->flags, Flags::MUTABLE);
 				else
-					flags_clear(self->flags, Flags::CONST);
+					flags_clear(self->flags, Flags::MUTABLE);
 			}
 			functions[orig_index] = f;
 		} else {

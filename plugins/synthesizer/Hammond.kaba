@@ -20,7 +20,7 @@ class HammondConfig extends Module.Config
 	var release: float
 	var key_stutter: float
 	func override reset()
-		for i in intensity
+		for mut i in intensity
 			i = 0
 		intensity[0] = 0.2
 		intensity[1] = 0.3
@@ -118,9 +118,9 @@ class HammondRenderer extends PitchRenderer
 	var filter: BiquadFilter
 	var override synth: HammondSynthesizer&
 	func override __init__(s: Synthesizer, pitch: int)
-		for x in phi
+		for mut x in phi
 			x = 0
-		for i=>a in A
+		for mut i=>a in A
 			a = RA(1000) / RA(pitch_to_freq(pitch) * HARMONIC_FREQS[i])
 			
 		#print(str(A))
@@ -152,7 +152,7 @@ class HammondRenderer extends PitchRenderer
 			volume = env.get()
 
 			var d: float = 0
-			for j=>x in phi
+			for mut j=>x in phi
 				d += sin(x * HARMONIC_FREQS[j]) * synth.config.intensity[j] * A[j]
 				
 				x += delta_phi

@@ -393,7 +393,7 @@ void SIAddPackageVulkan(Context *c) {
 
 
 	add_class(TypeInstance);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanInstance::__delete__));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanInstance::__delete__), Flags::MUTABLE);
 
 
 	add_class(TypeDevice);
@@ -401,7 +401,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("present_queue", TypeQueue, vul_p(&vulkan::Device::present_queue));
 		class_add_element("compute_queue", TypeQueue, vul_p(&vulkan::Device::compute_queue));
 		class_add_element("command_pool", TypeCommandPoolP, vul_p(&vulkan::Device::command_pool));
-		class_add_func("wait_idle", TypeVoid, vul_p(&vulkan::Device::wait_idle));
+		class_add_func("wait_idle", TypeVoid, vul_p(&vulkan::Device::wait_idle), Flags::MUTABLE);
 		class_add_func("create_simple", TypeDeviceXfer, vul_p(&__vulkan_device_create_simple), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("instance", TypeInstanceP);
 			func_add_param("win", TypePointer);
@@ -411,14 +411,14 @@ void SIAddPackageVulkan(Context *c) {
 	add_class(TypeVertexBuffer);
 		class_add_element("vertex", TypeBuffer, vul_p(&vulkan::VertexBuffer::vertex_buffer));
 		class_add_element("index", TypeBuffer, vul_p(&vulkan::VertexBuffer::index_buffer));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanVertexBuffer::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanVertexBuffer::__init__), Flags::MUTABLE);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanVertexBuffer::__delete__));
-		class_add_func("update", TypeVoid, vul_p(&vulkan::VertexBuffer::update));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanVertexBuffer::__delete__), Flags::MUTABLE);
+		class_add_func("update", TypeVoid, vul_p(&vulkan::VertexBuffer::update), Flags::MUTABLE);
 			func_add_param("vertices", TypeDynamicArray);
-		class_add_func("update_index", TypeVoid, vul_p(&vulkan::VertexBuffer::update_index));
+		class_add_func("update_index", TypeVoid, vul_p(&vulkan::VertexBuffer::update_index), Flags::MUTABLE);
 			func_add_param("indices", TypeIntList);
-		class_add_func("create_quad", TypeVoid, vul_p(&vulkan::VertexBuffer::create_quad));
+		class_add_func("create_quad", TypeVoid, vul_p(&vulkan::VertexBuffer::create_quad), Flags::MUTABLE);
 			func_add_param("dest", TypeRect);
 			func_add_param("source", TypeRect);
 
@@ -430,15 +430,15 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("height", TypeInt, vul_p(&vulkan::Texture::height));
 		class_add_element("view", TypePointer, vul_p(&vulkan::Texture::view));
 		//class_add_element("format", TypeInt, vul_p(&vulkan::Texture::format));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanTexture::__init__));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanTexture::__init_ext__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanTexture::__init__), Flags::MUTABLE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanTexture::__init_ext__), Flags::MUTABLE);
 			func_add_param("w", TypeInt);
 			func_add_param("h", TypeInt);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanTexture::__delete__));
-		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::write));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanTexture::__delete__), Flags::MUTABLE);
+		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::write), Flags::MUTABLE);
 			func_add_param("image", TypeImage);
-		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::writex));
+		class_add_func("write", TypeVoid, vul_p(&vulkan::Texture::writex), Flags::MUTABLE);
 			func_add_param("data", TypeReference);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
@@ -450,7 +450,7 @@ void SIAddPackageVulkan(Context *c) {
 
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanVolumeTexture::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanVolumeTexture::__init__), Flags::MUTABLE);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
@@ -459,14 +459,14 @@ void SIAddPackageVulkan(Context *c) {
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanCubeMap::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanCubeMap::__init__), Flags::MUTABLE);
 			func_add_param("size", TypeInt);
 			func_add_param("format", TypeString);
 
 
 	add_class(TypeStorageTexture);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanStorageTexture::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanStorageTexture::__init__), Flags::MUTABLE);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
@@ -475,132 +475,132 @@ void SIAddPackageVulkan(Context *c) {
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanDepthBuffer::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanDepthBuffer::__init__), Flags::MUTABLE);
 			func_add_param("w", TypeInt);
 			func_add_param("h", TypeInt);
 			func_add_param("format", TypeString);
 			func_add_param("with_sampler", TypeBool);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanTexture::__delete__), Flags::OVERRIDE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanTexture::__delete__), Flags::OVERRIDE | Flags::MUTABLE);
 
 
 	add_class(TypeFrameBuffer);
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, vul_p(&vulkan::FrameBuffer::_pointer_ref_counter));
 		class_add_element("width", TypeInt, vul_p(&vulkan::FrameBuffer::width));
 		class_add_element("height", TypeInt, vul_p(&vulkan::FrameBuffer::height));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanFrameBuffer::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanFrameBuffer::__init__), Flags::MUTABLE);
 			func_add_param("rp", TypeRenderPassP);
 			func_add_param("attachments", TypeTextureSharedNNList);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanFrameBuffer::__delete__));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanFrameBuffer::__delete__), Flags::MUTABLE);
 
 
 	add_class(TypeShader);
 		class_add_element(Identifier::SHARED_COUNT, TypeInt, vul_p(&vulkan::Shader::_pointer_ref_counter));
 		//class_add_element("descr_layout", TypePointerList, vul_p(&vulkan::Shader::descr_layouts));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanShader::__init__));
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanShader::__delete__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanShader::__init__), Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanShader::__delete__), Flags::MUTABLE);
 		class_add_func("load", TypeShaderXfer, vul_p(&__vulkan_load_shader), Flags::STATIC);
 			func_add_param("filename", TypePath);
 
 
 	add_class(TypeUniformBuffer);
 		class_derive_from(TypeBuffer);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanUniformBuffer::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanUniformBuffer::__init__), Flags::MUTABLE);
 			func_add_param("size", TypeInt);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanUniformBuffer::__delete__));
-		class_add_func("update", TypeVoid, vul_p(&vulkan::UniformBuffer::update));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanUniformBuffer::__delete__), Flags::MUTABLE);
+		class_add_func("update", TypeVoid, vul_p(&vulkan::UniformBuffer::update), Flags::MUTABLE);
 			func_add_param("source", TypeReference);
 
 
 	add_class(TypeDescriptorPool);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanDescriptorPool::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanDescriptorPool::__init__), Flags::MUTABLE);
 			func_add_param("s", TypeString);
 			func_add_param("max_sets", TypeInt);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanDescriptorPool::__delete__));
-		class_add_func("create_set", TypeDescriptorSetXfer, vul_p(&vulkan::DescriptorPool::_create_set_str), Flags::CONST);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanDescriptorPool::__delete__), Flags::MUTABLE);
+		class_add_func("create_set", TypeDescriptorSetXfer, vul_p(&vulkan::DescriptorPool::_create_set_str));
 			func_add_param("bindings", TypeString);
 
 
 	add_class(TypeDescriptorSet);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanDescriptorSet::__delete__));
-		class_add_func("update", TypeVoid, vul_p(&vulkan::DescriptorSet::update));
-		class_add_func("set_texture", TypeVoid, vul_p(&vulkan::DescriptorSet::set_texture));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanDescriptorSet::__delete__), Flags::MUTABLE);
+		class_add_func("update", TypeVoid, vul_p(&vulkan::DescriptorSet::update), Flags::MUTABLE);
+		class_add_func("set_texture", TypeVoid, vul_p(&vulkan::DescriptorSet::set_texture), Flags::MUTABLE);
 			func_add_param("binding", TypeInt);
 			func_add_param("tex", TypeTextureP);
-		class_add_func("set_storage_image", TypeVoid, vul_p(&vulkan::DescriptorSet::set_storage_image));
+		class_add_func("set_storage_image", TypeVoid, vul_p(&vulkan::DescriptorSet::set_storage_image), Flags::MUTABLE);
 			func_add_param("binding", TypeInt);
 			func_add_param("tex", TypeTextureP);
-		class_add_func("set_buffer", TypeVoid, vul_p(&vulkan::DescriptorSet::set_buffer));
+		class_add_func("set_buffer", TypeVoid, vul_p(&vulkan::DescriptorSet::set_buffer), Flags::MUTABLE);
 			func_add_param("binding", TypeInt);
 			func_add_param("buf", TypeBufferP);
-		class_add_func("set_acceleration_structure", TypeVoid, vul_p(&vulkan::DescriptorSet::set_acceleration_structure));
+		class_add_func("set_acceleration_structure", TypeVoid, vul_p(&vulkan::DescriptorSet::set_acceleration_structure), Flags::MUTABLE);
 			func_add_param("binding", TypeInt);
 			func_add_param("as", TypeAccelerationStructureP);
 
 
 	add_class(TypeGraphicsPipeline);
 		class_derive_from(TypePipeline);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanGraphicsPipeline::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanGraphicsPipeline::__init__), Flags::MUTABLE);
 			func_add_param("shader", TypeShaderP);
 			func_add_param("pass", TypeRenderPassP);
 			func_add_param("subpass", TypeInt);
 			func_add_param("topology", TypeString);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanGraphicsPipeline::__delete__));
-		class_add_func("set_wireframe", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_wireframe));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanGraphicsPipeline::__delete__), Flags::MUTABLE);
+		class_add_func("set_wireframe", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_wireframe), Flags::MUTABLE);
 			func_add_param("w", TypeBool);
-		class_add_func("set_line_width", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_line_width));
+		class_add_func("set_line_width", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_line_width), Flags::MUTABLE);
 			func_add_param("w", TypeFloat32);
 #ifdef KABA_EXPORT_VULKAN
 		void (vulkan::GraphicsPipeline::*mpf)(float) = &vulkan::GraphicsPipeline::set_blend;
-		class_add_func("set_blend", TypeVoid, vul_p(mpf));
+		class_add_func("set_blend", TypeVoid, vul_p(mpf), Flags::MUTABLE);
 #else
-		class_add_func("set_blend", TypeVoid, nullptr);
+		class_add_func("set_blend", TypeVoid, nullptr, Flags::MUTABLE);
 #endif
 			func_add_param("alpha", TypeFloat32);
 #ifdef KABA_EXPORT_VULKAN
 		void (vulkan::GraphicsPipeline::*mpf2)(vulkan::Alpha, vulkan::Alpha) = &vulkan::GraphicsPipeline::set_blend;
-		class_add_func("set_blend", TypeVoid, vul_p(mpf2));
+		class_add_func("set_blend", TypeVoid, vul_p(mpf2), Flags::MUTABLE);
 #else
-		class_add_func("set_blend", TypeVoid, nullptr);
+		class_add_func("set_blend", TypeVoid, nullptr, Flags::MUTABLE);
 #endif
 			func_add_param("src", TypeInt);
 			func_add_param("dst", TypeInt);
-		class_add_func("set_z", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_z));
+		class_add_func("set_z", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_z), Flags::MUTABLE);
 			func_add_param("test", TypeBool);
 			func_add_param("write", TypeBool);
-		class_add_func("set_dynamic", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_dynamic));
+		class_add_func("set_dynamic", TypeVoid, vul_p(&vulkan::GraphicsPipeline::set_dynamic), Flags::MUTABLE);
 			func_add_param("mode", TypeIntList);
-		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::GraphicsPipeline::rebuild));
+		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::GraphicsPipeline::rebuild), Flags::MUTABLE);
 
 
 	add_class(TypeComputePipeline);
 		class_derive_from(TypePipeline);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanComputePipeline::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanComputePipeline::__init__), Flags::MUTABLE);
 			func_add_param("layout", TypeString);
 			func_add_param("shader", TypeShaderP);
 
 
 	add_class(TypeRayPipeline);
 		class_derive_from(TypePipeline);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanRayPipeline::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanRayPipeline::__init__), Flags::MUTABLE);
 			func_add_param("layout", TypeString);
 			func_add_param("shader", TypeShaderPList);
 			func_add_param("recursion_depth", TypeInt);
-		class_add_func("create_sbt", TypeVoid, vul_p(&vulkan::RayPipeline::create_sbt));
+		class_add_func("create_sbt", TypeVoid, vul_p(&vulkan::RayPipeline::create_sbt), Flags::MUTABLE);
 
 
 	add_class(TypeRenderPass);
-		class_add_element("clear_color", TypeColorList, vul_p(&vulkan::RenderPass::clear_color));
-		class_add_element("clear_z", TypeFloat32, vul_p(&vulkan::RenderPass::clear_z));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanRenderPass::__init__));
+		class_add_element("clear_color", TypeColorList, vul_p(&vulkan::RenderPass::clear_color), Flags::MUTABLE);
+		class_add_element("clear_z", TypeFloat32, vul_p(&vulkan::RenderPass::clear_z), Flags::MUTABLE);
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanRenderPass::__init__), Flags::MUTABLE);
 			func_add_param("formats", TypeStringList);
 			func_add_param("options", TypeStringList);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanRenderPass::__delete__));
-		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::RenderPass::rebuild));
-		class_add_func("add_subpass", TypeVoid, vul_p(&vulkan::RenderPass::add_subpass));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanRenderPass::__delete__), Flags::MUTABLE);
+		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::RenderPass::rebuild), Flags::MUTABLE);
+		class_add_func("add_subpass", TypeVoid, vul_p(&vulkan::RenderPass::add_subpass), Flags::MUTABLE);
 			func_add_param("color_att", TypeIntList);
 			func_add_param("depth_att", TypeInt);
-		class_add_func("add_dependency", TypeVoid, vul_p(&vulkan::RenderPass::add_dependency));
+		class_add_func("add_dependency", TypeVoid, vul_p(&vulkan::RenderPass::add_dependency), Flags::MUTABLE);
 			func_add_param("src", TypeInt);
 			func_add_param("src_opt", TypeString);
 			func_add_param("dst", TypeInt);
@@ -611,89 +611,89 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_element("width", TypeInt, vul_p(&vulkan::SwapChain::width));
 		class_add_element("height", TypeInt, vul_p(&vulkan::SwapChain::height));
 		class_add_element("format", TypeInt, vul_p(&vulkan::SwapChain::image_format));
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanSwapChain::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanSwapChain::__init__), Flags::MUTABLE);
 			func_add_param("win", TypePointer);
 			func_add_param("device", TypeDeviceP);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanSwapChain::__delete__));
-		class_add_func("create_depth_buffer", TypeDepthBufferXfer, vul_p(&vulkan::SwapChain::create_depth_buffer));
-		class_add_func("create_render_pass", TypeRenderPassXfer, vul_p(&vulkan::SwapChain::create_render_pass));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanSwapChain::__delete__), Flags::MUTABLE);
+		class_add_func("create_depth_buffer", TypeDepthBufferXfer, vul_p(&vulkan::SwapChain::create_depth_buffer), Flags::MUTABLE);
+		class_add_func("create_render_pass", TypeRenderPassXfer, vul_p(&vulkan::SwapChain::create_render_pass), Flags::MUTABLE);
 			func_add_param("depth_buffer", TypeDepthBufferP);
 			func_add_param("options", TypeStringList);
-		class_add_func("create_frame_buffers", TypeFrameBufferXferList, vul_p(&vulkan::SwapChain::create_frame_buffers));
+		class_add_func("create_frame_buffers", TypeFrameBufferXferList, vul_p(&vulkan::SwapChain::create_frame_buffers), Flags::MUTABLE);
 			func_add_param("render_pass", TypeRenderPassP);
 			func_add_param("depth_buffer", TypeDepthBufferP);
-		class_add_func("create_textures", TypeTextureXferList, vul_p(&vulkan::SwapChain::create_textures));
-		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::SwapChain::rebuild));
-		class_add_func("present", TypeBool, vul_p(&vulkan::SwapChain::present));
+		class_add_func("create_textures", TypeTextureXferList, vul_p(&vulkan::SwapChain::create_textures), Flags::MUTABLE);
+		class_add_func("rebuild", TypeVoid, vul_p(&vulkan::SwapChain::rebuild), Flags::MUTABLE);
+		class_add_func("present", TypeBool, vul_p(&vulkan::SwapChain::present), Flags::MUTABLE);
 			func_add_param("image_index", TypeInt);
 			func_add_param("wait_sem", TypeSemaphorePList);
-		class_add_func("acquire_image", TypeIntOptional, vul_p(&VulkanSwapChain::acquire_image_x));
+		class_add_func("acquire_image", TypeIntOptional, vul_p(&VulkanSwapChain::acquire_image_x), Flags::MUTABLE);
 			func_add_param("signal_sem", TypeSemaphoreP);
 
 
 	add_class(TypeFence);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanFence::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanFence::__init__), Flags::MUTABLE);
 			func_add_param("device", TypeDeviceP);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanFence::__delete__));
-		class_add_func("wait", TypeVoid, vul_p(&vulkan::Fence::wait));
-		class_add_func("reset", TypeVoid, vul_p(&vulkan::Fence::reset));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanFence::__delete__), Flags::MUTABLE);
+		class_add_func("wait", TypeVoid, vul_p(&vulkan::Fence::wait), Flags::MUTABLE);
+		class_add_func("reset", TypeVoid, vul_p(&vulkan::Fence::reset), Flags::MUTABLE);
 
 
 	add_class(TypeSemaphore);
-		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanSemaphore::__init__));
+		class_add_func(Identifier::Func::INIT, TypeVoid, vul_p(&VulkanSemaphore::__init__), Flags::MUTABLE);
 			func_add_param("device", TypeDeviceP);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanSemaphore::__delete__));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanSemaphore::__delete__), Flags::MUTABLE);
 
 
 	add_class(TypeCommandPool);
 		//class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanCommandPool::__delete__));
-		class_add_func("create_command_buffer", TypeCommandBufferXfer, vul_p(&vulkan::CommandPool::create_command_buffer));
+		class_add_func("create_command_buffer", TypeCommandBufferXfer, vul_p(&vulkan::CommandPool::create_command_buffer), Flags::MUTABLE);
 
 
 	add_class(TypeCommandBuffer);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanCommandBuffer::__delete__));
-		class_add_func("begin", TypeVoid, vul_p(&vulkan::CommandBuffer::begin));
-		class_add_func("end", TypeVoid, vul_p(&vulkan::CommandBuffer::end));
-		class_add_func("set_bind_point", TypeVoid, vul_p(&vulkan::CommandBuffer::set_bind_point));
+		class_add_func(Identifier::Func::DELETE, TypeVoid, vul_p(&VulkanCommandBuffer::__delete__), Flags::MUTABLE);
+		class_add_func("begin", TypeVoid, vul_p(&vulkan::CommandBuffer::begin), Flags::MUTABLE);
+		class_add_func("end", TypeVoid, vul_p(&vulkan::CommandBuffer::end), Flags::MUTABLE);
+		class_add_func("set_bind_point", TypeVoid, vul_p(&vulkan::CommandBuffer::set_bind_point), Flags::MUTABLE);
 			func_add_param("bp", TypePipelineBindPoint);
-		class_add_func("bind_pipeline", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_pipeline));
+		class_add_func("bind_pipeline", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_pipeline), Flags::MUTABLE);
 			func_add_param("p", TypePipelineP);
-		class_add_func("draw", TypeVoid, vul_p(&vulkan::CommandBuffer::draw));
+		class_add_func("draw", TypeVoid, vul_p(&vulkan::CommandBuffer::draw), Flags::MUTABLE);
 			func_add_param("vb", TypeVertexBufferP);
-		class_add_func("begin_render_pass", TypeVoid, vul_p(&vulkan::CommandBuffer::begin_render_pass));
+		class_add_func("begin_render_pass", TypeVoid, vul_p(&vulkan::CommandBuffer::begin_render_pass), Flags::MUTABLE);
 			func_add_param("rp", TypeRenderPassP);
 			func_add_param("fb", TypeFrameBufferP);
-		class_add_func("next_subpass", TypeVoid, vul_p(&vulkan::CommandBuffer::next_subpass));
-		class_add_func("end_render_pass", TypeVoid, vul_p(&vulkan::CommandBuffer::end_render_pass));
-		class_add_func("push_constant", TypeVoid, vul_p(&vulkan::CommandBuffer::push_constant));
+		class_add_func("next_subpass", TypeVoid, vul_p(&vulkan::CommandBuffer::next_subpass), Flags::MUTABLE);
+		class_add_func("end_render_pass", TypeVoid, vul_p(&vulkan::CommandBuffer::end_render_pass), Flags::MUTABLE);
+		class_add_func("push_constant", TypeVoid, vul_p(&vulkan::CommandBuffer::push_constant), Flags::MUTABLE);
 			func_add_param("offset", TypeInt);
 			func_add_param("size", TypeInt);
 			func_add_param("data", TypeReference);
-		class_add_func("bind_descriptor_set", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_descriptor_set));
+		class_add_func("bind_descriptor_set", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_descriptor_set), Flags::MUTABLE);
 			func_add_param("index", TypeInt);
 			func_add_param("set", TypeDescriptorSetP);
-		class_add_func("set_scissor", TypeVoid, vul_p(&vulkan::CommandBuffer::set_scissor));
+		class_add_func("set_scissor", TypeVoid, vul_p(&vulkan::CommandBuffer::set_scissor), Flags::MUTABLE);
 			func_add_param("r", TypeRect);
-		class_add_func("set_viewport", TypeVoid, vul_p(&vulkan::CommandBuffer::set_viewport));
+		class_add_func("set_viewport", TypeVoid, vul_p(&vulkan::CommandBuffer::set_viewport), Flags::MUTABLE);
 			func_add_param("r", TypeRect);
-		class_add_func("dispatch", TypeVoid, vul_p(&vulkan::CommandBuffer::dispatch));
+		class_add_func("dispatch", TypeVoid, vul_p(&vulkan::CommandBuffer::dispatch), Flags::MUTABLE);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
-		class_add_func("barrier", TypeVoid, vul_p(&vulkan::CommandBuffer::barrier));
+		class_add_func("barrier", TypeVoid, vul_p(&vulkan::CommandBuffer::barrier), Flags::MUTABLE);
 			func_add_param("t", TypeTexturePList);
 			func_add_param("mode", TypeInt);
-		class_add_func("image_barrier", TypeVoid, vul_p(&vulkan::CommandBuffer::image_barrier));
+		class_add_func("image_barrier", TypeVoid, vul_p(&vulkan::CommandBuffer::image_barrier), Flags::MUTABLE);
 			func_add_param("t", TypeTextureP);
 			func_add_param("src_access", TypeAccessFlags);
 			func_add_param("dst_access", TypeAccessFlags);
 			func_add_param("old_layout", TypeImageLayout);
 			func_add_param("new_layout", TypeImageLayout);
-		class_add_func("copy_image", TypeVoid, vul_p(&vulkan::CommandBuffer::copy_image));
+		class_add_func("copy_image", TypeVoid, vul_p(&vulkan::CommandBuffer::copy_image), Flags::MUTABLE);
 			func_add_param("src", TypeTextureP);
 			func_add_param("dst", TypeTextureP);
 			func_add_param("extend", TypeIntList);
-		class_add_func("trace_rays", TypeVoid, vul_p(&vulkan::CommandBuffer::trace_rays));
+		class_add_func("trace_rays", TypeVoid, vul_p(&vulkan::CommandBuffer::trace_rays), Flags::MUTABLE);
 			func_add_param("nx", TypeInt);
 			func_add_param("ny", TypeInt);
 			func_add_param("nz", TypeInt);
@@ -710,7 +710,7 @@ void SIAddPackageVulkan(Context *c) {
 
 
 	add_class(TypeQueue);
-		class_add_func("submit", TypeVoid, vul_p(&vulkan::Queue::submit));
+		class_add_func("submit", TypeVoid, vul_p(&vulkan::Queue::submit), Flags::MUTABLE);
 			func_add_param("cb", TypeCommandBufferP);
 			func_add_param("wait_sem", TypeSemaphorePList);
 			func_add_param("signal_sem", TypeSemaphorePList);

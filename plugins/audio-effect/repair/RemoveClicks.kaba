@@ -49,5 +49,5 @@ class RemoveClicks extends AudioEffect
 			unclick(b, clicks[i], clicks[i+1])
 
 	func override process(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			repair(c)

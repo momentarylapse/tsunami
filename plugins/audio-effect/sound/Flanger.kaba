@@ -35,7 +35,7 @@ class Flanger extends AudioEffect
 		let f_b = 0.5 * config.depth * config.delay
 		let f_c = 1.0 / sample_rate * 2 * pi * config.speed
 	
-		for i=>bb in b
+		for mut i=>bb in b
 	
 			# old value
 			temp[p] = bb

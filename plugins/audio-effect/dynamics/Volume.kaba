@@ -17,6 +17,6 @@ class Volume extends AudioEffect
 	
 	func override process(out buf: AudioBuffer)
 		let factor = config.volume
-		for cc in buf.c
-			for b in cc
+		for mut cc in buf.c
+			for mut b in cc
 				b = clamp(b * factor, -1, 1)

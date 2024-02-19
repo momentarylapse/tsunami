@@ -61,6 +61,8 @@ public:
 	Any _cdecl operator + (const Any &a) const;
 	Any _cdecl operator - (const Any &a) const;
 	void _cdecl operator += (const Any &a);
+	bool operator==(const Any& other) const;
+	bool operator!=(const Any& other) const;
 
 	// array
 	void _cdecl add(const Any &a);

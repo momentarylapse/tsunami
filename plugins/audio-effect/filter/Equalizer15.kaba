@@ -16,7 +16,7 @@ class Equalizer15 extends AudioEffect
 		var factor: float[NUM_BANDS]
 
 		func override reset()
-			for f in factor
+			for mut f in factor
 				f = 1
 
 
@@ -55,7 +55,7 @@ class Equalizer15 extends AudioEffect
 		fft.c2r_inv(f, b)
 
 	func override process(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			equalize(c)
 		f.clear()
 	

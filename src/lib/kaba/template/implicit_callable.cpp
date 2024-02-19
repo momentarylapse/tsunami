@@ -31,22 +31,22 @@ static const Array<string> DUMMY_PARAMS = {"a", "b", "c", "d", "e", "f", "g", "h
 
 
 void AutoImplementer::_add_missing_function_headers_for_callable_fp(Class *t) {
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypePointer}, {"p"});
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypePointer}, {"p"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::CALL,
 			get_callable_return_type(t),
 			get_callable_param_types(t),
-			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
 void AutoImplementer::_add_missing_function_headers_for_callable_bind(Class *t) {
 	auto types = get_callable_capture_types(t);
 	types.insert(TypePointer, 0);
 	add_func_header(t, Identifier::Func::INIT, TypeVoid, types,
-			{"p", "a", "b", "c", "d", "e", "f", "g", "h"});
+			{"p", "a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::CALL,
 			get_callable_return_type(t),
 			get_callable_param_types(t),
-			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::CONST)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
 void AutoImplementer::implement_callable_constructor(Function *f, const Class *t) {

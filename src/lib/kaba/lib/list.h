@@ -16,6 +16,10 @@
 #include "../syntax/Operator.h"
 #include "../syntax/Inline.h"
 
+template<> inline string str(const u_int8_t& c) {
+	return format("0x%02x", (int)c);
+}
+
 namespace kaba {
 
 extern const Class *TypeAny;
@@ -262,29 +266,30 @@ public:
 
 
 template<class T>
-void lib_create_list(const Class *tt) {
+void lib_create_list(const Class *tt, bool allow_str = true) {
 	auto t = const_cast<Class*>(tt);
 	t->derive_from(TypeDynamicArray, DeriveFlags::SET_SIZE);
 	auto t_element = t->param[0];
 
 	add_class(t);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<T>::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &XList<T>::clear);
-		class_add_func("clear", TypeVoid, &XList<T>::clear);
-		class_add_func("add", TypeVoid, &XList<T>::__add);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<T>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &XList<T>::clear, Flags::MUTABLE);
+		class_add_func("clear", TypeVoid, &XList<T>::clear, Flags::MUTABLE);
+		class_add_func("add", TypeVoid, &XList<T>::__add, Flags::MUTABLE);
 			func_add_param("x", t_element);
-		class_add_func("insert", TypeVoid, &XList<T>::__insert);
+		class_add_func("insert", TypeVoid, &XList<T>::__insert, Flags::MUTABLE);
 			func_add_param("x", t_element);
 			func_add_param("index", TypeInt);
 		/*class_add_func(Identifier::Func::CONTAINS, TypeBool, &XList<T>::__contains__);
 			func_add_param("x", t_element);
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XList<T>::assign);
 			func_add_param("other", t);*/
-		class_add_func("remove", TypeVoid, &XList<T>::erase);
+		class_add_func("remove", TypeVoid, &XList<T>::erase, Flags::MUTABLE);
 			func_add_param("index", TypeInt);
-		class_add_func("resize", TypeVoid, &XList<T>::resize);
+		class_add_func("resize", TypeVoid, &XList<T>::resize, Flags::MUTABLE);
 			func_add_param("num", TypeInt);
-		class_add_func(Identifier::Func::STR, TypeString, &XList<T>::str, Flags::PURE);
+		if (allow_str)
+			class_add_func(Identifier::Func::STR, TypeString, &XList<T>::str, Flags::PURE);
 
 		add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::NONE, &XList<T>::assign);
 		add_operator(OperatorID::IN, TypeBool, t, t_element, InlineID::NONE, &XList<T>::__contains__);

@@ -7,11 +7,11 @@ class Reverse extends AudioEffect
 		apply_to_whole_buffer = true
 
 	func override process(out buf: AudioBuffer)
-		var n = len(buf) / 2
-		for c in buf.c
-			for i in 0:n
-				var j = len(buf) - i - 1
-				var x = c[i]
+		let n = len(buf) / 2
+		for mut c in buf.c
+			for mut i in 0:n
+				let j = len(buf) - i - 1
+				let x = c[i]
 				c[i] = c[j]
 				c[j] = x
 

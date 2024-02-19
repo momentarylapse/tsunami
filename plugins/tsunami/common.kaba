@@ -57,10 +57,10 @@ struct AudioBuffer
 	func extern selfref __subarray__(start: int, end: int) -> AudioBuffer
 	func extern get_spectrum(out spec_r: complex[], out spec_l: complex[], samples: int)
 	func mut scale(factor: float)
-		for cc in c
+		for mut cc in c
 			cc *= factor
 	func mut __imul__(f: float[])
-		for cc in c
+		for mut cc in c
 			cc *= f
 	func mut auto_generate_channels()
 		if channels > 1

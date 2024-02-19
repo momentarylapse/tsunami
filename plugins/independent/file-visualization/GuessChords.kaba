@@ -11,7 +11,7 @@ class XXX extends TsunamiPlugin
 
 		var n = 0
 		session.song.begin_action_group("guess chords")
-		for l in session.song.layers()
+		for mut l in session.song.layers()
 			if session.view.sel.has_layer(l) and l.type == SignalType.MIDI
 				guess_chords(l, session.view.sel.range())
 				n ++

@@ -15,7 +15,7 @@ class HullCurve extends AudioEffect
 	class Config extends Module.Config
 		var curve: vec2[]
 
-		func const fill_inter(out fi: FloatInterpolator)
+		func fill_inter(out fi: FloatInterpolator)
 			fi.set_type("cubic-spline-notang")
 			fi.add(curve[0].y, 0)
 			for i in 1:len(curve)
@@ -42,7 +42,7 @@ class HullCurve extends AudioEffect
 			b[i] = b[i] * pow(10, db / 20)
 
 	func override process(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			hull(c)
 
 	func override create_panel() -> xfer[ConfigPanel]

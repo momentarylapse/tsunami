@@ -68,13 +68,14 @@ enum class NodeKind {
 	LOCAL_MEMORY,       // local (but LinkNr = address)
 	// special
 	CLASS,
-	ARRAY_BUILDER,		// = [X,Y,...]
+	ARRAY_BUILDER,      // = [X,Y,...]
 	ARRAY_BUILDER_FOR,
 	ARRAY_BUILDER_FOR_IF,
-	DICT_BUILDER,		// = {"x":y, ...}
-	TUPLE,				// = (X,Y,...)
-	TUPLE_EXTRACTION,	// (X,Y,...) = ...
+	DICT_BUILDER,       // = {"x":y, ...}
+	TUPLE,              // = (X,Y,...)
+	TUPLE_EXTRACTION,   // (X,Y,...) = ...
 	CONSTRUCTOR_AS_FUNCTION,
+	SLICE,              // = A:B or A:B:C
 	// abstract syntax tree
 	ABSTRACT_TOKEN,
 	ABSTRACT_OPERATOR,
@@ -180,6 +181,7 @@ shared<Node> add_node_local(const Variable *var, const Class *type, int token_id
 shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
 shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
 shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
+shared<Node> add_node_slice(shared<Node> start, shared<Node> end);
 shared<Node> add_node_constructor(const Function *f, int token_id = -1);
 shared<Node> make_constructor_static(shared<Node> n, const string &name);
 

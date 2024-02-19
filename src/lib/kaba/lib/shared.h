@@ -45,14 +45,14 @@ void lib_create_pointer_shared(const Class *tt, const Class *t_xfer) {
 	auto t = const_cast<Class*>(tt);
 
 	add_class(t);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XShared<T>::__init__);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &XShared<T>::clear);
-		class_add_func(Identifier::Func::SHARED_CLEAR, TypeVoid, &XShared<T>::clear);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign_raw__);
+		class_add_func(Identifier::Func::INIT, TypeVoid, &XShared<T>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &XShared<T>::clear, Flags::MUTABLE);
+		class_add_func(Identifier::Func::SHARED_CLEAR, TypeVoid, &XShared<T>::clear, Flags::MUTABLE);
+		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign_raw__, Flags::MUTABLE);
 			func_add_param("other", t_xfer);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign_raw__);
+		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign_raw__, Flags::MUTABLE);
 			func_add_param("other", TypeNone);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign__);
+		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XShared<T>::__assign__, Flags::MUTABLE);
 			func_add_param("other", t);
 		class_add_func(Identifier::Func::SHARED_CREATE, t, &XShared<T>::create, Flags::STATIC);
 			func_add_param("p", t_xfer);

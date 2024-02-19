@@ -175,6 +175,7 @@ extern const Class *TypeFloat64;
 extern const Class *TypeFloat;
 extern const Class *TypeCString;
 extern const Class *TypeString;
+extern const Class *TypeBytes;
 
 extern const Class *TypeComplex;
 extern const Class *TypeVec2;

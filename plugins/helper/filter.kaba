@@ -255,13 +255,13 @@ struct BiquadFilter
 	func __init__()
 		reset()
 	func mut reset()
-		for s in state
+		for mut s in state
 			s.reset()
 	func mut create(mode: FilterType, freq: float, q: float, gain: float, _sample_rate: float)
 		params.create(mode, freq, q, gain, _sample_rate)
 	func mut apply(out buf: AudioBuffer)
 		state.resize(buf.channels)
-		for i=>c in buf.c
+		for mut i=>c in buf.c
 			# FIXME: maybe we should have len(buf.c)==buf.channels ?!?
 			#   why do we have that, anyways?
 			if i >= buf.channels
@@ -277,12 +277,12 @@ class BiquadMultiFilter
 	func __init__()
 		reset()
 	func mut reset()
-		for ff in f
+		for mut ff in f
 			ff.reset()
 	func mut create(mode: FilterType, freq: float[], q: float[], gain: float[], _sample_rate: float)
 		f.resize(len(freq))
 		for i in 0:len(freq)
 			f[i].create(mode, freq[i], q[i], gain[i], _sample_rate)
 	func mut apply(out buf: AudioBuffer)
-		for ff in f
+		for mut ff in f
 			ff.apply(buf)

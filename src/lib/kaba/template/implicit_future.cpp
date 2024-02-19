@@ -19,10 +19,10 @@ void AutoImplementerFutureCore::add_missing_function_headers(Class *t) {
 	msg_write(t->param[0]->long_name());
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
-	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"}, nullptr, Flags::CONST);
-	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f"}, nullptr, Flags::CONST);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"});
+	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f"});
 	//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 }
 
@@ -45,9 +45,9 @@ void AutoImplementerFuture::add_missing_function_headers(Class *t) {
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
 	//add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::EXTERN);
-	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"}, nullptr, Flags::CONST | Flags::EXTERN);
-	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f", "f_fail"}, nullptr, Flags::CONST | Flags::EXTERN);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE | Flags::EXTERN);
+	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"}, nullptr, Flags::EXTERN);
+	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f", "f_fail"}, nullptr, Flags::EXTERN);
 	//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 }
 

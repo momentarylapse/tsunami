@@ -28,7 +28,7 @@ class Echo extends AudioEffect
 
 	func do_delay(out b: float[], out d: float[])
 		var p = offset % len(d)
-		for bb in b
+		for mut bb in b
 	
 			# old value
 			let b0 = bb
@@ -51,7 +51,7 @@ class Echo extends AudioEffect
 		buf_temp.set_channels(buf.channels)
 		buf_temp.resize(delay_samples)
 	
-		for i=>c in buf.c
+		for mut i=>c in buf.c
 			do_delay(c, buf_temp.c[i])
 	
 		offset += len(buf)

@@ -25,13 +25,13 @@ namespace kaba {
 
 void AutoImplementer::_add_missing_function_headers_for_dict(Class *t) {
 	auto t_value = t->param[0];
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
-	add_func_header(t, "clear", TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::SET, TypeVoid, {TypeString, t_value}, {"key", "value"});
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::SET, TypeVoid, {TypeString, t_value}, {"key", "value"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::GET, t_value, {TypeString}, {"key"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
-	add_func_header(t, Identifier::Func::CONTAINS, TypeBool, {TypeString}, {"key"});
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::CONTAINS, TypeBool, {TypeString}, {"key"}, nullptr, Flags::PURE);
 
 	add_class(t);
 		class_add_func("keys", TypeStringList, &dict_get_keys, Flags::PURE);

@@ -20,13 +20,13 @@ class Noise extends AudioSource
 	
 	func mut do(out buf: float[])
 		if config.type == "uniform"
-			for b in buf
+			for mut b in buf
 				b = r.uniform(-1,1) * config.volume
 		else if config.type == "gauss"
-			for b in buf
+			for mut b in buf
 				b = r.normal(0, 0.2) * config.volume
 
 	func override read(out buf: AudioBuffer) -> int
-		for c in buf.c
+		for mut c in buf.c
 			do(c)
 		return len(buf)

@@ -2,7 +2,7 @@ use tsunami.*
 
 func update_bars(out bars: BarCollection)
 	var offset = 0
-	for b in bars
+	for mut b in bars
 		b.offset = offset
 		offset += b.length
 

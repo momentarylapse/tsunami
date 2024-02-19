@@ -17,7 +17,7 @@ Variable::Variable(const string &_name, const Class *_type) {
 	name = _name;
 	type = _type;
 	_offset = 0;
-	flags = Flags::NONE;
+	flags = Flags::MUTABLE;
 	explicitly_constructed = false;
 	memory = nullptr;
 	memory_owner = false;
@@ -38,7 +38,7 @@ string Variable::cname(const Class *ns, const Class *ns_obs) const {
 }
 
 bool Variable::is_mutable() const {
-	return !flags_has(flags, Flags::CONST);
+	return flags_has(flags, Flags::MUTABLE);
 }
 
 bool Variable::is_extern() const {

@@ -231,14 +231,14 @@ void SIAddPackageKaba(Context *c) {
 
 	add_class(TypeContext);
 		class_add_element("packages", TypeModuleRefList, &Context::packages);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &Context::__delete__);
-		class_add_func("load_module", TypeModuleShared, &KabaContext::__load_module__, Flags::RAISES_EXCEPTIONS);
+		class_add_func(Identifier::Func::DELETE, TypeVoid, &Context::__delete__, Flags::MUTABLE);
+		class_add_func("load_module", TypeModuleShared, &KabaContext::__load_module__, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("filename", TypePath);
 			func_add_param("just_analize", TypeBool);
-		class_add_func("create_module_for_source", TypeModuleShared, &KabaContext::__create_from_source__, Flags::RAISES_EXCEPTIONS);
+		class_add_func("create_module_for_source", TypeModuleShared, &KabaContext::__create_from_source__, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("source", TypeString);
 			func_add_param("just_analize", TypeBool);
-		class_add_func("execute_single_command", TypeVoid, &KabaContext::__execute_single_command__, Flags::RAISES_EXCEPTIONS);
+		class_add_func("execute_single_command", TypeVoid, &KabaContext::__execute_single_command__, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("cmd", TypeString);
 		class_add_func("get_dynamic_type", TypeClassP, &Context::get_dynamic_type, Flags::PURE);
 			func_add_param("p", TypePointer);

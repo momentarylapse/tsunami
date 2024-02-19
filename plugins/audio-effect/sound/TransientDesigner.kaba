@@ -61,5 +61,5 @@ class TransientDesigner extends AudioEffect
 		buf_sus = buf
 		env_sus.process(buf_sus)
 		
-		for i=>c in buf.c
+		for mut i=>c in buf.c
 			do(c, 0, buf_fast.c[i], buf_att.c[i], buf_sus.c[i])

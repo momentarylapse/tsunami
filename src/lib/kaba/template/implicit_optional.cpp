@@ -23,14 +23,14 @@ shared<Node> AutoImplementer::optional_data(shared<Node> node) {
 }
 
 void AutoImplementer::_add_missing_function_headers_for_optional(Class *t) {
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {t->param[0]}, {"value"}, nullptr, Flags::AUTO_CAST);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypeNone}, {"value"}, nullptr, Flags::AUTO_CAST);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {t->param[0]}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypeNone}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
 	//if (t->param[0]->get_destructor())
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t->param[0]}, {"other"});
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"});
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t->param[0]}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
 	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
 	add_func_header(t, "_value", t->param[0], {}, {});

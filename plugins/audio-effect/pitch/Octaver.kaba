@@ -13,9 +13,9 @@ class Octaver extends AudioEffect
 	var config: Config
 
 	func do_octaver(out b: float[])
-		for bb in b
+		for mut bb in b
 			bb = (bb * bb) * config.level + bb * (1 - config.level)
 
 	func override process(out buf: AudioBuffer)
-		for c in buf.c
+		for mut c in buf.c
 			do_octaver(c)

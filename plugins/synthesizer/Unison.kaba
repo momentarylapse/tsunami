@@ -226,7 +226,7 @@ class OscillatorState
 	var env: EnvelopeADSR
 	func __init__()
 		volume = 0
-		for p in phi
+		for mut p in phi
 			p = 0
 		env.reset()
 

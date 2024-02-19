@@ -20,8 +20,8 @@ class CircuitEffect extends AudioEffect
 		c.edges.add(new Diode([1,0]))
 	
 	func override process(out buf: AudioBuffer)
-		var dt = 1.0 / session.sample_rate()
-		for f in buf.c[0]
+		let dt = 1.0 / session.sample_rate()
+		for mut f in buf.c[0]
 			var I_in = f / 40
 			c.time_step(I_in, dt)
 			f = c.nodes[1].phi / 2

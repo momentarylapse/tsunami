@@ -20,29 +20,29 @@ static shared<Node> sa_num(shared<Node> node) {
 }*/
 
 void AutoImplementer::_add_missing_function_headers_for_list(Class *t) {
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
-	add_func_header(t, "clear", TypeVoid, {}, {});
-	add_func_header(t, "resize", TypeVoid, {TypeInt}, {"num"});
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "resize", TypeVoid, {TypeInt}, {"num"}, nullptr, Flags::MUTABLE);
 	if (t->param[0]->is_pointer_owned() or t->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0]->param[0], -1);
 		auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
-		add_func_header(t, "add", TypeVoid, {t_xfer}, {"x"});
-		add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer_list, {}, {});
+		add_func_header(t, "add", TypeVoid, {t_xfer}, {"x"}, nullptr, Flags::MUTABLE);
+		add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer_list, {}, {}, nullptr, Flags::MUTABLE);
 		//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"});
-		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"});
+		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"}, nullptr, Flags::MUTABLE);
 	} else if (t->param[0]->is_pointer_xfer_not_null()) {
 	//	add_func_header(t, "add", TypeVoid, {t->param[0]}, {"x"});
-		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
 	} else if (t->param[0]->is_reference()) {
 		add_func_header(t, "add", TypeVoid, {t->param[0]}, {"x"});
-		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
 	} else {
-		add_func_header(t, "add", TypeVoid, {t->param[0]}, {"x"});
+		add_func_header(t, "add", TypeVoid, {t->param[0]}, {"x"}, nullptr, Flags::MUTABLE);
 		if (class_can_assign(t->param[0]))
-			add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+			add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
 	}
-	add_func_header(t, "remove", TypeVoid, {TypeInt}, {"index"});
+	add_func_header(t, "remove", TypeVoid, {TypeInt}, {"index"}, nullptr, Flags::MUTABLE);
 	if (class_can_equal(t->param[0]))
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
 }

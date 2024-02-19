@@ -17,6 +17,8 @@ shared<Module> get_import_module(Parser *parser, const string &name, int token);
 
 void add_enum_label(const Class *type, int value, const string &label);
 
+shared<Node> build_abstract_tuple(const Array<shared<Node>> &el);
+
 void crash() {
 	int *p = nullptr;
 	*p = 4;
@@ -253,35 +255,41 @@ shared<Node> Parser::parse_abstract_operand_extension_array(shared<Node> operand
 
 
 	if (try_consume("]")) {
-		auto node = new Node(NodeKind::ABSTRACT_TYPE_LIST, 0, TypeUnknown, Flags::CONST, token0);
+		auto node = new Node(NodeKind::ABSTRACT_TYPE_LIST, 0, TypeUnknown, Flags::NONE, token0);
 		node->set_num_params(1);
 		node->set_param(0, operand);
 		return node;
 	}
 
-	shared<Node> index;
-	shared<Node> index2;
-	if (Exp.cur == ":") {
-		index = add_node_const(tree->add_constant_int(0));
-	} else {
-		index = parse_abstract_operand_greedy(block);
-	}
-	if (try_consume(":")) {
-		if (Exp.cur == "]") {
-			index2 = add_node_const(tree->add_constant_int(DynamicArray::MAGIC_END_INDEX));
-			// magic value (-_-)'
+	auto parse_value_or_slice = [this] (Block* block) {
+		shared<Node> index;
+		if (Exp.cur == ":") {
+			index = add_node_const(tree->add_constant_int(0));
 		} else {
-			index2 = parse_abstract_operand_greedy(block);
+			index = parse_abstract_operand_greedy(block);
 		}
+		if (try_consume(":")) {
+			shared<Node> index2;
+			if (Exp.cur == "]" or Exp.cur == ",") {
+				index2 = add_node_const(tree->add_constant_int(DynamicArray::MAGIC_END_INDEX));
+				// magic value (-_-)'
+			} else {
+				index2 = parse_abstract_operand_greedy(block);
+			}
+			index = add_node_slice(index, index2);
+		}
+		return index;
+	};
+
+	shared<Node> index = parse_value_or_slice(block);
+	if (try_consume(",")) {
+		// TODO ...more
+		auto index_b = parse_abstract_operand_greedy(block);
+		index = build_abstract_tuple({index, index_b});
 	}
 	expect_identifier("]", "']' expected after array index");
 
-	auto array = add_node_array(operand, index, TypeUnknown);
-	if (index2) {
-		array->set_num_params(3);
-		array->set_param(2, index2);
-	}
-	return array;
+	return add_node_array(operand, index, TypeUnknown);
 }
 
 shared<Node> Parser::parse_abstract_operand_extension_call(shared<Node> link, Block *block) {
@@ -289,7 +297,7 @@ shared<Node> Parser::parse_abstract_operand_extension_call(shared<Node> link, Bl
 	// parse all parameters
 	auto params = parse_abstract_call_parameters(block);
 
-	auto node = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown, Flags::CONST, link->token_id);
+	auto node = new Node(NodeKind::ABSTRACT_CALL, 0, TypeUnknown, Flags::NONE, link->token_id);
 	node->set_num_params(params.num + 1);
 	node->set_param(0, link);
 	for (auto&& [i,p]: enumerate(params))
@@ -419,7 +427,7 @@ shared_array<Node> Parser::parse_abstract_call_parameters(Block *block) {
 
 
 shared<Node> build_abstract_list(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::ARRAY_BUILDER, 0, TypeUnknown, Flags::CONST);
+	auto c = new Node(NodeKind::ARRAY_BUILDER, 0, TypeUnknown);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -427,7 +435,7 @@ shared<Node> build_abstract_list(const Array<shared<Node>> &el) {
 }
 
 shared<Node> build_abstract_dict(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::DICT_BUILDER, 0, TypeUnknown, Flags::CONST);
+	auto c = new Node(NodeKind::DICT_BUILDER, 0, TypeUnknown);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -435,7 +443,7 @@ shared<Node> build_abstract_dict(const Array<shared<Node>> &el) {
 }
 
 shared<Node> build_abstract_tuple(const Array<shared<Node>> &el) {
-	auto c = new Node(NodeKind::TUPLE, 0, TypeUnknown, Flags::CONST);
+	auto c = new Node(NodeKind::TUPLE, 0, TypeUnknown);
 	c->set_num_params(el.num);
 	for (int i=0; i<el.num; i++)
 		c->set_param(i, el[i]);
@@ -800,7 +808,7 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 
 	// variable name
 	int token0 = Exp.consume_token(); // for
-	bool is_shared = try_consume(Identifier::SHARED);
+	auto flags = parse_flags(Flags::NONE);
 	auto var = parse_abstract_token();
 
 	// index
@@ -853,8 +861,7 @@ shared<Node> Parser::parse_abstract_for_header(Block *block) {
 		cmd_for->set_param(2, array);
 		//cmd_for->set_uparam(3, loop_block);
 
-		if (is_shared)
-			flags_set(cmd_for->flags, Flags::SHARED);
+		flags_set(cmd_for->flags, flags);
 		return cmd_for;
 	}
 }
@@ -1218,7 +1225,9 @@ shared_array<Node> parse_comma_sep_token_list(Parser *p) {
 
 // local (variable) definitions...
 shared<Node> Parser::parse_abstract_statement_var(Block *block) {
-	bool is_let = (Exp.cur == Identifier::LET);
+	auto flags = Flags::MUTABLE;
+	if (Exp.cur == Identifier::LET)
+		flags = Flags::NONE;
 	Exp.next(); // "var"/"let"
 
 	// tuple "var (x,y) = ..."
@@ -1238,7 +1247,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 		assign->set_param(0, tuple);
 		assign->set_param(1, rhs);
 
-		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown, flags);
 		node->set_num_params(3);
 		//node->set_param(0, type); // no type
 		node->set_param(1, cp_node(tuple));
@@ -1269,7 +1278,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 		assign->set_param(0, names[0]);
 		assign->set_param(1, rhs);
 
-		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown, flags);
 		node->set_num_params(3);
 		node->set_param(0, type); // type
 		node->set_param(1, names[0]->shallow_copy()); // name
@@ -1281,7 +1290,7 @@ shared<Node> Parser::parse_abstract_statement_var(Block *block) {
 	expect_new_line();
 
 	for (auto &n: names) {
-		auto node = new Node(NodeKind::ABSTRACT_VAR, (int)is_let, TypeUnknown);
+		auto node = new Node(NodeKind::ABSTRACT_VAR, 0, TypeUnknown, flags);
 		node->set_num_params(2);
 		node->set_param(0, type); // type
 		node->set_param(1, n); // name
@@ -1693,7 +1702,7 @@ bool Parser::parse_class(Class *_namespace) {
 				skip_parse_class();
 			}
 		} else if (Exp.cur == Identifier::FUNC) {
-			auto flags = Flags::CONST;
+			auto flags = Flags::NONE;
 			if (_class->is_interface())
 				flags_set(flags, Flags::VIRTUAL);
 			if (_class->is_namespace())
@@ -2012,7 +2021,7 @@ Function *Parser::parse_function_header(const Class *default_type, Class *name_s
 	} else {
 		name = Exp.consume();
 		if ((name == Identifier::Func::INIT) or (name == Identifier::Func::DELETE) or (name == Identifier::Func::ASSIGN))
-			flags_clear(flags, Flags::CONST);
+			flags_set(flags, Flags::MUTABLE);
 	}
 
 	Function *f = tree->add_function(name, default_type, name_space, flags);
@@ -2020,7 +2029,11 @@ Function *Parser::parse_function_header(const Class *default_type, Class *name_s
 	// template?
 	Array<string> template_param_names;
 	if (try_consume("[")) {
-		template_param_names.add(Exp.consume());
+		while (true) {
+			template_param_names.add(Exp.consume());
+			if (!try_consume(","))
+				break;
+		}
 		expect_identifier("]", "']' expected after template parameter");
 		flags_set(f->flags, Flags::TEMPLATE);
 	}
@@ -2173,11 +2186,9 @@ Flags Parser::parse_flags(Flags initial) {
 		} else if (Exp.cur == Identifier::EXTERN) {
 			flags_set(flags, Flags::EXTERN);
 		} else if (Exp.cur == Identifier::CONST) {
-			flags_set(flags, Flags::CONST);
+			do_error("'const' deprecated", Exp.cur_token());
 		} else if (Exp.cur == Identifier::MUTABLE) {
-			flags_clear(flags, Flags::CONST);
-		} else if (Exp.cur == Identifier::CONST) {
-			flags_set(flags, Flags::CONST);
+			flags_set(flags, Flags::MUTABLE);
 		} else if (Exp.cur == Identifier::VIRTUAL) {
 			flags_set(flags, Flags::VIRTUAL);
 		} else if (Exp.cur == Identifier::OVERRIDE) {

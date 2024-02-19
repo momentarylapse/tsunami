@@ -14,17 +14,17 @@ class ScaleLength extends MidiEffect
 	var offsets: int[128]
 	
 	func override reset_state()
-		for o in offsets
+		for mut o in offsets
 			o = -1
 	
 	func override process(out midi: MidiEventBuffer)
-		for e in midi
+		for mut e in midi
 			if e.volume > 0
 				offsets[int(e.pitch)] = e.pos
 			else
 				let o = offsets[int(e.pitch)]
 				e.pos = o + int((o - e.pos) * config.scale)
 				offsets[int(e.pitch)] = -1
-		for o in offsets
+		for mut o in offsets
 			if o >= 0
 				o += midi.samples

@@ -15,11 +15,11 @@ namespace kaba {
 
 void AutoImplementer::_add_missing_function_headers_for_product(Class *t) {
 	if (t->needs_constructor())
-		add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
+		add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 	if (class_can_fully_construct(t))
 		add_full_constructor(t);
 	if (t->needs_destructor())
-		add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {});
+		add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 
 	bool allow_assign = true;
 	bool allow_equal = true;
@@ -31,7 +31,7 @@ void AutoImplementer::_add_missing_function_headers_for_product(Class *t) {
 	}
 
 	if (allow_assign) {
-		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign());
+		add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign(), Flags::MUTABLE);
 		if (t->can_memcpy())
 			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
 	}

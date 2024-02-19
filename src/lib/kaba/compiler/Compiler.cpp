@@ -16,6 +16,7 @@
 #include "../../base/set.h"
 #include "../../base/iter.h"
 #include "../../os/msg.h"
+#include "../../os/filesystem.h"
 #include <stdio.h>
 #include <functional>
 #if HAS_LIB_DL
@@ -536,7 +537,7 @@ void Compiler::link_virtual_functions_into_vtable(const Class *c) {
 }
 
 struct DynamicLibraryImport {
-	string filename;
+	string libname;
 	void *handle;
 	void *get_symbol(const string &name, Module *s) {
 #if HAS_LIB_DL
@@ -544,7 +545,7 @@ struct DynamicLibraryImport {
 			return nullptr;
 		void *p = dlsym(handle, name.c_str());
 		if (!p)
-			s->do_error_link("can't load symbol '" + name + "' from library " + filename);
+			s->do_error_link("can't load symbol '" + name + "' from library " + libname);
 		return p;
 #else
 		return nullptr;
@@ -552,16 +553,28 @@ struct DynamicLibraryImport {
 	}
 };
 static Array<DynamicLibraryImport*> dynamic_libs;
-DynamicLibraryImport *get_dynamic_lib(const string &filename, Module *s) {
+DynamicLibraryImport *get_dynamic_lib(const string &libname, Module *s) {
 #if HAS_LIB_DL
 	for (auto &d: dynamic_libs)
-		if (d->filename == filename)
+		if (d->libname == libname)
 			return d;
-	DynamicLibraryImport *d = new DynamicLibraryImport;
-	d->filename = filename;
+	auto *d = new DynamicLibraryImport;
+	d->libname = libname;
+
+	Array<Path> dirs = {"/usr/lib64", "/lib64", "/usr/lib", "/lib"};
+	Path filename;
+	for (auto &dir: dirs)
+		if (filename.is_empty())
+			for (auto &e: os::fs::search(dir, libname + "*.so.*", "f")) {
+				filename = dir | e;
+				break;
+			}
+	if (filename.is_empty())
+		s->do_error_link("can't find external library " + libname);
+
 	d->handle = dlopen(filename.c_str(), RTLD_NOW);
 	if (!d->handle)
-		s->do_error_link("can't load external library " + filename + ": " + dlerror());
+		s->do_error_link("can't load external library " + str(filename) + ": " + dlerror());
 	dynamic_libs.add(d);
 	return d;
 #else
@@ -589,7 +602,6 @@ void parse_magic_linker_string(SyntaxTree *s) {
 				}
 			}
 		}
-
 }
 
 

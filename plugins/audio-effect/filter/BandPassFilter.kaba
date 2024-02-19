@@ -54,5 +54,5 @@ class LowPassFilter extends AudioEffect
 		_in.resize(buf.channels)
 		_out.resize(buf.channels)
 		used.resize(buf.channels)
-		for i=>c in buf.c
+		for mut i=>c in buf.c
 			do(c, i)

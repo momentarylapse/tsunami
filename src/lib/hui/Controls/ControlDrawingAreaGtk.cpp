@@ -331,6 +331,7 @@ void on_gtk_gesture_motion(GtkEventControllerMotion *controller, double x, doubl
 #if GTK_CHECK_VERSION(4,0,0)
 	auto mod = gtk_event_controller_get_current_event_state(GTK_EVENT_CONTROLLER(controller));
 	win_correct_by_modifier(c->panel->win, mod);
+	c->panel->win->input.row = gdk_device_get_source(gtk_event_controller_get_current_event_device(GTK_EVENT_CONTROLLER(controller)));
 #endif
 	c->notify(EventID::MOUSE_MOVE, false);
 }
@@ -716,7 +717,7 @@ gboolean on_gtk_area_key_up(GtkWidget *widget, GdkEventKey *event, gpointer user
 
 
 // UNUSED
-void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
+/*void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double offset_y, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	double x0, y0;
 	gtk_gesture_drag_get_start_point(gesture, &x0, &y0);
@@ -731,7 +732,7 @@ void on_gtk_gesture_drag_update(GtkGestureDrag *gesture, double offset_x, double
 	c->panel->win->input.mb = false;
 	c->panel->win->input.rb = false;
 	c->notify(EventID::MOUSE_MOVE, false);
-}
+}*/
 
 
 
@@ -910,21 +911,49 @@ void ControlDrawingArea::__gtk_add_controller(GtkEventController* controller) {
 }
 #endif
 
-void on_gtk_gesture_zoom(GtkGestureZoom *controller, gdouble scale, gpointer user_data) {
+void on_gtk_gesture_zoom(GtkGestureZoom *gesture, gdouble scale, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
 	c->panel->win->input.scroll_x = scale;
 	c->panel->win->input.scroll_y = scale;
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
 	c->notify(EventID::GESTURE_ZOOM, false);
 }
 
-void on_gtk_gesture_zoom_begin(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
+void on_gtk_gesture_zoom_begin(GtkGestureZoom *gesture, GdkEventSequence *sequence, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
 	c->notify(EventID::GESTURE_ZOOM_BEGIN, false);
 }
 
-void on_gtk_gesture_zoom_end(GtkGestureZoom *controller, GdkEventSequence *sequence, gpointer user_data) {
+void on_gtk_gesture_zoom_end(GtkGestureZoom *gesture, GdkEventSequence *sequence, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
 	c->notify(EventID::GESTURE_ZOOM_END, false);
+}
+
+void on_gtk_gesture_drag_begin(GtkGestureDrag* gesture, gdouble start_x, gdouble start_y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.scroll_x = start_x;
+	c->panel->win->input.scroll_y = start_y;
+	// TODO find better drag notification system
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
+	c->notify(EventID::GESTURE_DRAG_BEGIN, false);
+}
+
+void on_gtk_gesture_drag_end(GtkGestureDrag* gesture, gdouble start_x, gdouble start_y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.scroll_x = start_x;
+	c->panel->win->input.scroll_y = start_y;
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
+	c->notify(EventID::GESTURE_DRAG_END, false);
+}
+
+void on_gtk_gesture_drag_update(GtkGestureDrag* gesture, gdouble x, gdouble y, gpointer user_data) {
+	auto c = reinterpret_cast<Control*>(user_data);
+	c->panel->win->input.scroll_x = x;
+	c->panel->win->input.scroll_y = y;
+	c->panel->win->input.row = gdk_device_get_source(gtk_gesture_get_device(GTK_GESTURE(gesture)));
+	c->notify(EventID::GESTURE_DRAG, false);
 }
 
 void ControlDrawingArea::__set_option(const string &op, const string &value) {
@@ -938,10 +967,19 @@ void ControlDrawingArea::__set_option(const string &op, const string &value) {
 #else
 			auto gesture_zoom = gtk_gesture_zoom_new(widget);
 #endif
-			gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER (gesture_zoom), GTK_PHASE_TARGET);
+			gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture_zoom), GTK_PHASE_TARGET);
 			g_signal_connect(G_OBJECT(gesture_zoom), "scale-changed", G_CALLBACK(&on_gtk_gesture_zoom), this);
 			g_signal_connect(G_OBJECT(gesture_zoom), "begin", G_CALLBACK(&on_gtk_gesture_zoom_begin), this);
 			g_signal_connect(G_OBJECT(gesture_zoom), "end", G_CALLBACK(&on_gtk_gesture_zoom_end), this);
+		} else if (value == "drag") {
+#if GTK_CHECK_VERSION(4,0,0)
+			auto gesture_drag = gtk_gesture_drag_new();
+			__gtk_add_controller(GTK_EVENT_CONTROLLER(gesture_drag));
+		//	gtk_event_controller_set_propagation_phase(GTK_EVENT_CONTROLLER(gesture_drag), GTK_PHASE_TARGET);
+			g_signal_connect(G_OBJECT(gesture_drag), "drag-update", G_CALLBACK(&on_gtk_gesture_drag_update), this);
+			g_signal_connect(G_OBJECT(gesture_drag), "drag-begin", G_CALLBACK(&on_gtk_gesture_drag_begin), this);
+			g_signal_connect(G_OBJECT(gesture_drag), "drag-end", G_CALLBACK(&on_gtk_gesture_drag_end), this);
+#endif
 		}
 	} else if (op == "noeventcompression") {
 #if !GTK_CHECK_VERSION(4,0,0)

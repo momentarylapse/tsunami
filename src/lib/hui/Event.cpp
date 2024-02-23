@@ -33,6 +33,9 @@ const string MOUSE_LEAVE = "hui:mouse-leave";
 const string GESTURE_ZOOM = "hui:gesture-zoom";
 const string GESTURE_ZOOM_BEGIN = "hui:gesture-zoom-begin";
 const string GESTURE_ZOOM_END = "hui:gesture-zoom-end";
+const string GESTURE_DRAG = "hui:gesture-drag";
+const string GESTURE_DRAG_BEGIN = "hui:gesture-drag-begin";
+const string GESTURE_DRAG_END = "hui:gesture-drag-end";
 const string FOCUS_IN = "hui:focus-in";
 const string RESIZE = "hui:resize";
 const string DRAW = "hui:draw";
@@ -56,6 +59,7 @@ bool is_valid(const string &id) {
 		RIGHT_BUTTON_DOWN, RIGHT_BUTTON_UP, RIGHT_DOUBLE_CLICK,
 		MOUSE_MOVE, MOUSE_WHEEL, MOUSE_ENTER, MOUSE_LEAVE,
 		GESTURE_ZOOM, GESTURE_ZOOM_BEGIN, GESTURE_ZOOM_END,
+		GESTURE_DRAG, GESTURE_DRAG_BEGIN, GESTURE_DRAG_END,
 		FOCUS_IN,
 		DRAW, DRAW_GL, REALIZE, UNREALIZE,
 		CLICK, CHANGE, SELECT, EDIT, ACTIVATE, MOVE, CLOSE, INFO}, id);

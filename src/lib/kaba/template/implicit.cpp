@@ -187,7 +187,7 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
-		auto v = f->block->add_var(param_names[i], p, Flags::NONE);
+		f->block->add_var(param_names[i], p, Flags::NONE);
 		f->num_params ++;
 	}
 	f->default_parameters = def_params;

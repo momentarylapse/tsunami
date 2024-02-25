@@ -27,6 +27,7 @@
 
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
+color hash_color(int h);
 
 MultiLinePainter::MultiLinePainter(Song *s, const ColorScheme &c) :
 	colors(c)
@@ -184,7 +185,8 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 	p->set_antialiasing(antialiasing);
 	const float d = line_height / 20;
 	for (auto b: bars){
-		float x = cam->sample2screen(b->offset);
+		float x1, x2;
+		cam->range2screen(b->range(), x1, x2);
 		double bpm = b->bpm(song->sample_rate);
 		string s;
 		if (b->beats != pdf_pattern) {
@@ -204,18 +206,15 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 			float dx = d*4;
 			if (b == bars[0])
 				dx += d*6;
-			p->draw_str({x + dx, y-d}, s);
+			p->draw_str({x1 + dx, y-d}, s);
 		}
 
 		// part?
-		auto *m = get_bar_part(song, b->offset);
-		if (m) {
+		if (auto *m = get_bar_part(song, b->offset)) {
 			p->set_color(colors.text);
-			p->draw_line({x - d*4, y - d*13}, {x - d*4, y - d*7});
-			p->draw_line({x - d*4, y - d*13}, {x + d*4, y - d*13});
-			p->draw_line({x - d*4, y - d*7},  {x + d*4, y - d*7});
-			p->set_font_size(line_height / 5);
-			p->draw_str({x - d*3, y-d*12}, m->nice_text());
+			float x = x1 * 0.75f + x2 * 0.25f;
+			p->set_font_size(line_height / 4);
+			p->draw_str({x - d*3, y-d*4}, m->nice_text());
 		}
 	}
 }
@@ -264,6 +263,8 @@ void MultiLinePainter::set(const Any &conf) {
 		allow_shadows = conf["allow-shadows"]._bool();
 	if (conf.has("min-font-size"))
 		min_font_size = conf["min-font-size"]._float();
+	if (conf.has("part-colors"))
+		allow_part_colors = conf["part-colors"]._bool();
 	update_scales();
 }
 
@@ -278,6 +279,19 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 
 	cam->pos = r.offset;
 	cam->pixels_per_sample = (double)cam->area.width() / (double)r.length;
+
+	if (allow_part_colors) {
+		float y1 = y0 + get_line_dy() - track_space*2 - line_space;
+		for (auto part: song->get_parts()) {
+			if (!part->range.overlaps(r))
+				continue;
+			auto rr = part->range and r;
+			p->set_color(color::interpolate(hash_color(part->text.hash()), theme.background, 0.90f));
+			float x0, x1;
+			cam->range2screen(rr, x0, x1);
+			p->draw_rect(rect(x0,x1, y0, y1));
+		}
+	}
 
 	const float d = line_height / 20;
 
@@ -325,7 +339,8 @@ float MultiLinePainter::draw_next_line(Painter *p, int &offset, const vec2 &pos)
 	float scale = w / line_samples;
 	Range r = Range(offset, line_samples);
 
-	float y0 = draw_line(p, pos.x + border, w, pos.y, r, scale) + line_space;
+	float y0 = draw_line(p, pos.x + border, w, pos.y, r, scale);
+	y0 += line_space;
 
 	offset += line_samples;
 	return y0;
@@ -339,9 +354,10 @@ float MultiLinePainter::get_line_dy() {
 	float h = 0;
 	for (auto &tt: track_data) {
 		if (tt.allow_classical)
-			h += line_height + track_space;
+			h += 2 * padding_y_classical + line_height + track_space;
 		if (tt.allow_tab)
-			h += tt.track->instrument.string_pitch.num * string_dy + track_space;
+			h += 2 * padding_y_tab + tt.track->instrument.string_pitch.num * string_dy + track_space;
+		// markers
 		h += track_space;
 	}
 	return h + line_space;

@@ -1,5 +1,6 @@
 use tsunami.*
 use hui
+use time.Timer
 
 func smooth(t: float) -> float
 	if t < 0.5
@@ -22,6 +23,9 @@ class MLVDialog extends hui.Dialog
 	line_samples: int[]
 	line_y0: float[]
 	area: rect
+	dragging = false
+	drag_y_offset0: float
+	drag_timer: Timer
 
 	func __init__(parent: hui.Window*, _mlv: MultiLineView)
 		super.__init__("Multi Line View", 800, 600, parent, true)
@@ -33,7 +37,7 @@ class MLVDialog extends hui.Dialog
 		from_source("Dialog multi-line-view 'Multi Line View' resizable headerbar
 	Grid ? '' vertical
 		Grid ? ''
-			DrawingArea area '' mainwindowcontrol expandx
+			DrawingArea area '' mainwindowcontrol expandx gesture=drag
 			Grid config-grid '' noexpandx width=300 hidden
 				Grid ? ''
 					Label l-line-height 'Line height'
@@ -72,6 +76,9 @@ class MLVDialog extends hui.Dialog
 		event_x("area", "hui:left-button-down", on_click)
 		event_x("area", "hui:mouse-wheel", on_scroll)
 		event_x("area", "hui:key-down", on_key)
+		event_x("area", "hui:gesture-drag-begin", on_drag_begin)
+		event_x("area", "hui:gesture-drag-end", on_drag_end)
+		event_x("area", "hui:gesture-drag", on_drag_update)
 		event("hui:close", on_close)
 		
 		#session.playback.signal_chain.subscribe(self, on_preview_change, "changed")
@@ -190,20 +197,34 @@ class MLVDialog extends hui.Dialog
 				return line_samples[i] + (line_samples[i+1] - line_samples[i]) * (pos.x - border) / (area.width() - 2*border)
 		return -1
 	
+	func mut on_drag_begin()
+		let e = hui.get_event()
+		if e.row != 3 # touch
+			return
+		dragging = true
+		drag_y_offset0 = config.y_offset
+		drag_timer.reset()
+	
+	func mut on_drag_end()
+		dragging = false
+	
+	func mut on_drag_update()
+		if not dragging
+			return
+		if drag_timer.peek() < 0.03
+			return
+		drag_timer.reset()
+		let e = hui.get_event()
+		config.y_offset = clamp(drag_y_offset0 - e.scroll.y, 0.0, 100000)
+		mlv.changed()
+	
 	func sample_to_screen(s: int) -> vec2
 		for i=>s0 in line_samples[:-1]
 			if s >= s0 and s < line_samples[i+1]
 				return [0,line_y0[i]] # X: TODO
 		return [0,0]
-		
-
-	func override on_draw(p: hui.Painter)
-		let window_size_prev = window_size
-		get_size(window_size[0], window_size[1])
-		if window_size != window_size_prev
-			mlv.changed()
-			
-		area = [0,p.width, 0,p.height]
+	
+	func mlp_config() -> any
 		var conf = dyn([])
 		for i=>t in session.song.tracks
 			if t.type != SignalType.MIDI
@@ -218,14 +239,26 @@ class MLVDialog extends hui.Dialog
 				conf.add(dyn({"index":i, "classical":true}))
 			else if track_mode[i*2+1]
 				conf.add(dyn({"index":i, "tab":true}))
-		mlp.set_context(conf, p.width, 44100*p.width/180 / x_scale)
+		return conf
+
+	func override on_draw(p: hui.Painter)
+		let window_size_prev = window_size
+		get_size(window_size[0], window_size[1])
+		if window_size != window_size_prev
+			mlv.changed()
+			
+		area = [0,p.width, 0,p.height]
+		p.set_color(colors.background)
+		p.draw_rect(area)
+		mlp.set_context(mlp_config(), p.width, 44100*p.width/180 / x_scale)
 		mlp.set(dyn({"border": border,
 			"line-height": line_height,
 			"line-space": line_height * line_space,
 			"track-space": line_height * track_space,
 			"allow-shadows": allow_shadows,
 			"antialiasing": true,
-			"collapse-midi": true}))
+			"collapse-midi": true,
+			"part-colors": true}))
 		var y0 = 10.0 - y_offset
 		var offset = 0
 		let dy = mlp.get_line_dy()
@@ -264,8 +297,10 @@ class MLVDialog extends hui.Dialog
 			if y_offset_t >= 1
 				y_offset_t = -1
 			let id = hui.run_later(0.02, force_redraw)
+
 	func force_redraw()
 		redraw("area")
+
 
 let AUTO_CONFIG_LINE_HEIGHT = "range=10:200"
 let AUTO_CONFIG_LINE_SPACE = "range=0:2:0.01,scale=100,unit=%"
@@ -276,6 +311,7 @@ let AUTO_CONFIG_X_SCALE = "range=0.02:4:0.01,scale=100,unit=%"
 #let AUTO_CONFIG_Y_OFFSET = "range=0:100000"
 let AUTO_CONFIG_Y_OFFSET = "ignore"
 let AUTO_CONFIG_SHOW_WINDOW = ""
+
 
 class MultiLineView extends TsunamiPlugin
 	dlg: shared[MLVDialog]

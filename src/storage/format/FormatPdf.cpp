@@ -51,16 +51,10 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	// mandatory defaults
 	if (!od->parameters.has("tracks"))
 		od->parameters.map_set("tracks", {});
-	
-	bool ok = false;
-	auto dlg = new PdfConfigDialog(od, od->win);
-	dlg->end_run_promise.get_future().then([&ok, dlg] {
-		msg_write("xxxxxxxx");
-		ok = dlg->ok;
-	});
-	hui::run(dlg);
-	msg_write("aaaaaa");
-	return ok;
+
+	shared<PdfConfigDialog> dlg = new PdfConfigDialog(od, od->win);
+	hui::fly_and_wait(dlg.to<hui::Window>());
+	return dlg->ok;
 }
 
 ColorScheme create_pdf_default_color_scheme() {

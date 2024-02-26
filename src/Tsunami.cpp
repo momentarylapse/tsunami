@@ -282,7 +282,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			if (a == Array<string>({"long"}))
 				for (int i=3; i<1000; i++)
 					dlg->add_string("list", i2s(i));
-			hui::run(dlg);
+			hui::fly_and_wait(dlg);
 		});
 	});
 	p.cmd("columnview", "", "bla", [this] (const Array<string> &) {
@@ -298,7 +298,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			dlg->event("button", [dlg] {
 				dlg->change_string("list", 0, "false\\bla\\z");
 			});
-			hui::run(dlg);
+			hui::fly_and_wait(dlg);
 		});
 	});
 	p.cmd("treeview", "", "bla", [this] (const Array<string> &a) {
@@ -310,7 +310,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			dlg->add_string("list", "2");
 			for (int i=3; i<30; i++)
 				dlg->add_child_string("list", i % 3, i2s(i));
-			hui::run(dlg);
+			hui::fly_and_wait(dlg);
 		});
 	});
 #endif

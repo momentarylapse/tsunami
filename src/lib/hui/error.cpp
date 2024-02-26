@@ -156,7 +156,7 @@ public:
 };
 
 void show_crash_window() {
-	hui::run(new ErrorDialog);
+	hui::fly_and_wait(new ErrorDialog);
 }
 
 void hui_default_error_handler() {

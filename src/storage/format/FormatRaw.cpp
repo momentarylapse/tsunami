@@ -37,12 +37,9 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 	if (!od->parameters.has("channels"))
 		od->parameters.map_set("channels", 1);
 
-
-	bool ok = false;
-	auto dlg = new RawConfigDialog(od, od->win);
-	hui::run(dlg);
-	ok = dlg->ok;
-	return ok;
+	shared<RawConfigDialog> dlg = new RawConfigDialog(od, od->win);
+	hui::fly_and_wait(dlg.to<hui::Window>());
+	return dlg->ok;
 }
 
 void FormatRaw::save_via_renderer(StorageOperationData *od) {

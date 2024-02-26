@@ -528,7 +528,7 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("id", TypeInt);
 	add_func("fly", TypeHuiVoidFuture, hui_p(&hui::fly), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
-	add_func("run", TypeVoid, hui_p(&hui::run), Flags::STATIC);
+	add_func("fly_and_wait", TypeVoid, hui_p(&hui::fly_and_wait), Flags::STATIC);
 		func_add_param("win", TypeHuiWindowShared);
 	/*add_func("HuiAddKeyCode", TypeVoid, (void*)&hui::AddKeyCode, Flags::STATIC);
 		func_add_param("id", TypeString);

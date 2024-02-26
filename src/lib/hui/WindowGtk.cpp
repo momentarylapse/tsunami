@@ -366,9 +366,11 @@ void Window::_wait_till_closed() {
 	}
 }
 
-void run(shared<Window> win) {
+void fly_and_wait(shared<Window> win) {
 	win->show();
 	//int uid = unique_id;
+
+	WindowFlightManager::add(win);
 
 /*#if GTK_CHECK_VERSION(4,0,0)
 	msg_error("TODO: hui.run() gtk4");
@@ -383,8 +385,6 @@ void run(shared<Window> win) {
 		win->_wait_till_closed();
 //	}
 //#endif
-
-	win->end_run_promise();
 }
 class ControlBasicWindowLayout : public Control {
 public:

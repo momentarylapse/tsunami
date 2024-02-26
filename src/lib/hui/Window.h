@@ -197,7 +197,7 @@ public:
 };
 
 
-void run(shared<Window> win);
+void fly_and_wait(shared<Window> win);
 base::future<void> fly(shared<Window> win);
 
 

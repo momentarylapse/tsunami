@@ -213,8 +213,8 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 		if (auto *m = get_bar_part(song, b->offset)) {
 			p->set_color(colors.text);
 			float x = x1 * 0.75f + x2 * 0.25f;
-			p->set_font_size(line_height / 4);
-			p->draw_str({x - d*3, y-d*4}, m->nice_text());
+			p->set_font_size(line_height / 3);
+			p->draw_str({x - d*3, y-d*6}, m->nice_text());
 		}
 	}
 }

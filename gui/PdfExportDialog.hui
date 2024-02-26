@@ -1,7 +1,7 @@
 Dialog pdf-export-config-dialog "Pdf Export" width=1200 height=800 headerbar resizable closebutton=no
 	Grid ? ""
 		Grid ? ""
-			DrawingArea area "" expandx expandy
+			DrawingArea area "" expandx expandy mainwindowcontrol
 			Grid ? "" vertical width=120
 				Grid ? ""
 					Label l-color "Theme"
@@ -11,10 +11,10 @@ Dialog pdf-export-config-dialog "Pdf Export" width=1200 height=800 headerbar res
 					SpinButton line-height ""
 					---|
 					Label l-line-space 'Line space'
-					SpinButton line-space "" range=0:2:0.01
+					SpinButton line-space "" range=0:10:0.01
 					---|
 					Label l-track-space 'Track space'
-					SpinButton track-space "" range=0:2:0.01
+					SpinButton track-space "" range=0:10:0.01
 					---|
 					Label l-horizontal-scale 'Horizontal scale'
 					SpinButton horizontal-scale "" range=1:500:1

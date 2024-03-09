@@ -734,9 +734,12 @@ template<> string str(const double& d) {
 template<> string str(const bool& b) {
 	return b2s(b);
 }
-template<> string str(const Array<string> &a) {
-	return sa2s(a);
+template<> string str(const string& s) {
+	return s;
 }
+/*template<> string str(const Array<string>& a) {
+	return sa2s(a);
+}*/
 template<> string repr(const string& s) {
 	return s.repr();
 }

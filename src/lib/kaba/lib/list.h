@@ -15,8 +15,9 @@
 #include "../syntax/Identifier.h"
 #include "../syntax/Operator.h"
 #include "../syntax/Inline.h"
+#include <cstdint>
 
-template<> inline string str(const u_int8_t& c) {
+template<> inline string str(const uint8_t& c) {
 	return format("0x%02x", (int)c);
 }
 

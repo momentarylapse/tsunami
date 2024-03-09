@@ -501,7 +501,7 @@ void SIAddPackageBase(Context *c) {
 	lib_create_list<float>(TypeFloatList);
 	lib_create_list<double>(TypeFloat64List);
 	lib_create_list<char>(TypeString);
-	lib_create_list<u_int8_t>(TypeBytes);
+	lib_create_list<uint8_t>(TypeBytes);
 	lib_create_list<string>(TypeStringList);
 
 

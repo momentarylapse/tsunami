@@ -101,6 +101,10 @@ int hui_main(const Array<string> &);
 
 #ifdef OS_WINDOWS
 
+int main(int num_args, char* args[]) {
+	return hui_main(hui::make_args(num_args, args));
+}
+
 #ifdef _CONSOLE
 
 int _tmain(int num_args, _TCHAR *args[]) {

@@ -93,7 +93,7 @@ void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, double 
 	dbo("E " + i2s(h->row_in_model));
 }
 
-void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h) {
+void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, ControlListView::ItemMapper *h) {
 	h->list_view->hover = -1;
 	dbo("L");
 }

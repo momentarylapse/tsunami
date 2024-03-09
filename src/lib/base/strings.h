@@ -194,6 +194,7 @@ template<> string str(const int64& i);
 template<> string str(const float& f);
 template<> string str(const double& d);
 template<> string str(const bool& b);
+template<> string str(const string& s);
 
 
 template<class T>
@@ -203,6 +204,8 @@ string repr(const T &t) {
 	else
 		return str(t);
 }
+
+template<> string repr(const string& s);
 
 template<class T>
 string str(const Array<T> &a) {

@@ -2,9 +2,9 @@
 #define BASE_H__INCLUDED_
 
 #include "macros.h"
+#include <ciso646>
 #include "array.h"
 #include "strings.h"
-#include <ciso646>
 
 #ifdef max
 #undef max

@@ -501,51 +501,58 @@ Function* class_add_func(const string &name, const Class *return_type, std::null
 }
 
 int get_virtual_index(void *func, const string &tname, const string &name) {
+	if (!func)
+		return 0;
 	if ((config.native_target.abi == Abi::X86_WINDOWS) or (config.native_target.abi == Abi::AMD64_WINDOWS)) {
-		if (!func)
-			return 0;
 		unsigned char* pp = (unsigned char*)func;
-		try {
-			//if ((cur_class->vtable) and (pp[0] == 0x8b) and (pp[1] == 0x01) and (pp[2] == 0xff) and (pp[3] == 0x60)){
+
+		if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0x60)) {
+			// amd64 small
+			// 48.8b.01    ff.60.NN
+			// virtual function
+			return (unsigned int)pp[5] / 8;
+		}
+		if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0xa0)) {
+			// amd64 big
+			// 48.8b.01    ff.a0.NN.NN.NN.NN
+			// virtual function
+			return *(int*)&pp[5] / 8;
+		}
+		if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)) {
+			// 8b.44.24.**    8b.00     ff.60.10
+			// virtual function
+			return (unsigned int)pp[8] / 4;
+		}
+		if (pp[0] == 0xe9) {
+			// jmp
+			//msg_write(Asm::disassemble(func, 16));
+			pp = &pp[5] + *(int*)&pp[1];
+			//msg_write(Asm::disassemble(pp, 16));
 			if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)) {
+				// x86
 				// 8b.44.24.**    8b.00     ff.60.10
 				// virtual function
-				return (int)pp[8] / 4;
-			} else if (pp[0] == 0xe9) {
-				// jmp
-				//msg_write(Asm::disassemble(func, 16));
-				pp = &pp[5] + *(int*)&pp[1];
-				//msg_write(Asm::disassemble(pp, 16));
-				if ((pp[0] == 0x8b) and (pp[1] == 0x44) and (pp[2] == 0x24) and (pp[4] == 0x8b) and (pp[5] == 0x00) and (pp[6] == 0xff) and (pp[7] == 0x60)) {
-					// x86
-					// 8b.44.24.**    8b.00     ff.60.10
-					// virtual function
-					return (unsigned int)pp[8] / 4;
-				} else if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0x60)) {
-					// amd64
-					// 48.8b.01   mov rax, [ecx]
-					// ff.60.NN   jmp [eax+N*8]
-					// virtual function
-					return (unsigned int)pp[5] / 8;
-				} else if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0xa0)) {
-					// amd64
-					// 48.8b.01            mov rax, [ecx]
-					// ff.a0.NN.NN.NN.NN   jmp [eax+N*8]
-					// virtual function
-					int* ppi = (int*)&pp[5];
-					return *ppi / 8;
-				} else {
-					throw(1);
-				}
-			} else {
-				throw(1);
+				return (unsigned int)pp[8] / 4;
+			} else if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0x60)) {
+				// amd64
+				// 48.8b.01   mov rax, [ecx]
+				// ff.60.NN   jmp [eax+N*8]
+				// virtual function
+				return (unsigned int)pp[5] / 8;
+			} else if ((pp[0] == 0x48) and (pp[1] == 0x8b) and (pp[2] == 0x01) and (pp[3] == 0xff) and (pp[4] == 0xa0)) {
+				// amd64
+				// 48.8b.01            mov rax, [ecx]
+				// ff.a0.NN.NN.NN.NN   jmp [eax+N*8]
+				// virtual function
+				return *(int*)&pp[5] / 8;
 			}
-		} catch (...) {
-			msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
-			msg_write(p2s(pp));
-			msg_write(Asm::disassemble(func, 16));
 		}
+		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
+		msg_write(p2s(pp));
+		msg_write(Asm::disassemble(func, 16));
+		exit(1);
 	} else if (config.native_target.abi == Abi::AMD64_WINDOWS) {
+		unsigned char* pp = (unsigned char*)func;
 		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
 	} else {

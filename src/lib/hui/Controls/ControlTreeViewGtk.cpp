@@ -21,7 +21,7 @@ string make_format_string_useful(const string &_format, int size);
 
 
 #if GTK_CHECK_VERSION(4,10,0)
-void on_gtk_list_activate(GtkWidget* widget, void* a, void* b, ControlListView* self);
+void on_gtk_list_activate(GtkWidget* widget, guint pos, ControlListView* self);
 void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, double x, double y, ControlListView *c);
 void gtk_list_item_widget_enter_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h);
 void gtk_list_item_widget_leave_cb(GtkEventControllerMotion *controller, double x, double y, ControlListView::ItemMapper *h);

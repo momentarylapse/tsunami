@@ -46,7 +46,12 @@ Array<GType> CreateTypeList(const string &format_string) {
 	return types;
 }
 
-void on_gtk_list_activate(GtkWidget* widget, void* a, void* b, ControlListView* self) {
+void on_gtk_list_activate(GtkWidget* widget, guint pos, ControlListView* self) {
+	self->panel->win->input.row = pos;
+	self->notify(EventID::ACTIVATE);
+}
+
+void on_gtk3_treeview_row_activated(GtkWidget* widget, void* a, void* b, ControlListView* self) {
 	self->notify(EventID::ACTIVATE);
 }
 
@@ -460,7 +465,7 @@ ControlListView::ControlListView(const string &title, const string &id, Panel *p
 
 	auto view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
 
-	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(&on_gtk_list_activate), this);
+	g_signal_connect(G_OBJECT(view), "row-activated", G_CALLBACK(&on_gtk3_treeview_row_activated), this);
 
 	// capture right click
 	g_signal_connect(G_OBJECT(view), "button-press-event", G_CALLBACK(&on_gtk_list_right_button), this);

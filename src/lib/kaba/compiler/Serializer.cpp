@@ -368,7 +368,7 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 	block->_label_end = list->create_label("_BLOCK_END_" + p2s(block));
 	cmd.add_label(block->_label_start);
 
-	SerialNodeParam ret;
+	SerialNodeParam ret{};
 
 	insert_constructors_block(block);
 

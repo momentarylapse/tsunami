@@ -10,8 +10,8 @@ Mostly done, now.
 Multiple problems:
 
 * building with gtk on windows constantly breaks
-  * `vcpkg` worked for a short time, before breaking automatic include directories 
-* some gtk4 workarounds (listviews) are broken
+  * `vcpkg` worked for a short time, before breaking automatic include directories
+  * ok, a mix of `vcpkg` and `gvsbuild` seems to work
 * not all utf-8 supported?!?
 * my `kaba` JIT compiler has not been tested on windows for a while, might need fixes
 

@@ -3,21 +3,27 @@
 ## Preparations
 
 Install libraries (the developer version):
-* **required**: gtk+-3, zlib, fftw3
+* **required**: gtk4, zlib, fftw3
 * **recommended**: pulseaudio, alsa, ogg, vorbis, flac, opengl, unwind, dl
 * **optional**: portaudio (mostly in case, pulseaudio is not available)
 
 ### Arch / Manjaro
 
 ```
-sudo pacman -S gtk3 libogg libvorbis flac fftw libpulse alsa-lib libunwind
+sudo pacman -S gtk4 libogg libvorbis flac fftw libpulse alsa-lib libunwind
+```
+
+### Fedora
+
+```
+sudo dnf install libogg-devel libvorbis-devel flac-devel fftw3-devel pulseaudio-libs-devel alsa-lib-devel libunwind-devel
 ```
 
 ### Ubuntu
 
 ```
 sudo apt-get install git make g++
-sudo apt-get install libgtk-3-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev libportaudio19-dev
+sudo apt-get install libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev libportaudio19-dev
 ```
 
 ## Building, installing
@@ -26,13 +32,13 @@ Assuming you are in the repository's root folder, type
 ```
 mkdir build
 cd build
-ccmake ..
+ccmake .. -GNinja
 # here, probably press C twice, then G
-make
-sudo make install   # optional
+ninja
+sudo ninja install   # optional
 ```
 
-By default, this will use **gtk3**. If you want to try **gtk4**, you can (in the `cmake ..` step) edit the option `GTK3_OR_GTK4` to "gtk4".
+By default, this will use **gtk4**. If you want to try **gtk3**, you can (in the `cmake ..` step) edit the option `GTK4_OR_GTK3` to "gtk3".
 
 
 <!---Alternatively, you can use **meson** to compile (might be broken...):
@@ -59,8 +65,22 @@ cd <REPOSITORY-ROOT>  # important to run the program from here!
 
 ## Windows
 
-There is experimental support for Visual Studio 2019. Libraries are best installed via vcpkg. Sadly, the latest vcpkg version replaces gtk3 with gtk4, so you need to checkout an older commit.
+There is experimental support for Visual Studio 2022.
 
+### Preparation: installing gtk4
 
-You will need to download theme files... TODO
+Follow the steps here: https://github.com/wingtk/gvsbuild
+
+But instead of `gvsbuild build gtk4` run
+
+```gvsbuild build gtk4 libadwaita adwaita-icon-theme```
+
+### Visual Studio
+
+The project can be opened as a regular cmake project/folder in Visual Studio 2022.
+
+All libraries (apart from `gtk`) are handled via `vcpkg`. This requires the `vcpkg` plugin in Visual Studio. The project provides a `vcpkg.json` file to declare its dependencies. When generating the `cmake` cache, Visual Studio will automatically download and install these libraries.
+
+Since `CMakePresets.json` and `.vs/launch.vs.json` are provided, you should be able to build and run the program.
+
 

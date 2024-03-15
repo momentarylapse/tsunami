@@ -23,7 +23,10 @@ namespace hui {
 
 
 void ErrorHandler::init() {
+	// windows: let VS handle things for now...
+#ifndef OS_WINDOWS
 	hui::SetErrorFunction(error_handler);
+#endif
 }
 
 namespace kaba {

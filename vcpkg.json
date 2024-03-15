@@ -1,0 +1,11 @@
+{
+  "dependencies": [
+    "fftw3",
+    "libflac",
+    "libogg",
+    "libvorbis",
+    "opengl",
+    "portaudio",
+    "zlib"
+  ]
+}

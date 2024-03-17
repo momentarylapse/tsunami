@@ -12,8 +12,8 @@ namespace hui {
 
 namespace clipboard {
 
-void _cdecl copy(const string &buffer);
-string _cdecl paste();
+void copy(const string &buffer);
+base::future<string> paste();
 
 }
 

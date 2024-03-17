@@ -24,39 +24,38 @@ void copy(const string &buffer) {
 #endif
 }
 
-string paste() {
-	string r;
-#ifdef HUI_API_GTK
-	//msg_write("--------a");
+static base::promise<string> clipboard_promise;
+
 #if GTK_CHECK_VERSION(4,0,0)
-	GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default()); //gtk_widget_get_clipboard(widget);
+void g_ready_callback(GObject* source_object, GAsyncResult* res, gpointer data) {
+	auto p = gdk_clipboard_read_text_finish(GDK_CLIPBOARD(source_object), res, nullptr);
+	if (p)
+		clipboard_promise(p);
+	else
+		clipboard_promise.fail();
+}
+#endif
 
-	GdkContentProvider *provider = gdk_clipboard_get_content(clipboard);
-
-	GValue value = G_VALUE_INIT;
-	g_value_init (&value, G_TYPE_STRING);
-
-	// If the content provider does not contain text, we are not interested
-	if (!gdk_content_provider_get_value (provider, &value, nullptr))
-		return "";
-
-	const char *buffer = g_value_get_string(&value);
-	r = buffer;
-	g_value_unset(&value);
-
+base::future<string> paste() {
+	clipboard_promise.reset();
+#ifdef HUI_API_GTK
+#if GTK_CHECK_VERSION(4,0,0)
+	GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default());
+	// sadly, gdk_clipboard_get_content() + gdk_content_provider_get_value() seems to fail
+	// need async :(
+	gdk_clipboard_read_text_async(clipboard, nullptr, &g_ready_callback, nullptr);
 #else
 	GtkClipboard *cb = gtk_clipboard_get_for_display(gdk_display_get_default(), GDK_SELECTION_CLIPBOARD);
 	//msg_write("--------b");
 	char *buffer = gtk_clipboard_wait_for_text(cb);
 	//msg_write(*buffer);
 	if (buffer) {
-		r = buffer;
+		clipboard_promise(buffer);
 		g_free(buffer);
 	}
 #endif
-	//msg_write(length);
 #endif
-	return r;
+	return clipboard_promise.get_future();
 }
 
 }

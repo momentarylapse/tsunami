@@ -552,7 +552,6 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 		msg_write(Asm::disassemble(func, 16));
 		exit(1);
 	} else if (config.native_target.abi == Abi::AMD64_WINDOWS) {
-		unsigned char* pp = (unsigned char*)func;
 		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
 	} else {

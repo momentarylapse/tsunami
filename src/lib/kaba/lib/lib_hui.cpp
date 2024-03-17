@@ -124,13 +124,17 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiEvent = add_type("Event", sizeof(hui::Event));
 	auto TypeHuiEventRef = add_type_ref(TypeHuiEvent);
 	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
+	auto TypeHuiClipboard = add_type("clipboard", 0);
+	const_cast<Class*>(TypeHuiClipboard)->type = Class::Type::NAMESPACE;
 
+	auto TypeHuiStringFuture = add_type("future[string]", sizeof(base::future<string>));
 	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(base::future<Path>));
 	auto TypeHuiBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
 	auto TypeHuiVoidFuture = add_type("future[void]", sizeof(base::future<void>));
 
 	auto TypeCallbackPainter = add_type_func(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
+	auto TypeCallbackString = add_type_func(TypeVoid, {TypeString});
 	auto TypeCallbackBool = add_type_func(TypeVoid, {TypeBool});
 
 	lib_create_pointer_xfer(TypeHuiMenuXfer);
@@ -140,6 +144,7 @@ void SIAddPackageHui(Context *c) {
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
 
+	lib_create_future<string>(TypeHuiStringFuture, TypeString, TypeCallbackString);
 	lib_create_future<Path>(TypeHuiPathFuture, TypePath, TypeCallbackPath);
 	lib_create_future<bool>(TypeHuiBoolFuture, TypeBool, TypeCallbackBool);
 	lib_create_future<void>(TypeHuiVoidFuture, TypeVoid, TypeCallback);
@@ -576,14 +581,17 @@ void SIAddPackageHui(Context *c) {
 //	add_func("get_key_char", TypeString, hui_p(&hui::GetKeyChar), Flags::STATIC | Flags::PURE);
 //		func_add_param("id", TypeInt);
 
-	// clipboard
-	add_func("copy_to_clipboard", TypeVoid, hui_p(&hui::clipboard::copy), Flags::STATIC);
-		func_add_param("buffer", TypeString);
-	add_func("paste_from_clipboard", TypeString, hui_p(&hui::clipboard::paste), Flags::STATIC);
 	add_func("open_document", TypeVoid, hui_p(&hui::open_document), Flags::STATIC);
 		func_add_param("filename", TypePath);
 	add_func("make_gui_image", TypeString, hui_p(&hui::set_image), Flags::STATIC);
 		func_add_param("image", TypeImage);
+
+
+	add_class(TypeHuiClipboard);
+		class_add_func("paste", TypeHuiStringFuture, hui_p(&hui::clipboard::paste), Flags::STATIC);
+		class_add_func("copy", TypeVoid, hui_p(&hui::clipboard::copy), Flags::STATIC);
+			func_add_param("text", TypeString);
+
 
 	add_class(TypeHuiEvent);
 		class_add_element("id", TypeString, GetDAEvent(id));

@@ -561,7 +561,7 @@ DynamicLibraryImport *get_dynamic_lib(const string &libname, Module *s) {
 	auto *d = new DynamicLibraryImport;
 	d->libname = libname;
 
-	Array<Path> dirs = {"/usr/lib64", "/lib64", "/usr/lib", "/lib"};
+	Array<Path> dirs = {"/usr/lib/x86_64-linux-gnu/", "/usr/lib64", "/lib64", "/usr/lib", "/lib"};
 	Path filename;
 	for (auto &dir: dirs)
 		if (filename.is_empty())

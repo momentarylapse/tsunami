@@ -84,7 +84,7 @@ public:
 		value = nullptr;
 	}
 	void parse(const string &s) override {
-		if (is_number(s[0])) {
+		if (is_number(s.num > 0 and s[0])) {
 			// legacy
 			auto p = s.explode(":");
 			if (p.num == 5) {
@@ -185,7 +185,7 @@ public:
 		panel = nullptr;
 	}
 	void parse(const string &s) override {
-		if (is_number(s[0])) {
+		if (is_number(s.num > 0 and s[0])) {
 			// legacy
 			auto p = s.explode(":");
 			if (p.num == 2) {

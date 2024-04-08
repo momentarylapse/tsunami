@@ -33,6 +33,7 @@ void g_ready_callback(GObject* source_object, GAsyncResult* res, gpointer data) 
 		clipboard_promise(p);
 	else
 		clipboard_promise.fail();
+	g_free(p);
 }
 #endif
 

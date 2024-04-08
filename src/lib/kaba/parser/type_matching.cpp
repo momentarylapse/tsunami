@@ -381,7 +381,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 	if (cast.cast == TypeCastId::OWN_STRING)
 		return add_converter_str(node, false);
 	if (cast.cast == TypeCastId::ABSTRACT_LIST) {
-		if (wanted == TypeDynamicArray)
+		if (wanted == TypeDynamicArray) // whatever, anything is ok!
 			return force_concrete_type(node);
 		CastingData cd2;
 		for (auto&& [i,e]: enumerate(node->params)) {
@@ -427,7 +427,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 				do_error("tuple as constructor...mismatch", e);
 			}
 		auto cmd = add_node_constructor(f);
-		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type, 1);
+		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type.sub_ref(1), 1);
 	}
 	if (cast.cast == TypeCastId::AUTO_CONSTRUCTOR) {
 		auto f = cast.f;
@@ -436,7 +436,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 			do_error("auto constructor...mismatch", node);
 		}
 		auto cmd = add_node_constructor(f);
-		return apply_params_with_cast(cmd, {node}, {c}, f->literal_param_type, 1);
+		return apply_params_with_cast(cmd, {node}, {c}, f->literal_param_type.sub_ref(1), 1);
 	}
 	if ((cast.cast == TypeCastId::MAKE_SHARED) or (cast.cast == TypeCastId::MAKE_OWNED)) {
 		if (!cast.f)

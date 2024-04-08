@@ -1,0 +1,179 @@
+use tsunami.*
+use hui
+
+struct Pitch
+	var pitch: int
+	var active: bool[]
+	func is_active(i: int) -> bool
+		if i < 0 or i >= len(active)
+			return false
+		return active[i]
+
+class Config extends Module.Config
+	var bpm: float
+	var beats: int
+	var subbeats: int
+	var pitches: Pitch[]
+	
+	func override reset()
+		bpm = 90
+		beats = 4
+		subbeats = 4
+		pitches = [[64,[true,false,true]], [66,[false,true]], [67,[]], [69,[]], [71,[]]]
+
+class SequencerSource extends MidiSource
+	var config: Config
+	var offset: int
+	var subbeat_length: int
+
+	func total_samples() -> int
+	
+	func override on_config()
+		subbeat_length = DEFAULT_SAMPLE_RATE * 60 / config.bpm / config.subbeats
+
+	func override reset_state()
+		offset = 0
+		
+	func sample_to_subbeat(pos: int) -> int
+		return pos / subbeat_length
+	func subbeat_to_sample(s: int) -> int
+		return s * subbeat_length
+		
+	func override read(out midi: MidiEventBuffer) -> int
+	
+		# generate all
+		var buf: MidiEventBuffer
+		buf.samples = subbeat_length * config.beats * config.subbeats
+		for p in config.pitches
+			for s in 0:config.beats*config.subbeats
+				if p.is_active(s)
+					buf.add(MidiEvent(subbeat_to_sample(s), p.pitch, 1))
+					buf.add(MidiEvent(subbeat_to_sample(s+1)-1, p.pitch, 0))
+		
+		var done = 0
+		while done < midi.samples
+			var chunk = min(midi.samples - done, buf.samples - offset)
+			for m in buf.get_events(Range(offset, chunk))
+				var mm = m
+				mm.pos += done
+				midi.add(mm)
+			
+			offset = loop(offset + chunk, 0, buf.samples)
+			done += chunk
+	
+		return midi.samples
+	
+	func override create_panel() -> xfer[ConfigPanel]
+		return new SequencerPanel(self)
+
+
+class SequencerPanel extends ConfigPanel
+	var override c: SequencerSource&
+	var hover: (int,int)?
+	var width = 0
+	var height = 0
+	var id_runner = -1
+	
+	func override __init__(_h: Module)
+		from_source("
+Grid ? '' vertical
+	Grid ? ''
+		Label l-bpm 'Bpm'
+		SpinButton bpm '10' range=10:300 'tooltip=Beats per minute' expandx
+		Label l-beats 'Beats'
+		SpinButton beats '4' range=1:32 'tooltip=Number of beats' expandx
+		Label l-beats '/'
+		SpinButton subbeats '4' range=1:32 'tooltip=Number of beat divisions' expandx
+	DrawingArea drawing '' grabfocus expandx expandy")
+	
+		event("bpm", on_edit)
+		event("beats", on_edit)
+		event("subbeats", on_edit)
+		event_x("drawing", "hui:draw", on_draw)
+		event_x("drawing", "hui:left-button-down", on_left_button_down)
+		event_x("drawing", "hui:mouse-move", on_mouse_move)
+		event_x("drawing", "hui:mouse-leave", on_mouse_leave)
+		
+		id_runner = hui.run_repeated(0.02, trigger_redraw)
+	
+	func override __delete__()
+		hui.cancel_runner(id_runner)
+	
+	func get_hover() -> (int,int)?
+		let subbeats = c.config.beats*c.config.subbeats
+		let m = hui.get_event().mouse
+		let k = int((height - m.y) / (height / len(c.config.pitches)))
+		let i = int(m.x / (width / subbeats))
+		if k>=0 and k<len(c.config.pitches) and i>=0 and i<subbeats
+			return (k,i)
+		return nil
+	
+	func mut on_left_button_down()
+		hover = get_hover()
+		for h in hover
+			c.config.pitches[h[0]].active.resize(c.config.beats*c.config.subbeats)
+			c.config.pitches[h[0]].active[h[1]] = not c.config.pitches[h[0]].active[h[1]]
+			changed()
+		redraw("drawing")
+
+	func mut on_mouse_move()
+		hover = get_hover()
+		redraw("drawing")
+
+	func mut on_mouse_leave()
+		hover = nil
+		redraw("drawing")
+	
+	func mut on_draw(p: hui.Painter)
+		width = p.width
+		height = p.height
+		
+		p.set_color(colors.background)
+		p.draw_rect([0,width, 0,height])
+		
+		let subbeats = c.config.beats*c.config.subbeats
+		let gridx = float(width) / subbeats
+		let gridy = float(height) / len(c.config.pitches)
+		let border = gridx * 0.05
+		let beat_border = gridx * 0.07 # additional
+		let wbutton = (width - subbeats * border - (c.config.beats-1)*beat_border) / subbeats
+		
+		for k=>pitch in c.config.pitches
+			var x0 = border
+			for i in 0:subbeats
+				var col = colors.pitch_color(pitch.pitch)
+				if not pitch.is_active(i)
+					col = color.interpolate(col, colors.background, 0.8)
+				for h in hover
+					if k == h[0] and i == h[1]
+						col = colors.hoverify(col)
+				p.set_color(col)
+				p.draw_rect([x0, x0+wbutton, height-k*gridy-border, height-(k+1)*gridy+border])
+				x0 += wbutton + border
+				if ((i+1) % c.config.subbeats) == 0
+					x0 += beat_border
+		
+		if c.offset != 0
+			p.set_color(color.GREEN)
+			let x = float(width) * c.offset / (DEFAULT_SAMPLE_RATE * 60 / c.config.bpm * c.config.beats)
+			p.draw_line([x,0], [x,height])
+	
+	func mut on_edit()
+		c.config.bpm = get_float("bpm")
+		c.config.beats = get_int("beats")
+		c.config.subbeats = get_int("subbeats")
+		changed()
+		redraw("drawing")
+	
+	func override update()
+		set_float("bpm", c.config.bpm)
+		set_int("beats", c.config.beats)
+		set_int("subbeats", c.config.subbeats)
+		redraw("drawing")
+	
+	func mut trigger_redraw()
+		redraw("drawing")
+
+
+
+

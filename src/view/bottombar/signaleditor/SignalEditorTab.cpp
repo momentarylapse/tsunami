@@ -34,7 +34,7 @@ class SignalEditorPlayButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({32, -32}, 20, 20) {
+	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({32, -32}, 45, 45) {
 		align.dz = 30;
 		align.vertical = AlignData::Mode::BOTTOM;
 		set_perf_name("button");
@@ -42,53 +42,33 @@ public:
 		chain = tab->chain;
 	}
 	void on_draw(Painter *p) override {
-		color col = theme.text_soft2;
-		if (!chain->is_active()) {
-			col = theme.text_soft1;
-			if (this->is_cur_hover())
-				col = theme.text;
+		color bg = theme.background_overlay;
+		color fg = theme.text_soft3;
+		float radius = area.width() * 0.48f;
+		if (is_cur_hover()) {
+			bg = theme.hoverify(bg);
+			fg = theme.text;
+			radius = area.width() * 0.6f;
 		}
-		p->set_color(col);
-		p->set_font_size(18);
-		p->draw_str({area.x1, area.y1}, u8"\u25B6");
+		p->set_color(bg);
+		p->draw_circle(area.center(), radius);
+		p->set_color(fg);
+		p->set_font_size(theme.FONT_SIZE_HUGE);
+		if (chain->is_active())
+			draw_str_centered(p, area.center(), u8"\u23F8");
+		else
+			draw_str_centered(p, area.center(), u8"\u25B6");
+		p->set_font_size(theme.FONT_SIZE);
 	}
 	bool on_left_button_down(const vec2 &m) override {
-		chain->start();
+		if (chain->is_active())
+			chain->stop();
+		else
+			chain->start();
 		return true;
 	}
 	string get_tip() const override {
 		return _("start");
-	}
-};
-
-class SignalEditorStopButton : public scenegraph::NodeRel {
-public:
-	SignalEditorTab *tab;
-	SignalChain *chain;
-	SignalEditorStopButton(SignalEditorTab *t) : scenegraph::NodeRel({72, -32}, 20, 20) {
-		align.dz = 30;
-		align.vertical = AlignData::Mode::BOTTOM;
-		set_perf_name("button");
-		tab = t;
-		chain = tab->chain;
-	}
-	void on_draw(Painter *p) override {
-		color col = theme.text_soft2;
-		if (chain->is_active()) {
-			col = theme.text_soft1;
-			if (this->is_cur_hover())
-				col = theme.text;
-		}
-		p->set_color(col);
-		p->set_font_size(18);
-		p->draw_str({area.x1, area.y1}, u8"\u23F9");
-	}
-	bool on_left_button_down(const vec2 &m) override {
-		chain->stop();
-		return true;
-	}
-	string get_tip() const override {
-		return _("stop");
 	}
 };
 
@@ -135,7 +115,6 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::N
 	graph->add_child(background);
 	pad->connect_scrollable(background);
 	graph->add_child(new SignalEditorPlayButton(this));
-	graph->add_child(new SignalEditorStopButton(this));
 
 	event_x("area", "hui:key-down", [this] { on_key_down(); });
 

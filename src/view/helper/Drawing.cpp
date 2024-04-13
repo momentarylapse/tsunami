@@ -24,6 +24,11 @@ color color_heat_map(float f) {
 	return c[4];
 }
 
+void draw_str_centered(Painter* c, const vec2& pos, const string& str) {
+	float w = c->get_str_width(str);
+	c->draw_str(pos - vec2(w / 2, c->font_size * 0.6f), str);
+}
+
 rect get_boxed_str_rect(Painter *c, const vec2 &pos, const string &str) {
 	float w = c->get_str_width(str);
 	return rect(pos.x-theme.CORNER_RADIUS, pos.x + w + theme.CORNER_RADIUS, pos.y-theme.CORNER_RADIUS, pos.y + c->font_size + theme.CORNER_RADIUS);

@@ -7,6 +7,7 @@
 
 #include "BottomBarExpandButton.h"
 #include "../AudioView.h"
+#include "../../helper/Drawing.h"
 #include "../../bottombar/BottomBar.h"
 #include "../../TsunamiWindow.h"
 #include "../../../Session.h"
@@ -36,9 +37,9 @@ void BottomBarExpandButton::on_draw(Painter *p) {
 	p->set_color(fg);
 	p->set_font_size(theme.FONT_SIZE_HUGE);
 	if (bottom_bar()->visible)
-		p->draw_str(area.center() - vec2(10,10),  "\u25bc");
+		draw_str_centered(p, area.center(),  "\u25bc");
 	else
-		p->draw_str(area.center() - vec2(10,10),  "\u25b2");
+		draw_str_centered(p, area.center(),  "\u25b2");
 	p->set_font_size(theme.FONT_SIZE);
 }
 bool BottomBarExpandButton::on_left_button_down(const vec2 &m) {

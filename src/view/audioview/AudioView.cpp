@@ -88,7 +88,7 @@ public:
 		p->draw_circle(area.center(), radius);
 		p->set_color(fg);
 		p->set_font("", theme.FONT_SIZE_BIG, true, false);
-		p->draw_str({area.center().x - 5, area.center().y - 5}, "+");
+		draw_str_centered(p, area.center(), "+");
 	}
 	bool on_left_button_down(const vec2 &m) override {
 		view->win->on_add_new_track(SignalType::AUDIO);

@@ -41,7 +41,8 @@ Dialog new-track-dialog "New track" width=300 height=80 headerbar closebutton=no
 					---|
 					Label l-no-metronome "" wrap hidden italic style=warning
 		Revealer revealer-synth ""
-			Revealer g-synth "Synthesizer"
+			Revealer user-revealer-synth "Synthesizer"
+				Grid g-synth "" class=card
 		Revealer revealer-master ""
 			Label l-master "A master track does not contain any audio or\nmidi data itself. It can be used to group a number\nof tracks and apply volume and effects collectively." italic wrap
 		Revealer revealer-presets ""

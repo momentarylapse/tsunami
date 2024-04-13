@@ -4668,8 +4668,14 @@ revealer-synth
 0
 1
 Revealer
-g-synth
+user-revealer-synth
 
+0
+0
+1
+Grid
+g-synth
+class=card
 0
 0
 0
@@ -10712,9 +10718,6 @@ Metronome
 new-track-dialog/g-presets
 Presets
 
-new-track-dialog/g-synth
-Synthesizer
-
 new-track-dialog/l-bars
 Bars
 
@@ -10763,6 +10766,9 @@ Midi
 new-track-dialog/type-preset
 ❤
 From list of presets
+new-track-dialog/user-revealer-synth
+Synthesizer
+
 pause_add_dialog/duration
 1.0
 

@@ -16,8 +16,8 @@
 #include "../../helper/Drawing.h"
 #include "../../helper/graph/SceneGraph.h"
 
-const float MODULE_WIDTH = 140;
-const float MODULE_HEIGHT = 23;
+const float MODULE_WIDTH = 180;
+const float MODULE_HEIGHT = 50;
 
 string module_header(Module *m) {
 	if (m->module_name.num > 0)
@@ -30,19 +30,19 @@ string module_header(Module *m) {
 
 
 static float module_port_in_x(Module *m) {
-	return - 5;
+	return - 10;
 }
 
 static float module_port_in_y(Module *m, int index) {
-	return MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*20;
+	return MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*30;
 }
 
 static float module_port_out_x(Module *m) {
-	return MODULE_WIDTH + 5;
+	return MODULE_WIDTH + 10;
 }
 
 static float module_port_out_y(Module *m, int index) {
-	return MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*20;
+	return MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*30;
 }
 
 
@@ -92,16 +92,35 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 		add_child(p);
 }
 
+
+//static color COOL_COLORS[6] = {Red, Orange, Yellow, Green, color(1, 0.2,0.2,1), color(1, 1,0,1)};
+static color COOL_COLORS[6] = {Red, Orange, color(1, 1,0.7f,0.15f), Green, color(1, 0.2,0.2,1), color(1, 0.8f,0,1)};
+
 void SignalEditorModule::on_draw(Painter *p) {
-	color bg = theme.blob_bg;
-	if (tab->sel_modules.contains(module))
-		bg = theme.blob_bg_selected;
+	string type = module_header(module);
+	color bg = theme.text_soft1;
+	bg = color::interpolate(theme.pitch_color(type.hash()), bg, 0.2f);
+//	bg = theme.pitch_color(type.hash());
+	bg = COOL_COLORS[(type.hash()) % 6];
+//	bg = COOL_COLORS[5];
+//	bg = theme.pitch_color(8);
+//	bg = theme.pitch_color((int)module->module_category);
+//	if (tab->sel_modules.contains(module))
+//		bg = theme.blob_bg_selected;
 	if (is_cur_hover())
 		bg = theme.hoverify(bg);
-	p->set_color(bg);
+	p->set_color(color::interpolate(bg, theme.background, 0.66f));
+	p->set_color(bg.with_alpha(0.3f));
 	p->set_roundness(theme.CORNER_RADIUS);
-	rect r = area;
-	p->draw_rect(r);
+	p->draw_rect(area);
+	p->set_fill(false);
+	//p->set_line_width(3);
+	//p->set_color(color::interpolate(bg, White, 0.2f));
+	p->set_color(bg);
+	//p->set_color(bg);
+	p->draw_rect(area);
+	p->set_line_width(1);
+	p->set_fill(true);
 	p->set_roundness(0);
 	p->set_font_size(theme.FONT_SIZE);// * 1.2f);
 	if (tab->sel_modules.contains(module)) {
@@ -110,8 +129,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 	} else {
 		p->set_color(theme.text_soft1);
 	}
-	string type = module_header(module);
-	draw_str_constrained(p, r.center() - vec2(0, p->font_size/2), r.width() - 12, type, TextAlign::CENTER);
+	draw_str_constrained(p, area.center() - vec2(0, p->font_size/2), area.width() - 12, type, TextAlign::CENTER);
 	p->set_font("", theme.FONT_SIZE, false, false);
 
 }

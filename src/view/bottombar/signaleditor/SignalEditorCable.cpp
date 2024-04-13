@@ -45,18 +45,21 @@ void SignalEditorCable::on_draw(Painter *p) {
 	for (float t=0; t<=1.0f; t+=0.025f)
 		cc.add(inter.get(t));
 	//p->set_color(color::interpolate(base_color, view->colors.background, 0.1f));
-	p->set_line_width(8.0f);
+	p->set_line_width(4.0f);
 	p->set_color(base_color.with_alpha(0.3f));
+	//p->set_color(color(1,0.7f,0.2f,0.3f));//base_color);
 	p->draw_lines(cc);
-	p->set_color(base_color);
-	p->set_line_width(2.0f);
+	p->set_color(theme.text_soft1); //base_color);//color::interpolate(base_color, Gray, 0.6f));
+	p->set_color(color(1,0.8f,0.3f,1.0f));//base_color);
+	p->set_color(White.with_alpha(0.8f));
+	p->set_line_width(1.0f);
 	p->set_line_dash({5, 2}, 0);
 	p->draw_lines(cc);
 	p->set_line_dash({}, 0);
 	p->set_line_width(1);
 
-	p->set_color(color::interpolate(base_color, theme.text, 0.1f));
-	//p->set_color(base_color);
+//	p->set_color(color::interpolate(base_color, theme.text, 0.1f));
+	p->set_color(base_color);
 	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), min(length / 7, 14.0f));
 }
 

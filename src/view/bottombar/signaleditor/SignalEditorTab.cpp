@@ -95,12 +95,6 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::N
 		pad->_update_scrolling();
 		graph->draw(p);
 
-		/*for (auto &pp: chain->_ports_out){
-			p->set_color(Red);
-			p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
-		}*/
-
-
 		auto m = hui::get_event()->m;
 
 		string tip;
@@ -162,7 +156,7 @@ color SignalEditorTab::signal_color_base(SignalType type) {
 	if (type == SignalType::AUDIO)
 		return theme.red;
 	if (type == SignalType::MIDI)
-		return theme.green;
+		return color(1, 0.9f,0.6f,0); // theme.green;
 	if (type == SignalType::BEATS)
 		return theme.blue;
 	return theme.white;
@@ -171,6 +165,7 @@ color SignalEditorTab::signal_color_base(SignalType type) {
 color SignalEditorTab::signal_color(SignalType type, bool hover) {
 	color c = signal_color_base(type);
 	c = color::interpolate(c, theme.text, 0.2f);
+//	c = color::interpolate(c, Gray, 0.6f);
 	//c = color::interpolate(c, colors.background, 0.2f);
 	if (hover)
 		c = theme.hoverify(c);
@@ -195,14 +190,7 @@ void SignalEditorTab::on_draw(Painter* p) {
 	pad->_update_scrolling();
 	graph->draw(p);
 
-	/*for (auto &pp: chain->_ports_out){
-		p->set_color(Red);
-		p->draw_circle(module_port_out_x(pp.module)+20, module_port_out_y(pp.module, pp.port), 10);
-	}*/
-
-
 	auto m = hui::get_event()->m;
-
 
 	string tip;
 	if (graph->hover.node)

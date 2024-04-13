@@ -14,7 +14,7 @@
 #include "../../../data/base.h"
 #include "../../../module/SignalChain.h"
 
-const float R = 10;
+const float HOVER_RADIUS = 20;
 
 
 
@@ -62,9 +62,10 @@ public:
 
 
 SignalEditorModulePort::SignalEditorModulePort(SignalEditorTab *t, Module *m, int _index, SignalType _type, float dx, float dy, bool out) :
-		scenegraph::NodeRel({dx - R, dy - R}, R*2, R*2) {
+		scenegraph::NodeRel({dx - HOVER_RADIUS, dy - HOVER_RADIUS}, HOVER_RADIUS*2, HOVER_RADIUS*2) {
 
 	set_perf_name("se:port");
+	align.dz = 9000;
 	tab = t;
 	module = m;
 	index = _index;
@@ -75,7 +76,7 @@ SignalEditorModulePort::SignalEditorModulePort(SignalEditorTab *t, Module *m, in
 void SignalEditorModulePort::on_draw(Painter *p) {
 	bool hovering = is_cur_hover();
 	p->set_color(tab->signal_color(type, hovering));
-	float r = hovering ? 6 : 4;
+	float r = hovering ? 7 : 5;
 	p->draw_circle(area.center(), r);
 }
 

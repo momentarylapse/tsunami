@@ -102,8 +102,8 @@ void SignalChain::set_tick_dt(float dt) {
 
 shared<Module> SignalChain::_add(shared<Module> m) {
 	int i = modules.num;
-	m->module_x = 50 + (i % 5) * 230;
-	m->module_y = 50 + (i % 2) * 30 + 150*(i / 5);
+	m->module_x = 50 + (i % 5) * 320;
+	m->module_y = 50 + (i % 2) * 80 + 200*(i / 5);
 
 	m->reset_state();
 	modules.add(m);

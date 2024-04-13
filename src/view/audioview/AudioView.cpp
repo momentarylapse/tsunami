@@ -78,11 +78,11 @@ public:
 	void on_draw(Painter *p) override {
 		color bg = theme.background_overlay;
 		color fg = theme.text_soft3;
-		float radius = area.width() * 0.45f;
+		float radius = area.width() * 0.48f;
 		if (is_cur_hover()) {
 			bg = theme.hoverify(bg);
-			fg = theme.blob_text;
-			radius = area.width() * 0.66f;
+			fg = theme.text;
+			radius = area.width() * 0.60f;
 		}
 		p->set_color(bg);
 		p->draw_circle(area.center(), radius);

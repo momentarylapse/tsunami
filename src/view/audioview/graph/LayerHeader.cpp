@@ -39,8 +39,8 @@ public:
 	}
 	color get_color() const {
 		if (is_cur_hover())
-			return theme.hoverify(header->color_text());
-		return header->color_text();
+			return header->color_text();
+		return header->color_text().with_alpha(0.7f);
 	}
 };
 

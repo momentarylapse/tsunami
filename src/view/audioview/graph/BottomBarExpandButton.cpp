@@ -25,12 +25,14 @@ BottomBar *BottomBarExpandButton::bottom_bar() const {
 void BottomBarExpandButton::on_draw(Painter *p) {
 	color bg = theme.background_overlay;
 	color fg = theme.text_soft3;
+	float radius = 32;
 	if (is_cur_hover()) {
 		bg = theme.hoverify(bg);
 		fg = theme.text;
+		radius = 40;
 	}
 	p->set_color(bg);
-	p->draw_circle(area.center(), 40);
+	p->draw_circle(area.center(), radius);
 	p->set_color(fg);
 	p->set_font_size(theme.FONT_SIZE_HUGE);
 	if (bottom_bar()->visible)

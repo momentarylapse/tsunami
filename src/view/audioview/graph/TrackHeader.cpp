@@ -43,8 +43,8 @@ public:
 	}
 	color get_color() const {
 		if (is_cur_hover())
-			return theme.hoverify(header->color_text());
-		return header->color_text();
+			return header->color_text();
+		return header->color_text().with_alpha(0.7f);
 	}
 };
 
@@ -103,7 +103,7 @@ public:
 	}
 };
 
-TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel({0, 0}, theme.TRACK_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
+TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel({0, 1}, theme.TRACK_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	align.dz = 70;
 	set_perf_name("header");
 	vtrack = t;

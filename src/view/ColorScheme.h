@@ -28,6 +28,8 @@ public:
 
 	static const float FONT_SIZE;
 	static const float FONT_SIZE_SMALL;
+	static const float FONT_SIZE_BIG;
+	static const float FONT_SIZE_HUGE;
 	static const int SAMPLE_FRAME_HEIGHT;
 	static const int TIME_SCALE_HEIGHT;
 	static const float LINE_WIDTH;

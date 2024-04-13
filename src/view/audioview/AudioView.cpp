@@ -68,25 +68,28 @@ extern Synthesizer* CreateSynthesizer(Session *session, const string &name);
 class AddTrackButton : public scenegraph::Node {
 	AudioView *view;
 public:
-	explicit AddTrackButton(AudioView *_view) : scenegraph::Node(theme.TRACK_HANDLE_HEIGHT_SMALL, theme.TRACK_HANDLE_HEIGHT_SMALL) {
+	explicit AddTrackButton(AudioView *_view) : scenegraph::Node(theme.TRACK_HANDLE_HEIGHT, theme.TRACK_HANDLE_HEIGHT) {
 		align.dz = 70;
+		// size overwritten by AudioView.update_scene_graph()!
 		/*align.horizontal = AlignData::Mode::LEFT;
 		align.vertical = AlignData::Mode::TOP;*/
 		view = _view;
 	}
-	void on_draw(Painter *c) override {
+	void on_draw(Painter *p) override {
+		color bg = theme.background_overlay;
+		color fg = theme.text_soft3;
+		float radius = area.width() * 0.45f;
 		if (is_cur_hover()) {
-			draw_box(c, area, theme.blob_bg_selected);
-			c->set_color(theme.blob_text);
-		} else {
-			c->set_color(theme.text_soft3);
+			bg = theme.hoverify(bg);
+			fg = theme.blob_text;
+			radius = area.width() * 0.66f;
 		}
-		c->set_font("", theme.FONT_SIZE, true, false);
-		c->draw_str({area.x1 + 5, area.y1 + 5}, "+");
+		p->set_color(bg);
+		p->draw_circle(area.center(), radius);
+		p->set_color(fg);
+		p->set_font("", theme.FONT_SIZE_BIG, true, false);
+		p->draw_str({area.center().x - 5, area.center().y - 5}, "+");
 	}
-	/*void update_geometry_recursive(const rect &target_area) override {
-
-	}*/
 	bool on_left_button_down(const vec2 &m) override {
 		view->win->on_add_new_track(SignalType::AUDIO);
 		return true;
@@ -1087,7 +1090,7 @@ bool AudioView::update_scene_graph() {
 
 	if (vtracks.num > 0) {
 		const auto a = vtracks.back()->area;
-		add_track_button->area = {a.x1, a.x1 + theme.TRACK_HANDLE_HEIGHT_SMALL, a.y2, a.y2 + theme.TRACK_HANDLE_HEIGHT_SMALL};
+		add_track_button->area = {a.x1, a.x1 + theme.TRACK_HANDLE_HEIGHT, a.y2, a.y2 + theme.TRACK_HANDLE_HEIGHT};
 	}
 
 	metronome_overlay_vlayer->hidden = !need_metro_overlay(song, this);

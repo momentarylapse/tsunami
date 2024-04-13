@@ -17,6 +17,8 @@ namespace hui {
 
 const float ColorScheme::FONT_SIZE = 10.0f;
 const float ColorScheme::FONT_SIZE_SMALL = FONT_SIZE * 0.8f;
+const float ColorScheme::FONT_SIZE_BIG = FONT_SIZE * 1.3f;
+const float ColorScheme::FONT_SIZE_HUGE = FONT_SIZE * 1.7f;
 const int ColorScheme::MAX_TRACK_CHANNEL_HEIGHT = 74;
 const float ColorScheme::LINE_WIDTH = 1.0f;
 const float ColorScheme::CORNER_RADIUS = 8.0f;

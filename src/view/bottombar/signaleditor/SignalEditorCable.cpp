@@ -15,6 +15,7 @@
 #include "../../../lib/math/interpolation.h"
 
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {
+	align.dz = -10;
 	tab = t;
 	source = c.source;
 	target = c.target;
@@ -48,11 +49,12 @@ void SignalEditorCable::on_draw(Painter *p) {
 	p->set_line_width(4.0f);
 	p->set_color(base_color.with_alpha(0.3f));
 	//p->set_color(color(1,0.7f,0.2f,0.3f));//base_color);
-	p->draw_lines(cc);
+//	p->draw_lines(cc);
 	p->set_color(theme.text_soft1); //base_color);//color::interpolate(base_color, Gray, 0.6f));
 	p->set_color(color(1,0.8f,0.3f,1.0f));//base_color);
 	p->set_color(White.with_alpha(0.8f));
-	p->set_line_width(1.0f);
+	p->set_color(theme.text_soft1);
+	p->set_line_width(4.0f);
 	p->set_line_dash({5, 2}, 0);
 	p->draw_lines(cc);
 	p->set_line_dash({}, 0);

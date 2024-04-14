@@ -95,33 +95,24 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 void SignalEditorModule::on_draw(Painter *p) {
 	string type = module_header(module);
 	color bg = theme.text_soft1;
-	bg = color::interpolate(theme.pitch_color(type.hash()), bg, 0.2f);
 //	bg = theme.pitch_color(type.hash());
 	bg = theme.neon(type.hash() + 2);
-//	bg = COOL_COLORS[5];
-//	bg = theme.pitch_color(8);
-//	bg = theme.pitch_color((int)module->module_category);
-//	if (tab->sel_modules.contains(module))
-//		bg = theme.blob_bg_selected;
+//	bg = theme.neon((int)module->module_category);
 	if (is_cur_hover())
 		bg = theme.hoverify(bg);
-	p->set_color(color::interpolate(bg, theme.background, 0.66f));
 	p->set_color(bg.with_alpha(0.3f));
 	p->set_roundness(theme.CORNER_RADIUS);
 	p->draw_rect(area);
 	p->set_fill(false);
-	//p->set_line_width(3);
-	//p->set_color(color::interpolate(bg, White, 0.2f));
 	p->set_color(bg);
-	//p->set_color(bg);
 	p->draw_rect(area);
 	p->set_line_width(1);
 	p->set_fill(true);
 	p->set_roundness(0);
-	p->set_font_size(theme.FONT_SIZE);// * 1.2f);
+	p->set_font_size(theme.FONT_SIZE);
 	if (tab->sel_modules.contains(module)) {
 		p->set_color(theme.text);
-		p->set_font("", -1, true, false);
+		p->set_font("", theme.FONT_SIZE*1.1f, true, false);
 	} else {
 		p->set_color(theme.text_soft1);
 	}

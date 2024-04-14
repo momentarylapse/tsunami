@@ -11,6 +11,7 @@
 #include "SignalEditorBackground.h"
 #include "../../../module/Module.h"
 #include "../../../module/port/Port.h"
+#include "../../../data/base.h"
 #include "../../audioview/AudioView.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../helper/Drawing.h"
@@ -24,7 +25,50 @@ string module_header(Module *m) {
 		return m->module_name;
 	if (m->module_class.num > 0)
 		return m->module_class;
-	return m->category_to_str(m->module_category);
+	return Module::category_to_str(m->module_category);
+}
+
+SignalType module_in_type(Module *m) {
+	for (auto &p: m->port_in)
+		return p.type;
+	return SignalType::GROUP;
+}
+
+SignalType module_out_type(Module *m) {
+	for (auto p: weak(m->port_out))
+		return p->type;
+	return SignalType::GROUP;
+}
+
+color module_color(Module *m) {
+	auto ti = module_in_type(m);
+	auto to = module_out_type(m);
+	if (m->module_category == ModuleCategory::STREAM)
+		return theme.neon(0); // red
+	if (m->module_category == ModuleCategory::SYNTHESIZER)
+		return theme.neon(3); // green
+	if (m->module_category == ModuleCategory::PLUMBING)
+		return theme.neon(1); // orange
+	if (m->module_category == ModuleCategory::AUDIO_SOURCE)
+		//return theme.neon(4); // blue
+		//return theme.neon(3); // green
+		return theme.neon(1); // orange
+	if (m->module_category == ModuleCategory::AUDIO_VISUALIZER)
+		//return theme.neon(5); // purple
+		return theme.neon(2); // yellow
+	if (ti == SignalType::AUDIO and to == SignalType::AUDIO)
+		return theme.neon(2); // yellow
+
+	if (ti == SignalType::BEATS or to == SignalType::BEATS)
+		return theme.neon(2); // yellow;
+	if (ti == SignalType::MIDI and to == SignalType::MIDI)
+		return theme.neon(3);
+	if (ti == SignalType::MIDI and to == SignalType::AUDIO)
+		return theme.neon(2);
+
+	return theme.neon(2); // yellow
+
+	//bg = theme.neon(m->type.hash() + 2);
 }
 
 
@@ -93,10 +137,10 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 }
 
 void SignalEditorModule::on_draw(Painter *p) {
-	string type = module_header(module);
+	string title = module_header(module);
 	color bg = theme.text_soft1;
 //	bg = theme.pitch_color(type.hash());
-	bg = theme.neon(type.hash() + 2);
+	bg = module_color(module);
 //	bg = theme.neon((int)module->module_category);
 	if (is_cur_hover())
 		bg = theme.hoverify(bg);
@@ -116,7 +160,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 	} else {
 		p->set_color(theme.text_soft1);
 	}
-	draw_str_constrained(p, area.center() - vec2(0, p->font_size/2), area.width() - 12, type, TextAlign::CENTER);
+	draw_str_constrained(p, area.center() - vec2(0, p->font_size/2), area.width() - 12, title, TextAlign::CENTER);
 	p->set_font("", theme.FONT_SIZE, false, false);
 
 }

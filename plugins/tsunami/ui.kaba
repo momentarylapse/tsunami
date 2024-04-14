@@ -22,7 +22,8 @@ struct ColorScheme as @noauto
 	var blob_bg_selected: color
 	var blob_bg_hidden: color
 	var pitch: color[12]
-	func extern static pitch_color(p: int) -> color
+	func extern pitch_color(p: int) -> color
+	func extern neon(p: int) -> color
 	func extern hoverify(c: color) -> color
 
 
@@ -129,7 +130,7 @@ class MultiLinePainter
 
 
 #extern PluginContext plugin_context
-var extern colors: ColorScheme
+var extern theme: ColorScheme
 
 var extern clipboard: Clipboard&
 

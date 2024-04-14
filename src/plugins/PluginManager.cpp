@@ -165,7 +165,7 @@ void PluginManager::link_app_data() {
 
 	// api definition
 	ext->link("device_manager", &tsunami->device_manager);
-	ext->link("colors", &theme);
+	ext->link("theme", &theme);
 	ext->link("clipboard", &tsunami->clipboard);
 	//ext->link("view_input", &export_view_input);
 	ext->link("db2amp", (void*)&db2amplitude);
@@ -846,7 +846,8 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("ColorScheme.blob_bg_hidden", &ColorScheme::blob_bg_hidden);
 	ext->declare_class_element("ColorScheme.pitch", &ColorScheme::pitch);
 	ext->link_class_func("ColorScheme.hoverify", &ColorScheme::hoverify);
-	ext->link("ColorScheme.pitch_color", (void*)&ColorScheme::pitch_color);
+	ext->link_class_func("ColorScheme.pitch_color", &ColorScheme::pitch_color);
+	ext->link_class_func("ColorScheme.neon", &ColorScheme::neon);
 
 	ext->link_class_func("Storage.load", &Storage::load);
 	ext->link_class_func("Storage.save", &Storage::save);

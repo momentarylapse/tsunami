@@ -91,7 +91,7 @@ Grid ? ''
 			var t = t0+a*(t1-t0)
 			var v = v0 * exp(a * e)
 			cc.add(vec2(t2x(t), v2y(v)))
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -105,7 +105,7 @@ Grid ? ''
 		var cc: vec2[]
 		cc.add(vec2(t2x(t0), v2y(v0)))
 		cc.add(vec2(t2x(t1), v2y(v1)))
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -117,9 +117,9 @@ Grid ? ''
 		p.draw_polygon(cc)
 	
 	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
-		var col2 = color.interpolate(col, colors.text_soft2, 0.3)
+		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
 		if hover
-			col2 = colors.hoverify(col2)
+			col2 = theme.hoverify(col2)
 		p.set_color(col2)
 		p.set_line_width(2.0)
 		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
@@ -139,7 +139,7 @@ Grid ? ''
 		draw_grabber(p, t2, 0, t2, 1, color.ORANGE, hover == -11)
 		draw_grabber(p, t3, 0, t3, 1, color.GREEN, hover == -12)
 		draw_grabber(p, t1, o.sustain, t3, o.sustain, color.YELLOW, hover == -13)
-		p.set_color(colors.text_soft1)
+		p.set_color(theme.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
 			p.draw_str([width - 100, height - 20], "attack {{o.attack * 1000|.1}} ms")
@@ -153,7 +153,7 @@ Grid ? ''
 	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0, width, 0, height])
 		
 		draw_envelope(p, fc)

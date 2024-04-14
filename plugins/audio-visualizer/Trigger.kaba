@@ -45,7 +45,7 @@ Grid ? '' vertical
 		var w = p.width
 		var h = p.height
 		
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0, w, 0, h])
 		
 		var curve_before, curve_after: float[]

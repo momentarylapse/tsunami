@@ -25,11 +25,10 @@ func spline_vel(p0: vec2, t0: vec2, p1: vec2, t1: vec2, t: float) -> vec2
 	return t0 + 2*B*t + 3*A*t^2
 
 
-const COLORS = [color.RED, color.ORANGE, color.YELLOW, color.GREEN, color(0.2,0.2,1, 1), color(1,0,1, 1)]
-
-func cool_color(index: int) -> color
-	let col = COLORS[loop(index, 0, len(COLORS))]
-	return color.interpolate(col, colors.text_soft2, 0.3)
+#func cool_color(index: int) -> color
+#	let col = theme.neon(index)
+#	#return color.interpolate(col, theme.text_soft2, 0.3)
+#	return col
 
 
 

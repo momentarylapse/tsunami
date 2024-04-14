@@ -23,7 +23,7 @@ DrawingArea area '' height=200 expandy")
 		var w = p.width
 		var h = p.height
 		
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0, w, 0, h])
 		
 		var buf: AudioBuffer

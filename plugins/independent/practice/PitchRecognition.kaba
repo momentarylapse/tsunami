@@ -41,7 +41,7 @@ class PitchRecognitionPanel extends ConfigPanel
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 	func on_draw(p: hui.Painter)
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.set_font_size(12)
 		p.draw_rect([0, p.width, 0, p.height])
 	
@@ -53,12 +53,12 @@ class PitchRecognitionPanel extends ConfigPanel
 		let x = float(p.width) / 2
 		let y = float(p.height) - 10
 	
-		p.set_color(colors.text_soft1)
+		p.set_color(theme.text_soft1)
 		for i in 0:9
 			var w = i * 0.125 * pi - pi / 2
 			p.draw_line([x + r1 * sin(w), y - r1 * cos(w)], [x + r2 * sin(w), y - r2 * cos(w)])
 	
-		p.set_color(colors.text)
+		p.set_color(theme.text)
 		if c.pitch_detector.loud_enough
 			let (note, error) = get_note(c.pitch_detector.frequency)
 			p.draw_str([x - 8, y - r2 - 22], note)

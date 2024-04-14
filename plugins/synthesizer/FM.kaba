@@ -198,13 +198,13 @@ Grid ? ''
 	
 	func draw_osci(p: hui.Painter, index: int)
 		let z = osci_pos(index)
-		var bg = colors.blob_bg
-		var col = colors.text_soft1
+		var bg = theme.blob_bg
+		var col = theme.text_soft1
 		if index == chosen
-			bg = colors.blob_bg_selected
-			col = colors.text
+			bg = theme.blob_bg_selected
+			col = theme.text
 		if index == hover
-			bg = colors.hoverify(bg)
+			bg = theme.hoverify(bg)
 		p.set_color(bg)
 		p.draw_circle([z.x, z.y], 15)
 	
@@ -213,11 +213,11 @@ Grid ? ''
 		draw_type(p, z - vec2(0,2), o.type, 9, 5.5)
 		let f = int(o.factor + 0.5)
 		p.set_font_size(7)
-		#p.set_color(colors.text_soft1)
+		#p.set_color(theme.text_soft1)
 		p.draw_str([z.x-4, z.y+6], "x{{f}}")
 	
 	func draw_link(p: hui.Painter, a: int, b: int)
-		p.set_color(colors.text_soft1)
+		p.set_color(theme.text_soft1)
 		let z1 = osci_pos(a)
 		let z2 = osci_pos(b)
 		let p0 = vec2(z2.x + 18, z2.y)
@@ -261,14 +261,14 @@ Grid ? ''
 		p.set_line_dash([2.0,0.0])
 		cc.add([t2x(t1), v2y(0)])
 		cc.add([t2x(t0), v2y(0)])
-		p.set_color(col.with_alpha(0.2))
+		p.set_color(col.with_alpha(0.3))
 		p.draw_polygon(cc)
 	
 	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
 		var col2 = col
 		p.set_line_width(2.0)
 		if hover
-			col2 = colors.hoverify(col2)
+			col2 = theme.hoverify(col2)
 			p.set_line_width(3.0)
 		p.set_color(col2)
 		p.draw_line([t2x(t0), v2y(v0)], [t2x(t1), v2y(v1)])
@@ -279,16 +279,16 @@ Grid ? ''
 		let t1 = t0 + o.attack
 		let t2 = t1 + o.decay
 		let t3 = t2 + o.release
-		draw_curve_lin(p, t0, o.initial, t1, o.peak, cool_color(0))
-		draw_curve_lin(p, t1, o.peak, t2, o.sustain, cool_color(1))
-		draw_curve_exp(p, t2, o.sustain, t3, 0.01, cool_color(3))
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, theme.neon(0))
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, theme.neon(1))
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, theme.neon(3))
 		
 		
-		draw_grabber(p, t1, 0, t1, 1, cool_color(0), hover == -10)
-		draw_grabber(p, t2, 0, t2, 1, cool_color(1), hover == -11)
-		draw_grabber(p, t3, 0, t3, 1, cool_color(3), hover == -12)
-		draw_grabber(p, t1, o.sustain, t3, o.sustain, cool_color(2), hover == -13)
-		p.set_color(colors.text_soft1)
+		draw_grabber(p, t1, 0, t1, 1, theme.neon(0), hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, theme.neon(1), hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, theme.neon(3), hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, theme.neon(2), hover == -13)
+		p.set_color(theme.text_soft1)
 		p.set_font_size(9)
 		if hover == -10
 			p.draw_str([width - 100, height - 20], "attack {{o.attack * 1000|.1}} ms")
@@ -302,14 +302,14 @@ Grid ? ''
 	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
 		p.set_roundness(5)
-		p.set_color(colors.blob_bg_hidden)
+		p.set_color(theme.blob_bg_hidden)
 		p.draw_rect([0, p_out.x+15, p_out.y-20, p_out.y+20])
 		p.set_roundness(0)
-		p.set_color(colors.text_soft1)
+		p.set_color(theme.text_soft1)
 		p.draw_str([p_out.x-32, p_out.y-10], "out")
 		
 		for j in 0:NUM_OSCILLATORS

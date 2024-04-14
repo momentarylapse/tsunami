@@ -87,7 +87,8 @@ public:
 	color pitch_text[12];
 	color pitch_soft1[12], pitch_soft2[12];
 	
-	static color pitch_color(int p);
+	color pitch_color(int p) const;
+	color neon(int p) const;
 	color hoverify(const color &c) const;
 };
 

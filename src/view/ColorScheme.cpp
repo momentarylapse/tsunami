@@ -50,6 +50,17 @@ const color PITCH_COLORS[12] = {
 	color(1, 1.000000, 0.400000, 0.700000)  // B
 };
 
+//static color COOL_COLORS[6] = {Red, Orange, Yellow, Green, color(1, 0.2,0.2,1), color(1, 1,0,1)};
+static color NEON_COLORS[6] = {
+	Red,
+	Orange,
+	color(1, 1,0.85f,0.1f),
+	Green,
+	color(1, 0.2,0.2,1),
+	color(1, 0.8f,0,1)
+};
+
+
 float color_brightness(const color &c) {
 	return (c.r + c.g + c.b) / 3;
 }
@@ -147,8 +158,12 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	}
 }
 
-color ColorScheme::pitch_color(int p) {
+color ColorScheme::pitch_color(int p) const {
 	return PITCH_COLORS[p % 12];
+}
+
+color ColorScheme::neon(int p) const {
+	return color::interpolate(NEON_COLORS[p % 6], text_soft2, 0.3f);
 }
 
 color ColorScheme::hoverify(const color &c) const {

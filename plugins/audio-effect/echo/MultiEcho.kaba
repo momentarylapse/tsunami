@@ -92,9 +92,9 @@ class MultiEchoGrid extends Grid
 		cp.event("reflection-delete", on_delete_reflection)
 
 	func draw_hull_curve(p: hui.Painter, r: MultiEcho.Config.Reflector, index: int)
-		let col = cool_color(index)
+		let col = theme.neon(index)
 		#if hover
-		#	col2 = colors.hoverify(col2)
+		#	col2 = theme.hoverify(col2)
 			
 		var v = r.volume
 		var t = r.delay
@@ -118,7 +118,7 @@ class MultiEchoGrid extends Grid
 		p.draw_polygon(cc)
 	
 	func draw_peaks(c: hui.Painter, r: MultiEcho.Config.Reflector, index: int)
-		let col = cool_color(index)
+		let col = theme.neon(index)
 		var v = r.volume
 		var t = r.delay
 		let n = min(100, int(x_axis.data.val_max/r.delay))
@@ -129,7 +129,7 @@ class MultiEchoGrid extends Grid
 			if i == 0
 				for h in hover
 					if index == h
-						c.set_color(colors.hoverify(col))
+						c.set_color(theme.hoverify(col))
 				c.draw_circle(p, 4.0)
 				c.set_line_width(2.0)
 			else
@@ -158,7 +158,7 @@ class MultiEchoGrid extends Grid
 			
 	func draw_details(p: hui.Painter, r: MultiEcho.Config.Reflector)
 		p.set_font_size(8)
-		p.set_color(colors.text_soft2)
+		p.set_color(theme.text_soft2)
 		let x = x_axis.project(r.delay)
 		let y = y_axis.project(r.volume)
 		

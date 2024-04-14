@@ -69,11 +69,11 @@ class SequencerPanel extends ConfigPanel
 		width = p.width
 		height = p.height
 		
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
 		# grid
-		p.set_color(colors.grid.with_alpha(0.5))
+		p.set_color(theme.grid.with_alpha(0.5))
 		for t in 1:NUM_TYPES
 			let y = type2y(t)
 			p.draw_line([0,y], [width, y])
@@ -81,9 +81,9 @@ class SequencerPanel extends ConfigPanel
 		for pos in 1:16
 			let x = pos2x(pos)
 			if (pos%4) == 0
-				p.set_color(colors.grid)
+				p.set_color(theme.grid)
 			else
-				p.set_color(colors.grid.with_alpha(0.5))
+				p.set_color(theme.grid.with_alpha(0.5))
 			p.draw_line([x,0], [x,height])
 			
 		
@@ -96,7 +96,7 @@ class SequencerPanel extends ConfigPanel
 			if n.pos == current_pos
 				p.set_color(c0)
 			else
-				p.set_color(color.interpolate(c0, colors.text_soft2, 0.8))
+				p.set_color(color.interpolate(c0, theme.text_soft2, 0.8))
 			p.draw_rect([w * n.pos + b, w * (n.pos + 1) - b, height - h * (n.type + 1) + b, height - h * n.type - b])
 			
 		for s in c.output.samples_played()

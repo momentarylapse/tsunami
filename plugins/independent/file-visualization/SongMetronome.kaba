@@ -118,35 +118,35 @@ Grid ? '' vertical
 		var bar_fraction = (cur_beat + beat_fraction) / num_beats
 		
 		# background
-		var bg = colors.background
+		var bg = theme.background
 		if allow_blink_background
-			bg = color.interpolate(color.RED, colors.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+			bg = color.interpolate(color.RED, theme.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
 		p.draw_rect([0, w, 0, h])
 		
 		if mode == AnimationMode.CIRCLE
 			# circle
 			p.set_line_width(r*0.05)
-			p.set_color(color.interpolate(colors.grid, colors.background, 0.5))
+			p.set_color(color.interpolate(theme.grid, theme.background, 0.5))
 			p.set_fill(false)
 			p.draw_circle([x0, y0], r)
 		
 			# top point
 			p.set_fill(true)
-			p.set_color(colors.text_soft3)
+			p.set_color(theme.text_soft3)
 			p.draw_circle([x0, y0 - r], r*0.07)
 		
 			# moving point
 			var t = beat_fraction - 0.5
 			var phi = 2 *pi * (2*t*t*t + t/2)
 			dot.move(x0 - sin(phi) * r, y0 + cos(phi) * r)
-			dot.draw(p, colors.text, r*0.1)
+			dot.draw(p, theme.text, r*0.1)
 		else if mode == AnimationMode.BOUNCE
 			var t = beat_fraction
 			dot.move(x0 + r, y0 + r - 2*abs(sin(t*pi)) * r)
-			dot.draw(p, colors.text, r*0.1)
+			dot.draw(p, theme.text, r*0.1)
 		else if mode == AnimationMode.BOUNCE_WALK
-			p.set_color(colors.text_soft3)
+			p.set_color(theme.text_soft3)
 			for i in 0:num_beats
 				var tx = loop((i + 0.5)/num_beats, 0, 1)
 				if i == 0
@@ -160,17 +160,17 @@ Grid ? '' vertical
 				dot.jump(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
 			else
 				dot.move(w*tx, y0 + r - 2*abs(sin(t*pi)) * r)
-			dot.draw(p, colors.text, r*0.1)
+			dot.draw(p, theme.text, r*0.1)
 		
 		# beat number
 		var fs = r * 0.5
 		if allow_blink_number
 			fs *= (1 + pow(closeness,5) * 0.2)
 		if cur_beat == 0
-			p.set_color(colors.text)
+			p.set_color(theme.text)
 		else
 			fs *= 0.8
-			p.set_color(colors.text_soft2)
+			p.set_color(theme.text_soft2)
 		p.set_font_size(fs)
 		p.draw_str([x0-fs*0.4, y0-fs/2], str(cur_beat + 1))
 		
@@ -195,7 +195,7 @@ Grid ? '' vertical
 		var offset = cur_bar.offset
 		var cur_part = get_part(&t, offset + DELTA)
 		var next_part = get_part(&t, offset + cur_bar.length + DELTA)
-		p.set_color(colors.text_soft2)
+		p.set_color(theme.text_soft2)
 		var fs = h * 0.08
 		p.set_font_size(fs)
 		for cp in cur_part
@@ -215,7 +215,7 @@ Grid ? '' vertical
 			if abs(cur_bpm - next_bpm) > 2
 				change += "  {{next_bpm|.0}} bpm"
 		if len(change) > 0
-			p.set_color(colors.text)
+			p.set_color(theme.text)
 			p.draw_str([20, 5 + fs*1.2 + 5], "> {{change}}")
 				
 	

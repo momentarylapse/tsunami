@@ -128,7 +128,7 @@ Grid ? '' vertical
 		width = p.width
 		height = p.height
 		
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
 		let subbeats = c.config.beats*c.config.subbeats
@@ -141,12 +141,12 @@ Grid ? '' vertical
 		for k=>pitch in c.config.pitches
 			var x0 = border
 			for i in 0:subbeats
-				var col = colors.pitch_color(pitch.pitch)
+				var col = theme.pitch_color(pitch.pitch)
 				if not pitch.is_active(i)
-					col = color.interpolate(col, colors.background, 0.8)
+					col = color.interpolate(col, theme.background, 0.8)
 				for h in hover
 					if k == h[0] and i == h[1]
-						col = colors.hoverify(col)
+						col = theme.hoverify(col)
 				p.set_color(col)
 				p.draw_rect([x0, x0+wbutton, height-k*gridy-border, height-(k+1)*gridy+border])
 				x0 += wbutton + border

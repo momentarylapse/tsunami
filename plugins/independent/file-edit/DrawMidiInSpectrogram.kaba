@@ -65,7 +65,7 @@ class SpecGrid extends Grid
 			var y = pitch_to_freq(mouse_pitch)
 			draw_point2(c, vec2(z.x, y), false, false)
 		
-		c.set_color(colors.text)
+		c.set_color(theme.text)
 		c.draw_str([120, 20], pitch_name(mouse_pitch))
 		c.set_line_width(1)
 		

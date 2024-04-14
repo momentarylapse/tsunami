@@ -248,7 +248,7 @@ class MLVDialog extends hui.Dialog
 			mlv.changed()
 			
 		area = [0,p.width, 0,p.height]
-		p.set_color(colors.background)
+		p.set_color(theme.background)
 		p.draw_rect(area)
 		mlp.set_context(mlp_config(), p.width, 44100*p.width/180 / x_scale)
 		mlp.set(dyn({"border": border,
@@ -285,7 +285,7 @@ class MLVDialog extends hui.Dialog
 				if pos >= s0 and pos < offset
 					let w = p.width - border*2
 					let x = border + float(pos - s0) * w / float(offset - s0)
-					p.set_color([0.2, 0.8, 0.2, 1]) #colors.
+					p.set_color([0.2, 0.8, 0.2, 1]) #theme.
 					p.set_line_width(3)
 					p.draw_line([x, y00], [x, y0])
 		line_samples.add(offset)

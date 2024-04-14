@@ -25,7 +25,7 @@ class SpectrumCurve extends Curve
 		ring = new RingBuffer(65536)
 		N = 4096*2
 		sample_rate = DEFAULT_SAMPLE_RATE
-		col = colors.text_soft2
+		col = theme.text_soft2
 	func mut set(buf: AudioBuffer, _sample_rate: float)
 		sample_rate = _sample_rate
 		ring.write(buf)

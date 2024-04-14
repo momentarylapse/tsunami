@@ -5,7 +5,7 @@ use tone.*
 struct Curve
 	var col, col_below: color
 	func __init__()
-		col = colors.text_soft1
+		col = theme.text_soft1
 		col_below = color(0.3, 0.3, 1, 0.3)
 	func virtual get(x: float) -> float
 	func virtual get_list(xx: float[]) -> float[]
@@ -233,12 +233,12 @@ class Grid extends Object
 
 	
 	func mut data_init()
-		col_grid = colors.grid
-		col_text = colors.text
-		col_line = colors.text_soft1
-		col_bg = colors.background
-		col_hover = colors.hover
-		col_sel = colors.selection
+		col_grid = theme.grid
+		col_text = theme.text
+		col_line = theme.text_soft1
+		col_bg = theme.background
+		col_hover = theme.hover
+		col_sel = theme.selection
 		allow_bg = true
 		x_axis.grid := &self
 		y_axis.grid := &self

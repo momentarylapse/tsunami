@@ -95,10 +95,10 @@ class CorrelationGrid extends Grid
 	
 		var q = [for c in curve project2(c)]
 		p.set_line_width(2)
-		p.set_color(colors.text_soft2)
+		p.set_color(theme.text_soft2)
 		p.draw_lines(q)
 		
-		p.set_color(colors.selection)
+		p.set_color(theme.selection)
 		let x = x_axis.project(bpm_opt)
 		p.draw_line([x, 0], [x, p.height])
 		p.set_font_size(8)

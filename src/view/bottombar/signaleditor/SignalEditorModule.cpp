@@ -92,16 +92,12 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 		add_child(p);
 }
 
-
-//static color COOL_COLORS[6] = {Red, Orange, Yellow, Green, color(1, 0.2,0.2,1), color(1, 1,0,1)};
-static color COOL_COLORS[6] = {Red, Orange, color(1, 1,0.7f,0.15f), Green, color(1, 0.2,0.2,1), color(1, 0.8f,0,1)};
-
 void SignalEditorModule::on_draw(Painter *p) {
 	string type = module_header(module);
 	color bg = theme.text_soft1;
 	bg = color::interpolate(theme.pitch_color(type.hash()), bg, 0.2f);
 //	bg = theme.pitch_color(type.hash());
-	bg = COOL_COLORS[(type.hash()) % 6];
+	bg = theme.neon(type.hash() + 2);
 //	bg = COOL_COLORS[5];
 //	bg = theme.pitch_color(8);
 //	bg = theme.pitch_color((int)module->module_category);

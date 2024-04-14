@@ -40,8 +40,8 @@ Grid ? ''
 		cam.set_range(Range(pos-44100*3, 44100*5))
 		
 		var gc: GridColors
-		gc.fg = colors.grid
-		gc.bg = colors.background
+		gc.fg = theme.grid
+		gc.bg = theme.background
 		gp.set_context(r, gc)
 		gp.draw_empty_background(p)
 		gp.draw_time(p)

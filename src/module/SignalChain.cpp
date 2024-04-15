@@ -28,6 +28,7 @@
 
 const float DEFAULT_UPDATE_DT = 0.050f;
 extern bool ugly_hack_slow;
+extern const float MODULE_GRID;
 
 
 const int SignalChain::DEFAULT_BUFFER_SIZE = 2048;
@@ -102,8 +103,8 @@ void SignalChain::set_tick_dt(float dt) {
 
 shared<Module> SignalChain::_add(shared<Module> m) {
 	int i = modules.num;
-	m->module_x = 50 + (i % 5) * 360;
-	m->module_y = 50 + (i % 2) * 100 + 240*(i / 5);
+	m->module_x = 2.5f*MODULE_GRID + (i % 5) * MODULE_GRID*15;
+	m->module_y = 2.5f*MODULE_GRID + (i % 2) * MODULE_GRID*4 + 9*MODULE_GRID*(i / 5);
 
 	m->reset_state();
 	modules.add(m);

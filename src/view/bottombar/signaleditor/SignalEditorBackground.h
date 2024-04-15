@@ -17,7 +17,7 @@ extern const float MODULE_GRID;
 class SignalEditorBackground : public Scrollable<scenegraph::Node> {
 public:
 	SignalEditorTab *tab;
-	SignalEditorBackground(SignalEditorTab *t);
+	explicit SignalEditorBackground(SignalEditorTab *t);
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_right_button_down(const vec2 &m) override;

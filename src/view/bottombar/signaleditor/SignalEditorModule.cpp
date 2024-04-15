@@ -17,8 +17,8 @@
 #include "../../helper/Drawing.h"
 #include "../../helper/graph/SceneGraph.h"
 
-const float MODULE_WIDTH = 180;
-const float MODULE_HEIGHT = 50;
+const float MODULE_WIDTH = MODULE_GRID * 7;
+const float MODULE_HEIGHT = MODULE_GRID * 2;
 
 string module_header(Module *m) {
 	if (m->module_name.num > 0)
@@ -114,8 +114,8 @@ public:
 	}
 	void on_finish(const vec2 &m) override {
 		for (auto m: sel) {
-			m->module_x = round(m->module_x / MODULE_GRID) * MODULE_GRID;
-			m->module_y = round(m->module_y / MODULE_GRID) * MODULE_GRID;
+			m->module_x = (floor(m->module_x / MODULE_GRID) + 0.5f) * MODULE_GRID;
+			m->module_y = (floor(m->module_y / MODULE_GRID) + 0.5f) * MODULE_GRID;
 		}
 		tab->update_module_positions();
 	}

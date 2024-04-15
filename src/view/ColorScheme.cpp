@@ -163,7 +163,7 @@ color ColorScheme::pitch_color(int p) const {
 }
 
 color ColorScheme::neon(int p) const {
-	return color::interpolate(NEON_COLORS[p % 6], text_soft2, 0.3f);
+	return color::interpolate(NEON_COLORS[p % 6], text_soft2, 0.25f);
 }
 
 color ColorScheme::hoverify(const color &c) const {

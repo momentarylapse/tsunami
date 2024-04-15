@@ -11,7 +11,7 @@
 #include "SignalEditorPort.h"
 #include "../../audioview/AudioView.h"
 #include "../../../module/SignalChain.h"
-#include "../../../module/Module.h"
+#include "../../../data/base.h"
 #include "../../../lib/math/interpolation.h"
 
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {
@@ -46,17 +46,19 @@ void SignalEditorCable::on_draw(Painter *p) {
 	for (float t=0; t<=1.0f; t+=0.025f)
 		cc.add(inter.get(t));
 	p->set_color(theme.text_soft1);
-	p->set_line_width(3.0f);
-	//p->set_line_dash({5, 2}, 0);
-	p->set_line_dash({10, 4}, 0);
+	p->set_line_width(3.5f);
+	if (type == SignalType::MIDI)
+		p->set_line_dash({6, 3}, 0);
+	else if (type == SignalType::BEATS)
+		p->set_line_dash({3, 6}, 0);
 	p->draw_lines(cc);
 	p->set_line_dash({}, 0);
 	p->set_line_width(1);
 
 	float arrow_len = min(length / 7, 14.0f);
 	p->set_color(theme.background);
-	p->draw_circle(p0, 14);
-	p->draw_circle(p1, 14);
+	p->draw_circle(p0, 10);
+	p->draw_circle(p1, 10);
 	p->draw_circle(inter.get(0.5f), arrow_len * 1.3f);
 	p->set_color(base_color);
 	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), arrow_len);

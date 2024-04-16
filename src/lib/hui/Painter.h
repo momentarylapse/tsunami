@@ -58,7 +58,7 @@ class Painter : public ::Painter {
 	void _cdecl draw_rect(const rect &r) override;
 	void _cdecl draw_circle(const vec2 &c, float radius) override;
 	void _cdecl draw_str(const vec2 &p, const string &str) override;
-	float _cdecl get_str_width(const string &str) override;
+	vec2 _cdecl get_str_size(const string &str) override;
 	void _cdecl draw_image(const vec2 &d, const Image *image) override;
 	void _cdecl draw_mask_image(const vec2 &d, const Image *image) override;
 	void _cdecl set_transform(float rot[], const vec2 &offset) override;

@@ -211,8 +211,8 @@ void ImagePainter::draw_str(const vec2 &p, const string& str) {
 #endif
 }
 
-float ImagePainter::get_str_width(const string& str) {
-	return 0;
+vec2 ImagePainter::get_str_size(const string& str) {
+	return {0, 0};
 }
 
 void ImagePainter::draw_image(const vec2 &d, const Image *im) {

@@ -209,15 +209,15 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 	//cairo_show_text(cr, str);
 }
 
-float Painter::get_str_width(const string &str) {
+vec2 Painter::get_str_size(const string &str) {
 	if (!cr)
-		return 0;
+		return {0,0};
 	pango_cairo_update_layout(cr, layout);
 	pango_layout_set_text(layout, (char*)str.data, str.num);
 	int w, h;
 	pango_layout_get_size(layout, &w, &h);
 
-	return (float)w / 1000.0f;
+	return {(float)w / 1000.0f, (float)h / 1000.0f};
 }
 
 void Painter::draw_rect(const rect &r) {

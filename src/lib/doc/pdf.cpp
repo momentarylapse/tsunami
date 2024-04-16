@@ -187,7 +187,7 @@ void PagePainter::draw_str(const vec2 &_p, const string& str) {
 	text_y = p.y;
 }
 
-float PagePainter::get_str_width(const string& str) {
+vec2 PagePainter::get_str_size(const string& str) {
 	auto f = parser->font_get(font_name);
 	string s = _pdf_str_filter(str, f);
 	if (f->true_type) {
@@ -200,9 +200,9 @@ float PagePainter::get_str_width(const string& str) {
 				dx += g->width / 1000.0f;
 		}
 		//msg_write(format("www   %f", dx));
-		return font_size * dx * scale;
+		return {font_size * dx * scale, font_size * scale};
 	}
-	return font_size * s.num * 0.5f;
+	return {font_size * s.num * 0.5f, font_size};
 }
 
 void PagePainter::draw_image(const vec2 &d, const Image *image) {

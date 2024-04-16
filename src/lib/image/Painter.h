@@ -9,6 +9,7 @@
 #define SRC_LIB_IMAGE_PAINTER_H_
 
 #include "../base/base.h"
+#include "../math/vec2.h"
 
 class Image;
 class color;
@@ -36,7 +37,10 @@ public:
 	virtual void _cdecl draw_rect(const rect &r) = 0;
 	virtual void _cdecl draw_circle(const vec2 &p, float radius) = 0;
 	virtual void _cdecl draw_str(const vec2 &p, const string &str) = 0;
-	virtual float _cdecl get_str_width(const string &str) = 0;
+	virtual float _cdecl get_str_width(const string &str) {
+		return get_str_size(str).x;
+	}
+	virtual vec2 _cdecl get_str_size(const string &str) = 0;
 	virtual void _cdecl draw_image(const vec2 &p, const Image *image) = 0;
 	virtual void _cdecl draw_mask_image(const vec2 &p, const Image *image) = 0;
 	virtual void _cdecl set_transform(float rot[], const vec2 &offset) {}

@@ -1159,13 +1159,14 @@ void AudioView::draw_song(Painter *c) {
 	for (auto *plugin: weak(session->plugins))
 		plugin->on_draw_post(c);
 
-	// tool tip?
+	// hover/tool tip?
 	string tip;
 	if (hover().node)
 		tip = hover().node->get_tip();
 	if (tip.num > 0)
 		draw_cursor_hover(c, tip);
 
+	// general hint (full line at bottom)
 	tip = mode->get_tip();
 	if (tip.num > 0)
 		draw_boxed_str(c, {song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);

@@ -101,8 +101,9 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::N
 		if (graph->hover.node)
 			tip = graph->hover.node->get_tip();
 		if (tip.num > 0) {
-			p->set_font_size(theme.FONT_SIZE);
+			p->set_font("", theme.FONT_SIZE, true, false);
 			draw_cursor_hover(p, tip, m, graph->area);
+			p->set_font("", theme.FONT_SIZE, false, false);
 		}
 	});
 	background = new SignalEditorBackground(this);
@@ -196,8 +197,9 @@ void SignalEditorTab::on_draw(Painter* p) {
 	if (graph->hover.node)
 		tip = graph->hover.node->get_tip();
 	if (tip.num > 0) {
-		p->set_font_size(theme.FONT_SIZE);
-		draw_cursor_hover(p, tip, m, graph->area);
+		p->set_font("", theme.FONT_SIZE*4, true, false);
+		//draw_cursor_hover(p, tip, m, graph->area);
+		p->set_font("", theme.FONT_SIZE, false, false);
 	}
 }
 

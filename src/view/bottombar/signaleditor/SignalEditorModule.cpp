@@ -180,5 +180,5 @@ bool SignalEditorModule::on_right_button_down(const vec2 &m) {
 }
 
 string SignalEditorModule::get_tip() const {
-	return "module...";
+	return "module: " + module->module_class + "\ncategory: " + Module::category_to_str(module->module_category);
 }

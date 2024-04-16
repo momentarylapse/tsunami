@@ -30,8 +30,9 @@ void draw_str_centered(Painter* c, const vec2& pos, const string& str) {
 }
 
 rect get_boxed_str_rect(Painter *c, const vec2 &pos, const string &str) {
-	float w = c->get_str_width(str);
-	return rect(pos.x-theme.CORNER_RADIUS, pos.x + w + theme.CORNER_RADIUS, pos.y-theme.CORNER_RADIUS, pos.y + c->font_size + theme.CORNER_RADIUS);
+	vec2 size = c->get_str_size(str);
+	size.y -= c->font_size * 1.0f; // ?!?
+	return rect(pos.x-theme.CORNER_RADIUS, pos.x + size.x + theme.CORNER_RADIUS, pos.y-theme.CORNER_RADIUS, pos.y + size.y + theme.CORNER_RADIUS);
 }
 
 void draw_boxed_str(Painter *c, const vec2 &pos, const string &str, const color &col_text, const color &col_bg, TextAlign align) {
@@ -87,12 +88,11 @@ float draw_str_constrained(Painter *p, const vec2 &pos, float w_max, const strin
 	return w;
 }
 
-
 void draw_cursor_hover(Painter *c, const string &msg, const vec2 &m, const rect &area) {
 	//c->set_font("", -1, true, false);
-	float w = c->get_str_width(msg);
-	float x = clamp(m.x - 20.0f, area.x1 + 2.0f, area.x2 - w);
-	float y = clamp(m.y + 30, area.y1 + 2.0f, area.y2 - theme.FONT_SIZE - 5);
+	vec2 size = c->get_str_size(msg);
+	float x = clamp(m.x - 20.0f, area.x1 + 2.0f, area.x2 - size.x);
+	float y = clamp(m.y + 30, area.y1 + 2.0f, area.y2 - size.y - 5);
 	draw_boxed_str(c, {x, y}, msg, theme.background, theme.text_soft1);
 	//c->set_font("", -1, false, false);
 }

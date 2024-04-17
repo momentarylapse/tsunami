@@ -12,7 +12,7 @@
 #include "graph/BottomBarExpandButton.h"
 #include "graph/Cursor.h"
 #include "graph/TimeScale.h"
-#include "graph/LogNotifier.h"
+#include "../mainview/LogNotifier.h"
 #include "../MouseDelayPlanner.h"
 #include "../helper/graph/SceneGraph.h"
 #include "../helper/graph/ScrollBar.h"

@@ -6,12 +6,12 @@
  */
 
 #include "LogNotifier.h"
-#include "../AudioView.h"
-#include "../../ColorScheme.h"
-#include "../../helper/Drawing.h"
-#include "../../TsunamiWindow.h"
-#include "../../../Session.h"
-#include "../../../stuff/Log.h"
+#include "../audioview/AudioView.h"
+#include "../ColorScheme.h"
+#include "../helper/Drawing.h"
+#include "../TsunamiWindow.h"
+#include "../../Session.h"
+#include "../../stuff/Log.h"
 
 
 class LogInfoBox : public scenegraph::NodeFree {

@@ -4,7 +4,7 @@
 
 #include "MainView.h"
 #include "../helper/graph/SceneGraph.h"
-#include "../audioview/graph/LogNotifier.h"
+#include "LogNotifier.h"
 #include "../TsunamiWindow.h"
 #include "../MouseDelayPlanner.h"
 #include "../ColorScheme.h"

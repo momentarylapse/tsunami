@@ -400,7 +400,6 @@ set(SOURCE
 	src/view/audioview/graph/BottomBarExpandButton.cpp
 	src/view/audioview/graph/Cursor.cpp
 	src/view/audioview/graph/LayerHeader.cpp
-	src/view/audioview/graph/LogNotifier.cpp
 	src/view/audioview/graph/TimeScale.cpp
 	src/view/audioview/graph/TrackHeader.cpp
 	src/view/audioview/graph/ViewMarker.cpp
@@ -461,6 +460,7 @@ set(SOURCE
 	src/view/helper/Slider.cpp
 	src/view/helper/SymbolRenderer.cpp
 	src/view/helper/VolumeControl.cpp
+	src/view/mainview/LogNotifier.cpp
 	src/view/mainview/MainView.cpp
 	src/view/mode/ViewMode.cpp
 	src/view/mode/ViewModeCapture.cpp

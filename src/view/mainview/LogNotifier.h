@@ -5,10 +5,10 @@
  *      Author: michi
  */
 
-#ifndef SRC_VIEW_GRAPH_LOGNOTIFIER_H_
-#define SRC_VIEW_GRAPH_LOGNOTIFIER_H_
+#ifndef SRC_VIEW_MAINVIEW_LOGNOTIFIER_H_
+#define SRC_VIEW_MAINVIEW_LOGNOTIFIER_H_
 
-#include "../../helper/graph/Node.h"
+#include "../helper/graph/Node.h"
 
 class Session;
 class LogInfoBox;
@@ -38,4 +38,4 @@ public:
 	LogInfoBox *info_box;
 };
 
-#endif /* SRC_VIEW_GRAPH_LOGNOTIFIER_H_ */
+#endif /* SRC_VIEW_MAINVIEW_LOGNOTIFIER_H_ */

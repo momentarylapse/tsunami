@@ -55,8 +55,10 @@ MainView::MainView(Session *_session, const string &_id) {
 		if (log_notifier->progress(0.03f))
 			animating = true;
 
-		//if (animating)
-		//	draw_runner_id = hui::run_later(animating ? 0.03f : 0.2f, [this]{ force_redraw(); });
+		if (animating)
+			draw_runner_id = hui::run_later(animating ? 0.03f : 0.2f, [this]{
+				scene_graph->request_redraw();
+			});
 	});
 
 	bottom_bar_expand_button = new BottomBarExpandButton(session);
@@ -101,12 +103,12 @@ MainView::MainView(Session *_session, const string &_id) {
 
 	set_theme(hui::config.get_str("View.ColorScheme", "system"));
 
-	hui::run_later(1.0f, [this] {
-		session->status("test");
-		session->e("test");
-	});
-
 	win->activate(id);
+}
+
+MainView::~MainView() {
+	if (draw_runner_id >= 0)
+		hui::cancel_runner(draw_runner_id);
 }
 
 void MainView::set_theme(const string &name) {
@@ -120,7 +122,6 @@ void MainView::set_theme(const string &name) {
 }
 
 void MainView::update_onscreen_displays() {
-	// TODO move to MainView
 	bottom_bar_expand_button->hidden = false;
 	peak_meter_display->hidden = true;
 	output_volume_dial->hidden = true;

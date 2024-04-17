@@ -27,12 +27,14 @@ class LogNotifier;
 class MainView : public obs::Node<VirtualBase> {
 public:
 	MainView(Session *session, const string &id);
+	~MainView();
 
 	void update_onscreen_displays();
 
 	string id;
 	Session* session;
 	owned<scenegraph::SceneGraph> scene_graph;
+	int draw_runner_id = -1;
 	CpuDisplay *cpu_display;
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;

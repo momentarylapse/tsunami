@@ -16,8 +16,8 @@
 
 class LogInfoBox : public scenegraph::NodeFree {
 public:
-	LogInfoBox(AudioView *_view) : scenegraph::NodeFree() {
-		view = _view;
+	LogInfoBox(Session *_session) : scenegraph::NodeFree() {
+		session = _session;
 		align.horizontal = AlignData::Mode::FILL;
 		align.vertical = AlignData::Mode::BOTTOM;
 		align.dy = -200;
@@ -31,7 +31,7 @@ public:
 		if (message.responses.num == 1) {
 			hui::Event e = hui::Event(message.responses[0].explode(":")[0], "hui::activate");
 			e.is_default = true;
-			view->session->win->_send_event_(&e);
+			session->win->_send_event_(&e);
 		}
 		message.ttl = -1;
 		hidden = true;
@@ -80,7 +80,7 @@ public:
 
 	}
 	HoverData get_hover_data(const vec2 &m) override {
-		auto h = view->hover_time(m);
+		auto h = session->view->hover_time(m);
 		h.node = this;
 		return h;
 	}
@@ -94,7 +94,7 @@ public:
 		return false;
 	}
 
-	AudioView *view;
+	Session *session;
 	struct Message {
 		string text;
 		Log::Type type;
@@ -112,18 +112,18 @@ public:
 };
 
 
-LogNotifier::LogNotifier(AudioView *_view) : scenegraph::NodeFree() {
-	view = _view;
+LogNotifier::LogNotifier(Session *_session) : scenegraph::NodeFree() {
+	session = _session;
 	align.horizontal = AlignData::Mode::FILL;
 	align.vertical = AlignData::Mode::FILL;
 	align.dz = 1000;
 	set_perf_name("notifier");
 
-	info_box = new LogInfoBox(view);
+	info_box = new LogInfoBox(session);
 	add_child(info_box);
 
-	view->session->log->out_add_message >> create_sink([this] {
-		auto m = view->session->log->latest(view->session);
+	session->log->out_add_message >> create_sink([this] {
+		auto m = session->log->latest(session);
 		if (m.type == Log::Type::STATUS)
 			set_status(m.text);
 		else if (m.type == Log::Type::ERROR or m.type == Log::Type::QUESTION)
@@ -132,7 +132,7 @@ LogNotifier::LogNotifier(AudioView *_view) : scenegraph::NodeFree() {
 }
 
 LogNotifier::~LogNotifier() {
-	view->session->log->unsubscribe(this);
+	session->log->unsubscribe(this);
 }
 
 void LogNotifier::on_draw(Painter* p) {
@@ -163,5 +163,5 @@ void LogNotifier::set_status(const string& text, float size) {
 	status.text = text;
 	status.ttl = 0.8f;
 	status.size = size;
-	view->force_redraw();
+	request_redraw();
 }

@@ -224,7 +224,7 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 		}
 	}
 
-	out_redraw >> create_sink([panel, _id = id] {
+	out_redraw >> create_sink([panel, _id = id, this] {
 		panel->redraw(_id);
 	});
 	panel->event_xp(id, "hui:draw", [this, custom_draw] (Painter* p) {

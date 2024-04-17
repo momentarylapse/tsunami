@@ -10,12 +10,12 @@
 
 #include "../../helper/graph/Node.h"
 
-class AudioView;
+class Session;
 class LogInfoBox;
 
 class LogNotifier : public scenegraph::NodeFree {
 public:
-	LogNotifier(AudioView *view);
+	LogNotifier(Session* session);
 	~LogNotifier();
 
 	bool hover(const vec2 &m) const override { return false; }
@@ -24,7 +24,7 @@ public:
 
 	bool progress(float dt);
 
-	AudioView *view;
+	Session* session;
 
 
 	struct Message {

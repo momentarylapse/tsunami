@@ -7,8 +7,10 @@
 
 #include "TsunamiWindow.h"
 #include "HeaderBar.h"
+#include "mainview/MainView.h"
 #include "audioview/AudioView.h"
 #include "audioview/graph/AudioViewTrack.h"
+#include "MouseDelayPlanner.h"
 #include "dialog/NewSongDialog.h"
 #include "dialog/HelpDialog.h"
 #include "dialog/SettingsDialog.h"
@@ -23,6 +25,7 @@
 #include "dialog/TrackRoutingDialog.h"
 #include "dialog/QuestionDialog.h"
 #include "dialog/BufferCompressionDialog.h"
+#include "helper/graph/SceneGraph.h"
 #include "bottombar/BottomBar.h"
 #include "sidebar/SideBar.h"
 #include "sidebar/CaptureConsole.h"
@@ -288,10 +291,13 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	// events
 	event("hui:close", [this] { on_exit(); });
 
-	view = new AudioView(session, "area");
+	main_view = new MainView(session, "area");
+
+	view = new AudioView(session);
+	main_view->scene_graph->add_child(view);
 	session->view = view;
 	hui::run_later(0.01f, [this] {
-		activate("area");
+		activate(main_view->id);
 	});
 
 	// side bar
@@ -376,7 +382,7 @@ TsunamiWindow::~TsunamiWindow() {
 	side_bar = nullptr;
 	unembed(bottom_bar.get());
 	bottom_bar = nullptr;
-	delete view;
+	view = nullptr;
 
 	auto _session = session;
 	hui::run_later(0.010f, [_session] {
@@ -891,13 +897,13 @@ void TsunamiWindow::update_menu() {
 
 void TsunamiWindow::on_side_bar_update() {
 	if (!side_bar->visible)
-		activate(view->id);
+		activate(main_view->id);
 	update_menu();
 }
 
 void TsunamiWindow::on_bottom_bar_update() {
 	if (!bottom_bar->visible)
-		activate(view->id);
+		activate(main_view->id);
 	view->update_onscreen_displays();
 	update_menu();
 }

@@ -11,12 +11,11 @@
 #include "../../lib/base/pointer.h"
 #include "../../data/SongSelection.h"
 #include "../../data/midi/Scale.h"
-#include "../../lib/pattern/Observable.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
 #include "../ColorScheme.h"
 #include "../HoverData.h"
-#include "graph/LogNotifier.h"
+#include "../helper/graph/Node.h"
 #include <atomic>
 
 namespace hui{
@@ -65,7 +64,6 @@ class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
 class BottomBarExpandButton;
-class LogNotifier;
 class PeakDatabase;
 enum class MidiMode;
 
@@ -84,16 +82,16 @@ enum class SelectionMode {
 	FAKE,
 };
 
-class AudioView : public obs::Node<VirtualBase> {
+class AudioView : public scenegraph::Node {
 public:
-	AudioView(Session *session, const string &id);
+	AudioView(Session *session);
 	virtual ~AudioView();
 
 	void check_consistency();
 	void force_redraw();
 	void force_redraw_part(const rect &r);
 
-	void on_draw(Painter *p);
+	void on_draw(Painter *p) override;
 	void on_mouse_move();
 	void on_left_button_down();
 	void on_left_button_up();
@@ -140,10 +138,6 @@ public:
 	void perform_optimize_view();
 	bool _optimize_view_requested;
 	void update_menu();
-
-	int perf_channel;
-
-	string id;
 
 	Array<ColorScheme> color_schemes;
 	void set_color_scheme(const string &name);
@@ -267,11 +261,9 @@ public:
 	bool editing_track(Track *t);
 	bool editing_layer(AudioViewLayer *l);
 
-	rect area;
 	rect song_area();
 	rect clip;
 	TrackHeightManager thm;
-	shared<scenegraph::SceneGraph> scene_graph;
 	bool update_scene_graph();
 
 	bool playback_range_locked;
@@ -291,7 +283,6 @@ public:
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
 	BottomBarExpandButton *bottom_bar_expand_button;
-	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
 	void update_onscreen_displays();
 	AddTrackButton *add_track_button;

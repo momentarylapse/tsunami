@@ -255,7 +255,7 @@ void scroll_y(AudioView *view, float dy) {
 
 void ViewModeDefault::on_mouse_wheel() {
 	auto e = hui::get_event();
-	if (view->scene_graph->on_mouse_wheel(e->scroll))
+	if (view->graph()->on_mouse_wheel(e->scroll))
 		return;
 
 	if (fabs(e->scroll.y) > 0.1f) {

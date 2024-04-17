@@ -99,7 +99,7 @@ public:
 	}
 };
 
-AudioView::AudioView(Session *_session, const string &_id) :
+AudioView::AudioView(Session *_session) :
 		in_solo_changed{this, [this] {
 			update_playback_layers();
 			out_solo_changed.notify();
@@ -108,7 +108,6 @@ AudioView::AudioView(Session *_session, const string &_id) :
 			force_redraw();
 		})
 {
-	id = _id;
 	session = _session;
 	win = session->win.get();
 	song = session->song.get();
@@ -118,7 +117,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 	color_schemes.add(ColorSchemeBright());
 	color_schemes.add(ColorSchemeDark());
-	color_schemes.add(ColorSchemeSystem(win, id));
+	color_schemes.add(ColorSchemeSystem(win, "area")); // FIXME move outside!
 
 	set_color_scheme(hui::config.get_str("View.ColorScheme", "system"));
 
@@ -144,14 +143,11 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_bars, mode_edit_dummy, mode_edit, mode_scale_marker, mode_curve, mode_capture};
 	set_mode(mode_default);
 
-	scene_graph = new scenegraph::SceneGraph();
-	scene_graph->set_perf_name("view");
 	/*scene_graph->set_callback_set_current([this] {
 		if (!selecting_or())
 			set_current(scene_graph->cur_selection);
 	});*/
-	scene_graph->out_redraw >> in_redraw;
-	PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
+	//PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
 	time_scale = new TimeScale(this);
@@ -182,7 +178,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	dummy_vlayer = new AudioViewLayer(this, dummy_layer.get());
 
 
-	scene_graph->add_child(vbox);
+	add_child(vbox);
 
 	vbox->add_child(time_scale);
 	vbox->add_child(hbox);
@@ -191,14 +187,14 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	hbox->add_child(background);
 	hbox->add_child(scroll_bar_y);
 
-	scene_graph->add_child(cursor_start);
-	scene_graph->add_child(cursor_end);
-	scene_graph->add_child(selection_marker);
-	scene_graph->add_child(metronome_overlay_vlayer);
+	add_child(cursor_start);
+	add_child(cursor_end);
+	add_child(selection_marker);
+	add_child(metronome_overlay_vlayer);
 
 
 	cpu_display = new CpuDisplay(session);
-	scene_graph->add_child(cpu_display);
+	add_child(cpu_display);
 
 	peak_database = new PeakDatabase();
 	peak_database->out_changed >> in_redraw;
@@ -246,7 +242,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 	peak_meter_display->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
 	peak_meter_display->align.dz = 100;
 	peak_meter_display->hidden = true;
-	scene_graph->add_child(peak_meter_display);
+	add_child(peak_meter_display);
 
 	output_volume_dial = new Dial(_("output"), 0, 100);
 	output_volume_dial->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
@@ -264,16 +260,13 @@ AudioView::AudioView(Session *_session, const string &_id) :
 		output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
 	});
 	output_volume_dial->hidden = true;
-	scene_graph->add_child(output_volume_dial);
+	add_child(output_volume_dial);
 
 	bottom_bar_expand_button = new BottomBarExpandButton(this);
-	scene_graph->add_child(bottom_bar_expand_button);
-
-	log_notifier = new LogNotifier(this);
-	scene_graph->add_child(log_notifier);
+	add_child(bottom_bar_expand_button);
 
 	add_track_button = new AddTrackButton(this);
-	scene_graph->add_child(add_track_button);
+	add_child(add_track_button);
 
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
@@ -281,6 +274,7 @@ AudioView::AudioView(Session *_session, const string &_id) :
 
 
 	// events
+	string id = "area";
 	win->event_xp(id, "hui:draw", [this](Painter *p) { on_draw(p); });
 	win->event_x(id, "hui:mouse-move", [this]{ on_mouse_move(); });
 	win->event_x(id, "hui:left-button-down", [this]{ on_left_button_down(); });
@@ -362,8 +356,6 @@ AudioView::~AudioView() {
 
 	session->playback->unsubscribe(this);
 	song->unsubscribe(this);
-
-	PerformanceMonitor::delete_channel(perf_channel);
 }
 
 void AudioView::set_antialiasing(bool set) {
@@ -527,7 +519,7 @@ void AudioView::snap_to_grid(int &pos) {
 void AudioView::on_mouse_move() {
 	set_mouse();
 
-	scene_graph->on_mouse_move(m);
+	//scene_graph->on_mouse_move(m);
 
 	mode->on_mouse_move();
 
@@ -536,7 +528,7 @@ void AudioView::on_mouse_move() {
 
 void AudioView::on_left_button_down() {
 	set_mouse();
-	scene_graph->on_left_button_down(m);
+	//scene_graph->on_left_button_down(m);
 
 	force_redraw();
 	update_menu();
@@ -563,7 +555,7 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 
 
 void AudioView::on_left_button_up() {
-	scene_graph->on_left_button_up(m);
+	//scene_graph->on_left_button_up(m);
 
 	force_redraw();
 	update_menu();
@@ -582,7 +574,7 @@ void AudioView::on_middle_button_up() {
 
 
 void AudioView::on_right_button_down() {
-	scene_graph->on_right_button_down(m);
+	//scene_graph->on_right_button_down(m);
 }
 
 void AudioView::on_right_button_up() {
@@ -600,7 +592,7 @@ void AudioView::on_mouse_leave() {
 
 
 void AudioView::on_left_double_click() {
-	scene_graph->on_left_double_click(m);
+	//scene_graph->on_left_double_click(m);
 	mode->on_left_double_click();
 	force_redraw();
 	update_menu();
@@ -783,12 +775,14 @@ void AudioView::on_mouse_wheel() {
 
 
 void AudioView::force_redraw() {
-	win->redraw(id);
+	request_redraw();
+	//win->redraw(id);
 	//win->redraw_rect(id, rect(200, 300, 0, area.y2));
 }
 
 void AudioView::force_redraw_part(const rect &r) {
-	win->redraw_rect(id, r);
+	request_redraw();
+	//win->redraw_rect(id, r);
 }
 
 void AudioView::unselect_all_samples() {
@@ -1139,7 +1133,7 @@ void AudioView::draw_song(Painter *c) {
 
 	c->set_antialiasing(false);
 
-	scene_graph->update_geometry_recursive(area);
+	//scene_graph->update_geometry_recursive(area);
 
 	cam.area = song_area();
 	if (_optimize_view_requested)
@@ -1148,7 +1142,7 @@ void AudioView::draw_song(Painter *c) {
 
 	update_buffer_zoom();
 	//scene_graph->on_draw(c);
-	scene_graph->draw(c);
+	//scene_graph->draw(c);
 
 
 	// playing/capturing position
@@ -1173,8 +1167,8 @@ void AudioView::draw_song(Painter *c) {
 
 	peak_database->iterate(session->sample_rate());
 
-	if (log_notifier->progress(0.03f))
-		animating = true;
+//	if (log_notifier->progress(0.03f))
+//		animating = true;
 
 	if (cam.needs_update())
 		animating = true;
@@ -1744,25 +1738,25 @@ void AudioView::open_popup(hui::Menu* menu) {
 }
 
 HoverData &AudioView::hover() {
-	return scene_graph->hover;
+	return graph()->hover;
 }
 
 MouseDelayPlanner *AudioView::mdp() {
-	return scene_graph->mdp.get();
+	return graph()->mdp.get();
 }
 
 void AudioView::mdp_prepare(MouseDelayAction *a) {
-	scene_graph->mdp_prepare(a);
+	graph()->mdp_prepare(a);
 }
 
 void AudioView::mdp_run(MouseDelayAction *a) {
-	scene_graph->mdp_run(a, m);
+	graph()->mdp_run(a, m);
 }
 
 void AudioView::mdp_prepare(hui::Callback update) {
-	scene_graph->mdp_prepare(update);
+	graph()->mdp_prepare(update);
 }
 
 bool view_has_focus(AudioView *view) {
-	return view->win->is_active(view->id);
+	return view->win->is_active("area"); //view->id);
 }

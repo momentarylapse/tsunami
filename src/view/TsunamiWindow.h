@@ -13,6 +13,7 @@
 #include "../lib/pattern/Observable.h"
 
 class Song;
+class MainView;
 class AudioView;
 class SideBar;
 class BottomBar;
@@ -136,11 +137,12 @@ public:
 	void on_bottom_bar_update();
 	void on_update();
 
-	AudioView *view;
+	AudioView* view;
 
 	Song *song;
 
 	Session *session;
+	owned<MainView> main_view;
 
 	owned<HeaderBar> header_bar;
 	shared<SideBar> side_bar;

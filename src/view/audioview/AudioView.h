@@ -63,7 +63,6 @@ class MouseDelayAction;
 class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
-class BottomBarExpandButton;
 class PeakDatabase;
 enum class MidiMode;
 
@@ -279,12 +278,6 @@ public:
 	scenegraph::Node *background;
 	Cursor *cursor_start, *cursor_end;
 	SelectionMarker *selection_marker;
-	CpuDisplay *cpu_display;
-	PeakMeterDisplay *peak_meter_display;
-	Dial *output_volume_dial;
-	BottomBarExpandButton *bottom_bar_expand_button;
-	scenegraph::Node *onscreen_display;
-	void update_onscreen_displays();
 	AddTrackButton *add_track_button;
 
 	owned<BufferPainter> buffer_painter;

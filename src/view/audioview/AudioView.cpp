@@ -9,18 +9,14 @@
 #include "graph/AudioViewLayer.h"
 #include "graph/AudioViewTrack.h"
 #include "graph/Background.h"
-#include "graph/BottomBarExpandButton.h"
 #include "graph/Cursor.h"
 #include "graph/TimeScale.h"
-#include "../mainview/LogNotifier.h"
 #include "../MouseDelayPlanner.h"
 #include "../helper/graph/SceneGraph.h"
 #include "../helper/graph/ScrollBar.h"
 #include "../helper/Dial.h"
 #include "../helper/Drawing.h"
 #include "../helper/PeakThread.h"
-#include "../helper/CpuDisplay.h"
-#include "../helper/PeakMeterDisplay.h"
 #include "../helper/PeakDatabase.h"
 #include "../mode/ViewModeDefault.h"
 #include "../mode/ViewModeEdit.h"
@@ -35,6 +31,7 @@
 #include "../painter/GridPainter.h"
 #include "../sidebar/SideBar.h"
 #include "../bottombar/BottomBar.h"
+#include "../mainview/MainView.h"
 #include "../TsunamiWindow.h"
 #include "../../data/base.h"
 #include "../../data/Track.h"
@@ -193,9 +190,6 @@ AudioView::AudioView(Session *_session) :
 	add_child(metronome_overlay_vlayer);
 
 
-	cpu_display = new CpuDisplay(session);
-	add_child(cpu_display);
-
 	peak_database = new PeakDatabase();
 	peak_database->out_changed >> in_redraw;
 
@@ -233,42 +227,8 @@ AudioView::AudioView(Session *_session) :
 		cam_changed();
 	});
 
-
-	// TODO move "OnScreenDisplay"?
-	peak_meter_display = new PeakMeterDisplay(session->playback->peak_meter.get(), PeakMeterDisplay::Mode::BOTH);
-	peak_meter_display->align.dx = 90;
-	peak_meter_display->align.dy = -20;
-	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
-	peak_meter_display->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
-	peak_meter_display->align.dz = 100;
-	peak_meter_display->hidden = true;
-	add_child(peak_meter_display);
-
-	output_volume_dial = new Dial(_("output"), 0, 100);
-	output_volume_dial->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
-	output_volume_dial->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
-	output_volume_dial->align.dx = 230;
-	output_volume_dial->align.dy = 0;
-	output_volume_dial->align.dz = 100;
-	//output_volume_dial->reference_value = 50;
-	output_volume_dial->unit = "%";
-	output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
-	output_volume_dial->out_value >> create_data_sink<float>([this] (float v) {
-		session->playback->output_stream->set_volume(v / 100.0f);
-	});
-	session->playback->output_stream->out_changed >> create_sink([this] {
-		output_volume_dial->set_value(session->playback->output_stream->get_volume() * 100);
-	});
-	output_volume_dial->hidden = true;
-	add_child(output_volume_dial);
-
-	bottom_bar_expand_button = new BottomBarExpandButton(this);
-	add_child(bottom_bar_expand_button);
-
 	add_track_button = new AddTrackButton(this);
 	add_child(add_track_button);
-
-	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
 	m = {0,0};
 
@@ -905,21 +865,9 @@ void AudioView::on_stream_tick() {
 }
 
 
-void AudioView::update_onscreen_displays() {
-	bottom_bar_expand_button->hidden = false;
-	peak_meter_display->hidden = true;
-	output_volume_dial->hidden = true;
-
-	if (session->win->bottom_bar)
-		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
-			peak_meter_display->hidden = !session->playback->is_active();
-			output_volume_dial->hidden = !session->playback->is_active();
-		}
-	force_redraw();
-}
-
 void AudioView::on_stream_state_change() {
-	update_onscreen_displays();
+	// TODO send event instead
+	win->main_view->update_onscreen_displays();
 }
 
 void AudioView::on_update_sidebar() {

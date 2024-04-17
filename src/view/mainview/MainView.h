@@ -27,15 +27,17 @@ class MainView : public obs::Node<VirtualBase> {
 public:
 	MainView(Session *session, const string &id);
 
+	void update_onscreen_displays();
+
 	string id;
-	//int perf_channel;
-	//vec2 m;
+	Session* session;
 	owned<scenegraph::SceneGraph> scene_graph;
 	CpuDisplay *cpu_display;
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
 	BottomBarExpandButton *bottom_bar_expand_button;
 	LogNotifier *log_notifier;
+	scenegraph::Node *onscreen_display;
 };
 
 

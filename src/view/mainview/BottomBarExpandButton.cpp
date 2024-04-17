@@ -6,22 +6,22 @@
  */
 
 #include "BottomBarExpandButton.h"
-#include "../AudioView.h"
-#include "../../helper/Drawing.h"
-#include "../../bottombar/BottomBar.h"
-#include "../../TsunamiWindow.h"
-#include "../../../Session.h"
+#include "../audioview/AudioView.h"
+#include "../helper/Drawing.h"
+#include "../bottombar/BottomBar.h"
+#include "../TsunamiWindow.h"
+#include "../../Session.h"
 
 
-BottomBarExpandButton::BottomBarExpandButton(AudioView *_view) : Node(50, 50) {
+BottomBarExpandButton::BottomBarExpandButton(Session *_session) : Node(50, 50) {
 	align.dz = 200;
 	align.horizontal = AlignData::Mode::LEFT;
 	align.vertical = AlignData::Mode::BOTTOM;
 	set_perf_name("button");
-	view = _view;
+	session = _session;
 }
 BottomBar *BottomBarExpandButton::bottom_bar() const {
-	return view->session->win->bottom_bar.get();
+	return session->win->bottom_bar.get();
 }
 void BottomBarExpandButton::on_draw(Painter *p) {
 	color bg = theme.background_overlay;

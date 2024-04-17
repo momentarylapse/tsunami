@@ -9,6 +9,7 @@
 #include "../helper/CpuDisplay.h"
 #include "../helper/Slider.h"
 #include "../audioview/AudioView.h"
+#include "../mainview/MainView.h"
 #include "../TsunamiWindow.h"
 #include "../../device/DeviceManager.h"
 #include "../../device/stream/AudioOutput.h"
@@ -195,7 +196,7 @@ void SettingsDialog::on_suck_buffer() {
 void SettingsDialog::on_cpu_meter() {
 	bool show = is_checked("");
 	hui::config.set_bool("CpuDisplay", show);
-	view->cpu_display->enable(show);
+	view->win->main_view->cpu_display->enable(show);
 }
 
 void SettingsDialog::on_antialiasing() {

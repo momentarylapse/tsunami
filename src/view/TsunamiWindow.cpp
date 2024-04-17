@@ -904,7 +904,7 @@ void TsunamiWindow::on_side_bar_update() {
 void TsunamiWindow::on_bottom_bar_update() {
 	if (!bottom_bar->visible)
 		activate(main_view->id);
-	view->update_onscreen_displays();
+	main_view->update_onscreen_displays();
 	update_menu();
 }
 

@@ -39,18 +39,12 @@
 #include "../../data/TrackMarker.h"
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
-#include "../../data/rhythm/Bar.h"
-#include "../../data/rhythm/BarCollection.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/SampleRef.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/SignalChain.h"
 #include "../../plugins/TsunamiPlugin.h"
-#include "../../lib/math/math.h"
-#include "../../lib/threads/Thread.h"
-#include "../../lib/hui/hui.h"
-#include "../../lib/threads/Mutex.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../Session.h"
 #include "../../Playback.h"
@@ -110,14 +104,6 @@ AudioView::AudioView(Session *_session) :
 	song = session->song.get();
 	_optimize_view_requested = false;
 
-	perf_channel = PerformanceMonitor::create_channel("view", this);
-
-	color_schemes.add(ColorSchemeBright());
-	color_schemes.add(ColorSchemeDark());
-	color_schemes.add(ColorSchemeSystem(win, "area")); // FIXME move outside!
-
-	set_color_scheme(hui::config.get_str("View.ColorScheme", "system"));
-
 	midi_view_mode = (MidiMode)hui::config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	playback_range_locked = false;
@@ -144,7 +130,6 @@ AudioView::AudioView(Session *_session) :
 		if (!selecting_or())
 			set_current(scene_graph->cur_selection);
 	});*/
-	//PerformanceMonitor::set_parent(scene_graph->perf_channel, perf_channel);
 	area = rect(0, 1024, 0, 768);
 	enabled = false;
 	time_scale = new TimeScale(this);
@@ -337,16 +322,6 @@ void AudioView::set_mouse_wheel_speed(float speed) {
 	mouse_wheel_speed = speed;
 	hui::config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
 	out_settings_changed.notify();
-}
-
-void AudioView::set_color_scheme(const string &name) {
-	hui::config.set_str("View.ColorScheme", name);
-	theme = color_schemes[0];
-	for (auto &b: color_schemes)
-		if (b.name == name)
-			theme = b;
-
-	force_redraw();
 }
 
 void AudioView::set_mode(ViewMode *m) {

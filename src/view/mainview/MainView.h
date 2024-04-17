@@ -13,6 +13,7 @@
 class Session;
 class rect;
 class Painter;
+class ColorScheme;
 namespace scenegraph {
 	class SceneGraph;
 	class Node;
@@ -38,6 +39,10 @@ public:
 	BottomBarExpandButton *bottom_bar_expand_button;
 	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
+
+
+	Array<ColorScheme> themes;
+	void set_theme(const string &name);
 };
 
 

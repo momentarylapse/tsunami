@@ -138,9 +138,6 @@ public:
 	bool _optimize_view_requested;
 	void update_menu();
 
-	Array<ColorScheme> color_schemes;
-	void set_color_scheme(const string &name);
-
 	static const int SNAPPING_DIST;
 
 	HoverData &hover();

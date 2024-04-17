@@ -26,6 +26,11 @@ MainView::MainView(Session *_session, const string &_id) {
 	auto win = session->win.get();
 	//perf_channel = PerformanceMonitor::create_channel("view", this);
 
+	themes.add(ColorSchemeBright());
+	themes.add(ColorSchemeDark());
+	themes.add(ColorSchemeSystem(win, id));
+
+
 	auto pad = new scenegraph::Node;
 
 	scene_graph = scenegraph::SceneGraph::create_integrated(win, id, pad, "view", [this] (Painter *p) {
@@ -94,12 +99,24 @@ MainView::MainView(Session *_session, const string &_id) {
 	onscreen_display = nullptr; //new scenegraph::NodeFree();
 
 
+	set_theme(hui::config.get_str("View.ColorScheme", "system"));
+
 	hui::run_later(1.0f, [this] {
 		session->status("test");
 		session->e("test");
 	});
 
 	win->activate(id);
+}
+
+void MainView::set_theme(const string &name) {
+	hui::config.set_str("View.ColorScheme", name);
+	theme = themes[0];
+	for (auto &b: themes)
+		if (b.name == name)
+			theme = b;
+
+	scene_graph->request_redraw();
 }
 
 void MainView::update_onscreen_displays() {

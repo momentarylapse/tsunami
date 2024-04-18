@@ -16,7 +16,6 @@
 #include "../../lib/image/image.h"
 #include "../../data/audio/AudioBuffer.h"
 #include <atomic>
-#include <shared_mutex>
 
 class AudioBuffer;
 class Range;
@@ -44,7 +43,6 @@ class PeakData {
 public:
 	PeakData(AudioBuffer& b, AudioViewMode mode);
 
-	std::shared_timed_mutex mtx;
 	AudioViewMode mode;
 	AudioBuffer* buffer;
 	int version;
@@ -81,8 +79,11 @@ public:
 
 //	void _truncate_peaks(int length);
 
+
 	// PeakThread
-	struct Temp {
+	struct Request {
+		AudioViewMode mode;
+		int uid;
 		AudioBuffer buffer;
 		Array<bytes> peaks;
 		bytes spectrogram;
@@ -92,9 +93,11 @@ public:
 		int _update_peaks_prepare();
 		void _update_peaks_chunk(int index);
 		bool _peaks_chunk_needs_update(int index);
-	} temp;
+	};
 };
 
+// single threaded (apart from requests)
+// access to PeakData needs to lock!
 class PeakDatabase : public obs::Node<VirtualBase> {
 public:
 	PeakDatabase();
@@ -104,8 +107,6 @@ public:
 	//bytes& get_spectrogram(AudioBuffer &b);
 
 	void invalidate_all();
-
-	std::shared_timed_mutex mtx;
 
 	//owned_array<PeakData> peak_data;
 	//base::map<int, owned<PeakData>> peak_data;
@@ -127,12 +128,11 @@ public:
 
 	void iterate(float sample_rate);
 	void iterate_items(Map& map);
+	void process_replies();
 
-	struct Request {
-		PeakData *p;
-	};
-
-	InterThreadFifoBuffer<Request> requests;
+	// shared between main thread and PeakThread:
+	InterThreadFifoBuffer<PeakData::Request*> requests;
+	InterThreadFifoBuffer<PeakData::Request*> replies;
 };
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

@@ -17,6 +17,8 @@
 #include <math.h>
 #include <atomic>
 
+#include <stdio.h>
+
 // AudioBuffer is only guaranteed to exist between acquire() and release()!
 
 const int PeakData::PEAK_CHUNK_EXP = 15;
@@ -117,7 +119,7 @@ inline float fabsmax(float *p) {
 	return max(max(max(a, b), max(c, d)), max(max(e, f), max(g, h)));
 }
 
-void PeakData::Temp::_ensure_peak_size(int level4, int n, bool set_invalid) {
+void PeakData::Request::_ensure_peak_size(int level4, int n, bool set_invalid) {
 	int dl = 2 * buffer.channels;
 	if (peaks.num < level4 + dl)
 		peaks.resize(level4 + dl);
@@ -134,7 +136,7 @@ void PeakData::Temp::_ensure_peak_size(int level4, int n, bool set_invalid) {
 	}*/
 }
 
-bool PeakData::Temp::_peaks_chunk_needs_update(int index) {
+bool PeakData::Request::_peaks_chunk_needs_update(int index) {
 	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
 	if (peaks.num <= pm)
 		return true;
@@ -143,7 +145,9 @@ bool PeakData::Temp::_peaks_chunk_needs_update(int index) {
 	return (peaks[pm][index] == 255);
 }
 
-void PeakData::Temp::_update_peaks_chunk(int index) {
+#include <stdio.h>
+
+void PeakData::Request::_update_peaks_chunk(int index) {
 	// first level
 	int i0 = index * (PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE);
 	int i1 = min(i0 + PEAK_CHUNK_SIZE / PEAK_FINEST_SIZE, buffer.length / PEAK_FINEST_SIZE);
@@ -152,11 +156,11 @@ void PeakData::Temp::_update_peaks_chunk(int index) {
 
 	_ensure_peak_size(0, i1, true);
 
-	//msg_write(format("lvl0:  %d  %d     %d  %d", i0, n, peaks[0].num, index));
-
 	for (int j=0; j<buffer.channels; j++) {
-		for (int i=i0; i<i1; i++)
-			peaks[j][i] = (unsigned char)(fabsmax(&buffer.c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
+		for (int i=i0; i<i1; i++) {
+			auto a = (unsigned char) (fabsmax(&buffer.c[j][i * PEAK_FINEST_SIZE]) * 254.0f);
+			peaks[j][i] = a;
+		}
 		memcpy(&peaks[buffer.channels + j][i0], &peaks[j][i0], n);
 	}
 
@@ -178,7 +182,6 @@ void PeakData::Temp::_update_peaks_chunk(int index) {
 			}
 	}
 
-	//	msg_write(format("%d  %d  %d", level4 / 4, peaks.num / 4 - 1, n));
 	if (n == 0)
 		return;
 
@@ -204,7 +207,7 @@ void PeakData::Temp::_update_peaks_chunk(int index) {
 	}
 }
 
-int PeakData::Temp::_update_peaks_prepare() {
+int PeakData::Request::_update_peaks_prepare() {
 	if (!_shrink_table_created)
 		update_shrink_table();
 
@@ -276,7 +279,7 @@ PeakData& PeakDatabase::acquire(AudioBuffer &b, AudioViewMode mode) {
 	int index = map->find(b.uid);
 	if (index >= 0) {
 		auto p = map->by_index(index);
-		p->mtx.lock();
+		//p->mtx.lock();
 		p->ticks_since_last_usage = 0;
 		p->buffer = &b;
 		if (p->version != b.version) {
@@ -288,39 +291,38 @@ PeakData& PeakDatabase::acquire(AudioBuffer &b, AudioViewMode mode) {
 
 	dbo(format("++ NEW BUFFER %x  %x", b.uid, b.version));
 	auto p = new PeakData(b, mode);
-	mtx.lock();
 	map->set(b.uid, p);
-	mtx.unlock();
 
-	p->mtx.lock();
 	return *p;
 }
 
 void PeakDatabase::release(PeakData& p) {
-	p.mtx.unlock();
+	//p.mtx.unlock();
 }
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
 	auto &p = acquire(buf, AudioViewMode::PEAKS);
 	if (p.state == PeakData::State::OUT_OF_SYNC) {
+		PeakData::Request r;
+		r.mode = p.mode;
 
-		if ((p.version & 0xffff0000) == (buf.version & 0xffff0000) and p.temp.buffer.length > 0) {
+		if ((p.version & 0xffff0000) == (buf.version & 0xffff0000) and r.buffer.length > 0) {
 			// incremental update
-			p.peaks.exchange(p.temp.peaks);
-			p.temp.buffer.append(buf.ref(p.temp.buffer.length, buf.length));
+			p.peaks.exchange(r.peaks);
+			r.buffer.append(buf.ref(r.buffer.length, buf.length));
 		} else {
 			// full update
 			p.peaks.clear();
 			p.spectrogram.clear();
-			p.temp.buffer = buf;
+			r.buffer = buf;
 		}
 
-		int n = p.temp._update_peaks_prepare();
+		int n = r._update_peaks_prepare();
 		for (int i=0; i<n; i++)
-			if (p.temp._peaks_chunk_needs_update(i))
-				p.temp._update_peaks_chunk(i);
+			if (r._peaks_chunk_needs_update(i))
+				r._update_peaks_chunk(i);
 
-		p.peaks.exchange(p.temp.peaks);
+		p.peaks.exchange(r.peaks);
 		p.state = PeakData::State::OK;
 		p.version = buf.version;
 	}
@@ -332,54 +334,82 @@ void PeakDatabase::stop_update() {
 }
 
 void PeakDatabase::iterate_items(Map& map) {
-	for (auto&& [uid,p]: map) {
-		p->ticks_since_last_usage ++;
+	Array<int> to_drop;
+
+	for (auto &&[uid, p]: map) {
+		p->ticks_since_last_usage++;
 		if (p->ticks_since_last_usage > 10) {
-			dbo("DELETING OLD PEAKS...");
+			dbo("DELETING OLD PEAKS... " + p2s(p));
 			delete p;
-			map.drop(uid);
-			// NOTE: we're abusing that map<> does not reallocate.
-			// we will only skip 1 element
-			//return;
+			to_drop.add(uid);
 		} else if (p->state == PeakData::State::OUT_OF_SYNC) {
 			if (requests.size() >= 4)
 				continue;
 
-			if ((p->version & 0xffff0000) == (p->buffer->version & 0xffff0000) and p->temp.buffer.length > 0) {
+			auto r = new PeakData::Request;
+			r->mode = p->mode;
+			r->uid = uid;
+
+			if ((p->version & 0xffff0000) == (p->buffer->version & 0xffff0000) and r->buffer.length > 0 and false) {
+				// FIXME
 				// incremental update
 				p->peaks.clear(); // TODO
 				p->spectrogram.clear(); // TODO
-				auto rr = p->buffer->ref(p->temp.buffer.length, p->buffer->length);
-				p->temp.buffer.append(rr);
+				auto rr = p->buffer->ref(r->buffer.length, p->buffer->length);
+				r->buffer.append(rr);
 			} else {
 				// full update
 				p->peaks.clear();
 				p->spectrogram.clear();
-				p->temp.buffer = *p->buffer;
+				r->buffer = *p->buffer;
 			}
 			p->state = PeakData::State::UPDATE_REQUESTED;
 			p->version = p->buffer->version;
-			dbo(format("+ peak request  %x  %x", p->buffer->uid, p->version));
-			requests.add({p});
+			dbo(format("+ peak request  %s %x  %x", p2s(p), p->buffer->uid, p->version));
+			requests.add(r);
 		}
+	}
+
+	for (int uid: to_drop)
+		map.drop(uid);
+}
+
+void PeakDatabase::process_replies() {
+	// replies from PeakThread
+	int n = replies.size();
+	for (int i=0; i<n; i++) {
+		auto r = replies.pop();
+		if (r->mode == AudioViewMode::PEAKS) {
+			if (peak_data.contains(r->uid)) {
+				auto& p = peak_data[r->uid];
+				p->peaks.exchange(r->peaks);
+				p->state = PeakData::State::OK;
+			}
+		} else if (r->mode == AudioViewMode::SPECTRUM) {
+			if (spectrogram_data.contains(r->uid)) {
+				auto& p = spectrogram_data[r->uid];
+				p->spectrogram.exchange(r->spectrogram);
+				p->image = r->image;
+				p->state = PeakData::State::OK;
+			}
+		}
+		out_changed();
 	}
 }
 
 void PeakDatabase::iterate(float _sample_rate) {
 	sample_rate = _sample_rate;
-	mtx.lock();
 
 	// new requests?
 	iterate_items(peak_data);
 	iterate_items(spectrogram_data);
+
+	process_replies();
 
 	// collect old requests?
 	/*for (auto &r: requests)
 		if (r.p and r.p->state == PeakData::State::UPDATE_FINISHED) {
 			r.p->state = PeakData::State::OK;
 		}*/
-
-	mtx.unlock();
-
 }
 

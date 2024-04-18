@@ -61,18 +61,18 @@ PeakThread::~PeakThread() {
 }
 
 
-void prepare_spectrum(PeakData &p, float sample_rate) {
+void prepare_spectrum(PeakData::Request *r, float sample_rate) {
 	//if (p.spectrogram.num > 0)
 	//	return false;
 
 	const float DB_RANGE = 50;
 	const float DB_BOOST = 10;
 
-	auto pspectrum = Spectrogram::log_spectrogram(p.temp.buffer, sample_rate, PeakData::SPECTRUM_CHUNK, PeakData::SPECTRUM_MIN_FREQ, PeakData::SPECTRUM_MAX_FREQ, PeakData::SPECTRUM_N, WindowFunction::HANN);
+	auto pspectrum = Spectrogram::log_spectrogram(r->buffer, sample_rate, PeakData::SPECTRUM_CHUNK, PeakData::SPECTRUM_MIN_FREQ, PeakData::SPECTRUM_MAX_FREQ, PeakData::SPECTRUM_N, WindowFunction::HANN);
 	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
-	p.temp.spectrogram.exchange(qspectrum);
+	r->spectrogram.exchange(qspectrum);
 }
 
 void PeakThread::on_run() {
@@ -84,65 +84,42 @@ void PeakThread::on_run() {
 		if (!db->requests.has_data())
 			continue;
 
-		auto p = db->requests.pop().p;
+		auto r = db->requests.pop();
 
-		if (p->mode == AudioViewMode::PEAKS) {
-
-			int n = p->temp._update_peaks_prepare();
+		if (r->mode == AudioViewMode::PEAKS) {
+			int n = r->_update_peaks_prepare();
 
 			Thread::cancelation_point();
 
 			for (int i=0; i<n; i++) {
-				if (p->temp._peaks_chunk_needs_update(i)) {
+				if (r->_peaks_chunk_needs_update(i)) {
 					PerformanceMonitor::start_busy(perf_channel);
-					p->temp._update_peaks_chunk(i);
+					r->_update_peaks_chunk(i);
 					PerformanceMonitor::end_busy(perf_channel);
-					//notify();
 					Thread::cancelation_point();
 				}
 			}
-
-			// write back
-			p->mtx.lock();
-			PerformanceMonitor::start_busy(perf_channel);
-			p->peaks = p->temp.peaks;
-			p->temp.peaks.clear();
-			p->state = PeakData::State::OK;
-			PerformanceMonitor::end_busy(perf_channel);
-			p->mtx.unlock();
-			notify();
-		} else if (p->mode == AudioViewMode::SPECTRUM) {
+		} else if (r->mode == AudioViewMode::SPECTRUM) {
 
 			PerformanceMonitor::start_busy(perf_channel);
-			prepare_spectrum(*p, db->sample_rate);
+			prepare_spectrum(r, db->sample_rate);
 
-			int n = p->temp.spectrogram.num / PeakData::SPECTRUM_N;
-			auto& im = p->temp.image;
+			int n = r->spectrogram.num / PeakData::SPECTRUM_N;
+			auto& im = r->image;
 			im.resize(n, PeakData::SPECTRUM_N);
 
 			for (int i=0; i<n; i++) {
 				for (int k=0; k<PeakData::SPECTRUM_N; k++) {
-					float f = Spectrogram::dequantize(p->temp.spectrogram[i * PeakData::SPECTRUM_N + k]);
+					float f = Spectrogram::dequantize(r->spectrogram[i * PeakData::SPECTRUM_N + k]);
 					im.set_pixel(i, PeakData::SPECTRUM_N - 1 - k, color_heat_map(f));
 				}
 				if ((i & 0xff) == 0)
 					Thread::cancelation_point();
 			}
 			PerformanceMonitor::end_busy(perf_channel);
-
-
-			// write back
-			p->mtx.lock();
-			PerformanceMonitor::start_busy(perf_channel);
-			p->spectrogram = p->temp.spectrogram;
-			p->image = p->temp.image;
-			p->temp.spectrogram.clear();
-			p->temp.image.resize(1, 1);
-			p->state = PeakData::State::OK;
-			PerformanceMonitor::end_busy(perf_channel);
-			p->mtx.unlock();
-			notify();
 		}
+		db->replies.add(r);
+		notify();
 	}
 }
 

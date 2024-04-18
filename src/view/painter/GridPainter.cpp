@@ -20,20 +20,18 @@
 color col_inter(const color a, const color &b, float t);
 
 
-GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_scheme) :
+GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, ColorScheme &_scheme) :
 	 local_theme(_scheme) {
 	sel = _sel;
 	if (!sel)
 		sel = new SongSelection;
-	hover = _hover;
-	if (!hover)
-		hover = new HoverData;
+	get_hover_bar = [] { return nullptr; };
 	cam = _cam;
 	song = _song;
 }
 
-void GridPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, ColorScheme &_scheme) {
-	new(this) GridPainter(_song, _cam, _sel, _hover, _scheme);
+void GridPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, ColorScheme &_scheme) {
+	new(this) GridPainter(_song, _cam, _sel, _scheme);
 }
 
 
@@ -199,6 +197,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	c->set_font("", local_theme.FONT_SIZE, true, false);
 	float change_block_until = -1;
 	bool block_reported = false;
+	Bar *hover_bar = get_hover_bar();
 	for (Bar *b: bars) {
 		float xx = cam->sample2screen(b->range().offset);
 		float dx_bar = cam->dsample2screen(b->range().length);
@@ -206,7 +205,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 		color halo_col = color(0,0,0,0);
 		if (sel->has(b))
 			halo_col = local_theme.blob_bg_selected;
-		if (hover->bar == b) {
+		if (hover_bar == b) {
 			if (halo_col.a == 0)
 				halo_col = local_theme.blob_bg;
 			halo_col = local_theme.hoverify(halo_col);

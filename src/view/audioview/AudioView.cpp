@@ -179,7 +179,8 @@ AudioView::AudioView(Session *_session) :
 	peak_database->out_changed >> in_redraw;
 
 	buffer_painter = new BufferPainter(this);
-	grid_painter = new GridPainter(song, &cam, &sel, &hover(), theme);
+	grid_painter = new GridPainter(song, &cam, &sel, theme);
+	grid_painter->get_hover_bar = [this] { return hover().bar; };
 
 	preview_sleep_time = hui::config.get_int("PreviewSleepTime", 10);
 	ScrollSpeed = 20;

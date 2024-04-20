@@ -541,6 +541,15 @@ gboolean on_gtk_area_focus_in(GtkWidget *widget, GdkEventButton *event, gpointer
 
 void on_gtk_gesture_scroll(GtkEventControllerScroll *controller, double dx, double dy, gpointer user_data) {
 	auto c = reinterpret_cast<Control*>(user_data);
+
+#if GTK_CHECK_VERSION(4,8,0)
+	const auto unit = gtk_event_controller_scroll_get_unit(controller);
+	if (unit == GDK_SCROLL_UNIT_SURFACE) { // px
+		// we're mostly expecting "clicks" ... 1 click ~ 25px
+		dx *= 0.04;
+		dy *= 0.04;
+	}
+#endif
 	c->panel->win->input.scroll_x = (float)dx;
 	c->panel->win->input.scroll_y = (float)dy;
 

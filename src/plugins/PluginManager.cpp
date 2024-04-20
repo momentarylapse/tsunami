@@ -787,7 +787,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_size("AudioView", sizeof(AudioView));
 	ext->declare_class_element("AudioView.cam", &AudioView::cam);
 	ext->declare_class_element("AudioView.sel", &AudioView::sel);
-	ext->declare_class_element("AudioView.mouse_wheel_speed", &AudioView::mouse_wheel_speed);
+	ext->declare_class_element("AudioView.mouse_wheel_factor", &AudioView::mouse_wheel_factor);
 	//ext->link_class_func("AudioView.subscribe", &ObservableKabaWrapper<AudioView>::subscribe_kaba);
 	ext->link_class_func("AudioView.unsubscribe", &AudioView::unsubscribe);
 	ext->link_class_func("AudioView.optimize_view", &AudioView::request_optimize_view);

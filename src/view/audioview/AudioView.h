@@ -171,8 +171,8 @@ public:
 	float ScrollSpeed;
 	float ScrollSpeedFast;
 	float ZoomSpeed;
-	float mouse_wheel_speed;
-	void set_mouse_wheel_speed(float speed);
+	float mouse_wheel_factor;
+	void set_mouse_wheel_factor(float factor);
 
 	vec2 m;
 

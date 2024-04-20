@@ -183,10 +183,12 @@ AudioView::AudioView(Session *_session) :
 	grid_painter->get_hover_bar = [this] { return hover().bar; };
 
 	preview_sleep_time = hui::config.get_int("PreviewSleepTime", 10);
-	ScrollSpeed = 20;
-	ScrollSpeedFast = 200;
-	ZoomSpeed = hui::config.get_float("View.ZoomSpeed", 0.1f);
-	set_mouse_wheel_speed(hui::config.get_float("View.MouseWheelSpeed", 1.0f));
+	ZoomSpeed = hui::config.get_float("View.ZoomSpeed", 0.15f);
+	//if (ZoomSpeed == 0.1f)
+		ZoomSpeed = 0.15f; // fix for legacy config
+	ScrollSpeed = hui::config.get_float("View.ScrollSpeed", 100.0f);
+	ScrollSpeedFast = hui::config.get_float("View.ScrollSpeedFast", 1000.0f);
+	set_mouse_wheel_factor(hui::config.get_float("View.MouseWheelSpeed", 1.0f));
 	set_antialiasing(hui::config.get_bool("View.Antialiasing", true));
 	set_high_details(hui::config.get_bool("View.HighDetails", true));
 	hui::config.set_float("View.ZoomSpeed", ZoomSpeed);
@@ -319,9 +321,9 @@ void AudioView::set_high_details(bool set) {
 	out_settings_changed.notify();
 }
 
-void AudioView::set_mouse_wheel_speed(float speed) {
-	mouse_wheel_speed = speed;
-	hui::config.set_float("View.MouseWheelSpeed", mouse_wheel_speed);
+void AudioView::set_mouse_wheel_factor(float speed) {
+	mouse_wheel_factor = speed;
+	hui::config.set_float("View.MouseWheelSpeed", mouse_wheel_factor);
 	out_settings_changed.notify();
 }
 
@@ -662,9 +664,9 @@ void AudioView::on_command(const string &id) {
 
 	float dt = 0.05f;
 	if (id == "cam-move-right")
-		cam.move(ScrollSpeedFast * dt / cam.pixels_per_sample);
+		cam.move(ScrollSpeedFast * dt / (float)cam.pixels_per_sample);
 	if (id == "cam-move-left")
-		cam.move(- ScrollSpeedFast * dt / cam.pixels_per_sample);
+		cam.move(- ScrollSpeedFast * dt / (float)cam.pixels_per_sample);
 
 	// vertical zoom
 	if (id == "vertical-zoom-in")
@@ -1160,11 +1162,11 @@ void AudioView::set_midi_view_mode(MidiMode mode) {
 }
 
 void AudioView::zoom_in() {
-	cam.zoom(exp( ZoomSpeed), m.x);
+	cam.zoom(exp( ZoomSpeed*0.8f), m.x);
 }
 
 void AudioView::zoom_out() {
-	cam.zoom(exp(-ZoomSpeed), m.x);
+	cam.zoom(exp(-ZoomSpeed*0.8f), m.x);
 }
 
 void AudioView::select_all() {

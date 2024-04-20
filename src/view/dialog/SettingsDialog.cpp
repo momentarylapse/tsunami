@@ -95,7 +95,8 @@ void SettingsDialog::load_data() {
 	check("cpu_meter", hui::config.get_bool("CpuDisplay", false));
 	check("antialiasing", view->antialiasing);
 	check("high_details", view->high_details);
-	set_float("scroll_speed", view->mouse_wheel_factor);
+	set_float("scroll_speed", hui::config.get_float("hui.scroll-factor", 1.0f));
+
 
 	int n_audio = 0, n_midi = 0;
 	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
@@ -144,7 +145,7 @@ void SettingsDialog::on_default_artist() {
 }
 
 void SettingsDialog::on_scroll_speed() {
-	view->set_mouse_wheel_factor(get_float(""));
+	hui::config.set_float("hui.scroll-factor", get_float(""));
 }
 
 void SettingsDialog::on_controls(bool header) {

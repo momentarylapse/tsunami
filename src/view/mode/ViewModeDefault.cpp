@@ -260,17 +260,17 @@ void ViewModeDefault::on_mouse_wheel() {
 
 	if (fabs(e->scroll.y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL)) {
-			scroll_y(view, e->scroll.y * view->mouse_wheel_factor * view->ScrollSpeed);
+			scroll_y(view, e->scroll.y * view->scroll_speed);
 		} else if (win->get_key(hui::KEY_SHIFT)) {
-			cam->move(e->scroll.y * view->mouse_wheel_factor / cam->pixels_per_sample * view->ScrollSpeed);
+			cam->move(e->scroll.y / cam->pixels_per_sample * view->scroll_speed);
 		} else {
-			cam->zoom(exp(e->scroll.y * view->mouse_wheel_factor * view->ZoomSpeed), view->m.x);
+			cam->zoom(exp(e->scroll.y * view->zoom_speed), view->m.x);
 		}
 	}
 
 	// horizontal scroll
 	if (fabs(e->scroll.x) > 0.1f)
-		cam->move(e->scroll.x * view->mouse_wheel_factor / cam->pixels_per_sample * view->ScrollSpeed);
+		cam->move(e->scroll.x / cam->pixels_per_sample * view->scroll_speed);
 }
 
 void expand_sel_range(AudioView *view, int pos) {

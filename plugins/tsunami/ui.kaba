@@ -48,7 +48,6 @@ class AudioView extends Object
 		
 	var sel: SongSelection
 	var cam: ViewPort
-	var mouse_wheel_factor: float
 	func extern mut unsubscribe(handler: Object)
 	func extern mut optimize_view()
 	func extern cur_vlayer() -> Layer&

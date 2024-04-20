@@ -168,11 +168,9 @@ public:
 	bool enabled;
 	void enable(bool enabled);
 
-	float ScrollSpeed;
-	float ScrollSpeedFast;
-	float ZoomSpeed;
-	float mouse_wheel_factor;
-	void set_mouse_wheel_factor(float factor);
+	float scroll_speed;
+	float scroll_speed_fast;
+	float zoom_speed;
 
 	vec2 m;
 

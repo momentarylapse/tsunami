@@ -84,7 +84,7 @@ class MLVDialog extends hui.Dialog
 		#session.playback.signal_chain.subscribe(self, on_preview_change, "changed")
 #		session.playback.subscribe(self, on_preview_tick, "tick")
 		
-		mlp = new MultiLinePainter(session.song, colors)
+		mlp = new MultiLinePainter(session.song, theme)
 		
 		on_config_changed()
 	

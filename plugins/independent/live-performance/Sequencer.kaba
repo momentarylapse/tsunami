@@ -91,7 +91,7 @@ class SequencerPanel extends ConfigPanel
 		let h = float(height) / NUM_TYPES
 		let b = w * 0.1
 		for n in c.config.pattern.notes
-			let c0 = cool_color(n.type)
+			let c0 = theme.neon(n.type)
 			
 			if n.pos == current_pos
 				p.set_color(c0)

@@ -156,14 +156,37 @@ base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 	Track *t = aa->add_track(SignalType::AUDIO);
 	TrackLayer *l = t->layers[0].get();
 	base::promise<AudioBuffer> promise;
-	load_track(l, filename, 0).then([promise, l, aa] () mutable {
-		AudioBuffer buf = l->buffers[0];
-		delete aa;
-		promise(buf);
-	}).on_fail([promise, aa] () mutable {
-		delete aa;
-		promise.fail();
-	});
+
+	current_directory = filename.parent();
+	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	if (!d)
+		return base::failed<AudioBuffer>();
+
+	Format *f = d->create();
+	auto od = StorageOperationData(session, f, filename);
+	od.allow_channels_change = true;
+	od.set_layer(l);
+	od.offset = 0;
+	if (!f->get_parameters(&od, true)) {
+		delete f;
+		return base::failed<AudioBuffer>();
+	}
+	od.start_progress(_("loading ") + d->description);
+
+	od.song->begin_action_group("load track");
+
+	f->load_track(&od);
+
+	od.song->end_action_group();
+
+	delete f;
+	if (od.errors_encountered)
+		return base::failed<AudioBuffer>();
+
+	AudioBuffer buf = l->buffers[0];
+	delete aa;
+	promise(buf);
+
 	return promise.get_future();
 }
 

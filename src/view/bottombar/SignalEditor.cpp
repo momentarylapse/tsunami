@@ -75,8 +75,16 @@ void SignalEditor::add_editor_panel_for_chain(SignalChain *c) {
 	set_int("selector", index);
 }
 
-void SignalEditor::remove_editor_panel_for_chain(SignalChain *c) {
+void SignalEditor::remove_editor_panel_for_chain(SignalChain *chain) {
 	msg_write("REMOVE!");
+
+	foreachi(auto *tt, weak(tabs), i)
+						if (tt->chain == chain) {
+							unembed(tt);
+							tabs.erase(i);
+							remove_string("selector", i);
+							set_int("selector", 0);
+						}
 }
 
 void SignalEditor::on_new() {
@@ -116,14 +124,4 @@ void SignalEditor::show_config(Module *m) {
 		hide_control("message", false);*/
 	}
 	expand("revealer", m);
-}
-
-void SignalEditor::remove_tab(SignalEditorTabPanel *t) {
-	foreachi(auto *tt, weak(tabs), i)
-		if (tt == t) {
-			unembed(t);
-			tabs.erase(i);
-			remove_string("selector", i);
-			set_int("selector", 0);
-		}
 }

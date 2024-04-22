@@ -27,7 +27,6 @@ public:
 
 	void on_new();
 	void on_load();
-	void remove_tab(SignalEditorTabPanel *t);
 
 	shared_array<SignalEditorTabPanel> tabs;
 

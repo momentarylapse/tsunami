@@ -53,7 +53,6 @@ public:
 
 	bool on_key(int k) override;
 	void on_chain_update();
-	void on_chain_delete();
 	void on_activate();
 	void on_delete();
 	void on_add(ModuleCategory type);

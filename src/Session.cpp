@@ -137,7 +137,7 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 	p->args = args;
 	p->on_start();
 
-	out_add_plugin.notify(p);
+	out_add_plugin(p);
 	return p;
 }
 
@@ -149,7 +149,7 @@ void session_clean_up_unused_signal_chains(Session* s) {
 }
 
 void session_destroy_plugin(Session* s, TsunamiPlugin *p) {
-	s->out_remove_plugin.notify(p);
+	s->out_remove_plugin(p);
 	p->on_stop();
 	foreachi (auto *pp, weak(s->plugins), i)
 		if (p == pp)
@@ -231,7 +231,7 @@ void Session::set_mode(const string &_mode) {
 			return;
 		}
 		this->mode = mode;
-		out_mode_changed.notify();
+		out_mode_changed();
 	});
 }
 
@@ -241,7 +241,7 @@ bool Session::in_mode(const string &m) {
 
 void Session::add_signal_chain(xfer<SignalChain> chain) {
 	all_signal_chains.add(chain);
-	out_add_signal_chain.notify(chain);
+	out_add_signal_chain(chain);
 	/*chain->subscribe(this, [this] {
 		_remove_signal_chain(chain);
 	}, chain->MESSAGE_DELETE);*/
@@ -267,6 +267,7 @@ shared<SignalChain> Session::load_signal_chain(const Path &filename) {
 }
 
 void Session::remove_signal_chain(SignalChain* chain) {
+	out_remove_signal_chain(chain);
 	for (int i=0; i<all_signal_chains.num; i++)
 		if (chain == all_signal_chains[i])
 			all_signal_chains.erase(i);

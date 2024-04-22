@@ -108,7 +108,7 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 	event("signal_module_configure", [this] { on_module_configure(); });
 
 	event("signal_chain_new", [this] { editor->on_new(); });
-	event("signal_chain_load", [this] { editor->on_load(); });
+	event("signal_chain_load", [this] { editor->on_load(); });*/
 
 	chain->out_state_changed >> create_sink([this] { on_chain_update(); });
 	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
@@ -116,7 +116,6 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 	chain->out_delete_module >> create_sink([this] { on_chain_update(); });
 	chain->out_add_cable >> create_sink([this] { on_chain_update(); });
 	chain->out_add_module >> create_sink([this] { on_chain_update(); });
-	chain->out_death >> create_sink([this] { on_chain_delete(); });*/
 
 	//menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
 	//menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
@@ -193,10 +192,6 @@ void SignalEditorTab::on_chain_update() {
 
 
 	update_module_positions();
-}
-
-void SignalEditorTab::on_chain_delete() {
-	//editor->remove_tab(this);
 }
 
 void SignalEditorTab::popup_chain() {
@@ -336,9 +331,7 @@ SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain
 		}
 	});
 
-	/*event_x("area", "hui:key-down", [this] { on_key_down(); });
-
-
+	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
 	event("signal_chain_add_audio_effect", [this] { on_add(ModuleCategory::AUDIO_EFFECT); });
 	event("signal_chain_add_stream", [this] { on_add(ModuleCategory::STREAM); });
@@ -359,18 +352,9 @@ SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain
 	event("signal_chain_new", [this] { editor->on_new(); });
 	event("signal_chain_load", [this] { editor->on_load(); });
 
-	chain->out_state_changed >> create_sink([this] { on_chain_update(); });
-	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
-	chain->out_delete_cable >> create_sink([this] { on_chain_update(); });
-	chain->out_delete_module >> create_sink([this] { on_chain_update(); });
-	chain->out_add_cable >> create_sink([this] { on_chain_update(); });
-	chain->out_add_module >> create_sink([this] { on_chain_update(); });
-	chain->out_death >> create_sink([this] { on_chain_delete(); });
-
 	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
 	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
-
-	on_chain_update();*/
+*/
 }
 
 SignalEditorTabPanel::~SignalEditorTabPanel() {

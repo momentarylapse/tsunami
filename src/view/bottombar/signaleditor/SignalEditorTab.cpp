@@ -72,46 +72,22 @@ public:
 	}
 };
 
+SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 
-SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::Node<hui::Panel>() {
-	set_parent(ed);
-	static int count = 0;
-	set_id(format("signal-editor-tab-%d", count++));
-
-	add_grid("", 0, 0, "grid");
-	set_target("grid");
-	add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
-
-	editor = ed;
-	view = ed->view;
-	session = ed->session;
 	chain = _chain;
+	//editor = ed;
+	session = chain->session;
+	view = session->view;
 
 	pad = new ScrollPad();
 	pad->align.dz = 5;
-	graph = scenegraph::SceneGraph::create_integrated(this, "area", pad, "SignalEditor", [this] (Painter *p) {
-		p->set_font_size(theme.FONT_SIZE);
-		graph->update_geometry_recursive(p->area());
-		pad->_update_scrolling();
-		graph->draw(p);
-
-		auto m = hui::get_event()->m;
-
-		string tip;
-		if (graph->hover.node)
-			tip = graph->hover.node->get_tip();
-		if (tip.num > 0) {
-			p->set_font("", theme.FONT_SIZE, true, false);
-			draw_cursor_hover(p, tip, m, graph->area);
-			p->set_font("", theme.FONT_SIZE, false, false);
-		}
-	});
+	add_child(pad);
 	background = new SignalEditorBackground(this);
-	graph->add_child(background);
+	add_child(background);
 	pad->connect_scrollable(background);
-	graph->add_child(new SignalEditorPlayButton(this));
+	add_child(new SignalEditorPlayButton(this));
 
-	event_x("area", "hui:key-down", [this] { on_key_down(); });
+	/*event_x("area", "hui:key-down", [this] { on_key_down(); });
 
 
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
@@ -140,17 +116,16 @@ SignalEditorTab::SignalEditorTab(SignalEditor *ed, SignalChain *_chain) : obs::N
 	chain->out_delete_module >> create_sink([this] { on_chain_update(); });
 	chain->out_add_cable >> create_sink([this] { on_chain_update(); });
 	chain->out_add_module >> create_sink([this] { on_chain_update(); });
-	chain->out_death >> create_sink([this] { on_chain_delete(); });
+	chain->out_death >> create_sink([this] { on_chain_delete(); });*/
 
-	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
-	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
+	//menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
+	//menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
 
 	on_chain_update();
 }
+
 SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
-	delete menu_chain;
-	delete menu_module;
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {
@@ -184,25 +159,6 @@ void SignalEditorTab::draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, floa
 	p->draw_polygon(pp);
 }
 
-
-void SignalEditorTab::on_draw(Painter* p) {
-	p->set_font_size(theme.FONT_SIZE);
-	graph->update_geometry_recursive(p->area());
-	pad->_update_scrolling();
-	graph->draw(p);
-
-	auto m = hui::get_event()->m;
-
-	string tip;
-	if (graph->hover.node)
-		tip = graph->hover.node->get_tip();
-	if (tip.num > 0) {
-		p->set_font("", theme.FONT_SIZE*4, true, false);
-		//draw_cursor_hover(p, tip, m, graph->area);
-		p->set_font("", theme.FONT_SIZE, false, false);
-	}
-}
-
 void SignalEditorTab::on_chain_update() {
 	// delete old modules
 	Array<SignalEditorModule*> to_del;
@@ -232,29 +188,29 @@ void SignalEditorTab::on_chain_update() {
 		pad->add_child(cc);
 	}
 
-	graph->hover = HoverData();
+	if (graph())
+		graph()->hover = HoverData();
 
 
 	update_module_positions();
 }
 
 void SignalEditorTab::on_chain_delete() {
-	editor->remove_tab(this);
+	//editor->remove_tab(this);
 }
 
 void SignalEditorTab::popup_chain() {
-	menu_chain->open_popup(this);
+	//menu_chain->open_popup(session->win);
 }
 
 void SignalEditorTab::popup_module() {
-	menu_module->open_popup(this);
+	//menu_module->open_popup(session->win);
 }
 
-void SignalEditorTab::on_key_down() {
-	int key = hui::get_event()->key_code;
-
+bool SignalEditorTab::on_key(int key) {
 	if (key == hui::KEY_DELETE)
 		on_module_delete();
+	return true;
 }
 
 void SignalEditorTab::on_activate() {
@@ -270,36 +226,36 @@ void SignalEditorTab::on_delete() {
 
 
 void SignalEditorTab::on_add(ModuleCategory type) {
-	auto names = session->plugin_manager->find_module_sub_types(type);
+	/*auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		ModuleSelectorDialog::choose(win, session, type).then([this, type] (const string &name) {
+		ModuleSelectorDialog::choose(session->win.get(), session, type).then([this, type] (const string &name) {
 			auto m = chain->add(type, name);
-			m->module_x = graph->m.x;
-			m->module_y = graph->m.y;
+			m->module_x = graph()->m.x;
+			m->module_y = graph()->m.y;
 			update_module_positions();
 		});
 	} else {
 		auto m = chain->add(type);
-		m->module_x = graph->m.x;
-		m->module_y = graph->m.y;
+		m->module_x = graph()->m.x;
+		m->module_y = graph()->m.y;
 		update_module_positions();
-	}
+	}*/
 }
 
 void SignalEditorTab::on_reset() {
 	chain->reset(false);
 }
 
-/*void SignalEditorTab::on_load() {
+/*void SignalEditorTabPanel::on_load() {
 	if (hui::FileDialogOpen(win, "", "", "*.chain", "*.chain"))
 		chain->load(hui::Filename);
 }*/
 
 void SignalEditorTab::on_save() {
-	hui::file_dialog_save(win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).then([this] (const Path &filename) {
+	/*hui::file_dialog_save(session->win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).then([this] (const Path &filename) {
 		session->storage->current_chain_directory = filename.parent();
 		chain->save(filename);
-	});
+	});*/
 }
 
 
@@ -318,8 +274,8 @@ void SignalEditorTab::select_module(Module *m, bool add) {
 		sel_modules.clear();
 	if (m)
 		sel_modules.add(m);
-	editor->show_config(m);
-	redraw("area");
+	out_module_selected(m);
+	request_redraw();
 }
 
 void SignalEditorTab::update_module_positions() {
@@ -344,3 +300,78 @@ SignalEditorModule *SignalEditorTab::get_module(Module *m) {
 	return nullptr;
 }
 
+
+
+
+SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain) : obs::Node<hui::Panel>() {
+	set_parent(ed);
+	static int count = 0;
+	set_id(format("signal-editor-tab-%d", count++));
+
+	add_grid("", 0, 0, "grid");
+	set_target("grid");
+	add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
+
+	editor = ed;
+	view = ed->view;
+	session = ed->session;
+	chain = _chain;
+
+	tab = new SignalEditorTab(chain);
+	graph = scenegraph::SceneGraph::create_integrated(this, "area", tab.get(), "SignalEditor", [this] (Painter *p) {
+		p->set_font_size(theme.FONT_SIZE);
+		graph->update_geometry_recursive(p->area());
+		//pad->_update_scrolling();
+		graph->draw(p);
+
+		auto m = hui::get_event()->m;
+
+		string tip;
+		if (graph->hover.node)
+			tip = graph->hover.node->get_tip();
+		if (tip.num > 0) {
+			p->set_font("", theme.FONT_SIZE, true, false);
+			draw_cursor_hover(p, tip, m, graph->area);
+			p->set_font("", theme.FONT_SIZE, false, false);
+		}
+	});
+
+	/*event_x("area", "hui:key-down", [this] { on_key_down(); });
+
+
+	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
+	event("signal_chain_add_audio_effect", [this] { on_add(ModuleCategory::AUDIO_EFFECT); });
+	event("signal_chain_add_stream", [this] { on_add(ModuleCategory::STREAM); });
+	event("signal_chain_add_plumbing", [this] { on_add(ModuleCategory::PLUMBING); });
+	event("signal_chain_add_audio_visualizer", [this] { on_add(ModuleCategory::AUDIO_VISUALIZER); });
+	event("signal_chain_add_midi_source", [this] { on_add(ModuleCategory::MIDI_SOURCE); });
+	event("signal_chain_add_midi_effect", [this] { on_add(ModuleCategory::MIDI_EFFECT); });
+	event("signal_chain_add_synthesizer", [this] { on_add(ModuleCategory::SYNTHESIZER); });
+	event("signal_chain_add_pitch_detector", [this] { on_add(ModuleCategory::PITCH_DETECTOR); });
+	event("signal_chain_add_beat_source", [this] { on_add(ModuleCategory::BEAT_SOURCE); });
+	event("signal_chain_reset", [this] { on_reset(); });
+	event("signal_chain_activate", [this] { on_activate(); });
+	event("signal_chain_delete", [this] { on_delete(); });
+	event("signal_chain_save", [this] { on_save(); });
+	event("signal_module_delete", [this] { on_module_delete(); });
+	event("signal_module_configure", [this] { on_module_configure(); });
+
+	event("signal_chain_new", [this] { editor->on_new(); });
+	event("signal_chain_load", [this] { editor->on_load(); });
+
+	chain->out_state_changed >> create_sink([this] { on_chain_update(); });
+	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
+	chain->out_delete_cable >> create_sink([this] { on_chain_update(); });
+	chain->out_delete_module >> create_sink([this] { on_chain_update(); });
+	chain->out_add_cable >> create_sink([this] { on_chain_update(); });
+	chain->out_add_module >> create_sink([this] { on_chain_update(); });
+	chain->out_death >> create_sink([this] { on_chain_delete(); });
+
+	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
+	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
+
+	on_chain_update();*/
+}
+
+SignalEditorTabPanel::~SignalEditorTabPanel() {
+}

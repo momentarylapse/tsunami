@@ -24,18 +24,17 @@ class SignalEditorBackground;
 class ScrollPad;
 class ScrollBar;
 
-
-class SignalEditorTab : public obs::Node<hui::Panel> {
+// TODO rename to SignalEditor
+class SignalEditorTab : public scenegraph::Node {
 public:
-	SignalEditorTab(SignalEditor *ed, SignalChain *_chain);
-	virtual ~SignalEditorTab();
+	SignalEditorTab(SignalChain *_chain);
+	~SignalEditorTab();
 
-	SignalEditor *editor;
+	obs::xsource<Module*> out_module_selected{this, "module-selected"};
+
 	Session *session;
 	AudioView *view;
 	SignalChain *chain;
-
-	owned<scenegraph::SceneGraph> graph;
 	ScrollPad *pad;
 	SignalEditorBackground *background;
 	Array<SignalEditorModule*> modules;
@@ -48,14 +47,13 @@ public:
 	void update_module_positions();
 
 
-	color signal_color_base(SignalType type);
-	color signal_color(SignalType type, bool hover);
-	void draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length);
+	static color signal_color_base(SignalType type);
+	static color signal_color(SignalType type, bool hover);
+	static void draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length);
 
-	void on_draw(Painter* p);
+	bool on_key(int k) override;
 	void on_chain_update();
 	void on_chain_delete();
-	void on_key_down();
 	void on_activate();
 	void on_delete();
 	void on_add(ModuleCategory type);
@@ -68,6 +66,20 @@ public:
 	void popup_chain();
 	void popup_module();
 
-	hui::Menu *menu_chain, *menu_module;
+	owned<hui::Menu> menu_chain, menu_module;
+};
+
+class SignalEditorTabPanel : public obs::Node<hui::Panel> {
+public:
+	SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain);
+	virtual ~SignalEditorTabPanel();
+
+	owned<scenegraph::SceneGraph> graph;
+	shared<SignalEditorTab> tab;
+
+	SignalEditor *editor;
+	Session *session;
+	AudioView *view;
+	SignalChain *chain;
 };
 

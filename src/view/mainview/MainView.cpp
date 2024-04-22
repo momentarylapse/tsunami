@@ -18,6 +18,18 @@
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../Session.h"
 
+class TabBar : public scenegraph::HBox {
+public:
+	TabBar() {
+		align.h = 25;
+		align.vertical = AlignData::Mode::TOP;
+		set_perf_name("tabbar");
+	}
+	void on_draw(Painter* p) override {
+		p->set_color(theme.background_track);
+		p->draw_rect(area);
+	}
+};
 
 
 MainView::MainView(Session *_session, const string &_id) {
@@ -31,9 +43,12 @@ MainView::MainView(Session *_session, const string &_id) {
 	themes.add(ColorSchemeSystem(win, id));
 
 
-	auto pad = new scenegraph::Node;
+	vbox = new scenegraph::VBox;
+	tab_bar = new TabBar;
+	tab_bar->set_hidden(true);
+	vbox->add_child(tab_bar.get());
 
-	scene_graph = scenegraph::SceneGraph::create_integrated(win, id, pad, "view", [this] (Painter *p) {
+	scene_graph = scenegraph::SceneGraph::create_integrated(win, id, vbox.get(), "view", [this] (Painter *p) {
 		p->set_font_size(theme.FONT_SIZE);
 		scene_graph->update_geometry_recursive(p->area());
 		//pad->_update_scrolling();
@@ -109,6 +124,14 @@ MainView::MainView(Session *_session, const string &_id) {
 MainView::~MainView() {
 	if (draw_runner_id >= 0)
 		hui::cancel_runner(draw_runner_id);
+}
+
+
+void MainView::add_view(scenegraph::Node* view) {
+	//vbox->children.clear();
+	vbox->add_child(view);
+	//vbox->add_child(tab_bar.get());
+	//tab_bar->set_hidden(false);
 }
 
 void MainView::set_theme(const string &name) {

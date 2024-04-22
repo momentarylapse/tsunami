@@ -28,15 +28,15 @@ public:
 		port = p;
 	}
 	void on_update(const vec2 &m) override {
-		tab->graph->hover = tab->graph->get_hover_data(m);
+		tab->graph()->hover = tab->graph()->get_hover_data(m);
 		target = nullptr;
-		if (tab->graph->hover.type == HoverData::Type::PORT_IN or tab->graph->hover.type == HoverData::Type::PORT_OUT) {
-			auto pp = static_cast<SignalEditorModulePort*>(tab->graph->hover.node);
+		if (tab->graph()->hover.type == HoverData::Type::PORT_IN or tab->graph()->hover.type == HoverData::Type::PORT_OUT) {
+			auto pp = static_cast<SignalEditorModulePort*>(tab->graph()->hover.node);
 			if ((pp->module != port->module) and (pp->is_out != port->is_out) and (pp->type == port->type))
 				target = pp;
 		}
 		if (!target)
-			tab->graph->hover = HoverData();
+			tab->graph()->hover = HoverData();
 	}
 	void on_finish(const vec2 &m) override {
 		if (target) {
@@ -85,7 +85,7 @@ bool SignalEditorModulePort::on_left_button_down(const vec2 &m) {
 	} else {
 		tab->chain->disconnect_in(module, index);
 	}
-	tab->graph->mdp_prepare(new MouseDelayCableCreate(tab, this));
+	tab->graph()->mdp_prepare(new MouseDelayCableCreate(tab, this));
 	return true;
 }
 

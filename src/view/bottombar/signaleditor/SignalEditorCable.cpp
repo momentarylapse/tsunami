@@ -39,7 +39,7 @@ void SignalEditorCable::on_draw(Painter *p) {
 	inter.add2(p0, vec2(length,0));
 	inter.add2(p1, vec2(length,0));
 
-	color base_color = tab->signal_color(type, false);
+	color base_color = SignalEditorTab::signal_color(type, false);
 
 	// curve
 	Array<vec2> cc;
@@ -61,7 +61,7 @@ void SignalEditorCable::on_draw(Painter *p) {
 	p->draw_circle(p1, 10);
 	p->draw_circle(inter.get(0.5f), arrow_len * 1.3f);
 	p->set_color(base_color);
-	tab->draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), arrow_len);
+	SignalEditorTab::draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), arrow_len);
 }
 
 bool SignalEditorCable::hover(const vec2 &m) const {

@@ -40,11 +40,14 @@ SignalEditor::SignalEditor(Session *session, BottomBar *bar) :
 	event("selector", [this]{ on_chain_switch(); });
 
 	for (auto *c: weak(session->all_signal_chains))
-		add_chain(c);
+		add_editor_panel_for_chain(c);
 	show_config(nullptr);
 
-	session->out_add_signal_chain >> create_sink([this, session] {
-		add_chain(session->all_signal_chains.back().get());
+	session->out_add_signal_chain >> create_data_sink<SignalChain*>([this] (SignalChain *chain) {
+		add_editor_panel_for_chain(chain);
+	});
+	session->out_remove_signal_chain >> create_data_sink<SignalChain*>([this] (SignalChain *chain) {
+		remove_editor_panel_for_chain(chain);
 	});
 }
 
@@ -53,8 +56,11 @@ SignalEditor::~SignalEditor() {
 	show_config(nullptr);
 }
 
-void SignalEditor::add_chain(SignalChain *c) {
-	auto *tab = new SignalEditorTab(this, c);
+void SignalEditor::add_editor_panel_for_chain(SignalChain *c) {
+	auto *tab = new SignalEditorTabPanel(this, c);
+	tab->tab->out_module_selected >> create_data_sink<Module*>([this] (Module *m) {
+		show_config(m);
+	});
 	int index = tabs.num;
 	string grid_id = format("grid-%d", index);
 	if (index > 0)
@@ -67,6 +73,10 @@ void SignalEditor::add_chain(SignalChain *c) {
 	tabs.add(tab);
 
 	set_int("selector", index);
+}
+
+void SignalEditor::remove_editor_panel_for_chain(SignalChain *c) {
+	msg_write("REMOVE!");
 }
 
 void SignalEditor::on_new() {
@@ -108,7 +118,7 @@ void SignalEditor::show_config(Module *m) {
 	expand("revealer", m);
 }
 
-void SignalEditor::remove_tab(SignalEditorTab *t) {
+void SignalEditor::remove_tab(SignalEditorTabPanel *t) {
 	foreachi(auto *tt, weak(tabs), i)
 		if (tt == t) {
 			unembed(t);

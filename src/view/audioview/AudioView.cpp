@@ -104,6 +104,8 @@ AudioView::AudioView(Session *_session) :
 	song = session->song.get();
 	_optimize_view_requested = false;
 
+	set_perf_name("audioview");
+
 	midi_view_mode = (MidiMode)hui::config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
 
 	playback_range_locked = false;

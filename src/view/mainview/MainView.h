@@ -35,12 +35,16 @@ public:
 	Session* session;
 	owned<scenegraph::SceneGraph> scene_graph;
 	int draw_runner_id = -1;
+	shared<scenegraph::Node> vbox;
+	shared<scenegraph::Node> tab_bar;
 	CpuDisplay *cpu_display;
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
 	BottomBarExpandButton *bottom_bar_expand_button;
 	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
+
+	void add_view(scenegraph::Node* view);
 
 
 	Array<ColorScheme> themes;

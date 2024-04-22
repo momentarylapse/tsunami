@@ -12,8 +12,10 @@
 #include "../../../module/Module.h"
 #include "../../../module/port/Port.h"
 #include "../../../data/base.h"
+#include "../../../Session.h"
 #include "../../audioview/AudioView.h"
 #include "../../MouseDelayPlanner.h"
+#include "../../TsunamiWindow.h"
 #include "../../helper/Drawing.h"
 #include "../../helper/graph/SceneGraph.h"
 
@@ -103,7 +105,7 @@ public:
 			px0.add(m->module_x);
 			py0.add(m->module_y);
 		}
-		m0 = tab->graph->m;
+		m0 = tab->graph()->m;
 	}
 	void on_update(const vec2 &m) override {
 		foreachi (auto mm, sel, i) {
@@ -167,14 +169,14 @@ void SignalEditorModule::on_draw(Painter *p) {
 
 bool SignalEditorModule::on_left_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
-		tab->select_module(module, tab->win->get_key(hui::KEY_CONTROL));
-	tab->graph->mdp_prepare(new MouseDelayModuleDnD(tab));
+		tab->select_module(module, tab->session->win->get_key(hui::KEY_CONTROL));
+	tab->graph()->mdp_prepare(new MouseDelayModuleDnD(tab));
 	return true;
 }
 
 bool SignalEditorModule::on_right_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
-		tab->select_module(module, tab->win->get_key(hui::KEY_CONTROL));
+		tab->select_module(module, tab->session->win->get_key(hui::KEY_CONTROL));
 	tab->popup_module();
 	return true;
 }

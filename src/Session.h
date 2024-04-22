@@ -37,9 +37,10 @@ public:
 	~Session() override;
 
 	obs::source out_mode_changed{this, "mode-changed"};
-	obs::source out_add_plugin{this, "add-plugin"};
-	obs::source out_remove_plugin{this, "remove-plugin"};
-	obs::source out_add_signal_chain{this, "add-signal-chain"};
+	obs::xsource<TsunamiPlugin*> out_add_plugin{this, "add-plugin"};
+	obs::xsource<TsunamiPlugin*> out_remove_plugin{this, "remove-plugin"};
+	obs::xsource<SignalChain*> out_add_signal_chain{this, "add-signal-chain"};
+	obs::xsource<SignalChain*> out_remove_signal_chain{this, "remove-signal-chain"};
 
 	static int next_id;
 
@@ -67,7 +68,6 @@ public:
 	void remove_signal_chain(SignalChain *chain);
 
 	shared_array<TsunamiPlugin> plugins;
-	TsunamiPlugin *last_plugin;
 	bool die_on_plugin_stop;
 
 

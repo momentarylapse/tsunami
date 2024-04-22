@@ -13,6 +13,7 @@
 //class PluginPanel;
 //class ConfigPanel;
 class ModulePanel;
+class TsunamiPlugin;
 
 class PluginConsole: public BottomBar::Console {
 public:
@@ -23,8 +24,8 @@ public:
 
 	void on_add_button();
 
-	void on_add_plugin();
-	void on_remove_plugin();
+	void on_add_plugin(TsunamiPlugin *p);
+	void on_remove_plugin(TsunamiPlugin *p);
 
 	void update_favotites();
 

@@ -11,6 +11,8 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/image/color.h"
 
+#include "../../../lib/os/msg.h"
+
 namespace scenegraph {
 
 bool Node::show_debug = false;
@@ -32,6 +34,8 @@ void sort_nodes_down(Array<Node*> &nodes) {
 
 
 Node::Node() : Node(0, 0) {
+	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::FILL;
 }
 
 Node::Node(float w, float h) {
@@ -230,6 +234,7 @@ HBox::HBox() {
 	align.vertical = AlignData::Mode::FILL;
 	set_perf_name("hbox");
 }
+
 void HBox::update_geometry_recursive(const rect &target_area) {
 	update_geometry(target_area);
 	if (parent)

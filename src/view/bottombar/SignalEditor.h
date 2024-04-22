@@ -14,7 +14,7 @@
 class Painter;
 class SignalChain;
 class Module;
-class SignalEditorTab;
+class SignalEditorTabPanel;
 class ModulePanel;
 
 class SignalEditor: public BottomBar::Console {
@@ -22,13 +22,14 @@ public:
 	SignalEditor(Session *session, BottomBar *bar);
 	virtual ~SignalEditor();
 
-	void add_chain(SignalChain *c);
+	void add_editor_panel_for_chain(SignalChain *c);
+	void remove_editor_panel_for_chain(SignalChain *c);
 
 	void on_new();
 	void on_load();
-	void remove_tab(SignalEditorTab *t);
+	void remove_tab(SignalEditorTabPanel *t);
 
-	shared_array<SignalEditorTab> tabs;
+	shared_array<SignalEditorTabPanel> tabs;
 
 	void on_chain_switch();
 

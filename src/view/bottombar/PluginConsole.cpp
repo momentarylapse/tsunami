@@ -23,8 +23,12 @@ PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
 
 	event("add", [this] { on_add_button(); });
 
-	session->out_add_plugin >> create_sink([this] { on_add_plugin(); });
-	session->out_remove_plugin >> create_sink([this] { on_remove_plugin(); });
+	session->out_add_plugin >> create_data_sink<TsunamiPlugin*>([this] (TsunamiPlugin *p) {
+		on_add_plugin(p);
+	});
+	session->out_remove_plugin >> create_data_sink<TsunamiPlugin*>([this] (TsunamiPlugin *p) {
+		on_remove_plugin(p);
+	});
 }
 
 PluginConsole::~PluginConsole() {
@@ -48,8 +52,7 @@ void PluginConsole::on_add_button() {
 	});
 }
 
-void PluginConsole::on_add_plugin() {
-	auto *plugin = session->last_plugin;
+void PluginConsole::on_add_plugin(TsunamiPlugin *plugin) {
 	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FIXED_WIDTH | ConfigPanelMode::DELETE | ConfigPanelMode::PROFILES);
 	p->set_options(p->root_control->id, "class=card");
 	p->set_func_delete([this, plugin] {
@@ -62,9 +65,9 @@ void PluginConsole::on_add_plugin() {
 	blink();
 }
 
-void PluginConsole::on_remove_plugin() {
-	int index = base::find_index_if(weak(panels), [this] (ModulePanel* p) {
-		return p->socket.module == session->last_plugin;
+void PluginConsole::on_remove_plugin(TsunamiPlugin *plugin) {
+	int index = base::find_index_if(weak(panels), [plugin] (ModulePanel* p) {
+		return p->socket.module == plugin;
 	});
 	if (index >= 0) {
 		unembed(weak(panels)[index]);

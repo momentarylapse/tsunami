@@ -67,8 +67,6 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	perf_mon = _perf_mon;
 	auto_delete = true;
 
-	last_plugin = nullptr;
-
 	id = next_id ++;
 	die_on_plugin_stop = false;
 }
@@ -139,8 +137,7 @@ shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const 
 	p->args = args;
 	p->on_start();
 
-	last_plugin = p;
-	out_add_plugin.notify();
+	out_add_plugin.notify(p);
 	return p;
 }
 
@@ -152,8 +149,7 @@ void session_clean_up_unused_signal_chains(Session* s) {
 }
 
 void session_destroy_plugin(Session* s, TsunamiPlugin *p) {
-	s->last_plugin = p;
-	s->out_remove_plugin.notify();
+	s->out_remove_plugin.notify(p);
 	p->on_stop();
 	foreachi (auto *pp, weak(s->plugins), i)
 		if (p == pp)
@@ -245,7 +241,7 @@ bool Session::in_mode(const string &m) {
 
 void Session::add_signal_chain(xfer<SignalChain> chain) {
 	all_signal_chains.add(chain);
-	out_add_signal_chain.notify();
+	out_add_signal_chain.notify(chain);
 	/*chain->subscribe(this, [this] {
 		_remove_signal_chain(chain);
 	}, chain->MESSAGE_DELETE);*/

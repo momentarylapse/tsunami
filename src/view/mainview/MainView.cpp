@@ -128,10 +128,10 @@ MainView::~MainView() {
 
 
 void MainView::add_view(scenegraph::Node* view) {
-	//vbox->children.clear();
+	views.add(view);
+	vbox->children.clear();
 	vbox->add_child(view);
-	//vbox->add_child(tab_bar.get());
-	//tab_bar->set_hidden(false);
+	active_view = view;
 }
 
 void MainView::set_theme(const string &name) {

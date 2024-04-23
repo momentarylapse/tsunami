@@ -59,7 +59,6 @@ public:
 	void on_reset();
 	void on_save();
 	void on_module_delete();
-	void on_module_configure();
 
 
 	void popup_chain();

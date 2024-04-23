@@ -44,6 +44,9 @@ public:
 	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
 
+	shared_array<scenegraph::Node> views;
+	scenegraph::Node* active_view = nullptr;
+
 	void add_view(scenegraph::Node* view);
 
 

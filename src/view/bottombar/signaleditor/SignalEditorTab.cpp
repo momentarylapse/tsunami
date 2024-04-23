@@ -11,6 +11,7 @@
 #include "SignalEditorCable.h"
 #include "../SignalEditor.h"
 #include "../../audioview/AudioView.h"
+#include "../../mainview/MainView.h"
 #include "../../HoverData.h"
 #include "../../../module/port/Port.h"
 #include "../../../module/Module.h"
@@ -18,8 +19,6 @@
 #include "../../dialog/ModuleSelectorDialog.h"
 #include "../../helper/graph/SceneGraph.h"
 #include "../../helper/graph/Node.h"
-#include "../../helper/graph/Scrollable.h"
-#include "../../helper/graph/ScrollBar.h"
 #include "../../helper/Drawing.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../../data/base.h"
@@ -72,10 +71,46 @@ public:
 	}
 };
 
+
+class SignalEditorBigButton : public scenegraph::NodeRel {
+public:
+	SignalEditorTab *tab;
+	SignalChain *chain;
+	SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({120, -32}, 45, 45) {
+		align.dz = 30;
+		align.vertical = AlignData::Mode::BOTTOM;
+		set_perf_name("button");
+		tab = t;
+		chain = tab->chain;
+	}
+	void on_draw(Painter *p) override {
+		color bg = theme.background_overlay;
+		color fg = theme.text_soft3;
+		float radius = area.width() * 0.48f;
+		if (is_cur_hover()) {
+			bg = theme.hoverify(bg);
+			fg = theme.text;
+			radius = area.width() * 0.6f;
+		}
+		p->set_color(bg);
+		p->draw_circle(area.center(), radius);
+		p->set_color(fg);
+		p->set_font_size(theme.FONT_SIZE_HUGE);
+		draw_str_centered(p, area.center(), "+");
+		p->set_font_size(theme.FONT_SIZE);
+	}
+	bool on_left_button_down(const vec2 &m) override {
+		chain->session->main_view->add_view(new SignalEditorTab(chain));
+		return true;
+	}
+	string get_tip() const override {
+		return _("edit in main view");
+	}
+};
+
 SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 
 	chain = _chain;
-	//editor = ed;
 	session = chain->session;
 	view = session->view;
 
@@ -86,10 +121,9 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 	add_child(background);
 	pad->connect_scrollable(background);
 	add_child(new SignalEditorPlayButton(this));
+	add_child(new SignalEditorBigButton(this));
 
-	/*event_x("area", "hui:key-down", [this] { on_key_down(); });
-
-
+	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
 	event("signal_chain_add_audio_effect", [this] { on_add(ModuleCategory::AUDIO_EFFECT); });
 	event("signal_chain_add_stream", [this] { on_add(ModuleCategory::STREAM); });
@@ -259,9 +293,6 @@ void SignalEditorTab::on_module_delete() {
 	for (auto m: sel_modules)
 		chain->delete_module(m);
 	select_module(nullptr);
-}
-
-void SignalEditorTab::on_module_configure() {
 }
 
 void SignalEditorTab::select_module(Module *m, bool add) {

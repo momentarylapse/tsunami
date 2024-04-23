@@ -17,6 +17,7 @@ class Log;
 class Song;
 class Storage;
 class AudioView;
+class MainView;
 class TsunamiPlugin;
 class DeviceManager;
 class PluginManager;
@@ -56,6 +57,7 @@ public:
 	shared<Song> song;
 	owned<Playback> playback;
 	AudioView *view;
+	MainView *main_view;
 	owned<Storage> storage;
 	bool auto_delete;
 	string persistent_name;

@@ -23,6 +23,7 @@ class PeakMeterDisplay;
 class Dial;
 class BottomBarExpandButton;
 class LogNotifier;
+class TabBar;
 
 class MainView : public obs::Node<VirtualBase> {
 public:
@@ -36,7 +37,7 @@ public:
 	owned<scenegraph::SceneGraph> scene_graph;
 	int draw_runner_id = -1;
 	shared<scenegraph::Node> vbox;
-	shared<scenegraph::Node> tab_bar;
+	shared<TabBar> tab_bar;
 	CpuDisplay *cpu_display;
 	PeakMeterDisplay *peak_meter_display;
 	Dial *output_volume_dial;
@@ -48,6 +49,7 @@ public:
 	scenegraph::Node* active_view = nullptr;
 
 	void add_view(scenegraph::Node* view);
+	void activate_view(scenegraph::Node* view);
 
 
 	Array<ColorScheme> themes;

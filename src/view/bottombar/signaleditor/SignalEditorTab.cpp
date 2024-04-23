@@ -76,9 +76,10 @@ class SignalEditorBigButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({120, -32}, 45, 45) {
+	SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, 32}, 45, 45) {
 		align.dz = 30;
-		align.vertical = AlignData::Mode::BOTTOM;
+		align.horizontal = AlignData::Mode::RIGHT;
+		align.vertical = AlignData::Mode::TOP;
 		set_perf_name("button");
 		tab = t;
 		chain = tab->chain;
@@ -121,7 +122,6 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 	add_child(background);
 	pad->connect_scrollable(background);
 	add_child(new SignalEditorPlayButton(this));
-	add_child(new SignalEditorBigButton(this));
 
 	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
@@ -361,6 +361,8 @@ SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain
 			p->set_font("", theme.FONT_SIZE, false, false);
 		}
 	});
+
+	graph->add_child(new SignalEditorBigButton(tab.get()));
 
 	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });

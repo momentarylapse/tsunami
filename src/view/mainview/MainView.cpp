@@ -18,16 +18,52 @@
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../Session.h"
 
+class TabBarButton : public scenegraph::Node {
+public:
+	TabBarButton(MainView *_main_view, scenegraph::Node* _view) {
+		align.w = 200;
+		align.horizontal = AlignData::Mode::LEFT;
+		align.vertical = AlignData::Mode::FILL;
+		set_perf_name("tabbar");
+		main_view = _main_view;
+		view = _view;
+	}
+	void on_draw(Painter* p) override {
+		p->set_color(theme.text_soft2);
+		if (is_cur_hover())
+			p->set_color(theme.text);
+		if (view == main_view->active_view)
+			p->set_font("", -1, true, false);
+		else
+			p->set_font("", -1, false, false);
+		p->draw_str({area.x1, area.y1}, PerformanceMonitor::get_name(view->perf_channel));
+	}
+	bool on_left_button_down(const vec2& m) override {
+		main_view->activate_view(view);
+		return true;
+	}
+	MainView *main_view;
+	scenegraph::Node* view;
+};
+
 class TabBar : public scenegraph::HBox {
 public:
-	TabBar() {
+	TabBar(MainView *_main_view) {
 		align.h = 25;
+		align.horizontal = AlignData::Mode::FILL;
 		align.vertical = AlignData::Mode::TOP;
 		set_perf_name("tabbar");
+		main_view = _main_view;
 	}
 	void on_draw(Painter* p) override {
 		p->set_color(theme.background_track);
 		p->draw_rect(area);
+	}
+	MainView *main_view;
+	void rebuild() {
+		children.clear();
+		for (auto v: weak(main_view->views))
+			add_child(new TabBarButton(main_view, v));
 	}
 };
 
@@ -44,9 +80,9 @@ MainView::MainView(Session *_session, const string &_id) {
 
 
 	vbox = new scenegraph::VBox;
-	tab_bar = new TabBar;
-	tab_bar->set_hidden(true);
-	vbox->add_child(tab_bar.get());
+	tab_bar = new TabBar(this);
+	//tab_bar->set_hidden(true);
+	//vbox->add_child(tab_bar.get());
 
 	scene_graph = scenegraph::SceneGraph::create_integrated(win, id, vbox.get(), "view", [this] (Painter *p) {
 		p->set_font_size(theme.FONT_SIZE);
@@ -129,8 +165,18 @@ MainView::~MainView() {
 
 void MainView::add_view(scenegraph::Node* view) {
 	views.add(view);
+	activate_view(view);
+}
+
+void MainView::activate_view(scenegraph::Node* view) {
 	vbox->children.clear();
-	vbox->add_child(view);
+	for (auto v: weak(views))
+		vbox->add_child(v);
+	vbox->add_child(tab_bar.get());
+	for (auto v: weak(views))
+		v->set_hidden(v != view);
+	tab_bar->set_hidden(views.num < 2);
+	tab_bar->rebuild();
 	active_view = view;
 }
 

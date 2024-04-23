@@ -69,6 +69,7 @@ bool Node::hover(const vec2 &m) const {
 void Node::add_child(Node* child) {
 	children.add(child);
 	child->parent = this;
+	request_redraw();
 	PerformanceMonitor::set_parent(child->perf_channel, perf_channel);
 }
 

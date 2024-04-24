@@ -58,6 +58,9 @@ Node::Node(float w, float h) {
 
 Node::~Node() {
 	PerformanceMonitor::delete_channel(perf_channel);
+	if (graph())
+		if (is_cur_hover())
+			graph()->hover = {};
 }
 
 bool Node::hover(const vec2 &m) const {

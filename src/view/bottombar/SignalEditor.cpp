@@ -76,15 +76,13 @@ void SignalEditor::add_editor_panel_for_chain(SignalChain *c) {
 }
 
 void SignalEditor::remove_editor_panel_for_chain(SignalChain *chain) {
-	msg_write("REMOVE!");
-
 	foreachi(auto *tt, weak(tabs), i)
-						if (tt->chain == chain) {
-							unembed(tt);
-							tabs.erase(i);
-							remove_string("selector", i);
-							set_int("selector", 0);
-						}
+		if (tt->chain == chain) {
+			unembed(tt);
+			tabs.erase(i);
+			remove_string("selector", i);
+			set_int("selector", 0);
+		}
 }
 
 void SignalEditor::on_new() {

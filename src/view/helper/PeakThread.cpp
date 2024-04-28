@@ -61,7 +61,7 @@ PeakThread::~PeakThread() {
 }
 
 
-void prepare_spectrum(PeakData::Request *r, float sample_rate) {
+void prepare_spectrum(PeakDataRequest *r, float sample_rate) {
 	//if (p.spectrogram.num > 0)
 	//	return false;
 
@@ -72,7 +72,7 @@ void prepare_spectrum(PeakData::Request *r, float sample_rate) {
 	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 
-	r->spectrogram.exchange(qspectrum);
+	r->peak_data.spectrogram.exchange(qspectrum);
 }
 
 void PeakThread::on_run() {
@@ -86,31 +86,31 @@ void PeakThread::on_run() {
 
 		auto r = db->requests.pop();
 
-		if (r->mode == AudioViewMode::PEAKS) {
-			int n = r->_update_peaks_prepare();
+		if (r->peak_data.mode == AudioViewMode::PEAKS) {
+			int n = r->peak_data._update_peaks_prepare(r->buffer);
 
 			Thread::cancelation_point();
 
 			for (int i=0; i<n; i++) {
-				if (r->_peaks_chunk_needs_update(i)) {
+				if (r->peak_data.peaks_chunk_state(r->buffer, i) == PeakData::State::OUT_OF_SYNC) {
 					PerformanceMonitor::start_busy(perf_channel);
-					r->_update_peaks_chunk(i);
+					r->peak_data._update_peaks_chunk(r->buffer, i);
 					PerformanceMonitor::end_busy(perf_channel);
 					Thread::cancelation_point();
 				}
 			}
-		} else if (r->mode == AudioViewMode::SPECTRUM) {
+		} else if (r->peak_data.mode == AudioViewMode::SPECTRUM) {
 
 			PerformanceMonitor::start_busy(perf_channel);
 			prepare_spectrum(r, db->sample_rate);
 
-			int n = r->spectrogram.num / PeakData::SPECTRUM_N;
+			int n = r->peak_data.spectrogram.num / PeakData::SPECTRUM_N;
 			auto& im = r->image;
 			im.resize(n, PeakData::SPECTRUM_N);
 
 			for (int i=0; i<n; i++) {
 				for (int k=0; k<PeakData::SPECTRUM_N; k++) {
-					float f = Spectrogram::dequantize(r->spectrogram[i * PeakData::SPECTRUM_N + k]);
+					float f = Spectrogram::dequantize(r->peak_data.spectrogram[i * PeakData::SPECTRUM_N + k]);
 					im.set_pixel(i, PeakData::SPECTRUM_N - 1 - k, color_heat_map(f));
 				}
 				if ((i & 0xff) == 0)

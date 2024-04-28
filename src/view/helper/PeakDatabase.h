@@ -41,6 +41,7 @@ struct HorizontallyChunkedImage {
 
 class PeakData {
 public:
+	PeakData() {}
 	PeakData(AudioBuffer& b, AudioViewMode mode);
 
 	AudioViewMode mode;
@@ -52,19 +53,25 @@ public:
 		OK,
 		OUT_OF_SYNC,
 		UPDATE_REQUESTED,
-		UPDATE_FINISHED
+		UPDATE_FINISHED,
+		OVERFLOW
 	};
 	std::atomic<State> state;
 
 	Array<bytes> peaks;
 	bytes spectrogram;
 	HorizontallyChunkedImage image;
+	int peak_length;
 
 	static const int PEAK_CHUNK_EXP;
 	static const int PEAK_CHUNK_SIZE;
 	static const int PEAK_OFFSET_EXP;
 	static const int PEAK_FINEST_SIZE;
 	static const int PEAK_MAGIC_LEVEL2;
+
+	static const int PEAK_VALUE_UNKNOWN;
+	static const int PEAK_VALUE_OVERFLOW;
+	static const int PEAK_VALUE_MAX;
 
 
 	static const int SPECTRUM_CHUNK;
@@ -73,27 +80,25 @@ public:
 	static const float SPECTRUM_MAX_FREQ;
 
 //	void _cdecl invalidate_peaks(const Range &r);
-	bool _peaks_chunk_needs_update(int index);
+	State peaks_chunk_state(const AudioBuffer& buffer, int index);
 
 	bool has_spectrum();
 
 //	void _truncate_peaks(int length);
 
 
-	// PeakThread
-	struct Request {
-		AudioViewMode mode;
-		int uid;
-		AudioBuffer buffer;
-		Array<bytes> peaks;
-		bytes spectrogram;
-		HorizontallyChunkedImage image;
+	void _ensure_peak_size(const AudioBuffer& buf, int level4, int n, bool set_invalid = false);
+	int _update_peaks_prepare(const AudioBuffer& buf);
+	void _update_peaks_chunk(const AudioBuffer& buf, int index);
 
-		void _ensure_peak_size(int level4, int n, bool set_invalid = false);
-		int _update_peaks_prepare();
-		void _update_peaks_chunk(int index);
-		bool _peaks_chunk_needs_update(int index);
-	};
+};
+
+// PeakThread
+struct PeakDataRequest {
+	int uid;
+	AudioBuffer buffer;
+	PeakData peak_data;
+	HorizontallyChunkedImage image;
 };
 
 // single threaded (apart from requests)
@@ -114,6 +119,7 @@ public:
 	Map peak_data;
 	Map spectrogram_data;
 
+	PeakData& _get(AudioBuffer &b, AudioViewMode mode);
 	PeakData& acquire(AudioBuffer &b, AudioViewMode mode);
 	void release(PeakData& p);
 
@@ -131,8 +137,8 @@ public:
 	void process_replies();
 
 	// shared between main thread and PeakThread:
-	InterThreadFifoBuffer<PeakData::Request*> requests;
-	InterThreadFifoBuffer<PeakData::Request*> replies;
+	InterThreadFifoBuffer<PeakDataRequest*> requests;
+	InterThreadFifoBuffer<PeakDataRequest*> replies;
 };
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

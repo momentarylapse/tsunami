@@ -106,11 +106,13 @@ base::optional<int64> AudioAccumulator::command(ModuleCommand cmd, int64 param) 
 		_accumulate(false);
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
+		std::lock_guard<std::mutex> lock(mtx_buf);
 		samples_skipped += buf.length;
 		buf.clear();
 		//buf.set_channels(2);
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
+		std::lock_guard<std::mutex> lock(mtx_buf);
 		return buf.length;
 	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
 		set_channels(param);

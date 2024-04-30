@@ -221,29 +221,6 @@ AudioView::AudioView(Session *_session) :
 
 	m = {0,0};
 
-
-	// events
-	string id = "area";
-	win->event_xp(id, "hui:draw", [this](Painter *p) { on_draw(p); });
-	win->event_x(id, "hui:mouse-move", [this]{ on_mouse_move(); });
-	win->event_x(id, "hui:left-button-down", [this]{ on_left_button_down(); });
-	win->event_x(id, "hui:left-double-click", [this]{ on_left_double_click(); });
-	win->event_x(id, "hui:left-button-up", [this]{ on_left_button_up(); });
-	win->event_x(id, "hui:middle-button-down", [this]{ on_middle_button_down(); });
-	win->event_x(id, "hui:middle-button-up", [this]{ on_middle_button_up(); });
-	win->event_x(id, "hui:right-button-down", [this]{ on_right_button_down(); });
-	win->event_x(id, "hui:right-button-up", [this]{ on_right_button_up(); });
-	win->event_x(id, "hui:mouse-leave", [this]{ on_mouse_leave(); });
-	win->event_x(id, "hui:key-down", [this]{ on_key_down(); });
-	win->event_x(id, "hui:key-up", [this]{ on_key_up(); });
-	win->event_x(id, "hui:mouse-wheel", [this]{ on_mouse_wheel(); });
-	win->event_x(id, "hui:gesture-zoom", [this]{ mode->on_command("hui:gesture-zoom"); });
-	win->event_x(id, "hui:gesture-zoom-begin", [this]{ mode->on_command("hui:gesture-zoom-begin"); });
-	win->event_x(id, "hui:gesture-zoom-end", [this]{ mode->on_command("hui:gesture-zoom-end"); });
-
-	win->activate(id);
-
-
 	menu_song = hui::create_resource_menu("popup-menu-song", win);
 	menu_track = hui::create_resource_menu("popup-menu-track", win);
 	menu_layer = hui::create_resource_menu("popup-menu-layer", win);
@@ -336,10 +313,6 @@ void AudioView::set_mode(ViewMode *m) {
 	}
 	thm.set_dirty();
 	force_redraw();
-}
-
-void AudioView::set_mouse() {
-	m = hui::get_event()->m;
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
@@ -449,22 +422,21 @@ void AudioView::snap_to_grid(int &pos) {
 		pos = new_pos;
 }
 
-void AudioView::on_mouse_move() {
-	set_mouse();
+bool AudioView::on_mouse_move(const vec2 &_m) {
+	m = _m;
 
-	//scene_graph->on_mouse_move(m);
-
-	mode->on_mouse_move();
+	mode->on_mouse_move(m);
 
 	force_redraw();
+	return true;
 }
 
-void AudioView::on_left_button_down() {
-	set_mouse();
-	//scene_graph->on_left_button_down(m);
+bool AudioView::on_left_button_down(const vec2 &_m) {
+	m = _m;
 
 	force_redraw();
 	update_menu();
+	return true;
 }
 
 // extend to beats
@@ -487,31 +459,17 @@ void align_to_beats(Song *s, Range &r, int beat_partition) {
 }
 
 
-void AudioView::on_left_button_up() {
-	//scene_graph->on_left_button_up(m);
-
+bool AudioView::on_left_button_up(const vec2 &m) {
 	force_redraw();
 	update_menu();
+	return true;
 }
 
 
 
-void AudioView::on_middle_button_down() {
-}
-
-
-
-void AudioView::on_middle_button_up() {
-}
-
-
-
-void AudioView::on_right_button_down() {
-	//scene_graph->on_right_button_down(m);
-}
-
-void AudioView::on_right_button_up() {
-	mode->on_right_button_up();
+bool AudioView::on_right_button_up(const vec2 &m) {
+	mode->on_right_button_up(m);
+	return true;
 }
 
 void AudioView::on_mouse_leave() {
@@ -524,11 +482,11 @@ void AudioView::on_mouse_leave() {
 
 
 
-void AudioView::on_left_double_click() {
-	//scene_graph->on_left_double_click(m);
-	mode->on_left_double_click();
+bool AudioView::on_left_double_click(const vec2 &m) {
+	mode->on_left_double_click(m);
 	force_redraw();
 	update_menu();
+	return true;
 }
 
 
@@ -676,8 +634,7 @@ void AudioView::on_command(const string &id) {
 
 
 
-void AudioView::on_key_down() {
-	int k = hui::get_event()->key_code;
+bool AudioView::on_key_down(int k) {
 	if (k == hui::KEY_ESCAPE) {
 		if (mdp()->acting()) {
 			mdp()->cancel();
@@ -692,20 +649,27 @@ void AudioView::on_key_down() {
 		force_redraw();
 
 	mode->on_key_down(k);
+	return true;
 }
 
-void AudioView::on_key_up() {
-	int k = hui::get_event()->key_code;
+bool AudioView::on_key_up(int k) {
 	if ((k == hui::KEY_LSHIFT) or (k == hui::KEY_RSHIFT))
 		force_redraw();
 
 	mode->on_key_up(k);
+	return true;
 }
 
-void AudioView::on_mouse_wheel() {
-	mode->on_mouse_wheel();
+bool AudioView::on_mouse_wheel(const vec2 &d) {
+	mode->on_mouse_wheel(d);
+	return true;
 }
 
+bool AudioView::on_gesture(const string &id, const vec2 &_m, const vec2 &param) {
+	m = _m;
+	mode->on_gesture(id, m, param);
+	return true;
+}
 
 void AudioView::force_redraw() {
 	request_redraw();
@@ -1062,8 +1026,6 @@ void AudioView::draw_song(Painter *c) {
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-	//scene_graph->on_draw(c);
-	//scene_graph->draw(c);
 
 
 	// playing/capturing position
@@ -1087,9 +1049,6 @@ void AudioView::draw_song(Painter *c) {
 		draw_boxed_str(c, {song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 
 	peak_database->iterate(session->sample_rate());
-
-//	if (log_notifier->progress(0.03f))
-//		animating = true;
 
 	if (cam.needs_update())
 		animating = true;

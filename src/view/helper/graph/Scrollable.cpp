@@ -53,7 +53,7 @@ bool ScrollPad::on_mouse_wheel(const vec2 &d) {
 	return true;
 }
 
-bool ScrollPad::on_key(int key) {
+bool ScrollPad::on_key_down(int key) {
 	if (key == hui::KEY_UP)
 		move_view({0, -10});
 	if (key == hui::KEY_DOWN)

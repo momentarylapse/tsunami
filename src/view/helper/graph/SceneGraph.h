@@ -36,7 +36,9 @@ public:
 	bool on_right_button_up(const vec2 &m) override;
 	bool on_mouse_move(const vec2 &m) override;
 	bool on_mouse_wheel(const vec2 &d) override;
-	bool on_key(int key) override;
+	bool on_key_down(int key) override;
+	bool on_key_up(int key) override;
+	bool on_gesture(const string &id, const vec2 &m, const vec2 &param) override;
 	bool allow_handle_click_when_gaining_focus() const override;
 
 	//ViewNode *get_hover();

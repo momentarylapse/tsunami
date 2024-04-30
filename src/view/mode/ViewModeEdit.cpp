@@ -31,12 +31,12 @@ void ViewModeEdit::on_end() {
 	mode->on_end();
 }
 
-void ViewModeEdit::on_mouse_move() {
-	mode->on_mouse_move();
+void ViewModeEdit::on_mouse_move(const vec2 &m) {
+	mode->on_mouse_move(m);
 }
 
-void ViewModeEdit::on_mouse_wheel() {
-	mode->on_mouse_wheel();
+void ViewModeEdit::on_mouse_wheel(const vec2 &m) {
+	mode->on_mouse_wheel(m);
 }
 
 void ViewModeEdit::on_key_down(int k) {
@@ -65,7 +65,7 @@ void ViewModeEdit::set_mode(ViewMode *m) {
 	mode = m;
 	if (view->mode == this)
 		mode->on_start();
-	out_changed.notify();
+	out_changed();
 }
 
 void ViewModeEdit::on_cur_layer_change() {

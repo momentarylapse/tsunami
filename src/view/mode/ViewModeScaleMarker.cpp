@@ -51,18 +51,18 @@ string ViewModeScaleMarker::get_tip() {
 	return _("move selection handles to scale   cancel (Esc)   done (Return)");
 }
 
-void ViewModeScaleMarker::on_left_button_up() {
-	ViewModeDefault::on_left_button_up();
+void ViewModeScaleMarker::on_left_button_up(const vec2 &m) {
+	ViewModeDefault::on_left_button_up(m);
 
 	perform_scale();
 }
 
-void ViewModeScaleMarker::on_right_button_down() {
+void ViewModeScaleMarker::on_right_button_down(const vec2 &m) {
 	session->set_mode(EditMode::Default);
 }
 
-void ViewModeScaleMarker::on_mouse_move() {
-	ViewModeDefault::on_mouse_move();
+void ViewModeScaleMarker::on_mouse_move(const vec2 &m) {
+	ViewModeDefault::on_mouse_move(m);
 }
 
 void ViewModeScaleMarker::on_key_down(int k) {

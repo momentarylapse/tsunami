@@ -252,9 +252,7 @@ bool ViewModeEditBars::editing(AudioViewLayer *l) {
 	return l == cur_vlayer();
 }
 
-void ViewModeEditBars::on_mouse_move() {
-	float mx = view->m.x;
-
+void ViewModeEditBars::on_mouse_move(const vec2& m) {
 	if (!cur_vlayer()->is_cur_hover())
 		return;
 
@@ -262,7 +260,7 @@ void ViewModeEditBars::on_mouse_move() {
 		rubber_hover = false;
 		if (view->sel.bar_indices(song).num > 0) {
 			float sx = view->cam.sample2screen(rubber_end_target);
-			rubber_hover = (fabs(sx - mx) < 10);
+			rubber_hover = (fabs(sx - m.x) < 10);
 		}
 	}
 

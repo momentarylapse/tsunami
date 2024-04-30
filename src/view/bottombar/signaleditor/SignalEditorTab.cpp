@@ -237,7 +237,7 @@ void SignalEditorTab::popup_module() {
 	//menu_module->open_popup(session->win);
 }
 
-bool SignalEditorTab::on_key(int key) {
+bool SignalEditorTab::on_key_down(int key) {
 	if (key == hui::KEY_DELETE)
 		on_module_delete();
 	return true;

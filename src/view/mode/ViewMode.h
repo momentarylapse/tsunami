@@ -37,16 +37,17 @@ public:
 	virtual void on_start() {}
 	virtual void on_end() {}
 
-	virtual void on_left_button_down() {}
-	virtual void on_left_button_up() {}
-	virtual void on_left_double_click() {}
-	virtual void on_right_button_down() {}
-	virtual void on_right_button_up() {}
-	virtual void on_mouse_move() {}
-	virtual void on_mouse_wheel() {}
+	virtual void on_left_button_down(const vec2 &m) {}
+	virtual void on_left_button_up(const vec2 &m) {}
+	virtual void on_left_double_click(const vec2 &m) {}
+	virtual void on_right_button_down(const vec2 &m) {}
+	virtual void on_right_button_up(const vec2 &m) {}
+	virtual void on_mouse_move(const vec2 &m) {}
+	virtual void on_mouse_wheel(const vec2 &d) {}
 	virtual void on_key_down(int k) {}
 	virtual void on_key_up(int k) {}
 	virtual void on_command(const string &id) {}
+	virtual void on_gesture(const string &id, const vec2 &m, const vec2 &param) {}
 	virtual float layer_suggested_height(AudioViewLayer *l) = 0;
 	virtual void on_cur_layer_change() {}
 

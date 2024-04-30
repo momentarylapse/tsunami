@@ -37,7 +37,9 @@ public:
 	virtual bool on_right_button_up(const vec2 &m) { return false; }
 	virtual bool on_mouse_move(const vec2 &m) { return false; }
 	virtual bool on_mouse_wheel(const vec2 &d) { return false; }
-	virtual bool on_key(int key) { return false; }
+	virtual bool on_gesture(const string &id, const vec2 &m, const vec2 &param) { return false; }
+	virtual bool on_key_down(int key) { return false; }
+	virtual bool on_key_up(int key) { return false; }
 
 	virtual bool hover(const vec2 &m) const;
 

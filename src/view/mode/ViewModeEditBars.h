@@ -39,7 +39,7 @@ public:
 	bool editing(AudioViewLayer *l);
 
 	void left_click_handle_void(AudioViewLayer *vlayer) override;
-	void on_mouse_move() override;
+	void on_mouse_move(const vec2& m) override;
 	string get_tip() override;
 
 	Range selected_bar_range() const;

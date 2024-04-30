@@ -253,24 +253,20 @@ void scroll_y(AudioView *view, float dy) {
 }
 
 
-void ViewModeDefault::on_mouse_wheel() {
-	auto e = hui::get_event();
-	if (view->graph()->on_mouse_wheel(e->scroll))
-		return;
-
-	if (fabs(e->scroll.y) > 0.1f) {
+void ViewModeDefault::on_mouse_wheel(const vec2 &scroll) {
+	if (fabs(scroll.y) > 0.1f) {
 		if (win->get_key(hui::KEY_CONTROL)) {
-			scroll_y(view, e->scroll.y * view->scroll_speed);
+			scroll_y(view, scroll.y * view->scroll_speed);
 		} else if (win->get_key(hui::KEY_SHIFT)) {
-			cam->move(e->scroll.y / cam->pixels_per_sample * view->scroll_speed);
+			cam->move(scroll.y / cam->pixels_per_sample * view->scroll_speed);
 		} else {
-			cam->zoom(exp(e->scroll.y * view->zoom_speed), view->m.x);
+			cam->zoom(exp(scroll.y * view->zoom_speed), view->m.x);
 		}
 	}
 
 	// horizontal scroll
-	if (fabs(e->scroll.x) > 0.1f)
-		cam->move(e->scroll.x / cam->pixels_per_sample * view->scroll_speed);
+	if (fabs(scroll.x) > 0.1f)
+		cam->move(scroll.x / cam->pixels_per_sample * view->scroll_speed);
 }
 
 void expand_sel_range(AudioView *view, int pos) {
@@ -363,13 +359,15 @@ void ViewModeDefault::on_command(const string &id) {
 		if (id == "cursor-expand-end")
 			expand_sel_range(view, song->range().end());
 	}
+}
 
-	if (id == "hui:gesture-zoom-begin") {
+void ViewModeDefault::on_gesture(const string &id, const vec2 &m, const vec2 &param) {
+	if (id == hui::EventID::GESTURE_ZOOM_BEGIN) {
 		_zoom_0_ = 1;//view->cam.scale;
 	}
-	if (id == "hui:gesture-zoom-end") {
+	if (id == hui::EventID::GESTURE_ZOOM_END) {
 	}
-	if (id == "hui:gesture-zoom") {
+	if (id == hui::EventID::GESTURE_ZOOM) {
 		view->cam.zoom(hui::get_event()->scroll.x/_zoom_0_, view->m.x);
 		_zoom_0_ = hui::get_event()->scroll.x;
 	}

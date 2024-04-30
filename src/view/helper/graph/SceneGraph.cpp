@@ -124,11 +124,29 @@ bool SceneGraph::on_mouse_wheel(const vec2 &d) {
 	return false;
 }
 
-bool SceneGraph::on_key(int key) {
+bool SceneGraph::on_key_down(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
 		//if (c->hover(m))
-			if (c->on_key(key))
+		if (c->on_key_down(key))
+			return true;
+	return false;
+}
+
+bool SceneGraph::on_key_up(int key) {
+	auto nodes = collect_children_down();
+	for (auto *c: nodes)
+		//if (c->hover(m))
+		if (c->on_key_up(key))
+			return true;
+	return false;
+}
+
+bool SceneGraph::on_gesture(const string &id, const vec2 &m, const vec2 &param) {
+	auto nodes = collect_children_down();
+	for (auto *c: nodes)
+		if (c->hover(m))
+			if (c->on_gesture(id, m, param))
 				return true;
 	return false;
 }
@@ -148,7 +166,7 @@ HoverData SceneGraph::get_hover_data(const vec2 &m) {
 		if (c->hover(m))
 			return c->get_hover_data(m);
 
-	return HoverData();
+	return {};
 }
 
 string SceneGraph::get_tip() const {
@@ -193,7 +211,7 @@ void SceneGraph::set_mouse(const vec2 &_m) {
 
 void SceneGraph::set_current(const HoverData &h) {
 	cur_selection = h;
-	out_current_changed.notify();
+	out_current_changed();
 }
 
 void SceneGraph::mdp_prepare(MouseDelayAction *a) {
@@ -235,37 +253,57 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 			draw(p);
 		}
 	});
-	panel->event_x(id, "hui:left-button-down", [this] {
+	panel->event_x(id, hui::EventID::LEFT_BUTTON_DOWN, [this] {
 		on_left_button_down(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:left-button-up", [this] {
+	panel->event_x(id, hui::EventID::LEFT_BUTTON_UP, [this] {
 		on_left_button_up(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:left-double-click", [this] {
+	panel->event_x(id, hui::EventID::LEFT_DOUBLE_CLICK, [this] {
 		on_left_double_click(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:right-button-down", [this] {
+	panel->event_x(id, hui::EventID::RIGHT_BUTTON_DOWN, [this] {
 		on_right_button_down(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:right-button-up", [this] {
+	panel->event_x(id, hui::EventID::RIGHT_BUTTON_UP, [this] {
 		on_right_button_up(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:mouse-wheel", [this] {
+	panel->event_x(id, hui::EventID::MOUSE_WHEEL, [this] {
 		on_mouse_wheel(hui::get_event()->scroll);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:mouse-move", [this] {
+	panel->event_x(id, hui::EventID::MOUSE_MOVE, [this] {
 		on_mouse_move(hui::get_event()->m);
 		request_redraw();
 	});
-	panel->event_x(id, "hui:key-down", [this] {
-		on_key(hui::get_event()->key_code);
-		request_redraw();
+	panel->event_x(id, hui::EventID::KEY_DOWN, [this] {
+		on_key_down(hui::get_event()->key_code);
+	});
+	panel->event_x(id, hui::EventID::KEY_UP, [this] {
+		on_key_up(hui::get_event()->key_code);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_ZOOM_BEGIN, [this] {
+		on_gesture(hui::EventID::GESTURE_ZOOM_BEGIN, hui::get_event()->m, hui::get_event()->scroll);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_ZOOM, [this] {
+		on_gesture(hui::EventID::GESTURE_ZOOM, hui::get_event()->m, hui::get_event()->scroll);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_ZOOM_END, [this] {
+		on_gesture(hui::EventID::GESTURE_ZOOM_END, hui::get_event()->m, hui::get_event()->scroll);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_DRAG_BEGIN, [this] {
+		on_gesture(hui::EventID::GESTURE_DRAG_BEGIN, hui::get_event()->m, hui::get_event()->scroll);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_DRAG, [this] {
+		on_gesture(hui::EventID::GESTURE_DRAG, hui::get_event()->m, hui::get_event()->scroll);
+	});
+	panel->event_x(id, hui::EventID::GESTURE_DRAG_END, [this] {
+		on_gesture(hui::EventID::GESTURE_DRAG_END, hui::get_event()->m, hui::get_event()->scroll);
 	});
 }
 

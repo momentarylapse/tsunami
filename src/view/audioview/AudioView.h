@@ -91,18 +91,16 @@ public:
 	void force_redraw_part(const rect &r);
 
 	void on_draw(Painter *p) override;
-	void on_mouse_move();
-	void on_left_button_down();
-	void on_left_button_up();
-	void on_middle_button_down();
-	void on_middle_button_up();
-	void on_right_button_down();
-	void on_right_button_up();
-	void on_left_double_click();
+	bool on_mouse_move(const vec2 &m) override;
+	bool on_left_button_down(const vec2 &m) override;
+	bool on_left_button_up(const vec2 &m) override;
+	bool on_right_button_up(const vec2 &m) override;
+	bool on_left_double_click(const vec2 &m) override;
 	void on_mouse_leave();
-	void on_mouse_wheel();
-	void on_key_down();
-	void on_key_up();
+	bool on_mouse_wheel(const vec2 &d) override;
+	bool on_key_down(int k) override;
+	bool on_key_up(int k) override;
+	bool on_gesture(const string &id, const vec2 &m, const vec2 &param) override;
 	void on_command(const string &id);
 
 	void on_song_change();
@@ -184,7 +182,6 @@ public:
 	void set_selection(const SongSelection &s);
 	Range get_playback_selection(bool for_recording);
 
-	void set_mouse();
 	int mouse_over_sample(SampleRef *s);
 	void selection_update_pos(HoverData &s);
 	bool mouse_over_time(int pos);

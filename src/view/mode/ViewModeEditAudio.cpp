@@ -190,7 +190,7 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 void ViewModeEditAudio::set_edit_mode(EditMode mode) {
 	edit_mode = mode;
 	view->force_redraw();
-	out_changed.notify();
+	out_changed();
 }
 
 
@@ -211,8 +211,7 @@ float step(float t) {
 }
 
 
-void ViewModeEditAudio::on_mouse_move() {
-	float mx = view->m.x;
+void ViewModeEditAudio::on_mouse_move(const vec2& m) {
 	rubber.hover = -1;
 	rubber.hover_type = RubberHoverType::NONE;
 
@@ -223,10 +222,10 @@ void ViewModeEditAudio::on_mouse_move() {
 		foreachi(auto &q, rubber.points, i) {
 			float sx = view->cam.sample2screen(q.source);
 			float tx = view->cam.sample2screen(q.target);
-			if (fabs(tx - mx) < 10) {
+			if (fabs(tx - m.x) < 10) {
 				rubber.hover = i;
 				rubber.hover_type = RubberHoverType::TARGET;
-			} else if (fabs(sx - mx) < 10) {
+			} else if (fabs(sx - m.x) < 10) {
 				rubber.hover = i;
 				rubber.hover_type = RubberHoverType::SOURCE;
 			}

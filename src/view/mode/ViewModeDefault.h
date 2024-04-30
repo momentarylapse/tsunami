@@ -18,9 +18,10 @@ class ViewModeDefault : public ViewMode {
 public:
 	ViewModeDefault(AudioView *view);
 
-	void on_mouse_wheel() override;
+	void on_mouse_wheel(const vec2 &d) override;
 	void on_key_down(int k) override;
 	void on_command(const string &id) override;
+	void on_gesture(const string &id, const vec2 &m, const vec2 &param) override;
 	float layer_suggested_height(AudioViewLayer *l) override;
 	int suggest_move_cursor(const Range &cursor, bool forward) override;
 

@@ -29,8 +29,8 @@ public:
 	float layer_suggested_height(AudioViewLayer *l) override;
 	void on_cur_layer_change() override;
 
-	void on_mouse_move() override;
-	void on_mouse_wheel() override;
+	void on_mouse_move(const vec2& m) override;
+	void on_mouse_wheel(const vec2& m) override;
 
 	void draw_layer_background(Painter *c, AudioViewLayer *l) override;
 	void draw_post(Painter *c) override;

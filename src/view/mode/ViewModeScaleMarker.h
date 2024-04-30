@@ -22,9 +22,9 @@ public:
 
 	void on_start() override;
 
-	void on_left_button_up() override;
-	void on_right_button_down() override;
-	void on_mouse_move() override;
+	void on_left_button_up(const vec2& m) override;
+	void on_right_button_down(const vec2& m) override;
+	void on_mouse_move(const vec2& m) override;
 	void on_key_down(int k) override;
 
 	void draw_post(Painter *c) override;

@@ -20,8 +20,8 @@ public:
 	void on_start() override;
 	void on_end() override;
 
-	void on_left_button_down() override {}
-	void on_left_double_click() override {}
+	void on_left_button_down(const vec2 &m) override {}
+	void on_left_double_click(const vec2 &m) override {}
 
 	void draw_post(Painter *c) override;
 

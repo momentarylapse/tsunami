@@ -126,7 +126,7 @@ public:
 	void zoom_out();
 
 	void draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time = false);
-	void draw_song(Painter *c);
+	void prepare_draw_song();
 	int draw_runner_id;
 
 	void draw_cursor_hover(Painter *c, const string &msg);

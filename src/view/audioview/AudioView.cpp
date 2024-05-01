@@ -90,10 +90,48 @@ public:
 	}
 };
 
+class SongOverlay : public scenegraph::Node {
+	AudioView *view;
+public:
+	SongOverlay(AudioView *v) {
+		view = v;
+	}
+	void on_draw(Painter *p) override {
+		//area = p->area();
+		//clip = p->clip();
+
+		p->set_font_size(theme.FONT_SIZE);
+		p->set_line_width(theme.LINE_WIDTH);
+
+		// playing/capturing position
+		if (view->session->playback->is_active())
+			view->draw_time_line(p, view->session->playback->get_pos(), theme.preview_marker, false, true);
+
+		view->mode->draw_post(p);
+		for (auto *plugin: weak(view->session->plugins))
+			plugin->on_draw_post(p);
+
+		// hover/tool tip?
+		string tip;
+		if (view->hover().node)
+			tip = view->hover().node->get_tip();
+		if (tip.num > 0)
+			view->draw_cursor_hover(p, tip);
+
+		// general hint (full line at bottom)
+		tip = view->mode->get_tip();
+		if (tip.num > 0)
+			draw_boxed_str(p, {view->song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
+
+		//static int frame = 0;
+		//c->draw_str(100, 100, i2s(frame++));
+	}
+};
+
 AudioView::AudioView(Session *_session) :
 		in_solo_changed{this, [this] {
 			update_playback_layers();
-			out_solo_changed.notify();
+			out_solo_changed();
 		}},
 		in_redraw(this, [this] {
 			force_redraw();
@@ -175,6 +213,7 @@ AudioView::AudioView(Session *_session) :
 	add_child(cursor_end);
 	add_child(selection_marker);
 	add_child(metronome_overlay_vlayer);
+	add_child(new SongOverlay(this));
 
 
 	peak_database = new PeakDatabase();
@@ -1013,12 +1052,8 @@ bool AudioView::selecting_xor() const {
 	return session->win->get_key(hui::KEY_CONTROL);
 }
 
-void AudioView::draw_song(Painter *c) {
+void AudioView::prepare_draw_song() {
 	bool animating = update_scene_graph();
-
-	c->set_antialiasing(false);
-
-	//scene_graph->update_geometry_recursive(area);
 
 	cam.area = song_area();
 	if (_optimize_view_requested)
@@ -1026,27 +1061,6 @@ void AudioView::draw_song(Painter *c) {
 	cam.update(0.1f);
 
 	update_buffer_zoom();
-
-
-	// playing/capturing position
-	if (session->playback->is_active())
-		draw_time_line(c, session->playback->get_pos(), theme.preview_marker, false, true);
-
-	mode->draw_post(c);
-	for (auto *plugin: weak(session->plugins))
-		plugin->on_draw_post(c);
-
-	// hover/tool tip?
-	string tip;
-	if (hover().node)
-		tip = hover().node->get_tip();
-	if (tip.num > 0)
-		draw_cursor_hover(c, tip);
-
-	// general hint (full line at bottom)
-	tip = mode->get_tip();
-	if (tip.num > 0)
-		draw_boxed_str(c, {song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 
 	peak_database->iterate(session->sample_rate());
 
@@ -1067,7 +1081,7 @@ void AudioView::on_draw(Painter *c) {
 	c->set_line_width(theme.LINE_WIDTH);
 
 	if (enabled)
-		draw_song(c);
+		prepare_draw_song();
 
 	//static int frame = 0;
 	//c->draw_str(100, 100, i2s(frame++));

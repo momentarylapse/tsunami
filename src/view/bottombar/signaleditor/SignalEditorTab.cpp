@@ -19,6 +19,7 @@
 #include "../../dialog/ModuleSelectorDialog.h"
 #include "../../helper/graph/SceneGraph.h"
 #include "../../helper/graph/Node.h"
+#include "../../helper/graph/ToolTipOverlay.h"
 #include "../../helper/Drawing.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../../data/base.h"
@@ -345,25 +346,10 @@ SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain
 	chain = _chain;
 
 	tab = new SignalEditorTab(chain);
-	graph = scenegraph::SceneGraph::create_integrated(this, "area", tab.get(), "SignalEditor", [this] (Painter *p) {
-		p->set_font_size(theme.FONT_SIZE);
-		graph->update_geometry_recursive(p->area());
-		//pad->_update_scrolling();
-		graph->draw(p);
-
-		auto m = hui::get_event()->m;
-
-		string tip;
-		if (graph->hover.node)
-			tip = graph->hover.node->get_tip();
-		if (tip.num > 0) {
-			p->set_font("", theme.FONT_SIZE, true, false);
-			draw_cursor_hover(p, tip, m, graph->area);
-			p->set_font("", theme.FONT_SIZE, false, false);
-		}
-	});
+	graph = scenegraph::SceneGraph::create_integrated(this, "area", tab.get(), "SignalEditor");
 
 	graph->add_child(new SignalEditorBigButton(tab.get()));
+	graph->add_child(new ToolTipOverlay);
 
 	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });

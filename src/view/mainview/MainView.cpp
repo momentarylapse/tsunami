@@ -6,6 +6,7 @@
 #include "LogNotifier.h"
 #include "BottomBarExpandButton.h"
 #include "../helper/graph/SceneGraph.h"
+#include "../helper/graph/ToolTipOverlay.h"
 #include "../helper/PeakMeterDisplay.h"
 #include "../helper/Dial.h"
 #include "../helper/CpuDisplay.h"
@@ -104,19 +105,7 @@ MainView::MainView(Session *_session, const string &_id) {
 	scene_graph = scenegraph::SceneGraph::create_integrated(win, id, vbox.get(), "view", [this] (Painter *p) {
 		p->set_font_size(theme.FONT_SIZE);
 		scene_graph->update_geometry_recursive(p->area());
-		//pad->_update_scrolling();
 		scene_graph->draw(p);
-
-		/*auto m = hui::get_event()->m;
-
-		string tip;
-		if (graph->hover.node)
-			tip = graph->hover.node->get_tip();
-		if (tip.num > 0) {
-			p->set_font("", theme.FONT_SIZE, true, false);
-			draw_cursor_hover(p, tip, m, graph->area);
-			p->set_font("", theme.FONT_SIZE, false, false);
-		}*/
 
 		bool animating = false;
 
@@ -137,6 +126,8 @@ MainView::MainView(Session *_session, const string &_id) {
 
 	cpu_display = new CpuDisplay(session);
 	scene_graph->add_child(cpu_display);
+
+	scene_graph->add_child(new ToolTipOverlay);
 
 	// TODO move "OnScreenDisplay"?
 	peak_meter_display = new PeakMeterDisplay(session->playback->peak_meter.get(), PeakMeterDisplay::Mode::BOTH);

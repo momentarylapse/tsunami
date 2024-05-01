@@ -13,6 +13,7 @@
 #include "../../../data/Song.h"
 #include "../../../data/TrackLayer.h"
 #include "../../../Session.h"
+#include "../../../Playback.h"
 
 bool view_has_focus(AudioView *view);
 
@@ -143,6 +144,11 @@ void SelectionMarker::on_draw(Painter* p) {
 			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
 		}
 	}
+
+	// playing/capturing position
+	if (view->session->playback->is_active())
+		view->draw_time_line(p, view->session->playback->get_pos(), theme.preview_marker, false, true);
+
 
 
 	// bar gap selection

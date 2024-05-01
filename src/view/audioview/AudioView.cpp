@@ -97,29 +97,16 @@ public:
 		view = v;
 	}
 	void on_draw(Painter *p) override {
-		//area = p->area();
-		//clip = p->clip();
-
 		p->set_font_size(theme.FONT_SIZE);
 		p->set_line_width(theme.LINE_WIDTH);
 
-		// playing/capturing position
-		if (view->session->playback->is_active())
-			view->draw_time_line(p, view->session->playback->get_pos(), theme.preview_marker, false, true);
-
+		// mode/plugin overlays
 		view->mode->draw_post(p);
 		for (auto *plugin: weak(view->session->plugins))
 			plugin->on_draw_post(p);
 
-		// hover/tool tip?
-		string tip;
-		if (view->hover().node)
-			tip = view->hover().node->get_tip();
-		if (tip.num > 0)
-			view->draw_cursor_hover(p, tip);
-
-		// general hint (full line at bottom)
-		tip = view->mode->get_tip();
+		// hints from current mode (full line at bottom)
+		string tip = view->mode->get_tip();
 		if (tip.num > 0)
 			draw_boxed_str(p, {view->song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
 

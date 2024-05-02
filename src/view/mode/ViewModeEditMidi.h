@@ -128,8 +128,8 @@ public:
 	int rep_key;
 	int rep_key_num;
 
-	void left_click_handle_void(AudioViewLayer *vlayer) override;
-	void left_click_handle_object(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) override;
 	string get_tip() override;
 };
 

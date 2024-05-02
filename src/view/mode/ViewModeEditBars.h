@@ -24,7 +24,7 @@ public:
 
 	void draw_post(Painter *c) override;
 
-	void add_bar_at_cursor();
+	void add_bar_at_cursor(const vec2 &m);
 
 	enum class EditMode {
 		SELECT,
@@ -38,7 +38,7 @@ public:
 	TrackLayer *cur_layer();
 	bool editing(AudioViewLayer *l);
 
-	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) override;
 	void on_mouse_move(const vec2& m) override;
 	string get_tip() override;
 

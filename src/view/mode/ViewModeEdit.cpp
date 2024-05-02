@@ -115,17 +115,17 @@ SongSelection ViewModeEdit::get_selection_for_range(const Range &r) {
 	return mode->get_selection_for_range(r);
 }
 
-void ViewModeEdit::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeEdit::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 	if (vlayer == view->cur_vlayer()) {
-		mode->left_click_handle_void(vlayer);
+		mode->left_click_handle_void(vlayer, m);
 	} else {
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 	}
 	view->exclusively_select_layer(vlayer);
 }
 
-void ViewModeEdit::left_click_handle_object(AudioViewLayer *vlayer) {
-	mode->left_click_handle_object(vlayer);
+void ViewModeEdit::left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) {
+	mode->left_click_handle_object(vlayer, m);
 }
 
 string ViewModeEdit::get_tip() {

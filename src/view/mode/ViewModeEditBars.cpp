@@ -68,7 +68,7 @@ public:
 		action = new ActionSongMoveBarGap(view->song, index);
 	}
 	void on_update(const vec2 &m) override {
-		int p = view->get_mouse_pos();
+		int p = view->get_mouse_pos(m);
 		view->snap_to_grid(p);
 		p = clamp(p, allowed_range.start(), allowed_range.end());
 		action->set_param_and_notify(view->song, p);
@@ -159,8 +159,8 @@ void ViewModeEditBars::on_key_down(int k) {
 	}
 }
 
-void ViewModeEditBars::add_bar_at_cursor() {
-	int smx = view->get_mouse_pos();
+void ViewModeEditBars::add_bar_at_cursor(const vec2 &m) {
+	int smx = view->get_mouse_pos(m);
 	int index = view->song->bars.get_bar_no(smx);
 
 	if (index >= 0) {
@@ -267,12 +267,12 @@ void ViewModeEditBars::on_mouse_move(const vec2& m) {
 	//view->force_redraw();
 }
 
-void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 	if (!editing(vlayer)) {
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 		return;
 	} else if (!view->sel.has(vlayer->layer)) {
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 		return;
 	}
 	
@@ -280,17 +280,17 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer) {
 		if (rubber_hover)
 			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target));
 		else
-			ViewModeDefault::left_click_handle_void(vlayer);
+			ViewModeDefault::left_click_handle_void(vlayer, m);
 	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BAR_GAP) {
 			if (h.index > 0)
 				view->mdp_prepare(new MouseDelayBarGapDnD(view, h.index));
 		} else {
-			add_bar_at_cursor();
+			add_bar_at_cursor(m);
 		}
 	} else { // SELECT
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 	}
 }
 

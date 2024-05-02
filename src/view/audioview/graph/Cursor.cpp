@@ -86,11 +86,11 @@ string Cursor::get_tip() const {
 bool Cursor::on_left_button_down(const vec2 &m) {
 	drag_range = view->sel.range_raw;
 
-	view->mdp_prepare([this] {
+	view->mdp_prepare([this, m] {
 		if (is_end)
-			drag_range.set_end(view->get_mouse_pos_snap());
+			drag_range.set_end(view->get_mouse_pos_snap(m));
 		else
-			drag_range.set_start(view->get_mouse_pos_snap());
+			drag_range.set_start(view->get_mouse_pos_snap(m));
 		view->sel.range_raw = drag_range;
 		view->update_selection();
 		view->select_under_cursor();

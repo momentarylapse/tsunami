@@ -246,7 +246,7 @@ public:
 		action = new ActionTrackMoveNotes(layer->layer, sel);
 	}
 	void on_update(const vec2 &m) override {
-		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+		int p = view->get_mouse_pos(m) + (ref_pos - mouse_pos0);
 		int pitch = mouse_to_pitch(m.y);
 		int stringno = mouse_to_string(m.y);
 
@@ -294,7 +294,7 @@ public:
 		action = new ActionTrackScaleNotes(layer->layer, sel);
 	}
 	void on_update(const vec2 &m) override {
-		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+		int p = view->get_mouse_pos(m) + (ref_pos - mouse_pos0);
 
 		view->snap_to_grid(p);
 		[[maybe_unused]] int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
@@ -518,7 +518,7 @@ public:
 		view->mode_edit_midi->start_midi_preview(pitch, 1.0f);
 	}
 	void on_finish(const vec2 &m) override {
-		auto notes = get_creation_notes();
+		auto notes = get_creation_notes(m);
 
 		if (notes.num > 0) {
 			view->set_cursor_pos(notes[0]->range.end());
@@ -535,11 +535,11 @@ public:
 		mp->set_force_shadows(true);
 
 		// current creation
-		auto notes = get_creation_notes();
+		auto notes = get_creation_notes(view->m);
 		mp->draw(c, notes);
 	}
-	MidiNoteBuffer get_creation_notes() {
-		Range r = Range::to(pos0, view->get_mouse_pos());
+	MidiNoteBuffer get_creation_notes(const vec2 &m) {
+		Range r = Range::to(pos0, view->get_mouse_pos(m));
 		r = r.canonical();
 
 		// align to beats
@@ -597,7 +597,7 @@ MidiHoverMetadata get_midi_hover_meta(ViewModeEditMidi *m) {
 }
 
 // note clicking already handled by ViewModeDefault!
-void ViewModeEditMidi::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeEditMidi::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 
 	if (!view->sel.has(vlayer->layer)) {
 		view->exclusively_select_layer(vlayer);
@@ -641,7 +641,7 @@ bool hover_end_of_note(HoverData &h, MidiNote *n) {
 	return h.pos >= n->range.end() - n->range.length*0.1f;
 }
 
-void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer) {
+void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) {
 
 	view->exclusively_select_layer(vlayer);
 	if (!view->hover_selected_object()) {
@@ -656,7 +656,7 @@ void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer) {
 		else
 			view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MIDI_NOTES)));
 	} else {
-		ViewModeDefault::left_click_handle_object(vlayer);
+		ViewModeDefault::left_click_handle_object(vlayer, m);
 	}
 }
 

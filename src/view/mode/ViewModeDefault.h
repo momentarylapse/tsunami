@@ -36,12 +36,12 @@ public:
 	HoverData get_hover_data(AudioViewLayer *vlayer, const vec2 &m) override;
 
 
-	void left_click_handle(AudioViewLayer *vlayer) override;
-	void left_click_handle_object(AudioViewLayer *vlayer) override;
-	void left_click_handle_object_xor(AudioViewLayer *vlayer) override;
-	void left_click_handle_void(AudioViewLayer *vlayer) override;
-	void left_click_handle_void_or(AudioViewLayer *vlayer) override;
-	void left_click_handle_void_xor(AudioViewLayer *vlayer) override;
+	void left_click_handle(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_object_xor(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_void_or(AudioViewLayer *vlayer, const vec2 &m) override;
+	void left_click_handle_void_xor(AudioViewLayer *vlayer, const vec2 &m) override;
 
 	void start_selection_rect(SelectionMode mode, bool keep_start = false);
 };

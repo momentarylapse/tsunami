@@ -36,7 +36,7 @@ Track *ViewModeCurve::cur_track() {
 	return view->cur_track();
 }
 
-void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 	if (target == "")
 		return;
 
@@ -47,13 +47,13 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer) {
 	}
 
 	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
-		int pos = view->get_mouse_pos();
-		float value = screen2value(view->m.y);
+		int pos = view->get_mouse_pos(m);
+		float value = screen2value(m.y);
 		cur_track()->curve_add_point(_curve, pos, value);
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
-		view->mdp_prepare([this] {
-			int pos = view->get_mouse_pos();
-			float value = clamp(screen2value(view->m.y), _curve->min, _curve->max);
+		view->mdp_prepare([this, m] {
+			int pos = view->get_mouse_pos(m);
+			float value = clamp(screen2value(m.y), _curve->min, _curve->max);
 			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);
 		});
 	}

@@ -1494,20 +1494,20 @@ void AudioView::exclusively_select_object() {
 	select_object();
 }
 
-int AudioView::get_mouse_pos() {
+int AudioView::get_mouse_pos(const vec2 &m) {
 	return cam.screen2sample(m.x);
 }
 
-int AudioView::get_mouse_pos_snap() {
-	int pos = get_mouse_pos();
+int AudioView::get_mouse_pos_snap(const vec2 &m) {
+	int pos = get_mouse_pos(m);
 	snap_to_grid(pos);
 	return pos;
 }
 
 HoverData AudioView::hover_time(const vec2 &m) {
 	HoverData s;
-	s.pos = get_mouse_pos();
-	s.pos_snap = get_mouse_pos_snap();
+	s.pos = get_mouse_pos(m);
+	s.pos_snap = get_mouse_pos_snap(m);
 	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = m.y;
 	s.type = HoverData::Type::TIME;

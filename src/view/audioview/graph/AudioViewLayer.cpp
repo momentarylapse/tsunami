@@ -526,7 +526,7 @@ void AudioViewLayer::update_header() {
 bool AudioViewLayer::on_left_button_down(const vec2 &m) {
 	view->sel_temp = view->sel; // for diff selection
 
-	view->mode->left_click_handle(this);
+	view->mode->left_click_handle(this, m);
 	return true;
 }
 

@@ -54,11 +54,11 @@ public:
 		if (keep_start) {
 			start_pos = view->sel.range_raw.start();
 		} else {
-			start_pos = view->get_mouse_pos_snap();
+			start_pos = view->get_mouse_pos_snap(view->m);
 		}
 	}
 	void on_start(const vec2 &m) override {
-		range = Range::to(start_pos, view->get_mouse_pos_snap());
+		range = Range::to(start_pos, view->get_mouse_pos_snap(m));
 		if (keep_start)
 			view->hover().y0 = view->cur_vlayer()->area.center().y;
 		else
@@ -76,7 +76,7 @@ public:
 		if (m.x > view->area.width() - 50)
 			view->cam.move(10 / view->cam.pixels_per_sample);
 
-		range.set_end(view->get_mouse_pos_snap());
+		range.set_end(view->get_mouse_pos_snap(m));
 		view->hover().y1 = m.y;
 		if (view->selecting_xor())
 			view->set_selection(view->sel_temp or view->mode->get_selection(range, mode));
@@ -120,7 +120,7 @@ public:
 		action = new ActionSongMoveSelection(view->song, sel, false);
 	}
 	void on_update(const vec2 &m) override {
-		int p = view->get_mouse_pos() + (ref_pos - mouse_pos0);
+		int p = view->get_mouse_pos(m) + (ref_pos - mouse_pos0);
 		view->snap_to_grid(p);
 		int dpos = p - mouse_pos0 - (ref_pos - mouse_pos0);
 		action->set_param_and_notify(view->song, dpos);
@@ -162,22 +162,22 @@ ViewModeDefault::ViewModeDefault(AudioView *view) :
 {
 }
 
-void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer, const vec2 &m) {
 	if (view->selecting_xor()) {
 
 		// differential selection
 		if (view->hover_any_object()) {
-			left_click_handle_object_xor(vlayer);
+			left_click_handle_object_xor(vlayer, m);
 		} else {
-			left_click_handle_void_xor(vlayer);
+			left_click_handle_void_xor(vlayer, m);
 		}
 	} else if (view->selecting_or()) {
 
 		// extending selection
 		if (view->hover_any_object()) {
-			left_click_handle_object_or(vlayer);
+			left_click_handle_object_or(vlayer, m);
 		} else {
-			left_click_handle_void_or(vlayer);
+			left_click_handle_void_or(vlayer, m);
 		}
 	} else if (view->is_playback_active()) {
 
@@ -186,9 +186,9 @@ void ViewModeDefault::left_click_handle(AudioViewLayer *vlayer) {
 
 		// really normal click
 		if (view->hover_any_object()) {
-			left_click_handle_object(vlayer);
+			left_click_handle_object(vlayer, m);
 		} else {
-			left_click_handle_void(vlayer);
+			left_click_handle_void(vlayer, m);
 		}
 	}
 }
@@ -197,11 +197,11 @@ void ViewModeDefault::start_selection_rect(SelectionMode mode, bool keep_start) 
 	view->mdp_prepare(CreateMouseDelaySelect(view, mode, keep_start));
 }
 
-void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
-	auto range = Range::to(view->sel.range_raw.start(), view->get_mouse_pos_snap());
+void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer, const vec2 &m) {
+	auto range = Range::to(view->sel.range_raw.start(), view->get_mouse_pos_snap(m));
 
 	view->hover().y0 = view->cur_vlayer()->area.center().y;
-	view->hover().y1 = view->m.y;
+	view->hover().y1 = m.y;
 	view->selection_mode = SelectionMode::TRACK_RECT;
 	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 
@@ -209,7 +209,7 @@ void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer) {
 	start_selection_rect(SelectionMode::TRACK_RECT, true);
 }
 
-void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 	view->set_current(view->hover());
 
 	if (view->sel.has(vlayer->layer)) {
@@ -223,7 +223,7 @@ void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer) {
 	start_selection_rect(SelectionMode::TRACK_RECT);
 }
 
-void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) {
 	view->exclusively_select_layer(vlayer);
 	if (!view->hover_selected_object()) {
 		view->exclusively_select_object();
@@ -236,14 +236,14 @@ void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer) {
 		//}
 }
 
-void ViewModeDefault::left_click_handle_void_xor(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle_void_xor(AudioViewLayer *vlayer, const vec2 &m) {
 	view->toggle_select_layer_with_content_in_cursor(vlayer);
 
 	// diff selection rectangle
 	start_selection_rect(SelectionMode::TRACK_RECT);
 }
 
-void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer) {
+void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer, const vec2 &m) {
 	view->toggle_object();
 }
 

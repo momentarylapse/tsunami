@@ -144,8 +144,8 @@ public:
 	SongSelection sel_temp;
 
 	HoverData hover_time(const vec2 &m);
-	int get_mouse_pos();
-	int get_mouse_pos_snap();
+	int get_mouse_pos(const vec2 &m);
+	int get_mouse_pos_snap(const vec2 &m);
 
 	SelectionMode selection_mode;
 	SelectionSnapMode selection_snap_mode;

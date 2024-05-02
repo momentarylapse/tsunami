@@ -68,13 +68,13 @@ public:
 
 	virtual int suggest_move_cursor(const Range &cursor, bool forward) = 0;
 
-	virtual void left_click_handle(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_object(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_object_or(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_object_xor(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_void(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_void_or(AudioViewLayer *vlayer) {}
-	virtual void left_click_handle_void_xor(AudioViewLayer *vlayer) {}
+	virtual void left_click_handle(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_object_or(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_object_xor(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_void_or(AudioViewLayer *vlayer, const vec2 &m) {}
+	virtual void left_click_handle_void_xor(AudioViewLayer *vlayer, const vec2 &m) {}
 
 	virtual string get_tip() { return ""; }
 

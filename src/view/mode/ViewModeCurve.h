@@ -18,7 +18,7 @@ public:
 
 	void on_start() override;
 
-	void left_click_handle_void(AudioViewLayer *vlayer) override;
+	void left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) override;
 	void on_key_down(int k) override;
 
 	void draw_track_data(Painter *c, AudioViewTrack *t) override;

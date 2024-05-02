@@ -235,12 +235,12 @@ void ViewModeEditAudio::on_mouse_move(const vec2& m) {
 	//view->force_redraw();
 }
 
-void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
+void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
 	if (!editing(vlayer)) {
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 		return;
 	} else if (!view->sel.has(vlayer->layer)) {
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 		return;
 	}
 	
@@ -264,8 +264,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 			}
 		vlayer->layer->edit_buffers_finish(a);
 	} else if (edit_mode == EditMode::RUBBER) {
-		float mx = view->m.x;
-		int smx = view->cam.screen2sample(mx);
+		int smx = view->cam.screen2sample(m.x);
 
 		rubber.selected = rubber.hover;
 		rubber.selected_type = rubber.hover_type;
@@ -273,7 +272,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 		if (rubber.hover >= 0) {
 			view->mdp_run(new MouseDelayRubberPoint(view, &rubber.points[rubber.hover], rubber.hover_type));
 		} else if (!view->sel.range().is_inside(smx)) {
-			ViewModeDefault::left_click_handle_void(vlayer);
+			ViewModeDefault::left_click_handle_void(vlayer, m);
 			return;
 		} else if (rubber.hover < 0) {
 			rubber.points.add({smx, smx});
@@ -282,7 +281,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer) {
 		}
 
 	} else { // SELECT
-		ViewModeDefault::left_click_handle_void(vlayer);
+		ViewModeDefault::left_click_handle_void(vlayer, m);
 	}
 }
 

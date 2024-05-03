@@ -287,7 +287,7 @@ public:
 		int orig = get_track_index(vtrack->track);
 		foreachi(auto vt, view->vtracks, i) {
 			int y = (vt->area.y1 + vt->area.y2) / 2;
-			if (y > view->m.y) {
+			if (y > view->cursor().y) {
 				if (visual or (i <= orig))
 					return i;
 				else

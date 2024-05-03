@@ -58,6 +58,7 @@ public:
 	virtual void update_geometry_recursive(const rect &target_area);
 
 	SceneGraph *graph() const;
+	vec2 cursor() const;
 
 	Node *parent;
 	struct AlignData {

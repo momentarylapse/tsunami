@@ -535,7 +535,7 @@ public:
 		mp->set_force_shadows(true);
 
 		// current creation
-		auto notes = get_creation_notes(view->m);
+		auto notes = get_creation_notes(view->cursor());
 		mp->draw(c, notes);
 	}
 	MidiNoteBuffer get_creation_notes(const vec2 &m) {

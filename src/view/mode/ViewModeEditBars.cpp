@@ -229,7 +229,8 @@ void ViewModeEditBars::draw_post(Painter *p) {
 		} else if (cur_vlayer()->is_cur_hover() and (h.pos > 0)) {
 			p->set_line_width(2);
 			p->set_color(theme.green);
-			p->draw_line({view->m.x, y1}, {view->m.x, y2});
+			vec2 m = view->cursor();
+			p->draw_line({m.x, y1}, {m.x, y2});
 		}
 	}
 }

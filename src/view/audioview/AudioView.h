@@ -161,7 +161,7 @@ public:
 
 	void snap_to_grid(int &pos);
 
-	void _cdecl unselect_all_samples();
+	void unselect_all_samples();
 
 	bool enabled;
 	void enable(bool enabled);
@@ -169,8 +169,6 @@ public:
 	float scroll_speed;
 	float scroll_speed_fast;
 	float zoom_speed;
-
-	vec2 m;
 
 	bool selecting_or() const;
 	bool selecting_xor() const;

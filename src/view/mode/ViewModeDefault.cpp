@@ -54,7 +54,7 @@ public:
 		if (keep_start) {
 			start_pos = view->sel.range_raw.start();
 		} else {
-			start_pos = view->get_mouse_pos_snap(view->m);
+			start_pos = view->get_mouse_pos_snap(view->cursor());
 		}
 	}
 	void on_start(const vec2 &m) override {
@@ -260,7 +260,7 @@ void ViewModeDefault::on_mouse_wheel(const vec2 &scroll) {
 		} else if (win->get_key(hui::KEY_SHIFT)) {
 			cam->move(scroll.y / cam->pixels_per_sample * view->scroll_speed);
 		} else {
-			cam->zoom(exp(scroll.y * view->zoom_speed), view->m.x);
+			cam->zoom(exp(scroll.y * view->zoom_speed), view->cursor().x);
 		}
 	}
 
@@ -368,7 +368,7 @@ void ViewModeDefault::on_gesture(const string &id, const vec2 &m, const vec2 &pa
 	if (id == hui::EventID::GESTURE_ZOOM_END) {
 	}
 	if (id == hui::EventID::GESTURE_ZOOM) {
-		view->cam.zoom(hui::get_event()->scroll.x/_zoom_0_, view->m.x);
+		view->cam.zoom(hui::get_event()->scroll.x/_zoom_0_, m.x);
 		_zoom_0_ = hui::get_event()->scroll.x;
 	}
 }

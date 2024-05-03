@@ -89,6 +89,10 @@ SceneGraph *Node::graph() const {
 	return dynamic_cast<SceneGraph*>(r);
 }
 
+vec2 Node::cursor() const {
+	return graph()->m;
+}
+
 bool Node::is_cur_hover() const {
 	for (auto *c: weak(children))
 		if (c->is_cur_hover())

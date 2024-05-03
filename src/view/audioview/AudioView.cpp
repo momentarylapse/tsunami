@@ -245,8 +245,6 @@ AudioView::AudioView(Session *_session) :
 	add_track_button = new AddTrackButton(this);
 	add_child(add_track_button);
 
-	m = {0,0};
-
 	menu_song = hui::create_resource_menu("popup-menu-song", win);
 	menu_track = hui::create_resource_menu("popup-menu-track", win);
 	menu_layer = hui::create_resource_menu("popup-menu-layer", win);
@@ -342,6 +340,7 @@ void AudioView::set_mode(ViewMode *m) {
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {
+	vec2 m = cursor();
 	if ((m.x >= s->area.x1) and (m.x < s->area.x2)) {
 		int offset = cam.screen2sample(m.x) - s->pos;
 		if ((m.y >= s->area.y1) and (m.y < s->area.y1 + theme.SAMPLE_FRAME_HEIGHT))
@@ -353,7 +352,7 @@ int AudioView::mouse_over_sample(SampleRef *s) {
 }
 
 void AudioView::selection_update_pos(HoverData &s) {
-	s.pos = cam.screen2sample(m.x);
+	s.pos = cam.screen2sample(cursor().x);
 }
 
 void AudioView::update_selection() {
@@ -378,6 +377,7 @@ void AudioView::set_selection(const SongSelection &s) {
 
 bool AudioView::mouse_over_time(int pos) {
 	int ssx = cam.sample2screen(pos);
+	vec2 m = cursor();
 	return ((m.x >= ssx - 5) and (m.x <= ssx + 5));
 }
 
@@ -448,18 +448,14 @@ void AudioView::snap_to_grid(int &pos) {
 		pos = new_pos;
 }
 
-bool AudioView::on_mouse_move(const vec2 &_m) {
-	m = _m;
-
+bool AudioView::on_mouse_move(const vec2 &m) {
 	mode->on_mouse_move(m);
 
 	force_redraw();
 	return true;
 }
 
-bool AudioView::on_left_button_down(const vec2 &_m) {
-	m = _m;
-
+bool AudioView::on_left_button_down(const vec2 &m) {
 	force_redraw();
 	update_menu();
 	return true;
@@ -691,8 +687,7 @@ bool AudioView::on_mouse_wheel(const vec2 &d) {
 	return true;
 }
 
-bool AudioView::on_gesture(const string &id, const vec2 &_m, const vec2 &param) {
-	m = _m;
+bool AudioView::on_gesture(const string &id, const vec2 &m, const vec2 &param) {
 	mode->on_gesture(id, m, param);
 	return true;
 }
@@ -1013,7 +1008,7 @@ rect AudioView::song_area() {
 }
 
 void AudioView::draw_cursor_hover(Painter *c, const string &msg) {
-	::draw_cursor_hover(c, msg, m, song_area());
+	::draw_cursor_hover(c, msg, cursor(), song_area());
 }
 
 void AudioView::draw_time_line(Painter *c, int pos, const color &col, bool hover, bool show_time) {
@@ -1117,11 +1112,11 @@ void AudioView::set_midi_view_mode(MidiMode mode) {
 }
 
 void AudioView::zoom_in() {
-	cam.zoom(exp( zoom_speed * 0.8f), m.x);
+	cam.zoom(exp( zoom_speed * 0.8f), cursor().x);
 }
 
 void AudioView::zoom_out() {
-	cam.zoom(exp(-zoom_speed * 0.8f), m.x);
+	cam.zoom(exp(-zoom_speed * 0.8f), cursor().x);
 }
 
 void AudioView::select_all() {
@@ -1631,7 +1626,7 @@ void AudioView::mdp_prepare(MouseDelayAction *a) {
 }
 
 void AudioView::mdp_run(MouseDelayAction *a) {
-	graph()->mdp_run(a, m);
+	graph()->mdp_run(a, cursor());
 }
 
 void AudioView::mdp_prepare(hui::Callback update) {

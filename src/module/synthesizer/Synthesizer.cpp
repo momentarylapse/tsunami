@@ -41,11 +41,11 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	// get from source...
 	synth->events.samples = buf.length;
 	int n = source->read_midi(synth->events);
-	if (n == source->NOT_ENOUGH_DATA){
+	if (n == NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;
 	}
-	if (n == source->END_OF_STREAM){
+	if (n == END_OF_STREAM){
 		synth->source_run_out = true;
 
 		// if source end_of_stream but still active rendering

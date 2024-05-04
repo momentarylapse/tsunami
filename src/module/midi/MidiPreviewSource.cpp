@@ -31,7 +31,7 @@ int MidiPreviewSource::read(MidiEventBuffer &midi) {
 	o("mps.read");
 	if (mode == Mode::END_OF_STREAM) {
 		o("  - end of stream");
-		return Port::END_OF_STREAM;
+		return END_OF_STREAM;
 	}
 
 	if (mode == Mode::START_NOTES) {

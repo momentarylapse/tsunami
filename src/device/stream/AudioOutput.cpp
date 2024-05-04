@@ -486,7 +486,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 	// read data
 	size = in.source->read_audio(b);
 
-	if (size == in.source->NOT_ENOUGH_DATA) {
+	if (size == NOT_ENOUGH_DATA) {
 		//printf(" -> no data\n");
 		// keep trying...
 		ring_buf.write_ref_cancel(b);
@@ -494,7 +494,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 	}
 
 	// out of data?
-	if (size == in.source->END_OF_STREAM) {
+	if (size == END_OF_STREAM) {
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
 		hui::run_later(0.001f,  [this] { on_read_end_of_stream(); });

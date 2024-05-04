@@ -26,7 +26,7 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 		if (loop)
 			offset = 0;
 		else if (!ignore_end)
-			return Port::END_OF_STREAM;
+			return END_OF_STREAM;
 	}
 
 	Range r = Range(offset, n);

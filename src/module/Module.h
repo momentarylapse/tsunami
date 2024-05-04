@@ -144,6 +144,10 @@ public:
 
 
 
+	static const int END_OF_STREAM;
+	static const int NOT_ENOUGH_DATA;
+	static const int NO_SOURCE;
+
 	// ports
 	Array<InPort*> port_in;
 	owned_array<Port> port_out;

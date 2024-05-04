@@ -49,7 +49,7 @@ ModuleConfiguration *AudioSucker::get_config() const {
 
 int AudioSucker::do_suck(int buffer_size) {
 	if (!in.source)
-		return Port::NO_SOURCE;
+		return NO_SOURCE;
 	AudioBuffer temp;
 	temp.set_channels(config.channels);
 	temp.resize(buffer_size);

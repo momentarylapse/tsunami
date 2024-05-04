@@ -48,9 +48,9 @@ public:
 		while (true) {
 			if (sucking) {
 				int r = chain->do_suck();
-				if (r == Port::END_OF_STREAM)
+				if (r == Module::END_OF_STREAM)
 					break;
-				if (r == Port::NOT_ENOUGH_DATA) {
+				if (r == Module::NOT_ENOUGH_DATA) {
 					os::sleep(chain->no_data_wait);
 					continue;
 				}
@@ -565,7 +565,7 @@ void SignalChain::_stop_sucking_hard() {
 int SignalChain::do_suck() {
 	std::lock_guard<std::mutex> lock(mutex);
 	PerformanceMonitor::start_busy(perf_channel);
-	int s = Port::END_OF_STREAM;
+	int s = END_OF_STREAM;
 	for (auto *m: weak(modules)) {
 		if (auto r = m->command(ModuleCommand::SUCK, buffer_size))
 			s = max(s, (int)*r);

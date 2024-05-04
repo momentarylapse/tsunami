@@ -21,6 +21,10 @@
 #include "../view/module/AutoConfigPanel.h"
 
 
+const int Module::NOT_ENOUGH_DATA = 0;
+const int Module::END_OF_STREAM = -2;
+const int Module::NO_SOURCE = 0;
+
 string guess_nice_module_name(const string &_class) {
 	if (_class.head(5) == "Audio")
 		return _class.sub(5);

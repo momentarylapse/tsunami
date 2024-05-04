@@ -126,7 +126,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
-		return Port::END_OF_STREAM;
+		return END_OF_STREAM;
 
 
 	bar_streamer->bars = song->bars;

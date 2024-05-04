@@ -9,10 +9,6 @@
 #include "../Module.h"
 #include "../../data/base.h"
 
-const int Port::NOT_ENOUGH_DATA = 0;
-const int Port::END_OF_STREAM = -2;
-const int Port::NO_SOURCE = 0;
-
 Port::Port(SignalType _type, const string &_name) {
 	type = _type;
 	name = _name;

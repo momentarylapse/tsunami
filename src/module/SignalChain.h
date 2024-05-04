@@ -47,6 +47,7 @@ public:
 	static xfer<SignalChain> load(Session *session, const Path &filename);
 
 	string name;
+	bool explicitly_save_for_session = false;
 
 	shared_array<Module> modules;
 	shared<Module> _add(shared<Module> m);

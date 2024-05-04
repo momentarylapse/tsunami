@@ -22,11 +22,14 @@
 #include "../view/audioview/AudioView.h"
 #include "../view/audioview/graph/AudioViewTrack.h"
 #include "../view/TsunamiWindow.h"
+#include "../module/SignalChain.h"
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../Playback.h"
 
 string title_filename(const Path &filename);
+xml::Element signal_chain_to_xml(SignalChain* chain);
+xfer<SignalChain> signal_chain_from_xml(Session *session, xml::Element& root);
 
 
 bool SessionLabel::is_active() const {
@@ -194,6 +197,13 @@ void SessionManager::save_session(Session *s, const string &name) {
 	e.add(ets);
 	e.add(ev);
 
+	// signal chains
+	auto echains = xml::Element("signalchains");
+	for (auto c: weak(s->all_signal_chains))
+		if (c->explicitly_save_for_session)
+			echains.add(signal_chain_to_xml(c));
+	e.add(echains);
+
 	// plugins
 	auto epp = xml::Element("plugins");
 	for (auto p: weak(s->plugins)) {
@@ -283,6 +293,15 @@ void SessionManager::load_into_session(const string &name, Session *session) {
 		}
 	}
 
+	// signal chains
+	if (auto echains = e.find("signalchains")) {
+		for (auto &ec: echains->elements) {
+			auto chain = signal_chain_from_xml(session, ec);
+			session->add_signal_chain(chain);
+		}
+	}
+
+	// plugins
 	if (auto epp = e.find("plugins")) {
 		for (auto &ep: epp->elements) {
 			string _class = ep.value("class");

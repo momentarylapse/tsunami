@@ -279,16 +279,15 @@ base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(M
 	return base::None;
 }
 
-void SignalChain::save(const Path& filename) {
-	xml::Parser p;
+xml::Element signal_chain_to_xml(SignalChain* chain) {
 	xml::Element root("chain");
 	xml::Element hh("head");
 	hh.add(xml::Element("version", "1.0"));
 	hh.add(xml::Element("system", "false"));
-	hh.add(xml::Element("name", name));
+	hh.add(xml::Element("name", chain->name));
 	root.add(hh);
 	xml::Element mm("modules");
-	for (Module *m: weak(modules)) {
+	for (Module *m: weak(chain->modules)) {
 		xml::Element e("module");
 		e.add(xml::Element("category", m->category_to_str(m->module_category)));
 		e.add(xml::Element("class", m->module_class));
@@ -305,27 +304,21 @@ void SignalChain::save(const Path& filename) {
 	}
 	root.add(mm);
 	xml::Element cc("cables");
-	for (Cable &c: cables()) {
+	for (Cable &c: chain->cables()) {
 		xml::Element e("cable");
-		e.add(xml::Element("source").witha("id", i2s(module_index(c.source))).witha("port", i2s(c.source_port)));
-		e.add(xml::Element("target").witha("id", i2s(module_index(c.target))).witha("port", i2s(c.target_port)));
+		e.add(xml::Element("source").witha("id", i2s(chain->module_index(c.source))).witha("port", i2s(c.source_port)));
+		e.add(xml::Element("target").witha("id", i2s(chain->module_index(c.target))).witha("port", i2s(c.target_port)));
 		cc.add(e);
 	}
 	root.add(cc);
-	p.elements.add(root);
-	p.save(filename);
+	return root;
 }
 
-xfer<SignalChain> SignalChain::load(Session *session, const Path &filename) {
-	auto *chain = new SignalChain(session, "new");
+xfer<SignalChain> signal_chain_from_xml(Session *session, xml::Element& root) {
+	auto *chain = new SignalChain(session, "temp");
+	chain->explicitly_save_for_session = true;
 
 	try {
-
-		xml::Parser p;
-		p.load(filename);
-		if (p.elements.num == 0)
-			throw Exception("no root element");
-		auto &root = p.elements[0];
 		if (root.tag != "chain")
 			throw Exception("root element is not called 'chain', but: " + root.tag);
 		auto *head = root.find("head");
@@ -365,17 +358,39 @@ xfer<SignalChain> SignalChain::load(Session *session, const Path &filename) {
 
 		auto *pp = root.find("ports");
 		for (auto &e: pp->elements) {
-			PortX p;
+			SignalChain::PortX p;
 			int m = e.value("module")._int();
 			p.port = e.value("port")._int();
 			p.module = chain->modules[m].get();
 			chain->_ports_out.add(p);
 		}
 		chain->update_ports();
-        chain->_rebuild_position_estimation_graph();
+		chain->_rebuild_position_estimation_graph();
 	} catch(Exception &e) {
 		session->e(e.message());
 	}
+	return chain;
+}
+
+
+void SignalChain::save(const Path& filename) {
+	xml::Parser p;
+	p.elements.add(signal_chain_to_xml(this));
+	p.save(filename);
+}
+
+xfer<SignalChain> SignalChain::load(Session *session, const Path &filename) {
+	try {
+		xml::Parser p;
+		p.load(filename);
+		if (p.elements.num == 0)
+			throw Exception("no root element");
+		return signal_chain_from_xml(session, p.elements[0]);
+	} catch(Exception &e) {
+		session->e(e.message());
+	}
+	auto *chain = new SignalChain(session, "temp");
+	chain->explicitly_save_for_session = true;
 	return chain;
 }
 

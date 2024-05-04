@@ -1,0 +1,20 @@
+use tsunami.*
+
+let AUTO_CONFIG_PITCH = "pitch,range=0:127"
+
+class Config extends Module.Config
+	var pitch: int
+	
+	func override reset()
+		pitch = 64
+
+class PitchFilter extends MidiEffect
+	var config: Config
+	
+	func override process(out midi: MidiEventBuffer)
+	#	midi = midi |> filter(e => e.pitch == config.pitch)
+		var midi2: MidiEventBuffer
+		for mut e in midi
+			if e.pitch == config.pitch
+				midi2.add(e)
+		midi = midi2

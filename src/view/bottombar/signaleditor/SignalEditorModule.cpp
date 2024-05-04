@@ -31,8 +31,8 @@ string module_header(Module *m) {
 }
 
 SignalType module_in_type(Module *m) {
-	for (auto &p: m->port_in)
-		return p.type;
+	for (auto p: m->port_in)
+		return p->type;
 	return SignalType::GROUP;
 }
 
@@ -130,8 +130,8 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 	tab = t;
 	module = m;
 	set_perf_name("se:module");
-	foreachi(auto &pd, m->port_in, i)
-		in.add(new SignalEditorModulePort(tab, module, i, pd.type, module_port_in_x(module), module_port_in_y(module, i), false));
+	foreachi(auto p, m->port_in, i)
+		in.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_in_x(module), module_port_in_y(module, i), false));
 	foreachi(auto p, m->port_out, i)
 		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module), module_port_out_y(module, i), true));
 	for (auto p: in + out)

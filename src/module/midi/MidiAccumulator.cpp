@@ -12,10 +12,10 @@
 
 
 int MidiAccumulator::Output::read_midi(MidiEventBuffer& buf) {
-	if (!acc->source)
+	if (!acc->in.source)
 		return NO_SOURCE;
 
-	int r = acc->source->read_midi(buf);
+	int r = acc->in.source->read_midi(buf);
 
 	if (acc->accumulating and (r > 0)) {
 		std::lock_guard<std::mutex> lock(acc->mtx_buf);
@@ -33,8 +33,6 @@ MidiAccumulator::MidiAccumulator() :
 	Module(ModuleCategory::PLUMBING, "MidiAccumulator")
 {
 	port_out.add(new Output(this));
-	port_in.add({SignalType::MIDI, &source, "in"});
-	source = nullptr;
 	accumulating = false;
 }
 

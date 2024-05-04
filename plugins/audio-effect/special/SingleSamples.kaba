@@ -4,10 +4,10 @@ use tsunami.*
 class SingleSamples extends AudioEffect
 	
 	func override read(out buf: AudioBuffer) -> int
-		if !source
-			return -1
-		for i in 0:len(buf)
-			var r = source.read_audio(buf[i:i+1])
-			if r < 0
-				return r
-		return len(buf)
+		for s in source.source
+			for i in 0:len(buf)
+				var r = s.read_audio(buf[i:i+1])
+				if r < 0
+					return r
+			return len(buf)
+		return Module.NO_SOURCE

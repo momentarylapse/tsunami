@@ -24,7 +24,7 @@ public:
 		AudioChannelSelector *cs;
 	};
 
-	Port *source;
+	AudioInPort in{this, "in"};
 
 	void _cdecl set_channel_map(int num_in, const Array<int> &map);
 

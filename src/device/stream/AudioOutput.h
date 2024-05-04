@@ -15,6 +15,7 @@
 #include "../../data/audio/RingBuffer.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
+#include "../../module/port/Port.h"
 #include <atomic>
 
 class DeviceManager;
@@ -76,7 +77,7 @@ public:
 private:
 	int _read_stream(int buffer_size);
 
-	Port *source;
+	AudioInPort in{this, "in"};
 	RingBuffer ring_buf;
 
 	int prebuffer_size;

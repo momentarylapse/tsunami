@@ -32,10 +32,11 @@ string AudioAccumulator::Config::auto_conf(const string &name) const {
 
 
 int AudioAccumulator::Output::read_audio(AudioBuffer& buf) {
-	if (!acc->source)
+	auto source = acc->in.source;
+	if (!source)
 		return NO_SOURCE;
 
-	int r = acc->source->read_audio(buf);
+	int r = source->read_audio(buf);
 
 	if (r <= 0)
 		return r;
@@ -61,8 +62,6 @@ AudioAccumulator::AudioAccumulator() :
 	Module(ModuleCategory::PLUMBING, "AudioAccumulator")
 {
 	port_out.add(new Output(this));
-	port_in.add({SignalType::AUDIO, &source, "in"});
-	source = nullptr;
 
 
 

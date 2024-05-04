@@ -10,8 +10,8 @@
 
 #include "../Module.h"
 #include "../ModuleConfiguration.h"
+#include "../port/Port.h"
 
-class Port;
 
 class AudioSucker : public Module {
 public:
@@ -19,7 +19,7 @@ public:
 
 	int do_suck(int buffer_size);
 
-	Port *source;
+	AudioInPort in{this, "in"};
 
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 

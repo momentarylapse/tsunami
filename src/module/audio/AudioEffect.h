@@ -37,7 +37,7 @@ public:
 		AudioEffect *fx;
 	};
 
-	Port *source;
+	AudioInPort in{this, "in"};
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 	void apply_with_wetness(AudioBuffer &buf);

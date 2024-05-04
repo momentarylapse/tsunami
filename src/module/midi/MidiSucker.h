@@ -9,8 +9,7 @@
 #define SRC_MODULE_MIDI_MIDISUCKER_H_
 
 #include "../Module.h"
-
-class Port;
+#include "../port/Port.h"
 
 class MidiSucker : public Module {
 public:
@@ -18,7 +17,7 @@ public:
 
 	int update(int buffer_size);
 
-	Port *source;
+	MidiInPort in{this, "in"};
 
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };

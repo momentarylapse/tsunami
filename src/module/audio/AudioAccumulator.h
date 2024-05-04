@@ -26,6 +26,8 @@ public:
 		AudioAccumulator *acc;
 	};
 
+	AudioInPort in{this, "in"};
+
 	void _accumulate(bool enable);
 	void set_channels(int channels);
 
@@ -33,7 +35,6 @@ public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 	void on_config() override;
 
-	Port *source;
 	AudioBuffer buf;
 	std::mutex mtx_buf;
 

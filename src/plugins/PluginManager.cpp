@@ -340,7 +340,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_element("AudioEffect.sample_rate", &AudioEffect::sample_rate);
 		ext->declare_class_element("AudioEffect.apply_to_whole_buffer", &AudioEffect::apply_to_whole_buffer);
 		ext->declare_class_element("AudioEffect.wetness", &AudioEffect::wetness);
-		ext->declare_class_element("AudioEffect.source", &AudioEffect::source);
+		ext->declare_class_element("AudioEffect.source", &AudioEffect::in);
 		ext->link_class_func("AudioEffect.__init__", &AudioEffect::__init__);
 		ext->link_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
 		ext->link_virtual("AudioEffect.process", &AudioEffect::process, &aeffect);
@@ -350,6 +350,7 @@ void PluginManager::link_app_data() {
 	{
 		MidiEffect meffect;
 		ext->declare_class_size("MidiEffect", sizeof(MidiEffect));
+		ext->declare_class_element("MidiEffect.source", &MidiEffect::in);
 		ext->link_class_func("MidiEffect.__init__", &MidiEffect::__init__);
 		ext->link_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
 		ext->link_virtual("MidiEffect.process", &MidiEffect::process, &meffect);

@@ -21,9 +21,9 @@ MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::MIDI, "out") {
 }
 
 int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
-	if (!fx->source)
+	if (!fx->in.source)
 		return NO_SOURCE;
-	int r = fx->source->read_midi(buf);
+	int r = fx->in.source->read_midi(buf);
 	fx->process(buf);
 	return r;
 }
@@ -32,8 +32,6 @@ MidiEffect::MidiEffect() :
 	Module(ModuleCategory::MIDI_EFFECT, "")
 {
 	port_out.add(new Output(this));
-	port_in.add({SignalType::MIDI, &source, "in"});
-	source = nullptr;
 }
 
 void MidiEffect::__init__() {

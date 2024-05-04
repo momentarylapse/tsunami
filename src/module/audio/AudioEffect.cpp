@@ -26,9 +26,7 @@ int AudioEffect::Output::read_audio(AudioBuffer &buf) {
 AudioEffect::AudioEffect() :
 	Module(ModuleCategory::AUDIO_EFFECT, "")
 {
-	source = nullptr;
 	port_out.add(new Output(this));
-	port_in.add({SignalType::AUDIO, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	apply_to_whole_buffer = false;
 	wetness = 1.0f;
@@ -67,7 +65,7 @@ void AudioEffect::apply_with_wetness(AudioBuffer &buf) {
 
 int AudioEffect::read(AudioBuffer &buf) {
 	sample_rate = session->sample_rate();
-	int samples = source->read_audio(buf);
+	int samples = in.source->read_audio(buf);
 	
 	perf_start();
 	if (samples > 0 and enabled)

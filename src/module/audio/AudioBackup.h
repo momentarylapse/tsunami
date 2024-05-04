@@ -30,7 +30,7 @@ public:
 		AudioBackup *backup;
 	};
 
-	Port *source;
+	AudioInPort in{this, "in"};
 
 	void _cdecl set_backup_mode(BackupMode mode);
 	os::fs::FileStream *backup_file;

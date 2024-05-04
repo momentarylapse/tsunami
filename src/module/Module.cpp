@@ -52,7 +52,7 @@ Module::~Module() {
 	//msg_write("del Module " + p2s(this));
 	// unlink sources
 	for (auto &pd: port_in)
-		*pd.port = nullptr;
+		pd->source = nullptr;
 
 	PerformanceMonitor::delete_channel(perf_channel);
 }
@@ -272,15 +272,15 @@ ModuleCategory Module::category_from_str(const string &str) {
 void Module::_plug_in(int in_port, Module *source, int source_port) {
 	Port *sp = source->port_out[source_port];
 	auto tp = port_in[in_port];
-	if (sp->type != tp.type)
+	if (sp->type != tp->type)
 		throw Exception("connect: port type mismatch");
 
-	*tp.port = sp;
+	tp->source = sp;
 }
 
 void Module::_unplug_in(int in_port) {
 	auto tp = port_in[in_port];
-	*tp.port = nullptr;
+	tp->source = nullptr;
 }
 
 

@@ -159,16 +159,16 @@ Array<Cable> SignalChain::cables() {
 	Array<Cable> cables;
 	for (Module *target: weak(modules)) {
 		foreachi (auto tp, target->port_in, tpi) {
-			if (*tp.port) {
+			if (tp->source) {
 				for (Module *source: weak(modules)) {
 					foreachi (auto sp, source->port_out, spi) {
-						if (*tp.port == sp) {
+						if (tp->source == sp) {
 							Cable c;
 							c.target = target;
 							c.target_port = tpi;
 							c.source = source;
 							c.source_port = spi;
-							c.type = tp.type;
+							c.type = tp->type;
 							cables.add(c);
 						}
 					}
@@ -207,10 +207,10 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 
 	for (Module *target: weak(modules))
 		for (auto &p: target->port_in) {
-			if ((*p.port) == sp) {
+			if (p->source == sp) {
 				{
 					std::lock_guard<std::mutex> lock(mutex);
-					*p.port = nullptr;
+					p->source = nullptr;
 				}
                 _rebuild_position_estimation_graph();
 				out_delete_cable.notify();
@@ -222,7 +222,7 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 	auto tp = target->port_in[target_port];
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		*(tp.port) = nullptr;
+		tp->source = nullptr;
 	}
     _rebuild_position_estimation_graph();
 	out_delete_cable.notify();
@@ -268,12 +268,12 @@ base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(M
 	if (direction == 1 and port < m->port_out.num) {
 		for (Module *target: weak(modules))
 			for (auto &&[i,p]: enumerate(target->port_in))
-				if ((*p.port) == m->port_out[port])
+				if (p->source == m->port_out[port])
 					return ConnectionQueryResult{target, i};
-	} else if (direction == 0 and port < m->port_in.num and m->port_in[port].port) {
+	} else if (direction == 0 and port < m->port_in.num and m->port_in[port]->source) {
 		for (Module *target: weak(modules))
 			for (auto &&[i,p]: enumerate(weak(target->port_out)))
-				if (p == *m->port_in[port].port)
+				if (p == m->port_in[port]->source)
 					return {{target, i}};
 	}
 	return base::None;

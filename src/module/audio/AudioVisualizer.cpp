@@ -20,9 +20,9 @@ AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "o
 }
 
 int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
-	if (!visualizer->source)
+	if (!visualizer->in.source)
 		return NO_SOURCE;
-	int r = visualizer->source->read_audio(buf);
+	int r = visualizer->in.source->read_audio(buf);
 	if (r <= 0)
 		return r;
 
@@ -55,8 +55,6 @@ AudioVisualizer::AudioVisualizer() :
 	Module(ModuleCategory::AUDIO_VISUALIZER, "")
 {
 	port_out.add(new Output(this));
-	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
-	source = nullptr;
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;
 	notify_counter = 0;

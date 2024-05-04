@@ -33,18 +33,19 @@ Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out") {
 }
 
 int Synthesizer::Output::read_audio(AudioBuffer &buf) {
-	if (!synth->source)
+	auto source = synth->in.source;
+	if (!source)
 		return NO_SOURCE;
 //	printf("synth read %d\n", buf.length);
 	synth->source_run_out = false;
 	// get from source...
 	synth->events.samples = buf.length;
-	int n = synth->source->read_midi(synth->events);
-	if (n == synth->source->NOT_ENOUGH_DATA){
+	int n = source->read_midi(synth->events);
+	if (n == source->NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;
 	}
-	if (n == synth->source->END_OF_STREAM){
+	if (n == source->END_OF_STREAM){
 		synth->source_run_out = true;
 
 		// if source end_of_stream but still active rendering
@@ -77,11 +78,9 @@ Synthesizer::Synthesizer() :
 	Module(ModuleCategory::SYNTHESIZER, "")
 {
 	port_out.add(new Output(this));
-	port_in.add({SignalType::MIDI, &source, "in"});
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);
-	source = nullptr;
 	source_run_out = false;
 	auto_generate_stereo = false;
 	render_by_ref = true;

@@ -17,7 +17,8 @@ public:
 	BeatMidifier();
 	int read(MidiEventBuffer &midi) override;
 
-	Port *beat_source;
+	BeatsInPort in{this, "in"};
+
 	float volume;
 };
 

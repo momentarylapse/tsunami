@@ -34,10 +34,6 @@ string AudioSucker::Config::auto_conf(const string &name) const {
 AudioSucker::AudioSucker(Session *session) :
 	Module(ModuleCategory::PLUMBING, "AudioSucker")
 {
-	port_in.add({SignalType::AUDIO, &source, "in"});
-	source = nullptr;
-
-
 	auto _class = session->plugin_manager->get_class("AudioSuckerConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
@@ -52,12 +48,12 @@ ModuleConfiguration *AudioSucker::get_config() const {
 }
 
 int AudioSucker::do_suck(int buffer_size) {
-	if (!source)
+	if (!in.source)
 		return Port::NO_SOURCE;
 	AudioBuffer temp;
 	temp.set_channels(config.channels);
 	temp.resize(buffer_size);
-	return source->read_audio(temp);
+	return in.source->read_audio(temp);
 }
 
 void AudioSucker::set_channels(int _channels) {

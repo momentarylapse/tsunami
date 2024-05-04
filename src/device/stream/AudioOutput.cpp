@@ -206,9 +206,6 @@ AudioOutput::AudioOutput(Session *_session) :
 	ring_buf(1048576) {
 	state = State::UNPREPARED_NO_DEVICE_NO_DATA;
 	session = _session;
-	source = nullptr;
-
-	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
 
 	config.volume = 1;
 	prebuffer_size = hui::config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
@@ -479,7 +476,7 @@ void AudioOutput::_unpause() {
 }
 
 int AudioOutput::_read_stream(int buffer_size) {
-	if (!source)
+	if (!in.source)
 		return 0;
 
 	int size = 0;
@@ -487,9 +484,9 @@ int AudioOutput::_read_stream(int buffer_size) {
 	ring_buf.write_ref(b, buffer_size);
 
 	// read data
-	size = source->read_audio(b);
+	size = in.source->read_audio(b);
 
-	if (size == source->NOT_ENOUGH_DATA) {
+	if (size == in.source->NOT_ENOUGH_DATA) {
 		//printf(" -> no data\n");
 		// keep trying...
 		ring_buf.write_ref_cancel(b);
@@ -497,7 +494,7 @@ int AudioOutput::_read_stream(int buffer_size) {
 	}
 
 	// out of data?
-	if (size == source->END_OF_STREAM) {
+	if (size == in.source->END_OF_STREAM) {
 		//printf(" -> end  STREAM\n");
 		read_end_of_stream = true;
 		hui::run_later(0.001f,  [this] { on_read_end_of_stream(); });

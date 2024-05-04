@@ -92,7 +92,7 @@ public:
 
 	};
 
-	Port *source;
+	MidiInPort in{this, "in"};
 
 protected:
 

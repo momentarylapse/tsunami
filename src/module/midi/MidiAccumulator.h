@@ -24,12 +24,12 @@ public:
 		int read_midi(MidiEventBuffer &buf) override;
 		MidiAccumulator *acc;
 	};
+	MidiInPort in{this, "in"};
 
 	void _accumulate(bool enable);
 
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 
-	Port *source;
 	MidiEventBuffer buffer;
 	bool accumulating;
 	std::mutex mtx_buf;

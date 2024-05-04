@@ -15,18 +15,16 @@
 BeatMidifier::BeatMidifier() {
 	module_category = ModuleCategory::PLUMBING;
 	module_class = "BeatMidifier";
-	beat_source = nullptr;
-	port_in.add(InPortDescription(SignalType::BEATS, (Port**)&beat_source, "in"));
 
 	volume = 1.0f;
 }
 
 int BeatMidifier::read(MidiEventBuffer &midi) {
-	if (!beat_source)
+	if (!in.source)
 		return midi.samples;
 
 	Array<Beat> beats;
-	int r = beat_source->read_beats(beats, midi.samples);
+	int r = in.source->read_beats(beats, midi.samples);
 
 	for (Beat &b: beats)
 		midi.add_metronome_click(b.range.offset, b.level, volume);

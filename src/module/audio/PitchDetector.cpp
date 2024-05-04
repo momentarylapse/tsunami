@@ -30,8 +30,6 @@ int freq_to_index(float f) {
 
 PitchDetector::PitchDetector() {
 	module_category = ModuleCategory::PITCH_DETECTOR;
-	port_in.add(InPortDescription(SignalType::AUDIO, &source, "in"));
-	source = nullptr;
 	loud_enough = false;
 	volume = 0;
 	frequency = 0;
@@ -45,7 +43,7 @@ void PitchDetector::__init__() {
 int PitchDetector::read(MidiEventBuffer& midi) {
 	AudioBuffer buf;
 	buf.resize(midi.samples);
-	int l = source->read_audio(buf);
+	int l = in.source->read_audio(buf);
 	if (l <= 0)
 		return l;
 

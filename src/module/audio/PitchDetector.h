@@ -23,7 +23,7 @@ public:
 
 	virtual void process(MidiEventBuffer &midi, AudioBuffer &buf) {};
 
-	Port *source;
+	AudioInPort in{this, "in"};
 
 	float frequency, volume;
 	int pitch;

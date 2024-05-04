@@ -23,7 +23,8 @@ public:
 		MidiJoiner *joiner;
 	};
 
-	Port *a, *b;
+	MidiInPort in_a{this, "a"};
+	MidiInPort in_b{this, "a"};
 };
 
 #endif /* SRC_MODULE_MIDI_MIDIJOINER_H_ */

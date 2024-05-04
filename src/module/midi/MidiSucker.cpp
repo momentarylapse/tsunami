@@ -14,8 +14,6 @@
 MidiSucker::MidiSucker() :
 	Module(ModuleCategory::PLUMBING, "MidiSucker")
 {
-	port_in.add({SignalType::MIDI, &source, "in"});
-	source = nullptr;
 }
 
 base::optional<int64> MidiSucker::command(ModuleCommand cmd, int64 param) {
@@ -26,10 +24,10 @@ base::optional<int64> MidiSucker::command(ModuleCommand cmd, int64 param) {
 }
 
 int MidiSucker::update(int buffer_size) {
-	if (!source)
+	if (!in.source)
 		return Port::NO_SOURCE;
 	MidiEventBuffer buf;
 	buf.samples = buffer_size;
-	return source->read_midi(buf);
+	return in.source->read_midi(buf);
 }
 

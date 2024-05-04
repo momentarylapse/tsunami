@@ -14,17 +14,16 @@ class Chunksize extends AudioEffect
 		ring_buffer = new RingBuffer(1<<20)
 	
 	func override read(out buf: AudioBuffer) -> int
-		if !source
-			return -1
-		
-		while ring_buffer.available() < len(buf)
-			var temp: AudioBuffer
-			temp.resize(config.size)
-			var r = source.read_audio(temp)
-			if r < 0
-				return 0
-			ring_buffer.write(temp)
-			if r < config.size
-				return 0
-		ring_buffer.read(buf)
-		return len(buf)
+		for s in source.source
+			while ring_buffer.available() < len(buf)
+				var temp: AudioBuffer
+				temp.resize(config.size)
+				var r = s.read_audio(temp)
+				if r < 0
+					return 0
+				ring_buffer.write(temp)
+				if r < config.size
+					return 0
+			ring_buffer.read(buf)
+			return len(buf)
+		return Module.NO_SOURCE

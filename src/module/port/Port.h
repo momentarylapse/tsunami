@@ -12,6 +12,7 @@
 
 enum class SignalType;
 
+class Module;
 class AudioBuffer;
 class MidiEventBuffer;
 class Beat;
@@ -37,13 +38,28 @@ public:
 	virtual int _cdecl read_beats(Array<Beat> &beats, int samples){ return 0; };
 };
 
-class InPortDescription {
-public:
-	InPortDescription() {}
-	InPortDescription(SignalType type, Port **port, const string &name);
+/*struct OutPort {
+	OutPort(Module* module, SignalType type, const string& name);
+};*/
+
+struct InPort {
+	InPort(Module* module, SignalType type, const string& name);
 	SignalType type;
-	Port **port;
 	string name;
+
+	Port *source = nullptr; // out port of source
+};
+
+struct AudioInPort : InPort {
+	AudioInPort(Module* module, const string& name);
+};
+
+struct MidiInPort : InPort {
+	MidiInPort(Module* module, const string& name);
+};
+
+struct BeatsInPort : InPort {
+	BeatsInPort(Module* module, const string& name);
 };
 
 #endif /* SRC_MODULE_PORT_PORT_H_ */

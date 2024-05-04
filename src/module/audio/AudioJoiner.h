@@ -22,7 +22,8 @@ public:
 		AudioJoiner *joiner;
 	};
 
-	Port *a, *b;
+	AudioInPort in_a{this, "a"};
+	AudioInPort in_b{this, "b"};
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOJOINER_H_ */

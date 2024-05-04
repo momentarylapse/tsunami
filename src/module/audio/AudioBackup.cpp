@@ -37,8 +37,6 @@ string AudioBackup::Config::auto_conf(const string &name) const {
 AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "AudioBackup") {
 	session = _session;
 	port_out.add(new Output(this));
-	port_in.add({SignalType::AUDIO, &source, "in"});
-	source = nullptr;
 
 	accumulating = true;
 	backup_file = nullptr;
@@ -59,10 +57,11 @@ ModuleConfiguration *AudioBackup::get_config() const {
 }
 
 int AudioBackup::Output::read_audio(AudioBuffer& buf) {
-	if (!backup->source)
+	auto source = backup->in.source;
+	if (!source)
 		return NO_SOURCE;
 
-	int r = backup->source->read_audio(buf);
+	int r = source->read_audio(buf);
 
 	if (r > 0 and backup->accumulating)
 		backup->save_chunk(buf.ref(0, r));

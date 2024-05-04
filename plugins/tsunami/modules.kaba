@@ -72,6 +72,10 @@ class Module extends Object as shared
 		PLUMBING
 		SIGNAL_CHAIN
 
+	let NOT_ENOUGH_DATA = 0
+	let END_OF_STREAM = -2
+	let NO_SOURCE = 0
+
 	var name: string
 	var session: Session&
 	var port_out: owned![Port][]
@@ -98,6 +102,11 @@ class Module extends Object as shared
 		func extern virtual mut read_audio(out buf: AudioBuffer) -> int
 		func extern virtual mut read_midi(out midi: MidiEventBuffer) -> int
 		func extern virtual mut read_beats(out beats: Beat[], samples: int) -> int
+	
+	class InPort
+		var type: SignalType
+		var name: string
+		var source: Module.Port*
 		
 	class Config
 		func extern __init__()
@@ -122,7 +131,7 @@ class Module extends Object as shared
 class AudioEffect extends Module
 	var apply_to_whole_buffer: bool
 	var wetness: float
-	var source: Module.Port&
+	var source: Module.InPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
@@ -130,6 +139,7 @@ class AudioEffect extends Module
 
 
 class MidiEffect extends Module
+	var source: Module.InPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out midi: MidiEventBuffer)

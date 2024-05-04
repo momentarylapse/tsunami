@@ -57,16 +57,18 @@ class ChangeSpeed extends AudioEffect
 		return nil
 	
 	func override read(out buf: AudioBuffer) -> int
-		let CHUNK_SIZE = 2048
-		var chunk: AudioBuffer
-		chunk.resize(CHUNK_SIZE)
-		while ring_buffer.available() < len(buf)
-			let r = source.read_audio(chunk)
-			if r <= 0
-				return r
-			let p = op.process(chunk)
-			ring_buffer.write(p)
-			counter.produce(CHUNK_SIZE, len(p), config.speed)
+		for s in source.source
+			let CHUNK_SIZE = 2048
+			var chunk: AudioBuffer
+			chunk.resize(CHUNK_SIZE)
+			while ring_buffer.available() < len(buf)
+				let r = s.read_audio(chunk)
+				if r <= 0
+					return r
+				let p = op.process(chunk)
+				ring_buffer.write(p)
+				counter.produce(CHUNK_SIZE, len(p), config.speed)
 		
-		ring_buffer.read(buf)
-		return len(buf)
+			ring_buffer.read(buf)
+			return len(buf)
+		return Module.NO_SOURCE

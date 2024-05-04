@@ -62,6 +62,8 @@ public:
 	void set_mouse(const vec2 &m);
 	void update_hover();
 
+	hui::Panel* panel = nullptr;
+
 	void integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill);
 	static SceneGraph *create_integrated(hui::Panel *panel, const string &id, Node *node, const string &perf_name, std::function<void(Painter *)> custom_draw=nullptr, bool fill=true);
 };

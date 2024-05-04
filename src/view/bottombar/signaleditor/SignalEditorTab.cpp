@@ -231,11 +231,13 @@ void SignalEditorTab::on_chain_update() {
 }
 
 void SignalEditorTab::popup_chain() {
-	//menu_chain->open_popup(session->win);
+	out_popup_chain();
+	//menu_chain->open_popup((hui::Panel*)session->win.get());
 }
 
 void SignalEditorTab::popup_module() {
-	//menu_module->open_popup(session->win);
+	out_popup_module();
+	//menu_module->open_popup((hui::Panel*)session->win.get());
 }
 
 bool SignalEditorTab::on_key_down(int key) {
@@ -257,9 +259,9 @@ void SignalEditorTab::on_delete() {
 
 
 void SignalEditorTab::on_add(ModuleCategory type) {
-	/*auto names = session->plugin_manager->find_module_sub_types(type);
+	auto names = session->plugin_manager->find_module_sub_types(type);
 	if (names.num > 1) {
-		ModuleSelectorDialog::choose(session->win.get(), session, type).then([this, type] (const string &name) {
+		ModuleSelectorDialog::choose(graph()->panel, session, type).then([this, type] (const string &name) {
 			auto m = chain->add(type, name);
 			m->module_x = graph()->m.x;
 			m->module_y = graph()->m.y;
@@ -270,7 +272,7 @@ void SignalEditorTab::on_add(ModuleCategory type) {
 		m->module_x = graph()->m.x;
 		m->module_y = graph()->m.y;
 		update_module_positions();
-	}*/
+	}
 }
 
 void SignalEditorTab::on_reset() {
@@ -283,10 +285,10 @@ void SignalEditorTab::on_reset() {
 }*/
 
 void SignalEditorTab::on_save() {
-	/*hui::file_dialog_save(session->win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).then([this] (const Path &filename) {
+	hui::file_dialog_save(graph()->panel->win, _("Save the signal chain"), session->storage->current_chain_directory, {"filter=*.chain", "showfilter=*.chain"}).then([this] (const Path &filename) {
 		session->storage->current_chain_directory = filename.parent();
 		chain->save(filename);
-	});*/
+	});
 }
 
 
@@ -351,30 +353,35 @@ SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain
 	graph->add_child(new SignalEditorBigButton(tab.get()));
 	graph->add_child(new ToolTipOverlay);
 
-	/*
-	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
-	event("signal_chain_add_audio_effect", [this] { on_add(ModuleCategory::AUDIO_EFFECT); });
-	event("signal_chain_add_stream", [this] { on_add(ModuleCategory::STREAM); });
-	event("signal_chain_add_plumbing", [this] { on_add(ModuleCategory::PLUMBING); });
-	event("signal_chain_add_audio_visualizer", [this] { on_add(ModuleCategory::AUDIO_VISUALIZER); });
-	event("signal_chain_add_midi_source", [this] { on_add(ModuleCategory::MIDI_SOURCE); });
-	event("signal_chain_add_midi_effect", [this] { on_add(ModuleCategory::MIDI_EFFECT); });
-	event("signal_chain_add_synthesizer", [this] { on_add(ModuleCategory::SYNTHESIZER); });
-	event("signal_chain_add_pitch_detector", [this] { on_add(ModuleCategory::PITCH_DETECTOR); });
-	event("signal_chain_add_beat_source", [this] { on_add(ModuleCategory::BEAT_SOURCE); });
-	event("signal_chain_reset", [this] { on_reset(); });
-	event("signal_chain_activate", [this] { on_activate(); });
-	event("signal_chain_delete", [this] { on_delete(); });
-	event("signal_chain_save", [this] { on_save(); });
-	event("signal_module_delete", [this] { on_module_delete(); });
-	event("signal_module_configure", [this] { on_module_configure(); });
+	event("signal_chain_add_audio_source", [this] { tab->on_add(ModuleCategory::AUDIO_SOURCE); });
+	event("signal_chain_add_audio_effect", [this] { tab->on_add(ModuleCategory::AUDIO_EFFECT); });
+	event("signal_chain_add_stream", [this] { tab->on_add(ModuleCategory::STREAM); });
+	event("signal_chain_add_plumbing", [this] { tab->on_add(ModuleCategory::PLUMBING); });
+	event("signal_chain_add_audio_visualizer", [this] { tab->on_add(ModuleCategory::AUDIO_VISUALIZER); });
+	event("signal_chain_add_midi_source", [this] { tab->on_add(ModuleCategory::MIDI_SOURCE); });
+	event("signal_chain_add_midi_effect", [this] { tab->on_add(ModuleCategory::MIDI_EFFECT); });
+	event("signal_chain_add_synthesizer", [this] { tab->on_add(ModuleCategory::SYNTHESIZER); });
+	event("signal_chain_add_pitch_detector", [this] { tab->on_add(ModuleCategory::PITCH_DETECTOR); });
+	event("signal_chain_add_beat_source", [this] { tab->on_add(ModuleCategory::BEAT_SOURCE); });
+	event("signal_chain_reset", [this] { tab->on_reset(); });
+	event("signal_chain_activate", [this] { tab->on_activate(); });
+	event("signal_chain_delete", [this] { tab->on_delete(); });
+	event("signal_chain_save", [this] { tab->on_save(); });
+	event("signal_module_delete", [this] { tab->on_module_delete(); });
+//	event("signal_module_configure", [this] { on_module_configure(); });
 
 	event("signal_chain_new", [this] { editor->on_new(); });
 	event("signal_chain_load", [this] { editor->on_load(); });
 
 	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
 	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
-*/
+
+	tab->out_popup_chain >> create_sink([this] {
+		menu_chain->open_popup(this);
+	});
+	tab->out_popup_module >> create_sink([this] {
+		menu_module->open_popup(this);
+	});
 }
 
 SignalEditorTabPanel::~SignalEditorTabPanel() {

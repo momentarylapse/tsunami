@@ -31,6 +31,8 @@ public:
 	~SignalEditorTab();
 
 	obs::xsource<Module*> out_module_selected{this, "module-selected"};
+	obs::source out_popup_chain{this, "popup-chain"};
+	obs::source out_popup_module{this, "popup-module"};
 
 	Session *session;
 	AudioView *view;
@@ -63,8 +65,6 @@ public:
 
 	void popup_chain();
 	void popup_module();
-
-	owned<hui::Menu> menu_chain, menu_module;
 };
 
 class SignalEditorTabPanel : public obs::Node<hui::Panel> {
@@ -79,5 +79,7 @@ public:
 	Session *session;
 	AudioView *view;
 	SignalChain *chain;
+
+	owned<hui::Menu> menu_chain, menu_module;
 };
 

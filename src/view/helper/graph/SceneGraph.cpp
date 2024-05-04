@@ -234,7 +234,8 @@ void SceneGraph::mdp_prepare(hui::Callback update) {
 	mdp->prepare(new MouseDelayActionWrapper(update));
 }
 
-void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill) {
+void SceneGraph::integrate(hui::Panel *_panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill) {
+	panel = _panel;
 	if (fill) {
 		for (auto c: weak(children)) {
 			c->align.horizontal = Node::AlignData::Mode::FILL;
@@ -242,7 +243,7 @@ void SceneGraph::integrate(hui::Panel *panel, const string &id, std::function<vo
 		}
 	}
 
-	out_redraw >> create_sink([panel, _id = id, this] {
+	out_redraw >> create_sink([this, _id = id] {
 		panel->redraw(_id);
 	});
 	panel->event_xp(id, "hui:draw", [this, custom_draw] (Painter* p) {

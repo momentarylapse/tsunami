@@ -1,17 +1,19 @@
 use tsunami.*
 
 let AUTO_CONFIG_VOLUME = "volume,range=0:1"
-let AUTO_CONFIG_TYPE = "choice=uniform|gauss"
+let AUTO_CONFIG_TYPE = "enum"
 
-
+enum NoiseType
+	UNIFORM as "uniform"
+	GAUSS as "gauss"
 
 class Noise extends AudioSource
 	class Config extends Module.Config
 		var volume: float
-		var type: string
+		var type: NoiseType
 		func override reset()
 			volume = 1
-			type = "uniform"
+			type = NoiseType.UNIFORM
 
 	var config: Config
 	var r: Random
@@ -19,10 +21,10 @@ class Noise extends AudioSource
 	func __assign__(n: Noise)
 	
 	func mut do(out buf: float[])
-		if config.type == "uniform"
+		if config.type == NoiseType.UNIFORM
 			for mut b in buf
 				b = r.uniform(-1,1) * config.volume
-		else if config.type == "gauss"
+		else if config.type == NoiseType.GAUSS
 			for mut b in buf
 				b = r.normal(0, 0.2) * config.volume
 

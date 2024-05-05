@@ -90,9 +90,4 @@ void AudioVisualizer::flip() {
 	current_reading = 1 - next_writing;
 }
 
-// TODO: move to PluginManager?
-AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name) {
-	return (AudioVisualizer*)ModuleFactory::create(session, ModuleCategory::AUDIO_VISUALIZER, name);
-}
-
 

@@ -47,6 +47,4 @@ public:
 	virtual _cdecl void process(AudioBuffer &buf){}
 };
 
-AudioVisualizer *CreateAudioVisualizer(Session *session, const string &name);
-
 #endif /* SRC_MODULE_AUDIO_AUDIOVISUALIZER_H_ */

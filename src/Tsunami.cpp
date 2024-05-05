@@ -260,7 +260,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 				m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
 				configure_module(session->win.get(), m);
 			} else if (a[0] == "vis") {
-				m = CreateAudioVisualizer(session, a[1]);
+				m = ModuleFactory::create(session, ModuleCategory::AUDIO_VISUALIZER, a[1]);
 				auto *dlg = new hui::Window("", 800, 600);
 				dlg->add_grid("", 0, 0, "root");
 				ConfigPanel::_hidden_parent_ = dlg;

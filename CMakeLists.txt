@@ -340,6 +340,7 @@ set(SOURCE
 	src/module/midi/MidiJoiner.cpp
 	src/module/midi/MidiPreviewSource.cpp
 	src/module/midi/MidiSource.cpp
+	src/module/midi/MidiSplitter.cpp
 	src/module/midi/MidiSucker.cpp
 	src/module/port/Port.cpp
 	src/module/synthesizer/DebugSynthesizer.cpp

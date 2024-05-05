@@ -19,6 +19,7 @@
 #include "midi/MidiEventStreamer.h"
 #include "midi/MidiJoiner.h"
 #include "midi/MidiSource.h"
+#include "midi/MidiSplitter.h"
 #include "midi/MidiSucker.h"
 #include "audio/PitchDetector.h"
 #include "beats/BeatMidifier.h"
@@ -51,6 +52,8 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 			return new AudioChannelSelector;
 		if (_class == "MidiJoiner")
 			return new MidiJoiner;
+		if (_class == "MidiSplitter")
+			return new MidiSplitter;
 		if (_class == "MidiAccumulator")
 			return new MidiAccumulator;
 		if (_class == "MidiSucker")

@@ -1161,6 +1161,7 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 		names.add("AudioSucker");
 		names.add("BeatMidifier");
 		names.add("MidiJoiner");
+		names.add("MidiSplitter");
 		names.add("MidiAccumulator");
 		names.add("MidiSucker");
 	} else if (type == ModuleCategory::PITCH_DETECTOR) {

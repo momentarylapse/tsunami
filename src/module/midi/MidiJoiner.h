@@ -16,15 +16,11 @@ class MidiJoiner : public Module {
 public:
 	MidiJoiner();
 
-	class Output : public Port {
-	public:
-		Output(MidiJoiner *j);
-		int read_midi(MidiEventBuffer &buf) override;
-		MidiJoiner *joiner;
-	};
-
+	MidiOutPort out{this};
 	MidiInPort in_a{this, "a"};
 	MidiInPort in_b{this, "a"};
+
+	int read_midi(int port, MidiEventBuffer &buf) override;
 };
 
 #endif /* SRC_MODULE_MIDI_MIDIJOINER_H_ */

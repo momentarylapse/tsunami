@@ -284,7 +284,7 @@ void CaptureTrackData::insert_audio(int s_start, int delay) {
 
 	int i0 = s_start + delay;
 
-	AudioBuffer &buf = audio_recorder()->buf;
+	AudioBuffer &buf = audio_recorder()->buffer;
 
 	// insert data
 	Range r = Range(i0, buf.length);

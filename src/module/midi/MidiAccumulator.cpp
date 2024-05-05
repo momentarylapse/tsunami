@@ -11,28 +11,23 @@
 #include "../../data/base.h"
 
 
-int MidiAccumulator::Output::read_midi(MidiEventBuffer& buf) {
-	if (!acc->in.source)
+int MidiAccumulator::read_midi(int port, MidiEventBuffer& buf) {
+	if (!in.source)
 		return NO_SOURCE;
 
-	int r = acc->in.source->read_midi(buf);
+	int r = in.source->read_midi(buf);
 
-	if (acc->accumulating and (r > 0)) {
-		std::lock_guard<std::mutex> lock(acc->mtx_buf);
-		acc->buffer.append(buf);
+	if (accumulating and (r > 0)) {
+		std::lock_guard<std::mutex> lock(mtx_buf);
+		buffer.append(buf);
 	}
 
 	return r;
 }
 
-MidiAccumulator::Output::Output(MidiAccumulator *a) : Port(SignalType::MIDI, "out") {
-	acc = a;
-}
-
 MidiAccumulator::MidiAccumulator() :
 	Module(ModuleCategory::PLUMBING, "MidiAccumulator")
 {
-	port_out.add(new Output(this));
 	accumulating = false;
 }
 

@@ -26,7 +26,7 @@ FormatDescriptorWave::FormatDescriptorWave() :
 
 
 void FormatWave::save_via_renderer(StorageOperationData *od) {
-	Port *r = od->renderer;
+	AudioOutPort *r = od->renderer;
 
 	SampleFormat format = SampleFormat::INT_16;
 	if (od->song)

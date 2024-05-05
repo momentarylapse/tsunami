@@ -160,7 +160,7 @@ void flac_progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 byt
 
 void FormatFlac::save_via_renderer(StorageOperationData *od)
 {
-	Port *r = od->renderer;
+	OutPort *r = od->renderer;
 
 	FLAC__StreamEncoder *encoder = nullptr;
 	FLAC__StreamMetadata *metadata = nullptr;

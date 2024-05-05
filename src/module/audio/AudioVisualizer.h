@@ -26,14 +26,10 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port {
-	public:
-		Output(AudioVisualizer *v);
-		int read_audio(AudioBuffer &buf) override;
-		AudioVisualizer *visualizer;
-	};
+	AudioOutPort out{this};
+	AudioInPort in{this};
 
-	AudioInPort in{this, "in"};
+	int read_audio(int port, AudioBuffer &buf) override;
 
 	owned<RingBuffer> buffer;
 	int chunk_size;

@@ -24,12 +24,8 @@ namespace kaba {
 #include <alsa/asoundlib.h>
 #endif
 
-MidiInput::Output::Output(MidiInput *_input) : Port(SignalType::MIDI, "out") {
-	input = _input;
-}
-
-int MidiInput::Output::read_midi(MidiEventBuffer &midi) {
-	if (input->config.free_flow){
+int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
+	if (config.free_flow){
 		for (auto &e: events){
 			e.pos = 0;
 			midi.add(e);
@@ -55,7 +51,7 @@ int MidiInput::Output::read_midi(MidiEventBuffer &midi) {
 	}
 }
 
-void MidiInput::Output::feed(const MidiEventBuffer &midi) {
+void MidiInput::feed(const MidiEventBuffer &midi) {
 	events.append(midi);
 }
 
@@ -81,8 +77,6 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 
 	device_manager = session->device_manager;
 	cur_device = nullptr;
-
-	port_out.add(new Output(this));
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	auto _class = session->plugin_manager->get_class("MidiInputConfig");
@@ -274,7 +268,7 @@ int MidiInput::do_capturing() {
 #endif
 
 	if (current_midi.samples > 0)
-		((Output*)(port_out[0]))->feed(current_midi);
+		feed(current_midi);
 
 	return current_midi.samples;
 }

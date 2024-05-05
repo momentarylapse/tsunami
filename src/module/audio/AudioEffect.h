@@ -30,14 +30,10 @@ public:
 	bool apply_to_whole_buffer;
 	float wetness;
 
-	class Output : public Port {
-	public:
-		Output(AudioEffect *fx);
-		int read_audio(AudioBuffer &buf) override;
-		AudioEffect *fx;
-	};
+	int read_audio(int port, AudioBuffer &buf) override;
 
-	AudioInPort in{this, "in"};
+	AudioOutPort out{this};
+	AudioInPort in{this};
 
 	virtual void _cdecl process(AudioBuffer &buf){};
 	void apply_with_wetness(AudioBuffer &buf);

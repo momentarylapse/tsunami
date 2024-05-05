@@ -14,7 +14,7 @@
 class Song;
 class Track;
 class SongSelection;
-class Port;
+class AudioOutPort;
 class AudioBuffer;
 class Range;
 class TrackLayer;
@@ -38,7 +38,7 @@ Array<Track*> selected_tracks_sorted(AudioView *view);
 void song_compress_buffers(Song *song, const SongSelection &sel, const string &codec);
 void song_make_buffers_movable(Song *song, const SongSelection &sel);
 
-void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog = nullptr);
+void write_into_buffer(AudioOutPort &out, AudioBuffer &buf, int len, Progress *prog = nullptr);
 
 void song_render_track(Song *song, const Range &range, const base::set<const TrackLayer*> &layers, hui::Window *win);
 

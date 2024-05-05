@@ -57,8 +57,8 @@ void ViewModeCapture::draw_post(Painter *c) {
 			view->buffer_painter->set_color(theme.capture_marker, l->background_color());
 
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
-			view->peak_database->update_peaks_now(rec->buf);
-			view->buffer_painter->draw_buffer(c, rec->buf, offset);
+			view->peak_database->update_peaks_now(rec->buffer);
+			view->buffer_painter->draw_buffer(c, rec->buffer, offset);
 		} else if (d.type() == SignalType::MIDI) {
 			auto *rec = d.midi_recorder();
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);

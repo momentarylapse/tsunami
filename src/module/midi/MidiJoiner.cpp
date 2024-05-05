@@ -10,17 +10,12 @@
 #include "../../data/midi/MidiData.h"
 
 MidiJoiner::MidiJoiner() : Module(ModuleCategory::PLUMBING, "MidiJoiner") {
-	port_out.add(new Output(this));
-}
-
-MidiJoiner::Output::Output(MidiJoiner* j) : Port(SignalType::MIDI, "out") {
-	joiner = j;
 }
 
 // if A or B is end-of-stream... just ignore and suck the other!
-int MidiJoiner::Output::read_midi(MidiEventBuffer& buf) {
-	auto pa = joiner->in_a.source;
-	auto pb = joiner->in_b.source;
+int MidiJoiner::read_midi(int port, MidiEventBuffer& buf) {
+	auto pa = in_a.source;
+	auto pb = in_b.source;
 	if (pa and pb) {
 		int ra = pa->read_midi(buf);
 		if (ra == NOT_ENOUGH_DATA) {

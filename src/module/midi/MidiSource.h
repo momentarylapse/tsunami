@@ -22,12 +22,9 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port {
-	public:
-		Output(MidiSource *s);
-		int read_midi(MidiEventBuffer &midi) override;
-		MidiSource *source;
-	};
+	MidiOutPort out{this};
+
+	int read_midi(int port, MidiEventBuffer &midi) override;
 
 	virtual int _cdecl read(MidiEventBuffer &midi);
 

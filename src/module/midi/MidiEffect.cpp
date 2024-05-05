@@ -16,22 +16,17 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/SongSelection.h"
 
-MidiEffect::Output::Output(MidiEffect *_fx) : Port(SignalType::MIDI, "out") {
-	fx = _fx;
-}
-
-int MidiEffect::Output::read_midi(MidiEventBuffer &buf) {
-	if (!fx->in.source)
+int MidiEffect::read_midi(int port, MidiEventBuffer &buf) {
+	if (!in.source)
 		return NO_SOURCE;
-	int r = fx->in.source->read_midi(buf);
-	fx->process(buf);
+	int r = in.source->read_midi(buf);
+	process(buf);
 	return r;
 }
 
 MidiEffect::MidiEffect() :
 	Module(ModuleCategory::MIDI_EFFECT, "")
 {
-	port_out.add(new Output(this));
 }
 
 void MidiEffect::__init__() {

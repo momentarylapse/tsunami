@@ -43,7 +43,7 @@ bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 }
 
 void FormatRaw::save_via_renderer(StorageOperationData *od) {
-	Port *r = od->renderer;
+	AudioOutPort *r = od->renderer;
 
 	auto f = os::fs::open(od->filename, "wb");
 	

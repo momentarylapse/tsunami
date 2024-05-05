@@ -36,8 +36,6 @@ string AudioChannelSelector::Config::auto_conf(const string &name) const {
 
 
 AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::PLUMBING, "AudioChannelSelector") {
-	port_out.add(new Output(this));
-
 	peak_meter = new PeakMeter;
 
 	auto _class = session->plugin_manager->get_class("AudioChannelSelectorConfig");
@@ -53,30 +51,26 @@ ModuleConfiguration *AudioChannelSelector::get_config() const {
 	return (ModuleConfiguration*)&config;
 }
 
-int AudioChannelSelector::Output::read_audio(AudioBuffer& buf) {
-	if (!cs->in.source)
+int AudioChannelSelector::read_audio(int port, AudioBuffer& buf) {
+	if (!in.source)
 		return NO_SOURCE;
 
 
 	AudioBuffer buf_in;
-	buf_in.set_channels(cs->config.channels);
+	buf_in.set_channels(config.channels);
 	buf_in.resize(buf.length);
-	int r = cs->in.source->read_audio(buf_in);
+	int r = in.source->read_audio(buf_in);
 
 	if (r > 0) {
-		if (cs->peak_meter) {
-			cs->peak_meter->process(buf_in);
+		if (peak_meter) {
+			peak_meter->process(buf_in);
 			// FIXME should we go to main thread?
-			cs->peak_meter->out_changed.notify();
+			peak_meter->out_changed.notify();
 		}
-		cs->apply(buf_in.ref(0, r), buf);
+		apply(buf_in.ref(0, r), buf);
 	}
 
 	return r;
-}
-
-AudioChannelSelector::Output::Output(AudioChannelSelector *_cs) : Port(SignalType::AUDIO, "out") {
-	cs = _cs;
 }
 
 void AudioChannelSelector::set_channel_map(int _n_in, const Array<int> &_map) {

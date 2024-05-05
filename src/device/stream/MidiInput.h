@@ -57,16 +57,12 @@ public:
 
 	MidiEventBuffer current_midi;
 
-	class Output : public Port {
-	public:
-		Output(MidiInput *input);
+	MidiOutPort out{this};
 
-		int read_midi(MidiEventBuffer &midi) override;
-		void feed(const MidiEventBuffer &midi);
+	int read_midi(int port, MidiEventBuffer &midi) override;
+	void feed(const MidiEventBuffer &midi);
 
-		MidiEventBuffer events;
-		MidiInput *input;
-	};
+	MidiEventBuffer events;
 
 	int _sample_rate;
 

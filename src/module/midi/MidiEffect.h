@@ -28,19 +28,14 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	MidiInPort in{this, "in"};
+	MidiOutPort out{this};
+	MidiInPort in{this};
 
 	virtual void _cdecl process(MidiEventBuffer &midi) {};
 
 	void process_layer(TrackLayer *l, const SongSelection &sel);
 
-	class Output : public Port {
-	public:
-		Output(MidiEffect *fx);
-		int read_midi(MidiEventBuffer &midi) override;
-
-		MidiEffect *fx;
-	};
+	int read_midi(int port, MidiEventBuffer &midi) override;
 };
 
 MidiEffect *_cdecl CreateMidiEffect(Session *session, const string &name);

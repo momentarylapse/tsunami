@@ -12,12 +12,11 @@
 AudioJoiner::AudioJoiner() :
 	Module(ModuleCategory::PLUMBING, "AudioJoiner")
 {
-	port_out.add(new Output(this));
 }
 
-int AudioJoiner::Output::read_audio(AudioBuffer& buf) {
-	auto pa = joiner->in_a.source;
-	auto pb = joiner->in_b.source;
+int AudioJoiner::read_audio(int port, AudioBuffer& buf) {
+	auto pa = in_a.source;
+	auto pb = in_b.source;
 	if (pa and pb) {
 		int ra = pa->read_audio(buf);
 		if (ra <= 0)
@@ -34,8 +33,4 @@ int AudioJoiner::Output::read_audio(AudioBuffer& buf) {
 		return pb->read_audio(buf);
 	}
 	return NO_SOURCE;
-}
-
-AudioJoiner::Output::Output(AudioJoiner *j) : Port(SignalType::AUDIO, "out") {
-	joiner = j;
 }

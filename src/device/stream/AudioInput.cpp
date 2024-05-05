@@ -156,22 +156,15 @@ int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void 
 
 
 
-AudioInput::Output::Output(AudioInput *s) :
-	Port(SignalType::AUDIO, "out") {
-	stream = s;
-}
-
-int AudioInput::Output::read_audio(AudioBuffer &buf) {
+int AudioInput::read_audio(int port, AudioBuffer &buf) {
 	//buf.set_channels(stream->num_channels);
 	// reader (AudioSucker) decides on number of channel!
 
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
-	if (stream->buffer.available() < buf.length)
+	if (buffer.available() < buf.length)
 		return NOT_ENOUGH_DATA;
 
-	int r = stream->buffer.read(buf);
-
-	return r;
+	return buffer.read(buf);
 }
 
 void AudioInput::Config::reset() {
@@ -199,9 +192,6 @@ AudioInput::AudioInput(Session *_session) :
 #if HAS_LIB_PORTAUDIO
 	portaudio_stream = nullptr;
 #endif
-
-	port_out.add(new Output(this));
-
 
 	dev_man = session->device_manager;
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");

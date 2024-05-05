@@ -96,6 +96,6 @@ void Format::save_song(StorageOperationData* od) {
 	}
 
 	od->num_samples = renderer.get_num_samples();
-	od->renderer = renderer.port_out[0];
+	od->renderer = &renderer.out;
 	save_via_renderer(od);
 }

@@ -78,7 +78,7 @@ class Module extends Object as shared
 
 	var name: string
 	var session: Session&
-	var port_out: owned![Port][]
+	var port_out: OutPort&[]
 	var out_changed: obs.source
 	var out_state_changed: obs.source
 	var out_play_end_of_stream: obs.source
@@ -96,17 +96,20 @@ class Module extends Object as shared
 	func extern mut unsubscribe(handler: Object)
 	func extern copy() -> xfer[Module]
 	
-	class Port
-		func extern __init__()
-		func extern virtual __delete__()
-		func extern virtual mut read_audio(out buf: AudioBuffer) -> int
-		func extern virtual mut read_midi(out midi: MidiEventBuffer) -> int
-		func extern virtual mut read_beats(out beats: Beat[], samples: int) -> int
+	func extern virtual mut read_audio(port: int, out buf: AudioBuffer) -> int
+	func extern virtual mut read_midi(port: int, out midi: MidiEventBuffer) -> int
+	func extern virtual mut read_beats(port: int, out beats: Beat[], samples: int) -> int
+	
+	class OutPort
+		#func extern __init__()
+		func extern mut read_audio(out buf: AudioBuffer) -> int
+		func extern mut read_midi(out midi: MidiEventBuffer) -> int
+		func extern mut read_beats(out beats: Beat[], samples: int) -> int
 	
 	class InPort
 		var type: SignalType
 		var name: string
-		var source: Module.Port*
+		var source: Module.OutPort*
 		
 	class Config
 		func extern __init__()
@@ -136,6 +139,7 @@ class AudioEffect extends Module
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
 	func extern virtual mut read(out buf: AudioBuffer) -> int
+	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
 
 
 class MidiEffect extends Module
@@ -143,6 +147,7 @@ class MidiEffect extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out midi: MidiEventBuffer)
+	func extern override mut read_midi(port: int, out midi: MidiEventBuffer) -> int
 
 
 class AudioVisualizer extends Module
@@ -167,6 +172,7 @@ class AudioSource extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out buf: AudioBuffer) -> int
+	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
 
 
 struct MidiProduceData
@@ -178,6 +184,7 @@ class MidiSource extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out midi: MidiEventBuffer) -> int
+	func extern override mut read_midi(port: int, out midi: MidiEventBuffer) -> int
 	# crappy experimental note api:
 	func extern virtual mut on_produce(data: MidiProduceData) -> bool
 	func extern mut note(pitch: float, volume: float, beats: int)
@@ -235,6 +242,7 @@ class Synthesizer extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut render(out buf: AudioBuffer)
+	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
 	func extern override mut on_config()
 	func extern override mut reset_state()
 	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
@@ -265,6 +273,7 @@ class BeatSource extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out beats: Beat[], samples: int) -> int
+	func extern override mut read_beats(port: int, out beats: Beat[], samples: int) -> int
 	func extern virtual beats_per_bar() -> int
 	func extern virtual cur_beat() -> int
 	func extern virtual cur_bar() -> int

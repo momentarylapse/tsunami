@@ -292,6 +292,9 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("Module.config_from_any", &Module::config_from_any);
 		ext->link_virtual("Module.on_config", &Module::on_config, &module);
 		ext->link_virtual("Module.command", &Module::command, &module);
+		ext->link_virtual("Module.read_audio", &Module::read_audio, &module);
+		ext->link_virtual("Module.read_midi", &Module::read_midi, &module);
+		ext->link_virtual("Module.read_beats", &Module::read_beats, &module);
 		ext->link_class_func("Module.create_sink", &ObservableKabaWrapper<Module>::create_sink_kaba);
 		ext->link_class_func("Module.unsubscribe", &Module::unsubscribe);
 		ext->link_class_func("Module.copy", &Module::copy);
@@ -332,6 +335,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("AudioSource.__init__", &AudioSource::__init__);
 		ext->link_virtual("AudioSource.__delete__", &AudioSource::__delete__, &asource);
 		ext->link_virtual("AudioSource.read", &AudioSource::read, &asource);
+		ext->link_virtual("AudioSource.read_audio", &AudioSource::read_audio, &asource);
 	}
 
 	{
@@ -345,6 +349,7 @@ void PluginManager::link_app_data() {
 		ext->link_virtual("AudioEffect.__delete__", &AudioEffect::__delete__, &aeffect);
 		ext->link_virtual("AudioEffect.process", &AudioEffect::process, &aeffect);
 		ext->link_virtual("AudioEffect.read", &AudioEffect::read, &aeffect);
+		ext->link_virtual("AudioEffect.read_audio", &AudioEffect::read_audio, &aeffect);
 	}
 
 	{
@@ -354,6 +359,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("MidiEffect.__init__", &MidiEffect::__init__);
 		ext->link_virtual("MidiEffect.__delete__", &MidiEffect::__delete__, &meffect);
 		ext->link_virtual("MidiEffect.process", &MidiEffect::process, &meffect);
+		ext->link_virtual("MidiEffect.read_midi", &MidiEffect::read_midi, &meffect);
 	}
 
 	{
@@ -366,6 +372,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
 		ext->link_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
 		ext->link_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
+		ext->link_virtual("AudioVisualizer.read_audio", &AudioVisualizer::read_audio, &avis);
 		ext->link_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
 		ext->link_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
 		ext->link_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
@@ -449,15 +456,11 @@ void PluginManager::link_app_data() {
 
 
 
-	{
-		Port port(SignalType::AUDIO, "");
-		ext->declare_class_size("Module.Port", sizeof(Port));
-		ext->link_class_func("Module.Port.__init__", &Port::__init__);
-		ext->link_virtual("Module.Port.__delete__", &Port::__delete__, &port);
-		ext->link_virtual("Module.Port.read_audio", &Port::read_audio, &port);
-		ext->link_virtual("Module.Port.read_midi", &Port::read_midi, &port);
-		ext->link_virtual("Module.Port.read_beats", &Port::read_beats, &port);
-	}
+	//ext->link_class_func("Module.OutPort.__init__", &OutPort::__init__);
+	ext->declare_class_size("Module.OutPort", sizeof(OutPort));
+	ext->link_class_func("Module.OutPort.read_audio", &OutPort::read_audio);
+	ext->link_class_func("Module.OutPort.read_midi", &OutPort::read_midi);
+	ext->link_class_func("Module.OutPort.read_beats", &OutPort::read_beats);
 
 	{
 		MidiSource msource;
@@ -466,6 +469,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("MidiSource.__init__", &MidiSource::__init__);
 		ext->link_virtual("MidiSource.__delete__", &MidiSource::__delete__, &msource);
 		ext->link_virtual("MidiSource.read", &MidiSource::read, &msource);
+		ext->link_virtual("MidiSource.read_midi", &MidiSource::read_midi, &msource);
 		ext->link_virtual("MidiSource.on_produce", &MidiSource::on_produce, &msource);
 		ext->link_class_func("MidiSource.note", &MidiSource::note);
 		ext->link_class_func("MidiSource.skip", &MidiSource::skip);
@@ -517,6 +521,7 @@ void PluginManager::link_app_data() {
 	ext->link_virtual("Synthesizer.create_pitch_renderer", &Synthesizer::create_pitch_renderer, &synth);
 	ext->link_virtual("Synthesizer.on_config", &Synthesizer::on_config, &synth);
 	ext->link_virtual("Synthesizer.reset_state", &Synthesizer::reset_state, &synth);
+	ext->link_virtual("Synthesizer.read_audio", &Synthesizer::read_audio, &synth);
 	ext->link_class_func("Synthesizer.set_sample_rate", &Synthesizer::set_sample_rate);
 	ext->link_class_func("Synthesizer.set_instrument", &Synthesizer::set_instrument);
 	//}
@@ -607,6 +612,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("BeatSource.__init__", &BeatSource::__init__);
 		ext->link_virtual("BeatSource.__delete__", &BeatSource::__delete__, &bsource);
 		ext->link_virtual("BeatSource.read", &BeatSource::read, &bsource);
+		ext->link_virtual("BeatSource.read_beats", &BeatSource::read_beats, &bsource);
 		ext->link_virtual("BeatSource.reset", &BeatSource::reset, &bsource);
 		ext->link_virtual("BeatSource.beats_per_bar", &BeatSource::beats_per_bar, &bsource);
 		ext->link_virtual("BeatSource.cur_beat", &BeatSource::cur_beat, &bsource);
@@ -753,7 +759,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_size("AudioAccumulator", sizeof(AudioAccumulator));
 		ext->link_class_func("AudioAccumulator.__init__", &generic__init__<AudioAccumulator>);
 		ext->declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
-		ext->declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buf);
+		ext->declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buffer);
 	}
 
 	{

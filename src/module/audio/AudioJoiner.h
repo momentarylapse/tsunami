@@ -15,15 +15,11 @@ class AudioJoiner : public Module {
 public:
 	AudioJoiner();
 
-	class Output : public Port {
-	public:
-		Output(AudioJoiner *j);
-		int read_audio(AudioBuffer &buf) override;
-		AudioJoiner *joiner;
-	};
-
+	AudioOutPort out{this};
 	AudioInPort in_a{this, "a"};
 	AudioInPort in_b{this, "b"};
+
+	int read_audio(int port, AudioBuffer &buf) override;
 };
 
 #endif /* SRC_MODULE_AUDIO_AUDIOJOINER_H_ */

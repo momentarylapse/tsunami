@@ -23,14 +23,10 @@ class AudioBackup : public Module {
 public:
 	AudioBackup(Session *session);
 
-	class Output : public Port {
-	public:
-		Output(AudioBackup *j);
-		int read_audio(AudioBuffer &buf) override;
-		AudioBackup *backup;
-	};
+	AudioOutPort out{this};
+	AudioInPort in{this};
 
-	AudioInPort in{this, "in"};
+	int read_audio(int port, AudioBuffer &buf) override;
 
 	void _cdecl set_backup_mode(BackupMode mode);
 	os::fs::FileStream *backup_file;

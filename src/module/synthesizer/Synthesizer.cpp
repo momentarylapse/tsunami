@@ -28,25 +28,21 @@ void PitchRenderer::__delete__() {
 	this->PitchRenderer::~PitchRenderer();
 }
 
-Synthesizer::Output::Output(Synthesizer *s) : Port(SignalType::AUDIO, "out") {
-	synth = s;
-}
-
-int Synthesizer::Output::read_audio(AudioBuffer &buf) {
-	auto source = synth->in.source;
+int Synthesizer::read_audio(int port, AudioBuffer &buf) {
+	auto source = in.source;
 	if (!source)
 		return NO_SOURCE;
 //	printf("synth read %d\n", buf.length);
-	synth->source_run_out = false;
+	source_run_out = false;
 	// get from source...
-	synth->events.samples = buf.length;
-	int n = source->read_midi(synth->events);
+	events.samples = buf.length;
+	int n = source->read_midi(events);
 	if (n == NOT_ENOUGH_DATA){
 //		printf(" no data\n");
 		return NOT_ENOUGH_DATA;
 	}
-	if (n == END_OF_STREAM){
-		synth->source_run_out = true;
+	if (n == END_OF_STREAM) {
+		source_run_out = true;
 
 		// if source end_of_stream but still active rendering
 		//  => render full requested buf size
@@ -54,22 +50,22 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 	}
 
 	//printf("  %d  %d\n", synth->active_pitch.num, n);
-	if (synth->has_run_out_of_data()){
+	if (has_run_out_of_data()){
 //		printf(" eos\n");
 		return END_OF_STREAM;
 	}
 
 //	printf("...%d  %d  ok\n", n, buf.length);
-	synth->perf_start();
+	perf_start();
 	buf.set_zero();
-	synth->render(buf);
+	render(buf);
 
-	if (synth->auto_generate_stereo and (buf.channels > 1))
+	if (auto_generate_stereo and (buf.channels > 1))
 		buf.c[1] = buf.c[0];
 
-	synth->events.clear();
+	events.clear();
 
-	synth->perf_end();
+	perf_end();
 	return buf.length;
 }
 
@@ -77,7 +73,6 @@ int Synthesizer::Output::read_audio(AudioBuffer &buf) {
 Synthesizer::Synthesizer() :
 	Module(ModuleCategory::SYNTHESIZER, "")
 {
-	port_out.add(new Output(this));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
 	instrument = Instrument(Instrument::Type::PIANO);

@@ -20,12 +20,9 @@ public:
 	void _cdecl __init__();
 	void _cdecl __delete__() override;
 
-	class Output : public Port {
-	public:
-		Output(BeatSource *s);
-		int read_beats(Array<Beat> &beats, int samples) override;
-		BeatSource *source;
-	};
+	BeatsOutPort out{this};
+
+	int read_beats(int port, Array<Beat> &beats, int samples) override;
 
 	virtual int _cdecl read(Array<Beat> &beats, int samples){ return samples; }
 	virtual void _cdecl reset(){}

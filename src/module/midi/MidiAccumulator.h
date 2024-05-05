@@ -18,13 +18,10 @@ class MidiAccumulator : public Module {
 public:
 	MidiAccumulator();
 
-	class Output : public Port {
-	public:
-		Output(MidiAccumulator *j);
-		int read_midi(MidiEventBuffer &buf) override;
-		MidiAccumulator *acc;
-	};
-	MidiInPort in{this, "in"};
+	MidiOutPort out{this};
+	MidiInPort in{this};
+
+	int read_midi(int port, MidiEventBuffer &buf) override;
 
 	void _accumulate(bool enable);
 

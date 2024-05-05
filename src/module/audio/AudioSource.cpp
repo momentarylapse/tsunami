@@ -12,7 +12,6 @@
 AudioSource::AudioSource() :
 	Module(ModuleCategory::AUDIO_SOURCE, "")
 {
-	port_out.add(new Output(this));
 }
 
 void AudioSource::__init__() {
@@ -23,14 +22,10 @@ void AudioSource::__delete__() {
 	this->AudioSource::~AudioSource();
 }
 
-AudioSource::Output::Output(AudioSource *s) : Port(SignalType::AUDIO, "out") {
-	source = s;
-}
-
-int AudioSource::Output::read_audio(AudioBuffer& buf) {
-	source->perf_start();
-	int r = source->read(buf);
-	source->perf_end();
+int AudioSource::read_audio(int port, AudioBuffer& buf) {
+	perf_start();
+	int r = read(buf);
+	perf_end();
 	return r;
 }
 

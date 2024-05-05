@@ -12,7 +12,6 @@
 #include "../../plugins/PluginManager.h"
 #include "../../data/base.h"
 
-
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
@@ -31,8 +30,8 @@ string AudioAccumulator::Config::auto_conf(const string &name) const {
 
 
 
-int AudioAccumulator::Output::read_audio(AudioBuffer& buf) {
-	auto source = acc->in.source;
+int AudioAccumulator::read_audio(int port, AudioBuffer& buf) {
+	auto source = in.source;
 	if (!source)
 		return NO_SOURCE;
 
@@ -41,30 +40,22 @@ int AudioAccumulator::Output::read_audio(AudioBuffer& buf) {
 	if (r <= 0)
 		return r;
 
-	if (acc->config.accumulate) {
+	if (config.accumulate) {
 		// accumulate
-		std::lock_guard<std::mutex> lock(acc->mtx_buf);
+		std::lock_guard<std::mutex> lock(mtx_buf);
 		//if (buf.channels > acc->buf.channels)
-		//	acc->buf.set_channels(buf.channels);
-		acc->buf.append(buf.ref(0, r));
+		//	buf.set_channels(buf.channels);
+		buffer.append(buf.ref(0, r));
 	} else {
 		// ignore
-		acc->samples_skipped += r;
+		samples_skipped += r;
 	}
 	return r;
-}
-
-AudioAccumulator::Output::Output(AudioAccumulator *a) : Port(SignalType::AUDIO, "out") {
-	acc = a;
 }
 
 AudioAccumulator::AudioAccumulator() :
 	Module(ModuleCategory::PLUMBING, "AudioAccumulator")
 {
-	port_out.add(new Output(this));
-
-
-
 	auto _class = session->plugin_manager->get_class("AudioAccumulatorConfig");
 	if (_class->elements.num == 0) {
 		kaba::add_class(_class);
@@ -94,7 +85,7 @@ void AudioAccumulator::set_channels(int _channels) {
 }
 
 void AudioAccumulator::on_config() {
-	buf.set_channels(config.channels);
+	buffer.set_channels(config.channels);
 }
 
 base::optional<int64> AudioAccumulator::command(ModuleCommand cmd, int64 param) {
@@ -106,15 +97,15 @@ base::optional<int64> AudioAccumulator::command(ModuleCommand cmd, int64 param) 
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
 		std::lock_guard<std::mutex> lock(mtx_buf);
-		samples_skipped += buf.length;
-		buf.clear();
+		samples_skipped += buffer.length;
+		buffer.clear();
 		//buf.set_channels(2);
 		return 0;
 	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
 		std::lock_guard<std::mutex> lock(mtx_buf);
-		return buf.length;
+		return buffer.length;
 	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
-		set_channels(param);
+		set_channels((int)param);
 		return 0;
 	}
 	return base::None;

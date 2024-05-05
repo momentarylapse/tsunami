@@ -41,7 +41,7 @@ class SongRenderer extends AudioSource
 class Storage
 	func extern load(out s: Song, filename: os.Path) -> future[void]
 	func extern save(s: Song&, filename: os.Path) -> future[void]
-	func extern save_via_renderer(source: Module.Port, filename: os.Path, num_samples: int, tags: Tag[]) -> future[void]
+	func extern save_via_renderer(source: Module.OutPort, filename: os.Path, num_samples: int, tags: Tag[]) -> future[void]
 	func extern load_buffer(filename: os.Path) -> future[AudioBuffer]
 	var current_directory: os.Path
 

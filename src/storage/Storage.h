@@ -18,7 +18,7 @@ class Song;
 class Track;
 class TrackLayer;
 class AudioBuffer;
-class Port;
+struct AudioOutPort;
 class SongSelection;
 class StorageOperationData;
 class Tag;
@@ -39,7 +39,7 @@ public:
 	base::future<void> load_ex(Song *song, const Path &filename, Flags flags);
 	base::future<void> load_track(TrackLayer *t, const Path &filename, int offset = 0);
 	base::future<AudioBuffer> load_buffer(const Path &filename);
-	base::future<void> save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags);
+	base::future<void> save_via_renderer(AudioOutPort &r, const Path &filename, int num_samples, const Array<Tag> &tags);
 	base::future<void> render_export_selection(Song *song, const SongSelection &sel, const Path &filename);
 	base::future<void> save_ex(Song *song, const Path &filename, bool exporting);
 	base::future<void> save(Song *song, const Path &filename);

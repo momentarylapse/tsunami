@@ -37,7 +37,7 @@ SignalType module_in_type(Module *m) {
 }
 
 SignalType module_out_type(Module *m) {
-	for (auto p: weak(m->port_out))
+	for (auto p: m->port_out)
 		return p->type;
 	return SignalType::GROUP;
 }

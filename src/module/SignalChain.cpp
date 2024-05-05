@@ -203,7 +203,7 @@ void SignalChain::disconnect(Module *source, int source_port, Module *target, in
 }
 
 void SignalChain::disconnect_out(Module *source, int source_port) {
-	Port *sp = source->port_out[source_port];
+	OutPort *sp = source->port_out[source_port];
 
 	for (Module *target: weak(modules))
 		for (auto &p: target->port_in) {
@@ -272,7 +272,7 @@ base::optional<SignalChain::ConnectionQueryResult> SignalChain::find_connected(M
 					return ConnectionQueryResult{target, i};
 	} else if (direction == 0 and port < m->port_in.num and m->port_in[port]->source) {
 		for (Module *target: weak(modules))
-			for (auto &&[i,p]: enumerate(weak(target->port_out)))
+			for (auto &&[i,p]: enumerate(target->port_out))
 				if (p == m->port_in[port]->source)
 					return {{target, i}};
 	}

@@ -11,7 +11,7 @@
 #include "../StorageOperationData.h"
 
 class StorageOperationData;
-class Port;
+struct AudioOutPort;
 class Format;
 class Song;
 namespace os::fs {

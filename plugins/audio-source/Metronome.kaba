@@ -35,7 +35,7 @@ class Metronome extends AudioSource
 
 	func override read(out buf: AudioBuffer) -> int
 		for s in synth
-			return s.port_out[0].read_audio(buf)
+			return s.read_audio(0, buf)
 		return 0
 			
 	func override on_config()

@@ -17,14 +17,10 @@ class AudioChannelSelector : public Module {
 public:
 	AudioChannelSelector();
 
-	class Output : public Port {
-	public:
-		Output(AudioChannelSelector *cs);
-		int read_audio(AudioBuffer &buf) override;
-		AudioChannelSelector *cs;
-	};
+	AudioOutPort out{this};
+	AudioInPort in{this};
 
-	AudioInPort in{this, "in"};
+	int read_audio(int port, AudioBuffer &buf) override;
 
 	void _cdecl set_channel_map(int num_in, const Array<int> &map);
 

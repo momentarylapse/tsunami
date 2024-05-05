@@ -52,7 +52,7 @@ void song_make_buffers_movable(Song *song, const SongSelection &sel) {
 }
 
 
-void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog) {
+void write_into_buffer(AudioOutPort &out, AudioBuffer &buf, int len, Progress *prog) {
 	const int chunk_size = 1 << 12;
 	int offset = 0;
 
@@ -65,7 +65,7 @@ void write_into_buffer(Port *out, AudioBuffer &buf, int len, Progress *prog) {
 		AudioBuffer tbuf;
 		tbuf.set_as_ref(buf, offset, r.length);
 
-		out->read_audio(tbuf);
+		out.read_audio(tbuf);
 
 		offset += chunk_size;
 		if (prog)
@@ -85,7 +85,7 @@ void song_render_track(Song *song, const Range &range, const base::set<const Tra
 	AudioBuffer buf;
 	buf.resize(range.length);
 
-	write_into_buffer(renderer.port_out[0], buf, range.length, p.get());
+	write_into_buffer(renderer.out, buf, range.length, p.get());
 
 	song->begin_action_group(_("render track"));
 	Track *t = song->add_track(SignalType::AUDIO_STEREO);

@@ -13,7 +13,6 @@
 BeatSource::BeatSource() :
 	Module(ModuleCategory::BEAT_SOURCE, "")
 {
-	port_out.add(new Output(this));
 }
 
 void BeatSource::__init__() {
@@ -24,12 +23,8 @@ void BeatSource::__delete__() {
 	this->BeatSource::~BeatSource();
 }
 
-BeatSource::Output::Output(BeatSource* s) : Port(SignalType::BEATS, "out") {
-	source = s;
-}
-
-int BeatSource::Output::read_beats(Array<Beat> &beats, int samples) {
-	return source->read(beats, samples);
+int BeatSource::read_beats(int port, Array<Beat> &beats, int samples) {
+	return read(beats, samples);
 }
 
 

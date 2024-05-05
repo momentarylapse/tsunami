@@ -19,14 +19,10 @@ class AudioAccumulator : public Module {
 public:
 	AudioAccumulator();
 
-	class Output : public Port {
-	public:
-		Output(AudioAccumulator *a);
-		int read_audio(AudioBuffer &buf) override;
-		AudioAccumulator *acc;
-	};
+	AudioOutPort out{this};
+	AudioInPort in{this};
 
-	AudioInPort in{this, "in"};
+	int read_audio(int port, AudioBuffer &buf) override;
 
 	void _accumulate(bool enable);
 	void set_channels(int channels);
@@ -35,7 +31,7 @@ public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 	void on_config() override;
 
-	AudioBuffer buf;
+	AudioBuffer buffer;
 	std::mutex mtx_buf;
 
 	int64 samples_skipped = 0;

@@ -15,38 +15,34 @@
 #include "../../lib/hui/Callback.h"
 #include "../../lib/hui/Application.h"
 
-AudioVisualizer::Output::Output(AudioVisualizer *v) : Port(SignalType::AUDIO, "out") {
-	visualizer = v;
-}
-
-int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
-	if (!visualizer->in.source)
+int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
+	if (!in.source)
 		return NO_SOURCE;
-	int r = visualizer->in.source->read_audio(buf);
+	int r = in.source->read_audio(buf);
 	if (r <= 0)
 		return r;
 
-	PerformanceMonitor::start_busy(visualizer->perf_channel);
-	visualizer->buffer->buf.set_channels(buf.channels);
-	visualizer->buffer->write(buf);
+	PerformanceMonitor::start_busy(perf_channel);
+	buffer->buf.set_channels(buf.channels);
+	buffer->write(buf);
 
-	if (visualizer->buffer->available() < visualizer->chunk_size)
+	if (buffer->available() < chunk_size)
 		return r;
 
-	visualizer->lock();
-	while (visualizer->buffer->available() >= visualizer->chunk_size) {
+	lock();
+	while (buffer->available() >= chunk_size) {
 		AudioBuffer b;
-		visualizer->buffer->read_ref(b, visualizer->chunk_size);
-		visualizer->process(b);
-		visualizer->buffer->read_ref_done(b);
+		buffer->read_ref(b, chunk_size);
+		process(b);
+		buffer->read_ref_done(b);
 	}
-	visualizer->unlock();
-	PerformanceMonitor::end_busy(visualizer->perf_channel);
+	unlock();
+	PerformanceMonitor::end_busy(perf_channel);
 
-	visualizer->notify_counter ++;
+	notify_counter ++;
 	hui::run_later(0.001f, [this] {
-		visualizer->out_changed.notify();
-		visualizer->notify_counter --;
+		out_changed.notify();
+		notify_counter --;
 	});
 	return r;
 }
@@ -54,7 +50,6 @@ int AudioVisualizer::Output::read_audio(AudioBuffer& buf) {
 AudioVisualizer::AudioVisualizer() :
 	Module(ModuleCategory::AUDIO_VISUALIZER, "")
 {
-	port_out.add(new Output(this));
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;
 	notify_counter = 0;

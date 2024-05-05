@@ -24,7 +24,7 @@ class Track;
 class TrackLayer;
 class Storage;
 class Format;
-class Port;
+struct AudioOutPort;
 class Tag;
 class Storage;
 class Session;
@@ -68,7 +68,7 @@ public:
 	bool allow_channels_change;
 	Track *track;
 	TrackLayer *layer;
-	Port *renderer;
+	AudioOutPort *renderer;
 	Array<Tag> tags;
 	int num_samples;
 	int offset;

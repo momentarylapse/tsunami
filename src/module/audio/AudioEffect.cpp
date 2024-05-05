@@ -15,18 +15,13 @@
 #include "../../data/TrackLayer.h"
 
 
-AudioEffect::Output::Output(AudioEffect *_fx) : Port(SignalType::AUDIO, "out") {
-	fx = _fx;
-}
-
-int AudioEffect::Output::read_audio(AudioBuffer &buf) {
-	return fx->read(buf);
+int AudioEffect::read_audio(int port, AudioBuffer &buf) {
+	return read(buf);
 }
 
 AudioEffect::AudioEffect() :
 	Module(ModuleCategory::AUDIO_EFFECT, "")
 {
-	port_out.add(new Output(this));
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	apply_to_whole_buffer = false;
 	wetness = 1.0f;

@@ -28,9 +28,12 @@ class ModuleConfiguration;
 class ConfigPanel;
 class Session;
 class Plugin;
-class Port;
-class InPort;
+struct OutPort;
+struct InPort;
 class Any;
+class AudioBuffer;
+class MidiEventBuffer;
+class Beat;
 
 enum class ModuleCategory {
 	// plug-ins
@@ -150,9 +153,13 @@ public:
 
 	// ports
 	Array<InPort*> port_in;
-	owned_array<Port> port_out;
+	Array<OutPort*> port_out;
 	void _plug_in(int in_port, Module *source, int out_port);
 	void _unplug_in(int in_port);
+
+	virtual int read_audio(int port, AudioBuffer &buf){ return 0; }
+	virtual int read_midi(int port, MidiEventBuffer &midi){ return 0; };
+	virtual int read_beats(int port, Array<Beat> &beats, int samples){ return 0; };
 
 
 

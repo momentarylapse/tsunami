@@ -60,7 +60,7 @@ int oe_write_page(ogg_page *page, FILE *fp) {
 
 
 void FormatOgg::save_via_renderer(StorageOperationData *od) {
-	Port *r = od->renderer;
+	AudioOutPort *r = od->renderer;
 
 	float OggQuality = hui::config.get_float("OggQuality", 0.5f);
 

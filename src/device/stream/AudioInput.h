@@ -60,13 +60,9 @@ public:
 
 	RingBuffer buffer;
 
-	class Output : public Port {
-	public:
-		Output(AudioInput *s);
-		int read_audio(AudioBuffer &buf) override;
+	AudioOutPort out{this};
 
-		AudioInput *stream;
-	};
+	int read_audio(int port, AudioBuffer &buf) override;
 
 	void _cdecl set_chunk_size(int size);
 	int chunk_size;

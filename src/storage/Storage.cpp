@@ -252,7 +252,7 @@ base::future<void> Storage::_export(Song *song, const Path &filename) {
 	return save_ex(song, filename, true);
 }
 
-base::future<void> Storage::save_via_renderer(Port *r, const Path &filename, int num_samples, const Array<Tag> &tags) {
+base::future<void> Storage::save_via_renderer(AudioOutPort &r, const Path &filename, int num_samples, const Array<Tag> &tags) {
 	auto d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
 	if (!d)
 		return base::failed<void>();
@@ -266,7 +266,7 @@ base::future<void> Storage::save_via_renderer(Port *r, const Path &filename, int
 		return base::failed<void>();
 	}
 	od.start_progress(_("exporting"));
-	od.renderer = r;
+	od.renderer = &r;
 	od.tags = tags;
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
@@ -280,7 +280,7 @@ base::future<void> Storage::render_export_selection(Song *song, const SongSelect
 	SongRenderer renderer(song);
 	renderer.set_range(sel.range());
 	renderer.allow_layers(sel.layers());
-	return save_via_renderer(renderer.port_out[0], filename, renderer.get_num_samples(), song->tags);
+	return save_via_renderer(renderer.out, filename, renderer.get_num_samples(), song->tags);
 }
 
 Storage::Future Storage::ask_by_flags(hui::Window *win, const string &title, int flags, const Array<string> &opt) {
@@ -367,7 +367,7 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	bytes r;
 
 	auto dir0 = this->current_directory;
-	auto future = save_via_renderer(bs.port_out[0], filename, buffer.length, {});
+	auto future = save_via_renderer(bs.out, filename, buffer.length, {});
 	future.then([this, &r, buffer, filename] {
 			r = os::fs::read_binary(filename);
 			session->i(format("compressed buffer... %db   %.1f%%", r.num, 100.0f * (float)r.num / (float)(buffer.length * 2 * buffer.channels)));

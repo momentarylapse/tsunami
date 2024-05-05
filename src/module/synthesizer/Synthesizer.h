@@ -84,15 +84,10 @@ public:
 
 	bool is_default();
 
-	class Output : public Port {
-	public:
-		Output(Synthesizer *synth);
-		Synthesizer *synth;
-		int read_audio(AudioBuffer &buf) override;
+	int read_audio(int port, AudioBuffer &buf) override;
 
-	};
-
-	MidiInPort in{this, "in"};
+	AudioOutPort out{this};
+	MidiInPort in{this};
 
 protected:
 

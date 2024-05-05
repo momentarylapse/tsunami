@@ -52,8 +52,11 @@ color module_color(Module *m) {
 		return theme.neon(0); // red
 	if (m->module_category == ModuleCategory::SYNTHESIZER)
 		return theme.neon(3); // green
-	if (m->module_category == ModuleCategory::PLUMBING)
-		return theme.neon(1); // orange
+	if (m->module_category == ModuleCategory::PLUMBING) {
+		if (sa_contains({"AudioSucker", "MidiSucker", "BeatMidifier"}, m->module_class))
+			return theme.neon(1); // orange
+		return theme.text_soft3;
+	}
 	if (m->module_category == ModuleCategory::AUDIO_SOURCE)
 		//return theme.neon(4); // blue
 		//return theme.neon(3); // green

@@ -21,6 +21,9 @@
 
 const float MODULE_WIDTH = MODULE_GRID * 7;
 const float MODULE_HEIGHT = MODULE_GRID * 2;
+static const float PORT_SWARM_CENTER_OFFSET = 35;
+static const float PORT_SWARM_RADIUS = 50;
+static const float PORT_SWARM_DPHI = 0.4f;
 
 string module_header(Module *m) {
 	if (m->module_name.num > 0)
@@ -75,20 +78,24 @@ color module_color(Module *m) {
 
 
 
-static float module_port_in_x(Module *m) {
-	return - 10;
+static float module_port_in_x(Module *m, int index) {
+	float phi = ((float)index - (float)(m->port_in.num-1) / 2) * PORT_SWARM_DPHI;
+	return PORT_SWARM_CENTER_OFFSET - cos(phi) * PORT_SWARM_RADIUS;
 }
 
 static float module_port_in_y(Module *m, int index) {
-	return MODULE_HEIGHT/2 + (index - (float)(m->port_in.num-1)/2)*30;
+	float phi = ((float)index - (float)(m->port_in.num-1) / 2) * PORT_SWARM_DPHI;
+	return MODULE_HEIGHT/2 + sin(phi) * PORT_SWARM_RADIUS;
 }
 
-static float module_port_out_x(Module *m) {
-	return MODULE_WIDTH + 10;
+static float module_port_out_x(Module *m, int index) {
+	float phi = ((float)index - (float)(m->port_out.num-1) / 2) * PORT_SWARM_DPHI;
+	return MODULE_WIDTH - PORT_SWARM_CENTER_OFFSET + cos(phi) * PORT_SWARM_RADIUS;
 }
 
 static float module_port_out_y(Module *m, int index) {
-	return MODULE_HEIGHT/2 + (index - (float)(m->port_out.num-1)/2)*30;
+	float phi = ((float)index - (float)(m->port_out.num-1) / 2) * PORT_SWARM_DPHI;
+	return MODULE_HEIGHT/2 + sin(phi) * PORT_SWARM_RADIUS;
 }
 
 
@@ -131,9 +138,9 @@ SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegra
 	module = m;
 	set_perf_name("se:module");
 	foreachi(auto p, m->port_in, i)
-		in.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_in_x(module), module_port_in_y(module, i), false));
+		in.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_in_x(module, i), module_port_in_y(module, i), false));
 	foreachi(auto p, m->port_out, i)
-		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module), module_port_out_y(module, i), true));
+		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module, i), module_port_out_y(module, i), true));
 	for (auto p: in + out)
 		add_child(p);
 }

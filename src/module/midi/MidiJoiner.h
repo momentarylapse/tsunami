@@ -18,7 +18,9 @@ public:
 
 	MidiOutPort out{this};
 	MidiInPort in_a{this, "a"};
-	MidiInPort in_b{this, "a"};
+	MidiInPort in_b{this, "b"};
+	MidiInPort in_c{this, "c"};
+	MidiInPort in_d{this, "d"};
 
 	int read_midi(int port, MidiEventBuffer &buf) override;
 };

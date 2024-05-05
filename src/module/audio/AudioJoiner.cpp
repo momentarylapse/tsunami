@@ -15,22 +15,26 @@ AudioJoiner::AudioJoiner() :
 }
 
 int AudioJoiner::read_audio(int port, AudioBuffer& buf) {
-	auto pa = in_a.source;
-	auto pb = in_b.source;
-	if (pa and pb) {
-		int ra = pa->read_audio(buf);
-		if (ra <= 0)
-			return ra;
-		// hmmm needs buffering if a has data, but b has none yet (input stream)
-		AudioBuffer buf_b;
-		buf_b.resize(buf.length);
-		int rb = pb->read_audio(buf_b);
-		buf.add(buf_b, 0, 1);
-		return max(ra, rb);
-	} else if (pa) {
-		return pa->read_audio(buf);
-	} else if (pb) {
-		return pb->read_audio(buf);
+	bool first = true;
+	int result = NO_SOURCE;
+	for (auto _in: port_in) {
+		if (!_in->source)
+			continue;
+		if (first) {
+			result = _in->source->read_audio(buf);
+			if (result <= 0)
+				return result;
+			first = false;
+		} else {
+			// hmmm needs buffering if a has data, but b has none yet (input stream)
+			AudioBuffer buf_b;
+			buf_b.resize(buf.length);
+			int r = _in->source->read_audio(buf_b);
+			if (r <= 0)
+				return r;
+			buf.add(buf_b, 0, 1);
+			result = max(result, r);
+		}
 	}
-	return NO_SOURCE;
+	return result;
 }

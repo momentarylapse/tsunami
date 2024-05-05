@@ -18,6 +18,8 @@ public:
 	AudioOutPort out{this};
 	AudioInPort in_a{this, "a"};
 	AudioInPort in_b{this, "b"};
+	AudioInPort in_c{this, "c"};
+	AudioInPort in_d{this, "d"};
 
 	int read_audio(int port, AudioBuffer &buf) override;
 };

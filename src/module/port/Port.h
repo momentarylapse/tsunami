@@ -20,7 +20,7 @@ struct InPort;
 
 
 struct OutPort {
-	OutPort(Module* module, SignalType type, const string& name = "out", int port_no = 0);
+	OutPort(Module* module, SignalType type, const string& name = "out");
 
 	void connect(InPort& in);
 	void operator>>(InPort& in) { connect(in); }
@@ -37,15 +37,15 @@ struct OutPort {
 };
 
 struct AudioOutPort : OutPort {
-	AudioOutPort(Module *module, const string &name = "out", int port_no = 0);
+	AudioOutPort(Module *module, const string &name = "out");
 };
 
 struct MidiOutPort : OutPort {
-	MidiOutPort(Module *module, const string &name = "out", int port_no = 0);
+	MidiOutPort(Module *module, const string &name = "out");
 };
 
 struct BeatsOutPort : OutPort {
-	BeatsOutPort(Module *module, const string &name = "out", int port_no = 0);
+	BeatsOutPort(Module *module, const string &name = "out");
 };
 
 

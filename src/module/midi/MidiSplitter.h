@@ -17,8 +17,10 @@ class MidiSplitter : public Module {
 public:
 	MidiSplitter();
 
-	MidiOutPort out_a{this, "a", 0};
-	MidiOutPort out_b{this, "b", 1};
+	MidiOutPort out_a{this, "a"};
+	MidiOutPort out_b{this, "b"};
+	MidiOutPort out_c{this, "c"};
+	MidiOutPort out_d{this, "d"};
 	MidiInPort in{this};
 
 	int read_midi(int port, MidiEventBuffer &buf) override;

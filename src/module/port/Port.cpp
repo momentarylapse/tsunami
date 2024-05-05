@@ -10,12 +10,11 @@
 #include "../../data/base.h"
 #include "../../Session.h"
 
-
-OutPort::OutPort(Module* _module, SignalType _type, const string& _name, int _port_no) {
+OutPort::OutPort(Module* _module, SignalType _type, const string& _name) {
 	module = _module;
 	type = _type;
 	name = _name;
-	port_no = _port_no;
+	port_no = module->port_out.num;
 	module->port_out.add(this);
 }
 
@@ -45,16 +44,16 @@ int OutPort::read_beats(Array<Beat> &beats, int samples) {
 	return module->read_beats(port_no, beats, samples);
 }
 
-AudioOutPort::AudioOutPort(Module *module, const string &name, int port_no) :
-		OutPort(module, SignalType::AUDIO, name, port_no) {
+AudioOutPort::AudioOutPort(Module *module, const string &name) :
+		OutPort(module, SignalType::AUDIO, name) {
 }
 
-MidiOutPort::MidiOutPort(Module *module, const string &name, int port_no) :
-		OutPort(module, SignalType::MIDI, name, port_no) {
+MidiOutPort::MidiOutPort(Module *module, const string &name) :
+		OutPort(module, SignalType::MIDI, name) {
 }
 
-BeatsOutPort::BeatsOutPort(Module *module, const string &name, int port_no) :
-		OutPort(module, SignalType::BEATS, name, port_no) {
+BeatsOutPort::BeatsOutPort(Module *module, const string &name) :
+		OutPort(module, SignalType::BEATS, name) {
 }
 
 InPort::InPort(Module* module, SignalType _type, const string& _name) {

@@ -18,11 +18,15 @@
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
 #include "../../data/midi/MidiData.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/kaba/kaba.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
 #include "../../Session.h"
 
+namespace kaba {
+	string find_enum_label(const Class *type, int value);
+}
 
 bool is_number(char c) {
 	return (c >= '0' and c <= '9');
@@ -364,47 +368,97 @@ public:
 	string *value;
 	string id;
 	ConfigPanel *panel;
-	Array<string> choices;
-	AutoConfigDataString(const string &_name) : AutoConfigData(_name) {
+	explicit AutoConfigDataString(const string &_name) : AutoConfigData(_name) {
 		value = nullptr;
 		panel = nullptr;
 	}
 	void parse(const string &s) override {
-		for (const auto& p: s.explode(",")) {
-			if (p.head(7) == "choice=") {
-				choices = p.sub_ref(7).explode("|");
-			}
-		}
 	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		panel = p;
 		id = "string-" + i2s(i);
-		if (choices.num > 0) {
-			p->add_combo_box("!expandx", 1, i, id);
-			for (string &c: choices)
-				p->add_string(id, c);
-		} else {
-			p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
-		}
+		p->add_edit("!width=150,expandx\\" + *value, 1, i, id);
 		p->event(id, callback);
 	}
 	void value_from_gui() override {
-		if (choices.num > 0) {
-			int n = panel->get_int(id);
-			if (n >= 0)
-				*value = choices[n];
-		} else {
-			*value = panel->get_string(id);
-		}
+		*value = panel->get_string(id);
 	}
 	void value_to_gui() override {
-		if (choices.num > 0) {
-			foreachi (string &c, choices, i)
-				if (c == *value)
-					panel->set_int(id, i);
-		} else {
-			panel->set_string(id, *value);
-		}
+		panel->set_string(id, *value);
+	}
+};
+
+class AutoConfigDataStringChoices : public AutoConfigData {
+public:
+	string *value;
+	string id;
+	ConfigPanel *panel;
+	Array<string> choices;
+	explicit AutoConfigDataStringChoices(const string &_name) : AutoConfigData(_name) {
+		value = nullptr;
+		panel = nullptr;
+	}
+	void parse(const string &s) override {
+		for (const auto& p: s.explode(","))
+			if (p.head(7) == "choice=")
+				choices = p.sub_ref(7).explode("|");
+	}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
+		panel = p;
+		id = "string-" + i2s(i);
+		p->add_combo_box("!expandx", 1, i, id);
+		for (string &c: choices)
+			p->add_string(id, c);
+		p->event(id, callback);
+	}
+	void value_from_gui() override {
+		int n = panel->get_int(id);
+		if (n >= 0)
+			*value = choices[n];
+	}
+	void value_to_gui() override {
+		for (auto&& [i,c]: enumerate(choices))
+			if (c == *value)
+				panel->set_int(id, i);
+	}
+};
+
+class AutoConfigDataEnum : public AutoConfigData {
+public:
+	int *value;
+	string id;
+	ConfigPanel *panel;
+	struct Choice {
+		string name;
+		int value;
+	};
+	Array<Choice> choices;
+	explicit AutoConfigDataEnum(const string &_name, const kaba::Class *type) : AutoConfigData(_name) {
+		value = nullptr;
+		panel = nullptr;
+		for (auto c: weak(type->constants))
+			if (c->type == type)
+				choices.add({find_enum_label(type, c->as_int()), c->as_int()});
+	}
+	void parse(const string &s) override {
+	}
+	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
+		panel = p;
+		id = "enum-" + i2s(i);
+		p->add_combo_box("!expandx", 1, i, id);
+		for (auto &c: choices)
+			p->add_string(id, c.name);
+		p->event(id, callback);
+	}
+	void value_from_gui() override {
+		int n = panel->get_int(id);
+		if (n >= 0 and n < choices.num)
+			*value = choices[n].value;
+	}
+	void value_to_gui() override {
+		for (auto&& [i,c]: enumerate(choices))
+			if (c.value == *value)
+				panel->set_int(id, i);
 	}
 };
 
@@ -537,8 +591,18 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 			a->value = (bool*)((char*)config + e.offset);
 			r.add(a);
 		} else if (e.type == kaba::TypeString) {
-			auto *a = new AutoConfigDataString(e.name);
-			a->value = (string*)((char*)config + e.offset);
+			if (cc.find("choices=") >= 0) {
+				auto *a = new AutoConfigDataStringChoices(e.name);
+				a->value = (string*)((char*)config + e.offset);
+				r.add(a);
+			} else {
+				auto *a = new AutoConfigDataString(e.name);
+				a->value = (string *) ((char *) config + e.offset);
+				r.add(a);
+			}
+		} else if (e.type->is_enum()) {
+			auto *a = new AutoConfigDataEnum(e.name, e.type);
+			a->value = (int*)((char*)config + e.offset);
 			r.add(a);
 		} else if (e.type->name == "shared[SampleRef]") {
 			auto *a = new AutoConfigDataSampleRef(e.name, session);
@@ -562,7 +626,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 	aa = _aa;
 	add_grid("", 0, 0, "grid");
 	set_target("grid");
-	foreachi(auto *a, aa, i) {
+	for (auto&& [i, a]: enumerate(aa)) {
 		set_target("grid");
 		add_label("!right,disabled\\" + a->label, 0, i, format("label-%d", i));
 		add_label(a->unit, 2, i, format("unit-%d", i));

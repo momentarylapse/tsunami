@@ -30,8 +30,9 @@ class Metronome extends AudioSource
 	func mut create_stuff()
 		synth = CreateSynthesizer(session, "")
 		source = CreateMidiSourceX[MetronomeSource](session, "Metronome") #weak(CreateMidiSource(session, "Metronome")) as MetronomeSource*
-		for s in synth
-			s.plug_in(0, source, 0)
+		for s in source
+			for ss in synth
+				s.output >> ss.input
 
 	func override read(out buf: AudioBuffer) -> int
 		for s in synth

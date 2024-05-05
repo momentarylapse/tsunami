@@ -8,19 +8,7 @@
 #include "Port.h"
 #include "../Module.h"
 #include "../../data/base.h"
-
-/*Port::Port(SignalType _type, const string &_name) {
-	type = _type;
-	name = _name;
-}
-
-void Port::__init__(SignalType _type, const string &_name) {
-	new(this) Port(_type, _name);
-}
-
-void Port::__delete__() {
-	this->Port::~Port();
-}*/
+#include "../../Session.h"
 
 
 OutPort::OutPort(Module* _module, SignalType _type, const string& _name, int _port_no) {
@@ -29,6 +17,20 @@ OutPort::OutPort(Module* _module, SignalType _type, const string& _name, int _po
 	name = _name;
 	port_no = _port_no;
 	module->port_out.add(this);
+}
+
+void OutPort::connect(InPort &in) {
+	if (_connection_count > 0) {
+		module->session->e("connect: port already connected");
+		return;
+	}
+	if (type != in.type) {
+		module->session->e("connect: port type mismatch");
+		return;
+	}
+
+	in.source = this;
+	_connection_count ++;
 }
 
 int OutPort::read_audio(AudioBuffer &buf) {
@@ -59,6 +61,12 @@ InPort::InPort(Module* module, SignalType _type, const string& _name) {
 	type = _type;
 	name = _name;
 	module->port_in.add(this);
+}
+
+void InPort::disconnect() {
+	if (source)
+		source->_connection_count --;
+	source = nullptr;
 }
 
 AudioInPort::AudioInPort(Module* module, const string& name) :

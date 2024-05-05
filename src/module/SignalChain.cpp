@@ -184,7 +184,7 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 	if (source_port < 0 or source_port >= source->port_out.num)
 		throw Exception("connect: invalid source port");
 	if (target_port < 0 or target_port >= target->port_in.num)
-		throw Exception("connect: invalid source port");
+		throw Exception("connect: invalid target port");
 	//msg_write("connect " + i2s(source->port_out[source_port].type) + " -> " + i2s(target->port_in[target_port].type));
 
 	disconnect_out(source, source_port);
@@ -192,7 +192,7 @@ void SignalChain::connect(Module *source, int source_port, Module *target, int t
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		target->_plug_in(target_port, source, source_port);
+		source->port_out[source_port]->connect(*target->port_in[target_port]);
 	}
     _rebuild_position_estimation_graph();
 	out_add_cable.notify();
@@ -210,7 +210,7 @@ void SignalChain::disconnect_out(Module *source, int source_port) {
 			if (p->source == sp) {
 				{
 					std::lock_guard<std::mutex> lock(mutex);
-					p->source = nullptr;
+					p->disconnect();
 				}
                 _rebuild_position_estimation_graph();
 				out_delete_cable.notify();
@@ -222,7 +222,7 @@ void SignalChain::disconnect_in(Module *target, int target_port) {
 	auto tp = target->port_in[target_port];
 	{
 		std::lock_guard<std::mutex> lock(mutex);
-		tp->source = nullptr;
+		tp->disconnect();
 	}
     _rebuild_position_estimation_graph();
 	out_delete_cable.notify();

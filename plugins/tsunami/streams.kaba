@@ -2,6 +2,7 @@ use common.*
 use modules.*
 
 class AudioOutput extends Module
+	var input: Module.InPort
 	func extern __init__(session: Session)
 	func extern override __delete__()
 	func extern mut stop()
@@ -13,6 +14,7 @@ class AudioOutput extends Module
 
 
 class AudioInput extends Module
+	var output: Module.OutPort
 	var current_buffer: RingBuffer
 	var buffer: AudioBuffer
 	func extern __init__(session: Session)

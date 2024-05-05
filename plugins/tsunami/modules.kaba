@@ -90,8 +90,6 @@ class Module extends Object as shared
 	func extern virtual mut reset_state()
 	func extern mut changed()
 	func extern virtual mut command(cmd: Command, param: i64) -> i64?
-	func extern mut plug_in(in_port: int, source: Module*, out_port: int)
-	func extern mut unplug_in(in_port: int)
 	func extern mut create_sink(f: void->void) -> obs.sink&
 	func extern mut unsubscribe(handler: Object)
 	func extern copy() -> xfer[Module]
@@ -101,7 +99,12 @@ class Module extends Object as shared
 	func extern virtual mut read_beats(port: int, out beats: Beat[], samples: int) -> int
 	
 	class OutPort
+		var type: SignalType
+		var name: string
 		#func extern __init__()
+		func extern mut connect(source: InPort)
+		func mut __rshift__(source: InPort)
+			connect(source)
 		func extern mut read_audio(out buf: AudioBuffer) -> int
 		func extern mut read_midi(out midi: MidiEventBuffer) -> int
 		func extern mut read_beats(out beats: Beat[], samples: int) -> int
@@ -110,6 +113,7 @@ class Module extends Object as shared
 		var type: SignalType
 		var name: string
 		var source: Module.OutPort*
+		func extern mut disconnect()
 		
 	class Config
 		func extern __init__()
@@ -132,6 +136,8 @@ class Module extends Object as shared
 
 
 class AudioEffect extends Module
+	var output: Module.OutPort
+	var input: Module.InPort
 	var apply_to_whole_buffer: bool
 	var wetness: float
 	var source: Module.InPort
@@ -143,7 +149,8 @@ class AudioEffect extends Module
 
 
 class MidiEffect extends Module
-	var source: Module.InPort
+	var output: Module.OutPort
+	var input: Module.InPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out midi: MidiEventBuffer)
@@ -151,6 +158,8 @@ class MidiEffect extends Module
 
 
 class AudioVisualizer extends Module
+	var output: Module.OutPort
+	var input: Module.InPort
 	var chunk_size: int
 	var ring_buffer: RingBuffer&
 	var next_writing: int
@@ -169,6 +178,7 @@ class AudioVisualizer extends Module
 # general "interface"
 
 class AudioSource extends Module
+	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out buf: AudioBuffer) -> int
@@ -181,6 +191,7 @@ struct MidiProduceData
 
 
 class MidiSource extends Module
+	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out midi: MidiEventBuffer) -> int
@@ -208,6 +219,7 @@ class MidiEventStreamer extends MidiSource
 
 
 class PitchDetector extends MidiSource
+	var input: Module.InPort
 	var frequency, volume: float
 	var pitch: int
 	var loud_enough: bool
@@ -230,6 +242,8 @@ class PitchRenderer as @noauto
 
 
 class Synthesizer extends Module
+	var output: Module.OutPort
+	var input: Module.InPort
 	var sample_rate: int
 	var keep_notes: int
 	var freq: float[MAX_PITCH]
@@ -270,6 +284,7 @@ struct EnvelopeADSR
 
 
 class BeatSource extends Module
+	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut read(out beats: Beat[], samples: int) -> int
@@ -284,17 +299,22 @@ class BeatMidifier extends MidiSource
 	func extern override __init__()
 	#extern override void __delete__()
 	func extern override mut read(out midi: MidiEventBuffer) -> int
+	var input: Module.InPort
 	var volume: float
 
 
 class AudioAccumulator extends Module
 	func extern __init__()
+	var output: Module.OutPort
+	var input: Module.InPort
 	var samples_skipped: int
 	var buffer: AudioBuffer
 
 
 class MidiAccumulator extends Module
 	func extern __init__()
+	var output: Module.OutPort
+	var input: Module.InPort
 	var buffer: MidiEventBuffer
 
 

@@ -28,8 +28,8 @@ class SineSource extends AudioSource
 		#dyn({"pitch":config.pitch, "volume":config.volume})
 		for s in source
 			s.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
-		for s in synth
-			s.plug_in(0, weak(source), 0)
+			for ss in synth
+				s.output >> ss.input
 
 	func override read(out buf: AudioBuffer) -> int
 		for s in synth

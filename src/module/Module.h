@@ -154,8 +154,6 @@ public:
 	// ports
 	Array<InPort*> port_in;
 	Array<OutPort*> port_out;
-	void _plug_in(int in_port, Module *source, int out_port);
-	void _unplug_in(int in_port);
 
 	virtual int read_audio(int port, AudioBuffer &buf){ return 0; }
 	virtual int read_midi(int port, MidiEventBuffer &midi){ return 0; };

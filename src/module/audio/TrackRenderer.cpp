@@ -110,13 +110,13 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 		midi_streamer = new MidiEventStreamer();
 		midi_streamer->set_data(raw);
 		midi_streamer->perf_set_parent(this);
-		synth->_plug_in(0, midi_streamer.get(), 0);
+		midi_streamer->out >> synth->in;
 		fill_midi_streamer();
 	} else if (t->type == SignalType::BEATS) {
 		beat_midifier = new BeatMidifier;
-		beat_midifier->_plug_in(0, sr->bar_streamer.get(), 0);
+		sr->bar_streamer->out >> beat_midifier->in;
 		beat_midifier->perf_set_parent(this);
-		synth->_plug_in(0, beat_midifier.get(), 0);
+		beat_midifier->out >> synth->in;
 	}
 	
 	perf_set_parent(song_renderer);
@@ -209,9 +209,9 @@ void TrackRenderer::on_track_replace_synth() {
 	}
 
 	if (track->type == SignalType::MIDI) {
-		synth->_plug_in(0, midi_streamer.get(), 0);
+		midi_streamer->out >> synth->in;
 	} else if (track->type == SignalType::BEATS) {
-		synth->_plug_in(0, beat_midifier.get(), 0);
+		beat_midifier->out >> synth->in;
 	}
 	synth->perf_set_parent(this);
 }

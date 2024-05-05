@@ -273,20 +273,6 @@ ModuleCategory Module::category_from_str(const string &str) {
 	return (ModuleCategory)-1;
 }
 
-void Module::_plug_in(int in_port, Module *source, int source_port) {
-	OutPort *sp = source->port_out[source_port];
-	auto tp = port_in[in_port];
-	if (sp->type != tp->type)
-		throw Exception("connect: port type mismatch");
-
-	tp->source = sp;
-}
-
-void Module::_unplug_in(int in_port) {
-	auto tp = port_in[in_port];
-	tp->source = nullptr;
-}
-
 
 void Module::set_func_edit(std::function<void()> f) {
 	func_edit = f;

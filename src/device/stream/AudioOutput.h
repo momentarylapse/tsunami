@@ -39,6 +39,8 @@ public:
 	AudioOutput(Session *session);
 	virtual ~AudioOutput();
 
+	AudioInPort in{this, "in"};
+
 	void _cdecl __init__(Session *session);
 	void __delete__() override;
 	
@@ -77,7 +79,6 @@ public:
 private:
 	int _read_stream(int buffer_size);
 
-	AudioInPort in{this, "in"};
 	RingBuffer ring_buf;
 
 	int prebuffer_size;

@@ -225,7 +225,7 @@ void Session::set_mode(const string &_mode) {
 			win->side_bar->open(SideBar::SAMPLEREF_CONSOLE);
 		} else if (mode == EditMode::XSignalEditor) {
 			//view->set_mode(view->mode_default);
-			win->bottom_bar->open(BottomBar::SIGNAL_EDITOR);
+			win->bottom_bar->open(BottomBar::SIGNAL_CHAIN_CONSOLE);
 		} else {
 			e("unknown mode: " + mode);
 			return;
@@ -267,8 +267,9 @@ shared<SignalChain> Session::load_signal_chain(const Path &filename) {
 }
 
 void Session::remove_signal_chain(SignalChain* chain) {
-	out_remove_signal_chain(chain);
+	shared<SignalChain> temp = chain; // keep alive until after the event
 	for (int i=0; i<all_signal_chains.num; i++)
 		if (chain == all_signal_chains[i])
 			all_signal_chains.erase(i);
+	out_remove_signal_chain(chain);
 }

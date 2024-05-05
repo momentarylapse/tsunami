@@ -417,6 +417,7 @@ set(SOURCE
 	src/view/bottombar/MixingConsole.cpp
 	src/view/bottombar/PluginConsole.cpp
 	src/view/bottombar/SessionConsole.cpp
+	src/view/bottombar/SignalChainConsole.cpp
 	src/view/bottombar/SignalEditor.cpp
 	src/view/dialog/AudioScaleDialog.cpp
 	src/view/dialog/BarAddDialog.cpp

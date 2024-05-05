@@ -1,10 +1,3 @@
-/*
- * SessionConsole.cpp
- *
- *  Created on: 1 May 2022
- *      Author: michi
- */
-
 #include "SessionConsole.h"
 #include "../dialog/QuestionDialog.h"
 #include "../TsunamiWindow.h"

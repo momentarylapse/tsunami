@@ -1,0 +1,6 @@
+Dialog signal-chain-console "Signal Chains"
+	Grid ? ""
+		Grid ? "" vertical
+			Button signal-chain-new "new"
+			Button signal-chain-load "load"
+		ListView signal-chains "name" format=m nobar expandy expandx

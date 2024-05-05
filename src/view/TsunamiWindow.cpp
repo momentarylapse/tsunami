@@ -881,7 +881,7 @@ void TsunamiWindow::update_menu() {
 	enable("record", !session->in_mode(EditMode::Capture));
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
-	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_EDITOR));
+	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_CHAIN_CONSOLE));
 	check("show-plugin-console", bottom_bar->is_active(BottomBar::PLUGIN_CONSOLE));
 	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
 

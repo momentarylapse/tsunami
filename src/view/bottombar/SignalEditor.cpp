@@ -85,20 +85,7 @@ void SignalEditor::remove_editor_panel_for_chain(SignalChain *chain) {
 		}
 }
 
-string suggest_new_signal_chain_name(Session *session) {
-	auto exists = [session] (const string& name) {
-		for (auto c: weak(session->all_signal_chains))
-			if (c->name == name)
-				return true;
-		return false;
-	};
-	if (!exists("user chain"))
-		return "user chain";
-	for (int n=2; n<999; n++)
-		if (!exists(format("user chain %d", n)))
-			return format("user chain %d", n);
-	return "?";
-}
+string suggest_new_signal_chain_name(Session *session);
 
 void SignalEditor::on_new() {
 	auto chain = session->create_signal_chain(suggest_new_signal_chain_name(session));

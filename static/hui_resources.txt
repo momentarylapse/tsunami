@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-87
+88
 # Resource
 Menu
 menu_fake
@@ -8241,6 +8241,43 @@ expandx
 0
 # Resource
 Dialog
+signal-chain-console
+
+0
+0
+1
+Grid
+?
+
+0
+0
+2
+Grid
+?
+vertical
+0
+0
+2
+Button
+signal-chain-new
+
+0
+0
+0
+Button
+signal-chain-load
+
+1
+0
+0
+ListView
+signal-chains
+format=m,nobar,expandy,expandx
+1
+0
+0
+# Resource
+Dialog
 song_dialog
 width=430,height=375
 0
@@ -9219,7 +9256,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-802
+806
 # Text
 /bars-add
 Add bars...
@@ -11428,6 +11465,18 @@ Suck buffer
 
 settings_dialog/tab
 User Interface\\Devices\\Storage
+
+signal-chain-console/signal-chain-console
+Signal Chains
+
+signal-chain-console/signal-chain-load
+load
+
+signal-chain-console/signal-chain-new
+new
+
+signal-chain-console/signal-chains
+name
 
 song_dialog/ad_t_edit
 Edit

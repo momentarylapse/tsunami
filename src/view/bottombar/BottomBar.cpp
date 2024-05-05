@@ -9,6 +9,7 @@
 #include "MixingConsole.h"
 #include "LogConsole.h"
 #include "SignalEditor.h"
+#include "SignalChainConsole.h"
 #include "DeviceConsole.h"
 #include "PluginConsole.h"
 #include "SessionConsole.h"
@@ -27,7 +28,7 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	add_grid("!expandx", 0, 1, "root_grid");
 	set_target("root_grid");
 	if (hui::Application::adwaita_started)
-		add_list_view("!width=120,noexpandx,nobar,class=navigation-sidebar,noframe\\", 0, 0, "choose");
+		add_list_view("!width=130,noexpandx,nobar,class=navigation-sidebar,noframe\\", 0, 0, "choose");
 	else
 		add_tab_control("!left,noframe,noexpandx,expandy", 1, 0, "choose");
 	//add_separator("!vertical", 1, 0, "");
@@ -35,13 +36,14 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	set_target("button_grid");
 
 	mixing_console = new MixingConsole(session, this);
-	signal_editor = new SignalEditor(session, this);
+	//signal_editor = new SignalEditor(session, this);
+	signal_chain_console = new SignalChainConsole(session, this);
 	plugin_console = new PluginConsole(session, this);
 	device_console = new DeviceConsole(session, this);
 	session_console = new SessionConsole(session, this);
 	log_console = new LogConsole(session, this);
 	add_console(mixing_console, "");
-	add_console(signal_editor, "");
+	add_console(signal_chain_console, "");
 	add_console(plugin_console, "");
 	add_console(device_console, "");
 	add_console(session_console, "");

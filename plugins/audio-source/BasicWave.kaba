@@ -1,0 +1,48 @@
+use tsunami.*
+use helper.tone.*
+
+let AUTO_CONFIG_PITCH = "pitch"
+let AUTO_CONFIG_VOLUME = "volume,range=0:1"
+let AUTO_CONFIG_TYPE = "enum"
+
+enum WaveType
+	SINE as "sine"
+	SQUARE as "square"
+	SAW_TOOTH as "saw tooth"
+
+class SineSource extends AudioSource
+	class Config extends Module.Config
+		var pitch: float
+		var volume: float
+		var type: WaveType
+		func override reset()
+			pitch = 64
+			volume = 0.5
+			type = WaveType.SINE
+
+	var config: Config
+	var phi: float
+	
+	func override reset_state()
+		phi = 0
+
+	func override read(out buf: AudioBuffer) -> int
+		let dphi = pitch_to_freq(config.pitch) * 2 * pi / session.sample_rate()
+		
+		if config.type == WaveType.SINE
+			for mut x in buf.c[0]
+				x = sin(phi) * config.volume
+				phi += dphi
+		else if config.type == WaveType.SQUARE
+			for mut x in buf.c[0]
+				x = sign(sin(phi)) * config.volume
+				phi += dphi
+		else if config.type == WaveType.SAW_TOOTH
+			for mut x in buf.c[0]
+				x = loop(phi / (2*pi), 0, 1) * config.volume
+				phi += dphi
+		
+		phi = loop(phi, 0, 2 * pi)
+		
+		buf.auto_generate_channels()
+		return len(buf)

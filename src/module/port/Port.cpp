@@ -20,8 +20,10 @@ OutPort::OutPort(Module* _module, SignalType _type, const string& _name) {
 
 void OutPort::connect(InPort &in) {
 	if (_connection_count > 0) {
-		module->session->e("connect: port already connected");
-		return;
+		// TODO maybe some day... but not before we have multi-consumer ports
+		//module->session->e("connect: port already connected " + module->module_class);
+		//return;
+		in.disconnect();
 	}
 	if (type != in.type) {
 		module->session->e("connect: port type mismatch");

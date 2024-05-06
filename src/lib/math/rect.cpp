@@ -59,6 +59,10 @@ bool rect::overlaps(const rect &r) const {
 	return false;
 }
 
+rect rect::grow(float d) const {
+	return rect(x1 - d, x2 + d, y1 - d, y2 + d);
+}
+
 bool rect::operator==(const rect &r) const {
 	return (x1 == r.x1) and (y1 == r.y1) and (x2 == r.x2) and (y2 == r.y2);
 }

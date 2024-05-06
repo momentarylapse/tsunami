@@ -49,7 +49,7 @@ vec2 ScrollPad::unproject(const vec2 &p) {
 }
 
 bool ScrollPad::on_mouse_wheel(const vec2 &d) {
-	move_view(d * 10);
+	move_view(d * 50);
 	return true;
 }
 

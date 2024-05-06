@@ -34,14 +34,25 @@ public:
 		view = _view;
 	}
 	void on_draw(Painter* p) override {
-		p->set_color(theme.text_soft2);
-		if (is_cur_hover())
-			p->set_color(theme.text);
-		if (view == main_view->active_view)
+		color fg = theme.text_soft2;
+		color bg = theme.background_overlay;
+		if (is_cur_hover()) {
+			fg = theme.text_soft1;
+			bg = theme.hoverify(bg);
+		}
+		p->set_roundness(8);
+		p->set_color(bg);
+		p->set_fill(true);
+		p->draw_rect(area.grow(-2));
+		p->set_roundness(0);
+		p->set_color(fg);
+		if (view == main_view->active_view) {
 			p->set_font("", theme.FONT_SIZE_SMALL, true, false);
-		else
+			p->set_color(theme.text);
+		} else {
 			p->set_font("", theme.FONT_SIZE_SMALL, false, false);
-		p->draw_str({area.x1, area.y1}, view->main_view_description());
+		}
+		p->draw_str({area.x1 + 8, area.center().y - theme.FONT_SIZE_SMALL * 0.5f}, view->main_view_description());
 	}
 	bool on_left_button_down(const vec2& m) override {
 		main_view->_activate_view(view);

@@ -20,6 +20,7 @@ public:
 	bool _cdecl inside(const vec2 &p) const;
 	bool _cdecl covers(const rect &r) const;
 	bool _cdecl overlaps(const rect &r) const;
+	rect grow(float d) const;
 
 	bool _cdecl operator==(const rect &r) const;
 	bool _cdecl operator!=(const rect &r) const;

@@ -103,7 +103,7 @@ public:
 		p->set_font_size(theme.FONT_SIZE);
 	}
 	bool on_left_button_down(const vec2 &m) override {
-		chain->session->main_view->add_view(new SignalEditorTab(chain));
+		chain->session->main_view->open_for(chain);
 		return true;
 	}
 	string get_tip() const override {
@@ -111,7 +111,7 @@ public:
 	}
 };
 
-SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
+SignalEditorTab::SignalEditorTab(SignalChain *_chain) {
 
 	chain = _chain;
 	session = chain->session;
@@ -161,6 +161,14 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) : scenegraph::Node() {
 
 SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
+}
+
+void* SignalEditorTab::main_view_data() const {
+	return chain;
+}
+
+string SignalEditorTab::main_view_description() const {
+	return "chain: " + chain->name;
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {

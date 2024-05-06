@@ -8,7 +8,7 @@
 #pragma once
 
 #include "../../../lib/hui/hui.h"
-#include "../../helper/graph/Node.h"
+#include "../../mainview/MainViewNode.h"
 
 class SignalEditor;
 class SignalChain;
@@ -25,7 +25,7 @@ class ScrollPad;
 class ScrollBar;
 
 // TODO rename to SignalEditor
-class SignalEditorTab : public scenegraph::Node {
+class SignalEditorTab : public MainViewNode {
 public:
 	SignalEditorTab(SignalChain *_chain);
 	~SignalEditorTab();
@@ -48,6 +48,8 @@ public:
 	void select_module(Module *m, bool add=false);
 	void update_module_positions();
 
+	void* main_view_data() const override;
+	string main_view_description() const override;
 
 	static color signal_color_base(SignalType type);
 	static color signal_color(SignalType type, bool hover);

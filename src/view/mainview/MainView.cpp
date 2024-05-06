@@ -18,28 +18,20 @@
 #include "../ColorScheme.h"
 #include "../../device/stream/AudioOutput.h"
 #include "../../stuff/PerformanceMonitor.h"
+#include "../../data/Song.h"
 #include "../../module/SignalChain.h"
 #include "../../Playback.h"
 #include "../../Session.h"
 
 class TabBarButton : public scenegraph::Node {
 public:
-	TabBarButton(MainView *_main_view, scenegraph::Node* _view) {
+	TabBarButton(MainView *_main_view, MainViewNode* _view) {
 		align.w = 200;
 		align.horizontal = AlignData::Mode::LEFT;
 		align.vertical = AlignData::Mode::FILL;
 		set_perf_name("button");
 		main_view = _main_view;
 		view = _view;
-	}
-	string title() const {
-		if (auto av = dynamic_cast<AudioView*>(view)) {
-			return "song..."; //av->song->
-		}
-		if (auto e = dynamic_cast<SignalEditorTab*>(view)) {
-			return "chain: " + e->chain->name;
-		}
-		return PerformanceMonitor::get_name(view->perf_channel);
 	}
 	void on_draw(Painter* p) override {
 		p->set_color(theme.text_soft2);
@@ -49,14 +41,14 @@ public:
 			p->set_font("", theme.FONT_SIZE_SMALL, true, false);
 		else
 			p->set_font("", theme.FONT_SIZE_SMALL, false, false);
-		p->draw_str({area.x1, area.y1}, title());
+		p->draw_str({area.x1, area.y1}, view->main_view_description());
 	}
 	bool on_left_button_down(const vec2& m) override {
-		main_view->activate_view(view);
+		main_view->_activate_view(view);
 		return true;
 	}
 	MainView *main_view;
-	scenegraph::Node* view;
+	MainViewNode* view;
 };
 
 class TabBar : public scenegraph::HBox {
@@ -171,22 +163,36 @@ MainView::~MainView() {
 }
 
 
-void MainView::add_view(scenegraph::Node* view) {
+void MainView::_add_view(MainViewNode* view) {
 	views.add(view);
 	vbox->children.clear();
 	for (auto v: weak(views))
 		vbox->add_child(v);
 	vbox->add_child(tab_bar.get());
 
-	activate_view(view);
+	_activate_view(view);
 }
 
-void MainView::activate_view(scenegraph::Node* view) {
+void MainView::_activate_view(MainViewNode* view) {
 	for (auto v: weak(views))
 		v->set_hidden(v != view);
 	tab_bar->set_hidden(views.num < 2);
 	tab_bar->rebuild();
 	active_view = view;
+}
+
+void MainView::open_for(VirtualBase* p) {
+	for (auto v: weak(views))
+		if (v->main_view_data() == p) {
+			_activate_view(v);
+			return;
+		}
+
+	if (auto song = dynamic_cast<Song*>(p)) {
+		_add_view(new AudioView(song->session));
+	} else if (auto chain = dynamic_cast<SignalChain*>(p)) {
+		_add_view(new SignalEditorTab(chain));
+	}
 }
 
 void MainView::set_theme(const string &name) {

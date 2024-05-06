@@ -15,7 +15,7 @@
 #include "ViewPort.h"
 #include "../ColorScheme.h"
 #include "../HoverData.h"
-#include "../helper/graph/Node.h"
+#include "../mainview/MainViewNode.h"
 #include <atomic>
 
 namespace hui{
@@ -81,10 +81,13 @@ enum class SelectionMode {
 	FAKE,
 };
 
-class AudioView : public scenegraph::Node {
+class AudioView : public MainViewNode {
 public:
 	AudioView(Session *session);
 	virtual ~AudioView();
+
+	void* main_view_data() const override;
+	string main_view_description() const override;
 
 	void check_consistency();
 	void force_redraw();

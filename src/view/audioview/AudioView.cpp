@@ -308,6 +308,14 @@ AudioView::~AudioView() {
 	song->unsubscribe(this);
 }
 
+void* AudioView::main_view_data() const {
+	return song;
+}
+
+string AudioView::main_view_description() const {
+	return "song: " + song->filename.basename();
+}
+
 void AudioView::set_antialiasing(bool set) {
 	antialiasing = set;
 	hui::config.set_bool("View.Antialiasing", antialiasing);

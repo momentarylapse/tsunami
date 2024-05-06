@@ -24,6 +24,7 @@ class Dial;
 class BottomBarExpandButton;
 class LogNotifier;
 class TabBar;
+class MainViewNode;
 
 class MainView : public obs::Node<VirtualBase> {
 public:
@@ -45,11 +46,12 @@ public:
 	LogNotifier *log_notifier;
 	scenegraph::Node *onscreen_display;
 
-	shared_array<scenegraph::Node> views;
-	scenegraph::Node* active_view = nullptr;
+	shared_array<MainViewNode> views;
+	MainViewNode* active_view = nullptr;
 
-	void add_view(scenegraph::Node* view);
-	void activate_view(scenegraph::Node* view);
+	void _add_view(MainViewNode* view);
+	void _activate_view(MainViewNode* view);
+	void open_for(VirtualBase* p);
 
 
 	Array<ColorScheme> themes;

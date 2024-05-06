@@ -68,7 +68,7 @@ void SignalChainConsole::on_delete() {
 void SignalChainConsole::on_list_double_click() {
 	int n = get_int(id_list);
 	if (n >= 0)
-		session->main_view->add_view(new SignalEditorTab(session->all_signal_chains[n].get()));
+		session->main_view->open_for(session->all_signal_chains[n].get());
 }
 
 void SignalChainConsole::on_right_click() {

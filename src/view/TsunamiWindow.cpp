@@ -294,7 +294,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	main_view = new MainView(session, "area");
 
 	view = new AudioView(session);
-	main_view->add_view(view);
+	main_view->_add_view(view);
 	session->main_view = main_view.get();
 	session->view = view;
 	hui::run_later(0.01f, [this] {

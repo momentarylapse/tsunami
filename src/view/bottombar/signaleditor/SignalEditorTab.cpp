@@ -24,6 +24,7 @@
 #include "../../MouseDelayPlanner.h"
 #include "../../../data/base.h"
 #include "../../../Session.h"
+#include "../../../EditModes.h"
 #include "../../../storage/Storage.h"
 #include "../../../plugins/PluginManager.h"
 
@@ -169,6 +170,10 @@ void* SignalEditorTab::main_view_data() const {
 
 string SignalEditorTab::main_view_description() const {
 	return "chain: " + chain->name;
+}
+
+void SignalEditorTab::on_enter_main_view() {
+	session->set_mode(EditMode::SignalChain);
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {

@@ -31,6 +31,7 @@ public:
 	static const string ScaleBars;
 	static const string ScaleMarker;
 	static const string Curves;
+	static const string SignalChain;
 };
 
 

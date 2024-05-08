@@ -504,6 +504,7 @@ set(SOURCE
 	src/view/sidebar/SampleManagerConsole.cpp
 	src/view/sidebar/SampleRefConsole.cpp
 	src/view/sidebar/SideBar.cpp
+	src/view/sidebar/SignalChainPanel.cpp
 	src/view/sidebar/SongConsole.cpp
 	src/view/sidebar/TrackConsole.cpp
 	src/view/ColorScheme.cpp

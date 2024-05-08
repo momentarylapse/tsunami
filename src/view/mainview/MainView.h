@@ -31,6 +31,8 @@ public:
 	MainView(Session *session, const string &id);
 	~MainView();
 
+	obs::xsource<MainViewNode*> out_view_changed{this, "view-changed"};
+
 	void update_onscreen_displays();
 
 	string id;

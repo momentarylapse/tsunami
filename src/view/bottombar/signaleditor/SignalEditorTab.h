@@ -50,6 +50,7 @@ public:
 
 	void* main_view_data() const override;
 	string main_view_description() const override;
+	void on_enter_main_view() override;
 
 	static color signal_color_base(SignalType type);
 	static color signal_color(SignalType type, bool hover);

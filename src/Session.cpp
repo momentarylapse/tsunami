@@ -53,6 +53,7 @@ const string EditMode::Capture = "capture";
 const string EditMode::ScaleBars = "scale-bars";
 const string EditMode::ScaleMarker = "scale-marker";
 const string EditMode::Curves = "curves";
+const string EditMode::SignalChain = "signal-chain";
 
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
@@ -226,6 +227,8 @@ void Session::set_mode(const string &_mode) {
 		} else if (mode == EditMode::XSignalEditor) {
 			//view->set_mode(view->mode_default);
 			win->bottom_bar->open(BottomBar::SIGNAL_CHAIN_CONSOLE);
+		} else if (mode == EditMode::SignalChain) {
+			win->side_bar->open(SideBar::SIGNAL_CHAIN_CONSOLE);
 		} else {
 			e("unknown mode: " + mode);
 			return;

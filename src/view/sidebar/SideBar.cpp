@@ -17,6 +17,7 @@
 #include "SampleRefConsole.h"
 #include "SongConsole.h"
 #include "CaptureConsole.h"
+#include "SignalChainPanel.h"
 #include "../audioview/AudioView.h"
 #include "../bottombar/BottomBar.h"
 #include "../helper/BreadCrumps.h"
@@ -60,6 +61,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	curve_console = new CurveConsole(session, this);
 	sample_ref_console = new SampleRefConsole(session, this);
 	capture_console = new CaptureConsole(session, this);
+	signal_chain_console = new SignalChainPanel(session, this);
 
 	add_console(song_console);
 	add_console(sample_manager);
@@ -72,6 +74,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 	add_console(curve_console);
 	add_console(sample_ref_console);
 	add_console(capture_console);
+	add_console(signal_chain_console);
 
 	event("close", [this]{ on_close(); });
 

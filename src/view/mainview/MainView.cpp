@@ -190,6 +190,8 @@ void MainView::_activate_view(MainViewNode* view) {
 	tab_bar->set_hidden(views.num < 2);
 	tab_bar->rebuild();
 	active_view = view;
+	view->on_enter_main_view();
+	out_view_changed(view);
 }
 
 void MainView::open_for(VirtualBase* p) {

@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-88
+90
 # Resource
 Menu
 menu_fake
@@ -8278,6 +8278,62 @@ format=m,nobar,expandy,expandx
 0
 # Resource
 Dialog
+signal-chain-module-console
+width=400,height=400,allow-parent
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+1
+Grid
+grid-module
+class=card
+0
+0
+0
+# Resource
+Dialog
+signal-chain-panel
+width=400,height=400,allow-parent
+0
+0
+1
+Grid
+?
+vertical
+0
+0
+2
+Grid
+grid-chain
+vertical
+0
+0
+2
+Edit
+search
+placeholder=search...
+0
+0
+0
+ListView
+module-list
+nobar
+1
+0
+0
+Grid
+grid-module
+class=card,hidden
+1
+0
+0
+# Resource
+Dialog
 song_dialog
 width=430,height=375
 0
@@ -9256,7 +9312,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-806
+809
 # Text
 /bars-add
 Add bars...
@@ -11477,6 +11533,15 @@ new
 
 signal-chain-console/signal-chains
 name
+
+signal-chain-module-console/signal-chain-module-console
+Module
+
+signal-chain-panel/module-list
+Name
+
+signal-chain-panel/signal-chain-panel
+Signal Chain
 
 song_dialog/ad_t_edit
 Edit

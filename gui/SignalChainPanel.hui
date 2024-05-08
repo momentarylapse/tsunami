@@ -1,0 +1,6 @@
+Dialog signal-chain-panel "Signal Chain" width=400 height=400 allow-parent
+	Grid ? "" vertical
+		Grid grid-chain "" vertical
+			Edit search "" "placeholder=search..."
+			ListView module-list "Name" nobar
+		Grid grid-module "" class=card hidden

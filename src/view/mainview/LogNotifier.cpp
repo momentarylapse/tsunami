@@ -108,6 +108,7 @@ public:
 		message.type = m.type;
 		message.responses = m.responses;
 		hidden = false;
+		request_redraw();
 	}
 };
 

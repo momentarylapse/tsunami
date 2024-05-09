@@ -6,11 +6,13 @@
 #include "../signaleditor/SignalEditorTab.h"
 #include "../mainview/MainView.h"
 #include "../module/ModulePanel.h"
+#include "../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
 #include "../../plugins/PluginManager.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
+#include "../../storage/Storage.h"
 #include "../../lib/base/sort.h"
 
 SignalChainPanel::SignalChainPanel(Session *session, SideBar *bar) :
@@ -40,6 +42,8 @@ SignalChainPanel::SignalChainPanel(Session *session, SideBar *bar) :
 
 	event("search", [this]{ on_search(); });
 	event(id_list, [this]{ on_list(); });
+	event("delete-signal-chain", [this] { on_delete(); });
+	event("save-signal-chain", [this] { on_save_as(); });
 }
 
 SignalChainPanel::~SignalChainPanel() = default;
@@ -101,5 +105,25 @@ void SignalChainPanel::set_module(Module *m) {
 		embed(module_panel, "grid-module", 0, 0);
 	} else {
 		session->set_mode(EditMode::SignalChain);
+	}
+}
+
+void SignalChainPanel::on_delete() {
+	if (auto c = chain()) {
+		if (c->belongs_to_system) {
+			session->e(_("not allowed to delete the main signal chain"));
+			return;
+		}
+		hui::run_later(0.001f, [c] { c->unregister(); });
+	}
+}
+
+void SignalChainPanel::on_save_as() {
+	if (auto c = chain()) {
+		hui::file_dialog_save(session->win.get(), _("Save the signal chain"), session->storage->current_chain_directory,
+		                      {"filter=*.chain", "showfilter=*.chain"}).then([this, c] (const Path &filename) {
+			session->storage->current_chain_directory = filename.parent();
+			c->save(filename);
+		});
 	}
 }

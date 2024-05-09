@@ -24,6 +24,9 @@ public:
 	void on_search();
 	void on_list();
 
+	void on_delete();
+	void on_save_as();
+
 	void fill_module_list(const string& search);
 
 //	void on_enter() override;

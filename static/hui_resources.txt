@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-90
+89
 # Resource
 Menu
 menu_fake
@@ -8278,25 +8278,6 @@ format=m,nobar,expandy,expandx
 0
 # Resource
 Dialog
-signal-chain-module-console
-width=400,height=400,allow-parent
-0
-0
-1
-Grid
-?
-vertical
-0
-0
-1
-Grid
-grid-module
-class=card
-0
-0
-0
-# Resource
-Dialog
 signal-chain-panel
 width=400,height=400,allow-parent
 0
@@ -8314,6 +8295,48 @@ vertical
 0
 0
 2
+Grid
+?
+
+0
+0
+4
+Label
+?
+expandx
+0
+0
+0
+Button
+save-signal-chain
+image=hui:save-as,big,flat
+1
+0
+0
+Button
+delete-signal-chain
+image=hui:delete,big,flat
+2
+0
+0
+Label
+?
+expandx
+3
+0
+0
+Group
+g-add-module
+
+1
+0
+1
+Grid
+?
+vertical
+0
+0
+2
 Edit
 search
 placeholder=search...
@@ -8322,7 +8345,7 @@ placeholder=search...
 0
 ListView
 module-list
-nobar
+format=mm,nobar
 1
 0
 0
@@ -9312,7 +9335,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-809
+811
 # Text
 /bars-add
 Add bars...
@@ -11534,12 +11557,18 @@ new
 signal-chain-console/signal-chains
 name
 
-signal-chain-module-console/signal-chain-module-console
-Module
+signal-chain-panel/delete-signal-chain
+
+Delete signal chain
+signal-chain-panel/g-add-module
+Add new module
 
 signal-chain-panel/module-list
-Name
+Type\\Name
 
+signal-chain-panel/save-signal-chain
+
+Save as...
 signal-chain-panel/signal-chain-panel
 Signal Chain
 

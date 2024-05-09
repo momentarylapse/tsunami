@@ -55,8 +55,15 @@ void SignalChainPanel::fill_module_list(const string& search) {
 //	modules = base::sorted(modules, [] (const string& a, const string& b) { return a <= b; });
 
 	reset(id_list);
-	for (auto& m: modules)
-		add_string(id_list, m.name);
+	auto cat_prev = ModuleCategory::TSUNAMI_PLUGIN; // invalid
+	for (auto& m: modules) {
+		string cat;
+		if (m.category != cat_prev) {
+			cat = format("<small><span alpha=\"50%%\">%s</span></small>", Module::category_to_str(m.category));
+			cat_prev = m.category;
+		}
+		add_string(id_list, format("%s\\%s", cat, m.name));
+	}
 }
 
 void SignalChainPanel::on_list() {

@@ -1,6 +1,13 @@
 Dialog signal-chain-panel "Signal Chain" width=400 height=400 allow-parent
 	Grid ? "" vertical
 		Grid grid-chain "" vertical
-			Edit search "" "placeholder=search..."
-			ListView module-list "Name" nobar
+			Grid ? ""
+				Label ? "" expandx
+				Button save-signal-chain "" image=hui:save-as "tooltip=Save as..." big flat
+				Button delete-signal-chain "" image=hui:delete "tooltip=Delete signal chain" big flat
+				Label ? "" expandx
+			Group g-add-module "Add new module"
+				Grid ? "" vertical
+					Edit search "" "placeholder=search..."
+					ListView module-list "Type\\Name" format=mm nobar
 		Grid grid-module "" class=card hidden

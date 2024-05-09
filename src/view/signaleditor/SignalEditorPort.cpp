@@ -8,11 +8,11 @@
 
 #include "SignalEditorPort.h"
 #include "SignalEditorTab.h"
-#include "../../MouseDelayPlanner.h"
-#include "../../helper/graph/SceneGraph.h"
-#include "../../audioview/AudioView.h"
-#include "../../../data/base.h"
-#include "../../../module/SignalChain.h"
+#include "../MouseDelayPlanner.h"
+#include "../helper/graph/SceneGraph.h"
+#include "../audioview/AudioView.h"
+#include "../../data/base.h"
+#include "../../module/SignalChain.h"
 
 const float HOVER_RADIUS = 20;
 

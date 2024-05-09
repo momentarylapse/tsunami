@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../helper/graph/Node.h"
+#include "../helper/graph/Node.h"
 
 class SignalEditorTab;
 class Module;

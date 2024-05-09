@@ -1,5 +1,5 @@
 #include "SignalChainConsole.h"
-#include "signaleditor/SignalEditorTab.h"
+#include "../signaleditor/SignalEditorTab.h"
 #include "../mainview/MainView.h"
 #include "../TsunamiWindow.h"
 #include "../../Tsunami.h"

@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../helper/graph/Node.h"
-#include "../../helper/graph/Scrollable.h"
+#include "../helper/graph/Node.h"
+#include "../helper/graph/Scrollable.h"
 
 class SignalEditorTab;
 

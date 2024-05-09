@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include "../../../lib/hui/hui.h"
-#include "../../mainview/MainViewNode.h"
+#include "../../lib/hui/hui.h"
+#include "../mainview/MainViewNode.h"
 
 class SignalEditor;
 class SignalChain;

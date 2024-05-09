@@ -406,11 +406,6 @@ set(SOURCE
 	src/view/audioview/AudioView.cpp
 	src/view/audioview/TrackHeightManager.cpp
 	src/view/audioview/ViewPort.cpp
-	src/view/bottombar/signaleditor/SignalEditorBackground.cpp
-	src/view/bottombar/signaleditor/SignalEditorCable.cpp
-	src/view/bottombar/signaleditor/SignalEditorModule.cpp
-	src/view/bottombar/signaleditor/SignalEditorPort.cpp
-	src/view/bottombar/signaleditor/SignalEditorTab.cpp
 	src/view/bottombar/BottomBar.cpp
 	src/view/bottombar/DeviceConsole.cpp
 	src/view/bottombar/LogConsole.cpp
@@ -507,6 +502,11 @@ set(SOURCE
 	src/view/sidebar/SignalChainPanel.cpp
 	src/view/sidebar/SongConsole.cpp
 	src/view/sidebar/TrackConsole.cpp
+	src/view/signaleditor/SignalEditorBackground.cpp
+	src/view/signaleditor/SignalEditorCable.cpp
+	src/view/signaleditor/SignalEditorModule.cpp
+	src/view/signaleditor/SignalEditorPort.cpp
+	src/view/signaleditor/SignalEditorTab.cpp
 	src/view/ColorScheme.cpp
 	src/view/HeaderBar.cpp
 	src/view/HoverData.cpp

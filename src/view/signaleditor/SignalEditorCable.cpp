@@ -9,10 +9,10 @@
 #include "SignalEditorTab.h"
 #include "SignalEditorModule.h"
 #include "SignalEditorPort.h"
-#include "../../audioview/AudioView.h"
-#include "../../../module/SignalChain.h"
-#include "../../../data/base.h"
-#include "../../../lib/math/interpolation.h"
+#include "../audioview/AudioView.h"
+#include "../../module/SignalChain.h"
+#include "../../data/base.h"
+#include "../../lib/math/interpolation.h"
 
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {
 	align.dz = -10;

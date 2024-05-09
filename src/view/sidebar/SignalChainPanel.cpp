@@ -3,7 +3,7 @@
 //
 
 #include "SignalChainPanel.h"
-#include "../bottombar/signaleditor/SignalEditorTab.h"
+#include "../signaleditor/SignalEditorTab.h"
 #include "../mainview/MainView.h"
 #include "../module/ModulePanel.h"
 #include "../../Session.h"

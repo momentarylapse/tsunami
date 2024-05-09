@@ -6,7 +6,7 @@
  */
 
 #include "SignalEditor.h"
-#include "signaleditor/SignalEditorTab.h"
+#include "../signaleditor/SignalEditorTab.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
 #include "../TsunamiWindow.h"

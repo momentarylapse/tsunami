@@ -12,7 +12,7 @@
 #include "../helper/CpuDisplay.h"
 #include "../audioview/AudioView.h"
 #include "../bottombar/BottomBar.h"
-#include "../bottombar/signaleditor/SignalEditorTab.h"
+#include "../signaleditor/SignalEditorTab.h"
 #include "../TsunamiWindow.h"
 #include "../MouseDelayPlanner.h"
 #include "../ColorScheme.h"

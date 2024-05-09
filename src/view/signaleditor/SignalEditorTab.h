@@ -10,7 +10,6 @@
 #include "../../lib/hui/hui.h"
 #include "../mainview/MainViewNode.h"
 
-class SignalEditor;
 class SignalChain;
 class Session;
 class AudioView;
@@ -68,21 +67,5 @@ public:
 
 	void popup_chain();
 	void popup_module();
-};
-
-class SignalEditorTabPanel : public obs::Node<hui::Panel> {
-public:
-	SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain);
-	virtual ~SignalEditorTabPanel();
-
-	owned<scenegraph::SceneGraph> graph;
-	shared<SignalEditorTab> tab;
-
-	SignalEditor *editor;
-	Session *session;
-	AudioView *view;
-	SignalChain *chain;
-
-	owned<hui::Menu> menu_chain, menu_module;
 };
 

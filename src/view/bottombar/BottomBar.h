@@ -18,7 +18,6 @@ class DeviceManager;
 class Track;
 class MixingConsole;
 class LogConsole;
-class SignalEditor;
 class SignalChainConsole;
 class Session;
 class BottomBarConsole;
@@ -73,7 +72,6 @@ public:
 	bool visible;
 
 	MixingConsole *mixing_console;
-	//SignalEditor *signal_editor;
 	SignalChainConsole *signal_chain_console;
 	PluginConsole *plugin_console;
 	DeviceConsole *device_console;

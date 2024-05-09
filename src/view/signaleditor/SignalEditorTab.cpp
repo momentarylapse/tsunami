@@ -9,7 +9,6 @@
 #include "SignalEditorBackground.h"
 #include "SignalEditorModule.h"
 #include "SignalEditorCable.h"
-#include "../bottombar/SignalEditor.h"
 #include "../audioview/AudioView.h"
 #include "../mainview/MainView.h"
 #include "../HoverData.h"
@@ -345,59 +344,3 @@ SignalEditorModule *SignalEditorTab::get_module(Module *m) {
 	return nullptr;
 }
 
-
-
-
-SignalEditorTabPanel::SignalEditorTabPanel(SignalEditor *ed, SignalChain *_chain) : obs::Node<hui::Panel>() {
-	set_parent(ed);
-	static int count = 0;
-	set_id(format("signal-editor-tab-%d", count++));
-
-	add_grid("", 0, 0, "grid");
-	set_target("grid");
-	add_drawing_area("!expandx,expandy,grabfocus", 0, 0, "area");
-
-	editor = ed;
-	view = ed->view;
-	session = ed->session;
-	chain = _chain;
-
-	tab = new SignalEditorTab(chain);
-	graph = scenegraph::SceneGraph::create_integrated(this, "area", tab.get(), "SignalEditor");
-
-	graph->add_child(new SignalEditorBigButton(tab.get()));
-	graph->add_child(new ToolTipOverlay);
-
-	event("signal_chain_add_audio_source", [this] { tab->on_add(ModuleCategory::AUDIO_SOURCE); });
-	event("signal_chain_add_audio_effect", [this] { tab->on_add(ModuleCategory::AUDIO_EFFECT); });
-	event("signal_chain_add_stream", [this] { tab->on_add(ModuleCategory::STREAM); });
-	event("signal_chain_add_plumbing", [this] { tab->on_add(ModuleCategory::PLUMBING); });
-	event("signal_chain_add_audio_visualizer", [this] { tab->on_add(ModuleCategory::AUDIO_VISUALIZER); });
-	event("signal_chain_add_midi_source", [this] { tab->on_add(ModuleCategory::MIDI_SOURCE); });
-	event("signal_chain_add_midi_effect", [this] { tab->on_add(ModuleCategory::MIDI_EFFECT); });
-	event("signal_chain_add_synthesizer", [this] { tab->on_add(ModuleCategory::SYNTHESIZER); });
-	event("signal_chain_add_pitch_detector", [this] { tab->on_add(ModuleCategory::PITCH_DETECTOR); });
-	event("signal_chain_add_beat_source", [this] { tab->on_add(ModuleCategory::BEAT_SOURCE); });
-	event("signal_chain_reset", [this] { tab->on_reset(); });
-	event("signal_chain_activate", [this] { tab->on_activate(); });
-	event("signal_chain_delete", [this] { tab->on_delete(); });
-	event("signal_chain_save", [this] { tab->on_save(); });
-	event("signal_module_delete", [this] { tab->on_module_delete(); });
-//	event("signal_module_configure", [this] { on_module_configure(); });
-
-	event("signal_chain_new", [this] { editor->on_new(); });
-	event("signal_chain_load", [this] { editor->on_load(); });
-
-	menu_chain = hui::create_resource_menu("popup_signal_chain_menu", this);
-	menu_module = hui::create_resource_menu("popup_signal_module_menu", this);
-
-	tab->out_popup_chain >> create_sink([this] {
-		menu_chain->open_popup(this);
-	});
-	tab->out_popup_module >> create_sink([this] {
-		menu_module->open_popup(this);
-	});
-}
-
-SignalEditorTabPanel::~SignalEditorTabPanel() {
-}

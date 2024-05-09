@@ -8,7 +8,6 @@
 #include "BottomBar.h"
 #include "MixingConsole.h"
 #include "LogConsole.h"
-#include "SignalEditor.h"
 #include "SignalChainConsole.h"
 #include "DeviceConsole.h"
 #include "PluginConsole.h"
@@ -36,7 +35,6 @@ BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	set_target("button_grid");
 
 	mixing_console = new MixingConsole(session, this);
-	//signal_editor = new SignalEditor(session, this);
 	signal_chain_console = new SignalChainConsole(session, this);
 	plugin_console = new PluginConsole(session, this);
 	device_console = new DeviceConsole(session, this);

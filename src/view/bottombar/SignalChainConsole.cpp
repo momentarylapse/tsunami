@@ -79,10 +79,12 @@ void SignalChainConsole::load_data() {
 	for (auto c: weak(session->all_signal_chains)) {
 		string desc = "created by plugin";
 		if (c == session->all_signal_chains[0].get())
-			desc = "program default signal chain";
-		if (c->explicitly_save_for_session)
+			desc = "default signal chain - used by the program for file play back";
+		else if (c->belongs_to_system)
+			desc = "internal signal chain used by the program";
+		else if (c->explicitly_save_for_session)
 			desc = "created by user";
-		add_string(id_list, format("<big>%s</big>\n      <small>%s</small>", c->name, desc));
+		add_string(id_list, format("<big>%s</big>\n      <small><span alpha=\"50%%\">%s</span></small>", c->name, desc));
 	}
 }
 

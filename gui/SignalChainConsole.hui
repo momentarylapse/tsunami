@@ -1,6 +1,6 @@
 Dialog signal-chain-console "Signal Chains"
 	Grid ? ""
 		Grid ? "" vertical
-			Button signal-chain-new "new"
-			Button signal-chain-load "load"
-		ListView signal-chains "name" format=m nobar expandy expandx
+			Button signal-chain-new "" image=hui:new "tooltip=Create a new additional signal chain" big flat
+			Button signal-chain-load "" image=hui:open "tooltip=Load an additional signal chain from a file..." big flat
+		ListView signal-chains "name" format=m nobar expandy expandx "tooltip=List of all signal processing chains active in this session.\nDouble click to open one for editing."

@@ -8260,13 +8260,13 @@ vertical
 2
 Button
 signal-chain-new
-
+image=hui:new,big,flat
 0
 0
 0
 Button
 signal-chain-load
-
+image=hui:open,big,flat
 1
 0
 0
@@ -11549,14 +11549,14 @@ signal-chain-console/signal-chain-console
 Signal Chains
 
 signal-chain-console/signal-chain-load
-load
 
+Load an additional signal chain from a file...
 signal-chain-console/signal-chain-new
-new
 
+Create a new additional signal chain
 signal-chain-console/signal-chains
 name
-
+List of all signal processing chains active in this session.\nDouble click to open one for editing.
 signal-chain-panel/delete-signal-chain
 
 Delete signal chain

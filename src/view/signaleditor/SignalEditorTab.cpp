@@ -147,6 +147,8 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) {
 	event("signal_chain_new", [this] { editor->on_new(); });
 	event("signal_chain_load", [this] { editor->on_load(); });*/
 
+	chain->out_death >> create_sink([this] { out_delete_me(); });
+
 	chain->out_state_changed >> create_sink([this] { on_chain_update(); });
 	//chain->subscribe(this, [this] { on_chain_update(); }, chain->MESSAGE_PLAY_END_OF_STREAM);
 	chain->out_delete_cable >> create_sink([this] { on_chain_update(); });

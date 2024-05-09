@@ -316,6 +316,10 @@ string AudioView::main_view_description() const {
 	return "song: " + song->filename.basename();
 }
 
+void AudioView::on_enter_main_view() {
+	session->set_mode(EditMode::Default);
+}
+
 void AudioView::set_antialiasing(bool set) {
 	antialiasing = set;
 	hui::config.set_bool("View.Antialiasing", antialiasing);

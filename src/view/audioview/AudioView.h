@@ -88,6 +88,7 @@ public:
 
 	void* main_view_data() const override;
 	string main_view_description() const override;
+	void on_enter_main_view() override;
 
 	void check_consistency();
 	void force_redraw();

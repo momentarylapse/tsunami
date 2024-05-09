@@ -174,14 +174,37 @@ MainView::~MainView() {
 }
 
 
-void MainView::_add_view(MainViewNode* view) {
-	views.add(view);
+void MainView::_update_box() {
 	vbox->children.clear();
 	for (auto v: weak(views))
 		vbox->add_child(v);
 	vbox->add_child(tab_bar.get());
+}
 
-	_activate_view(view);
+void MainView::_add_view(shared<MainViewNode> view) {
+	views.add(view);
+	_update_box();
+
+	_activate_view(view.get());
+
+	view->out_delete_me >> create_sink([this, _view = view.get()] {
+		_remove_view(_view);
+	});
+}
+
+void MainView::_remove_view(MainViewNode* view) {
+	for (int i=0; i<views.num; i++)
+		if (views[i].get() == view) {
+			// switch to another panel before deleting - keep active_view valid
+			if (i >= 1)
+				_activate_view(views[0].get());
+			views.erase(i);
+			break;
+		}
+
+	_update_box();
+
+	_activate_view(active_view);
 }
 
 void MainView::_activate_view(MainViewNode* view) {
@@ -189,9 +212,11 @@ void MainView::_activate_view(MainViewNode* view) {
 		v->set_hidden(v != view);
 	tab_bar->set_hidden(views.num < 2);
 	tab_bar->rebuild();
-	active_view = view;
-	view->on_enter_main_view();
-	out_view_changed(view);
+	if (view != active_view) {
+		active_view = view;
+		view->on_enter_main_view();
+		out_view_changed(view);
+	}
 }
 
 void MainView::open_for(VirtualBase* p) {

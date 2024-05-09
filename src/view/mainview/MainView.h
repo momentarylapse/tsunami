@@ -51,8 +51,10 @@ public:
 	shared_array<MainViewNode> views;
 	MainViewNode* active_view = nullptr;
 
-	void _add_view(MainViewNode* view);
+	void _add_view(shared<MainViewNode> view);
 	void _activate_view(MainViewNode* view);
+	void _remove_view(MainViewNode* view);
+	void _update_box();
 	void open_for(VirtualBase* p);
 
 

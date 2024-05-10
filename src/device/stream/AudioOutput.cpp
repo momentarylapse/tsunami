@@ -13,6 +13,7 @@
 #include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
+#include "../pulse/AudioOutputStreamPulse.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
@@ -244,6 +245,18 @@ void AudioOutput::_create_dev() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
+		pulse_stream = new AudioOutputStreamPulse(session, cur_device, [this] (float* out, int frames) {
+			bool out_of_data = feed_stream_output(frames, out);
+			return out_of_data;
+		}, [this] {
+			if (read_end_of_stream and !played_end_of_stream) {
+				//printf("end of data...\n");
+				played_end_of_stream = true;
+				hui::run_later(0.001f, [this]{ on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+			}
+			//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+		});
+#if 0
 		pa_sample_spec ss;
 		ss.rate = dev_sample_rate;
 		ss.channels = 2;
@@ -290,6 +303,13 @@ void AudioOutput::_create_dev() {
 				return;
 			}
 		}
+#endif
+		if (pulse_stream->error) {
+			delete pulse_stream;
+			pulse_stream = nullptr;
+			stop();
+			return;
+		}
 	}
 #endif
 
@@ -330,19 +350,8 @@ void AudioOutput::_kill_dev() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		_pulse_flush_op();
-		device_manager->lock();
-		pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
-		pa_stream_set_write_callback(pulse_stream, nullptr, nullptr);
-		pa_stream_set_underflow_callback(pulse_stream, nullptr, nullptr);
-
-		if (pa_stream_disconnect(pulse_stream) != 0)
-			_pulse_test_error("pa_stream_disconnect");
-
-		pa_stream_unref(pulse_stream);
-		//_pulse_test_error("pa_stream_unref");
+		delete pulse_stream;
 		pulse_stream = nullptr;
-		device_manager->unlock();
 	}
 #endif
 
@@ -405,10 +414,7 @@ void AudioOutput::_pause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		device_manager->lock();
-		auto op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		device_manager->unlock();
-		_pulse_start_op(op, "pa_stream_cork");
+		pulse_stream->pause();
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -439,11 +445,7 @@ void AudioOutput::_unpause() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (pulse_stream) {
-		device_manager->lock();
-		pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-		device_manager->unlock();
-		_pulse_start_op(op, "pa_stream_cork");
-		_pulse_flush_op();
+		pulse_stream->unpause();
 	}
 #endif
 #if HAS_LIB_PORTAUDIO
@@ -637,13 +639,13 @@ void AudioOutput::reset_state() {
 			session->debug("out", "flush");
 			if (pulse_stream) {
 				device_manager->lock();
-				pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
+				pa_operation *op = pa_stream_flush(pulse_stream->pulse_stream, &pulse_stream_success_callback, this);
 				device_manager->unlock();
 				_pulse_start_op(op, "pa_stream_flush");
 				_pulse_flush_op();
 
 				auto get_write_offset = [this] () {
-					if (auto info = pa_stream_get_timing_info(pulse_stream))
+					if (auto info = pa_stream_get_timing_info(pulse_stream->pulse_stream))
 						if (info->read_index_corrupt == 0)
 							return info->write_index / 8 - samples_offset_since_reset;
 					return samples_requested;
@@ -711,7 +713,7 @@ base::optional<int64> AudioOutput::estimate_samples_played() {
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 		// PA_STREAM_INTERPOLATE_TIMING
-		if (auto info = pa_stream_get_timing_info(pulse_stream)) {
+		if (auto info = pa_stream_get_timing_info(pulse_stream->pulse_stream)) {
 			auto dbuffer = (info->write_index - info->read_index) / 8;
 			if (false)
 				printf("%6ld  %6ld  %6ld | w=%-6lld  r=%-6lld  d=%-6ld | req=%-8lld\n", info->configured_sink_usec, info->sink_usec, info->transport_usec, info->write_index/8-samples_offset_since_reset, info->read_index/8-samples_offset_since_reset, dbuffer, samples_requested);

@@ -18,6 +18,9 @@
 #include "../../module/port/Port.h"
 #include <atomic>
 
+class AudioOutputStream;
+class AudioOutputStreamPulse;
+
 class DeviceManager;
 class Device;
 class Session;
@@ -87,7 +90,7 @@ private:
 	std::atomic<bool> played_end_of_stream;
 
 #if HAS_LIB_PULSEAUDIO
-	pa_stream *pulse_stream = nullptr;
+	AudioOutputStreamPulse *pulse_stream = nullptr;
 	bool _pulse_test_error(const char *msg);
 	pa_operation *operation = nullptr;
 	void _pulse_flush_op();

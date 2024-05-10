@@ -27,13 +27,28 @@ struct pa_operation;
 
 class AudioOutputStreamPulse : public AudioOutputStream {
 public:
-	AudioOutputStreamPulse(Session *session, Device *device);
+	AudioOutputStreamPulse(Session *session, Device *device, std::function<bool(float*,int)> callback_feed, std::function<void()> callback_out_of_data);
 	~AudioOutputStreamPulse() override;
 
 	void pause() override;
 	void unpause() override;
 	void flush() override;
 	base::optional<int64> estimate_samples_played() override;
+
+
+	pa_stream *pulse_stream = nullptr;
+	pa_operation *operation = nullptr;
+	void _pulse_flush_op();
+	void _pulse_start_op(pa_operation *op, const char *msg);
+	bool _pulse_test_error(const char *msg);
+
+	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
+	static void pulse_stream_underflow_callback(pa_stream *s, void *userdata);
+	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
+	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
+
+	std::function<bool(float*,int)> callback_feed;
+	std::function<void()> callback_out_of_data;
 
 };
 

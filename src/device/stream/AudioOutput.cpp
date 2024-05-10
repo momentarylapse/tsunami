@@ -41,8 +41,6 @@ namespace os {
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 //extern void pulse_ignore_op(Session*, pa_operation*);
 
-// DeviceManager needs to be locked!
-bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm);
 
 int nnn = 0;
 int xxx_total_read = 0;
@@ -256,54 +254,6 @@ void AudioOutput::_create_dev() {
 			}
 			//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 		});
-#if 0
-		pa_sample_spec ss;
-		ss.rate = dev_sample_rate;
-		ss.channels = 2;
-		ss.format = PA_SAMPLE_FLOAT32NE;
-		//ss.format = PA_SAMPLE_S16NE;
-		pulse_stream = pa_stream_new(device_manager->pulse_context, "stream", &ss, nullptr);
-		if (!pulse_stream)
-			_pulse_test_error("pa_stream_new");
-
-		pa_stream_set_state_callback(pulse_stream, &pulse_stream_state_callback, this);
-		pa_stream_set_write_callback(pulse_stream, &pulse_stream_request_callback, this);
-		pa_stream_set_underflow_callback(pulse_stream, &pulse_stream_underflow_callback, this);
-
-		pa_buffer_attr attr_out;
-		attr_out.fragsize = -1; // recording only
-		attr_out.maxlength = hui::config.get_int("Output.Pulseaudio.maxlength", -1);
-		attr_out.minreq = hui::config.get_int("Output.Pulseaudio.minreq", 1024);
-		attr_out.tlength = hui::config.get_int("Output.Pulseaudio.tlength", 1024);
-		attr_out.prebuf = hui::config.get_int("Output.Pulseaudio.prebuf", 0); // don't prebuffer
-		// prebuf = 0 also prevents pausing during buffer underruns
-
-		const char *dev = nullptr;
-		if (!cur_device->is_default())
-			dev = cur_device->internal_name.c_str();
-		auto flags = (pa_stream_flags_t)(PA_STREAM_START_CORKED|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
-
-		if (pa_stream_connect_playback(pulse_stream, dev, &attr_out, flags, nullptr, nullptr) != 0)
-			_pulse_test_error("pa_stream_connect_playback");
-
-
-		if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
-			session->w("retry");
-
-			// retry with default device
-			if (pa_stream_connect_playback(pulse_stream, nullptr, &attr_out, flags, nullptr, nullptr) != 0)
-				_pulse_test_error("pa_stream_connect_playback");
-
-			if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
-				device_manager->unlock();
-				// still no luck... give up
-				session->e("pulse_wait_stream_ready");
-//				pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
-				stop();
-				return;
-			}
-		}
-#endif
 		if (pulse_stream->error) {
 			delete pulse_stream;
 			pulse_stream = nullptr;
@@ -637,21 +587,8 @@ void AudioOutput::reset_state() {
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 			session->debug("out", "flush");
-			if (pulse_stream) {
-				device_manager->lock();
-				pa_operation *op = pa_stream_flush(pulse_stream->pulse_stream, &pulse_stream_success_callback, this);
-				device_manager->unlock();
-				_pulse_start_op(op, "pa_stream_flush");
-				_pulse_flush_op();
-
-				auto get_write_offset = [this] () {
-					if (auto info = pa_stream_get_timing_info(pulse_stream->pulse_stream))
-						if (info->read_index_corrupt == 0)
-							return info->write_index / 8 - samples_offset_since_reset;
-					return samples_requested;
-				};
-				samples_offset_since_reset += get_write_offset();
-			}
+			if (pulse_stream)
+				samples_offset_since_reset += pulse_stream->flush(samples_offset_since_reset, samples_requested);
 		}
 #endif
 		_set_state(State::UNPREPARED_NO_DATA);

@@ -23,7 +23,7 @@ public:
 
 	virtual void pause() = 0;
 	virtual void unpause() = 0;
-	virtual void flush() = 0;
+	virtual int64 flush(int64 samples_offset_since_reset, int64 samples_requested) = 0;
 	virtual base::optional<int64> estimate_samples_played() = 0;
 
 	Session *session;

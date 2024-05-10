@@ -127,7 +127,20 @@ void AudioOutputStreamPulse::unpause() {
 	_pulse_flush_op();
 
 }
-void AudioOutputStreamPulse::flush() {
+int64 AudioOutputStreamPulse::flush(int64 samples_offset_since_reset, int64 samples_requested) {
+	device_manager->lock();
+	pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
+	device_manager->unlock();
+	_pulse_start_op(op, "pa_stream_flush");
+	_pulse_flush_op();
+
+	auto get_write_offset = [this, samples_offset_since_reset, samples_requested] () {
+		if (auto info = pa_stream_get_timing_info(pulse_stream))
+			if (info->read_index_corrupt == 0)
+				return info->write_index / 8 - samples_offset_since_reset;
+		return samples_requested;
+	};
+	return get_write_offset();
 
 }
 base::optional<int64> AudioOutputStreamPulse::estimate_samples_played() {

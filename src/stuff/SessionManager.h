@@ -46,16 +46,20 @@ public:
 
 	Path session_path(const string &name) const;
 	string session_name(const string &name) const;
-	Path directory() const;
+	static Path directory();
 	bool session_exists(const string& name) const;
 	bool is_persistent(Session *s) const;
 
 	shared_array<Session> active_sessions;
 
+	void load_session_map_legacy();
 	void load_session_map();
+	void save_session_map();
 	base::map<Path, string> session_map;
 
 	Array<SessionLabel> enumerate_all_sessions() const;
+	Array<SessionLabel> enumerate_persistent_sessions() const;
+	Array<SessionLabel> enumerate_active_non_persistent_sessions() const;
 };
 
 #endif /* SRC_STUFF_SESSIONMANAGER_H_ */

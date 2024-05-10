@@ -11,6 +11,7 @@
 #include "../lib/base/iter.h"
 #include "../lib/base/optional.h"
 #include "../lib/os/filesystem.h"
+#include "../lib/os/file.h"
 #include "../lib/doc/xml.h"
 #include "../data/base.h"
 #include "../data/Track.h"
@@ -46,11 +47,12 @@ bool SessionLabel::is_backup() const {
 
 SessionManager::SessionManager() {
 	//os::Timer t;
-	load_session_map();
+	load_session_map_legacy();
+	save_session_map();
 	//msg_write(f2s(t.get()*1000, 3));
 }
 
-void SessionManager::load_session_map() {
+void SessionManager::load_session_map_legacy() {
 	auto all = enumerate_all_sessions();
 	if constexpr (false) {
 		// correct
@@ -84,6 +86,23 @@ void SessionManager::load_session_map() {
 				}
 			}
 	}
+}
+
+void SessionManager::save_session_map() {
+	auto f = os::fs::open(directory() | "index", "wt");
+
+	auto all = enumerate_all_sessions();
+	for (const auto& l: all)
+		if (l.is_persistent()) {
+			f->write_str(l.name);
+			Path path;
+			for (const auto&& [p, n]: session_map)
+				if (n == l.name)
+					path = p;
+			f->write_str(str(path));
+			f->write_int(0);
+			f->write_int(0);
+		}
 }
 
 Session *SessionManager::spawn_new_session() {
@@ -163,10 +182,12 @@ base::optional<AudioViewMode> parse_audio_mode(const string& s) {
 void SessionManager::save_session(Session *s, const string &name) {
 	os::fs::create_directory(directory());
 
+	s->persistent_name = session_name(name);
+
 	xml::Parser parser;
 
 	auto e = xml::Element("session");
-	e.add(xml::Element("head").witha("version", "1.0"));
+	e.add(xml::Element("head").witha("version", "1.0").witha("name", s->persistent_name));
 
 	// file
 	if (s->song->filename)
@@ -219,8 +240,7 @@ void SessionManager::save_session(Session *s, const string &name) {
 	parser.elements.add(e);
 	parser.save(session_path(name));
 
-	s->persistent_name = session_name(name);
-
+	save_session_map();
 
 	out_changed.notify();
 }
@@ -333,41 +353,51 @@ void SessionManager::delete_saved_session(const string &name) {
 	for (auto s: weak(active_sessions))
 		if (s->persistent_name == name)
 			s->persistent_name = "";
+	save_session_map();
 	out_changed.notify();
 }
 
-Path SessionManager::directory() const {
-	return tsunami->directory | "sessions";
+Path SessionManager::directory() {
+	return Tsunami::directory | "sessions";
 }
 
 static SessionLabel::Flags operator|(SessionLabel::Flags a, SessionLabel::Flags b) {
 	return (SessionLabel::Flags)((int)a | (int)b);
 }
 
-Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
-	Array<SessionLabel> session_labels;
-
+Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
 	auto find_active = [this] (const string &name) -> Session* {
 		for (auto s: weak(active_sessions))
-				if (s->persistent_name == name)
-					return s;
+			if (s->persistent_name == name)
+				return s;
 		return nullptr;
 	};
 
-	// non-persistent active
-	for (auto s: weak(active_sessions))
-		if (s->persistent_name == "")
-			session_labels.add({SessionLabel::Flags::ACTIVE, title_filename(s->song->filename), s, -1});
-
-	// persistent sessions
-	auto list = os::fs::search(tsunami->session_manager->directory(), "*.session", "f");
+	Array<SessionLabel> sessions;
+	auto list = os::fs::search(directory(), "*.session", "f");
 	for (auto &e: list) {
 		auto name = e.no_ext().str();
 		if (auto s = find_active(name))
-			session_labels.add({SessionLabel::Flags::PERSISTENT | SessionLabel::Flags::ACTIVE, name, s, -1});
+			sessions.add({SessionLabel::Flags::PERSISTENT | SessionLabel::Flags::ACTIVE, name, s, -1});
 		else
-			session_labels.add({SessionLabel::Flags::PERSISTENT, name, nullptr, -1});
+			sessions.add({SessionLabel::Flags::PERSISTENT, name, nullptr, -1});
 	}
+	return sessions;
+}
+
+Array<SessionLabel> SessionManager::enumerate_active_non_persistent_sessions() const {
+	Array<SessionLabel> sessions;
+	for (auto s: weak(active_sessions))
+		if (s->persistent_name == "")
+			sessions.add({SessionLabel::Flags::ACTIVE, title_filename(s->song->filename), s, -1});
+	return sessions;
+}
+
+Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
+	Array<SessionLabel> session_labels;
+
+	session_labels.append(enumerate_active_non_persistent_sessions());
+	session_labels.append(enumerate_persistent_sessions());
 
 	// backups
 	BackupManager::check_old_files();

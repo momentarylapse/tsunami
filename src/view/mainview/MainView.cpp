@@ -23,6 +23,8 @@
 #include "../../Playback.h"
 #include "../../Session.h"
 
+const static float TAB_BAR_HEIGHT = 35;
+
 class TabBarButton : public scenegraph::Node {
 public:
 	TabBarButton(MainView *_main_view, MainViewNode* _view) {
@@ -65,7 +67,7 @@ public:
 class TabBar : public scenegraph::HBox {
 public:
 	TabBar(MainView *_main_view) {
-		align.h = 25;
+		align.h = TAB_BAR_HEIGHT;
 		align.horizontal = AlignData::Mode::FILL;
 		align.vertical = AlignData::Mode::TOP;
 		set_perf_name("tabbar");

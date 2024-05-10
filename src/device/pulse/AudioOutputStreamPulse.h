@@ -49,7 +49,6 @@ public:
 
 	std::function<bool(float*,int)> callback_feed;
 	std::function<void()> callback_out_of_data;
-
 };
 
 #endif

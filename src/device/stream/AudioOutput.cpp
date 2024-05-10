@@ -80,32 +80,6 @@ bool AudioOutput::feed_stream_output(int frames_request, float *out) {
 	return false;
 }
 
-#if HAS_LIB_PORTAUDIO
-
-int AudioOutput::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
-                                                    unsigned long frames,
-                                                    const PaStreamCallbackTimeInfo* timeInfo,
-                                                    PaStreamCallbackFlags statusFlags,
-                                                    void *userData) {
-//	printf("request %d\n", (int)frames);
-	auto stream = static_cast<AudioOutput*>(userData);
-
-	auto out = static_cast<float*>(outputBuffer);
-	(void) inputBuffer; /* Prevent unused variable warning. */
-
-	bool out_of_data = stream->feed_stream_output((int)frames, out);
-
-	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
-		//printf("XXX end of data...\n");
-		stream->played_end_of_stream = true;
-		hui::run_later(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
-		//printf("/XXX end of data...\n");
-		//return paComplete;
-	}
-	return paContinue;
-}
-
-#endif
 
 
 void AudioOutput::Config::reset() {
@@ -142,9 +116,6 @@ AudioOutput::AudioOutput(Session *_session) :
 	}
 	config.kaba_class = _class;
 
-#if HAS_LIB_PORTAUDIO
-	portaudio_stream = nullptr;
-#endif
 	dev_sample_rate = -1;
 	cur_device = nullptr;
 
@@ -201,24 +172,22 @@ void AudioOutput::_create_dev() {
 
 #if HAS_LIB_PORTAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-
-
-		int chunk_size = hui::config.get_int("Output.Portaudio.chunk-size", 256);
-		//256*4; // paFramesPerBufferUnspecified
-		if (cur_device->is_default()) {
-			PaError err = Pa_OpenDefaultStream(&portaudio_stream, 0, 2, paFloat32, dev_sample_rate, chunk_size,
-					&portaudio_stream_request_callback, this);
-			_portaudio_test_error(err, "Pa_OpenDefaultStream");
-		} else {
-			PaStreamParameters params;
-			params.channelCount = 2;
-			params.sampleFormat = paFloat32;
-			params.device = cur_device->index_in_lib;
-			params.hostApiSpecificStreamInfo = nullptr;
-			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, nullptr, &params, dev_sample_rate, chunk_size,
-					paNoFlag, &portaudio_stream_request_callback, this);
-			_portaudio_test_error(err, "Pa_OpenStream");
+		stream = new AudioOutputStreamPort(session, cur_device, [this] (float* out, int frames) {
+			bool out_of_data = feed_stream_output(frames, out);
+			return out_of_data;
+		}, [this] {
+			if (read_end_of_stream and !played_end_of_stream) {
+				//printf("end of data...\n");
+				played_end_of_stream = true;
+				hui::run_later(0.001f, [this]{ on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+			}
+			//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+		});
+		if (stream->error) {
+			delete stream;
+			stream = nullptr;
+			stop();
+			return;
 		}
 	}
 #endif
@@ -238,16 +207,6 @@ void AudioOutput::_kill_dev() {
 		delete stream;
 		stream = nullptr;
 	}
-
-#if HAS_LIB_PORTAUDIO
-	if (portaudio_stream) {
-		device_manager->lock();
-		PaError err = Pa_CloseStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_CloseStream");
-		portaudio_stream = nullptr;
-		device_manager->unlock();
-	}
-#endif
 
 	_clear_data_state();
 	_set_state(State::UNPREPARED_NO_DEVICE_NO_DATA);
@@ -276,16 +235,6 @@ void AudioOutput::_pause() {
 	if (stream)
 		stream->pause();
 
-#if HAS_LIB_PORTAUDIO
-	if (portaudio_stream) {
-		device_manager->lock();
-		//Pa_AbortStream Pa_StopStream
-		PaError err = Pa_AbortStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_AbortStream");
-		device_manager->unlock();
-	}
-#endif
-
 	_set_state(State::PAUSED);
 }
 
@@ -304,15 +253,6 @@ void AudioOutput::_unpause() {
 
 	if (stream)
 		stream->unpause();
-
-#if HAS_LIB_PORTAUDIO
-	if (portaudio_stream) {
-		device_manager->lock();
-		PaError err = Pa_StartStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_StartStream");
-		device_manager->unlock();
-	}
-#endif
 
 	_set_state(State::PLAYING);
 }
@@ -399,7 +339,7 @@ void AudioOutput::_fill_prebuffer() {
 
 #if HAS_LIB_PORTAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		if (!portaudio_stream)
+		if (!stream)
 			return;
 		//device_manager->lock();
 		//PaError err = Pa_StartStream(portaudio_stream);
@@ -451,16 +391,6 @@ void AudioOutput::on_config() {
 	if (cur_device != config.device)
 		update_device();
 }
-
-#if HAS_LIB_PORTAUDIO
-bool AudioOutput::_portaudio_test_error(PaError err, const char *msg) {
-	if (err != paNoError) {
-		session->e(format("AudioOutput: %s: %s", msg, Pa_GetErrorText(err)));
-		return true;
-	}
-	return false;
-}
-#endif
 
 void AudioOutput::on_played_end_of_stream() {
 	//printf("---------ON PLAY END OF STREAM\n");

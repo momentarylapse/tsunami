@@ -25,13 +25,6 @@ class Device;
 class Session;
 
 
-#if HAS_LIB_PORTAUDIO
-typedef void PaStream;
-struct PaStreamCallbackTimeInfo;
-typedef unsigned long PaStreamCallbackFlags;
-typedef int PaError;
-#endif
-
 class AudioOutput : public Module {
 public:
 	AudioOutput(Session *session);
@@ -87,11 +80,6 @@ private:
 	AudioOutputStream *stream = nullptr;
 	int64 samples_offset_since_reset = 0;
 
-#if HAS_LIB_PORTAUDIO
-	PaStream *portaudio_stream;
-	bool _portaudio_test_error(PaError err, const char *msg);
-#endif
-
 	int dev_sample_rate;
 	int64 samples_requested = 0;
 	int64 fake_samples_played = 0;
@@ -132,13 +120,6 @@ private:
 
 	bool feed_stream_output(int frames, float *out);
 
-#if HAS_LIB_PORTAUDIO
-	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
-	                                             unsigned long frames,
-	                                             const PaStreamCallbackTimeInfo* timeInfo,
-	                                             PaStreamCallbackFlags statusFlags,
-	                                             void *userData);
-#endif
 
 	void on_played_end_of_stream();
 	void on_read_end_of_stream();

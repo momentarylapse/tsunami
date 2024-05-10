@@ -160,7 +160,7 @@ public:
 	MouseDelayPlanner *mdp();
 	void mdp_prepare(MouseDelayAction *action);
 	void mdp_run(MouseDelayAction *action);
-	void mdp_prepare(hui::Callback update);
+	void mdp_prepare(std::function<void(const vec2&)> update);
 
 
 	void snap_to_grid(int &pos);

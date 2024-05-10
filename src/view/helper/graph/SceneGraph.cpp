@@ -225,12 +225,15 @@ void SceneGraph::mdp_run(MouseDelayAction *a, const vec2 &m) {
 
 class MouseDelayActionWrapper : public MouseDelayAction {
 public:
-	hui::Callback callback;
-	MouseDelayActionWrapper(hui::Callback c) { callback = c; }
-	void on_update(const vec2 &m) override { callback(); }
+	std::function<void(const vec2&)> callback;
+	MouseDelayActionWrapper(std::function<void(const vec2&)> c) { callback = c; }
+	void on_update(const vec2 &m) override {
+		callback(m);
+		scene_graph->out_redraw();
+	}
 };
 
-void SceneGraph::mdp_prepare(hui::Callback update) {
+void SceneGraph::mdp_prepare(MouseCallback update) {
 	mdp->prepare(new MouseDelayActionWrapper(update));
 }
 

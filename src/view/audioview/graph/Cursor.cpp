@@ -83,10 +83,10 @@ string Cursor::get_tip() const {
 	return _("cursor");
 }
 
-bool Cursor::on_left_button_down(const vec2 &m) {
+bool Cursor::on_left_button_down(const vec2 &_m) {
 	drag_range = view->sel.range_raw;
 
-	view->mdp_prepare([this, m] {
+	view->mdp_prepare([this] (const vec2& m) {
 		if (is_end)
 			drag_range.set_end(view->get_mouse_pos_snap(m));
 		else

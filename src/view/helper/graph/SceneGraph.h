@@ -23,7 +23,7 @@ namespace scenegraph {
 
 class SceneGraph : public Node {
 public:
-	using Callback = std::function<void()>;
+	using MouseCallback = std::function<void(const vec2&)>;
 	SceneGraph();
 
 	obs::source out_current_changed{this, "current-changed"};
@@ -56,7 +56,7 @@ public:
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);
 	void mdp_run(MouseDelayAction *action, const vec2 &m);
-	void mdp_prepare(Callback update);
+	void mdp_prepare(MouseCallback update);
 
 	vec2 m;
 	void set_mouse(const vec2 &m);

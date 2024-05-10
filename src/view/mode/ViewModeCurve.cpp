@@ -51,7 +51,7 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m
 		float value = screen2value(m.y);
 		cur_track()->curve_add_point(_curve, pos, value);
 	} else if (hover().type == HoverData::Type::CURVE_POINT) {
-		view->mdp_prepare([this, m] {
+		view->mdp_prepare([this] (const vec2& m) {
 			int pos = view->get_mouse_pos(m);
 			float value = clamp(screen2value(m.y), _curve->min, _curve->max);
 			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);

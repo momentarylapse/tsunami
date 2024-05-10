@@ -1641,7 +1641,7 @@ void AudioView::mdp_run(MouseDelayAction *a) {
 	graph()->mdp_run(a, cursor());
 }
 
-void AudioView::mdp_prepare(hui::Callback update) {
+void AudioView::mdp_prepare(std::function<void(const vec2&)> update) {
 	graph()->mdp_prepare(update);
 }
 

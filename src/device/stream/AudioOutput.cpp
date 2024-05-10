@@ -40,25 +40,8 @@ namespace os {
 extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
 //extern void pulse_ignore_op(Session*, pa_operation*);
 
-
 // DeviceManager needs to be locked!
-bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm) {
-	//msg_write("wait stream ready");
-	int n = 0;
-	while (pa_stream_get_state(s) != PA_STREAM_READY) {
-		//printf(".\n");
-		//pa_mainloop_iterate(m, 1, NULL);
-		//hui::Sleep(0.01f);
-		pa_threaded_mainloop_wait(dm->pulse_mainloop);
-		n ++;
-		if (n >= 1000)
-			return false;
-		if (pa_stream_get_state(s) == PA_STREAM_FAILED)
-			return false;
-	}
-	//msg_write("ok");
-	return true;
-}
+bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm);
 
 int nnn = 0;
 int xxx_total_read = 0;

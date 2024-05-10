@@ -13,7 +13,9 @@
 #include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
+#include "../AudioOutputStream.h"
 #include "../pulse/AudioOutputStreamPulse.h"
+#include "../port/AudioOutputStreamPort.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
@@ -35,69 +37,6 @@ const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
 namespace os {
 	extern void require_main_thread(const string &msg);
 }
-
-#if HAS_LIB_PULSEAUDIO
-
-extern void pulse_wait_op(Session*, pa_operation*); // -> DeviceManager.cpp
-//extern void pulse_ignore_op(Session*, pa_operation*);
-
-
-int nnn = 0;
-int xxx_total_read = 0;
-
-
-void AudioOutput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
-	//printf("output request %d\n", (int)nbytes/8);
-	auto stream = static_cast<AudioOutput*>(userdata);
-
-	if (nbytes == 0)
-		return;
-
-	void *data = nullptr;
-	int r = pa_stream_begin_write(p, &data, &nbytes);
-	if (r != 0) {
-		stream->_pulse_test_error("pa_stream_begin_write");
-		return;
-	}
-	//printf("%d  %p  %d\n", r, data, (int)nbytes);
-
-	int frames = nbytes / 8;
-	float *out = static_cast<float*>(data);
-
-	bool out_of_data = stream->feed_stream_output(frames, out);
-
-	if (pa_stream_write(p, data, nbytes, nullptr, 0, (pa_seek_mode_t)PA_SEEK_RELATIVE) != 0)
-		stream->_pulse_test_error("pa_stream_write");
-
-	if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
-		//printf("end of data...\n");
-		stream->played_end_of_stream = true;
-		hui::run_later(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
-	}
-	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
-}
-
-void AudioOutput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto stream = static_cast<AudioOutput*>(userdata);
-	//msg_write("--success");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
-}
-
-void AudioOutput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto stream = static_cast<AudioOutput*>(userdata);
-	//printf("--state\n");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
-}
-
-void AudioOutput::pulse_stream_underflow_callback(pa_stream *s, void *userdata) {
-	//auto stream = static_cast<AudioOutput*>(userdata);
-	//stream->session->w("pulse: underflow\n");
-	if (STREAM_WARNINGS)
-		printf("pulse: underflow\n");
-	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
-}
-
-#endif
 
 
 // return: underrun?
@@ -203,9 +142,6 @@ AudioOutput::AudioOutput(Session *_session) :
 	}
 	config.kaba_class = _class;
 
-#if HAS_LIB_PULSEAUDIO
-	pulse_stream = nullptr;
-#endif
 #if HAS_LIB_PORTAUDIO
 	portaudio_stream = nullptr;
 #endif
@@ -243,7 +179,7 @@ void AudioOutput::_create_dev() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		pulse_stream = new AudioOutputStreamPulse(session, cur_device, [this] (float* out, int frames) {
+		stream = new AudioOutputStreamPulse(session, cur_device, [this] (float* out, int frames) {
 			bool out_of_data = feed_stream_output(frames, out);
 			return out_of_data;
 		}, [this] {
@@ -254,9 +190,9 @@ void AudioOutput::_create_dev() {
 			}
 			//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
 		});
-		if (pulse_stream->error) {
-			delete pulse_stream;
-			pulse_stream = nullptr;
+		if (stream->error) {
+			delete stream;
+			stream = nullptr;
 			stop();
 			return;
 		}
@@ -298,12 +234,10 @@ void AudioOutput::_kill_dev() {
 		return;
 	session->debug("out", "kill device");
 
-#if HAS_LIB_PULSEAUDIO
-	if (pulse_stream) {
-		delete pulse_stream;
-		pulse_stream = nullptr;
+	if (stream) {
+		delete stream;
+		stream = nullptr;
 	}
-#endif
 
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
@@ -334,39 +268,14 @@ void AudioOutput::stop() {
 	_pause();
 }
 
-#if HAS_LIB_PULSEAUDIO
-// NOT inside lock()/unlock()
-void AudioOutput::_pulse_flush_op() {
-	if (operation) {
-		device_manager->lock();
-		pulse_wait_op(session, operation);
-		device_manager->unlock();
-	}
-	operation = nullptr;
-}
-
-// NOT inside lock()/unlock()
-void AudioOutput::_pulse_start_op(pa_operation *op, const char *msg) {
-	if (!op) {
-		_pulse_test_error(msg);
-		return;
-	}
-	_pulse_flush_op();
-	operation = op;
-	//pulse_wait_op(session, op);
-}
-#endif
-
 void AudioOutput::_pause() {
 	if (state != State::PLAYING)
 		return;
 	session->debug("out", "pause");
 
-#if HAS_LIB_PULSEAUDIO
-	if (pulse_stream) {
-		pulse_stream->pause();
-	}
-#endif
+	if (stream)
+		stream->pause();
+
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
 		device_manager->lock();
@@ -393,11 +302,9 @@ void AudioOutput::_unpause() {
 	read_end_of_stream = false;
 	played_end_of_stream = false;
 
-#if HAS_LIB_PULSEAUDIO
-	if (pulse_stream) {
-		pulse_stream->unpause();
-	}
-#endif
+	if (stream)
+		stream->unpause();
+
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
 		device_manager->lock();
@@ -476,7 +383,7 @@ void AudioOutput::_fill_prebuffer() {
 
 #if HAS_LIB_PULSEAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		if (!pulse_stream)
+		if (!stream)
 			return;
 
 		/*device_manager->lock();
@@ -545,17 +452,6 @@ void AudioOutput::on_config() {
 		update_device();
 }
 
-#if HAS_LIB_PULSEAUDIO
-bool AudioOutput::_pulse_test_error(const char *msg) {
-	int e = pa_context_errno(device_manager->pulse_context);
-	if (e != 0) {
-		session->e(format("AudioOutput: %s: %s", msg, pa_strerror(e)));
-		return true;
-	}
-	return false;
-}
-#endif
-
 #if HAS_LIB_PORTAUDIO
 bool AudioOutput::_portaudio_test_error(PaError err, const char *msg) {
 	if (err != paNoError) {
@@ -587,8 +483,8 @@ void AudioOutput::reset_state() {
 #if HAS_LIB_PULSEAUDIO
 		if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
 			session->debug("out", "flush");
-			if (pulse_stream)
-				samples_offset_since_reset += pulse_stream->flush(samples_offset_since_reset, samples_requested);
+			if (stream)
+				samples_offset_since_reset += stream->flush(samples_offset_since_reset, samples_requested);
 		}
 #endif
 		_set_state(State::UNPREPARED_NO_DATA);
@@ -647,28 +543,11 @@ base::optional<int> AudioOutput::get_latency() {
 base::optional<int64> AudioOutput::estimate_samples_played() {
 	if (!has_device())
 		return base::None;
-#if HAS_LIB_PULSEAUDIO
-	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		// PA_STREAM_INTERPOLATE_TIMING
-		if (auto info = pa_stream_get_timing_info(pulse_stream->pulse_stream)) {
-			auto dbuffer = (info->write_index - info->read_index) / 8;
-			if (false)
-				printf("%6ld  %6ld  %6ld | w=%-6lld  r=%-6lld  d=%-6ld | req=%-8lld\n", info->configured_sink_usec, info->sink_usec, info->transport_usec, info->write_index/8-samples_offset_since_reset, info->read_index/8-samples_offset_since_reset, dbuffer, samples_requested);
-			double samples_per_usec = session->sample_rate() / 1000000.0;
-			double delay_samples = (double)(info->sink_usec + info->transport_usec) * samples_per_usec;
-			if (info->read_index_corrupt == 0)
-				return max(info->write_index / 8 - samples_offset_since_reset - (int64)delay_samples, (int64)0);
-			//printf("    %d %d\n", info->write_index, info->read_index);
-		}
-		/*pa_usec_t t;
-		if (pa_stream_get_time(pulse_stream, &t) == 0) {
-			double usec2samples = session->sample_rate() / 1000000.0;
-			printf("%lld  %.3f\n", fake_samples_played, t/1000000.0);
-			return (double)t * usec2samples - fake_samples_played;
-		}*/
-		return samples_requested;
-	}
-#endif
+
+	if (stream)
+		return stream->estimate_samples_played(samples_offset_since_reset, samples_requested);
+	return samples_requested;
+
 #if HAS_LIB_PORTAUDIO
 	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 	//	always returning 0???

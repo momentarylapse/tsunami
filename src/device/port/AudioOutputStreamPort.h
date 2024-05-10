@@ -15,7 +15,6 @@ struct PaStreamCallbackTimeInfo;
 typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 
-
 class AudioOutputStreamPort : public AudioOutputStream {
 public:
 	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,

@@ -19,16 +19,11 @@
 #include <atomic>
 
 class AudioOutputStream;
-class AudioOutputStreamPulse;
 
 class DeviceManager;
 class Device;
 class Session;
 
-#if HAS_LIB_PULSEAUDIO
-struct pa_stream;
-struct pa_operation;
-#endif
 
 #if HAS_LIB_PORTAUDIO
 typedef void PaStream;
@@ -89,14 +84,8 @@ private:
 	std::atomic<bool> read_end_of_stream;
 	std::atomic<bool> played_end_of_stream;
 
-#if HAS_LIB_PULSEAUDIO
-	AudioOutputStreamPulse *pulse_stream = nullptr;
-	bool _pulse_test_error(const char *msg);
-	pa_operation *operation = nullptr;
-	void _pulse_flush_op();
-	void _pulse_start_op(pa_operation *op, const char *msg);
+	AudioOutputStream *stream = nullptr;
 	int64 samples_offset_since_reset = 0;
-#endif
 
 #if HAS_LIB_PORTAUDIO
 	PaStream *portaudio_stream;
@@ -142,13 +131,6 @@ private:
 
 
 	bool feed_stream_output(int frames, float *out);
-
-#if HAS_LIB_PULSEAUDIO
-	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
-	static void pulse_stream_underflow_callback(pa_stream *s, void *userdata);
-	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
-	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
-#endif
 
 #if HAS_LIB_PORTAUDIO
 	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,

@@ -18,10 +18,6 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
-#if HAS_LIB_PULSEAUDIO
-#include <pulse/pulseaudio.h>
-#endif
-
 #if HAS_LIB_PORTAUDIO
 #include <portaudio.h>
 #endif
@@ -38,82 +34,6 @@ static const int DEFAULT_CHUNK_SIZE = 512;
 namespace os {
 	extern void require_main_thread(const string&);
 }
-
-#if HAS_LIB_PULSEAUDIO
-extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
-extern bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm); // -> OutputStream.cpp
-
-
-void AudioInput::pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata) {
-	//printf("input request %d\n", (int)nbytes);
-	auto input = static_cast<AudioInput*>(userdata);
-
-	const void *data;
-	if (pa_stream_peek(p, &data, &nbytes) < 0)
-		input->_pulse_test_error("pa_stream_peek");
-
-	// empty buffer
-	if (nbytes == 0)
-		return;
-
-	int frames = nbytes / sizeof(float) / input->num_channels;
-
-	if (data) {
-		if (input->is_capturing()) {
-			float *in = (float*)data;
-
-			RingBuffer &buf = input->buffer;
-			AudioBuffer b;
-			buf.write_ref(b, frames);
-			b.deinterleave(in, input->num_channels);
-			buf.write_ref_done(b);
-
-			int done = b.length;
-			if (done < frames) {
-				buf.write_ref(b, frames - done);
-				b.deinterleave(&in[input->num_channels * done], input->num_channels);
-				buf.write_ref_done(b);
-			}
-		}
-
-		if (pa_stream_drop(p) != 0)
-			input->_pulse_test_error("pa_stream_drop");
-	} else if (nbytes > 0) {
-		// holes
-		if (pa_stream_drop(p) != 0)
-			input->_pulse_test_error("pa_stream_drop");
-	}
-	//msg_write(">");
-	//pa_threaded_mainloop_signal(input->dev_man->pulse_mainloop, 0);
-}
-
-void AudioInput::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto stream = static_cast<AudioInput*>(userdata);
-	//msg_write("--success");
-	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
-}
-
-void AudioInput::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto stream = static_cast<AudioInput*>(userdata);
-	//printf("--state\n");
-	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
-}
-
-void AudioInput::pulse_input_notify_callback(pa_stream *p, void *userdata) {
-	auto stream = static_cast<AudioInput*>(userdata);
-	printf("sstate... %p:  ", p);
-	int s = pa_stream_get_state(p);
-	if (s == PA_STREAM_UNCONNECTED)
-		printf("unconnected");
-	if (s == PA_STREAM_READY)
-		printf("ready");
-	if (s == PA_STREAM_TERMINATED)
-		printf("terminated");
-	printf("\n");
-	pa_threaded_mainloop_signal(stream->dev_man->pulse_mainloop, 0);
-}
-
-#endif
 
 
 #if HAS_LIB_PORTAUDIO
@@ -178,17 +98,13 @@ string AudioInput::Config::auto_conf(const string &name) const {
 }
 
 AudioInput::AudioInput(Session *_session) :
-		Module(ModuleCategory::STREAM, "AudioInput"),
-		buffer(1048576) {
+		Module(ModuleCategory::STREAM, "AudioInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
 	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 2;
 
 	state = State::NO_DEVICE;
-#if HAS_LIB_PULSEAUDIO
-	pulse_stream = nullptr;
-#endif
 #if HAS_LIB_PORTAUDIO
 	portaudio_stream = nullptr;
 #endif

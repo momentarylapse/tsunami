@@ -14,15 +14,12 @@
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
+#include "../AudioInputStream.h"
 
 class PluginManager;
 class DeviceManager;
 class Device;
 class Session;
-
-#if HAS_LIB_PULSEAUDIO
-struct pa_stream;
-#endif
 
 #if HAS_LIB_PORTAUDIO
 typedef void PaStream;
@@ -57,8 +54,6 @@ public:
 
 	int _cdecl sample_rate(){ return _sample_rate; }
 
-
-	RingBuffer buffer;
 
 	AudioOutPort out{this};
 
@@ -97,21 +92,12 @@ protected:
 	Device *cur_device;
 	void update_device();
 
-#if HAS_LIB_PULSEAUDIO
-	pa_stream *pulse_stream;
-#endif
+	AudioInputStream* stream = nullptr;
+
 #if HAS_LIB_PORTAUDIO
-	PaStream *portaudio_stream;
 #endif
 
 
-#if HAS_LIB_PULSEAUDIO
-	bool _pulse_test_error(const char *msg);
-	static void pulse_stream_request_callback(pa_stream *p, size_t nbytes, void *userdata);
-	static void pulse_input_notify_callback(pa_stream *p, void *userdata);
-	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
-	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
-#endif
 #if HAS_LIB_PORTAUDIO
 	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
 	                                             unsigned long frames,

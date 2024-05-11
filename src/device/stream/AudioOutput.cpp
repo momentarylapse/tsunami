@@ -13,15 +13,12 @@
 #include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
-#include "../AudioOutputStream.h"
 #include "../pulse/AudioOutputStreamPulse.h"
 #include "../port/AudioOutputStreamPort.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
-
-static const bool STREAM_WARNINGS = true;
 
 
 namespace os {

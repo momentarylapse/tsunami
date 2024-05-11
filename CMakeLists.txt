@@ -121,10 +121,12 @@ set(SOURCE
 	src/data/TrackLayer.cpp
 	src/data/TrackMarker.cpp
 	src/device/port/AudioOutputStreamPort.cpp
+	src/device/pulse/AudioInputStreamPulse.cpp
 	src/device/pulse/AudioOutputStreamPulse.cpp
 	src/device/stream/AudioInput.cpp
 	src/device/stream/AudioOutput.cpp
 	src/device/stream/MidiInput.cpp
+	src/device/AudioInputStream.cpp
 	src/device/AudioOutputStream.cpp
 	src/device/Device.cpp
 	src/device/DeviceManager.cpp

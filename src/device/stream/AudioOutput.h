@@ -16,9 +16,8 @@
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
 #include "../../module/port/Port.h"
+#include "../AudioOutputStream.h"
 #include <atomic>
-
-class AudioOutputStream;
 
 class DeviceManager;
 class Device;
@@ -43,24 +42,24 @@ public:
 	void reset_state() override;
 
 
-	void _cdecl stop();
-	void _cdecl start();
+	void stop();
+	void start();
 
 	void _pause();
 	void _unpause();
 
-	bool _cdecl is_playing();
+	bool is_playing();
 
 	bool buffer_is_cleared;
 	void _fill_prebuffer();
 
-	void _cdecl set_device(Device *d);
-	int _cdecl get_available();
+	void set_device(Device *d);
+	int get_available();
 
-	float _cdecl get_volume();
-	void _cdecl set_volume(float volume);
+	float get_volume() const;
+	void set_volume(float volume);
 
-	void _cdecl set_prebuffer_size(int size);
+	void set_prebuffer_size(int size);
 
 	base::optional<int64> estimate_samples_played();
 	int64 get_samples_requested() const;
@@ -68,14 +67,13 @@ public:
 	base::optional<int> get_latency();
 
 private:
-	int _read_stream(int buffer_size);
+	int _read_stream_into_ring_buffer(int buffer_size);
+
+	AudioOutputStream::SharedData shared_data;
 
 	RingBuffer ring_buf;
 
 	int prebuffer_size;
-
-	std::atomic<bool> read_end_of_stream;
-	std::atomic<bool> played_end_of_stream;
 
 	AudioOutputStream *stream = nullptr;
 	int64 samples_offset_since_reset = 0;

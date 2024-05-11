@@ -27,11 +27,12 @@ struct pa_operation;
 
 class AudioOutputStreamPulse : public AudioOutputStream {
 public:
-	AudioOutputStreamPulse(Session *session, Device *device, std::function<bool(float*,int)> callback_feed, std::function<void()> callback_out_of_data);
+	AudioOutputStreamPulse(Session *session, Device *device, SharedData& shared_data);
 	~AudioOutputStreamPulse() override;
 
 	void pause() override;
 	void unpause() override;
+	void pre_buffer() override;
 	int64 flush(int64 samples_offset_since_reset, int64 samples_requested) override;
 	base::optional<int64> estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) override;
 
@@ -46,9 +47,6 @@ public:
 	static void pulse_stream_underflow_callback(pa_stream *s, void *userdata);
 	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
 	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
-
-	std::function<bool(float*,int)> callback_feed;
-	std::function<void()> callback_out_of_data;
 };
 
 #endif

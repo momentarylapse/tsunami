@@ -71,6 +71,9 @@ int64 AudioOutputStreamPort::flush(int64 samples_offset_since_reset, int64 sampl
 }
 
 base::optional<int64> AudioOutputStreamPort::estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) {
+	//	always returning 0???
+	//	PaTime t = Pa_GetStreamTime(portaudio_stream);
+	//	return (double)t / session->sample_rate() - fake_samples_played;
 	return base::None;
 }
 
@@ -92,7 +95,7 @@ int AudioOutputStreamPort::portaudio_stream_request_callback(const void *inputBu
 	//bool out_of_data = stream->feed_stream_output((int)frames, out);
 
 	if (out_of_data)
-		stream->callback_out_of_data();
+		stream->signal_out_of_data();
 
 	return paContinue;
 }

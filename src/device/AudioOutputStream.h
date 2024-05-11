@@ -18,11 +18,20 @@ class DeviceManager;
 
 class AudioOutputStream {
 public:
-	AudioOutputStream(Session* session);
+	struct SharedData {
+		SharedData();
+		std::atomic<bool> read_end_of_stream;
+		std::atomic<bool> played_end_of_stream;
+		std::function<bool(float*,int)> callback_feed;
+		std::function<void()> callback_played_end_of_stream;
+	};
+
+	AudioOutputStream(Session* session, SharedData& shared_data);
 	virtual ~AudioOutputStream();
 
 	virtual void pause() = 0;
 	virtual void unpause() = 0;
+	virtual void pre_buffer() {}
 	virtual int64 flush(int64 samples_offset_since_reset, int64 samples_requested) = 0;
 	virtual base::optional<int64> estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) = 0;
 
@@ -31,16 +40,11 @@ public:
 
 	static const int DEFAULT_PREBUFFER_SIZE;
 
-	/*void signal_out_of_data();
-
-	std::atomic<bool> read_end_of_stream;
-	std::atomic<bool> played_end_of_stream;
-
-
-	std::function<void()> callback_read_end_of_stream;
-	std::function<void()> callback_played_end_of_stream;*/
+	void signal_out_of_data();
 
 	bool error = false;
+
+	SharedData& shared_data;
 };
 
 

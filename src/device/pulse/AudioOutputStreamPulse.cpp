@@ -40,13 +40,7 @@ static int nnn = 0;
 static int xxx_total_read = 0;
 
 
-AudioOutputStreamPulse::AudioOutputStreamPulse(Session *session, Device *device,
-
-											   std::function<bool(float*,int)> _callback_feed,
-std::function<void()> _callback_out_of_data) : AudioOutputStream(session) {
-
-	callback_feed = _callback_feed;
-	callback_out_of_data = _callback_out_of_data;
+AudioOutputStreamPulse::AudioOutputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioOutputStream(session, shared_data) {
 
 	pa_sample_spec ss;
 	ss.rate = session->sample_rate();
@@ -127,6 +121,18 @@ void AudioOutputStreamPulse::unpause() {
 	_pulse_flush_op();
 
 }
+
+void AudioOutputStreamPulse::pre_buffer() {
+	/*device_manager->lock();
+	pa_operation *op = pa_stream_prebuf(pulse_stream, &pulse_stream_success_callback, this);
+	device_manager->unlock();
+	_pulse_start_op(op, "pa_stream_prebuf");*/
+
+	/*pa_operation *op = pa_stream_trigger(pulse_stream, &pulse_stream_success_callback, nullptr);
+	_pulse_test_error("pa_stream_trigger");
+	pa_wait_op(session, op);*/
+}
+
 int64 AudioOutputStreamPulse::flush(int64 samples_offset_since_reset, int64 samples_requested) {
 	device_manager->lock();
 	pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
@@ -211,7 +217,7 @@ void AudioOutputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t 
 	int frames = nbytes / 8;
 	float *out = static_cast<float*>(data);
 
-	bool out_of_data = stream->callback_feed(out, frames);
+	bool out_of_data = stream->shared_data.callback_feed(out, frames);
 
 //	bool out_of_data = stream->feed_stream_output(frames, out);
 
@@ -219,12 +225,7 @@ void AudioOutputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t 
 		stream->_pulse_test_error("pa_stream_write");
 
 	if (out_of_data)
-		stream->callback_out_of_data();
-	/*if (out_of_data and stream->read_end_of_stream and !stream->played_end_of_stream) {
-		//printf("end of data...\n");
-		stream->played_end_of_stream = true;
-		hui::run_later(0.001f, [stream]{ stream->on_played_end_of_stream(); }); // TODO prevent abort before playback really finished
-	}
+		stream->signal_out_of_data();
 	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);*/
 }
 

@@ -13,13 +13,7 @@
 #include <portaudio.h>
 
 
-AudioOutputStreamPort::AudioOutputStreamPort(Session *session, Device *device,
-
-											   std::function<bool(float*,int)> _callback_feed,
-											   std::function<void()> _callback_out_of_data) : AudioOutputStream(session) {
-
-	callback_feed = _callback_feed;
-	callback_out_of_data = _callback_out_of_data;
+AudioOutputStreamPort::AudioOutputStreamPort(Session *session, Device *device, SharedData& shared_data) : AudioOutputStream(session, shared_data) {
 
 	int dev_sample_rate = session->sample_rate();
 
@@ -66,14 +60,13 @@ void AudioOutputStreamPort::unpause() {
 	device_manager->unlock();
 }
 
-int64 AudioOutputStreamPort::flush(int64 samples_offset_since_reset, int64 samples_requested) {
-	return 0;
+void AudioOutputStreamPort::flush() {
 }
 
-base::optional<int64> AudioOutputStreamPort::estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) {
+base::optional<int64> AudioOutputStreamPort::estimate_samples_played() {
 	//	always returning 0???
 	//	PaTime t = Pa_GetStreamTime(portaudio_stream);
-	//	return (double)t / session->sample_rate() - fake_samples_played;
+	//	return (double)t / session->sample_rate() - shared_data.fake_samples_played;
 	return base::None;
 }
 
@@ -90,9 +83,7 @@ int AudioOutputStreamPort::portaudio_stream_request_callback(const void *inputBu
 	auto out = static_cast<float*>(outputBuffer);
 	(void) inputBuffer; /* Prevent unused variable warning. */
 
-	bool out_of_data = stream->callback_feed(out, frames);
-
-	//bool out_of_data = stream->feed_stream_output((int)frames, out);
+	bool out_of_data = stream->shared_data.feed_stream_output(frames, out);
 
 	if (out_of_data)
 		stream->signal_out_of_data();

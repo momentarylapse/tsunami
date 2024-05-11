@@ -23,55 +23,10 @@ namespace kaba {
 
 static const bool STREAM_WARNINGS = true;
 
-const int AudioOutput::DEFAULT_PREBUFFER_SIZE = 4096;
-
 
 namespace os {
 	extern void require_main_thread(const string &msg);
 }
-
-
-// return: underrun?
-bool AudioOutput::feed_stream_output(int frames_request, float *out) {
-
-	//printf("feed %d\n", frames_request);
-	int available = ring_buf.available();
-	int frames = min(frames_request, available);
-	samples_requested += frames_request;
-
-
-	//printf("av=%d r=%d reos=%d\n", available, stream->reading.load(), stream->read_end_of_stream.load());
-
-	// read 2x in case of wrap-around
-	int done = 0;
-	for (int n=0; (n<2) and (done < frames); n++) {
-		AudioBuffer b;
-		ring_buf.read_ref(b, frames - done);
-		b.interleave(out, device_manager->get_output_volume() * config.volume);
-		ring_buf.read_ref_done(b);
-		out += b.length * 2;
-		done += b.length;
-	}
-	done = frames;
-
-
-	// underflow? -> add silence
-	if (available < frames_request) {
-		if (!shared_data.read_end_of_stream and !buffer_is_cleared)
-			if (STREAM_WARNINGS)
-				printf("< underflow  %d < %d\n", available, frames_request);
-		// output silence...
-		fake_samples_played += frames_request - done;
-		for (int i=done; i<frames_request; i++) {
-			*out ++ = 0;
-			*out ++ = 0;
-		}
-		return true;
-	}
-
-	return false;
-}
-
 
 
 void AudioOutput::Config::reset() {
@@ -89,19 +44,12 @@ string AudioOutput::Config::auto_conf(const string &name) const {
 
 
 AudioOutput::AudioOutput(Session *_session) :
-	Module(ModuleCategory::STREAM, "AudioOutput"),
-	ring_buf(1048576) {
+	Module(ModuleCategory::STREAM, "AudioOutput") {
 	state = State::UNPREPARED_NO_DEVICE_NO_DATA;
 	session = _session;
 
 	config.volume = 1;
-	prebuffer_size = hui::config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 
-
-	shared_data.callback_feed = [this] (float* out, int frames) {
-		bool out_of_data = feed_stream_output(frames, out);
-		return out_of_data;
-	};
 	shared_data.callback_played_end_of_stream = [this]{ on_played_end_of_stream(); }; // TODO prevent abort before playback really finished
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
@@ -115,10 +63,8 @@ AudioOutput::AudioOutput(Session *_session) :
 	}
 	config.kaba_class = _class;
 
-	dev_sample_rate = -1;
 	cur_device = nullptr;
 
-	buffer_is_cleared = true;
 	latency = 0;
 }
 
@@ -141,7 +87,6 @@ void AudioOutput::_create_dev() {
 	if (!device_manager->audio_api_initialized())
 		return;
 	session->debug("out", "create device");
-	dev_sample_rate = session->sample_rate();
 	device_manager->lock();
 
 
@@ -186,17 +131,8 @@ void AudioOutput::_kill_dev() {
 		stream = nullptr;
 	}
 
-	_clear_data_state();
+	shared_data.clear_data_state();
 	_set_state(State::UNPREPARED_NO_DEVICE_NO_DATA);
-}
-
-void AudioOutput::_clear_data_state() {
-	ring_buf.clear();
-	buffer_is_cleared = true;
-	shared_data.read_end_of_stream = false;
-	shared_data.played_end_of_stream = false;
-	samples_requested = 0;
-	fake_samples_played = 0;
 }
 
 
@@ -241,7 +177,7 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 
 	int size = 0;
 	AudioBuffer b;
-	ring_buf.write_ref(b, buffer_size);
+	shared_data.ring_buf.write_ref(b, buffer_size);
 
 	// read data
 	size = in.source->read_audio(b);
@@ -249,7 +185,7 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 	if (size == NOT_ENOUGH_DATA) {
 		//printf(" -> no data\n");
 		// keep trying...
-		ring_buf.write_ref_cancel(b);
+		shared_data.ring_buf.write_ref_cancel(b);
 		return size;
 	}
 
@@ -258,14 +194,14 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 		//printf(" -> end  STREAM\n");
 		shared_data.read_end_of_stream = true;
 		hui::run_later(0.001f,  [this] { on_read_end_of_stream(); });
-		ring_buf.write_ref_cancel(b);
+		shared_data.ring_buf.write_ref_cancel(b);
 		return size;
 	}
 
 	// add to queue
 	b.length = size;
-	ring_buf.write_ref_done(b);
-	buffer_is_cleared = false;
+	shared_data.ring_buf.write_ref_done(b);
+	shared_data.buffer_is_cleared = false;
 //	printf(" -> %d of %d\n", size, buffer_size);
 	return size;
 }
@@ -297,7 +233,7 @@ void AudioOutput::_fill_prebuffer() {
 	session->debug("out", "prebuf");
 
 	// we need some data in the buffer...
-	_read_stream_into_ring_buffer(prebuffer_size);
+	_read_stream_into_ring_buffer(shared_data.prebuffer_size);
 
 	if (!stream)
 		return;
@@ -310,7 +246,7 @@ void AudioOutput::_fill_prebuffer() {
 }
 
 int AudioOutput::get_available() {
-	return ring_buf.available();
+	return shared_data.ring_buf.available();
 }
 
 float AudioOutput::get_volume() const {
@@ -319,12 +255,13 @@ float AudioOutput::get_volume() const {
 
 void AudioOutput::set_volume(float _volume) {
 	config.volume = _volume;
+	on_config();
 	out_state_changed.notify();
 	out_changed.notify();
 }
 
 void AudioOutput::set_prebuffer_size(int size) {
-	prebuffer_size = size;
+	shared_data.prebuffer_size = size;
 }
 
 
@@ -345,6 +282,7 @@ void AudioOutput::update_device() {
 void AudioOutput::on_config() {
 	if (cur_device != config.device)
 		update_device();
+	shared_data.volume = config.volume * device_manager->output_volume;
 }
 
 void AudioOutput::on_played_end_of_stream() {
@@ -367,11 +305,11 @@ void AudioOutput::reset_state() {
 	if (state == State::PAUSED) {
 		session->debug("out", "flush");
 		if (stream)
-			samples_offset_since_reset += stream->flush(samples_offset_since_reset, samples_requested);
+			stream->flush();
 		_set_state(State::UNPREPARED_NO_DATA);
 	}
 
-	_clear_data_state();
+	shared_data.clear_data_state();
 }
 
 base::optional<int64> AudioOutput::command(ModuleCommand cmd, int64 param) {
@@ -388,7 +326,7 @@ base::optional<int64> AudioOutput::command(ModuleCommand cmd, int64 param) {
 			_create_dev();
 		return 0;
 	} else if (cmd == ModuleCommand::SUCK) {
-		if (ring_buf.available() >= prebuffer_size)
+		if (shared_data.ring_buf.available() >= shared_data.prebuffer_size)
 			return 0;
 		//printf("suck %d    av %d\n", param, ring_buf.available());
 		return (int64)_read_stream_into_ring_buffer((int)param);
@@ -425,15 +363,15 @@ base::optional<int64> AudioOutput::estimate_samples_played() {
 		return base::None;
 
 	if (stream)
-		if (auto r = stream->estimate_samples_played(samples_offset_since_reset, samples_requested))
+		if (auto r = stream->estimate_samples_played())
 			return *r;
-	return samples_requested;
+	return shared_data.samples_requested;
 	//return base::None;
 }
 
 // requested by audio library (since last reset_state())
 int64 AudioOutput::get_samples_requested() const {
-	return samples_requested;
+	return shared_data.samples_requested;
 }
 
 ModuleConfiguration *AudioOutput::get_config() const {

@@ -33,8 +33,8 @@ public:
 	void pause() override;
 	void unpause() override;
 	void pre_buffer() override;
-	int64 flush(int64 samples_offset_since_reset, int64 samples_requested) override;
-	base::optional<int64> estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) override;
+	void flush() override;
+	base::optional<int64> estimate_samples_played() override;
 
 
 	pa_stream *pulse_stream = nullptr;

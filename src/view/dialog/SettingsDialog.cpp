@@ -116,7 +116,7 @@ void SettingsDialog::load_data() {
 			n_midi++;
 		}
 	}
-	set_int("prebuffer_size", hui::config.get_int("Output.BufferSize", AudioOutput::DEFAULT_PREBUFFER_SIZE));
+	set_int("prebuffer_size", hui::config.get_int("Output.BufferSize", AudioOutputStream::DEFAULT_PREBUFFER_SIZE));
 	set_int("suck_size", hui::config.get_int("SignalChain.BufferSize", SignalChain::DEFAULT_BUFFER_SIZE));
 }
 

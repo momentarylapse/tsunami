@@ -33,8 +33,6 @@ public:
 
 	void _cdecl __init__(Session *session);
 	void __delete__() override;
-	
-	static const int DEFAULT_PREBUFFER_SIZE;
 
 	void _create_dev();
 	void _kill_dev();
@@ -50,7 +48,6 @@ public:
 
 	bool is_playing();
 
-	bool buffer_is_cleared;
 	void _fill_prebuffer();
 
 	void set_device(Device *d);
@@ -71,16 +68,7 @@ private:
 
 	AudioOutputStream::SharedData shared_data;
 
-	RingBuffer ring_buf;
-
-	int prebuffer_size;
-
 	AudioOutputStream *stream = nullptr;
-	int64 samples_offset_since_reset = 0;
-
-	int dev_sample_rate;
-	int64 samples_requested = 0;
-	int64 fake_samples_played = 0;
 
 	DeviceManager *device_manager;
 
@@ -98,7 +86,6 @@ private:
 
 	Device *cur_device;
 	void update_device();
-	void _clear_data_state();
 
 	enum class State {
 		UNPREPARED_NO_DEVICE_NO_DATA,
@@ -114,10 +101,6 @@ private:
 
 	int latency;
 	//timeval xxx_prev_time;
-
-
-	bool feed_stream_output(int frames, float *out);
-
 
 	void on_played_end_of_stream();
 	void on_read_end_of_stream();

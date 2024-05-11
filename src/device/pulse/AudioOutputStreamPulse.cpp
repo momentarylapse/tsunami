@@ -133,32 +133,32 @@ void AudioOutputStreamPulse::pre_buffer() {
 	pa_wait_op(session, op);*/
 }
 
-int64 AudioOutputStreamPulse::flush(int64 samples_offset_since_reset, int64 samples_requested) {
+void AudioOutputStreamPulse::flush() {
 	device_manager->lock();
 	pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
 	device_manager->unlock();
 	_pulse_start_op(op, "pa_stream_flush");
 	_pulse_flush_op();
 
-	auto get_write_offset = [this, samples_offset_since_reset, samples_requested] () {
+	auto get_write_offset = [this] () {
 		if (auto info = pa_stream_get_timing_info(pulse_stream))
 			if (info->read_index_corrupt == 0)
-				return info->write_index / 8 - samples_offset_since_reset;
-		return samples_requested;
+				return info->write_index / 8 - shared_data.samples_offset_since_reset;
+		return shared_data.samples_requested;
 	};
-	return get_write_offset();
+	shared_data.samples_offset_since_reset += get_write_offset();
 
 }
-base::optional<int64> AudioOutputStreamPulse::estimate_samples_played(int64 samples_offset_since_reset, int64 samples_requested) {
+base::optional<int64> AudioOutputStreamPulse::estimate_samples_played() {
 	// PA_STREAM_INTERPOLATE_TIMING
 	if (auto info = pa_stream_get_timing_info(pulse_stream)) {
 		auto dbuffer = (info->write_index - info->read_index) / 8;
 		if (false)
-			printf("%6ld  %6ld  %6ld | w=%-6lld  r=%-6lld  d=%-6ld | req=%-8lld\n", info->configured_sink_usec, info->sink_usec, info->transport_usec, info->write_index/8-samples_offset_since_reset, info->read_index/8-samples_offset_since_reset, dbuffer, samples_requested);
+			printf("%6ld  %6ld  %6ld | w=%-6lld  r=%-6lld  d=%-6ld | req=%-8lld\n", info->configured_sink_usec, info->sink_usec, info->transport_usec, info->write_index/8-shared_data.samples_offset_since_reset, info->read_index/8-shared_data.samples_offset_since_reset, dbuffer, shared_data.samples_requested);
 		double samples_per_usec = session->sample_rate() / 1000000.0;
 		double delay_samples = (double)(info->sink_usec + info->transport_usec) * samples_per_usec;
 		if (info->read_index_corrupt == 0)
-			return max(info->write_index / 8 - samples_offset_since_reset - (int64)delay_samples, (int64)0);
+			return max(info->write_index / 8 - shared_data.samples_offset_since_reset - (int64)delay_samples, (int64)0);
 		//printf("    %d %d\n", info->write_index, info->read_index);
 	}
 	/*pa_usec_t t;
@@ -167,7 +167,7 @@ base::optional<int64> AudioOutputStreamPulse::estimate_samples_played(int64 samp
 		printf("%lld  %.3f\n", fake_samples_played, t/1000000.0);
 		return (double)t * usec2samples - fake_samples_played;
 	}*/
-	return samples_requested;
+	return shared_data.samples_requested;
 }
 // NOT inside lock()/unlock()
 void AudioOutputStreamPulse::_pulse_flush_op() {
@@ -217,7 +217,7 @@ void AudioOutputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t 
 	int frames = nbytes / 8;
 	float *out = static_cast<float*>(data);
 
-	bool out_of_data = stream->shared_data.callback_feed(out, frames);
+	bool out_of_data = stream->shared_data.feed_stream_output(frames, out);
 
 //	bool out_of_data = stream->feed_stream_output(frames, out);
 

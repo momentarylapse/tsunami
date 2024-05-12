@@ -48,12 +48,9 @@ public:
 	Session *load_session(const Path &filename, Session *session_caller = nullptr);
 	void load_into_session(SessionPersistenceData *p, Session *session);
 	bool try_restore_session_for_song(Session *session, const Path &song_filename);
-	void delete_saved_session(const string &name);
+	//void delete_saved_session(const string &name);
 
-	Path session_path(const string &name) const;
-	string session_name(const string &name) const;
 	static Path directory();
-	bool is_persistent(Session *s) const;
 
 	shared_array<Session> active_sessions;
 

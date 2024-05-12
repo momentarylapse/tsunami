@@ -888,7 +888,7 @@ void TsunamiWindow::update_menu() {
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->is_save())
 		title = "*" + title;
-	if (tsunami->session_manager->is_persistent(session) and !header_bar)
+	if (session->persistence_data and !header_bar)
 		title += " (session)";
 	set_title(title);
 

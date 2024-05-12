@@ -69,6 +69,10 @@ SessionPersistenceData* SessionManager::find_for_song_filename(const Path &filen
 void SessionManager::load_session_map_legacy() {
 	auto list = os::fs::search(directory(), "*.session", "f");
 	for (auto &e: list) {
+		auto p = new SessionPersistenceData;
+		session_persistence_data_internal.add(p);
+		p->session_filename = directory() | e;
+		msg_write(str(p->session_filename));
 		if constexpr (false) {
 			// correct
 			xml::Parser parser;
@@ -91,10 +95,7 @@ void SessionManager::load_session_map_legacy() {
 				int p2 = s.find("\"", p1 + 13);
 				if (p2 < 0)
 					continue;
-				auto p = new SessionPersistenceData;
 				p->song_filename = s.sub_ref(p1 + 12, p2);
-				p->session_filename = directory() | e;
-				session_persistence_data_internal.add(p);
 			} catch(...) {
 			}
 		}
@@ -262,30 +263,12 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 }
 
 
-Path SessionManager::session_path(const string &name) const {
-	// already a full filename?
-	if (name.tail(8) == ".session")
-		return name;
-	return directory() | (name + ".session");
-}
-
-string SessionManager::session_name(const string &name) const {
-	return session_path(name).basename_no_ext();
-}
-
 /*bool SessionManager::session_exists(const string& name) const {
 	for (const auto& l: enumerate_all_sessions())
 		if (l.is_persistent() and l.name == session_name(name))
 			return true;
 	return false;
 }*/
-
-bool SessionManager::is_persistent(Session *s) const {
-	for (const auto& l: enumerate_all_sessions())
-		if (l.session == s and l.is_persistent())
-			return true;
-	return false;
-}
 
 Session *SessionManager::load_session(const Path &filename, Session *session_caller) {
 	auto *session = get_empty_session(session_caller);
@@ -368,14 +351,14 @@ bool SessionManager::try_restore_session_for_song(Session *session, const Path &
 	return true;
 }
 
-void SessionManager::delete_saved_session(const string &name) {
+/*void SessionManager::delete_saved_session(const string &name) {
 	os::fs::_delete(session_path(name));
 	for (auto s: weak(active_sessions))
 		if (s->persistent_name == name)
 			s->persistent_name = "";
 	save_session_map();
 	out_changed.notify();
-}
+}*/
 
 Path SessionManager::directory() {
 	return Tsunami::directory | "sessions";

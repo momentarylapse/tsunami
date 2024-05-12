@@ -61,7 +61,6 @@ public:
 	MainView *main_view;
 	owned<Storage> storage;
 	bool auto_delete;
-	string persistent_name;
 	SessionPersistenceData* persistence_data = nullptr;
 
 	shared_array<SignalChain> all_signal_chains;

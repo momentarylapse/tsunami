@@ -76,8 +76,8 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 Session::~Session() = default;
 
 void Session::prepare_end() {
-	if (persistent_name != "")
-		session_manager->save_session(this, persistent_name);
+	if (persistence_data)
+		session_manager->save_session(this);
 
 	for (auto p: weak(plugins))
 		p->on_stop();

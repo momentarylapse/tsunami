@@ -179,12 +179,15 @@ AudioView::AudioView(Session *_session) :
 	});
 	scroll_bar_time->constrained = false;
 
-	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
-	metronome_overlay_vlayer->align.dz = 80;
 	dummy_track = new Track(song, SignalType::AUDIO, CreateSynthesizer(session, ""));
 	dummy_layer = new TrackLayer(dummy_track.get());
 	dummy_vtrack = new AudioViewTrack(this, dummy_track.get());
 	dummy_vlayer = new AudioViewLayer(this, dummy_layer.get());
+
+	metronome_overlay_vlayer = new AudioViewLayer(this, nullptr);
+	metronome_overlay_vlayer->layer = dummy_layer.get(); // don't subscribe...
+	metronome_overlay_vlayer->align.dz = 80;
+	metronome_overlay_vlayer->set_hidden(true);
 
 
 	add_child(vbox);

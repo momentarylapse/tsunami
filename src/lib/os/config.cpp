@@ -248,4 +248,16 @@ Array<string> Configuration::keys() const {
 	return map.keys();
 }
 
+void Configuration::migrate(const string& from_key, const string& to_key) {
+	if (has(from_key)) {
+		if (has(to_key))
+			map[to_key] = map[from_key];
+		remove(from_key);
+	}
+}
+
+void Configuration::remove(const string& key) {
+	map.drop(key);
+}
+
 

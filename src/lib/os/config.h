@@ -42,6 +42,9 @@ public:
 
 	Array<string> keys() const;
 
+	void remove(const string& key);
+	void migrate(const string& from_key, const string& to_key);
+
 	bool loaded, changed;
 	Array<string> comments;
 	base::map<string, Any> map;

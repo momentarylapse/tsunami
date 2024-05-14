@@ -1052,7 +1052,7 @@ void TsunamiWindow::on_export_selection() {
 }
 
 void TsunamiWindow::on_quick_export() {
-	auto dir = Path(hui::config.get_str("QuickExportDir", hui::Application::directory.str()));
+	const auto dir = session->storage->quick_export_directory;
 	session->storage->save(song, dir | _suggest_filename(song, dir)).then([this] {
 		session->status(_("file saved"));
 	});

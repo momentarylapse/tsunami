@@ -8,7 +8,7 @@
 
 
 #include "FormatOgg.h"
-
+#include "../Storage.h"
 #include "../../module/port/Port.h"
 #include "../../Session.h"
 #include "../../lib/hui/hui.h"
@@ -62,8 +62,6 @@ int oe_write_page(ogg_page *page, FILE *fp) {
 void FormatOgg::save_via_renderer(StorageOperationData *od) {
 	AudioOutPort *r = od->renderer;
 
-	float OggQuality = hui::config.get_float("OggQuality", 0.5f);
-
 	FILE *f = fopen(od->filename.c_str(), "wb");
 	if (!f) {
 		od->error("can not create file");
@@ -73,7 +71,7 @@ void FormatOgg::save_via_renderer(StorageOperationData *od) {
 	vorbis_info vi;
 	vorbis_info_init(&vi);
 	int channels = od->channels_suggested;
-	if (vorbis_encode_setup_vbr(&vi, channels, od->session->sample_rate(), OggQuality)) {
+	if (vorbis_encode_setup_vbr(&vi, channels, od->session->sample_rate(), Storage::default_ogg_quality)) {
 		od->error("vorbis_encode_setup_vbr() failed");
 		return;
 	}

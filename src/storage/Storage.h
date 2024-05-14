@@ -62,6 +62,10 @@ public:
 	Array<FormatDescriptor*> formats;
 	Path current_directory;
 	Path current_chain_directory;
+	static Path quick_export_directory;
+	static float default_ogg_quality;
+
+	Array<Path> recently_used_files;
 
 	static string options_in;
 	static string options_out;

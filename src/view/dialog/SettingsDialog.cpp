@@ -15,6 +15,7 @@
 #include "../../device/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../stuff/Log.h"
+#include "../../storage/Storage.h"
 #include "../../Session.h"
 #include "../../Playback.h"
 #include "../../Tsunami.h"
@@ -82,15 +83,14 @@ void SettingsDialog::load_data() {
 	check("controls:headerbar", hui::config.get_bool("Window.HeaderBar", false));
 
 	// ogg quality
-	float CurOggQuality = hui::config.get_float("OggQuality", 0.5f);
-	foreachi(OggQuality &q, ogg_quality, i)
-		if (CurOggQuality > q.quality - 0.05f)
+	foreachi(auto &q, ogg_quality, i)
+		if (Storage::default_ogg_quality > q.quality - 0.05f)
 			set_int("ogg_bitrate", i);
 	set_decimals(1);
 
 	set_string("default_artist", hui::config.get_str("DefaultArtist", ""));
 
-	set_string("quick_export_dir", hui::config.get_str("QuickExportDir", ""));
+	set_string("quick_export_dir", str(Storage::quick_export_directory));
 
 	check("cpu_meter", hui::config.get_bool("CpuDisplay", false));
 	check("antialiasing", view->antialiasing);
@@ -137,7 +137,7 @@ void SettingsDialog::on_color_scheme() {
 }
 
 void SettingsDialog::on_ogg_bitrate() {
-	hui::config.set_float("OggQuality", ogg_quality[get_int("")].quality);
+	Storage::default_ogg_quality = ogg_quality[get_int("")].quality;
 }
 
 void SettingsDialog::on_default_artist() {
@@ -210,7 +210,7 @@ void SettingsDialog::on_high_details() {
 
 void SettingsDialog::on_qed_find() {
 	hui::file_dialog_dir(this, _("Quick export directory"), "", {}).then([this] (const Path &dir) {
-		hui::config.set_str("QuickExportDir", dir.str());
+		Storage::quick_export_directory = dir;
 		set_string("quick_export_dir", dir.str());
 	});
 }

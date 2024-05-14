@@ -38,6 +38,8 @@
 
 string Storage::options_in;
 string Storage::options_out;
+Path Storage::quick_export_directory;
+float Storage::default_ogg_quality;
 
 Storage::Storage(Session *_session) {
 	session = _session;
@@ -59,12 +61,28 @@ Storage::Storage(Session *_session) {
 	formats.add(new FormatDescriptorMidi());
 	formats.add(new FormatDescriptorPdf());
 
-	current_directory = hui::config.get_str("CurrentDirectory", "");
 	current_chain_directory = hui::Application::directory_static | "SignalChains";
+
+	hui::config.migrate("QuickExportDir", "Storage.QuickExportDirectory");
+	hui::config.migrate("CurrentDirectory", "Storage.CurrentDirectory");
+	hui::config.migrate("OggQuality", "Storage.DefaultOggQuality");
+
+	quick_export_directory = hui::config.get_str("Storage.QuickExportDirectory", str(hui::Application::directory));
+
+	default_ogg_quality = hui::config.get_float("Storage.DefaultOggQuality", 0.5f);
+
+	current_directory = hui::config.get_str("Storage.CurrentDirectory", "");
+	for (auto& s: hui::config.get_str_array("Storage.RecentFiles"))
+		recently_used_files.add(s);
 }
 
 Storage::~Storage() {
-	hui::config.set_str("CurrentDirectory", current_directory.str());
+	hui::config.set_float("Storage.DefaultOggQuality", default_ogg_quality);
+	hui::config.set_str("Storage.CurrentDirectory", current_directory.str());
+	Array<string> ruf;
+	for (auto& f: recently_used_files)
+		ruf.add(str(f));
+	hui::config.set_str_array("Storage.RecentFiles", ruf);
 
 	for (auto *d: formats)
 		delete d;

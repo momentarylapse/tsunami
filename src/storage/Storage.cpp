@@ -126,6 +126,7 @@ base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flag
 	for (Track *t: weak(song->tracks))
 		t->out_changed.notify();
 	song->out_finished_loading.notify();
+	mark_file_used(filename);
 
 	delete f;
 	if (od.errors_encountered)
@@ -251,6 +252,7 @@ base::future<void> Storage::save_ex(Song *song, const Path &filename, bool expor
 	if (!od.errors_encountered) {
 		try {
 			os::fs::move(temp_file, filename);
+			mark_file_used(filename);
 		} catch (Exception &e) {
 			od.error("failed to move temp file to target: " + e.message());
 		}
@@ -288,6 +290,7 @@ base::future<void> Storage::save_via_renderer(AudioOutPort &r, const Path &filen
 	od.tags = tags;
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
+	mark_file_used(filename);
 	delete f;
 	if (od.errors_encountered)
 		return base::failed<void>();
@@ -412,4 +415,17 @@ AudioBuffer Storage::decompress(const string &codec, const bytes &data) {
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b) {
 	return (Storage::Flags)((int)a | (int)b);
+}
+
+void Storage::mark_file_used(const Path& filename) {
+	auto f = filename.absolute();
+
+	int index = recently_used_files.find(f);
+	if (index >= 0)
+		recently_used_files.erase(index);
+
+	recently_used_files.insert(f, 0);
+
+	while (recently_used_files.num > 30)
+		recently_used_files.pop();
 }

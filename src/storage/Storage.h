@@ -75,6 +75,8 @@ public:
 
 	bytes compress(AudioBuffer &buffer, const string &codec);
 	AudioBuffer decompress(const string &codec, const bytes &data);
+
+	void mark_file_used(const Path& filename);
 };
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);

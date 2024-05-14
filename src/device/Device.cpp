@@ -34,8 +34,7 @@ Device::Device(DeviceType _type, const string &_name, const string &_internal_na
 	default_by_lib = false;
 }
 
-Device::Device(DeviceType _type, const string &s) {
-	Array<string> c = s.explode(",");
+Device::Device(DeviceType _type, const Any &a) {
 	type = _type;
 	channels = 0;
 	present = false;
@@ -45,12 +44,14 @@ Device::Device(DeviceType _type, const string &s) {
 	index_in_lib = -1;
 	default_by_lib = false;
 
-	if (c.num >= 4) {
-		name = c[0].replace("${COMMA}", ",").replace("${PIPE}", "|");
-		internal_name = c[1].replace("${COMMA}", ",").replace("${PIPE}", "|");
-		channels = c[2]._int();
-		visible = c[3]._bool();
-	}
+	if (a.has("name"))
+		name = str(a["name"]);
+	if (a.has("internal"))
+		internal_name = str(a["internal"]);
+	if (a.has("channels"))
+		channels = a["channels"]._int();
+	if (a.has("visible"))
+		visible = a["visible"]._bool();
 }
 
 string Device::get_name() const {
@@ -70,11 +71,11 @@ bool Device::is_default() const {
 	return default_by_lib;
 }
 
-string Device::to_config() {
-	string r;
-	r += name.replace(",", "${COMMA}").replace("|", "${PIPE}") + ",";
-	r += internal_name.replace(",", "${COMMA}").replace("|", "${PIPE}") + ",";
-	r += i2s(channels) + ",";
-	r += b2s(visible) + ",";
-	return r;
+Any Device::to_config() const {
+	Any a = Any::EmptyMap;
+	a["name"] = name;
+	a["internal"] = internal_name;
+	a["channels"] = channels;
+	a["visible"] = visible;
+	return a;
 }

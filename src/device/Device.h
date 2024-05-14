@@ -10,6 +10,8 @@
 
 #include "../lib/base/base.h"
 
+class Any;
+
 enum class DeviceType {
 	AUDIO_OUTPUT,
 	AUDIO_INPUT,
@@ -23,9 +25,9 @@ public:
 
 	Device();
 	Device(DeviceType type, const string &name, const string &internal_name, int channels);
-	Device(DeviceType type, const string &s);
+	Device(DeviceType type, const Any& a);
 
-	string to_config();
+	Any to_config() const;
 	string get_name() const;
 	bool is_default() const;
 

@@ -155,22 +155,37 @@ void DeviceManager::pulse_state_callback(pa_context* context, void* userdata) {
 #endif
 
 
+// for legacy migration
 Array<Device*> str2devs(const string &s, DeviceType type) {
-	Array<Device*> devices;
+	Array<Device *> devices;
 	auto a = s.explode("|");
-	for (string &b: a)
-		devices.add(new Device(type, b));
+	for (string &b: a) {
+		auto d = new Device(type, {});
+		auto c = b.explode(",");
+			if (c.num >= 4) {
+			d->name = c[0].replace("${COMMA}", ",").replace("${PIPE}", "|");
+			d->internal_name = c[1].replace("${COMMA}", ",").replace("${PIPE}", "|");
+			d->channels = c[2]._int();
+			d->visible = c[3]._bool();
+		}
+		devices.add(d);
+	}
 	return devices;
 }
 
-string devs2str(Array<Device*> devices) {
-	string r;
-	foreachi(Device *d, devices, i) {
-		if (i > 0)
-			r += "|";
-		r += d->to_config();
-	}
-	return r;
+Array<Device*> parse_devs(const Any& a, DeviceType type) {
+	Array<Device*> devices;
+	if (a.is_array())
+		for (const auto& aa: a.as_array())
+			devices.add(new Device(type, aa));
+	return devices;
+}
+
+Any devs2any(const Array<Device*>& devices) {
+	Any a = Any::EmptyArray;
+	for (auto d: devices)
+		a.add(d->to_config());
+	return a;
 }
 
 
@@ -269,9 +284,9 @@ void DeviceManager::write_config() {
 	string midi_api_name = api_descriptions[(int)midi_api].name;
 
 	//hui::Config.set_float("Devices.OutputVolume", output_volume);
-	hui::config.set_str("Devices.Output[" + audio_api_name + "]", devs2str(output_devices));
-	hui::config.set_str("Devices.Input[" + audio_api_name + "]", devs2str(input_devices));
-	hui::config.set_str("Devices.MidiInput[" + midi_api_name + "]", devs2str(midi_input_devices));
+	hui::config.set("Devices.Output[" + audio_api_name + "]", devs2any(output_devices));
+	hui::config.set("Devices.Input[" + audio_api_name + "]", devs2any(input_devices));
+	hui::config.set("Devices.MidiInput[" + midi_api_name + "]", devs2any(midi_input_devices));
 }
 
 
@@ -440,6 +455,14 @@ static int select_api(const string &preferred_name, int mode) {
 	return best;
 }
 
+void migrate_dev_config(const string& key, DeviceType type) {
+	auto a = hui::config.get(key);
+	if (a.is_string()) {
+		const auto devs = str2devs(a.as_string(), type);
+		hui::config.set(key, devs2any(devs));
+	}
+}
+
 void DeviceManager::init() {
 	if (initialized)
 		return;
@@ -450,6 +473,9 @@ void DeviceManager::init() {
 		hui::config.migrate("Output.Devices[" + d.name + "]", "Devices.Output[" + d.name + "]");
 		hui::config.migrate("Input.Devices[" + d.name + "]", "Devices.Input[" + d.name + "]");
 		hui::config.migrate("MidiInput.Devices[" + d.name + "]", "Devices.MidiInput[" + d.name + "]");
+		migrate_dev_config("Devices.Output[" + d.name + "]", DeviceType::AUDIO_OUTPUT);
+		migrate_dev_config("Devices.Input[" + d.name + "]", DeviceType::AUDIO_INPUT);
+		migrate_dev_config("Devices.MidiInput[" + d.name + "]", DeviceType::MIDI_INPUT);
 	}
 	hui::config.migrate("Output.Volume", "Devices.OutputVolume");
 
@@ -465,9 +491,9 @@ void DeviceManager::init() {
 
 
 
-	output_devices = str2devs(hui::config.get_str("Devices.Output[" + audio_api_name + "]", ""), DeviceType::AUDIO_OUTPUT);
-	input_devices = str2devs(hui::config.get_str("Devices.Input[" + audio_api_name + "]", ""), DeviceType::AUDIO_INPUT);
-	midi_input_devices = str2devs(hui::config.get_str("Devices.MidiInput[" + midi_api_name + "]", ""), DeviceType::MIDI_INPUT);
+	output_devices = parse_devs(hui::config.get("Devices.Output[" + audio_api_name + "]"), DeviceType::AUDIO_OUTPUT);
+	input_devices = parse_devs(hui::config.get("Devices.Input[" + audio_api_name + "]"), DeviceType::AUDIO_INPUT);
+	midi_input_devices = parse_devs(hui::config.get("Devices.MidiInput[" + midi_api_name + "]"), DeviceType::MIDI_INPUT);
 
 	output_volume = 1;
 	//output_volume = hui::Config.get_float("Devices.OutputVolume", 1.0f);

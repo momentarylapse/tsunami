@@ -38,7 +38,7 @@ Playback::Playback(Session *s) {
 
 Playback::~Playback() {
 	session->remove_signal_chain(signal_chain.get());
-	hui::config.set_float("Output.Volume", output_stream->get_volume());
+	hui::config.set_float("Devices.OutputVolume", output_stream->get_volume());
 }
 
 AudioView *Playback::view() {

@@ -32,7 +32,7 @@ struct ApiDescription {
 	int mode;
 	bool available;
 };
-ApiDescription api_descriptions[] = {
+Array<ApiDescription> api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
@@ -268,11 +268,10 @@ void DeviceManager::write_config() {
 	string audio_api_name = api_descriptions[(int)audio_api].name;
 	string midi_api_name = api_descriptions[(int)midi_api].name;
 
-	//hui::Config.set_str("Output.ChosenDevice", chosen_device);
-	//hui::Config.set_float("Output.Volume", output_volume);
-	hui::config.set_str("Output.Devices[" + audio_api_name + "]", devs2str(output_devices));
-	hui::config.set_str("Input.Devices[" + audio_api_name + "]", devs2str(input_devices));
-	hui::config.set_str("MidiInput.Devices[" + midi_api_name + "]", devs2str(midi_input_devices));
+	//hui::Config.set_float("Devices.OutputVolume", output_volume);
+	hui::config.set_str("Devices.Output[" + audio_api_name + "]", devs2str(output_devices));
+	hui::config.set_str("Devices.Input[" + audio_api_name + "]", devs2str(input_devices));
+	hui::config.set_str("Devices.MidiInput[" + midi_api_name + "]", devs2str(midi_input_devices));
 }
 
 
@@ -445,24 +444,33 @@ void DeviceManager::init() {
 	if (initialized)
 		return;
 
-	audio_api = (ApiType)select_api(hui::config.get_str("AudioApi", "porteaudio"), 1);
+	hui::config.migrate("AudioApi", "Devices.AudioApi");
+	hui::config.migrate("MidiApi", "Devices.MidiApi");
+	for (auto& d: api_descriptions) {
+		hui::config.migrate("Output.Devices[" + d.name + "]", "Devices.Output[" + d.name + "]");
+		hui::config.migrate("Input.Devices[" + d.name + "]", "Devices.Input[" + d.name + "]");
+		hui::config.migrate("MidiInput.Devices[" + d.name + "]", "Devices.MidiInput[" + d.name + "]");
+	}
+	hui::config.migrate("Output.Volume", "Devices.OutputVolume");
+
+	audio_api = (ApiType)select_api(hui::config.get_str("Devices.AudioApi", "porteaudio"), 1);
 	string audio_api_name = api_descriptions[(int)audio_api].name;
 	session->i(_("audio library selected: ") + audio_api_name);
-	midi_api = (ApiType)select_api(hui::config.get_str("MidiApi", "alsa"), 2);
+	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", "alsa"), 2);
 	string midi_api_name = api_descriptions[(int)midi_api].name;
 	session->i(_("midi library selected: ") + midi_api_name);
 
-	hui::config.set_str("AudioApi", audio_api_name);
-	hui::config.set_str("MidiApi", midi_api_name);
+	hui::config.set_str("Devices.AudioApi", audio_api_name);
+	hui::config.set_str("Devices.MidiApi", midi_api_name);
 
 
 
-	output_devices = str2devs(hui::config.get_str("Output.Devices[" + audio_api_name + "]", ""), DeviceType::AUDIO_OUTPUT);
-	input_devices = str2devs(hui::config.get_str("Input.Devices[" + audio_api_name + "]", ""), DeviceType::AUDIO_INPUT);
-	midi_input_devices = str2devs(hui::config.get_str("MidiInput.Devices[" + midi_api_name + "]", ""), DeviceType::MIDI_INPUT);
+	output_devices = str2devs(hui::config.get_str("Devices.Output[" + audio_api_name + "]", ""), DeviceType::AUDIO_OUTPUT);
+	input_devices = str2devs(hui::config.get_str("Devices.Input[" + audio_api_name + "]", ""), DeviceType::AUDIO_INPUT);
+	midi_input_devices = str2devs(hui::config.get_str("Devices.MidiInput[" + midi_api_name + "]", ""), DeviceType::MIDI_INPUT);
 
 	output_volume = 1;
-	//output_volume = hui::Config.get_float("Output.Volume", 1.0f);
+	//output_volume = hui::Config.get_float("Devices.OutputVolume", 1.0f);
 
 	// audio
 

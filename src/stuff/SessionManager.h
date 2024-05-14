@@ -11,6 +11,7 @@
 #include "../lib/pattern/Observable.h"
 #include "../lib/base/pointer.h"
 #include "../lib/base/map.h"
+#include "../lib/base/optional.h"
 #include "../lib/os/path.h"
 
 class Session;
@@ -25,14 +26,16 @@ struct SessionLabel {
 	enum Flags {
 		ACTIVE = 1,
 		PERSISTENT = 2,
-		BACKUP = 4
+		BACKUP = 4,
+		RECENT = 8
 	};
 
 	Flags flags;
-	Path session_filename;
+	Path filename;
 	Session *session;
 	int uuid;
 	bool is_active() const;
+	bool is_recent() const;
 	bool is_persistent() const;
 	bool is_backup() const;
 };
@@ -53,6 +56,8 @@ public:
 
 	static Path directory();
 
+	static bool is_persistent(const Path& filename);
+
 	shared_array<Session> active_sessions;
 
 	// all *.session files in tsunami's session folder
@@ -67,8 +72,9 @@ public:
 	SessionPersistenceData* find_for_session_filename(const Path& filename);
 
 	Array<SessionLabel> enumerate_all_sessions() const;
+	Array<SessionLabel> enumerate_active_sessions() const;
+	Array<SessionLabel> enumerate_recently_used_files() const;
 	Array<SessionLabel> enumerate_persistent_sessions() const;
-	Array<SessionLabel> enumerate_active_non_persistent_sessions() const;
 };
 
 #endif /* SRC_STUFF_SESSIONMANAGER_H_ */

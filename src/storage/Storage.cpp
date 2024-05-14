@@ -40,6 +40,7 @@ string Storage::options_in;
 string Storage::options_out;
 Path Storage::quick_export_directory;
 float Storage::default_ogg_quality;
+Array<Path> Storage::recently_used_files;
 
 Storage::Storage(Session *_session) {
 	session = _session;
@@ -72,6 +73,8 @@ Storage::Storage(Session *_session) {
 	default_ogg_quality = hui::config.get_float("Storage.DefaultOggQuality", 0.5f);
 
 	current_directory = hui::config.get_str("Storage.CurrentDirectory", "");
+
+	recently_used_files.clear();
 	for (auto& s: hui::config.get_str_array("Storage.RecentFiles"))
 		recently_used_files.add(s);
 }
@@ -79,10 +82,6 @@ Storage::Storage(Session *_session) {
 Storage::~Storage() {
 	hui::config.set_float("Storage.DefaultOggQuality", default_ogg_quality);
 	hui::config.set_str("Storage.CurrentDirectory", current_directory.str());
-	Array<string> ruf;
-	for (auto& f: recently_used_files)
-		ruf.add(str(f));
-	hui::config.set_str_array("Storage.RecentFiles", ruf);
 
 	for (auto *d: formats)
 		delete d;
@@ -126,7 +125,6 @@ base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flag
 	for (Track *t: weak(song->tracks))
 		t->out_changed.notify();
 	song->out_finished_loading.notify();
-	mark_file_used(filename);
 
 	delete f;
 	if (od.errors_encountered)
@@ -252,7 +250,6 @@ base::future<void> Storage::save_ex(Song *song, const Path &filename, bool expor
 	if (!od.errors_encountered) {
 		try {
 			os::fs::move(temp_file, filename);
-			mark_file_used(filename);
 		} catch (Exception &e) {
 			od.error("failed to move temp file to target: " + e.message());
 		}
@@ -290,7 +287,6 @@ base::future<void> Storage::save_via_renderer(AudioOutPort &r, const Path &filen
 	od.tags = tags;
 	od.num_samples = num_samples;
 	f->save_via_renderer(&od);
-	mark_file_used(filename);
 	delete f;
 	if (od.errors_encountered)
 		return base::failed<void>();
@@ -428,4 +424,9 @@ void Storage::mark_file_used(const Path& filename) {
 
 	while (recently_used_files.num > 30)
 		recently_used_files.pop();
+
+	Array<string> ruf;
+	for (const auto& ff: recently_used_files)
+		ruf.add(str(ff));
+	hui::config.set_str_array("Storage.RecentFiles", ruf);
 }

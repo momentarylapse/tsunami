@@ -931,21 +931,26 @@ void TsunamiWindow::on_new() {
 
 void TsunamiWindow::on_open() {
 	session->storage->ask_open(this).then([this] (const Path &filename) {
-		auto *s = tsunami->session_manager->get_empty_session(session);
-		if (s->session_manager->try_restore_session_for_song(s, filename)) {
-			BackupManager::set_save_state(s);
-		} else {
-			s->storage->load(s->song.get(), filename).then([s] {
-				BackupManager::set_save_state(s);
-			});
-		}
-		/*} else {
-			auto *s = tsunami->session_manager->spawn_new_session();
-			s->win->show();
-			if (s->storage->load(s->song.get(), filename))
-				s->session_manager->try_restore_matching_session(s);
-		}*/
+		load_song_with_session(filename);
+		Storage::mark_file_used(filename);
 	});
+}
+
+void TsunamiWindow::load_song_with_session(const Path& filename) {
+	auto *s = tsunami->session_manager->get_empty_session(session);
+	if (s->session_manager->try_restore_session_for_song(s, filename)) {
+		BackupManager::set_save_state(s);
+	} else {
+		s->storage->load(s->song.get(), filename).then([s] {
+			BackupManager::set_save_state(s);
+		});
+	}
+	/*} else {
+		auto *s = tsunami->session_manager->spawn_new_session();
+		s->win->show();
+		if (s->storage->load(s->song.get(), filename))
+			s->session_manager->try_restore_matching_session(s);
+	}*/
 }
 
 void TsunamiWindow::on_save() {
@@ -955,6 +960,7 @@ void TsunamiWindow::on_save() {
 		session->storage->save(song, song->filename).then([this] {
 			session->status(_("file saved"));
 			BackupManager::set_save_state(session);
+			Storage::mark_file_used(song->filename);
 		});
 	}
 }
@@ -998,6 +1004,7 @@ void TsunamiWindow::on_save_as() {
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		session->storage->save(song, filename).then([this] {
 			session->status(_("file saved"));
+			Storage::mark_file_used(song->filename);
 		});
 	});
 }

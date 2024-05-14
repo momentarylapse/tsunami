@@ -65,7 +65,7 @@ public:
 	static Path quick_export_directory;
 	static float default_ogg_quality;
 
-	Array<Path> recently_used_files;
+	static Array<Path> recently_used_files;
 
 	static string options_in;
 	static string options_out;
@@ -76,7 +76,7 @@ public:
 	bytes compress(AudioBuffer &buffer, const string &codec);
 	AudioBuffer decompress(const string &codec, const bytes &data);
 
-	void mark_file_used(const Path& filename);
+	static void mark_file_used(const Path& filename);
 };
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);

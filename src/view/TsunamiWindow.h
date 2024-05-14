@@ -130,6 +130,7 @@ public:
 
 	base::future<bool> test_allow_termination();
 	bool save();
+	void load_song_with_session(const Path& filename);
 
 	void update_menu();
 

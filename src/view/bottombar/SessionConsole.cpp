@@ -50,10 +50,12 @@ void SessionConsole::on_load() {
 	if (n < 0)
 		return;
 	auto &l = session_labels[n];
-	if (l.is_persistent())
-		tsunami->session_manager->load_session(l.session_filename, session);
+	if (l.is_recent())
+		session->win->load_song_with_session(l.filename);
+	else if (l.is_persistent())
+		tsunami->session_manager->load_session(l.filename, session);
 	else if (l.is_backup())
-		load_backup(session, l.session_filename);
+		load_backup(session, l.filename);
 }
 
 void SessionConsole::on_save() {
@@ -90,7 +92,7 @@ void SessionConsole::on_delete() {
 				// TODO: make BackupManager observable :P
 				tsunami->session_manager->out_changed.notify();
 			} else if (l.is_persistent()) {
-				tsunami->session_manager->delete_saved_session(l.session_filename);
+				tsunami->session_manager->delete_saved_session(l.filename);
 			}
 		}
 	});
@@ -129,6 +131,10 @@ void SessionConsole::load_data() {
 				return _("this window's session");
 			else
 				return _("other window's session");
+		} else if (l.is_recent()) {
+			if (l.is_persistent())
+				return "recently used file (persistent)";
+			return "recently used file";
 		} else if (l.is_persistent()) {
 			return _("persistent session");
 		} else if (l.is_backup()) {
@@ -140,7 +146,7 @@ void SessionConsole::load_data() {
 		if (l.is_active()) {
 			if (l.session == session)
 				return "weight='bold'";
-		} else if (l.is_persistent()) {
+		} else if (l.is_persistent() or l.is_recent()) {
 			return "alpha=\"50%%\"";
 		} else if (l.is_backup()) {
 			return "color='orange'";
@@ -150,7 +156,7 @@ void SessionConsole::load_data() {
 	for (auto &l: session_labels) {
 		auto d = description(l);
 		auto m = markup(l);
-		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, l.session_filename, d));
+		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, l.filename, d));
 	}
 }
 

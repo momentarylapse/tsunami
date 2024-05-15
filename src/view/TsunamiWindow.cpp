@@ -560,10 +560,17 @@ void TsunamiWindow::on_redo() {
 void TsunamiWindow::on_send_bug_report() {
 }
 
-string title_filename(const Path &filename) {
-	if (filename)
-		return filename.basename();
+string nice_filename(const Path& f) {
+	if (f) {
+		if (auto h = getenv("HOME"))
+			return str(f).replace(h, "~");
+		return str(f);
+	}
 	return _("No name");
+}
+
+string title_filename(const Path &filename) {
+	return nice_filename(filename.basename());
 }
 
 base::future<bool> TsunamiWindow::test_allow_termination() {

@@ -14,7 +14,9 @@
 #include "../stuff/SessionManager.h"
 #include "../lib/hui/Controls/ControlMenuButton.h"
 #include "../lib/base/iter.h"
-#include "../lib/base/algo.h"
+
+
+string nice_filename(const Path& f);
 
 HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	win = _win;
@@ -90,12 +92,6 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	}
 }
 
-string nice_dir(const string& f) {
-	if (auto h = getenv("HOME"))
-		return f.replace(h, "~");
-	return f;
-}
-
 void HeaderBar::update() {
 	bool editing = win->session->in_mode(EditMode::EditTrack);
 	bool recording = win->session->in_mode(EditMode::Capture);
@@ -106,10 +102,14 @@ void HeaderBar::update() {
 	win->set_string("session-indicator", "\u2713 (session)");
 
 	auto label = [] (const SessionLabel& l) {
-		return format("<big>%s.<span alpha=\"50%%\">%s</span></big>\n <small><span alpha=\"50%%\">%s</span></small>",
+		string s;
+		if (l.is_persistent())
+			s = "    <span fgcolor=\"#8080ff\"><b>session</b></span>";
+		return format("<big>%s.<span alpha=\"50%%\">%s</span></big>\n <small><span alpha=\"50%%\">%s</span>%s</small>",
 					  l.filename.basename_no_ext(),
 					  l.filename.extension(),
-					  nice_dir(l.filename.dirname()));
+					  nice_filename(l.filename.dirname()),
+					  s);
 	};
 
 	if (auto c = reinterpret_cast<hui::ControlMenuButton*>(win->_get_control_("open-menu"))) {
@@ -117,25 +117,18 @@ void HeaderBar::update() {
 		menu_load->add("Open...", "open");
 		menu_load->add_separator();
 		auto files = win->session->session_manager->enumerate_recently_used_files();
-		menu_load->add("Recently used sessions", "recent-sessions");
-		menu_load->enable("recent-sessions", false);
+		menu_load->add("Recently used files", "recent-files");
+		menu_load->enable("recent-files", false);
 		for (auto&& [i,l]: enumerate(files)) {
 			if (l.is_persistent())
 				menu_load->add(label(l), format("open-recent-%d", i));
 		}
-		if (base::count_if(files, [](const auto& l) { return l.is_persistent(); }) == 0) {
-			menu_load->add("<i>-none-</i>", "no-recent-sessions");
-			menu_load->enable("no-recent-sessions", false);
-		}
-		menu_load->add_separator();
-		menu_load->add("Recently used files", "recent-files");
-		menu_load->enable("recent-files", false);
 		for (auto&& [i,l]: enumerate(files)) {
 			if (!l.is_persistent())
 				menu_load->add(label(l), format("open-recent-%d", i));
 		}
-		if (base::count_if(files, [](const auto& l) { return !l.is_persistent(); }) == 0) {
-			menu_load->add("-none-", "no-recent-files");
+		if (files.num == 0) {
+			menu_load->add(" -none-", "no-recent-files");
 			menu_load->enable("no-recent-files", false);
 		}
 		c->set_menu(menu_load.get());

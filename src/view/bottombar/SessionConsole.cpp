@@ -10,6 +10,8 @@
 #include "../../Session.h"
 
 
+string nice_filename(const Path& f);
+
 void load_backup(Session *session_caller, const Path &filename) {
 	if (!filename)
 		return;
@@ -156,7 +158,7 @@ void SessionConsole::load_data() {
 	for (auto &l: session_labels) {
 		auto d = description(l);
 		auto m = markup(l);
-		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, l.filename, d));
+		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, nice_filename(l.filename), d));
 	}
 }
 

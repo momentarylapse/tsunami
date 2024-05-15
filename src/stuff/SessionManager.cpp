@@ -52,44 +52,52 @@ bool SessionLabel::is_backup() const {
 SessionManager::SessionManager() {
 	//os::Timer t;
 	load_session_map_legacy();
-//	save_session_map();
 	//msg_write(f2s(t.get()*1000, 3));
 }
 
-SessionPersistenceData* SessionManager::find_for_session(Session* session) {
-	for (auto& p: session_persistence_data_internal)
-		if (p->session == session)
-			return p;
-	return nullptr;
-}
-
-Path suggest_session_filename(const Path& filename) {
+Path associated_session_filename(const Path& filename) {
 	return filename.with(".tsunami.session");
 }
 
-bool SessionManager::is_persistent(const Path& filename) {
-	return os::fs::exists(suggest_session_filename(filename));
+Path associated_song_filename(const Path& filename) {
+	const auto s = str(filename);
+	if (s.tail(16) == ".tsunami.session")
+		return s.sub_ref(0, -16);
+	//if (s.tail(8) == ".session")
+	//	return s.sub_ref(0, -8);
+	return filename;
 }
 
-SessionPersistenceData* SessionManager::find_for_song_filename(const Path &filename) {
-	for (auto& p: session_persistence_data_internal)
-		if (p->song_filename == filename)
+bool SessionManager::can_find_associated_session_file(const Path& filename) {
+	return os::fs::exists(associated_session_filename(filename));
+}
+
+SessionPersistenceData* SessionManager::find_for_filename(const Path &filename) const {
+	for (auto &p: known_persistence_data)
+		if (p->song_filename == filename or p->song_filename == filename)
 			return p;
-	if (is_persistent(filename)) {
-		auto p = new SessionPersistenceData;
-		p->song_filename = filename;
-		p->session_filename = suggest_session_filename(filename);
-		session_persistence_data_internal.add(p);
-		out_changed();
-		return p;
-	}
 	return nullptr;
 }
 
-SessionPersistenceData* SessionManager::find_for_session_filename(const Path &filename) {
-	for (auto& p: session_persistence_data_internal)
-		if (p->session_filename == filename)
+SessionPersistenceData* SessionManager::find_for_filename_x(const Path &filename) {
+	if (auto p = find_for_filename(filename))
+		return p;
+	if (filename.extension() == "session") {
+		if (os::fs::exists(filename)) {
+			auto p = new SessionPersistenceData;
+			p->session_filename = filename;
+			known_persistence_data.add(p);
+			out_changed();
 			return p;
+		}
+	} else if (can_find_associated_session_file(filename)) {
+		auto p = new SessionPersistenceData;
+		p->song_filename = filename;
+		p->session_filename = associated_session_filename(filename);
+		known_persistence_data.add(p);
+		out_changed();
+		return p;
+	}
 	return nullptr;
 }
 
@@ -98,6 +106,7 @@ void SessionManager::load_session_map_legacy() {
 	for (auto &e: list) {
 		auto p = new SessionPersistenceData;
 		p->session_filename = directory() | e;
+		known_persistence_data.add(p);
 		if constexpr (false) {
 			// correct
 			xml::Parser parser;
@@ -124,25 +133,7 @@ void SessionManager::load_session_map_legacy() {
 			} catch(...) {
 			}
 		}
-		session_persistence_data_internal.add(p);
 	}
-}
-
-void SessionManager::save_session_map() {
-	/*auto f = os::fs::open(directory() | "index", "wt");
-
-	auto all = enumerate_all_sessions();
-	for (const auto& l: all)
-		if (l.is_persistent()) {
-			f->write_str(l.name);
-			Path path;
-			for (const auto&& [p, n]: session_map)
-				if (n == l.name)
-					path = p;
-			f->write_str(str(path));
-			f->write_int(0);
-			f->write_int(0);
-		}*/
 }
 
 Session *SessionManager::spawn_new_session() {
@@ -222,7 +213,7 @@ base::optional<AudioViewMode> parse_audio_mode(const string& s) {
 Path suggest_internal_session_path(Session *s) {
 	if (!s->song->filename.is_empty()) {
 		// song file
-		return suggest_session_filename(s->song->filename.absolute());
+		return associated_session_filename(s->song->filename.absolute());
 	} else {
 		// no song file
 		for (int i=1; i<1000; i++) {
@@ -246,7 +237,7 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 
 	if (!s->persistence_data) {
 		s->persistence_data = new SessionPersistenceData;
-		session_persistence_data_internal.add(s->persistence_data);
+		known_persistence_data.add(s->persistence_data);
 		s->persistence_data->session = s;
 	}
 	s->persistence_data->session_filename = filename;
@@ -309,8 +300,7 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 	parser.elements.add(e);
 	parser.save(filename);
 
-	save_session_map();
-
+	Storage::mark_file_used(filename);
 	s->out_changed();
 	out_changed();
 }
@@ -325,7 +315,7 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 
 Session *SessionManager::load_session(const Path &filename, Session *session_caller) {
 	auto *session = get_empty_session(session_caller);
-	if (auto p = find_for_session_filename(filename))
+	if (auto p = find_for_filename_x(filename))
 		load_into_session(p, session);
 	return session;
 }
@@ -336,6 +326,7 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 	auto &e = parser.elements[0];
 
 	session->persistence_data = p;
+	p->session = session;
 	session->win->show();
 
 	if (auto ef = e.find("file")) {
@@ -389,12 +380,15 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 		}
 	}
 
+	Storage::mark_file_used(p->session_filename);
 	out_changed.notify();
 }
 
-bool SessionManager::try_restore_session_for_song(Session *session, const Path &song_filename) {
-	auto path = song_filename.absolute();
-	auto p = find_for_song_filename(path);
+// session should be empty
+// filename might refer to an audio file OR a session file
+bool SessionManager::try_restore_session(Session *session, const Path &filename) {
+	auto path = filename.absolute();
+	auto p = find_for_filename_x(path);
 	if (!p)
 		return false;
 	load_into_session(p, session);
@@ -403,15 +397,14 @@ bool SessionManager::try_restore_session_for_song(Session *session, const Path &
 }
 
 void SessionManager::delete_saved_session(const Path& filename) {
-	if (auto p = find_for_session_filename(filename)) {
+	if (auto p = find_for_filename(filename)) {
 		if (p->session)
 			p->session->persistence_data = nullptr;
-		int index = weak(session_persistence_data_internal).find(p);
-		session_persistence_data_internal.erase(index);
+		os::fs::_delete(p->session_filename);
+		int index = weak(known_persistence_data).find(p);
+		known_persistence_data.erase(index);
 	}
-	os::fs::_delete(filename);
-	save_session_map();
-	out_changed.notify();
+	out_changed();
 }
 
 Path SessionManager::directory() {
@@ -422,43 +415,60 @@ static SessionLabel::Flags operator|(SessionLabel::Flags a, SessionLabel::Flags 
 	return (SessionLabel::Flags)((int)a | (int)b);
 }
 
-Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
-	Array<SessionLabel> sessions;
-	for (auto p: session_persistence_data_internal) {
-		if (p->session) // active?
-			sessions.add({SessionLabel::Flags::PERSISTENT | SessionLabel::Flags::ACTIVE, p->session_filename, p->session, -1});
-		else
-			sessions.add({SessionLabel::Flags::PERSISTENT, p->session_filename, p->session, -1});
-	}
-	return sessions;
-}
-
 Array<SessionLabel> SessionManager::enumerate_active_sessions() const {
 	Array<SessionLabel> sessions;
 	for (auto s: weak(active_sessions)) {
-		if (s->persistence_data)
-			sessions.add({SessionLabel::Flags::ACTIVE | SessionLabel::Flags::PERSISTENT, s->song->filename, s, -1});
-		else
+		if (auto p = s->persistence_data) {
+			if (s->song->filename)
+				sessions.add({SessionLabel::Flags::ACTIVE | SessionLabel::Flags::PERSISTENT, s->song->filename, s, -1});
+			else
+				sessions.add({SessionLabel::Flags::ACTIVE | SessionLabel::Flags::PERSISTENT, p->session_filename, s, -1});
+		} else {
 			sessions.add({SessionLabel::Flags::ACTIVE, s->song->filename, s, -1});
+		}
 	}
 	return sessions;
 }
 
+// not active!
 Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 	auto is_active = [this] (const Path& filename) {
-		for (auto s: weak(active_sessions))
+		for (auto s: weak(active_sessions)) {
 			if (s->song->filename == filename)
 				return true;
+			if (s->persistence_data and s->persistence_data->session_filename == filename)
+				return true;
+		}
 		return false;
 	};
 	Array<SessionLabel> sessions;
 	for (auto& f: Storage::recently_used_files) {
 		if (is_active(f))
 			continue;
-		if (is_persistent(f))
+	//	if (find_for_filename(f))
+	//		continue;
+		if (can_find_associated_session_file(f))
 			sessions.add({SessionLabel::RECENT | SessionLabel::PERSISTENT, f});
+		else if (f.extension() == "session")
+			sessions.add({SessionLabel::RECENT | SessionLabel::PERSISTENT, associated_song_filename(f)});
 		else
 			sessions.add({SessionLabel::RECENT, f});
+	}
+	return sessions;
+}
+
+// not active, not recent!
+Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
+	auto is_recent = [this] (const Path& path) {
+		return Storage::recently_used_files.find(path) >= 0;
+	};
+	Array<SessionLabel> sessions;
+	for (auto p: known_persistence_data) {
+		if (p->session) // active?
+			continue;
+		if (is_recent(p->session_filename))
+			continue;
+		sessions.add({SessionLabel::Flags::PERSISTENT, p->session_filename, p->session, -1});
 	}
 	return sessions;
 }
@@ -467,13 +477,13 @@ Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
 	Array<SessionLabel> sessions;
 
 	sessions.append(enumerate_active_sessions());
-	//sessions.append(enumerate_persistent_sessions());
 	sessions.append(enumerate_recently_used_files());
+	sessions.append(enumerate_persistent_sessions());
 
 	// backups
 	BackupManager::check_old_files();
 	for (auto &f: BackupManager::files)
-		sessions.add({SessionLabel::Flags::BACKUP, f.filename.str(), nullptr, f.uuid});
+		sessions.add({SessionLabel::Flags::BACKUP, f.filename, nullptr, f.uuid});
 
 	return sessions;
 }

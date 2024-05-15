@@ -135,10 +135,10 @@ void SessionConsole::load_data() {
 				return _("other window's session");
 		} else if (l.is_recent()) {
 			if (l.is_persistent())
-				return "recently used file (persistent)";
+				return "recently used file - <span fgcolor=\"#8080ff\"><b>persistent session</b></span>";
 			return "recently used file";
 		} else if (l.is_persistent()) {
-			return _("persistent session");
+			return "<span fgcolor=\"#8080ff\"><b>persistent session</b></span>";
 		} else if (l.is_backup()) {
 			return _("recording backup");
 		}
@@ -158,6 +158,7 @@ void SessionConsole::load_data() {
 	for (auto &l: session_labels) {
 		auto d = description(l);
 		auto m = markup(l);
+		//msg_write(l.filename.str());
 		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, nice_filename(l.filename), d));
 	}
 }

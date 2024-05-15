@@ -946,7 +946,7 @@ void TsunamiWindow::on_open() {
 
 void TsunamiWindow::load_song_with_session(const Path& filename) {
 	auto *s = tsunami->session_manager->get_empty_session(session);
-	if (s->session_manager->try_restore_session_for_song(s, filename)) {
+	if (s->session_manager->try_restore_session(s, filename)) {
 		BackupManager::set_save_state(s);
 	} else {
 		s->storage->load(s->song.get(), filename).then([s] {

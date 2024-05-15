@@ -51,25 +51,21 @@ public:
 	void save_session(Session *s, const Path& filename);
 	Session *load_session(const Path &filename, Session *session_caller = nullptr);
 	void load_into_session(SessionPersistenceData *p, Session *session);
-	bool try_restore_session_for_song(Session *session, const Path &song_filename);
+	bool try_restore_session(Session *session, const Path &filename);
 	void delete_saved_session(const Path &filename);
 
 	static Path directory();
 
-	static bool is_persistent(const Path& filename);
+	static bool can_find_associated_session_file(const Path& filename);
 
 	shared_array<Session> active_sessions;
 
-	// all *.session files in tsunami's session folder
-	owned_array<SessionPersistenceData> session_persistence_data_internal;
+	// cache of all known *.session files (including all in tsunami's session folder)
+	owned_array<SessionPersistenceData> known_persistence_data;
 
 	void load_session_map_legacy();
-	void load_session_map();
-	void save_session_map();
-	//base::map<Path, string> session_map;
-	SessionPersistenceData* find_for_session(Session* session);
-	SessionPersistenceData* find_for_song_filename(const Path& filename);
-	SessionPersistenceData* find_for_session_filename(const Path& filename);
+	SessionPersistenceData* find_for_filename(const Path& filename) const;
+	SessionPersistenceData* find_for_filename_x(const Path& filename);
 
 	Array<SessionLabel> enumerate_all_sessions() const;
 	Array<SessionLabel> enumerate_active_sessions() const;

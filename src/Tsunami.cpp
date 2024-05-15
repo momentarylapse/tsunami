@@ -148,7 +148,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 
 			session->win->show();
 			if (a.num > 0) {
-				if (!session_manager->try_restore_session_for_song(session, a[0]))
+				if (!session_manager->try_restore_session(session, a[0]))
 					session->storage->load(session->song.get(), a[0]);
 				Storage::options_in = "";
 				Storage::options_out = "";

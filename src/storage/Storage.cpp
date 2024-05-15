@@ -422,6 +422,14 @@ void Storage::mark_file_used(const Path& filename) {
 
 	recently_used_files.insert(f, 0);
 
+	// prefer the .session over the audio file
+	for (int i=0; i<recently_used_files.num; i++)
+		for (int k=0; k<recently_used_files.num; k++)
+			if (recently_used_files[i] == recently_used_files[k].with(".tsunami.session")) {
+				recently_used_files.erase(k);
+				k --;
+			}
+
 	while (recently_used_files.num > 30)
 		recently_used_files.pop();
 

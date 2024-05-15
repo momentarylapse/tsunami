@@ -85,7 +85,7 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 
 	for (int i=0; i<100; i++) {
 		win->event(format("open-recent-%d", i), [this,i] {
-			auto files = win->session->session_manager->enumerate_recently_used_files();
+			auto files = win->session->session_manager->enumerate_all_sessions();
 			if (i < files.num)
 				win->load_song_with_session(files[i].filename);
 		});
@@ -116,21 +116,17 @@ void HeaderBar::update() {
 		menu_load = new hui::Menu(win);
 		menu_load->add("Open...", "open");
 		menu_load->add_separator();
-		auto files = win->session->session_manager->enumerate_recently_used_files();
+		auto files = win->session->session_manager->enumerate_all_sessions();
 		menu_load->add("Recently used files", "recent-files");
 		menu_load->enable("recent-files", false);
 		for (auto&& [i,l]: enumerate(files)) {
-			if (l.is_persistent())
+			if (l.is_recent() and !l.is_active())
 				menu_load->add(label(l), format("open-recent-%d", i));
 		}
-		for (auto&& [i,l]: enumerate(files)) {
-			if (!l.is_persistent())
-				menu_load->add(label(l), format("open-recent-%d", i));
-		}
-		if (files.num == 0) {
+		/*if (files.num == 0) {
 			menu_load->add(" -none-", "no-recent-files");
 			menu_load->enable("no-recent-files", false);
-		}
+		}*/
 		c->set_menu(menu_load.get());
 	}
 }

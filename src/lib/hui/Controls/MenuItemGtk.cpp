@@ -46,6 +46,7 @@ MenuItem::MenuItem(const string &title, const string &id, Panel *_panel) :
 	panel = _panel;
 #if GTK_CHECK_VERSION(4,0,0)
 	item = g_menu_item_new(get_lang_sys(id, get_lang_sys(id, title), false), get_gtk_action_name(id, panel).c_str());
+	g_menu_item_set_attribute (item, "use-markup", "s", "TRUE", NULL);
 #else
 	widget = gtk_menu_item_new_with_label(get_lang_sys(id, get_lang_sys(id, title), false));
 	/*GtkWidget *im = (GtkWidget*)get_gtk_image(image, GTK_ICON_SIZE_MENU);

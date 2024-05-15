@@ -19,6 +19,8 @@ public:
 	void update();
 
 	TsunamiWindow* win;
+
+	owned<hui::Menu> menu_load;
 };
 
 #endif /* SRC_VIEW_HEADERBAR_H_ */

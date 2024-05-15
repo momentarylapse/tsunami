@@ -89,6 +89,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("save", hui::KEY_S + hui::KEY_CONTROL);
 	event("save_as", [this] { on_save_as(); });
 	set_key_code("save_as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	event("save-session", [this] { on_save_session(); });
 	event("copy", [this] { on_copy(); });
 	set_key_code("copy", hui::KEY_C + hui::KEY_CONTROL);
 	event("paste", [this] { on_paste(); });
@@ -964,6 +965,11 @@ void TsunamiWindow::on_save() {
 		});
 	}
 }
+
+void TsunamiWindow::on_save_session() {
+	session->session_manager->save_session(session);
+}
+
 
 bool song_is_simple_audio(Song *s) {
 	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::AUDIO) and (s->tracks[0]->layers.num == 1));

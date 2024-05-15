@@ -90,6 +90,12 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 	}
 }
 
+string nice_dir(const string& f) {
+	if (auto h = getenv("HOME"))
+		return f.replace(h, "~");
+	return f;
+}
+
 void HeaderBar::update() {
 	bool editing = win->session->in_mode(EditMode::EditTrack);
 	bool recording = win->session->in_mode(EditMode::Capture);
@@ -98,6 +104,13 @@ void HeaderBar::update() {
 
 	win->hide_control("session-indicator", !win->session->persistence_data);
 	win->set_string("session-indicator", "\u2713 (session)");
+
+	auto label = [] (const SessionLabel& l) {
+		return format("<big>%s.<span alpha=\"50%%\">%s</span></big>\n <small><span alpha=\"50%%\">%s</span></small>",
+					  l.filename.basename_no_ext(),
+					  l.filename.extension(),
+					  nice_dir(l.filename.dirname()));
+	};
 
 	if (auto c = reinterpret_cast<hui::ControlMenuButton*>(win->_get_control_("open-menu"))) {
 		menu_load = new hui::Menu(win);
@@ -108,7 +121,7 @@ void HeaderBar::update() {
 		menu_load->enable("recent-sessions", false);
 		for (auto&& [i,l]: enumerate(files)) {
 			if (l.is_persistent())
-				menu_load->add("<big>" + l.filename.basename() + "</big>\n <small><span alpha=\"50%\">" + l.filename.dirname() + "</span></small>", format("open-recent-%d", i));
+				menu_load->add(label(l), format("open-recent-%d", i));
 		}
 		if (base::count_if(files, [](const auto& l) { return l.is_persistent(); }) == 0) {
 			menu_load->add("<i>-none-</i>", "no-recent-sessions");
@@ -119,7 +132,7 @@ void HeaderBar::update() {
 		menu_load->enable("recent-files", false);
 		for (auto&& [i,l]: enumerate(files)) {
 			if (!l.is_persistent())
-				menu_load->add("<big>" + l.filename.basename() + "</big>\n <small><span alpha=\"50%\">" + l.filename.dirname() + "</span></small>", format("open-recent-%d", i));
+				menu_load->add(label(l), format("open-recent-%d", i));
 		}
 		if (base::count_if(files, [](const auto& l) { return !l.is_persistent(); }) == 0) {
 			menu_load->add("-none-", "no-recent-files");

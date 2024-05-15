@@ -43,6 +43,7 @@ public:
 	void on_open();
 	void on_save();
 	void on_save_as();
+	void on_save_session();
 
 
 	void on_copy();

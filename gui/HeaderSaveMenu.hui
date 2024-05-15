@@ -1,6 +1,7 @@
 Menu header-save-menu ""
 	Item /save "Save" image=hui:save
 	Item /save_as "Save as..." image=hui:save-as
+	Item /save-session "Save persistent session" image=hui:save
 	Item /export "Export..." image=hui:save-as
 	Item /export-selection "Export selection..." image=hui:save-as
 	Item /quick-export "Quick export" image=hui:save

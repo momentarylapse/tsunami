@@ -311,6 +311,7 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 
 	save_session_map();
 
+	s->out_changed();
 	out_changed();
 }
 

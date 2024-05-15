@@ -1824,7 +1824,7 @@ header-save-menu
 
 0
 0
-5
+6
 Item
 save
 image=hui:save
@@ -1838,21 +1838,27 @@ image=hui:save-as
 0
 0
 Item
-export
-image=hui:save-as
+save-session
+image=hui:save
 2
 0
 0
 Item
-export-selection
+export
 image=hui:save-as
 3
 0
 0
 Item
+export-selection
+image=hui:save-as
+4
+0
+0
+Item
 quick-export
 image=hui:save
-4
+5
 0
 0
 # Resource
@@ -9335,7 +9341,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-811
+812
 # Text
 /bars-add
 Add bars...
@@ -9585,6 +9591,9 @@ Properties...
 
 /save
 Save
+
+/save-session
+Save persistent session
 
 /save_as
 Save as...

@@ -16,6 +16,10 @@ public:
 	AudioInputStreamPulse(Session *session, Device *device, SharedData& shared_data);
 	~AudioInputStreamPulse() override;
 
+	void pause() override;
+	void unpause() override;
+	base::optional<int64> estimate_samples_captured() override;
+
 	pa_stream *pulse_stream;
 
 	bool _pulse_test_error(const char *msg);

@@ -746,7 +746,7 @@ void PluginManager::link_app_data() {
 		AudioInput input(Session::GLOBAL);
 		ext->declare_class_size("AudioInput", sizeof(AudioInput));
 		ext->declare_class_element("AudioInput.output", &AudioInput::out);
-		ext->declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
+	//	ext->declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
 		//ext->declare_class_element("AudioInput.out", &AudioInput::out);
 		ext->link_class_func("AudioInput.__init__", &AudioInput::__init__);
 		ext->link_virtual("AudioInput.__delete__", &AudioInput::__delete__, &input);

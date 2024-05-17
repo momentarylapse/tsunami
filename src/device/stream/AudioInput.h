@@ -59,8 +59,7 @@ public:
 
 	int read_audio(int port, AudioBuffer &buf) override;
 
-	void _cdecl set_chunk_size(int size);
-	int chunk_size;
+	void set_chunk_size(int size);
 
 	int _sample_rate;
 	
@@ -91,6 +90,9 @@ protected:
 
 	Device *cur_device;
 	void update_device();
+
+
+	AudioInputStream::SharedData shared_data;
 
 	AudioInputStream* stream = nullptr;
 

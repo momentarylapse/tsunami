@@ -6,11 +6,12 @@
  */
 
 #include "AudioInput.h"
+#include "../pulse/AudioInputStreamPulse.h"
+#include "../Device.h"
+#include "../DeviceManager.h"
 #include "../../lib/hui/hui.h"
 #include "../../Session.h"
 #include "../../data/base.h"
-#include "../Device.h"
-#include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
 
@@ -29,7 +30,6 @@ namespace kaba {
 //   don't set to null!
 
 
-static const int DEFAULT_CHUNK_SIZE = 512;
 
 namespace os {
 	extern void require_main_thread(const string&);
@@ -81,10 +81,10 @@ int AudioInput::read_audio(int port, AudioBuffer &buf) {
 	// reader (AudioSucker) decides on number of channel!
 
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
-	if (buffer.available() < buf.length)
+	if (shared_data.buffer.available() < buf.length)
 		return NOT_ENOUGH_DATA;
 
-	return buffer.read(buf);
+	return shared_data.buffer.read(buf);
 }
 
 void AudioInput::Config::reset() {
@@ -101,7 +101,6 @@ AudioInput::AudioInput(Session *_session) :
 		Module(ModuleCategory::STREAM, "AudioInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
-	chunk_size = DEFAULT_CHUNK_SIZE;
 	num_channels = 2;
 
 	state = State::NO_DEVICE;
@@ -139,9 +138,9 @@ void AudioInput::__delete__() {
 
 void AudioInput::set_chunk_size(int size) {
 	if (size > 0)
-		chunk_size = size;
+		shared_data.chunk_size = size;
 	else
-		chunk_size = DEFAULT_CHUNK_SIZE;
+		shared_data.chunk_size = AudioInputStream::DEFAULT_CHUNK_SIZE;
 }
 
 Device *AudioInput::get_device() {
@@ -180,27 +179,9 @@ void AudioInput::_kill_dev() {
 	session->debug("input", "kill device");
 	dev_man->lock();
 
-#if HAS_LIB_PULSEAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
+	delete stream;
+	stream = nullptr;
 
-		pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
-		pa_stream_set_read_callback(pulse_stream, nullptr, nullptr);
-
-		if (pa_stream_disconnect(pulse_stream) != 0)
-			_pulse_test_error("pa_stream_disconnect");
-
-/*		// FIXME really necessary?!?!?!?
-		for (int i=0; i<1000; i++) {
-			if (pa_stream_get_state(pulse_stream) == PA_STREAM_TERMINATED) {
-				break;
-			}
-			hui::Sleep(0.001f);
-		}*/
-
-		pa_stream_unref(pulse_stream);
-		//_pulse_test_error("pa_stream_unref");
-	}
-#endif
 
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
@@ -226,15 +207,8 @@ void AudioInput::_pause() {
 	session->debug("input", "pause");
 	dev_man->lock();
 
+	stream->pause();
 
-#if HAS_LIB_PULSEAUDIO
-	if (pulse_stream) {
-		pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-		if (!op)
-			_pulse_test_error("pa_stream_cork");
-		pulse_wait_op(session, op);
-	}
-#endif
 #if HAS_LIB_PORTAUDIO
 	if (portaudio_stream) {
 		// often crashes here... might be a bug in the libraries...?!?
@@ -256,43 +230,12 @@ void AudioInput::_create_dev() {
 	session->debug("input", "create device");
 
 	num_channels = cur_device->channels;
-	buffer.set_channels(num_channels);
+	shared_data.buffer.set_channels(num_channels);
 	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
-		pa_sample_spec ss;
-		ss.rate = _sample_rate;
-		ss.channels = num_channels;
-		ss.format = PA_SAMPLE_FLOAT32NE;
-		pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
-		if (!pulse_stream)
-			_pulse_test_error("pa_stream_new");
-
-
-		pa_stream_set_read_callback(pulse_stream, &pulse_stream_request_callback, this);
-		pa_stream_set_state_callback(pulse_stream, &pulse_stream_state_callback, this);
-
-		pa_buffer_attr attr_in;
-	//	attr_in.fragsize = -1;
-		attr_in.fragsize = chunk_size;
-		attr_in.maxlength = -1;
-		attr_in.minreq = -1;
-		attr_in.tlength = -1;
-		attr_in.prebuf = -1;
-		const char *dev = nullptr;
-		if (!cur_device->is_default())
-			dev = cur_device->internal_name.c_str();
-		auto flags = (pa_stream_flags_t)(PA_STREAM_ADJUST_LATENCY|PA_STREAM_AUTO_TIMING_UPDATE|PA_STREAM_INTERPOLATE_TIMING);
-		// without PA_STREAM_ADJUST_LATENCY, we will get big chunks (split into many small ones, but still "clustered")
-		if (pa_stream_connect_record(pulse_stream, dev, &attr_in, flags) != 0)
-			_pulse_test_error("pa_stream_connect_record");
-
-		if (!pulse_wait_stream_ready(pulse_stream, dev_man)) {
-			dev_man->unlock();
-			session->e("pulse_wait_stream_ready");
-			return;
-		}
+		stream = new AudioInputStreamPulse(session, cur_device, shared_data);
 	}
 #endif
 
@@ -334,16 +277,8 @@ void AudioInput::_unpause() {
 	session->debug("input", "unpause");
 	dev_man->lock();
 
-#if HAS_LIB_PULSEAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
-		if (pulse_stream) {
-			pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-			if (!op)
-				_pulse_test_error("pa_stream_cork");
-			pulse_wait_op(session, op);
-		}
-	}
-#endif
+	stream->unpause();
+
 #if HAS_LIB_PORTAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
 		if (portaudio_stream) {
@@ -367,14 +302,6 @@ bool AudioInput::start() {
 	return state == State::CAPTURING;
 }
 
-#if HAS_LIB_PULSEAUDIO
-bool AudioInput::_pulse_test_error(const char *msg) {
-	int e = pa_context_errno(session->device_manager->pulse_context);
-	if (e != 0)
-		session->e(format("%s (input): %s", msg, pa_strerror(e)));
-	return (e != 0);
-}
-#endif
 
 #if HAS_LIB_PORTAUDIO
 bool AudioInput::_portaudio_test_error(PaError err, const char *msg) {
@@ -409,16 +336,7 @@ base::optional<int64> AudioInput::command(ModuleCommand cmd, int64 param) {
 base::optional<int64> AudioInput::samples_recorded() {
 	if (state == State::NO_DEVICE)
 		return base::None;
-#if HAS_LIB_PULSEAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
-		pa_usec_t t;
-		if (pa_stream_get_time(pulse_stream, &t) == 0) {
-			double usec2samples = session->sample_rate() / 1000000.0;
-			return (double)t * usec2samples;
-		}
-	}
-#endif
-	return base::None;
+	return stream->estimate_samples_captured();
 }
 
 ModuleConfiguration *AudioInput::get_config() const {

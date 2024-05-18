@@ -98,14 +98,6 @@ DeviceManager::~DeviceManager() {
 	kill_library();
 }
 
-void DeviceManager::lock() {
-	audio_context->lock();
-}
-
-void DeviceManager::unlock() {
-	audio_context->unlock();
-}
-
 bool DeviceManager::audio_api_initialized() const {
 	if (audio_context)
 		return audio_context->fully_initialized;

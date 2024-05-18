@@ -83,7 +83,6 @@ void AudioOutput::_create_dev() {
 	if (!device_manager->audio_api_initialized())
 		return;
 	session->debug("out", "create device");
-	device_manager->lock();
 
 
 #if HAS_LIB_PULSEAUDIO
@@ -97,7 +96,6 @@ void AudioOutput::_create_dev() {
 		stream = new AudioOutputStreamPort(session, cur_device, shared_data);
 	}
 #endif
-	device_manager->unlock();
 
 	if (!stream) {
 		stop();

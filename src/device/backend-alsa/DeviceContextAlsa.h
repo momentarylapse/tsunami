@@ -17,8 +17,6 @@ public:
 	~DeviceContextAlsa();
 
 	bool init() override;
-	void lock() override;
-	void unlock() override;
 	void update_device(DeviceManager* device_manager, bool serious) override;
 
 	_snd_seq *alsa_midi_handle = nullptr;

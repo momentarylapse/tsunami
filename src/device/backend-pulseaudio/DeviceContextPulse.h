@@ -24,9 +24,10 @@ public:
 	~DeviceContextPulse();
 
 	bool init() override;
-	void lock() override;
-	void unlock() override;
 	void update_device(DeviceManager* device_manager, bool serious) override;
+
+	void lock();
+	void unlock();
 
 	pa_context *pulse_context = nullptr;
 	pa_threaded_mainloop *pulse_mainloop = nullptr;

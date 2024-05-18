@@ -37,27 +37,21 @@ AudioOutputStreamPort::AudioOutputStreamPort(Session *session, Device *device, S
 }
 
 AudioOutputStreamPort::~AudioOutputStreamPort() {
-	device_manager->lock();
 	PaError err = Pa_CloseStream(portaudio_stream);
 	_portaudio_test_error(err, "Pa_CloseStream");
 	portaudio_stream = nullptr;
-	device_manager->unlock();
 }
 
 
 void AudioOutputStreamPort::pause() {
-	device_manager->lock();
 	//Pa_AbortStream Pa_StopStream
 	PaError err = Pa_AbortStream(portaudio_stream);
 	_portaudio_test_error(err, "Pa_AbortStream");
-	device_manager->unlock();
 }
 
 void AudioOutputStreamPort::unpause() {
-	device_manager->lock();
 	PaError err = Pa_StartStream(portaudio_stream);
 	_portaudio_test_error(err, "Pa_StartStream");
-	device_manager->unlock();
 }
 
 void AudioOutputStreamPort::flush() {

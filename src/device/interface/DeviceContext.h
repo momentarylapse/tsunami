@@ -22,8 +22,6 @@ public:
 	obs::xsource<Device> out_device_found{this, "device-found"};
 
 	virtual bool init() = 0;
-	virtual void lock() {}
-	virtual void unlock() {}
 
 	virtual void update_device(DeviceManager* device_manager, bool serious) = 0;
 	virtual AudioOuputStream* create_audio_output_stream(Device* device) { return nullptr; }

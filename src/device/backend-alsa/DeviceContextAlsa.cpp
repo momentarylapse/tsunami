@@ -33,14 +33,6 @@ bool DeviceContextAlsa::init() {
 	return true;
 }
 
-void DeviceContextAlsa::lock() {
-
-}
-
-void DeviceContextAlsa::unlock() {
-
-}
-
 
 void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool serious) {
 	if (!alsa_midi_handle)

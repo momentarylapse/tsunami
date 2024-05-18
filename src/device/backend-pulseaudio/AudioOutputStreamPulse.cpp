@@ -21,6 +21,7 @@ static int xxx_total_read = 0;
 
 
 AudioOutputStreamPulse::AudioOutputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioOutputStream(session, shared_data) {
+	DeviceContextPulse::instance->lock();
 
 	pa_sample_spec ss;
 	ss.rate = session->sample_rate();
@@ -60,19 +61,21 @@ AudioOutputStreamPulse::AudioOutputStreamPulse(Session *session, Device *device,
 			_pulse_test_error("pa_stream_connect_playback");
 
 		if (!DeviceContextPulse::instance->wait_stream_ready(pulse_stream)) {
-			device_manager->unlock();
+			DeviceContextPulse::instance->unlock();
 			// still no luck... give up
 			session->e("pulse_wait_stream_ready");
 //				pa_threaded_mainloop_unlock(device_manager->pulse_mainloop);
 			error = true;
+			DeviceContextPulse::instance->unlock();
 			return;
 		}
 	}
+	DeviceContextPulse::instance->unlock();
 }
 
 AudioOutputStreamPulse::~AudioOutputStreamPulse() {
 	_pulse_flush_op();
-	device_manager->lock();
+	DeviceContextPulse::instance->lock();
 	pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
 	pa_stream_set_write_callback(pulse_stream, nullptr, nullptr);
 	pa_stream_set_underflow_callback(pulse_stream, nullptr, nullptr);
@@ -83,20 +86,20 @@ AudioOutputStreamPulse::~AudioOutputStreamPulse() {
 	pa_stream_unref(pulse_stream);
 	//_pulse_test_error("pa_stream_unref");
 	pulse_stream = nullptr;
-	device_manager->unlock();
+	DeviceContextPulse::instance->unlock();
 }
 
 void AudioOutputStreamPulse::pause() {
-	device_manager->lock();
+	DeviceContextPulse::instance->lock();
 	auto op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
-	device_manager->unlock();
+	DeviceContextPulse::instance->unlock();
 	_pulse_start_op(op, "pa_stream_cork");
 
 }
 void AudioOutputStreamPulse::unpause() {
-	device_manager->lock();
+	DeviceContextPulse::instance->lock();
 	pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
-	device_manager->unlock();
+	DeviceContextPulse::instance->unlock();
 	_pulse_start_op(op, "pa_stream_cork");
 	_pulse_flush_op();
 
@@ -114,9 +117,9 @@ void AudioOutputStreamPulse::pre_buffer() {
 }
 
 void AudioOutputStreamPulse::flush() {
-	device_manager->lock();
+	DeviceContextPulse::instance->lock();
 	pa_operation *op = pa_stream_flush(pulse_stream, &pulse_stream_success_callback, this);
-	device_manager->unlock();
+	DeviceContextPulse::instance->unlock();
 	_pulse_start_op(op, "pa_stream_flush");
 	_pulse_flush_op();
 
@@ -152,9 +155,9 @@ base::optional<int64> AudioOutputStreamPulse::estimate_samples_played() {
 // NOT inside lock()/unlock()
 void AudioOutputStreamPulse::_pulse_flush_op() {
 	if (operation) {
-		device_manager->lock();
+		DeviceContextPulse::instance->lock();
 		DeviceContextPulse::wait_op(session, operation);
-		device_manager->unlock();
+		DeviceContextPulse::instance->unlock();
 	}
 	operation = nullptr;
 }

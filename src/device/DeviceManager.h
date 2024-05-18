@@ -52,9 +52,6 @@ public:
 	
 	bool audio_api_initialized() const;
 
-	void lock();
-	void unlock();
-
 
 	float get_output_volume();
 	void set_output_volume(float volume);

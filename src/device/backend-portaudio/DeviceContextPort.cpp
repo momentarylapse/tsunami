@@ -33,14 +33,6 @@ bool DeviceContextPort::init() {
 	return true;
 }
 
-void DeviceContextPort::lock() {
-
-}
-
-void DeviceContextPort::unlock() {
-
-}
-
 void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	if (index < 0)
 		return;

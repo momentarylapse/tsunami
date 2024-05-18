@@ -16,10 +16,10 @@
 
 AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioInputStream(session, shared_data) {
 
+	DeviceContextPulse::instance->lock();
 	pa_sample_spec ss;
 	ss.rate = session->sample_rate();
 	ss.channels = shared_data.num_channels;
-	msg_write(shared_data.num_channels);
 	ss.format = PA_SAMPLE_FLOAT32NE;
 	pulse_stream = pa_stream_new(DeviceContextPulse::instance->pulse_context, "stream-in", &ss, nullptr);
 	if (!pulse_stream)
@@ -45,13 +45,15 @@ AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, S
 		_pulse_test_error("pa_stream_connect_record");
 
 	if (!DeviceContextPulse::instance->wait_stream_ready(pulse_stream)) {
-		device_manager->unlock();
+		DeviceContextPulse::instance->unlock();
 		session->e("pulse_wait_stream_ready");
 		return;
 	}
+	DeviceContextPulse::instance->unlock();
 }
 
 AudioInputStreamPulse::~AudioInputStreamPulse() {
+	DeviceContextPulse::instance->lock();
 	pa_stream_set_state_callback(pulse_stream, nullptr, nullptr);
 	pa_stream_set_read_callback(pulse_stream, nullptr, nullptr);
 
@@ -68,22 +70,27 @@ AudioInputStreamPulse::~AudioInputStreamPulse() {
 
 	pa_stream_unref(pulse_stream);
 	//_pulse_test_error("pa_stream_unref");
+	DeviceContextPulse::instance->unlock();
 }
 
 void AudioInputStreamPulse::pause() {
+	DeviceContextPulse::instance->lock();
 	pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
 	DeviceContextPulse::wait_op(session, op);
+	DeviceContextPulse::instance->unlock();
 }
 
 void AudioInputStreamPulse::unpause() {
 	if (!pulse_stream)
 		return;
+	DeviceContextPulse::instance->lock();
 	pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
 	DeviceContextPulse::wait_op(session, op);
+	DeviceContextPulse::instance->unlock();
 }
 
 base::optional<int64> AudioInputStreamPulse::estimate_samples_captured() {

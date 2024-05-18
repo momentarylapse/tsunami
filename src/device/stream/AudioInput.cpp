@@ -130,12 +130,10 @@ void AudioInput::_kill_dev() {
 	if (state != State::PAUSED)
 		return;
 	session->debug("input", "kill device");
-	dev_man->lock();
 
 	delete stream;
 	stream = nullptr;
 
-	dev_man->unlock();
 	state = State::NO_DEVICE;
 }
 
@@ -149,11 +147,9 @@ void AudioInput::_pause() {
 	if (state != State::CAPTURING)
 		return;
 	session->debug("input", "pause");
-	dev_man->lock();
 
 	stream->pause();
 
-	dev_man->unlock();
 	state = State::PAUSED;
 }
 
@@ -167,7 +163,6 @@ void AudioInput::_create_dev() {
 
 	shared_data.num_channels = cur_device->channels;
 	shared_data.buffer.set_channels(shared_data.num_channels);
-	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
@@ -181,7 +176,6 @@ void AudioInput::_create_dev() {
 	}
 #endif
 
-	dev_man->unlock();
 	state = State::PAUSED;
 }
 
@@ -189,11 +183,9 @@ void AudioInput::_unpause() {
 	if (state != State::PAUSED)
 		return;
 	session->debug("input", "unpause");
-	dev_man->lock();
 
 	stream->unpause();
 
-	dev_man->unlock();
 	state = State::CAPTURING;
 }
 

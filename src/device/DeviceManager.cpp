@@ -7,16 +7,13 @@
 
 #include "DeviceManager.h"
 #include "backend-pulseaudio/DeviceContextPulse.h"
+#include "backend-portaudio/DeviceContextPort.h"
 
 #include "../Session.h"
 #include "../module/Module.h"
 #include "Device.h"
 #include "../Tsunami.h"
 #include "../stuff/Log.h"
-
-#if HAS_LIB_PORTAUDIO
-#include <portaudio.h>
-#endif
 
 #if HAS_LIB_ALSA
 #include <alsa/asoundlib.h>
@@ -119,10 +116,6 @@ void DeviceManager::unlock() {
 bool DeviceManager::audio_api_initialized() const {
 	if (audio_context)
 		return audio_context->fully_initialized;
-#if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO)
-		return portaudio_fully_initialized;
-#endif
 	return false;
 }
 
@@ -155,11 +148,6 @@ void DeviceManager::write_config() {
 // don't poll pulse too much... it will send notifications anyways
 void DeviceManager::update_devices(bool serious) {
 	audio_context->update_device(this, serious);
-#if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO) {
-		_update_devices_audio_portaudio();
-	}
-#endif
 #if HAS_LIB_ALSA
 	if (midi_api == ApiType::ALSA)
 		_update_devices_midi_alsa();
@@ -168,50 +156,6 @@ void DeviceManager::update_devices(bool serious) {
 	write_config();
 	out_changed.notify();
 }
-
-#if HAS_LIB_PORTAUDIO
-void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
-	if (index < 0)
-		return;
-	const PaDeviceInfo* dev = Pa_GetDeviceInfo(index);
-	if (!dev)
-		return;
-	int channels = (type == DeviceType::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
-	if (channels > 0) {
-		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
-		d->name = string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name;
-		d->channels = channels;
-		d->index_in_lib = index;
-		if (type == DeviceType::AUDIO_OUTPUT)
-			d->default_by_lib = (index == Pa_GetDefaultOutputDevice());
-		else
-			d->default_by_lib = (index == Pa_GetDefaultInputDevice());
-		d->present = true;
-		dm->set_device_config(d);
-	}
-}
-#endif
-
-#if HAS_LIB_PORTAUDIO
-void DeviceManager::_update_devices_audio_portaudio() {
-	if (!portaudio_fully_initialized)
-		return;
-	for (Device *d: output_devices)
-		d->present = false;
-	for (Device *d: input_devices)
-		d->present = false;
-
-	// make sure, the default is first...
-	_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, Pa_GetDefaultOutputDevice());
-	_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, Pa_GetDefaultInputDevice());
-
-	int count = Pa_GetDeviceCount();
-	for (int i=0; i<count; i++) {
-		_portaudio_add_dev(this, DeviceType::AUDIO_OUTPUT, i);
-		_portaudio_add_dev(this, DeviceType::AUDIO_INPUT, i);
-	}
-}
-#endif
 
 #if HAS_LIB_ALSA
 void DeviceManager::_update_devices_midi_alsa() {
@@ -324,6 +268,10 @@ void DeviceManager::init() {
 		audio_context = new DeviceContextPulse(session);
 	}
 #endif
+#if HAS_LIB_PORTAUDIO
+	if (audio_api == ApiType::PORTAUDIO)
+		audio_context = new DeviceContextPort(session);
+#endif
 	audio_context->out_request_update >> create_sink([this] {
 		update_devices(true);
 	});
@@ -336,11 +284,6 @@ void DeviceManager::init() {
 	});
 
 	audio_context->fully_initialized = audio_context->init();
-
-#if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO)
-		portaudio_fully_initialized = _init_audio_portaudio();
-#endif
 
 
 	// midi
@@ -361,17 +304,6 @@ void DeviceManager::init() {
 	initialized = true;
 }
 
-#if HAS_LIB_PORTAUDIO
-bool DeviceManager::_init_audio_portaudio() {
-	PaError err = Pa_Initialize();
-	_portaudio_test_error(err, session, "Pa_Initialize");
-	if (err != paNoError)
-		return false;
-
-	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
-	return true;
-}
-#endif
 
 #if HAS_LIB_ALSA
 bool DeviceManager::_init_midi_alsa() {
@@ -395,14 +327,6 @@ void DeviceManager::kill_library() {
 		delete audio_context;
 		audio_context = nullptr;
 	}
-
-#if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO) {
-		portaudio_fully_initialized = false;
-		PaError err = Pa_Terminate();
-		_portaudio_test_error(err, session, "Pa_Terminate");
-	}
-#endif
 
 	// midi
 #if HAS_LIB_ALSA
@@ -513,13 +437,3 @@ void DeviceManager::move_device_priority(Device *d, int new_prio) {
 	write_config();
 	out_changed.notify();
 }
-
-#if HAS_LIB_PORTAUDIO
-bool DeviceManager::_portaudio_test_error(PaError err, Session *session, const string &msg) {
-	if (err != paNoError) {
-		session->e(msg + ": " + Pa_GetErrorText(err));
-		return true;
-	}
-	return false;
-}
-#endif

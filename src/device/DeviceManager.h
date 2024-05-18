@@ -22,17 +22,6 @@ enum class DeviceType;
 class DeviceContext;
 class Session;
 
-#if HAS_LIB_PULSEAUDIO
-struct pa_context;
-struct pa_threaded_mainloop;
-struct pa_sink_info;
-struct pa_source_info;
-#endif
-
-#if HAS_LIB_PORTAUDIO
-typedef int PaError;
-#endif
-
 
 #if HAS_LIB_ALSA
 struct _snd_seq;
@@ -55,7 +44,6 @@ public:
 	void init();
 	void kill_library();
 
-	bool _init_audio_portaudio();
 	bool _init_midi_alsa();
 
 	enum class ApiType {
@@ -97,12 +85,6 @@ public:
 
 	DeviceContext* audio_context = nullptr;
 	DeviceContext* midi_context = nullptr;
-
-#if HAS_LIB_PORTAUDIO
-	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);
-	bool portaudio_fully_initialized = false;
-	void _update_devices_audio_portaudio();
-#endif
 
 #if HAS_LIB_ALSA
 	_snd_seq *alsa_midi_handle;

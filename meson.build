@@ -222,6 +222,7 @@ sources = [
 	'src/device/backend-alsa/MidiInputStreamAlsa.cpp',
 	'src/device/backend-portaudio/AudioInputStreamPort.cpp',
 	'src/device/backend-portaudio/AudioOutputStreamPort.cpp',
+	'src/device/backend-portaudio/DeviceContextPort.cpp',
 	'src/device/backend-pulseaudio/AudioInputStreamPulse.cpp',
 	'src/device/backend-pulseaudio/AudioOutputStreamPulse.cpp',
 	'src/device/backend-pulseaudio/DeviceContextPulse.cpp',

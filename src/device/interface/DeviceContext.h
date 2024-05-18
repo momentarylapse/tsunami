@@ -24,9 +24,11 @@ public:
 	virtual bool init(Session* session) = 0;
 
 	virtual void update_device(DeviceManager* device_manager, bool serious) = 0;
-	virtual AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
-	virtual AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
-	virtual MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
+
+	// will return dummy objects, if not possible
+	virtual AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data);
+	virtual AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data);
+	virtual MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data);
 
 	//Session* session;
 	bool fully_initialized = false;

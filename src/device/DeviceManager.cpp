@@ -56,6 +56,29 @@ Any devs2any(const Array<Device*>& devices) {
 }
 
 
+DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType api) {
+#if HAS_LIB_PULSEAUDIO
+	if (api == DeviceManager::ApiType::PULSE)
+		return new DeviceContextPulse(session);
+#endif
+#if HAS_LIB_PORTAUDIO
+	if (api == DeviceManager::ApiType::PORTAUDIO)
+		return new DeviceContextPort(session);
+#endif
+#if HAS_LIB_ALSA
+	if (api == DeviceManager::ApiType::ALSA)
+		return new DeviceContextAlsa(session);
+#endif
+
+	class DeviceContextDummy : public DeviceContext {
+	public:
+		DeviceContextDummy(Session* session) : DeviceContext(session) {}
+		bool init(Session* session) override { return true; }
+		void update_device(DeviceManager* device_manager, bool serious) override {}
+	};
+	return new DeviceContextDummy(session);
+}
+
 DeviceManager::DeviceManager(Session *_session) {
 	initialized = false;
 
@@ -185,15 +208,7 @@ void DeviceManager::init() {
 
 	// audio
 
-#if HAS_LIB_PULSEAUDIO
-	if (audio_api == ApiType::PULSE) {
-		audio_context = new DeviceContextPulse(session);
-	}
-#endif
-#if HAS_LIB_PORTAUDIO
-	if (audio_api == ApiType::PORTAUDIO)
-		audio_context = new DeviceContextPort(session);
-#endif
+	audio_context = create_backend_context(session, audio_api);
 	audio_context->out_request_update >> create_sink([this] {
 		update_devices(true);
 	});
@@ -209,13 +224,8 @@ void DeviceManager::init() {
 
 
 	// midi
-#if HAS_LIB_ALSA
-	if (midi_api == ApiType::ALSA)
-		midi_context = new DeviceContextAlsa(session);
-#endif
-	if (midi_context) {
-		midi_context->fully_initialized = midi_context->init(session);
-	}
+	midi_context = create_backend_context(session, midi_api);
+	midi_context->fully_initialized = midi_context->init(session);
 
 	update_devices(true);
 

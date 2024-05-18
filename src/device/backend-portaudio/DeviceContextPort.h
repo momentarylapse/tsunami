@@ -16,8 +16,10 @@ public:
 	DeviceContextPort(Session* session);
 	~DeviceContextPort();
 
-	bool init() override;
+	bool init(Session* session) override;
 	void update_device(DeviceManager* device_manager, bool serious) override;
+	AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data) override;
+	AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data) override;
 
 	bool _test_error(PaError err, Session *session, const string &msg);
 

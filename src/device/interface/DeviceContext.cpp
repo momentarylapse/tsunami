@@ -5,5 +5,5 @@
 #include "DeviceContext.h"
 
 DeviceContext::DeviceContext(Session *_session) {
-	session = _session;
+	//session = _session;
 }

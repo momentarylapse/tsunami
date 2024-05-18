@@ -5,6 +5,8 @@
 #if HAS_LIB_PULSEAUDIO
 
 #include "DeviceContextPulse.h"
+#include "AudioInputStreamPulse.h"
+#include "AudioOutputStreamPulse.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
@@ -90,7 +92,7 @@ DeviceContextPulse::~DeviceContextPulse() {
 	//_test_error(session, "pa_threaded_mainloop_free");
 }
 
-bool DeviceContextPulse::init() {
+bool DeviceContextPulse::init(Session* session) {
 	pulse_mainloop = pa_threaded_mainloop_new();
 	if (!pulse_mainloop) {
 		session->e("pa_threaded_mainloop_new failed");
@@ -157,6 +159,7 @@ void DeviceContextPulse::unlock() {
 void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serious) {
 	if (!fully_initialized)
 		return;
+	Session* session = device_manager->session;
 
 	for (Device *d: device_manager->output_devices)
 		d->present = false;
@@ -188,7 +191,14 @@ void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serio
 	wait_op(session, op);
 
 	unlock();
+}
 
+AudioOutputStream* DeviceContextPulse::create_audio_output_stream(Session *session, Device *device, void* shared_data) {
+	return new AudioOutputStreamPulse(session, device, *reinterpret_cast<AudioOutputStream::SharedData*>(shared_data));
+}
+
+AudioInputStream* DeviceContextPulse::create_audio_input_stream(Session *session, Device *device, void* shared_data) {
+	return new AudioInputStreamPulse(session, device, *reinterpret_cast<AudioInputStream::SharedData*>(shared_data));
 }
 
 bool DeviceContextPulse::wait_context_ready() {

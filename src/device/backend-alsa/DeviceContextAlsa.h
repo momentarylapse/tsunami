@@ -16,8 +16,9 @@ public:
 	DeviceContextAlsa(Session* session);
 	~DeviceContextAlsa();
 
-	bool init() override;
+	bool init(Session* session) override;
 	void update_device(DeviceManager* device_manager, bool serious) override;
+	MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) override;
 
 	_snd_seq *alsa_midi_handle = nullptr;
 

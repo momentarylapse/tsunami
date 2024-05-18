@@ -6,7 +6,7 @@
  */
 
 #include "MidiInput.h"
-#include "../backend-alsa/MidiInputStreamAlsa.h"
+#include "../interface/DeviceContext.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
@@ -96,11 +96,9 @@ MidiInput::~MidiInput() {
 void MidiInput::_create_dev() {
 	if (state != State::NO_DEVICE)
 		return;
-#if HAS_LIB_ALSA
-	stream = new MidiInputStreamAlsa(session, cur_device, shared_data);
+	stream = device_manager->midi_context->create_midi_input_stream(session, cur_device, &shared_data);
 	if (stream->error)
 		return;
-#endif
 
 	state = State::PAUSED;
 }

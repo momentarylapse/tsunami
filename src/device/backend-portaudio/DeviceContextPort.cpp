@@ -5,6 +5,8 @@
 #if HAS_LIB_PORTAUDIO
 
 #include "DeviceContextPort.h"
+#include "AudioInputStreamPort.h"
+#include "AudioOutputStreamPort.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
@@ -20,10 +22,10 @@ DeviceContextPort::DeviceContextPort(Session* session) : DeviceContext(session) 
 
 DeviceContextPort::~DeviceContextPort() {
 	PaError err = Pa_Terminate();
-	_test_error(err, session, "Pa_Terminate");
+	_test_error(err, Session::GLOBAL, "Pa_Terminate");
 }
 
-bool DeviceContextPort::init() {
+bool DeviceContextPort::init(Session* session) {
 	PaError err = Pa_Initialize();
 	_test_error(err, session, "Pa_Initialize");
 	if (err != paNoError)
@@ -31,6 +33,14 @@ bool DeviceContextPort::init() {
 
 	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
 	return true;
+}
+
+AudioOutputStream* DeviceContextPort::create_audio_output_stream(Session *session, Device *device, void* shared_data) {
+	return new AudioOutputStreamPort(session, device, *reinterpret_cast<AudioOutputStream::SharedData*>(shared_data));
+}
+
+AudioInputStream* DeviceContextPort::create_audio_input_stream(Session *session, Device *device, void* shared_data) {
+	return new AudioInputStreamPort(session, device, *reinterpret_cast<AudioInputStream::SharedData*>(shared_data));
 }
 
 void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {

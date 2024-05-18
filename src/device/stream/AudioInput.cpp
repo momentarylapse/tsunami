@@ -6,8 +6,8 @@
  */
 
 #include "AudioInput.h"
-#include "../backend-pulseaudio/AudioInputStreamPulse.h"
-#include "../backend-portaudio/AudioInputStreamPort.h"
+#include "../interface/DeviceContext.h"
+#include "../interface/AudioInputStream.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
@@ -164,17 +164,7 @@ void AudioInput::_create_dev() {
 	shared_data.num_channels = cur_device->channels;
 	shared_data.buffer.set_channels(shared_data.num_channels);
 
-#if HAS_LIB_PULSEAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PULSE) {
-		stream = new AudioInputStreamPulse(session, cur_device, shared_data);
-	}
-#endif
-
-#if HAS_LIB_PORTAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		stream = new AudioInputStreamPort(session, cur_device, shared_data);
-	}
-#endif
+	stream = dev_man->audio_context->create_audio_input_stream(session, cur_device, &shared_data);
 
 	state = State::PAUSED;
 }

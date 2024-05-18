@@ -5,6 +5,7 @@
 #if HAS_LIB_ALSA
 
 #include "DeviceContextAlsa.h"
+#include "MidiInputStreamAlsa.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
@@ -22,7 +23,7 @@ DeviceContextAlsa::~DeviceContextAlsa() {
 		snd_seq_close(alsa_midi_handle);
 }
 
-bool DeviceContextAlsa::init() {
+bool DeviceContextAlsa::init(Session* session) {
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0) {
 		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
@@ -77,7 +78,10 @@ void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool seriou
 			changed = true;
 	if (changed)
 		device_manager->out_changed.notify();
+}
 
+MidiInputStream* DeviceContextAlsa::create_midi_input_stream(Session *session, Device *device, void* shared_data) {
+	return new MidiInputStreamAlsa(session, device, *reinterpret_cast<MidiInputStream::SharedData*>(shared_data));
 }
 
 #endif

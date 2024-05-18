@@ -8,7 +8,7 @@
 #include "../../lib/pattern/Observable.h"
 
 class AudioInputStream;
-class AudioOuputStream;
+class AudioOutputStream;
 class MidiInputStream;
 class DeviceManager;
 class Device;
@@ -21,14 +21,14 @@ public:
 	obs::source out_request_update{this, "request-update"};
 	obs::xsource<Device> out_device_found{this, "device-found"};
 
-	virtual bool init() = 0;
+	virtual bool init(Session* session) = 0;
 
 	virtual void update_device(DeviceManager* device_manager, bool serious) = 0;
-	virtual AudioOuputStream* create_audio_output_stream(Device* device) { return nullptr; }
-	virtual AudioInputStream* create_audio_input_stream(Device* device) { return nullptr; }
-	virtual MidiInputStream* create_midi_input_stream(Device* device) { return nullptr; }
+	virtual AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
+	virtual AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
+	virtual MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) { return nullptr; }
 
-	Session* session;
+	//Session* session;
 	bool fully_initialized = false;
 };
 

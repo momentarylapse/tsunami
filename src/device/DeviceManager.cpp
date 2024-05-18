@@ -205,7 +205,7 @@ void DeviceManager::init() {
 		set_device_config(d);
 	});
 
-	audio_context->fully_initialized = audio_context->init();
+	audio_context->fully_initialized = audio_context->init(session);
 
 
 	// midi
@@ -214,7 +214,7 @@ void DeviceManager::init() {
 		midi_context = new DeviceContextAlsa(session);
 #endif
 	if (midi_context) {
-		midi_context->fully_initialized = midi_context->init();
+		midi_context->fully_initialized = midi_context->init(session);
 	}
 
 	update_devices(true);

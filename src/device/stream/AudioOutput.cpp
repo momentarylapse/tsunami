@@ -6,14 +6,14 @@
  */
 
 #include "AudioOutput.h"
-#include "../../Session.h"
-#include "../../data/base.h"
+#include "../interface/DeviceContext.h"
+#include "../interface/AudioOutputStream.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
+#include "../../Session.h"
+#include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
-#include "../backend-pulseaudio/AudioOutputStreamPulse.h"
-#include "../backend-portaudio/AudioOutputStreamPort.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
@@ -85,17 +85,7 @@ void AudioOutput::_create_dev() {
 	session->debug("out", "create device");
 
 
-#if HAS_LIB_PULSEAUDIO
-	if (device_manager->audio_api == DeviceManager::ApiType::PULSE) {
-		stream = new AudioOutputStreamPulse(session, cur_device, shared_data);
-	}
-#endif
-
-#if HAS_LIB_PORTAUDIO
-	if (device_manager->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		stream = new AudioOutputStreamPort(session, cur_device, shared_data);
-	}
-#endif
+	stream = device_manager->audio_context->create_audio_output_stream(session, cur_device, &shared_data);
 
 	if (!stream) {
 		stop();

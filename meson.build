@@ -219,6 +219,7 @@ sources = [
 	'src/data/Track.cpp',
 	'src/data/TrackLayer.cpp',
 	'src/data/TrackMarker.cpp',
+	'src/device/backend-alsa/DeviceContextAlsa.cpp',
 	'src/device/backend-alsa/MidiInputStreamAlsa.cpp',
 	'src/device/backend-portaudio/AudioInputStreamPort.cpp',
 	'src/device/backend-portaudio/AudioOutputStreamPort.cpp',

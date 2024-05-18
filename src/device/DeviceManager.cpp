@@ -8,16 +8,13 @@
 #include "DeviceManager.h"
 #include "backend-pulseaudio/DeviceContextPulse.h"
 #include "backend-portaudio/DeviceContextPort.h"
+#include "backend-alsa/DeviceContextAlsa.h"
 
 #include "../Session.h"
 #include "../module/Module.h"
 #include "Device.h"
 #include "../Tsunami.h"
 #include "../stuff/Log.h"
-
-#if HAS_LIB_ALSA
-#include <alsa/asoundlib.h>
-#endif
 
 
 struct ApiDescription {
@@ -76,10 +73,6 @@ DeviceManager::DeviceManager(Session *_session) {
 
 	audio_api = ApiType::NONE;
 	midi_api = ApiType::NONE;
-
-#if HAS_LIB_ALSA
-	alsa_midi_handle = nullptr;
-#endif
 
 	dummy_device = new Device(DeviceType::NONE, "dummy");
 
@@ -148,61 +141,12 @@ void DeviceManager::write_config() {
 // don't poll pulse too much... it will send notifications anyways
 void DeviceManager::update_devices(bool serious) {
 	audio_context->update_device(this, serious);
-#if HAS_LIB_ALSA
-	if (midi_api == ApiType::ALSA)
-		_update_devices_midi_alsa();
-#endif
+	if (midi_context)
+		midi_context->update_device(this, serious);
 
 	write_config();
 	out_changed.notify();
 }
-
-#if HAS_LIB_ALSA
-void DeviceManager::_update_devices_midi_alsa() {
-	if (!alsa_midi_handle)
-		return;
-
-	for (Device *d: midi_input_devices) {
-		d->present_old = d->present;
-		d->present = false;
-	}
-
-	// default
-	auto *def = get_device_create(DeviceType::MIDI_INPUT, "");
-	def->default_by_lib = true;
-	def->present = true;
-
-	snd_seq_client_info_t *cinfo;
-	snd_seq_port_info_t *pinfo;
-
-	snd_seq_client_info_alloca(&cinfo);
-	snd_seq_port_info_alloca(&pinfo);
-	snd_seq_client_info_set_client(cinfo, -1);
-	while (snd_seq_query_next_client(alsa_midi_handle, cinfo) >= 0) {
-		snd_seq_port_info_set_client(pinfo, snd_seq_client_info_get_client(cinfo));
-		snd_seq_port_info_set_port(pinfo, -1);
-		while (snd_seq_query_next_port(alsa_midi_handle, pinfo) >= 0) {
-			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_READ) == 0)
-				continue;
-			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
-				continue;
-			Device *d = get_device_create(DeviceType::MIDI_INPUT, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
-			d->name = d->internal_name;
-			d->client = snd_seq_client_info_get_client(cinfo);
-			d->port = snd_seq_port_info_get_port(pinfo);
-			d->present = true;
-		}
-	}
-
-
-	bool changed = false;
-	for (Device *d: midi_input_devices)
-		if (d->present_old != d->present)
-			changed = true;
-	if (changed)
-		out_changed.notify();
-}
-#endif
 
 
 static int select_api(const string &preferred_name, int mode) {
@@ -289,8 +233,11 @@ void DeviceManager::init() {
 	// midi
 #if HAS_LIB_ALSA
 	if (midi_api == ApiType::ALSA)
-		_init_midi_alsa();
+		midi_context = new DeviceContextAlsa(session);
 #endif
+	if (midi_context) {
+		midi_context->fully_initialized = midi_context->init();
+	}
 
 	update_devices(true);
 
@@ -298,25 +245,15 @@ void DeviceManager::init() {
 #if HAS_LIB_ALSA
 	// only updating alsa makes sense...
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
-	hui_rep_id = hui::run_repeated(2.0f, [this] { _update_devices_midi_alsa(); });
+	if (midi_api == ApiType::ALSA)
+		hui_rep_id = hui::run_repeated(2.0f, [this] {
+			DeviceContextAlsa::instance->update_device(this, true);
+		});
 #endif
 
 	initialized = true;
 }
 
-
-#if HAS_LIB_ALSA
-bool DeviceManager::_init_midi_alsa() {
-	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
-	if (r < 0) {
-		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
-		return false;
-	}
-
-	snd_seq_set_client_name(alsa_midi_handle, "Tsunami");
-	return true;
-}
-#endif
 
 void DeviceManager::kill_library() {
 	if (!initialized)
@@ -329,10 +266,10 @@ void DeviceManager::kill_library() {
 	}
 
 	// midi
-#if HAS_LIB_ALSA
-	if (alsa_midi_handle)
-		snd_seq_close(alsa_midi_handle);
-#endif
+	if (midi_context) {
+		delete midi_context;
+		midi_context = nullptr;
+	}
 
 	initialized = false;
 }

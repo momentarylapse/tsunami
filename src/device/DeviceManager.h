@@ -23,10 +23,6 @@ class DeviceContext;
 class Session;
 
 
-#if HAS_LIB_ALSA
-struct _snd_seq;
-#endif
-
 class DeviceManager : public obs::Node<VirtualBase> {
 public:
 	friend class AudioOutput;
@@ -43,8 +39,6 @@ public:
 
 	void init();
 	void kill_library();
-
-	bool _init_midi_alsa();
 
 	enum class ApiType {
 		ALSA,
@@ -85,11 +79,6 @@ public:
 
 	DeviceContext* audio_context = nullptr;
 	DeviceContext* midi_context = nullptr;
-
-#if HAS_LIB_ALSA
-	_snd_seq *alsa_midi_handle;
-	void _update_devices_midi_alsa();
-#endif
 
 	float output_volume;
 

@@ -7,6 +7,7 @@
 
 #include "AudioInput.h"
 #include "../pulse/AudioInputStreamPulse.h"
+#include "../port/AudioInputStreamPort.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../lib/hui/hui.h"
@@ -34,46 +35,6 @@ namespace kaba {
 namespace os {
 	extern void require_main_thread(const string&);
 }
-
-
-#if HAS_LIB_PORTAUDIO
-
-int AudioInput::portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
-                                                    unsigned long frames,
-                                                    const PaStreamCallbackTimeInfo* timeInfo,
-                                                    PaStreamCallbackFlags statusFlags,
-                                                    void *userData) {
-	//printf("request %d\n", (int)frames);
-	auto input = static_cast<AudioInput*>(userData);
-
-	(void)outputBuffer; /* Prevent unused variable warning. */
-	auto in = static_cast<const float*>(inputBuffer);
-
-
-	if (in) {
-		if (input->is_capturing()) {
-
-			RingBuffer &buf = input->buffer;
-			AudioBuffer b;
-			buf.write_ref(b, frames);
-			b.deinterleave(in, input->num_channels);
-			buf.write_ref_done(b);
-
-			int done = b.length;
-			if (done < (int)frames) {
-				buf.write_ref(b, frames - done);
-				b.deinterleave(&in[input->num_channels * done], input->num_channels);
-				buf.write_ref_done(b);
-			}
-		}
-	} else {
-		hui::run_later(0.001f, [=] { input->session->w("stream callback error"); });
-	}
-	return 0;
-}
-
-#endif
-
 
 
 int AudioInput::read_audio(int port, AudioBuffer &buf) {
@@ -104,9 +65,6 @@ AudioInput::AudioInput(Session *_session) :
 	num_channels = 2;
 
 	state = State::NO_DEVICE;
-#if HAS_LIB_PORTAUDIO
-	portaudio_stream = nullptr;
-#endif
 
 	dev_man = session->device_manager;
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
@@ -182,15 +140,6 @@ void AudioInput::_kill_dev() {
 	delete stream;
 	stream = nullptr;
 
-
-#if HAS_LIB_PORTAUDIO
-	if (portaudio_stream) {
-		PaError err = Pa_CloseStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_CloseStream");
-		portaudio_stream = nullptr;
-	}
-#endif
-
 	dev_man->unlock();
 	state = State::NO_DEVICE;
 }
@@ -208,14 +157,6 @@ void AudioInput::_pause() {
 	dev_man->lock();
 
 	stream->pause();
-
-#if HAS_LIB_PORTAUDIO
-	if (portaudio_stream) {
-		// often crashes here... might be a bug in the libraries...?!?
-		PaError err = Pa_StopStream(portaudio_stream);
-		_portaudio_test_error(err, "Pa_StopStream");
-	}
-#endif
 
 	dev_man->unlock();
 	state = State::PAUSED;
@@ -241,29 +182,7 @@ void AudioInput::_create_dev() {
 
 #if HAS_LIB_PORTAUDIO
 	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-
-		int chunk_size = hui::config.get_int("portaudio.chunk-size", 256);
-		// on windows, some devices will stutter, due to some mysterious limit of 100 requests/s
-		// nah, that doesn't work either:
-		/*paFramesPerBufferUnspecified*/
-
-		if (cur_device->is_default()) {
-			session->i(format("open def stream %d  %d", _sample_rate, num_channels));
-			PaError err = Pa_OpenDefaultStream(&portaudio_stream, num_channels, 0, paFloat32, _sample_rate, chunk_size,
-					&portaudio_stream_request_callback, this);
-			_portaudio_test_error(err, "Pa_OpenDefaultStream");
-		} else {
-			session->i(format("open stream %d  %d", _sample_rate, num_channels));
-			PaStreamParameters params;
-			params.channelCount = num_channels;
-			params.sampleFormat = paFloat32;
-			params.device = cur_device->index_in_lib;
-			params.hostApiSpecificStreamInfo = nullptr;
-			params.suggestedLatency = 0;
-			PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, chunk_size,
-					paNoFlag, &portaudio_stream_request_callback, this);
-			_portaudio_test_error(err, "Pa_OpenStream");
-		}
+		stream = new AudioInputStreamPort(session, cur_device, shared_data);
 	}
 #endif
 
@@ -279,15 +198,6 @@ void AudioInput::_unpause() {
 
 	stream->unpause();
 
-#if HAS_LIB_PORTAUDIO
-	if (dev_man->audio_api == DeviceManager::ApiType::PORTAUDIO) {
-		if (portaudio_stream) {
-			PaError err = Pa_StartStream(portaudio_stream);
-			_portaudio_test_error(err, "Pa_StartStream");
-		}
-	}
-#endif
-
 	dev_man->unlock();
 	state = State::CAPTURING;
 }
@@ -302,16 +212,6 @@ bool AudioInput::start() {
 	return state == State::CAPTURING;
 }
 
-
-#if HAS_LIB_PORTAUDIO
-bool AudioInput::_portaudio_test_error(PaError err, const char *msg) {
-	if (err != paNoError) {
-		session->e(format("%s: (input): %s", msg, Pa_GetErrorText(err)));
-		return true;
-	}
-	return false;
-}
-#endif
 
 
 bool AudioInput::is_capturing() {

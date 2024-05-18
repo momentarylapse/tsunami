@@ -21,13 +21,6 @@ class DeviceManager;
 class Device;
 class Session;
 
-#if HAS_LIB_PORTAUDIO
-typedef void PaStream;
-struct PaStreamCallbackTimeInfo;
-typedef unsigned long PaStreamCallbackFlags;
-typedef int PaError;
-#endif
-
 
 class AudioInput : public Module {
 	friend class PluginManager;
@@ -96,18 +89,6 @@ protected:
 
 	AudioInputStream* stream = nullptr;
 
-#if HAS_LIB_PORTAUDIO
-#endif
-
-
-#if HAS_LIB_PORTAUDIO
-	static int portaudio_stream_request_callback(const void *inputBuffer, void *outputBuffer,
-	                                             unsigned long frames,
-	                                             const PaStreamCallbackTimeInfo* timeInfo,
-	                                             PaStreamCallbackFlags statusFlags,
-	                                             void *userData);
-	bool _portaudio_test_error(PaError err, const char *msg);
-#endif
 
 public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;

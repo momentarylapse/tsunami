@@ -6,8 +6,8 @@
  */
 
 #include "AudioInput.h"
-#include "../pulse/AudioInputStreamPulse.h"
-#include "../port/AudioInputStreamPort.h"
+#include "../backend-pulseaudio/AudioInputStreamPulse.h"
+#include "../backend-portaudio/AudioInputStreamPort.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"

@@ -8,13 +8,12 @@
 #include "AudioOutput.h"
 #include "../../Session.h"
 #include "../../data/base.h"
-#include "../../module/port/Port.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
-#include "../pulse/AudioOutputStreamPulse.h"
-#include "../port/AudioOutputStreamPort.h"
+#include "../backend-pulseaudio/AudioOutputStreamPulse.h"
+#include "../backend-portaudio/AudioOutputStreamPort.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);

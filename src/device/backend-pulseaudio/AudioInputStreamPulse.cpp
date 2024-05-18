@@ -5,15 +5,13 @@
 #if HAS_LIB_PULSEAUDIO
 
 #include "AudioInputStreamPulse.h"
+#include "DeviceContextPulse.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
 #include <stdio.h>
 
 #include <pulse/pulseaudio.h>
-
-extern void pulse_wait_op(Session *session, pa_operation *op); // -> DeviceManager.cpp
-extern bool pulse_wait_stream_ready(pa_stream *s, DeviceManager *dm); // -> OutputStream.cpp
 
 
 AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioInputStream(session, shared_data) {
@@ -23,7 +21,7 @@ AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, S
 	ss.channels = shared_data.num_channels;
 	msg_write(shared_data.num_channels);
 	ss.format = PA_SAMPLE_FLOAT32NE;
-	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
+	pulse_stream = pa_stream_new(DeviceContextPulse::instance->pulse_context, "stream-in", &ss, nullptr);
 	if (!pulse_stream)
 		_pulse_test_error("pa_stream_new");
 
@@ -46,7 +44,7 @@ AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, S
 	if (pa_stream_connect_record(pulse_stream, dev, &attr_in, flags) != 0)
 		_pulse_test_error("pa_stream_connect_record");
 
-	if (!pulse_wait_stream_ready(pulse_stream, device_manager)) {
+	if (!DeviceContextPulse::instance->wait_stream_ready(pulse_stream)) {
 		device_manager->unlock();
 		session->e("pulse_wait_stream_ready");
 		return;
@@ -76,7 +74,7 @@ void AudioInputStreamPulse::pause() {
 	pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
-	pulse_wait_op(session, op);
+	DeviceContextPulse::wait_op(session, op);
 }
 
 void AudioInputStreamPulse::unpause() {
@@ -85,7 +83,7 @@ void AudioInputStreamPulse::unpause() {
 	pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
-	pulse_wait_op(session, op);
+	DeviceContextPulse::wait_op(session, op);
 }
 
 base::optional<int64> AudioInputStreamPulse::estimate_samples_captured() {
@@ -141,13 +139,13 @@ void AudioInputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t n
 void AudioInputStreamPulse::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
 	auto stream = static_cast<AudioInputStreamPulse*>(userdata);
 	//msg_write("--success");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 void AudioInputStreamPulse::pulse_stream_state_callback(pa_stream *s, void *userdata) {
 	auto stream = static_cast<AudioInputStreamPulse*>(userdata);
 	//printf("--state\n");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 void AudioInputStreamPulse::pulse_input_notify_callback(pa_stream *p, void *userdata) {
@@ -161,11 +159,11 @@ void AudioInputStreamPulse::pulse_input_notify_callback(pa_stream *p, void *user
 	if (s == PA_STREAM_TERMINATED)
 		printf("terminated");
 	printf("\n");
-	pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 bool AudioInputStreamPulse::_pulse_test_error(const char *msg) {
-	int e = pa_context_errno(session->device_manager->pulse_context);
+	int e = pa_context_errno(DeviceContextPulse::instance->pulse_context);
 	if (e != 0)
 		session->e(format("%s (input): %s", msg, pa_strerror(e)));
 	return (e != 0);

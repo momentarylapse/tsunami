@@ -173,6 +173,10 @@ int run_repeated(float time, const Callback &c) {
 	#endif
 }
 
+int run_in_gui_thread(const Callback &c) {
+	return run_later(0.001f, c);
+}
+
 void cancel_runner(int id) {
 	//msg_write("cancel " + i2s(id));
 	std::lock_guard<std::mutex> lock(runner_mutex);

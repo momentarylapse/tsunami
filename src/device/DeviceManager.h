@@ -19,6 +19,7 @@ class MidiInput;
 class Module;
 class Device;
 enum class DeviceType;
+class DeviceContext;
 class Session;
 
 #if HAS_LIB_PULSEAUDIO
@@ -54,7 +55,6 @@ public:
 	void init();
 	void kill_library();
 
-	bool _init_audio_pulse();
 	bool _init_audio_portaudio();
 	bool _init_midi_alsa();
 
@@ -95,17 +95,9 @@ public:
 	bool initialized;
 	int hui_rep_id;
 
-#if HAS_LIB_PULSEAUDIO
-	pa_context *pulse_context;
-	pa_threaded_mainloop *pulse_mainloop;
-	bool pulse_fully_initialized = false;
-	bool _pulse_test_error(Session *session, const string &msg);
-	bool pulse_wait_context_ready();
-	void _update_devices_audio_pulse();
-	static void pulse_sink_info_callback(pa_context *c, const pa_sink_info *i, int eol, void *userdata);
-	static void pulse_source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata);
-	static void pulse_state_callback(pa_context* context, void* userdata);
-#endif
+	DeviceContext* audio_context = nullptr;
+	DeviceContext* midi_context = nullptr;
+
 #if HAS_LIB_PORTAUDIO
 	static bool _portaudio_test_error(PaError err, Session *session, const string &msg);
 	bool portaudio_fully_initialized = false;

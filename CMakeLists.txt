@@ -125,8 +125,10 @@ set(SOURCE
 	src/device/backend-portaudio/AudioOutputStreamPort.cpp
 	src/device/backend-pulseaudio/AudioInputStreamPulse.cpp
 	src/device/backend-pulseaudio/AudioOutputStreamPulse.cpp
+	src/device/backend-pulseaudio/DeviceContextPulse.cpp
 	src/device/interface/AudioInputStream.cpp
 	src/device/interface/AudioOutputStream.cpp
+	src/device/interface/DeviceContext.cpp
 	src/device/interface/MidiInputStream.cpp
 	src/device/stream/AudioInput.cpp
 	src/device/stream/AudioOutput.cpp

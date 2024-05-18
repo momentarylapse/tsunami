@@ -120,12 +120,14 @@ set(SOURCE
 	src/data/Track.cpp
 	src/data/TrackLayer.cpp
 	src/data/TrackMarker.cpp
+	src/device/backend-alsa/MidiInputStreamAlsa.cpp
 	src/device/backend-portaudio/AudioInputStreamPort.cpp
 	src/device/backend-portaudio/AudioOutputStreamPort.cpp
 	src/device/backend-pulseaudio/AudioInputStreamPulse.cpp
 	src/device/backend-pulseaudio/AudioOutputStreamPulse.cpp
 	src/device/interface/AudioInputStream.cpp
 	src/device/interface/AudioOutputStream.cpp
+	src/device/interface/MidiInputStream.cpp
 	src/device/stream/AudioInput.cpp
 	src/device/stream/AudioOutput.cpp
 	src/device/stream/MidiInput.cpp

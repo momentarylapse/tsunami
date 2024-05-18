@@ -6,12 +6,12 @@
  */
 
 #include "MidiInput.h"
-
+#include "../backend-alsa/MidiInputStreamAlsa.h"
+#include "../Device.h"
+#include "../DeviceManager.h"
 #include "../../Session.h"
 #include "../../module/port/Port.h"
 #include "../../data/base.h"
-#include "../Device.h"
-#include "../DeviceManager.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../lib/os/time.h"
 #include "../../plugins/PluginManager.h"
@@ -20,9 +20,6 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
-#if HAS_LIB_ALSA
-#include <alsa/asoundlib.h>
-#endif
 
 int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 	if (config.free_flow){
@@ -71,10 +68,6 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 	_sample_rate = session->sample_rate();
 	state = State::NO_DEVICE;
 
-#if HAS_LIB_ALSA
-	subs = nullptr;
-#endif
-
 	device_manager = session->device_manager;
 	cur_device = nullptr;
 
@@ -92,7 +85,6 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiIn
 	offset = 0;
 	pfd = nullptr;
 	npfd = 0;
-	portid = -1;
 }
 
 MidiInput::~MidiInput() {
@@ -106,13 +98,9 @@ void MidiInput::_create_dev() {
 	if (state != State::NO_DEVICE)
 		return;
 #if HAS_LIB_ALSA
-	portid = snd_seq_create_simple_port(device_manager->alsa_midi_handle, "Tsunami MIDI in",
-				SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
-				SND_SEQ_PORT_TYPE_APPLICATION);
-	if (portid < 0){
-		session->e(string("Error creating sequencer port: ") + snd_strerror(portid));
+	stream = new MidiInputStreamAlsa(session, cur_device, shared_data);
+	if (stream->error)
 		return;
-	}
 #endif
 
 	state = State::PAUSED;
@@ -121,23 +109,14 @@ void MidiInput::_create_dev() {
 void MidiInput::_kill_dev() {
 	if (state == State::NO_DEVICE)
 		return;
-#if HAS_LIB_ALSA
-	snd_seq_delete_simple_port(device_manager->alsa_midi_handle, portid);
-#endif
+	delete stream;
+	stream = nullptr;
 	state = State::NO_DEVICE;
 }
 
 bool MidiInput::unconnect() {
-#if HAS_LIB_ALSA
-	if (!subs)
-		return true;
-	int r = snd_seq_unsubscribe_port(device_manager->alsa_midi_handle, subs);
-	if (r != 0)
-		session->e(_("Error unconnecting from midi port: ") + snd_strerror(r));
-	snd_seq_port_subscribe_free(subs);
-	subs = nullptr;
-	return r == 0;
-#endif
+	if (stream)
+		return stream->unconnect();
 	return true;
 }
 
@@ -151,7 +130,6 @@ Device *MidiInput::get_device() {
 }
 
 void MidiInput::update_device() {
-
 	if (state != State::NO_DEVICE)
 		unconnect();
 
@@ -160,48 +138,7 @@ void MidiInput::update_device() {
 	if (state == State::NO_DEVICE)
 		_create_dev();
 
-	if ((cur_device->client < 0) or (cur_device->port < 0))
-		return;// true;
-
-#if HAS_LIB_ALSA
-	if (!device_manager->alsa_midi_handle)
-		return;
-
-	snd_seq_addr_t sender, dest;
-	sender.client = cur_device->client;
-	sender.port = cur_device->port;
-	dest.client = snd_seq_client_id(device_manager->alsa_midi_handle);
-	dest.port = portid;
-
-	snd_seq_port_subscribe_malloc(&subs);
-	snd_seq_port_subscribe_set_sender(subs, &sender);
-	snd_seq_port_subscribe_set_dest(subs, &dest);
-	int r = snd_seq_subscribe_port(device_manager->alsa_midi_handle, subs);
-	if (r != 0){
-		session->e(string("Error connecting to midi port: ") + snd_strerror(r));
-		snd_seq_port_subscribe_free(subs);
-		subs = nullptr;
-	}
-	return;// r == 0;
-
-	// simple version raises "no permission" error...?!?
-	/*int r = snd_seq_connect_to(handle, portid, p.client, p.port);
-	if (r != 0)
-		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
-	return r == 0;*/
-#endif
-}
-
-void MidiInput::clear_input_queue() {
-#if HAS_LIB_ALSA
-	while (true){
-		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(device_manager->alsa_midi_handle, &ev);
-		if (r < 0)
-			break;
-		snd_seq_free_event(ev);
-	}
-#endif
+	stream->update_device(cur_device);
 }
 
 bool MidiInput::start() {
@@ -210,16 +147,13 @@ bool MidiInput::start() {
 	if (state != State::PAUSED)
 		return false;
 	session->i(_("capture midi start"));
-#if HAS_LIB_ALSA
-	if (!device_manager->alsa_midi_handle){
-		session->e(_("no alsa midi handler"));
+
+	if (stream->start())
 		return false;
-	}
-#endif
 
 	offset = 0;
 
-	clear_input_queue();
+	stream->clear_input_queue();
 
 	timer->reset();
 
@@ -231,6 +165,9 @@ void MidiInput::stop() {
 	if (state != State::CAPTURING)
 		return;
 	session->i(_("capture midi stop"));
+
+	if (stream->stop())
+		return;
 
 	//midi.sanify(Range(0, midi.samples));
 	state = State::PAUSED;
@@ -245,27 +182,9 @@ int MidiInput::do_capturing() {
 	int pos_new = offset_new * (double)_sample_rate;
 	current_midi.clear();
 	current_midi.samples = pos_new - pos;
-	//if (accumulating)
-		offset = offset_new;
+	offset = offset_new;
 
-#if HAS_LIB_ALSA
-	while (true){
-		snd_seq_event_t *ev;
-		int r = snd_seq_event_input(device_manager->alsa_midi_handle, &ev);
-		if (r < 0)
-			break;
-		int pitch = ev->data.note.note;
-		switch (ev->type) {
-			case SND_SEQ_EVENT_NOTEON:
-				current_midi.add(MidiEvent(0, pitch, (float)ev->data.note.velocity / 127.0f));
-				break;
-			case SND_SEQ_EVENT_NOTEOFF:
-				current_midi.add(MidiEvent(0, pitch, 0));
-				break;
-		}
-		snd_seq_free_event(ev);
-	}
-#endif
+	stream->read(current_midi);
 
 	if (current_midi.samples > 0)
 		feed(current_midi);
@@ -273,7 +192,7 @@ int MidiInput::do_capturing() {
 	return current_midi.samples;
 }
 
-bool MidiInput::is_capturing() {
+bool MidiInput::is_capturing() const {
 	return state == State::CAPTURING;
 }
 

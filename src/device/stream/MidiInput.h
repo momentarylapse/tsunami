@@ -8,6 +8,7 @@
 #ifndef SRC_DEVICE_STREAM_MIDIINPUT_H_
 #define SRC_DEVICE_STREAM_MIDIINPUT_H_
 
+#include "../interface/MidiInputStream.h"
 #include "../../data/midi/MidiData.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
@@ -19,10 +20,6 @@ class Session;
 namespace os {
 	class Timer;
 }
-
-#if HAS_LIB_ALSA
-struct _snd_seq_port_subscribe;
-#endif
 
 class MidiInput : public Module {
 public:
@@ -44,12 +41,12 @@ public:
 
 	int do_capturing();
 
-	bool _cdecl is_capturing();
+	bool _cdecl is_capturing() const;
 
 	int _cdecl get_delay();
 	void _cdecl reset_sync();
 
-	int _cdecl sample_rate(){ return _sample_rate; }
+	int _cdecl sample_rate() { return _sample_rate; }
 
 	bool _cdecl unconnect();
 	void _cdecl set_device(Device *d);
@@ -67,13 +64,10 @@ public:
 	int _sample_rate;
 
 private:
+	MidiInputStream* stream = nullptr;
 
-	void clear_input_queue();
+	MidiInputStream::SharedData shared_data;
 
-#if HAS_LIB_ALSA
-	_snd_seq_port_subscribe *subs;
-#endif
-	int portid;
 
 	DeviceManager *device_manager;
 	Device *cur_device;

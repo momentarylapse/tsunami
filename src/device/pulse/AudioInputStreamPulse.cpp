@@ -21,6 +21,7 @@ AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, S
 	pa_sample_spec ss;
 	ss.rate = session->sample_rate();
 	ss.channels = shared_data.num_channels;
+	msg_write(shared_data.num_channels);
 	ss.format = PA_SAMPLE_FLOAT32NE;
 	pulse_stream = pa_stream_new(session->device_manager->pulse_context, "stream-in", &ss, nullptr);
 	if (!pulse_stream)

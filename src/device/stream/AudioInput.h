@@ -68,8 +68,6 @@ protected:
 		PAUSED,
 	} state;
 
-	int num_channels;
-
 
 	class Config : public ModuleConfiguration {
 	public:

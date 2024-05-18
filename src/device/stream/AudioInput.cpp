@@ -10,7 +10,6 @@
 #include "../port/AudioInputStreamPort.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
-#include "../../lib/hui/hui.h"
 #include "../../Session.h"
 #include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"
@@ -19,10 +18,6 @@
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
-
-#if HAS_LIB_PORTAUDIO
-#include <portaudio.h>
-#endif
 
 
 // device
@@ -62,7 +57,7 @@ AudioInput::AudioInput(Session *_session) :
 		Module(ModuleCategory::STREAM, "AudioInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
-	num_channels = 2;
+	shared_data.num_channels = 2;
 
 	state = State::NO_DEVICE;
 
@@ -118,7 +113,7 @@ void AudioInput::update_device() {
 		_kill_dev();
 
 	cur_device = config.device;
-	num_channels = config.device->channels;
+	shared_data.num_channels = config.device->channels;
 
 	if (old_state == State::CAPTURING)
 		start();
@@ -170,8 +165,8 @@ void AudioInput::_create_dev() {
 
 	session->debug("input", "create device");
 
-	num_channels = cur_device->channels;
-	shared_data.buffer.set_channels(num_channels);
+	shared_data.num_channels = cur_device->channels;
+	shared_data.buffer.set_channels(shared_data.num_channels);
 	dev_man->lock();
 
 #if HAS_LIB_PULSEAUDIO

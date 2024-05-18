@@ -20,13 +20,6 @@
 #include "../../Playback.h"
 #include "../../Tsunami.h"
 
-struct ApiDescription {
-	string name;
-	DeviceManager::ApiType type;
-	int mode;
-	bool available;
-};
-extern ApiDescription api_descriptions[];
 
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 		hui::Dialog("settings_dialog", _parent) {
@@ -99,8 +92,7 @@ void SettingsDialog::load_data() {
 
 
 	int n_audio = 0, n_midi = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
-		auto &a = api_descriptions[i];
+	for (const auto& a: DeviceManager::api_descriptions) {
 		if (!a.available)
 			continue;
 		if (a.mode & 1) {
@@ -155,8 +147,7 @@ void SettingsDialog::on_controls(bool header) {
 void SettingsDialog::on_audio_api() {
 	int n = get_int("");
 	int n_audio = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
-		auto &a = api_descriptions[i];
+	for (auto& a: DeviceManager::api_descriptions) {
 		if (!a.available)
 			continue;
 		if (a.mode & 1) {
@@ -170,8 +161,7 @@ void SettingsDialog::on_audio_api() {
 void SettingsDialog::on_midi_api() {
 	int n = get_int("");
 	int n_midi = 0;
-	for (int i=0; i<(int)DeviceManager::ApiType::NUM_APIS; i++) {
-		auto &a = api_descriptions[i];
+	for (auto& a: DeviceManager::api_descriptions) {
 		if (!a.available)
 			continue;
 		if (a.mode & 2) {

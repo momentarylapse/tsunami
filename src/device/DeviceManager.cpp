@@ -13,13 +13,7 @@
 #include "../Session.h"
 
 
-struct ApiDescription {
-	string name;
-	DeviceManager::ApiType type;
-	int mode;
-	bool available;
-};
-Array<ApiDescription> api_descriptions = {
+Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
@@ -136,7 +130,7 @@ void DeviceManager::update_devices(bool serious) {
 static int select_api(const string &preferred_name, int mode) {
 	int best = -1;
 	for (int i=(int)DeviceManager::ApiType::NUM_APIS-1; i>=0; i--) {
-		ApiDescription &a = api_descriptions[i];
+		auto &a = DeviceManager::api_descriptions[i];
 		if (!a.available or ((a.mode & mode) == 0))
 			continue;
 		if (a.name == preferred_name)

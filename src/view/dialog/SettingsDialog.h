@@ -46,7 +46,7 @@ private:
 
 	Array<OggQuality> ogg_quality;
 	AudioView *view;
-	DeviceConsole *device_console;
+	DeviceConsole *device_console = nullptr;
 };
 
 #endif /* SETTINGSDIALOG_H_ */

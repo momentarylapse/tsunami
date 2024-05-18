@@ -87,6 +87,15 @@ public:
 	Device *dummy_device;
 
 	void write_config();
+
+	struct ApiDescription {
+		string name;
+		DeviceManager::ApiType type;
+		int mode;
+		bool available;
+	};
+	static Array<ApiDescription> api_descriptions;
 };
+
 
 #endif /* SRC_DEVICE_DEVICEMANAGER_H_ */

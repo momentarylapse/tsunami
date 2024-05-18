@@ -10,13 +10,13 @@
 
 
 
+#include "../Module.h"
+#include "../ModuleConfiguration.h"
+#include "../port/Port.h"
 #include "../../lib/base/base.h"
 #include "../../lib/base/optional.h"
 #include "../../data/audio/RingBuffer.h"
-#include "../../module/Module.h"
-#include "../../module/ModuleConfiguration.h"
-#include "../../module/port/Port.h"
-#include "../interface/AudioOutputStream.h"
+#include "../../device/interface/AudioOutputStream.h"
 #include <atomic>
 
 class DeviceManager;

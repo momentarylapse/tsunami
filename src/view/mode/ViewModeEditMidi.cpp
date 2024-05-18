@@ -30,7 +30,7 @@
 #include "../../data/midi/Clef.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
-#include "../../device/stream/MidiInput.h"
+#include "../../module/stream/MidiInput.h"
 #include "../../module/midi/MidiAccumulator.h"
 #include "../../Session.h"
 

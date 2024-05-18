@@ -6,9 +6,9 @@
  */
 
 #include "MidiInput.h"
-#include "../interface/DeviceContext.h"
-#include "../Device.h"
-#include "../DeviceManager.h"
+#include "../../device/interface/DeviceContext.h"
+#include "../../device/Device.h"
+#include "../../device/DeviceManager.h"
 #include "../../Session.h"
 #include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"

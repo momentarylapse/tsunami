@@ -13,7 +13,7 @@
 #include "../TsunamiWindow.h"
 #include "../../data/Curve.h"
 #include "../../data/Track.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 
 ViewModeCurve::ViewModeCurve(AudioView* view) :

@@ -9,7 +9,7 @@
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../module/midi/MidiPreviewSource.h"
 #include "../../module/SignalChain.h"
-#include "../../device/stream/MidiInput.h"
+#include "../../module/stream/MidiInput.h"
 #include "../../Session.h"
 
 

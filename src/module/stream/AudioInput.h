@@ -8,13 +8,13 @@
 #ifndef SRC_DEVICE_STREAM_AUDIOINPUT_H_
 #define SRC_DEVICE_STREAM_AUDIOINPUT_H_
 
+#include "../port/Port.h"
+#include "../Module.h"
+#include "../ModuleConfiguration.h"
 #include "../../lib/base/base.h"
 #include "../../lib/base/optional.h"
 #include "../../data/audio/RingBuffer.h"
-#include "../../module/port/Port.h"
-#include "../../module/Module.h"
-#include "../../module/ModuleConfiguration.h"
-#include "../interface/AudioInputStream.h"
+#include "../../device/interface/AudioInputStream.h"
 
 class PluginManager;
 class DeviceManager;

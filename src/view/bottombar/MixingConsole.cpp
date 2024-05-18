@@ -25,7 +25,7 @@
 #include "../../EditModes.h"
 #include "../../plugins/PluginManager.h"
 #include "../../device/DeviceManager.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include <math.h>
 
 

@@ -7,7 +7,7 @@
 
 #include "SignalChain.h"
 
-#include "../device/stream/AudioOutput.h"
+#include "stream/AudioOutput.h"
 #include "Module.h"
 #include "ModuleFactory.h"
 #include "port/Port.h"

@@ -16,7 +16,7 @@
 #include "../TsunamiWindow.h"
 #include "../MouseDelayPlanner.h"
 #include "../ColorScheme.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../data/Song.h"
 #include "../../module/SignalChain.h"

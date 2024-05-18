@@ -132,9 +132,6 @@ set(SOURCE
 	src/device/interface/AudioOutputStream.cpp
 	src/device/interface/DeviceContext.cpp
 	src/device/interface/MidiInputStream.cpp
-	src/device/stream/AudioInput.cpp
-	src/device/stream/AudioOutput.cpp
-	src/device/stream/MidiInput.cpp
 	src/device/Device.cpp
 	src/device/DeviceManager.cpp
 	src/lib/any/any.cpp
@@ -355,6 +352,9 @@ set(SOURCE
 	src/module/midi/MidiSplitter.cpp
 	src/module/midi/MidiSucker.cpp
 	src/module/port/Port.cpp
+	src/module/stream/AudioInput.cpp
+	src/module/stream/AudioOutput.cpp
+	src/module/stream/MidiInput.cpp
 	src/module/synthesizer/DebugSynthesizer.cpp
 	src/module/synthesizer/DummySynthesizer.cpp
 	src/module/synthesizer/EnvelopeADSR.cpp

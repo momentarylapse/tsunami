@@ -30,7 +30,7 @@
 #include "../../data/SampleRef.h"
 #include "../../lib/hui/Controls/Control.h"
 #include "../../action/song/ActionSongMoveSelection.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../Session.h"
 #include "../../Playback.h"
 #include <math.h>

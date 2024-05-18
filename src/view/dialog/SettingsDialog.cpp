@@ -12,7 +12,7 @@
 #include "../mainview/MainView.h"
 #include "../TsunamiWindow.h"
 #include "../../device/DeviceManager.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../stuff/Log.h"
 #include "../../storage/Storage.h"

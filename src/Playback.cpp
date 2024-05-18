@@ -10,7 +10,7 @@
 #include "module/SignalChain.h"
 #include "module/audio/SongRenderer.h"
 #include "module/audio/PeakMeter.h"
-#include "device/stream/AudioOutput.h"
+#include "module/stream/AudioOutput.h"
 #include "view/audioview/AudioView.h"
 #include "lib/hui/hui.h"
 

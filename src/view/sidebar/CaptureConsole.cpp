@@ -16,7 +16,7 @@
 #include "../../data/base.h"
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../Session.h"
 #include "../../Playback.h"

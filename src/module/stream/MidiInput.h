@@ -5,14 +5,14 @@
  *      Author: michi
  */
 
-#ifndef SRC_DEVICE_STREAM_MIDIINPUT_H_
-#define SRC_DEVICE_STREAM_MIDIINPUT_H_
+#ifndef SRC_MODULE_STREAM_MIDIINPUT_H_
+#define SRC_MODULE_STREAM_MIDIINPUT_H_
 
-#include "../interface/MidiInputStream.h"
+#include "../port/Port.h"
+#include "../Module.h"
+#include "../ModuleConfiguration.h"
+#include "../../device/interface/MidiInputStream.h"
 #include "../../data/midi/MidiData.h"
-#include "../../module/port/Port.h"
-#include "../../module/Module.h"
-#include "../../module/ModuleConfiguration.h"
 
 class Device;
 class DeviceManager;
@@ -94,4 +94,4 @@ public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };
 
-#endif /* SRC_DEVICE_STREAM_MIDIINPUT_H_ */
+#endif /* SRC_MODULE_STREAM_MIDIINPUT_H_ */

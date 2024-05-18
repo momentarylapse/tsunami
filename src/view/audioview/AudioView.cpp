@@ -41,7 +41,7 @@
 #include "../../data/Sample.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/SampleRef.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/SignalChain.h"
 #include "../../plugins/TsunamiPlugin.h"

@@ -17,7 +17,7 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
-#include "../../device/stream/AudioOutput.h"
+#include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../module/audio/BufferStreamer.h"
 #include "../../module/audio/SongRenderer.h"

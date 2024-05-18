@@ -13,8 +13,8 @@
 #include "../data/base.h"
 #include "../module/audio/AudioSource.h"
 #include "../module/SignalChain.h"
+#include "../module/stream/AudioOutput.h"
 #include "../Session.h"
-#include "../device/stream/AudioOutput.h"
 #include <cstdio>
 
 TestStreams::TestStreams() : UnitTest("streams") {

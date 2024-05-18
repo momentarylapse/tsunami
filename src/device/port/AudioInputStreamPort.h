@@ -8,7 +8,7 @@
 
 #if HAS_LIB_PORTAUDIO
 
-#include "../AudioInputStream.h"
+#include "../interface/AudioInputStream.h"
 
 
 #if HAS_LIB_PORTAUDIO

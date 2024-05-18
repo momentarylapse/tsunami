@@ -6,9 +6,9 @@
 #define TSUNAMI_AUDIOOUTPUTSTREAM_H
 
 
-#include "../lib/base/base.h"
-#include "../lib/base/optional.h"
-#include "../data/audio/RingBuffer.h"
+#include "../../lib/base/base.h"
+#include "../../lib/base/optional.h"
+#include "../../data/audio/RingBuffer.h"
 #include <atomic>
 #include <functional>
 

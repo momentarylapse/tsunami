@@ -16,7 +16,7 @@
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
 #include "../../module/port/Port.h"
-#include "../AudioOutputStream.h"
+#include "../interface/AudioOutputStream.h"
 #include <atomic>
 
 class DeviceManager;

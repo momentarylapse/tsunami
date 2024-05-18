@@ -14,7 +14,7 @@
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/ModuleConfiguration.h"
-#include "../AudioInputStream.h"
+#include "../interface/AudioInputStream.h"
 
 class PluginManager;
 class DeviceManager;

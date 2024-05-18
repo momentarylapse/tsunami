@@ -3,7 +3,7 @@
 //
 
 #include "AudioInputStream.h"
-#include "../Session.h"
+#include "../../Session.h"
 
 AudioInputStream::SharedData::SharedData() :
 		buffer(1048576) {

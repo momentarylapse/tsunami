@@ -3,9 +3,9 @@
 //
 
 #include "AudioOutputStream.h"
-#include "DeviceManager.h"
-#include "../Session.h"
-#include "../lib/hui/hui.h"
+#include "../DeviceManager.h"
+#include "../../Session.h"
+#include "../../lib/hui/hui.h"
 
 const int AudioOutputStream::DEFAULT_PREBUFFER_SIZE = 4096;
 

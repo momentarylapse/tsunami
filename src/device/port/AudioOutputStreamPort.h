@@ -7,7 +7,7 @@
 
 #if HAS_LIB_PORTAUDIO
 
-#include "../AudioOutputStream.h"
+#include "../interface/AudioOutputStream.h"
 
 
 typedef void PaStream;

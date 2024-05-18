@@ -8,8 +8,7 @@
 
 #if HAS_LIB_PULSEAUDIO
 
-#include "../AudioOutputStream.h"
-
+#include "../interface/AudioOutputStream.h"
 #include "../../lib/base/base.h"
 #include "../../lib/base/optional.h"
 #include "../../data/audio/RingBuffer.h"

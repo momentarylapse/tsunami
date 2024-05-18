@@ -7,7 +7,7 @@
 
 #if HAS_LIB_PULSEAUDIO
 
-#include "../AudioInputStream.h"
+#include "../interface/AudioInputStream.h"
 
 struct pa_stream;
 

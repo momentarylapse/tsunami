@@ -44,10 +44,10 @@ DeviceConsole::DeviceConsole(Session *session, BottomBar *bar) :
 
 	popup = hui::create_resource_menu("popup-menu-device", this);
 
-	device_manager->out_add_device >> create_sink([this] {
-		on_add_device();
+	device_manager->out_add_device >> create_data_sink<Device*>([this] (Device* device) {
+		on_add_device(device);
 	});
-	device_manager->out_remove_device >> create_sink([this] {
+	device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) {
 		update_full();
 	});
 	device_manager->out_changed >> create_sink([this] {
@@ -146,8 +146,8 @@ void DeviceConsole::update_full() {
 	}
 }
 
-void DeviceConsole::on_add_device() {
-	auto type = device_manager->msg_type;
+void DeviceConsole::on_add_device(Device* device) {
+	auto type = device->type;
 	auto d = device_manager->device_list(type).back();
 	add_string(list_id(type), to_format(d));
 }

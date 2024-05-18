@@ -9,12 +9,8 @@
 #include "backend-pulseaudio/DeviceContextPulse.h"
 #include "backend-portaudio/DeviceContextPort.h"
 #include "backend-alsa/DeviceContextAlsa.h"
-
-#include "../Session.h"
-#include "../module/Module.h"
 #include "Device.h"
-#include "../Tsunami.h"
-#include "../stuff/Log.h"
+#include "../Session.h"
 
 
 struct ApiDescription {
@@ -76,8 +72,6 @@ DeviceManager::DeviceManager(Session *_session) {
 
 	dummy_device = new Device(DeviceType::NONE, "dummy");
 
-	msg_index = -1;
-	msg_type = DeviceType::AUDIO_INPUT;
 	output_volume = 0;
 	hui_rep_id = -1;
 }
@@ -110,13 +104,11 @@ void DeviceManager::remove_device(DeviceType type, int index) {
 		return;
 	if (devices[index]->present)
 		return;
+	out_remove_device.notify(devices[index]);
 	delete devices[index];
 	devices.erase(index);
 
 	write_config();
-	msg_type = type;
-	msg_index = index;
-	out_remove_device.notify();
 }
 
 void DeviceManager::write_config() {
@@ -292,9 +284,7 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 			return d;
 	Device *d = new Device(type, "", internal_name, 0);
 	devices.add(d);
-	msg_type = type;
-	msg_index = devices.num - 1;
-	out_add_device.notify();
+	out_add_device.notify(d);
 	return d;
 }
 

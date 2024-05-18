@@ -54,8 +54,8 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->out_add_device >> create_sink([this] { update_device_list(); });
-	session->device_manager->out_remove_device >> create_sink([this] { update_device_list(); });
+	session->device_manager->out_add_device >> create_data_sink<Device*>([this] (Device*) { update_device_list(); });
+	session->device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) { update_device_list(); });
 
 
 	for (auto &c: items()) {

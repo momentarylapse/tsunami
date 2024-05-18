@@ -10,7 +10,6 @@
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
-#include "../../module/port/Port.h"
 #include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../lib/os/time.h"

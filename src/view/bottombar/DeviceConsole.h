@@ -21,7 +21,7 @@ public:
 
 	void update_full();
 	void change_data();
-	void on_add_device();
+	void on_add_device(Device* device);
 
 	void on_move_device(DeviceType type);
 	void on_right_click_device(DeviceType type);

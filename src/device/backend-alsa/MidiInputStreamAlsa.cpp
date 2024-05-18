@@ -17,7 +17,7 @@ MidiInputStreamAlsa::MidiInputStreamAlsa(Session *session, Device *device, MidiI
 	shared_data.portid = snd_seq_create_simple_port(DeviceContextAlsa::instance->alsa_midi_handle, "Tsunami MIDI in",
 	                                    SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 	                                    SND_SEQ_PORT_TYPE_APPLICATION);
-	if (shared_data.portid < 0){
+	if (shared_data.portid < 0) {
 		session->e(string("Error creating sequencer port: ") + snd_strerror(shared_data.portid));
 		error = true;
 	}

@@ -481,8 +481,8 @@ void MidiEditorConsole::clear() {
 }
 
 void MidiEditorConsole::on_enter() {
-	session->device_manager->out_add_device >> create_sink([this] { update_input_device_list(); });
-	session->device_manager->out_remove_device >> create_sink([this] { update_input_device_list(); });
+	session->device_manager->out_add_device >> create_data_sink<Device*>([this] (Device*) { update_input_device_list(); });
+	session->device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) { update_input_device_list(); });
 	view->out_cur_layer_changed >> create_sink([this] { on_view_cur_layer_change(); });
 	view->out_vtrack_changed >> create_sink([this] { on_view_vtrack_change(); });
 	mode->out_changed >> create_sink([this] { on_settings_change(); });

@@ -29,8 +29,8 @@ public:
 	friend class AudioInput;
 	friend class MidiInput;
 
-	obs::source out_add_device{this, "add-device"};
-	obs::source out_remove_device{this, "remove-device"};
+	obs::xsource<Device*> out_add_device{this, "add-device"};
+	obs::xsource<Device*> out_remove_device{this, "remove-device"};
 
 	DeviceManager(Session *session);
 	virtual ~DeviceManager();
@@ -87,10 +87,6 @@ public:
 	Device *dummy_device;
 
 	void write_config();
-
-public:
-	DeviceType msg_type;
-	int msg_index;
 };
 
 #endif /* SRC_DEVICE_DEVICEMANAGER_H_ */

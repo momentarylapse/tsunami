@@ -63,7 +63,7 @@ void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, 
 			ctx->out_request_update();
 		});
 	}
-	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
+	pa_threaded_mainloop_signal(ctx->pulse_mainloop, 0);
 }
 
 
@@ -216,7 +216,7 @@ bool DeviceContextPulse::wait_stream_ready(pa_stream *s) {
 		//printf(".\n");
 		//pa_mainloop_iterate(m, 1, NULL);
 		//hui::Sleep(0.01f);
-		pa_threaded_mainloop_wait(DeviceContextPulse::instance->pulse_mainloop);
+		pa_threaded_mainloop_wait(pulse_mainloop);
 		n ++;
 		if (n >= 1000)
 			return false;
@@ -238,6 +238,7 @@ void DeviceContextPulse::sink_info_callback(pa_context *c, const pa_sink_info *i
 	Device d;
 	d.type = DeviceType::AUDIO_OUTPUT;
 	d.internal_name = i->name;
+	d.index_in_lib = (int)i->index;
 	d.name = i->description;
 	d.channels = i->channel_map.channels;
 	d.present = true;
@@ -256,6 +257,7 @@ void DeviceContextPulse::source_info_callback(pa_context *c, const pa_source_inf
 	Device d;
 	d.type = DeviceType::AUDIO_INPUT;
 	d.internal_name = i->name;
+	d.index_in_lib = (int)i->index;
 	d.name = i->description;
 	d.channels = i->channel_map.channels;
 	d.present = true;
@@ -264,8 +266,8 @@ void DeviceContextPulse::source_info_callback(pa_context *c, const pa_source_inf
 }
 
 void DeviceContextPulse::state_callback(pa_context* context, void* userdata) {
-	auto *dm = static_cast<DeviceContextPulse*>(userdata);
-	pa_threaded_mainloop_signal(dm->pulse_mainloop, 0);
+	auto *ctx = static_cast<DeviceContextPulse*>(userdata);
+	pa_threaded_mainloop_signal(ctx->pulse_mainloop, 0);
 }
 
 bool DeviceContextPulse::_test_error(Session *session, const string &msg) {

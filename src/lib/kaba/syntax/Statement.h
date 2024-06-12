@@ -20,7 +20,6 @@ namespace kaba {
 // statements
 enum class StatementID {
 	RETURN,
-	BLOCK_RETURN,
 	IF,
 	IF_UNWRAP,
 	WHILE,
@@ -32,7 +31,7 @@ enum class StatementID {
 	NEW,
 	DELETE,
 	ASM,
-	//RAISE,
+	RAISE,
 	TRY,
 	EXCEPT,
 	PASS,

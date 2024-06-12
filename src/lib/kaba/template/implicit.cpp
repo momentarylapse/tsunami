@@ -54,13 +54,6 @@ shared<Node> AutoImplementer::node_return(shared<Node> n) {
 	return ret;
 }
 
-shared<Node> AutoImplementer::node_block_return(shared<Node> n) {
-	auto ret = add_node_statement(StatementID::BLOCK_RETURN, -1);
-	ret->set_num_params(1);
-	ret->set_param(0, n);
-	return ret;
-}
-
 shared<Node> AutoImplementer::node_if(shared<Node> n_test, shared<Node> n_true) {
 	auto cmd_if = add_node_statement(StatementID::IF);
 	//cmd_if->type = n_true->type;

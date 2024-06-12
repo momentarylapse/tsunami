@@ -85,7 +85,6 @@ public:
 	void implement_optional_assign_raw(Function *f, const Class *t);
 	void implement_optional_assign_null(Function *f, const Class *t);
 	void implement_optional_has_value(Function *f, const Class *t);
-	void implement_optional_value(Function *f, const Class *t);
 	void implement_optional_equal(Function *f, const Class *t);
 	void implement_optional_equal_raw(Function *f, const Class *t);
 	void implement_product_equal(Function *f, const Class *t);
@@ -112,7 +111,6 @@ public:
 
 	static shared<Node> node_not(shared<Node> n);
 	static shared<Node> node_return(shared<Node> n);
-	static shared<Node> node_block_return(shared<Node> n);
 	static shared<Node> node_if(shared<Node> n_test, shared<Node> n_true);
 	static shared<Node> node_if_else(shared<Node> n_test, shared<Node> n_true, shared<Node> n_false);
 	shared<Node> node_raise_no_value();

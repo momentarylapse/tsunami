@@ -33,7 +33,6 @@ void AutoImplementer::_add_missing_function_headers_for_optional(Class *t) {
 	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
 	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
-	add_func_header(t, "_value", t->param[0], {}, {});
 	//add_func_header(t, "_get_p", t->param[0], {}, {}, nullptr, Flags::REF);
 	if (t->param[0]->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})) {
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
@@ -195,23 +194,6 @@ void AutoImplementer::implement_optional_has_value(Function *f, const Class *t) 
 	f->block->add(node_return(optional_has_value(self)));
 }
 
-void AutoImplementer::implement_optional_value(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
-
-	{
-		// if not self.has_value
-		//     raise(new NoValueError())
-		auto cmd_not = node_not(optional_has_value(self));
-		f->block->add(node_if(cmd_not, node_raise_no_value()));
-	}
-
-
-	{
-		// return self.data
-		f->block->add(node_return(optional_data(self)));
-	}
-}
-
 void AutoImplementer::implement_optional_equal_raw(Function *f, const Class *t) {
 	if (!f)
 		return;
@@ -268,7 +250,6 @@ void AutoImplementer::_implement_functions_for_optional(const Class *t) {
 	implement_optional_assign_null(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {TypeNone})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func(Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {})), t);
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func("__bool__", TypeBool, {})), t);
-	implement_optional_value(prepare_auto_impl(t, t->get_member_func("_value", t->param[0], {})), t);
 	implement_optional_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t);
 	implement_optional_equal_raw(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})), t);
 }

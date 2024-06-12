@@ -19,6 +19,7 @@
 namespace kaba {
 
 
+
 bool _verbose_exception_ = false;
 
 static void dbo(const string &s) {
@@ -51,16 +52,18 @@ void KabaNoValueError::__init__() {
 	new(this) KabaNoValueError();
 }
 
+KabaNullPointerError::KabaNullPointerError() : KabaException("null pointer") {
+}
 
 
 
 struct StackFrameInfo {
-	void *rip;
-	void *rsp;
-	void *rbp;
+	void *rip = nullptr;
+	void *rsp = nullptr;
+	void *rbp = nullptr;
 	shared<Module> s;
-	Function *f;
-	int64 offset;
+	Function *f = nullptr;
+	int64 offset = 0;
 	string str() const {
 		if (!s or !f)
 			return ">>  NOT IN KABA";
@@ -176,30 +179,6 @@ ExceptionBlockData get_blocks(shared<Module> s, Function *f, void* rip, const Cl
 }
 
 
-void* rbp2 = nullptr;
-
-#ifdef CPU_AMD64
-
-void relink_return(void *rip, void *rbp, void *rsp) {
-#if defined(OS_LINUX) || defined(OS_MAC)
-	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
-	// ARGH....
-	asm volatile(	"mov %1, %%rsp\n\t"
-			"pop %%rbp\n\t" // pop rbp
-			"pop %%rax\n\t" // pop rip
-			"push %2\n\t" // push rip
-			"ret"
-		: "=r" (rbp2)
-		: "r" (rsp), "r" (rip)
-		: );
-
-//	printf("rbp=%p\n", rbp2);
-#endif
-
-	exit(0);
-}
-#endif
-
 const Class* _get_type(void *p, void *vtable, const Class *ns) {
 	for (auto *c: weak(ns->classes)) {
 		if (c->_vtable_location_compiler_)
@@ -228,10 +207,56 @@ const Class* get_type(void *p) {
 	return TypeUnknown;
 }
 
+void just_die(KabaException *kaba_exception, const Array<StackFrameInfo> &trace) {
+	// uncaught...
+	const Class *ex_type = get_type(kaba_exception);
+	if (!kaba_exception)
+		msg_error("uncaught exception  (nil)");
+	else if (ex_type == TypeUnknown)
+		msg_error("uncaught exception:  " + kaba_exception->message());
+	else
+		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
+
+	// stack trace
+	msg_write("stack trace:");
+	for (const auto& r: trace)
+		if (!r.f or r.f->name != "@die")
+			msg_write(r.str());
+
+	exit(1);
+}
+
+
 #ifdef CPU_AMD64
 
-Array<StackFrameInfo> get_stack_trace(void **rbp) {
+/*--------------------------------------------------------------*\
+      AMD64
+\*--------------------------------------------------------------*/
+
+void relink_return(void *rip, void *rbp, void *rsp) {
+	static void* rbp2 = nullptr;
+#if defined(OS_LINUX) || defined(OS_MAC)
+	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
+	// ARGH....
+	asm volatile(	"mov %1, %%rsp\n\t"
+			"pop %%rbp\n\t" // pop rbp
+			"pop %%rax\n\t" // pop rip
+			"push %2\n\t" // push rip
+			"ret"
+		: "=r" (rbp2)
+		: "r" (rsp), "r" (rip)
+		: );
+
+//	printf("rbp=%p\n", rbp2);
+#endif
+
+	exit(0);
+}
+
+Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 	Array<StackFrameInfo> trace;
+
+	void **rbp = (void**)frame.rbp;
 
 	void **rsp = nullptr;
 //	msg_write("stack trace");
@@ -288,31 +313,17 @@ void clean_up_block(Block *b, const StackFrameInfo& r) {
 	}
 }
 
-void just_die(KabaException *kaba_exception, const Class *ex_type, const Array<StackFrameInfo> &trace) {
-	// uncaught...
-	if (!kaba_exception)
-		msg_error("uncaught exception  (nil)");
-	else if (ex_type == TypeUnknown)
-		msg_error("uncaught exception:  " + kaba_exception->message());
-	else
-		msg_error("uncaught " + get_type(kaba_exception)->name + ":  " + kaba_exception->message());
-	for (auto r: trace)
-		msg_write(r.str());
-	exit(1);
-}
+StackFrameInfo get_current_stack_frame() {
+	void *rbp = nullptr;
+	void *rsp = nullptr;
 
-void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 #if defined(OS_LINUX) || defined(OS_MAC)
 	// get stack frame base pointer rbp
-	void **rbp = nullptr;
-	void **rsp = nullptr;
 	asm volatile("movq %%rbp, %0\n\t"
-			"movq %%rsp, %1\n\t"
-		: "=r" (rbp), "=r" (rsp)
-		:
-		: );
-
-	dbo("raise...");
+				 "movq %%rsp, %1\n\t"
+			: "=r" (rbp), "=r" (rsp)
+			:
+			: );
 
 //	printf("rbp=%p   rsp=%p    local=%p\n", rbp, rsp, &rsp);
 
@@ -322,12 +333,25 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 	assert((rbp > rsp) and (rbp > local) and (local > rsp));
 	assert((int_p)rbp - (int_p)rsp < 10000);
 
+#else
+
+	// TODO
+
+#endif
+
+	return {nullptr, rsp, rbp};
+}
+
+void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
+#if defined(OS_LINUX) || defined(OS_MAC)
+	auto frame = get_current_stack_frame();
+
 	void *return_rsp = nullptr;
 	void *return_rip = nullptr;
 
 
 	{
-		auto trace = get_stack_trace(rbp);
+		auto trace = get_stack_trace(frame);
 
 		const Class *ex_type = get_type(kaba_exception);
 
@@ -357,17 +381,29 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 
 		// uncaught?
 		if (!return_rsp)
-			just_die(kaba_exception, ex_type, trace);
+			just_die(kaba_exception, trace);
 	}
-	relink_return(return_rip, rbp, return_rsp);
+	relink_return(return_rip, frame.rbp, return_rsp);
 
 #else
-	just_die(kaba_exception, TypeUnknown, {});
+	just_die(kaba_exception, {});
 #endif
 }
 #pragma GCC pop_options
 
 #else
+
+/*--------------------------------------------------------------*\
+      OTHER CPUS
+\*--------------------------------------------------------------*/
+
+StackFrameInfo get_current_stack_frame() {
+	return {};
+}
+
+Array<StackFrameInfo> get_stack_trace(void **rbp) {
+	return {};
+}
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 	msg_error("exception handling not working on this architecture...");
@@ -376,6 +412,15 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 }
 
 #endif
+
+
+
+
+void kaba_die(KabaException* e) {
+	auto frame = get_current_stack_frame();
+	auto trace = get_stack_trace(frame);
+	just_die(e, trace);
+}
 
 }
 

@@ -1,7 +1,9 @@
 #include "../kaba.h"
 #include "Serializer.h"
 #include "Compiler.h"
+#include "../dynamic/exception.h"
 #include "../../os/msg.h"
+#include "../../base/algo.h"
 #include "../../base/iter.h"
 
 
@@ -63,7 +65,7 @@ SerialNodeParam Serializer::add_temp(const Class *t, bool add_constructor) {
 
 	if (t != TypeVoid) {
 		if (r.type->get_destructor())
-			inserted_temp.add(r);
+			inserted_temp.add({r, cur_block_level});
 
 		if (add_constructor)
 			add_cmd_constructor(r, NodeKind::VAR_TEMP);
@@ -230,11 +232,12 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 	/*----- direct nodes --------*/
 
-	SerialNodeParam p;
-	p.kind = com->kind;
-	p.type = com->type;
-	p.p = 0;
-	p.shift = 0;
+	SerialNodeParam p{
+			.kind = com->kind,
+			.p = 0,
+			.type = com->type,
+			.shift = 0
+	};
 
 	if (com->kind == NodeKind::MEMORY) {
 		p.p = com->link_no;
@@ -370,6 +373,8 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 
 	SerialNodeParam ret{};
 
+	cur_block_level ++;
+
 	insert_constructors_block(block);
 
 	for (int i=0; i<block->params.num; i++) {
@@ -377,6 +382,13 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 
 		// serialize
 		ret = serialize_node(block->params[i].get(), block, i);
+
+		// keep return temp vars alive longer...
+		if (i == block->params.num - 1 and ret.kind == NodeKind::VAR_TEMP) {
+			for (int k=0; k<inserted_temp.num; k++)
+				if (inserted_temp[k].param.p == ret.p)
+					inserted_temp[k].block_level = cur_block_level - 1;
+		}
 		
 		// destruct new temp vars
 		insert_destructors_temp();
@@ -389,6 +401,8 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 	}
 
 	insert_destructors_block(block);
+
+	cur_block_level --;
 
 	cmd.add_label(block->_label_end);
 	return ret;
@@ -545,8 +559,6 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			}
 
 			break;
-		case StatementID::BLOCK_RETURN:
-			return serialize_node(com->params[0].get(), block, index);
 		case StatementID::NEW:{
 			auto ret = add_temp(com->type, false);
 
@@ -571,9 +583,11 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			auto f = syntax_tree->required_func_global("@free");
 			add_function_call(f, {operand}, p_none);
 			break;}
-		/*case StatementID::RAISE:
-			AddFunctionCall();
-			break;*/
+		case StatementID::RAISE:{
+			auto e = com->params[0]->as_const_p();
+			auto f = syntax_tree->required_func_global(block->is_in_try() ? Identifier::RAISE : "@die");
+			add_function_call(f, {param_global(TypePointer, e)}, p_none);
+			break;}
 		case StatementID::TRY:{
 			int label_finish = list->create_label("_TRY_AFTER_" + i2s(num_labels ++));
 
@@ -1186,9 +1200,13 @@ void Serializer::insert_destructors_block(Block *b, bool recursive) {
 }
 
 void Serializer::insert_destructors_temp() {
-	for (SerialNodeParam &p: inserted_temp)
-		add_cmd_destructor(p);
-	inserted_temp.clear();
+	for (auto &[p, l]: inserted_temp)
+		if (l >= cur_block_level) {
+			add_cmd_destructor(p);
+		}
+	base::remove_if(inserted_temp, [this] (auto &t) {
+		return t.block_level >= cur_block_level;
+	});
 }
 
 int Serializer::temp_in_cmd(int c, int v) {
@@ -1583,6 +1601,7 @@ void Serializer::serialize_function(Function *f) {
 	Asm::CurrentMetaInfo = syntax_tree->asm_meta_info.get();
 
 	cur_func = f;
+	cur_block_level = 0;
 	num_labels = 0;
 	call_used = false;
 	stack_offset = f->_var_size;
@@ -1594,6 +1613,7 @@ void Serializer::serialize_function(Function *f) {
 	// function
 
 	serialize_block(f->block.get());
+	insert_destructors_temp();
 	scan_temp_var_usage();
 
 	cmd_list_out("ser:a", "start");

@@ -66,13 +66,12 @@ SerialNodeParam CommandList::_add_temp(const Class *t) {
 	v.type = t;
 	v.force_stack = (t->size > config.target.pointer_size) or t->is_list() or t->is_array() or (t->elements.num > 0);
 	temp_var.add(v);
-	SerialNodeParam param;
-	param.kind = NodeKind::VAR_TEMP;
-	param.p = temp_var.num - 1;
-	param.type = t;
-	param.shift = 0;
-
-	return param;
+	return SerialNodeParam {
+		.kind = NodeKind::VAR_TEMP,
+		.p = temp_var.num - 1,
+		.type = t,
+		.shift = 0
+	};
 }
 
 
@@ -84,7 +83,7 @@ void CommandList::set_cmd_param(int index, int param_index, const SerialNodePara
 		if (p.vreg >= 0)
 			use_virtual_reg(p.vreg, index, index);
 	if ((p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::DEREF_VAR_TEMP)) {
-		int v = (int_p)p.p;
+		int v = (int)(int_p)p.p;
 		temp_var[v].use(index, index);
 		if ((c.inst == Asm::InstID::LEA) and (param_index == 1)) {
 //			msg_error("ref a " + i2s(v));
@@ -94,10 +93,11 @@ void CommandList::set_cmd_param(int index, int param_index, const SerialNodePara
 }
 
 void CommandList::add_cmd(Asm::ArmCond cond, Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3) {
-	SerialNode c;
-	c.inst = inst;
-	c.cond = cond;
-	c.index = next_cmd_index;
+	SerialNode c{
+		.inst = inst,
+		.cond = cond,
+		.index = next_cmd_index
+	};
 
 	if (next_cmd_index == cmd.num) {
 		cmd.add(c);
@@ -192,7 +192,7 @@ void CommandList::remove_temp_var(int v) {
 void CommandList::move_param(SerialNodeParam &p, int from, int to) {
 	if ((p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::DEREF_VAR_TEMP)) {
 		// move_param temp
-		int64 v = p.p;
+		int v = (int)p.p;
 		if (temp_var[v].last < max(from, to))
 			temp_var[v].last = max(from, to);
 		if (temp_var[v].first > min(from, to))
@@ -202,7 +202,7 @@ void CommandList::move_param(SerialNodeParam &p, int from, int to) {
 		auto r = Asm::reg_root[p.p];
 		bool found = false;
 		for (VirtualRegister &rc: virtual_reg)
-			if ((r == rc.reg_root) and (from >= rc.first) and (from >= rc.first)) {
+			if ((r == rc.reg_root) and (from >= rc.first) and (from >= rc.first)) { // FIXME from <= rc.last ?!?
 				if (rc.last < max(from, to))
 					rc.last = max(from, to);
 				if (rc.first > min(from, to))

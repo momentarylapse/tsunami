@@ -1013,6 +1013,7 @@ shared<Node> Parser::parse_abstract_statement_try(Block *block) {
 	token0 = Exp.cur_token();
 	Exp.next_line();
 
+	flags_set(cmd_try->params[0]->flags, Flags::TRY);
 
 	int num_excepts = 0;
 

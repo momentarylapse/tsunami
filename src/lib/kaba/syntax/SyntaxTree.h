@@ -27,6 +27,7 @@ namespace kaba {
 class Module;
 class SyntaxTree;
 class Parser;
+class KabaException;
 
 
 
@@ -161,6 +162,7 @@ public:
 	owned<Asm::MetaInfo> asm_meta_info;
 	Array<AsmBlock> asm_blocks;
 	Array<Function*> functions;
+	owned_array<KabaException> raised_exceptions;
 
 	shared<Function> root_of_all_evil;
 

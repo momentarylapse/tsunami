@@ -45,6 +45,7 @@ enum class Flags {
 	NOFRAME = 1 << 18,
 	MACRO = 1 << 19,
 	TRUST_ME = 1 << 20,
+	TRY = 1 << 21,
 
 	AUTO_IMPORT = 1<<24,
 	FULLY_PARSED = 1<<25,

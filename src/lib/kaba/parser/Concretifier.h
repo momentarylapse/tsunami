@@ -64,6 +64,7 @@ public:
 	shared<Node> concretify_array_builder_for_inner(shared<Node> n_for, shared<Node> n_exp, shared<Node> n_cmp, const Class *type_el, Block *block, const Class *ns, int token_id);
 	shared<Node> concretify_operator(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_block(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_definitely(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_call(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_return(shared<Node> node, Block *block, const Class *ns);
@@ -80,6 +81,7 @@ public:
 	shared<Node> concretify_statement_delete(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_raw_function_pointer(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_try(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_statement_raise(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_lambda(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_special_function_call(shared<Node> node, SpecialFunction *s, Block *block, const Class *ns);
 	shared<Node> concretify_special_function_str(shared<Node> node, Block *block, const Class *ns);

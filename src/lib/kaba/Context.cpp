@@ -176,8 +176,6 @@ void Context::execute_single_command(const string &cmd) {
 		return;
 
 	auto node = func->block->params[0];
-	if (node->kind == NodeKind::STATEMENT and node->as_statement()->id == StatementID::BLOCK_RETURN)
-		node = node->params[0];
 	
 	// implicit print(...)?
 	if (node->type != TypeVoid) {

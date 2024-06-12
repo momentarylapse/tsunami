@@ -1,10 +1,8 @@
 #include "../kaba.h"
 #include "../parser/Parser.h"
-#include "../template/template.h"
-#include "../asm/asm.h"
+#include "../dynamic/exception.h"
 #include "../../os/msg.h"
 #include "../../base/iter.h"
-#include <stdio.h>
 
 namespace kaba {
 

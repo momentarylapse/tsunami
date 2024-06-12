@@ -44,6 +44,14 @@ bool Block::is_trust_me() const {
 	return false;
 }
 
+bool Block::is_in_try() const {
+	if (flags_has(flags, Flags::TRY))
+		return true;
+	if (parent)
+		return parent->is_in_try();
+	return false;
+}
+
 Variable *Block::add_var(const string &name, const Class *type, Flags flags) {
 	return insert_var(function->var.num, name, type, flags);
 }

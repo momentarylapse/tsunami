@@ -52,7 +52,6 @@ int add_special_function(const string &name, SpecialFunctionID id, int min_param
 void SIAddStatements() {
 	// statements
 	add_statement(Identifier::RETURN, StatementID::RETURN); // return: ParamType will be defined by the parser!
-	add_statement("-block-return-", StatementID::BLOCK_RETURN, 1);
 	add_statement(Identifier::IF, StatementID::IF, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
 	add_statement("-if/unwrap-", StatementID::IF_UNWRAP, 3); // [EXPR, OUT_VAR, BLOCK, [ELSE-BLOCK]]
 	add_statement(Identifier::WHILE, StatementID::WHILE, 2); // [CMP, BLOCK]
@@ -66,7 +65,7 @@ void SIAddStatements() {
 	add_statement(Identifier::LET, StatementID::LET);
 	add_statement(Identifier::VAR, StatementID::VAR);
 	add_statement(Identifier::ASM, StatementID::ASM);
-	//add_statement(Identifier::RAISE, StatementID::RAISE); NOPE, now it's a function!
+	add_statement(/*Identifier::RAISE*/ "-raise-", StatementID::RAISE, 1); // [EXCEPTION (pointer into static array)]
 	add_statement(Identifier::TRY, StatementID::TRY); // return: ParamType will be defined by the parser!
 	add_statement(Identifier::EXCEPT, StatementID::EXCEPT); // return: ParamType will be defined by the parser!
 	add_statement(Identifier::PASS, StatementID::PASS);

@@ -69,7 +69,12 @@ public:
 
 
 
-	Array<SerialNodeParam> inserted_temp;
+	int cur_block_level = 0;
+	struct SerialNodeParamWithLevel {
+		SerialNodeParam param;
+		int block_level;
+	};
+	Array<SerialNodeParamWithLevel> inserted_temp;
 	void add_cmd_constructor(const SerialNodeParam &param, NodeKind modus);
 	void add_cmd_destructor(const SerialNodeParam &param, bool needs_ref = true);
 

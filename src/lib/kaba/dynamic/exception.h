@@ -10,8 +10,10 @@
 
 #include "../../base/base.h"
 
-namespace kaba
-{
+namespace kaba {
+
+class Module;
+
 
 class KabaException {
 public:
@@ -30,7 +32,19 @@ public:
 	void _cdecl __init__();
 };
 
+class KabaNullPointerError : public KabaException {
+public:
+	KabaNullPointerError();
+};
+
+enum class ErrorID {
+	NONE,
+	OPTIONAL_NO_VALUE,
+	NULL_POINTER
+};
+
 void _cdecl kaba_raise_exception(KabaException *kaba_exception);
+void kaba_die(KabaException* e);
 
 
 

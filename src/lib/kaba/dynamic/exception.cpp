@@ -401,7 +401,7 @@ StackFrameInfo get_current_stack_frame() {
 	return {};
 }
 
-Array<StackFrameInfo> get_stack_trace(void **rbp) {
+Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 	return {};
 }
 

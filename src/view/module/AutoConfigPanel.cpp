@@ -630,7 +630,7 @@ AutoConfigPanel::AutoConfigPanel(Array<AutoConfigData*> &_aa, Module *_c) :
 		set_target("grid");
 		add_label("!right,disabled\\" + a->label, 0, i, format("label-%d", i));
 		add_label(a->unit, 2, i, format("unit-%d", i));
-		a->add_gui(this, i, [a,this]{
+		a->add_gui(this, i, [a=a,this]{
 			a->value_from_gui();
 			changed();
 		});

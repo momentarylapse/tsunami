@@ -26,6 +26,10 @@ enum class AudioViewMode;
 #define NUM_PEAK_LEVELS		24
 #define PEAK_FACTOR			2
 
+#ifdef OVERFLOW
+#undef OVERFLOW
+#endif
+
 
 // gtk/cairo does not like drawing huge images - let's split them into smaller chunks
 struct HorizontallyChunkedImage {

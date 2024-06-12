@@ -10,7 +10,11 @@
 #include "../math/vec2.h"
 #if __has_include("../hui/Painter.h") && (HAS_LIB_GTK3 || HAS_LIB_GTK4)
 #include "../hui/Painter.h"
+#if __has_include(<cairo.h>)
+#include <cairo.h>
+#else
 #include <cairo/cairo.h>
+#endif
 #include <gtk/gtk.h>
 #define HAS_HUI_PAINTER 1
 #endif

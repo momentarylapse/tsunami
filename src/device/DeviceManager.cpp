@@ -6,6 +6,7 @@
  */
 
 #include "DeviceManager.h"
+#include "interface/DeviceContext.h"
 #include "backend-pulseaudio/DeviceContextPulse.h"
 #include "backend-portaudio/DeviceContextPort.h"
 #include "backend-alsa/DeviceContextAlsa.h"

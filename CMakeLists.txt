@@ -745,6 +745,15 @@ else()
 	target_compile_definitions(tsunami PUBLIC HAS_LIB_GL=0)
 endif()
 
+
+if(APPLE)
+	find_library(COREAUDIO_LIBRARY CoreAudio REQUIRED)
+	find_library(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
+	message(STATUS "aaa ok")
+	#list(APPEND DEPS ${GL_LIBRARIES})
+endif(APPLE)
+
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)

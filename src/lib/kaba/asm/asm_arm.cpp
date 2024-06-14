@@ -71,7 +71,7 @@ void arm_init() {
 	registers.clear();
 	for (int i=0; i<16; i++)
 		add_reg(format("r%d", i), r_reg(i), RegGroup::GENERAL, SIZE_32, (RegRoot)((int)RegRoot::R0 + i));
-	for (int i=0; i<32; i++)
+	for (int i=0; i<16; i++)
 		add_reg(format("s%d", i), s_reg(i), RegGroup::VFP, SIZE_32, (RegRoot)((int)RegRoot::S0 + i));
 
 	// create easy to access array

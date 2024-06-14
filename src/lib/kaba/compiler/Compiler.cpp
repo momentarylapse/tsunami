@@ -23,6 +23,10 @@
 #include <dlfcn.h>
 #endif
 
+#if defined(OS_MAC)
+#include <pthread.h>
+#endif
+
 
 #if defined(OS_LINUX) || defined(OS_MAC) // || defined(OS_MINGW)
 	#include <sys/mman.h>
@@ -140,11 +144,13 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 		prot = PAGE_EXECUTE_READWRITE;
 	}
 #elif defined(OS_MAC)
-	msg_error("FIXME: kaba compiler - mmap() parameters for MacOS");
-	int prot = 0;//PROT_READ | PROT_WRITE;
-	int flags = 0;//MAP_PRIVATE | MAP_ANON | MAP_FIXED_NOREPLACE;
-	//if (executable) {
-	//	prot |= PROT_EXEC;
+	//msg_error("FIXME: kaba compiler - mmap() parameters for MacOS");
+	int prot = PROT_READ | PROT_WRITE;
+	int flags = MAP_PRIVATE | MAP_ANON;
+	if (executable) {
+		prot |= PROT_EXEC;
+		flags |= MAP_JIT;
+	}
 #else // OS_LINUX
 	int prot = PROT_READ | PROT_WRITE;
 	int flags = MAP_PRIVATE | MAP_ANON | MAP_FIXED_NOREPLACE;
@@ -691,6 +697,9 @@ void Compiler::_compile() {
 
 	allocate_opcode();
 
+#ifdef OS_MAC
+	pthread_jit_write_protect_np(0);
+#endif
 
 
 // compiling an operating system?
@@ -749,6 +758,9 @@ void Compiler::_compile() {
 	if (config.allow_output_stage("dasm"))
 		msg_write(Asm::disassemble(module->opcode, module->opcode_size));
 
+#ifdef OS_MAC
+	pthread_jit_write_protect_np(1);
+#endif
 
 #ifdef OS_WINDOWS
 	register_functions(module);

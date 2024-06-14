@@ -733,6 +733,9 @@ InstructionSet guess_native_instruction_set() {
 #ifdef CPU_X86
 	return InstructionSet::X86;
 #endif
+#ifdef CPU_ARM64
+	return InstructionSet::ARM64;
+#endif
 #ifdef CPU_ARM32
 	return InstructionSet::ARM;
 #endif

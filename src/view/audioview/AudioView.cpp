@@ -309,6 +309,9 @@ AudioView::~AudioView() {
 
 	session->playback->unsubscribe(this);
 	song->unsubscribe(this);
+
+	// workaround... since we didn't subsribe
+	metronome_overlay_vlayer->layer = nullptr;
 }
 
 void* AudioView::main_view_data() const {

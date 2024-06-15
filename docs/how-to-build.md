@@ -63,11 +63,13 @@ cd <REPOSITORY-ROOT>  # important to run the program from here!
 
 
 
-## Windows
+# Windows
 
 There is experimental support for Visual Studio 2022.
 
-### Preparation: installing gtk4
+*Note:* _so far, only BASIC functionality is working (not much more than audio playback and recording)! All plugins (audio fx, synthesizers etc.) depend on the "kaba" JIT compiler, which is currently not working on windows_
+
+## Preparation: installing gtk4
 
 Follow the steps here: https://github.com/wingtk/gvsbuild
 
@@ -75,7 +77,7 @@ But instead of `gvsbuild build gtk4` run
 
 ```gvsbuild build gtk4 libadwaita adwaita-icon-theme```
 
-### Visual Studio
+## Visual Studio
 
 The project can be opened as a regular cmake project/folder in Visual Studio 2022.
 
@@ -83,4 +85,40 @@ All libraries (apart from `gtk`) are handled via `vcpkg`. This requires the `vcp
 
 Since `CMakePresets.json` and `.vs/launch.vs.json` are provided, you should be able to build and run the program.
 
+
+
+# MacOS
+
+Also experimental support, using `homebrew`, `gtk4` and `portaudio`!
+
+*Note:* _so far, only BASIC functionality is working (not much more than audio playback and recording)! All plugins (audio fx, synthesizers etc.) depend on the "kaba" JIT compiler, which is currently not working on MacOS_
+
+## Preparation: installing libraries
+
+```
+brew install cmake extra-cmake-modules pkg-config ninja
+brew install fftw libogg libvorbis flac
+brew install gtk4 libadwaita portaudio
+```
+
+## Building
+
+```
+# (in the repository root folder)
+mkdir build
+cd build
+ccmake .. -GNinja
+# here, probably press C twice, then G
+ninja
+cd ..
+```
+
+Installing is not supported!
+
+## Running
+
+````
+# (in the repository root folder)
+./build/tsunami
+````
 

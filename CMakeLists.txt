@@ -122,6 +122,8 @@ set(SOURCE
 	src/data/TrackMarker.cpp
 	src/device/backend-alsa/DeviceContextAlsa.cpp
 	src/device/backend-alsa/MidiInputStreamAlsa.cpp
+	src/device/backend-coreaudio/AudioOutputStreamCoreAudio.cpp
+	src/device/backend-coreaudio/DeviceContextCoreAudio.cpp
 	src/device/backend-portaudio/AudioInputStreamPort.cpp
 	src/device/backend-portaudio/AudioOutputStreamPort.cpp
 	src/device/backend-portaudio/DeviceContextPort.cpp
@@ -751,6 +753,7 @@ if(APPLE)
 	find_library(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
 	message(STATUS "aaa ok")
 	#list(APPEND DEPS ${GL_LIBRARIES})
+	target_compile_definitions(tsunami PUBLIC HAS_LIB_COREAUDIO=1)
 endif(APPLE)
 
 

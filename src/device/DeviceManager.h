@@ -46,6 +46,7 @@ public:
 		ALSA,
 		PULSE,
 		PORTAUDIO,
+		COREAUDIO,
 		NUM_APIS
 	};
 	ApiType audio_api;

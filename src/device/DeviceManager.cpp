@@ -10,6 +10,7 @@
 #include "backend-pulseaudio/DeviceContextPulse.h"
 #include "backend-portaudio/DeviceContextPort.h"
 #include "backend-alsa/DeviceContextAlsa.h"
+#include "backend-coreaudio/DeviceContextCoreAudio.h"
 #include "Device.h"
 #include "../Session.h"
 
@@ -19,6 +20,7 @@ Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
+	{"coreaudio", DeviceManager::ApiType::COREAUDIO, 1, HAS_LIB_COREAUDIO},
 	{"dummy", DeviceManager::ApiType::DUMMY, 3, true}
 };
 
@@ -59,6 +61,10 @@ Any devs2any(const Array<Device*>& devices) {
 
 
 DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType api) {
+#if HAS_LIB_COREAUDIO
+	if (api == DeviceManager::ApiType::COREAUDIO)
+		return new DeviceContextCoreAudio(session);
+#endif
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::ApiType::PULSE)
 		return new DeviceContextPulse(session);
@@ -80,6 +86,7 @@ DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType a
 	};
 	return new DeviceContextDummy(session);
 }
+
 
 DeviceManager::DeviceManager(Session *_session) {
 	initialized = false;

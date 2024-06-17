@@ -30,7 +30,7 @@
 
 #if defined(OS_LINUX) || defined(OS_MAC) // || defined(OS_MINGW)
 	#include <sys/mman.h>
-	#if (!defined(__x86_64__)) && (!defined(__amd64__))
+	#if (!defined(__x86_64__) && !defined(__amd64__) && !defined(__ppc64__))
 		#ifndef MAP_32BIT
 		#define MAP_32BIT		0
 		#endif

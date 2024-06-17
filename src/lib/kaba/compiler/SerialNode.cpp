@@ -113,29 +113,29 @@ string SerialNodeParam::str(Serializer *ser) const {
 }
 
 string _cond_str(Asm::ArmCond cond) {
-	if (cond == Asm::ArmCond::EQUAL)
+	if (cond == Asm::ArmCond::Equal)
 		return "eq";
-	if (cond == Asm::ArmCond::NOT_EQUAL)
+	if (cond == Asm::ArmCond::NotEqual)
 		return "ne";
-	if (cond == Asm::ArmCond::LESS_THAN)
+	if (cond == Asm::ArmCond::LessThan)
 		return "lt";
-	if (cond == Asm::ArmCond::LESS_EQUAL)
+	if (cond == Asm::ArmCond::LessEqual)
 		return "le";
-	if (cond == Asm::ArmCond::GREATER_THAN)
+	if (cond == Asm::ArmCond::GreaterThan)
 		return "gt";
-	if (cond == Asm::ArmCond::GREATER_EQUAL)
+	if (cond == Asm::ArmCond::GreaterEqual)
 		return "ge";
-	if (cond == Asm::ArmCond::CARRY_SET)
+	if (cond == Asm::ArmCond::CarrySet)
 		return "carry";
-	if (cond == Asm::ArmCond::CARRY_CLEAR)
+	if (cond == Asm::ArmCond::CarryClear)
 		return "nocarry";
-	if (cond == Asm::ArmCond::NEGATIVE)
+	if (cond == Asm::ArmCond::Negative)
 		return "neg";
-	if (cond == Asm::ArmCond::POSITIVE)
+	if (cond == Asm::ArmCond::Positive)
 		return "pos";
-	if (cond == Asm::ArmCond::OVERFLOW)
+	if (cond == Asm::ArmCond::Overflow)
 		return "over";
-	if (cond == Asm::ArmCond::NO_OVERFLOW)
+	if (cond == Asm::ArmCond::NoOverflow)
 		return "nover";
 	return "?";
 }
@@ -146,7 +146,7 @@ string SerialNode::str(Serializer *ser) const {
 	if (inst == Asm::InstID::ASM)
 		return format("-- Asm %d --", p[0].p);
 	string t;
-	if (cond != Asm::ArmCond::ALWAYS)
+	if (cond != Asm::ArmCond::Always)
 		t += _cond_str(cond) + ":";
 	t += format("%-6s %s", Asm::get_instruction_name(inst), p[0].str(ser));
 	if (p[1].kind != NodeKind::NONE)

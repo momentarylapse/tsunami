@@ -547,7 +547,7 @@ void InstructionWithParamsList::add_arm(ArmCond cond, InstID inst, const Instruc
 void InstructionWithParamsList::add2(InstID inst, const InstructionParam &p1, const InstructionParam &p2) {
 	InstructionWithParams i;
 	i.inst = inst;
-	i.condition = ArmCond::ALWAYS;
+	i.condition = ArmCond::Always;
 	i.p[0] = p1;
 	i.p[1] = p2;
 	i.p[2] = param_none;
@@ -876,7 +876,7 @@ string ARMConditions[16] = {
 
 string InstructionWithParams::str() {
 	string s;
-	if (condition != ArmCond::ALWAYS)
+	if (condition != ArmCond::Always)
 		s += ARMConditions[(int)condition & 0xf] + ":";
 	s += get_instruction_name(inst);
 	s += "  " + p[0].str(false);
@@ -1369,15 +1369,15 @@ void InstructionWithParamsList::append_from_source(const string &_code) {
 
 
 		InstructionWithParams iwp;
-		iwp.condition = ArmCond::ALWAYS;
+		iwp.condition = ArmCond::Always;
 
 		if (cmd.find(":") >= 0) {
-			iwp.condition = ArmCond::UNKNOWN;
+			iwp.condition = ArmCond::Unknown;
 			auto l = cmd.explode(":");
 			for (int i=0; i<16; i++)
 				if (l[0] == ARMConditions[i])
 					iwp.condition = (ArmCond)i;
-			if (iwp.condition == ArmCond::UNKNOWN)
+			if (iwp.condition == ArmCond::Unknown)
 				raise_error("unknown condition: " + l[0]);
 			cmd = l[1];
 		}

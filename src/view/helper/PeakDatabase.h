@@ -26,10 +26,6 @@ enum class AudioViewMode;
 #define NUM_PEAK_LEVELS		24
 #define PEAK_FACTOR			2
 
-#ifdef OVERFLOW
-#undef OVERFLOW
-#endif
-
 
 // gtk/cairo does not like drawing huge images - let's split them into smaller chunks
 struct HorizontallyChunkedImage {
@@ -54,11 +50,11 @@ public:
 	int ticks_since_last_usage;
 
 	enum class State {
-		OK,
-		OUT_OF_SYNC,
-		UPDATE_REQUESTED,
-		UPDATE_FINISHED,
-		OVERFLOW
+		Ok,
+		OutOfSync,
+		UpdateRequested,
+		UpdateFinished,
+		Overflow
 	};
 	std::atomic<State> state;
 

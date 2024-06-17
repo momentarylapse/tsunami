@@ -92,7 +92,7 @@ void PeakThread::on_run() {
 			Thread::cancelation_point();
 
 			for (int i=0; i<n; i++) {
-				if (r->peak_data.peaks_chunk_state(r->buffer, i) == PeakData::State::OUT_OF_SYNC) {
+				if (r->peak_data.peaks_chunk_state(r->buffer, i) == PeakData::State::OutOfSync) {
 					PerformanceMonitor::start_busy(perf_channel);
 					r->peak_data._update_peaks_chunk(r->buffer, i);
 					PerformanceMonitor::end_busy(perf_channel);

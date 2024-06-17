@@ -207,9 +207,9 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 			int nn = min(b.length / PeakData::PEAK_CHUNK_SIZE, p.peaks[pm].num);
 			for (int i=0; i<nn; i++) {
 				const auto state = p.peaks_chunk_state(b, i);
-				if (state != PeakData::State::OK) {
+				if (state != PeakData::State::Ok) {
 					c->set_color(Blue.with_alpha(0.25f));
-					if (state == PeakData::State::OVERFLOW)
+					if (state == PeakData::State::Overflow)
 						c->set_color(Red.with_alpha(0.25f));
 					float xx0 = clamp((float)view->cam.sample2screen(offset + i*PeakData::PEAK_CHUNK_SIZE), x0, x1);
 					float xx1 = clamp((float)view->cam.sample2screen(offset + (i+1)*PeakData::PEAK_CHUNK_SIZE), x0, x1);

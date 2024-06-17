@@ -48,7 +48,7 @@ bool buffer_had_simple_change(const AudioBuffer& buf, int version) {
 
 PeakData::PeakData(AudioBuffer& b, AudioViewMode m) : buffer(&b) {
 	version = b.version;
-	state = State::OUT_OF_SYNC;
+	state = State::OutOfSync;
 	mode = m;
 	ticks_since_last_usage = 0;
 }
@@ -81,18 +81,18 @@ PeakData::State PeakData::peaks_chunk_state(const AudioBuffer& buffer, int index
 //		return true;
 	int pm = PEAK_MAGIC_LEVEL2 * buffer.channels;
 	if (peaks.num <= pm)
-		return State::OUT_OF_SYNC;
+		return State::OutOfSync;
 	if (index >= peaks[pm].num)
-		return State::OUT_OF_SYNC;
+		return State::OutOfSync;
 	if (peaks[pm][index] == PEAK_VALUE_UNKNOWN)
-		return State::OUT_OF_SYNC;
+		return State::OutOfSync;
 	if (peaks[pm][index] == PEAK_VALUE_OVERFLOW)
-		return State::OVERFLOW;
-	return State::OK;
+		return State::Overflow;
+	return State::Ok;
 }
 
 bool PeakData::has_spectrum() {
-	if (state != State::OK)
+	if (state != State::Ok)
 		return false;
 	return true;
 }
@@ -313,7 +313,7 @@ PeakData& PeakDatabase::acquire(AudioBuffer &b, AudioViewMode mode) {
 
 	if (p.version != b.version) {
 		dbo(format("%x   V  %x != %x", b.uid, p->version, b.version));
-		p.state = PeakData::State::OUT_OF_SYNC;
+		p.state = PeakData::State::OutOfSync;
 		if (buffer_had_simple_change(b, p.version)) {
 			update_peaks_now(b);
 		}
@@ -327,15 +327,15 @@ void PeakDatabase::release(PeakData& p) {
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
 	auto &p = _get(buf, AudioViewMode::PEAKS);
-	if (p.state == PeakData::State::OUT_OF_SYNC) {
+	if (p.state == PeakData::State::OutOfSync) {
 
 		int n = p._update_peaks_prepare(buf);
 		for (int i=0; i<n; i++)
-			if (p.peaks_chunk_state(buf, i) == PeakData::State::OUT_OF_SYNC)
+			if (p.peaks_chunk_state(buf, i) == PeakData::State::OutOfSync)
 				p._update_peaks_chunk(buf, i);
 
 		p.peak_length = buf.length;
-		p.state = PeakData::State::OK;
+		p.state = PeakData::State::Ok;
 		p.version = buf.version;
 	}
 }
@@ -353,7 +353,7 @@ void PeakDatabase::iterate_items(Map& map) {
 			dbo("DELETING OLD PEAKS... " + p2s(p));
 			delete p;
 			to_drop.add(uid);
-		} else if (p->state == PeakData::State::OUT_OF_SYNC) {
+		} else if (p->state == PeakData::State::OutOfSync) {
 			if (requests.size() >= 4)
 				continue;
 
@@ -364,7 +364,7 @@ void PeakDatabase::iterate_items(Map& map) {
 			// TODO new data structure allowing incremental updates / chunks
 			r->buffer = *p->buffer;
 
-			p->state = PeakData::State::UPDATE_REQUESTED;
+			p->state = PeakData::State::UpdateRequested;
 			p->version = p->buffer->version;
 			dbo(format("+ peak request  %s %x  %x", p2s(p), p->buffer->uid, p->version));
 			requests.add(r);
@@ -385,14 +385,14 @@ void PeakDatabase::process_replies() {
 				auto& p = peak_data[r->uid];
 				p->peaks.exchange(r->peak_data.peaks);
 				p->peak_length = p->buffer->length; // FIXME!!!!
-				p->state = PeakData::State::OK;
+				p->state = PeakData::State::Ok;
 			}
 		} else if (r->peak_data.mode == AudioViewMode::SPECTRUM) {
 			if (spectrogram_data.contains(r->uid)) {
 				auto& p = spectrogram_data[r->uid];
 				p->spectrogram.exchange(r->peak_data.spectrogram);
 				p->image = r->image;
-				p->state = PeakData::State::OK;
+				p->state = PeakData::State::Ok;
 			}
 		}
 		delete r;

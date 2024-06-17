@@ -351,27 +351,23 @@ enum class InstID {
 	INVALID = -1
 };
 
-#ifdef OVERFLOW
-#undef OVERFLOW
-#endif
-
 enum class ArmCond {
-	EQUAL,
-	NOT_EQUAL,
-	CARRY_SET,
-	CARRY_CLEAR,
-	NEGATIVE,
-	POSITIVE,
-	OVERFLOW,
-	NO_OVERFLOW,
-	UNSIGNED_HIGHER,
-	UNSIGNED_LOWER_SAME,
-	GREATER_EQUAL,
-	LESS_THAN,
-	GREATER_THAN,
-	LESS_EQUAL,
-	ALWAYS,
-	UNKNOWN = -1,
+	Equal,
+	NotEqual,
+	CarrySet,
+	CarryClear,
+	Negative,
+	Positive,
+	Overflow,
+	NoOverflow,
+	UnsignedHigher,
+	UnsignedLowerSame,
+	GreaterEqual,
+	LessThan,
+	GreaterThan,
+	LessEqual,
+	Always,
+	Unknown = -1,
 };
 
 const string get_instruction_name(InstID inst);

@@ -131,19 +131,19 @@ void CommandList::add_cmd(Asm::ArmCond cond, Asm::InstID inst, const SerialNodeP
 }
 
 void CommandList::add_cmd(Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3) {
-	add_cmd(Asm::ArmCond::ALWAYS, inst, p1, p2, p3);
+	add_cmd(Asm::ArmCond::Always, inst, p1, p2, p3);
 }
 
 void CommandList::add_cmd(Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2) {
-	add_cmd(Asm::ArmCond::ALWAYS, inst, p1, p2, p_none);
+	add_cmd(Asm::ArmCond::Always, inst, p1, p2, p_none);
 }
 
 void CommandList::add_cmd(Asm::InstID inst, const SerialNodeParam &p) {
-	add_cmd(Asm::ArmCond::ALWAYS, inst, p, p_none, p_none);
+	add_cmd(Asm::ArmCond::Always, inst, p, p_none, p_none);
 }
 
 void CommandList::add_cmd(Asm::InstID inst) {
-	add_cmd(Asm::ArmCond::ALWAYS, inst, p_none, p_none, p_none);
+	add_cmd(Asm::ArmCond::Always, inst, p_none, p_none, p_none);
 }
 
 void CommandList::next_cmd_target(int index) {

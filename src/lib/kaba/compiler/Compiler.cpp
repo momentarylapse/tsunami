@@ -25,6 +25,7 @@
 
 #if defined(OS_MAC)
 #include <pthread.h>
+#include <AvailabilityMacros.h>
 #endif
 
 
@@ -149,7 +150,9 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 	int flags = MAP_PRIVATE | MAP_ANON;
 	if (executable) {
 		prot |= PROT_EXEC;
+	#if MAC_OS_X_VERSION_MIN_REQUIRED >= 1070
 		flags |= MAP_JIT;
+	#endif
 	}
 #else // OS_LINUX
 	int prot = PROT_READ | PROT_WRITE;
@@ -698,7 +701,9 @@ void Compiler::_compile() {
 	allocate_opcode();
 
 #ifdef OS_MAC
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
 	pthread_jit_write_protect_np(0);
+#endif
 #endif
 
 
@@ -759,7 +764,9 @@ void Compiler::_compile() {
 		msg_write(Asm::disassemble(module->opcode, module->opcode_size));
 
 #ifdef OS_MAC
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
 	pthread_jit_write_protect_np(1);
+#endif
 #endif
 
 #ifdef OS_WINDOWS

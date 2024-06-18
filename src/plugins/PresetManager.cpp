@@ -123,14 +123,14 @@ void PresetManager::make_usable(Session *session) {
 }
 
 void PresetManager::load(Session *session) {
-	if (os::fs::exists(tsunami->directory | "profiles.xml")) {
+	if (os::fs::exists(Tsunami::directory | "profiles.xml")) {
 		// convert from legacy
-		load_from_file_old(tsunami->directory | "profiles.xml", false, session);
+		load_from_file_old(Tsunami::directory | "profiles.xml", false, session);
 		save(session);
-		os::fs::_delete(tsunami->directory | "profiles.xml");
+		os::fs::_delete(Tsunami::directory | "profiles.xml");
 	} else {
-		load_from_file(tsunami->directory_static | "presets-demo.xml", true, session);
-		load_from_file(tsunami->directory | "presets.xml", false, session);
+		load_from_file(Tsunami::directory_static | "presets-demo.xml", true, session);
+		load_from_file(Tsunami::directory | "presets.xml", false, session);
 		save(session);
 	}
 	loaded = true;
@@ -188,7 +188,7 @@ void PresetManager::save(Session *session) {
 		root.add(tt);
 
 		p.elements.add(root);
-		p.save(tsunami->directory | "presets.xml");
+		p.save(Tsunami::directory | "presets.xml");
 	} catch (Exception &e) {
 		session->e(e.message());
 	}

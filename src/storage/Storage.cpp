@@ -209,11 +209,11 @@ base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 
 Path Storage::temp_saving_file(const string &ext) {
 	for (int i = 0; i < 1000; i++) {
-		Path p = (tsunami->directory | format("-temp-saving-%03d-.", i)).with(ext);
+		Path p = (Tsunami::directory | format("-temp-saving-%03d-.", i)).with(ext);
 		if (!os::fs::exists(p))
 			return p;
 	}
-	return (tsunami->directory | "-temp-saving-.").with(ext);
+	return (Tsunami::directory | "-temp-saving-.").with(ext);
 }
 
 // safety: first write to temp file, then (if successful) move

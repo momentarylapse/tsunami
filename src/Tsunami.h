@@ -47,9 +47,9 @@ public:
 	owned<PluginManager> plugin_manager;
 	owned<Clipboard> clipboard;
 	owned<PerformanceMonitor> perf_mon;
+
+	static Tsunami* instance;
 };
 
-
-extern Tsunami *tsunami;
 
 #endif /* TSUNAMI_H_ */

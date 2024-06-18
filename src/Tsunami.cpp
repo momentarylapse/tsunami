@@ -42,7 +42,7 @@ const string AppName = "Tsunami";
 const string AppVersion = "0.7.115.0";
 const string AppNickname = "absolute 2er0";
 
-Tsunami *tsunami = nullptr;
+Tsunami *Tsunami::instance = nullptr;
 
 bool ugly_hack_slow = false;
 
@@ -83,7 +83,7 @@ hui::AppStatus Tsunami::on_startup(const Array<string> &arg) {
 }
 
 hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
-	tsunami = this;
+	instance = this;
 
 	ErrorHandler::init();
 

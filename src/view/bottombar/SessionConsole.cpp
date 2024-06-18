@@ -16,7 +16,7 @@ void load_backup(Session *session_caller, const Path &filename) {
 	if (!filename)
 		return;
 	Storage::options_in = "format:f32,channels:2,samplerate:44100";
-	Session *session = tsunami->session_manager->get_empty_session(session_caller);
+	Session *session = Tsunami::instance->session_manager->get_empty_session(session_caller);
 	session->win->show();
 	session->storage->load(session->song.get(), filename);
 	Storage::options_in = "";
@@ -40,11 +40,11 @@ SessionConsole::SessionConsole(Session *s, BottomBar *bar) :
 	event(id_list, [this] { on_list_double_click(); });
 	event_x(id_list, "hui:right-button-down", [this] { on_right_click(); });
 
-	tsunami->session_manager->out_changed >> create_sink([this] { load_data(); });
+	Tsunami::instance->session_manager->out_changed >> create_sink([this] { load_data(); });
 }
 
 SessionConsole::~SessionConsole() {
-	tsunami->session_manager->unsubscribe(this);
+	Tsunami::instance->session_manager->unsubscribe(this);
 }
 
 void SessionConsole::on_load() {
@@ -55,7 +55,7 @@ void SessionConsole::on_load() {
 	if (l.is_recent())
 		session->win->load_song_with_session(l.filename);
 	else if (l.is_persistent())
-		tsunami->session_manager->load_session(l.filename, session);
+		Tsunami::instance->session_manager->load_session(l.filename, session);
 	else if (l.is_backup())
 		load_backup(session, l.filename);
 }
@@ -68,7 +68,7 @@ void SessionConsole::on_save() {
 	if (!l.is_active())
 		return;
 
-	tsunami->session_manager->save_session(l.session);
+	Tsunami::instance->session_manager->save_session(l.session);
 
 	/*QuestionDialogString::ask(win, _("Session name")).then([this, s=l.session] (const string& name) {
 		if (tsunami->session_manager->session_exists(name))
@@ -92,9 +92,9 @@ void SessionConsole::on_delete() {
 				BackupManager::delete_old(l.uuid);
 
 				// TODO: make BackupManager observable :P
-				tsunami->session_manager->out_changed.notify();
+				Tsunami::instance->session_manager->out_changed.notify();
 			} else if (l.is_persistent()) {
-				tsunami->session_manager->delete_saved_session(l.filename);
+				Tsunami::instance->session_manager->delete_saved_session(l.filename);
 			}
 		}
 	});
@@ -120,7 +120,7 @@ void SessionConsole::on_right_click() {
 }
 
 void SessionConsole::load_data() {
-	session_labels = tsunami->session_manager->enumerate_all_sessions();
+	session_labels = Tsunami::instance->session_manager->enumerate_all_sessions();
 	reset(id_list);
 	auto description = [this] (const SessionLabel& l) -> string {
 		if (l.is_active() and l.is_persistent()) {

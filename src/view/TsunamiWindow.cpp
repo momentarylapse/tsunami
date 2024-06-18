@@ -72,7 +72,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	session = _session;
 	session->set_win(this);
 	song = session->song.get();
-	app = tsunami;
+	app = Tsunami::instance;
 
 	int width = hui::config.get_int("Window.Width", 800);
 	int height = hui::config.get_int("Window.Height", 600);
@@ -388,7 +388,7 @@ TsunamiWindow::~TsunamiWindow() {
 
 	auto _session = session;
 	hui::run_later(0.010f, [_session] {
-		tsunami->session_manager->end_session(_session);
+		Tsunami::instance->session_manager->end_session(_session);
 	});
 }
 
@@ -945,7 +945,7 @@ void TsunamiWindow::on_open() {
 }
 
 void TsunamiWindow::load_song_with_session(const Path& filename) {
-	auto *s = tsunami->session_manager->get_empty_session(session);
+	auto *s = Tsunami::instance->session_manager->get_empty_session(session);
 	if (s->session_manager->try_restore_session(s, filename)) {
 		BackupManager::set_save_state(s);
 	} else {
@@ -954,7 +954,7 @@ void TsunamiWindow::load_song_with_session(const Path& filename) {
 		});
 	}
 	/*} else {
-		auto *s = tsunami->session_manager->spawn_new_session();
+		auto *s = Tsunami::instance->session_manager->spawn_new_session();
 		s->win->show();
 		if (s->storage->load(s->song.get(), filename))
 			s->session_manager->try_restore_matching_session(s);

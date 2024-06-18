@@ -22,8 +22,8 @@ Path BackupManager::get_filename(const string &extension) {
 	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
-		if (!os::fs::exists(tsunami->directory | fn))
-			return tsunami->directory | fn;
+		if (!os::fs::exists(Tsunami::directory | fn))
+			return Tsunami::directory | fn;
 	}
 	return "";
 }
@@ -44,13 +44,13 @@ void BackupManager::check_old_files() {
 	_clear_old();
 
 	// update list
-	auto _files = os::fs::search(tsunami->directory, "backup-*", "f");
+	auto _files = os::fs::search(Tsunami::directory, "backup-*", "f");
 	for (auto &f: _files) {
 		BackupFile bf;
 		bf.uuid = next_uuid ++;
 		bf.session = nullptr;
 		bf.f = nullptr;
-		bf.filename = tsunami->directory | f;
+		bf.filename = Tsunami::directory | f;
 		files.add(bf);
 	}
 }

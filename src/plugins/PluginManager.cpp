@@ -164,9 +164,9 @@ void PluginManager::link_app_data() {
 	auto ext = kaba::default_context->external.get();
 
 	// api definition
-	ext->link("device_manager", &tsunami->device_manager);
+	ext->link("device_manager", &Tsunami::instance->device_manager);
 	ext->link("theme", &theme);
-	ext->link("clipboard", &tsunami->clipboard);
+	ext->link("clipboard", &Tsunami::instance->clipboard);
 	//ext->link("view_input", &export_view_input);
 	ext->link("db2amp", (void*)&db2amplitude);
 	ext->link("amp2db", (void*)&amplitude2db);
@@ -448,7 +448,7 @@ void PluginManager::link_app_data() {
 
 	{
 		shared<Sample> sample = new Sample(SignalType::AUDIO);
-		//sample.owner = tsunami->song;
+		//sample.owner = Tsunami::instance->song;
 		SampleRef sampleref(sample.get());
 		ext->declare_class_size("SampleRef", sizeof(SampleRef));
 		ext->link_class_func("SampleRef.buf", &SampleRef::buf);
@@ -1119,14 +1119,14 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleCategory type, const s
 }
 
 Path PluginManager::plugin_dir_static() {
-	if (tsunami->installed)
-		return tsunami->directory_static | "plugins";
+	if (Tsunami::installed)
+		return Tsunami::directory_static | "plugins";
 	return "plugins";
 }
 
 Path PluginManager::plugin_dir_local() {
-	if (tsunami->installed)
-		return tsunami->directory | "plugins";
+	if (Tsunami::installed)
+		return Tsunami::directory | "plugins";
 	return "plugins";
 }
 

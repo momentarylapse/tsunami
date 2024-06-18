@@ -137,7 +137,8 @@ void SessionManager::load_session_map_legacy() {
 }
 
 Session *SessionManager::spawn_new_session() {
-	Session *session = new Session(tsunami->log.get(), tsunami->device_manager.get(), tsunami->plugin_manager.get(), this, tsunami->perf_mon.get());
+	auto t = Tsunami::instance;
+	Session *session = new Session(t->log.get(), t->device_manager.get(), t->plugin_manager.get(), this, t->perf_mon.get());
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 
@@ -167,7 +168,7 @@ void SessionManager::end_session(Session *session) {
 	});
 
 	if (active_sessions.num == 0)
-		tsunami->end();
+		Tsunami::end();
 }
 
 string midi_mode_str(MidiMode m) {

@@ -51,7 +51,7 @@ NewSongDialog::NewSongDialog(hui::Window *_parent):
 
 void NewSongDialog::on_ok() {
 	int sample_rate = get_string("sample-rate")._int();
-	Session *session = tsunami->session_manager->spawn_new_session();
+	Session *session = Tsunami::instance->session_manager->spawn_new_session();
 	Song *song = session->song.get();
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);

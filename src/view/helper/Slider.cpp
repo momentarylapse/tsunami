@@ -18,7 +18,7 @@ Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id
 	value_max_slider = 1;
 	factor = 1;
 	value = 0;
-	mode = Mode::LINEAR;
+	mode = Mode::Linear;
 
 	if (panel) {
 		event_handler_id[0] = panel->event(id_slider, [this] { on_slide(); });
@@ -74,9 +74,9 @@ void Slider::set(float v) {
 
 
 void Slider::set_slide(float v) {
-	if (mode == Mode::EXPONENTIAL)
+	if (mode == Mode::Exponential)
 		panel->set_float(id_slider, (log(value) - log(value_min_slider)) / (log(value_max_slider) - log(value_min_slider)));
-	else if (mode == Mode::SQUARE)
+	else if (mode == Mode::Square)
 		panel->set_float(id_slider, (sqrt(value) - sqrt(value_min_slider)) / (sqrt(value_max_slider) - sqrt(value_min_slider)));
 	else
 		panel->set_float(id_slider, (value - value_min_slider) / (value_max_slider - value_min_slider));
@@ -100,9 +100,9 @@ void Slider::enable(bool enabled) {
 
 
 void Slider::on_slide() {
-	if (mode == Mode::EXPONENTIAL)
+	if (mode == Mode::Exponential)
 		value = value_min_slider + exp(panel->get_float(id_slider)) * (value_max_slider - value_min_slider);
-	else if (mode == Mode::SQUARE)
+	else if (mode == Mode::Square)
 		value = value_min_slider + sqr(panel->get_float(id_slider)) * (value_max_slider - value_min_slider);
 	else
 		value = value_min_slider + panel->get_float(id_slider) * (value_max_slider - value_min_slider);

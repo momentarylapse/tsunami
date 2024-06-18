@@ -49,7 +49,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 	int offset = view->get_playback_selection(true).offset;
 	for (auto &d: data) {
 		auto *l = view->get_layer(d.track->layers[0].get());
-		if (d.type() == SignalType::AUDIO) {
+		if (d.type() == SignalType::Audio) {
 			auto *rec = d.audio_recorder();
 
 			//view->buffer_painter->set_context(l->area, l->vtrack()->audio_mode);
@@ -59,7 +59,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			view->peak_database->update_peaks_now(rec->buffer);
 			view->buffer_painter->draw_buffer(c, rec->buffer, offset);
-		} else if (d.type() == SignalType::MIDI) {
+		} else if (d.type() == SignalType::Midi) {
 			auto *rec = d.midi_recorder();
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			l->draw_midi(c, midi_events_to_notes(rec->buffer), true, offset);

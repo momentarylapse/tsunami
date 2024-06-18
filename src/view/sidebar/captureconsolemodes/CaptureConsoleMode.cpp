@@ -94,9 +94,9 @@ void CaptureConsoleMode::update_data_from_items() {
 
 Device* CaptureConsoleMode::get_source(SignalType type, int i) {
 	if (i >= 0) {
-		if (type == SignalType::AUDIO)
+		if (type == SignalType::Audio)
 			return sources_audio[i];
-		if (type == SignalType::MIDI)
+		if (type == SignalType::Midi)
 			return sources_midi[i];
 	}
 	return nullptr;
@@ -111,7 +111,7 @@ void CaptureConsoleMode::update_device_list() {
 
 	for (auto &c: items()) {
 		auto sources = sources_audio;
-		if (c.track->type == SignalType::MIDI)
+		if (c.track->type == SignalType::Midi)
 			sources = sources_midi;
 
 		// add all

@@ -26,7 +26,7 @@ void CaptureConsoleModeMulti::enter() {
 
 	// target list multi
 	for (Track *t: weak(song->tracks)) {
-		if ((t->type != SignalType::AUDIO) and (t->type != SignalType::MIDI))
+		if ((t->type != SignalType::Audio) and (t->type != SignalType::Midi))
 			continue;
 		if (!view->sel.has(t))
 			continue;
@@ -49,11 +49,11 @@ void CaptureConsoleModeMulti::enter() {
 		cc->add_check_box("!switch", 0, 0, c.id_active);
 		cc->set_tooltip(c.id_active, _("Enable recording for this track?"));
 
-		if (t->type == SignalType::AUDIO) {
+		if (t->type == SignalType::Audio) {
 			cc->add_combo_box("", 1, 0, c.id_source);
 			cc->add_button("C", 2, 0, c.id_mapper);
 			cc->set_tooltip(c.id_mapper, _("Channel map..."));
-		} else if (t->type == SignalType::MIDI) {
+		} else if (t->type == SignalType::Midi) {
 			cc->add_combo_box("", 1, 0, c.id_source);
 		}
 		cc->set_tooltip(c.id_source, _("Source device"));

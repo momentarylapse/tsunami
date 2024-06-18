@@ -192,14 +192,14 @@ void FormatMidi::load_song(StorageOperationData *od) {
 				int bar_samples = next_bar_end_sample - od->song->bars.range().end();
 
 				auto b = BarPattern(bar_samples, s.numerator, max(s.denominator / 4, 1));
-				od->song->add_bar(-1, b, false);
+				od->song->add_bar(-1, b, BarEditMode::Ignore);
 				dbo("--add bar " + od->song->bars.back()->range().str());
 				cur_tick += bar_ticks;
 			}
 		};
 
 
-		od->song->add_track(SignalType::BEATS);
+		od->song->add_track(SignalType::Beats);
 
 		int max_ticks = 0;
 
@@ -321,7 +321,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 			if ((events.num > 0) or (i > 0)) {
 				Array<int> keys = events.keys();
 				for (int k : keys) {
-					Track *t = od->song->add_track(SignalType::MIDI);
+					Track *t = od->song->add_track(SignalType::Midi);
 					t->layers[0]->midi = midi_events_to_notes(events[k]);
 					t->name = track_name;
 				}
@@ -345,7 +345,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 
 		int num_tracks = 0;
 		for (Track *t: weak(od->song->tracks))
-			if (t->type == SignalType::MIDI)
+			if (t->type == SignalType::Midi)
 				num_tracks ++;
 		int ticks_per_beat = 960;
 		// heaer
@@ -358,7 +358,7 @@ void FormatMidi::save_song(StorageOperationData* od) {
 		int usec_per_beat = 500000; // micro s/beat = 120 beats/min;
 		bool first_track = true;
 		for (Track* t : weak(od->song->tracks)) {
-			if (t->type != SignalType::MIDI)
+			if (t->type != SignalType::Midi)
 				continue;
 			write_chunk_name(f, "MTrk");
 			int pos0 = f->pos();

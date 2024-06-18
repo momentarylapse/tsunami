@@ -118,7 +118,7 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 
 	sample_offset = -1;
 
-	song->add_track(SignalType::AUDIO);
+	song->add_track(SignalType::Audio);
 
 	try {
 		f = os::fs::open(od->filename, "rb");
@@ -369,7 +369,7 @@ void FormatSoundFont2::read_samples(Stream *f) {
 		char *data = new char[num_samples*2];
 		f->read(data, num_samples*2);
 		buf.resize(num_samples);
-		buf.import(data, 1, SampleFormat::INT_16, num_samples);// / 2);
+		buf.import(data, 1, SampleFormat::Int16, num_samples);// / 2);
 		Sample *sample = song->create_sample_audio(s.name, buf);
 		delete[] data;
 

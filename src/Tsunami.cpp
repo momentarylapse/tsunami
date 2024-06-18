@@ -154,7 +154,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 				Storage::options_out = "";
 			} else {
 				// new file
-				session->song->add_track(SignalType::AUDIO_MONO);
+				session->song->add_track(SignalType::AudioMono);
 
 				// default tags
 				session->song->add_tag("title", _("New Audio File"));

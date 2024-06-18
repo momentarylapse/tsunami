@@ -39,10 +39,10 @@ int get_layer_index(TrackLayer *layer) {
 }
 
 SignalType effective_type(Track *t) {
-	if (t->type == SignalType::AUDIO and t->channels == 1)
-		return SignalType::AUDIO_MONO;
-	if (t->type == SignalType::AUDIO and t->channels == 2)
-		return SignalType::AUDIO_STEREO;
+	if (t->type == SignalType::Audio and t->channels == 1)
+		return SignalType::AudioMono;
+	if (t->type == SignalType::Audio and t->channels == 2)
+		return SignalType::AudioStereo;
 	return t->type;
 }
 

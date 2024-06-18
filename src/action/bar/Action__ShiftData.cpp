@@ -16,7 +16,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <assert.h>
 
-Action__ShiftData::Action__ShiftData(int _offset, int _shift, int _mode) {
+Action__ShiftData::Action__ShiftData(int _offset, int _shift, BarEditMode _mode) {
 	offset = _offset;
 	shift = _shift;
 	mode = _mode;

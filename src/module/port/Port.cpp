@@ -47,15 +47,15 @@ int OutPort::read_beats(Array<Beat> &beats, int samples) {
 }
 
 AudioOutPort::AudioOutPort(Module *module, const string &name) :
-		OutPort(module, SignalType::AUDIO, name) {
+		OutPort(module, SignalType::Audio, name) {
 }
 
 MidiOutPort::MidiOutPort(Module *module, const string &name) :
-		OutPort(module, SignalType::MIDI, name) {
+		OutPort(module, SignalType::Midi, name) {
 }
 
 BeatsOutPort::BeatsOutPort(Module *module, const string &name) :
-		OutPort(module, SignalType::BEATS, name) {
+		OutPort(module, SignalType::Beats, name) {
 }
 
 InPort::InPort(Module* module, SignalType _type, const string& _name) {
@@ -71,13 +71,13 @@ void InPort::disconnect() {
 }
 
 AudioInPort::AudioInPort(Module* module, const string& name) :
-		InPort(module, SignalType::AUDIO, name) {
+		InPort(module, SignalType::Audio, name) {
 }
 
 MidiInPort::MidiInPort(Module* module, const string& name) :
-		InPort(module, SignalType::MIDI, name) {
+		InPort(module, SignalType::Midi, name) {
 }
 
 BeatsInPort::BeatsInPort(Module* module, const string& name) :
-		InPort(module, SignalType::BEATS, name) {
+		InPort(module, SignalType::Beats, name) {
 }

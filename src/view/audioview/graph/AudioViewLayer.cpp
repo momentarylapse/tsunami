@@ -234,11 +234,11 @@ void AudioViewLayer::draw_sample(Painter *c, SampleRef *s) {
 	draw_sample_frame(c, s, col, 0);
 
 	// buffer
-	if (s->type() == SignalType::AUDIO) {
+	if (s->type() == SignalType::Audio) {
 		view->buffer_painter->set_context(area, vtrack()->audio_mode);
 		view->buffer_painter->set_color(col, background_color());
 		view->buffer_painter->draw_buffer(c, s->buf(), s->pos);
-	} else if (s->type() == SignalType::MIDI) {
+	} else if (s->type() == SignalType::Midi) {
 		draw_midi(c, s->midi(), true, s->pos);
 	}
 }
@@ -472,7 +472,7 @@ void AudioViewLayer::on_draw(Painter *c) {
 
 	Track *t = layer->track;
 
-	if (layer->type == SignalType::BEATS) {
+	if (layer->type == SignalType::Beats) {
 		view->grid_painter->set_context(area, grid_colors());
 		if (t->song->bars.num > 0)
 			view->grid_painter->draw_bar_numbers(c);
@@ -483,7 +483,7 @@ void AudioViewLayer::on_draw(Painter *c) {
 	c->set_clip(area and c->area());
 
 	// midi
-	if (layer->type == SignalType::MIDI)
+	if (layer->type == SignalType::Midi)
 		draw_midi(c, layer->midi, false, 0);
 
 	// audio buffer
@@ -657,7 +657,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	}
 
 	// bars
-	if (layer->track->type == SignalType::BEATS) {
+	if (layer->track->type == SignalType::Beats) {
 
 		// bars
 		auto bars = view->song->bars.get_bars(Range::to(s.pos, Range::END));

@@ -35,16 +35,16 @@ void Clipboard::clear() {
 }
 
 void Clipboard::_copy_append_track(TrackLayer *source, AudioView *view, int offset) {
-	if (source->type == SignalType::BEATS)
+	if (source->type == SignalType::Beats)
 		return;
 
 	TrackLayer *target = temp->add_track(source->type)->layers[0].get();
 
-	if (source->type == SignalType::AUDIO) {
+	if (source->type == SignalType::Audio) {
 		AudioBuffer buf;
 		target->buffers.add(buf);
 		source->read_buffers(target->buffers[0], view->sel.range(), false);
-	} else if (source->type == SignalType::MIDI) {
+	} else if (source->type == SignalType::Midi) {
 		target->midi = source->midi.get_notes_by_selection(view->sel).duplicate(-offset);
 		target->midi.samples = view->sel.range().length;
 		target->midi.sanify(view->sel.range());
@@ -124,13 +124,13 @@ void Clipboard::copy(AudioView *view) {
 
 void Clipboard::paste_track(TrackLayer *source, TrackLayer *target, int offset) {
 	offset -= temp_offset;
-	if (target->type == SignalType::AUDIO) {
+	if (target->type == SignalType::Audio) {
 		Range r = Range(offset, source->buffers[0].length);
 		AudioBuffer buf;
 		auto *a = target->edit_buffers(buf, r);
 		buf.set(source->buffers[0], 0, 1.0f);
 		target->edit_buffers_finish(a);
-	} else if (target->type == SignalType::MIDI) {
+	} else if (target->type == SignalType::Midi) {
 		for (MidiNote *n: weak(source->midi))
 			target->add_midi_note(n->copy(offset));
 	}
@@ -146,11 +146,11 @@ void Clipboard::paste_track_as_samples(TrackLayer *source, int source_index, Tra
 	if (ref) {
 		target->add_sample_ref(offset, ref);
 	} else {
-		if (target->type == SignalType::AUDIO) {
+		if (target->type == SignalType::Audio) {
 			MidiNoteBuffer midi;
 			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, offset, source->buffers[0], true));
 			ref_uid[source_index] = sample->uid;
-		} else if (target->type == SignalType::MIDI) {
+		} else if (target->type == SignalType::Midi) {
 			Sample *sample = (Sample*)s->execute(new ActionTrackPasteAsSample(target, offset, source->midi, true));
 			ref_uid[source_index] = sample->uid;
 		}
@@ -163,7 +163,7 @@ bool Clipboard::prepare_layer_map(AudioView *view, Array<TrackLayer*> &source_li
 		for (TrackLayer *l: weak(t->layers)) {
 			if (!view->sel.has(l))
 				continue;
-			if (l->type == SignalType::BEATS)
+			if (l->type == SignalType::Beats)
 				continue;
 			target_list.add(l);
 			dest_type.add(signal_type_name(l->type));
@@ -242,7 +242,7 @@ void Clipboard::paste_insert_time(AudioView *view) {
 
 	//if (temp->bars.num )
 	for (Bar *b: weak(temp->bars))
-		s->add_bar(index ++, *b, Bar::EditMode::INSERT_SILENCE);
+		s->add_bar(index ++, *b, BarEditMode::InsertSilence);
 
 	paste(view);
 
@@ -295,7 +295,7 @@ void Clipboard::paste_aligned_to_beats(AudioView *view) {
 	};
 
 	auto paste_layer = [this, remap] (int offset, TrackLayer *source, TrackLayer *dest) {
-		if (dest->type != SignalType::MIDI)
+		if (dest->type != SignalType::Midi)
 			return;
 
 		for (auto n: source->midi) {

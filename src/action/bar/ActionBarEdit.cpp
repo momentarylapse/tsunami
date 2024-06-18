@@ -19,7 +19,7 @@
 #include "../track/buffer/ActionTrack__ShrinkBuffer.h"
 #include <assert.h>
 
-ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, int _mode) {
+ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, BarEditMode _mode) {
 	index = _index;
 	length = b.length;
 	divisor = b.divisor;
@@ -34,8 +34,8 @@ void ActionBarEdit::build(Data *d) {
 	float scale_factor = (float)length / (float)r.length;
 
 	add_sub_action(new ActionBar__Edit(index, length, beats, divisor), d);
-	if (mode != Bar::EditMode::IGNORE) {
-		bool scale_audio = (mode == Bar::EditMode::STRETCH_AND_SCALE_AUDIO);
+	if (mode != BarEditMode::Ignore) {
+		bool scale_audio = (mode == BarEditMode::StretchAndScaleAudio);
 
 		if (scale_audio) {
 			for (auto t: weak(s->tracks))

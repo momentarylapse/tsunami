@@ -227,7 +227,7 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _av
 	track_data.clear();
 
 	foreachi (Track* t, weak(song->tracks), ti) {
-		if (t->type != SignalType::MIDI)
+		if (t->type != SignalType::Midi)
 			continue;
 
 		Any at;

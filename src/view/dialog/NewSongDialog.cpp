@@ -25,7 +25,7 @@ NewSongDialog::NewSongDialog(hui::Window *_parent):
 	set_int("sample-rate", POSSIBLE_SAMPLE_RATES.find(DEFAULT_SAMPLE_RATE));
 	expand("metro-revealer", false);
 
-	on_type(SignalType::AUDIO);
+	on_type(SignalType::Audio);
 
 	check("channels:mono", true);
 
@@ -39,9 +39,9 @@ NewSongDialog::NewSongDialog(hui::Window *_parent):
 	event("hui:close", [this] { request_destroy(); });
 	event("ok", [this] { on_ok(); });
 	event("metronome", [this] { on_metronome(); });
-	event("type-audio", [this] { on_type(SignalType::AUDIO); });
-	//event("type-audio-stereo", [this] { on_type(SignalType::AUDIO_STEREO); });
-	event("type-midi", [this] { on_type(SignalType::MIDI); });
+	event("type-audio", [this] { on_type(SignalType::Audio); });
+	//event("type-audio-stereo", [this] { on_type(SignalType::Audio_STEREO); });
+	event("type-midi", [this] { on_type(SignalType::Midi); });
 	event("type-preset", [this] { on_type((SignalType)-1); });
 	event("beats", [this] { on_beats(); });
 	event("divisor", [this] { on_divisor(); });
@@ -56,12 +56,12 @@ void NewSongDialog::on_ok() {
 	song->sample_rate = sample_rate;
 	song->action_manager->enable(false);
 	if (is_checked("metronome")) {
-		song->add_track(SignalType::BEATS, 0);
+		song->add_track(SignalType::Beats, 0);
 		int count = get_int("num-bars");
 		float bpm = get_float("beats-per-minute");
 		new_bar.set_bpm(bpm, song->sample_rate);
 		for (int i=0; i<count; i++)
-			song->add_bar(-1, new_bar, false);
+			song->add_bar(-1, new_bar, BarEditMode::Ignore);
 	}
 	song->add_track(type);
 
@@ -99,18 +99,18 @@ void NewSongDialog::on_complex() {
 
 void NewSongDialog::on_type(SignalType t) {
 	type = t;
-	check("type-audio", t == SignalType::AUDIO);
-	//check("type-audio-stereo", t == SignalType::AUDIO_STEREO);
-	check("type-midi", t == SignalType::MIDI);
+	check("type-audio", t == SignalType::Audio);
+	//check("type-audio-stereo", t == SignalType::Audio_STEREO);
+	check("type-midi", t == SignalType::Midi);
 	check("type-preset", t == (SignalType)-1);
 
-	expand("revealer-channels", type == SignalType::AUDIO);
+	expand("revealer-channels", type == SignalType::Audio);
 	expand("revealer-presets", type == (SignalType)-1);
 	enable("ok", type != (SignalType)-1);
 
 	if (!manually_changed_metronome_flag) {
-		check("metronome", t == SignalType::MIDI);
-		expand("metro-revealer", t == SignalType::MIDI);
+		check("metronome", t == SignalType::Midi);
+		expand("metro-revealer", t == SignalType::Midi);
 	}
 }
 

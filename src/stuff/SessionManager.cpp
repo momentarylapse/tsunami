@@ -270,9 +270,9 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 		auto vt = s->view->get_track(t);
 		if (vt->solo)
 			et.witha("solo", "true");
-		if (t->type == SignalType::AUDIO)
+		if (t->type == SignalType::Audio)
 			et.witha("audio_mode", audio_mode_str(vt->audio_mode));
-		else if (t->type == SignalType::MIDI)
+		else if (t->type == SignalType::Midi)
 			et.witha("midi_mode", midi_mode_str(vt->midi_mode_wanted));
 		ets.add(et);
 	}

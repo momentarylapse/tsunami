@@ -691,7 +691,7 @@ public:
 		add_child(new FileChunkMidiData<Sample>);
 	}
 	void create() override {
-		me = new Sample(SignalType::AUDIO);
+		me = new Sample(SignalType::Audio);
 		me->set_owner(parent);
 		parent->samples.add(me);
 	}
@@ -712,9 +712,9 @@ public:
 		f->write_int(me->uid);
 	}
 	void write_subs() override {
-		if (me->type == SignalType::AUDIO)
+		if (me->type == SignalType::Audio)
 			write_sub("bufbox", me->buf);
-		else if (me->type == SignalType::MIDI)
+		else if (me->type == SignalType::Midi)
 			write_sub("midi", &me->midi);
 	}
 };
@@ -866,7 +866,7 @@ public:
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
-		if (type == BarPattern::Type::PAUSE)
+		if (type == (int)BarPattern::Type::Pause)
 			num_beats = 0;
 		int count = f->read_int();
 		int divisor = f->read_int();
@@ -886,11 +886,11 @@ public:
 	}
 	void write(Stream *f) override {
 		if (me->is_pause())
-			f->write_int(BarPattern::Type::PAUSE);
+			f->write_int((int)BarPattern::Type::Pause);
 		else if (me->is_uniform())
-			f->write_int(BarPattern::Type::BAR);
+			f->write_int((int)BarPattern::Type::Bar);
 		else
-			f->write_int(BarPattern::Type::BAR + 42);
+			f->write_int((int)BarPattern::Type::Bar + 42);
 		f->write_int(me->length);
 		f->write_int(me->beats.num);
 		f->write_int(1);
@@ -910,7 +910,7 @@ public:
 		int type = f->read_int();
 		int length = f->read_int();
 		int num_beats = f->read_int();
-		if (type == BarPattern::Type::PAUSE)
+		if (type == (int)BarPattern::Type::Pause)
 			num_beats = 0;
 		int count = f->read_int();
 		int sub_beats = f->read_int();
@@ -1009,7 +1009,7 @@ public:
 		add_child(new FileChunkFadeOld); // deprecated
 	}
 	void create() override {
-		//me = parent->addTrack(SignalType::AUDIO);
+		//me = parent->addTrack(SignalType::Audio);
 	}
 	void read(Stream *f) override {
 		string name = f->read_str();
@@ -1044,7 +1044,7 @@ public:
 			write_sub("tuning", &me->instrument);
 		write_sub_parray("level", me->layers);
 		write_sub_parray("effect", me->fx);
-		if ((me->type == SignalType::BEATS) or (me->type == SignalType::MIDI))
+		if ((me->type == SignalType::Beats) or (me->type == SignalType::Midi))
 			if (!me->synth->is_default())
 				write_sub("synth", me->synth.get());
 		write_sub_parray("curve", me->curves);
@@ -1164,7 +1164,7 @@ void check_empty_subs(Song *a) {
 void FormatNami::make_consistent(StorageOperationData *od) {
 	Song *a = od->song;
 	for (auto *s: weak(a->samples)) {
-		if (s->type == SignalType::MIDI) {
+		if (s->type == SignalType::Midi) {
 			if ((s->midi.samples == 0) and (s->midi.num > 0)) {
 				s->midi.samples = s->midi.back()->range.end();
 			}
@@ -1191,7 +1191,7 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 
 	if (a->__fx.num > 0) {
 		od->session->w(_("file contains global fx. Will add a mastering track instead"));
-		auto *tm = a->add_track(SignalType::GROUP);
+		auto *tm = a->add_track(SignalType::Group);
 		tm->name = "Master";
 		tm->fx = a->__fx;
 		for (Track *t: weak(a->tracks))

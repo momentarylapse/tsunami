@@ -25,14 +25,14 @@ void TrackRoutingDialog::load() {
 	groups.clear();
 
 	for (Track *t: weak(song->tracks))
-		if (t->type == SignalType::GROUP)
+		if (t->type == SignalType::Group)
 			groups.add(t);
 
 	foreachi (Track *t, weak(song->tracks), i) {
 		set_target("list");
 		string id = "target-" + i2s(i);
 		if (i >= num_tracks) {
-			if (t->type == SignalType::GROUP)
+			if (t->type == SignalType::Group)
 				add_label("<i>" + t->nice_name() + "</i>", 0, i+1, "");
 			else
 				add_label(t->nice_name(), 0, i+1, "");
@@ -68,7 +68,7 @@ bool has_track_name(Song *s, const string &name) {
 
 void TrackRoutingDialog::on_add_group() {
 	song->begin_action_group("add track group");
-	[[maybe_unused]] auto *t = song->add_track(SignalType::GROUP);
+	[[maybe_unused]] auto *t = song->add_track(SignalType::Group);
 	song->end_action_group();
 	load();
 }

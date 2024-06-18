@@ -118,7 +118,7 @@ TrackHeader::TrackHeader(AudioViewTrack *t) : scenegraph::NodeRel({0, 1}, theme.
 int group_color(const Track *group) {
 	int index = 0;
 	for (auto *t: weak(group->song->tracks))
-		if (t->type == SignalType::GROUP) {
+		if (t->type == SignalType::Group) {
 			if (t == group)
 				return (index * 7 + 10) % 12;
 			index ++;
@@ -128,7 +128,7 @@ int group_color(const Track *group) {
 
 Array<int> track_group_colors(Track *t) {
 	Array<int> c;
-	if (t->type == SignalType::GROUP)
+	if (t->type == SignalType::Group)
 		c.add(group_color(t));
 
 	if (t->send_target)
@@ -149,7 +149,7 @@ color TrackHeader::color_bg(bool allow_hover) const {
 	auto *track = vtrack->track;
 	color col = track_header_main_color(track, view);
 	if (!view->sel.has(track)) {
-		if ((track->type == SignalType::GROUP) or track->send_target)
+		if ((track->type == SignalType::Group) or track->send_target)
 			col = color::interpolate(col, theme.background, 0.6f);
 		else
 			col = theme.blob_bg_hidden;
@@ -225,11 +225,11 @@ void TrackHeader::on_draw(Painter *c) {
 
 	// icons
 	auto *icon = view->images.track_audio.get();
-	if (track->type == SignalType::BEATS)
+	if (track->type == SignalType::Beats)
 		icon = view->images.track_time.get();
-	else if (track->type == SignalType::MIDI)
+	else if (track->type == SignalType::Midi)
 		icon = view->images.track_midi.get();
-	else if (track->type == SignalType::GROUP)
+	else if (track->type == SignalType::Group)
 		icon = view->images.track_group.get();
 	c->draw_mask_image({area.x1 + 5, area.y1 + 5}, icon);
 }
@@ -301,7 +301,7 @@ public:
 		auto v = view->hover().vtrack();
 		if (!v)
 			return nullptr;
-		if (v->track->type == SignalType::GROUP) {
+		if (v->track->type == SignalType::Group) {
 			if (target == get_track_index(v->track))
 				return v->track->send_target;
 			return v->track;

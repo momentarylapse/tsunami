@@ -26,16 +26,16 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 
 void CaptureConsoleModeAudio::on_source() {
 	int n = cc->get_int("");
-	items()[0].set_device(get_source(SignalType::AUDIO, n));
+	items()[0].set_device(get_source(SignalType::Audio, n));
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
 	items()[0].track = t;
 
-	bool ok = (items()[0].track->type == SignalType::AUDIO);
+	bool ok = (items()[0].track->type == SignalType::Audio);
 	cc->set_string("message", "");
 	if (!ok)
-		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::AUDIO).c_str()));
+		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio).c_str()));
 	cc->enable("start", ok);
 }
 
@@ -53,7 +53,7 @@ void CaptureConsoleModeAudio::enter() {
 	}
 
 	for (Track *t: weak(view->song->tracks))
-		if (view->sel.has(t) and (t->type == SignalType::AUDIO))
+		if (view->sel.has(t) and (t->type == SignalType::Audio))
 			set_target(t);
 
 

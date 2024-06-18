@@ -17,7 +17,7 @@ RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	od = _od;
 	ok = false;
 
-	for (int i=1; i<(int)SampleFormat::NUM; i++)
+	for (int i=1; i<(int)SampleFormat::Count; i++)
 		add_string("format", format_name((SampleFormat)i));
 	set_int("format", (int)format_from_code(od->parameters["format"].str()) - 1);
 

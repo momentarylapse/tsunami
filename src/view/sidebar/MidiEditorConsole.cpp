@@ -218,7 +218,7 @@ void MidiEditorConsole::update() {
 
 	[[maybe_unused]] bool allow = false;
 	//if (get_track_index_save(view->song, view->cur_track) >= 0)
-		allow = (layer->type == SignalType::MIDI);
+		allow = (layer->type == SignalType::Midi);
 
 	check("mode-select", mode->creation_mode == ViewModeEditMidi::CreationMode::SELECT);
 	check("mode-note", mode->creation_mode == ViewModeEditMidi::CreationMode::NOTE);

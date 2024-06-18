@@ -168,15 +168,15 @@ void PresetManager::save(Session *session) {
 			xml::Element e("preset");
 			e.add_attribute("name", ff.name);
 			e.add_attribute("type", i2s((int)ff.type));
-			if (ff.type == SignalType::AUDIO)
+			if (ff.type == SignalType::Audio)
 				e.add_attribute("channels", i2s(ff.channels));
-			if (ff.type == SignalType::MIDI) {
+			if (ff.type == SignalType::Midi) {
 				xml::Element i("instrument");
 				i.add_attribute("type", i2s((int)ff.instrument.type));
 				i.add_attribute("strings", str(ff.instrument.string_pitch));
 				e.add(i);
 			}
-			if (ff.type == SignalType::MIDI or ff.type == SignalType::BEATS) {
+			if (ff.type == SignalType::Midi or ff.type == SignalType::Beats) {
 				xml::Element s("synthesizer");
 				s.add_attribute("class", ff.synth_class);
 				s.add_attribute("version", i2s(ff.synth_version));

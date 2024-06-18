@@ -34,7 +34,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 
 	set_target("tracks");
 	for (auto&& [i,t]: enumerate(weak(song->tracks))){
-		if (t->type != SignalType::MIDI)
+		if (t->type != SignalType::Midi)
 			continue;
 		string id_classic = format("classical-%d", i);
 		string id_tab = format("tab-%d", i);
@@ -85,7 +85,7 @@ void PdfConfigDialog::on_ok() {
 void PdfConfigDialog::update_params() {
 	Any ats;
 	for (auto&& [i,t]: enumerate(weak(song->tracks))){
-		if (t->type != SignalType::MIDI)
+		if (t->type != SignalType::Midi)
 			continue;
 		Any at;
 		at.map_set("index", i);

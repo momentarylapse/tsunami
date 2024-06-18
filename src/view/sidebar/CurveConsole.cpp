@@ -50,8 +50,8 @@ void CurveConsole::on_enter() {
 	view->mode_curve->set_curve_target("");
 	update_list();
 	auto t = track();
-	enable("edit_synth", t->type == SignalType::MIDI);
-	enable("edit_midi", t->type == SignalType::MIDI);
+	enable("edit_synth", t->type == SignalType::Midi);
+	enable("edit_midi", t->type == SignalType::Midi);
 	song->out_new >> in_update;
 	t->out_curve_list_changed >> in_update;
 	t->out_edit_curve >> in_update;

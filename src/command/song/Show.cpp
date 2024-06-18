@@ -18,7 +18,7 @@ void show_song(Song *song) {
 	for (Track *t: weak(song->tracks)) {
 		msg_write(format("  track '%s'", t->nice_name()));
 		msg_write("    type: " + signal_type_name(t->type));
-		if (t->type == SignalType::MIDI) {
+		if (t->type == SignalType::Midi) {
 			msg_write(format("    synth: %s v%d", t->synth->module_class, t->synth->version()));
 		}
 		for (TrackLayer *l: weak(t->layers)) {

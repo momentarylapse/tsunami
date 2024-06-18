@@ -105,14 +105,14 @@ TrackRenderer::TrackRenderer(Track *t, SongRenderer *sr) {
 	}
 
 	//midi.add(t, t->midi);
-	if (t->type == SignalType::MIDI) {
+	if (t->type == SignalType::Midi) {
 		MidiEventBuffer raw;
 		midi_streamer = new MidiEventStreamer();
 		midi_streamer->set_data(raw);
 		midi_streamer->perf_set_parent(this);
 		midi_streamer->out >> synth->in;
 		fill_midi_streamer();
-	} else if (t->type == SignalType::BEATS) {
+	} else if (t->type == SignalType::Beats) {
 		beat_midifier = new BeatMidifier;
 		sr->bar_streamer->out >> beat_midifier->in;
 		beat_midifier->perf_set_parent(this);
@@ -171,7 +171,7 @@ void TrackRenderer::fill_midi_streamer() {
 		_midi = layers[0]->midi;
 	for (auto *l: weak(layers))
 		for (auto c: weak(l->samples))
-			if (c->type() == SignalType::MIDI)
+			if (c->type() == SignalType::Midi)
 			_midi.append(c->midi(), c->pos); // TODO: mute/solo....argh
 
 	MidiEventBuffer events = midi_notes_to_events(_midi);
@@ -208,9 +208,9 @@ void TrackRenderer::on_track_replace_synth() {
 		synth->set_instrument(track->instrument);
 	}
 
-	if (track->type == SignalType::MIDI) {
+	if (track->type == SignalType::Midi) {
 		midi_streamer->out >> synth->in;
-	} else if (track->type == SignalType::BEATS) {
+	} else if (track->type == SignalType::Beats) {
 		beat_midifier->out >> synth->in;
 	}
 	synth->perf_set_parent(this);
@@ -247,7 +247,7 @@ void TrackRenderer::set_pos(int pos) {
 		midi_streamer->set_pos(pos);
 	for (auto *f: weak(fx))
 		f->reset_state();
-	if (track->type == SignalType::BEATS)
+	if (track->type == SignalType::Beats)
 		song_renderer->bar_streamer->set_pos(pos);
 }
 
@@ -394,13 +394,13 @@ void TrackRenderer::render_group(AudioBuffer &buf) {
 void TrackRenderer::render_no_fx(AudioBuffer &buf) {
 	if (!track)
 		return;
-	if (track->type == SignalType::AUDIO)
+	if (track->type == SignalType::Audio)
 		render_audio(buf);
-	else if (track->type == SignalType::BEATS)
+	else if (track->type == SignalType::Beats)
 		render_time(buf);
-	else if (track->type == SignalType::MIDI)
+	else if (track->type == SignalType::Midi)
 		render_midi(buf);
-	else if (track->type == SignalType::GROUP)
+	else if (track->type == SignalType::Group)
 		render_group(buf);
 	offset += buf.length;
 }

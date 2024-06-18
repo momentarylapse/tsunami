@@ -47,9 +47,9 @@ void SignalEditorCable::on_draw(Painter *p) {
 		cc.add(inter.get(t));
 	p->set_color(theme.text_soft1);
 	p->set_line_width(3.5f);
-	if (type == SignalType::MIDI)
+	if (type == SignalType::Midi)
 		p->set_line_dash({6, 3}, 0);
-	else if (type == SignalType::BEATS)
+	else if (type == SignalType::Beats)
 		p->set_line_dash({3, 6}, 0);
 	p->draw_lines(cc);
 	p->set_line_dash({}, 0);

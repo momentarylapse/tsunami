@@ -11,10 +11,6 @@
 #include "../../lib/base/pointer.h"
 #include "../Range.h"
 
-#ifdef IGNORE
-#undef IGNORE
-#endif
-
 class BarCollection;
 class Beat;
 
@@ -37,9 +33,9 @@ public:
 	bool operator==(const BarPattern &o) const;
 	bool operator!=(const BarPattern &o) const;
 
-	enum Type {
-		BAR,
-		PAUSE
+	enum class Type {
+		Bar,
+		Pause
 	};
 };
 
@@ -64,14 +60,15 @@ public:
 	int index_text; // index without pause "bars" (well, text = n+1...)
 	int offset;
 	Range range();
+};
 
-	// when inserting new bars
-	enum EditMode {
-		IGNORE,
-		INSERT_SILENCE,
-		STRETCH,
-		STRETCH_AND_SCALE_AUDIO
-	};
+
+// when inserting new bars
+enum class BarEditMode {
+	Ignore,
+	InsertSilence,
+	Stretch,
+	StretchAndScaleAudio
 };
 
 

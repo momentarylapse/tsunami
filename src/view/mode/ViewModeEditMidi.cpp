@@ -985,7 +985,7 @@ void ViewModeEditMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 		view->grid_painter->draw_empty_background(c);
 		view->grid_painter->draw_whatever(c, sub_beat_partition);
 
-		if (l->layer->type == SignalType::MIDI) {
+		if (l->layer->type == SignalType::Midi) {
 			auto *mp = l->midi_context();
 			mp->set_force_shadows(true);
 			mp->set_synthesizer(l->layer->track->synth.get());

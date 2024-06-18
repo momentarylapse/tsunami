@@ -66,9 +66,9 @@ void CaptureConsole::on_enter() {
 	int num_audio = 0, num_midi = 0;
 	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t)) {
-			if (t->type == SignalType::AUDIO)
+			if (t->type == SignalType::Audio)
 				num_audio ++;
-			if (t->type == SignalType::MIDI)
+			if (t->type == SignalType::Midi)
 				num_midi ++;
 		}
 

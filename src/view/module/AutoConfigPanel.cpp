@@ -77,7 +77,7 @@ public:
 	float min_slider, max_slider;
 	float *value;
 	owned<Slider> slider;
-	Slider::Mode mode = Slider::Mode::LINEAR;
+	Slider::Mode mode = Slider::Mode::Linear;
 	AutoConfigDataFloat(const string &_name) : obs::Node<AutoConfigData>(_name) {
 		min = -100;
 		max = 100;
@@ -122,9 +122,9 @@ public:
 				} else if (p.head(5) == "unit=") {
 					unit = p.sub(5);
 				} else if (p == "exponential") {
-					mode = Slider::Mode::EXPONENTIAL;
+					mode = Slider::Mode::Exponential;
 				} else if (p == "square") {
-					mode = Slider::Mode::SQUARE;
+					mode = Slider::Mode::Square;
 				}
 			}
 		}
@@ -241,7 +241,7 @@ public:
 		id = "combo-" + i2s(i);
 		panel = p;
 		p->add_combo_box("!width=150,expandx", 1, i, id);
-		for (int i=1; i<(int)SampleFormat::NUM; i++)
+		for (int i=1; i<(int)SampleFormat::Count; i++)
 			p->add_string(id, format_name((SampleFormat)i));
 		p->event(id, callback);
 	}

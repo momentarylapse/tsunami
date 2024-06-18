@@ -27,17 +27,17 @@ Sample::Sample(SignalType _type) {
 	uid = create_uid();
 
 	buf = nullptr;
-	if (_type == SignalType::AUDIO)
+	if (_type == SignalType::Audio)
 		buf = new AudioBuffer;
 }
 
-Sample::Sample(const string &_name, const AudioBuffer &_buf) : Sample(SignalType::AUDIO) {
+Sample::Sample(const string &_name, const AudioBuffer &_buf) : Sample(SignalType::Audio) {
 	name = _name;
 	*buf = _buf;
 	buf->offset = 0;
 }
 
-Sample::Sample(const string &_name, const MidiNoteBuffer &_buf) : Sample(SignalType::MIDI) {
+Sample::Sample(const string &_name, const MidiNoteBuffer &_buf) : Sample(SignalType::Midi) {
 	name = _name;
 	midi = _buf;
 	midi.sort();
@@ -62,7 +62,7 @@ int Sample::get_index() const {
 }
 
 Range Sample::range() const {
-	if (type == SignalType::MIDI)
+	if (type == SignalType::Midi)
 		return Range(0, midi.samples);
 	return buf->range0();
 }

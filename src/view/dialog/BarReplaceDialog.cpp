@@ -62,7 +62,7 @@ void BarReplaceDialog::on_ok() {
 			song->delete_bar(i, false);
 		new_bar.length = duration / number;
 		for (int i=0; i<number; i++)
-			song->add_bar(sel[0], new_bar, Bar::EditMode::IGNORE);
+			song->add_bar(sel[0], new_bar, BarEditMode::Ignore);
 	/*}else{
 		foreachb(int i, sel){
 			BarPattern b = *song->bars[i];

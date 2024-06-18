@@ -33,10 +33,10 @@ void PauseAddDialog::on_ok() {
 	song->begin_action_group("add pause");
 
 	if (!song->time_track())
-		song->add_track(SignalType::BEATS, 0);
+		song->add_track(SignalType::Beats, 0);
 
 	int length = (int)(duration * (float)song->sample_rate);
-	song->add_pause(index, length, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+	song->add_pause(index, length, bar_dialog_move_data ? BarEditMode::Stretch : BarEditMode::Ignore);
 	song->end_action_group();
 
 	request_destroy();

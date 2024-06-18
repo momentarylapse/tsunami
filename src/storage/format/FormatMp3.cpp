@@ -191,7 +191,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 			if ((samples == 0) and (info.frame_bytes == 0))
 				break;
 			channels = info.channels;
-			import_data(od->layer, &pcm[0], channels, SampleFormat::FLOAT_32, samples, sample_offset);
+			import_data(od->layer, &pcm[0], channels, SampleFormat::Float32, samples, sample_offset);
 			sample_offset += samples;
 			bytes_offset += info.frame_bytes;
 			data = bytes(&data[info.frame_bytes], data.num - info.frame_bytes);

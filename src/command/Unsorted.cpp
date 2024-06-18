@@ -88,7 +88,7 @@ void song_render_track(Song *song, const Range &range, const base::set<const Tra
 	write_into_buffer(renderer.out, buf, range.length, p.get());
 
 	song->begin_action_group(_("render track"));
-	Track *t = song->add_track(SignalType::AUDIO_STEREO);
+	Track *t = song->add_track(SignalType::AudioStereo);
 	AudioBuffer buf_track;
 	auto *a = t->layers[0]->edit_buffers(buf_track, range);
 	buf_track.set(buf, 0, 1);
@@ -116,7 +116,7 @@ void song_group_tracks(Song *song, const Array<Track*> &tracks) {
 		return;
 	song->begin_action_group(_("group tracks"));
 	int first_index = tracks[0]->get_index();
-	auto group = song->add_track(SignalType::GROUP, first_index);
+	auto group = song->add_track(SignalType::Group, first_index);
 	// add to group
 	for (auto t: tracks)
 		t->set_send_target(group);
@@ -130,7 +130,7 @@ void song_group_tracks(Song *song, const Array<Track*> &tracks) {
 Track *track_top_group(Track *t) {
 	if (t->send_target)
 		return track_top_group(t->send_target);
-	if (t->type == SignalType::GROUP)
+	if (t->type == SignalType::Group)
 		return t;
 	return nullptr;
 }
@@ -242,7 +242,7 @@ float song_max_volume(Song *song, const SongSelection &sel) {
 	float max_vol = 0;
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+			if (sel.has(l) and (t->type == SignalType::Audio)) {
 				AudioBuffer buf;
 				l->read_buffers(buf, sel.range(), true);
 				for (auto& c: buf.c)
@@ -260,7 +260,7 @@ int song_apply_volume(Song *song, float volume, bool maximize, const SongSelecti
 	song->begin_action_group(_("apply audio fx"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+			if (sel.has(l) and (t->type == SignalType::Audio)) {
 				layer_apply_volume(l, sel.range(), volume, win);
 				n_layers ++;
 			}
@@ -273,7 +273,7 @@ int song_apply_audio_effect(Song *song, AudioEffect *fx, const SongSelection &se
 	song->begin_action_group(_("apply audio fx"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+			if (sel.has(l) and (t->type == SignalType::Audio)) {
 				fx_process_layer(l, sel.range(), fx, win);
 				n_layers ++;
 			}
@@ -286,7 +286,7 @@ int song_apply_audio_source(Song *song, AudioSource *s, const SongSelection &sel
 	song->begin_action_group(_("audio source"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+			if (sel.has(l) and (t->type == SignalType::Audio)) {
 				source_process_layer(l, sel.range(), s, win);
 				n_layers ++;
 			}
@@ -299,7 +299,7 @@ int song_apply_midi_effect(Song *song, MidiEffect *fx, const SongSelection &sel,
 	song->begin_action_group(_("apply midi fx"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::MIDI)) {
+			if (sel.has(l) and (t->type == SignalType::Midi)) {
 				fx->reset_state();
 				fx->process_layer(l, sel);
 				n_layers ++;
@@ -313,7 +313,7 @@ int song_apply_midi_source(Song *song, MidiSource *s, const SongSelection &sel, 
 	song->begin_action_group(_("midi source"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::MIDI)) {
+			if (sel.has(l) and (t->type == SignalType::Midi)) {
 				s->reset_state();
 				MidiEventBuffer buf;
 				buf.samples = sel.range().length;
@@ -370,7 +370,7 @@ int song_audio_scale_pitch_shift(Song *song, int new_size, BufferInterpolator::M
 	song->begin_action_group(_("audio scale/pitch"));
 	for (Track *t: weak(song->tracks))
 		for (auto *l: weak(t->layers))
-			if (sel.has(l) and (t->type == SignalType::AUDIO)) {
+			if (sel.has(l) and (t->type == SignalType::Audio)) {
 				layer_audio_scale_pitch_shift(l, sel.range(), new_size, scaling_method, pitch_factor, win);
 				n_layers ++;
 			}

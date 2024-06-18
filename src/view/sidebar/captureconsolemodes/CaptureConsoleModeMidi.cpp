@@ -23,7 +23,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 
 void CaptureConsoleModeMidi::on_source() {
 	int n = cc->get_int("");
-	items()[0].set_device(get_source(SignalType::MIDI, n));
+	items()[0].set_device(get_source(SignalType::Midi, n));
 }
 
 
@@ -41,7 +41,7 @@ void CaptureConsoleModeMidi::enter() {
 
 
 	for (Track *t: weak(view->song->tracks))
-		if (view->sel.has(t) and (t->type == SignalType::MIDI))
+		if (view->sel.has(t) and (t->type == SignalType::Midi))
 			items()[0].track = t;
 
 	update_data_from_items();

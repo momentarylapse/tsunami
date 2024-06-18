@@ -21,7 +21,7 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
-ActionBarAdd::ActionBarAdd(int _index, const BarPattern &pattern, int _mode) {
+ActionBarAdd::ActionBarAdd(int _index, const BarPattern &pattern, BarEditMode _mode) {
 	index = _index;
 	bar = new Bar(pattern);
 	mode = _mode;
@@ -31,7 +31,7 @@ void ActionBarAdd::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	add_sub_action(new ActionBar__Add(index, bar), d);
 
-	if (mode != Bar::EditMode::IGNORE) {
+	if (mode != BarEditMode::Ignore) {
 		int pos0 = s->bar_offset(index);
 
 		for (auto t: s->tracks)

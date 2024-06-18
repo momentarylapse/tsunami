@@ -60,13 +60,13 @@ Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 	type = _type;
 	song = _song;
 	channels = 1;
-	if (type == SignalType::AUDIO_MONO) {
-		type = SignalType::AUDIO;
+	if (type == SignalType::AudioMono) {
+		type = SignalType::Audio;
 		channels = 1;
-	} else if (type == SignalType::AUDIO_STEREO) {
-		type = SignalType::AUDIO;
+	} else if (type == SignalType::AudioStereo) {
+		type = SignalType::Audio;
 		channels = 2;
-	} else if (type == SignalType::AUDIO) {
+	} else if (type == SignalType::Audio) {
 		channels = 1;
 	}
 	muted = false;
@@ -112,13 +112,13 @@ int get_same_type_index(const Track *t) {
 }
 
 string track_base_name(SignalType type) {
-	if (type == SignalType::BEATS)
+	if (type == SignalType::Beats)
 		return _("Metronome");
-	if (type == SignalType::GROUP)
+	if (type == SignalType::Group)
 		return _("Master");
-	if (type == SignalType::AUDIO)
+	if (type == SignalType::Audio)
 		return _("Audio");
-	if (type == SignalType::MIDI)
+	if (type == SignalType::Midi)
 		return _("Midi");
 	return _("Track");
 }
@@ -128,7 +128,7 @@ string Track::nice_name() const {
 		return name;
 	int n = get_same_type_index(this);
 	string base = track_base_name(type);
-	if ((n == 0) and ((type == SignalType::BEATS) or (type == SignalType::GROUP)))
+	if ((n == 0) and ((type == SignalType::Beats) or (type == SignalType::Group)))
 		return base;
 	return base + format(" %d", n+1);
 	//int n = get_track_index(this);

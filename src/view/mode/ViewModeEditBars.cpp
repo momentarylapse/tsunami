@@ -100,7 +100,7 @@ ViewModeEditBars::ViewModeEditBars(AudioView *view) :
 	ViewModeDefault(view)
 {
 	mode_name = "bars";
-	edit_mode = EditMode::SELECT;
+	edit_mode = EditMode::Select;
 }
 
 
@@ -119,7 +119,7 @@ void ViewModeEditBars::on_end() {
 void ViewModeEditBars::on_key_down(int k) {
 	view->force_redraw();
 
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		if (k == hui::KEY_RETURN) {
 			auto scaling_range_orig = selected_bar_range();
 			auto target_range = Range::to(scaling_range_orig.offset, rubber_end_target);
@@ -131,11 +131,11 @@ void ViewModeEditBars::on_key_down(int k) {
 			foreachb(int i, indices) {
 				BarPattern bb = *song->bars[i];
 				bb.length = (int)((float)bb.length * factor);
-				song->edit_bar(i, bb, Bar::EditMode::STRETCH);
+				song->edit_bar(i, bb, BarEditMode::Stretch);
 			}
 			song->end_action_group();
 		}
-	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
+	} else if (edit_mode == EditMode::AddAndSplit) {
 		if (k == hui::KEY_DELETE) {
 			auto h = view->hover();
 			if (h.type != HoverData::Type::BAR_GAP)
@@ -152,7 +152,7 @@ void ViewModeEditBars::on_key_down(int k) {
 				auto bp = *(BarPattern*)(weak(song->bars)[index - 1]);
 				bp.length += song->bars[index]->length;
 				song->delete_bar(index, false);
-				song->edit_bar(index - 1, bp, Bar::EditMode::IGNORE);
+				song->edit_bar(index - 1, bp, BarEditMode::Ignore);
 				song->end_action_group();
 			}
 		}
@@ -169,16 +169,16 @@ void ViewModeEditBars::add_bar_at_cursor(const vec2 &m) {
 		auto bp = *(BarPattern*)(weak(song->bars)[index]);
 		song->begin_action_group("add bar");
 		bp.length = smx - r.start();
-		song->edit_bar(index, bp, Bar::EditMode::IGNORE);
+		song->edit_bar(index, bp, BarEditMode::Ignore);
 		bp.length = r.end() - smx;
-		song->add_bar(index + 1, bp, Bar::EditMode::IGNORE);
+		song->add_bar(index + 1, bp, BarEditMode::Ignore);
 		song->end_action_group();
 	} else if (smx > 0) {
 		BarPattern bp = {100, 4, 1};
 		if (song->bars.num > 0)
 			bp = *(BarPattern*)weak(song->bars).back();
 		bp.length = smx - song->bars.range().end();
-		song->add_bar(song->bars.num, bp, Bar::EditMode::IGNORE);
+		song->add_bar(song->bars.num, bp, BarEditMode::Ignore);
 	}
 }
 Range ViewModeEditBars::selected_bar_range() const {
@@ -198,7 +198,7 @@ void ViewModeEditBars::draw_post(Painter *p) {
 	float y1 = view->cur_vlayer()->area.y1;
 	float y2 = view->cur_vlayer()->area.y2;
 
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		auto r = selected_bar_range();
 		if (r.is_empty())
 			return;
@@ -223,7 +223,7 @@ void ViewModeEditBars::draw_post(Painter *p) {
 		p->set_color(theme.green.with_alpha(0.8f));
 		draw_arrow(p, {x2, y1 + (y2-y1)*0.2f}, {x3, y1 + (y2-y1)*0.2f});
 		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f});
-	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
+	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BAR_GAP) {
 		} else if (cur_vlayer()->is_cur_hover() and (h.pos > 0)) {
@@ -257,7 +257,7 @@ void ViewModeEditBars::on_mouse_move(const vec2& m) {
 	if (!cur_vlayer()->is_cur_hover())
 		return;
 
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		rubber_hover = false;
 		if (view->sel.bar_indices(song).num > 0) {
 			float sx = view->cam.sample2screen(rubber_end_target);
@@ -277,12 +277,12 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer, const vec2
 		return;
 	}
 	
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		if (rubber_hover)
 			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target));
 		else
 			ViewModeDefault::left_click_handle_void(vlayer, m);
-	} else if (edit_mode == EditMode::ADD_AND_SPLIT) {
+	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BAR_GAP) {
 			if (h.index > 0)
@@ -296,9 +296,9 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer, const vec2
 }
 
 string ViewModeEditBars::get_tip() {
-	if (edit_mode == EditMode::RUBBER)
+	if (edit_mode == EditMode::Rubber)
 		return "1. select bars    2. move handle on the right    3. scale [Return]    track [Alt+↑,↓]";
-	if (edit_mode == EditMode::ADD_AND_SPLIT)
+	if (edit_mode == EditMode::AddAndSplit)
 		return "split/insert bar [click]    move gap [drag'n'drop]    delete/merge [delete]    track [Alt+↑,↓]";
 	//if (edit_mode == EditMode::SELECT)
 	return "track [Alt+↑,↓]";

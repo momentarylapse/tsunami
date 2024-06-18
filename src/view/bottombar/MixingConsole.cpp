@@ -144,7 +144,7 @@ public:
 			draw_str_constrained(p, {p->width/2.0f, 8}, p->width, tt, TextAlign::CENTER);
 		}
 
-		if (vtrack->track->type == SignalType::GROUP) {
+		if (vtrack->track->type == SignalType::Group) {
 			bool any_shrunk = false;
 			for (auto gm: track_group_members(vtrack->track, false))
 				if (console->mixer[gm->get_index()]->shrunk)
@@ -183,7 +183,7 @@ public:
 
 		set_current();
 
-		if (vtrack->track->type == SignalType::GROUP and (hui::get_event()->m.x > shrink_button_x)) {
+		if (vtrack->track->type == SignalType::Group and (hui::get_event()->m.x > shrink_button_x)) {
 			bool any_shrunk = false;
 			for (auto gm: track_group_members(vtrack->track, false))
 				if (console->mixer[gm->get_index()]->shrunk)

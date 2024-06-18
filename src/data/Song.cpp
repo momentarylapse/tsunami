@@ -54,7 +54,7 @@ Song::Song(Session *session, int _sample_rate) :
 {
 	//msg_write("  new Song " + p2s(this));
 	sample_rate = _sample_rate;
-	default_format = SampleFormat::INT_16;
+	default_format = SampleFormat::Int16;
 	compression = 0;
 }
 
@@ -117,7 +117,7 @@ void Song::reset() {
 	filename = "";
 	tags.clear();
 	bars.clear();
-	default_format = SampleFormat::INT_16;
+	default_format = SampleFormat::Int16;
 	compression = 0;
 	sample_rate = DEFAULT_SAMPLE_RATE;
 
@@ -239,7 +239,7 @@ int song_bar_divisor(Song *s, int pos) {
 
 
 Track *Song::add_track(SignalType type, int index) {
-	if (type == SignalType::BEATS) {
+	if (type == SignalType::Beats) {
 		// force single time track
 		if (time_track())
 			throw Error(_("There already is one rhythm track."));
@@ -321,21 +321,21 @@ void Song::create_samples_from_selection(const SongSelection &sel, bool auto_del
 		execute(new ActionTrackSampleFromSelection(sel, auto_delete));
 }
 
-void Song::add_bar(int index, const BarPattern &b, int mode) {
+void Song::add_bar(int index, const BarPattern &b, BarEditMode mode) {
 	if (index >= 0)
 		execute(new ActionBarAdd(index, b, mode));
 	else
 		execute(new ActionBarAdd(bars.num, b, mode));
 }
 
-void Song::add_pause(int index, int length, int mode) {
+void Song::add_pause(int index, int length, BarEditMode mode) {
 	if (index >= 0)
 		execute(new ActionBarAdd(index, BarPattern(length, 0, 0), mode));
 	else
 		execute(new ActionBarAdd(bars.num, BarPattern(length, 0, 0), mode));
 }
 
-void Song::edit_bar(int index, const BarPattern &b, int mode) {
+void Song::edit_bar(int index, const BarPattern &b, BarEditMode mode) {
 	execute(new ActionBarEdit(index, b, mode));
 }
 
@@ -357,7 +357,7 @@ Sample* Song::get_sample_by_uid(int uid) {
 
 Track *Song::time_track() {
 	for (Track *t: weak(tracks))
-		if (t->type == SignalType::BEATS)
+		if (t->type == SignalType::Beats)
 			return t;
 	return nullptr;
 }

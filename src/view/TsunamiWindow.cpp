@@ -114,9 +114,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("redo", [this] { on_redo(); });
 	set_key_code("redo", hui::KEY_Y + hui::KEY_CONTROL);
 	event("track_render", [this] { on_track_render(); });
-	event("track-add-new", [this] { on_add_new_track(SignalType::AUDIO); });
+	event("track-add-new", [this] { on_add_new_track(SignalType::Audio); });
 	set_key_code("track-add-new", hui::KEY_N + hui::KEY_CONTROL + hui::KEY_SHIFT);
-	event("track-add-beats", [this] { on_add_new_track(SignalType::BEATS); });
+	event("track-add-beats", [this] { on_add_new_track(SignalType::Beats); });
 	event("track-delete", [this] { on_track_delete(); });
 	event("track-create-group", [this] { on_track_group(); });
 	event("track-ungroup", [this] { on_track_ungroup(); });
@@ -715,7 +715,7 @@ void TsunamiWindow::on_settings() {
 
 void TsunamiWindow::on_track_import() {
 	session->storage->ask_open_import(this).then([this] (const Path &filename) {
-		Track *t = song->add_track(SignalType::AUDIO_STEREO);
+		Track *t = song->add_track(SignalType::AudioStereo);
 		session->storage->load_track(t->layers[0].get(), filename, view->cursor_pos());
 	});
 }
@@ -979,12 +979,12 @@ void TsunamiWindow::on_save_session() {
 
 
 bool song_is_simple_audio(Song *s) {
-	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::AUDIO) and (s->tracks[0]->layers.num == 1));
+	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::Audio) and (s->tracks[0]->layers.num == 1));
 }
 
 bool song_is_simple_midi(Song *s) {
 	for (Track* t: weak(s->tracks))
-		if ((t->type != SignalType::MIDI) and (t->type != SignalType::BEATS))
+		if ((t->type != SignalType::Midi) and (t->type != SignalType::Beats))
 			return false;
 	return true;
 }

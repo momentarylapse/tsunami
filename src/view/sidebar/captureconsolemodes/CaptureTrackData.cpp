@@ -70,7 +70,7 @@ void CaptureTrackData::start_sync_before(AudioOutput *out) {
 }
 
 void CaptureTrackData::sync(AudioOutput *out) {
-	if (type() == SignalType::AUDIO) {
+	if (type() == SignalType::Audio) {
 		auto sr = out->estimate_samples_played();
 		auto sp = audio_input()->samples_recorded();
 		if (sr.has_value() and sp.has_value()) {
@@ -146,9 +146,9 @@ Array<int> CaptureTrackData::channel_map() {
 }
 
 Device *CaptureTrackData::get_device() {
-	if (type() == SignalType::AUDIO)
+	if (type() == SignalType::Audio)
 		return audio_input()->get_device();
-	if (type() == SignalType::MIDI)
+	if (type() == SignalType::Midi)
 		return midi_input()->get_device();
 	return nullptr;
 }
@@ -163,10 +163,10 @@ void CaptureTrackData::set_map(const Array<int> &_map) {
 
 void CaptureTrackData::set_device(Device *device) {
 
-	if (type() == SignalType::AUDIO) {
+	if (type() == SignalType::Audio) {
 		audio_input()->set_device(device);
 		set_map(create_default_channel_map(device->channels, track->channels));
-	} else if (type() == SignalType::MIDI) {
+	} else if (type() == SignalType::Midi) {
 		midi_input()->set_device(device);
 	}
 
@@ -181,7 +181,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 	auto device = preferred_device;
 
 
-	if (type() == SignalType::AUDIO) {
+	if (type() == SignalType::Audio) {
 		if (!device)
 			device = chain->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 
@@ -215,7 +215,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		chain->connect(accumulator, 0, backup, 0);
 		chain->connect(backup, 0, sucker, 0);
 
-	} else if (t->type == SignalType::MIDI) {
+	} else if (t->type == SignalType::Midi) {
 		if (!device)
 			device = chain->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 
@@ -306,9 +306,9 @@ void CaptureTrackData::insert_audio(int s_start, int delay) {
 void CaptureTrackData::insert(int pos) {
 	int delay = get_sync_delay();
 	track->song->session->debug("input", format("latency: %d samples", delay));
-	if (type() == SignalType::AUDIO) {
+	if (type() == SignalType::Audio) {
 		insert_audio(pos, delay);
-	} else if (type() == SignalType::MIDI) {
+	} else if (type() == SignalType::Midi) {
 		insert_midi(pos, delay);
 	}
 }

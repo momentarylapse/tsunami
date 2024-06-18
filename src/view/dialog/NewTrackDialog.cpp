@@ -93,10 +93,10 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s, SignalType init
 	event("instrument", [this] { on_instrument(); });
 	event("edit_tuning", [this] { on_edit_tuning(); });
 	event("metronome", [this] { on_metronome(); });
-	event("type-audio", [this] { on_type(SignalType::AUDIO); });
-	event("type-midi", [this] { on_type(SignalType::MIDI); });
-	event("type-metronome", [this] { on_type(SignalType::BEATS); });
-	event("type-master", [this] { on_type(SignalType::GROUP); });
+	event("type-audio", [this] { on_type(SignalType::Audio); });
+	event("type-midi", [this] { on_type(SignalType::Midi); });
+	event("type-metronome", [this] { on_type(SignalType::Beats); });
+	event("type-master", [this] { on_type(SignalType::Group); });
 	event("type-preset", [this] { on_type((SignalType)FAKE_TYPE_PRESET); });
 	event("beats", [this] { on_beats(); });
 	event("divisor", [this] { on_divisor(); });
@@ -143,15 +143,15 @@ void NewTrackDialog::on_ok() {
 	auto song = session->song;
 
 	song->begin_action_group("add-track");
-	if (type == SignalType::AUDIO) {
+	if (type == SignalType::Audio) {
 		auto t = song->add_track(type);
 		if (is_checked("channels:stereo"))
 			t->set_channels(2);
-	} else if (type == SignalType::MIDI) {
+	} else if (type == SignalType::Midi) {
 		auto t = song->add_track(type);
 		t->set_instrument(instrument);
 		t->set_synthesizer(synth);
-	} else if (type == SignalType::BEATS) {
+	} else if (type == SignalType::Beats) {
 		auto t = song->add_track(type);
 		t->set_synthesizer(synth);
 
@@ -160,18 +160,18 @@ void NewTrackDialog::on_ok() {
 			float bpm = get_float("beats-per-minute");
 			new_bar.set_bpm(bpm, song->sample_rate);
 			for (int i = 0; i < count; i++)
-				song->add_bar(-1, new_bar, false);
+				song->add_bar(-1, new_bar, BarEditMode::Ignore);
 		}
-	} else if (type == SignalType::GROUP) {
+	} else if (type == SignalType::Group) {
 		[[maybe_unused]] auto t = song->add_track(type);
 	} else if (type == (SignalType)FAKE_TYPE_PRESET) {
 		int r = get_int("presets");
 		const auto& p = session->plugin_manager->presets->get_track_preset(session, presets[r]);
 		auto t = song->add_track(p.type);
 		t->set_channels(p.channels);
-		if (p.type == SignalType::MIDI)
+		if (p.type == SignalType::Midi)
 			t->set_instrument(p.instrument);
-		if (p.type == SignalType::MIDI or p.type == SignalType::BEATS) {
+		if (p.type == SignalType::Midi or p.type == SignalType::Beats) {
 			synth = CreateSynthesizer(session, p.synth_class);
 			synth->config_from_string(p.synth_version, p.synth_options);
 			t->set_synthesizer(synth);
@@ -204,27 +204,27 @@ void NewTrackDialog::on_complex() {
 
 void NewTrackDialog::on_type(SignalType t) {
 	type = t;
-	check("type-audio", t == SignalType::AUDIO);
-	check("type-midi", t == SignalType::MIDI);
-	check("type-metronome", t == SignalType::BEATS);
-	check("type-master", t == SignalType::GROUP);
+	check("type-audio", t == SignalType::Audio);
+	check("type-midi", t == SignalType::Midi);
+	check("type-metronome", t == SignalType::Beats);
+	check("type-master", t == SignalType::Group);
 	check("type-preset", t == (SignalType)FAKE_TYPE_PRESET);
 
 	bool allow_ok = true;
 	if (type == (SignalType)FAKE_TYPE_PRESET) {
 		int r = get_int("presets");
 		allow_ok = (r >= 0);
-	} else if (type == SignalType::BEATS and session->song->time_track()) {
+	} else if (type == SignalType::Beats and session->song->time_track()) {
 		allow_ok = false;
 	}
 	enable("ok", allow_ok);
 
-	expand("revealer-channels", t == SignalType::AUDIO);
-	expand("revealer-instrument", t == SignalType::MIDI);
-	expand("revealer-synth", t == SignalType::MIDI or t == SignalType::BEATS);
-	//expand("g-fx-midi", true);//t == SignalType::MIDI);
-	expand("revealer-metronome", t == SignalType::BEATS);
-	expand("revealer-master", t == SignalType::GROUP);
+	expand("revealer-channels", t == SignalType::Audio);
+	expand("revealer-instrument", t == SignalType::Midi);
+	expand("revealer-synth", t == SignalType::Midi or t == SignalType::Beats);
+	//expand("g-fx-midi", true);//t == SignalType::Midi);
+	expand("revealer-metronome", t == SignalType::Beats);
+	expand("revealer-master", t == SignalType::Group);
 	expand("revealer-presets", t == (SignalType)FAKE_TYPE_PRESET);
 }
 

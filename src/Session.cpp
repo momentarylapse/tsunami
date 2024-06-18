@@ -183,7 +183,7 @@ void Session::set_mode(const string &_mode) {
 			view->set_mode(view->mode_edit);
 		} else if (mode == EditMode::ScaleBars) {
 			view->set_mode(view->mode_edit_bars);
-			view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::RUBBER);
+			view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::Rubber);
 		} else if (mode == EditMode::ScaleMarker) {
 			view->set_mode(view->mode_scale_marker);
 		} else if (mode == EditMode::Curves) {

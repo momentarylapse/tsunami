@@ -16,13 +16,13 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	from_resource("bars-editor");
 
 	event("mode-select", [this] {
-		on_edit_mode((int)ViewModeEditBars::EditMode::SELECT);
+		on_edit_mode((int)ViewModeEditBars::EditMode::Select);
 	});
 	event("mode-add-and-split", [this] {
-		on_edit_mode((int)ViewModeEditBars::EditMode::ADD_AND_SPLIT);
+		on_edit_mode((int)ViewModeEditBars::EditMode::AddAndSplit);
 	});
 	event("mode-rubber", [this] {
-		on_edit_mode((int)ViewModeEditBars::EditMode::RUBBER);
+		on_edit_mode((int)ViewModeEditBars::EditMode::Rubber);
 	});
 	event("action-edit-speed", [this] {
 		on_action_edit_speed();
@@ -72,8 +72,8 @@ void BarsEditorConsole::set_layer(TrackLayer *t) {
 }
 
 void BarsEditorConsole::update() {
-	check("mode-select", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::SELECT);
-	check("mode-add-and-split", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::ADD_AND_SPLIT);
-	check("mode-rubber", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::RUBBER);
+	check("mode-select", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::Select);
+	check("mode-add-and-split", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::AddAndSplit);
+	check("mode-rubber", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::Rubber);
 }
 

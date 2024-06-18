@@ -92,7 +92,7 @@ void TrackConsole::on_leave() {
 }
 
 bool track_wants_synth(const Track *t) {
-	return (t->type == SignalType::MIDI) or (t->type == SignalType::BEATS);
+	return (t->type == SignalType::Midi) or (t->type == SignalType::Beats);
 }
 
 void TrackConsole::load_data() {
@@ -110,10 +110,10 @@ void TrackConsole::load_data() {
 		set_options("name", "placeholder=" + track->nice_name());
 		set_float("volume", amplitude2db(track->volume));
 		set_float("panning", track->panning * 100.0f);
-		//hide_control("edit_midi_fx", track->type != SignalType::MIDI);
-		//hide_control("edit_synth", track->type != SignalType::MIDI);
-		enable("edit_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
-		enable("select_synth", track->type == SignalType::MIDI or track->type == SignalType::BEATS);
+		//hide_control("edit_midi_fx", track->type != SignalType::Midi);
+		//hide_control("edit_synth", track->type != SignalType::Midi);
+		enable("edit_synth", track->type == SignalType::Midi or track->type == SignalType::Beats);
+		enable("select_synth", track->type == SignalType::Midi or track->type == SignalType::Beats);
 
 		for (auto&& [ii,i]: enumerate(instrument_list)) {
 			if (track->instrument.type == i.type)

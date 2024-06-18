@@ -29,6 +29,7 @@ class TrackMarker;
 class MidiNoteBuffer;
 enum class SampleFormat;
 enum class SignalType;
+enum class BarEditMode;
 
 class Tag {
 public:
@@ -98,9 +99,9 @@ public:
 	void _cdecl delete_sample(Sample *s);
 	void _cdecl edit_sample_name(Sample *s, const string &name);
 	void _cdecl sample_replace_buffer(Sample *s, AudioBuffer *buf);
-	void _cdecl add_bar(int index, const BarPattern &bar, int mode);
-	void _cdecl add_pause(int index, int length, int mode);
-	void _cdecl edit_bar(int index, const BarPattern &bar, int mode);
+	void _cdecl add_bar(int index, const BarPattern &bar, BarEditMode mode);
+	void _cdecl add_pause(int index, int length, BarEditMode mode);
+	void _cdecl edit_bar(int index, const BarPattern &bar, BarEditMode mode);
 	void _cdecl delete_bar(int index, bool affect_midi);
 	void _cdecl delete_time_interval(int index, const Range &range);
 	void _cdecl insert_selected_samples(const SongSelection &sel);

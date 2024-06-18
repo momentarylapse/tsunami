@@ -95,7 +95,7 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 			if (has(sr))
 				s.add(sr);
 
-		//if (l->type == SignalType::BEATS)
+		//if (l->type == SignalType::Beats)
 		//	s._bars = _bars;
 	}
 

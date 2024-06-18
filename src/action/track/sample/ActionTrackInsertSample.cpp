@@ -24,7 +24,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index) {
 void ActionTrackInsertSample::build(Data *d) {
 	SampleRef *ref = layer->samples[index].get();
 
-	if (layer->type == SignalType::AUDIO) {
+	if (layer->type == SignalType::Audio) {
 
 		// get target buffer
 		Range r = ref->range();
@@ -36,7 +36,7 @@ void ActionTrackInsertSample::build(Data *d) {
 		auto *action = new ActionTrackEditBuffer(layer, r);
 		buf.set(ref->buf(), 0, ref->volume);
 		add_sub_action(action, d);
-	}else if (layer->type == SignalType::MIDI) {
+	}else if (layer->type == SignalType::Midi) {
 		auto midi = ref->midi();
 		for (auto n: weak(midi)) {
 			MidiNote *nn = n->copy();

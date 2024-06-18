@@ -78,6 +78,6 @@ void ActionBarDelete::build(Data *d) {
 
 		add_sub_action(new ActionSongDeleteSelection(sel), d);
 
-		add_sub_action(new Action__ShiftData(r.end(), - r.length, Bar::EditMode::STRETCH), d);
+		add_sub_action(new Action__ShiftData(r.end(), - r.length, BarEditMode::Stretch), d);
 	}
 }

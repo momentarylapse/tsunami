@@ -14,10 +14,10 @@
 #include "../../Session.h"
 
 const Array<SampleFormat> POSSIBLE_FORMATS = {
-	SampleFormat::INT_16,
-	SampleFormat::INT_24,
-	SampleFormat::INT_32,
-	SampleFormat::FLOAT_32
+	SampleFormat::Int16,
+	SampleFormat::Int24,
+	SampleFormat::Int32,
+	SampleFormat::Float32
 };
 
 SongConsole::SongConsole(Session *session, SideBar *bar) :

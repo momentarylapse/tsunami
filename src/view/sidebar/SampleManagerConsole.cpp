@@ -62,9 +62,9 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 string render_sample(Sample *s, AudioView *view) {
 	Image im;
 	im.create(SAMPLE_PREVIEW_WIDTH, SAMPLE_PREVIEW_HEIGHT, color(0, 0, 0, 0));
-	if (s->type == SignalType::AUDIO)
+	if (s->type == SignalType::Audio)
 		render_bufbox(im, *s->buf, view);
-	else if (s->type == SignalType::MIDI)
+	else if (s->type == SignalType::Midi)
 		render_midi(im, s->midi);
 	string id = "image:sample-" + i2s(s->uid);
 	return hui::set_image(&im, id);
@@ -213,7 +213,7 @@ void SampleManagerConsole::on_export() {
 		return;
 
 	session->storage->ask_save_render_export(win).then([this, sel] (const Path &filename) {
-		if (sel[0]->type == SignalType::AUDIO) {
+		if (sel[0]->type == SignalType::Audio) {
 			BufferStreamer rr(sel[0]->buf);
 			session->storage->save_via_renderer(rr.out, filename, sel[0]->buf->length, {});
 		}
@@ -231,12 +231,12 @@ void SampleManagerConsole::on_create_from_selection() {
 		return;
 	for (auto *l: song->layers())
 		if (view->sel.has(l)) {
-			if (l->type == SignalType::AUDIO) {
+			if (l->type == SignalType::Audio) {
 				AudioBuffer buf;
 				buf.resize(view->sel.range().length);
 				l->read_buffers_fixed(buf, view->sel.range());
 				song->create_sample_audio("-new-", buf);
-			} else if (l->type == SignalType::MIDI) {
+			} else if (l->type == SignalType::Midi) {
 				auto buf = l->midi.get_notes(view->sel.range());
 				for (auto *n: weak(buf))
 					n->range.offset -= view->sel.range().offset;
@@ -266,7 +266,7 @@ void SampleManagerConsole::on_delete() {
 void SampleManagerConsole::on_scale() {
 	auto sel = get_selected();
 	for (Sample* s: sel) {
-		if (s->type != SignalType::AUDIO)
+		if (s->type != SignalType::Audio)
 			continue;
 		hui::fly(new SampleScaleDialog(parent->win, s));
 	}
@@ -316,7 +316,7 @@ void SampleManagerConsole::on_song_update() {
 
 void SampleManagerConsole::on_preview_tick() {
 	int pos = 0;
-	if (preview.sample->type == SignalType::AUDIO) {
+	if (preview.sample->type == SignalType::Audio) {
 		pos = preview.renderer->get_pos();
 	} else {
 		pos = preview.midi_streamer->get_pos();
@@ -335,7 +335,7 @@ void SampleManagerConsole::on_preview() {
 	int sel = get_int(id_list);
 	preview.sample = items[sel]->s;
 	preview.chain = session->create_signal_chain_system("sample-preview");
-	if (preview.sample->type == SignalType::AUDIO) {
+	if (preview.sample->type == SignalType::Audio) {
 		preview.renderer = new BufferStreamer(preview.sample->buf);
 		preview.chain->_add(preview.renderer);
 		preview.stream = preview.chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput").get();

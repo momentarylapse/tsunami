@@ -378,9 +378,9 @@ float ViewModeDefault::layer_suggested_height(AudioViewLayer *l) {
 	float scale = 1.0f;
 	if (l->track()->layers.num > 1)
 		scale = 0.7f;
-	if (l->layer->type == SignalType::AUDIO)
+	if (l->layer->type == SignalType::Audio)
 		return theme.MAX_TRACK_CHANNEL_HEIGHT * n_ch * scale;
-	else if (l->layer->type == SignalType::MIDI)
+	else if (l->layer->type == SignalType::Midi)
 		return theme.MAX_TRACK_CHANNEL_HEIGHT * 2 * scale;
 	else
 		return theme.TIME_SCALE_HEIGHT * 2;
@@ -454,7 +454,7 @@ void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	view->grid_painter->draw_whatever(c, 0);
 
 
-	if (l->layer->type == SignalType::MIDI) {
+	if (l->layer->type == SignalType::Midi) {
 		auto *mp = l->midi_context();
 		mp->draw_background(c);
 	}

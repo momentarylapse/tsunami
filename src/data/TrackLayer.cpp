@@ -54,7 +54,7 @@ Range TrackLayer::range(int keep_notes) const {
 	for (AudioBuffer &b: buffers)
 		r = r or b.range();
 
-	if ((type == SignalType::MIDI) and (midi.num > 0))
+	if ((type == SignalType::Midi) and (midi.num > 0))
 		r = r or midi.range(keep_notes);
 
 	for (auto *m: weak(markers))

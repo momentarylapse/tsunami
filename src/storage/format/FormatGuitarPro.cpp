@@ -100,7 +100,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 
 	//Array<Track*> tracks;
 	for (Track *t : weak(song->tracks))
-		if (t->type == SignalType::MIDI){
+		if (t->type == SignalType::Midi){
 			GpTrack tt;
 			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
 			tt.midi_instrument = t->instrument.midi_no();
@@ -227,7 +227,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 		msg_write(format("measures: %d   tracks: %d", num_measures, num_tracks));
 		for (int i=0; i<num_measures; i++)
 			read_measure_header();
-		song->add_track(SignalType::BEATS);
+		song->add_track(SignalType::Beats);
 		for (int i=0; i<num_tracks; i++)
 			read_track();
 
@@ -243,7 +243,7 @@ void FormatGuitarPro::load_song(StorageOperationData *_od)
 			int length = (int)(song->sample_rate * 60.0f / (float)tempo * 4.0f * (float)measures[i].numerator / (float)measures[i].denominator);
 			offset += length;
 			BarPattern b = BarPattern(length, measures[i].numerator, 1);
-			song->add_bar(-1, b, false);
+			song->add_bar(-1, b, BarEditMode::Ignore);
 		}
 
 	}catch(Exception &e){
@@ -480,7 +480,7 @@ void FormatGuitarPro::read_track()
 {
 	f->read_byte();
 	GpTrack tt;
-	tt.t = song->add_track(SignalType::MIDI);
+	tt.t = song->add_track(SignalType::Midi);
 	tt.t->set_name(read_str1c(f, 40));
 	int stringCount = f->read_int();
 	for (int i=0; i<7; i++){

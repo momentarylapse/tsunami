@@ -82,7 +82,7 @@ public:
 		draw_str_centered(p, area.center(), "+");
 	}
 	bool on_left_button_down(const vec2 &m) override {
-		view->win->on_add_new_track(SignalType::AUDIO);
+		view->win->on_add_new_track(SignalType::Audio);
 		return true;
 	}
 	string get_tip() const override {
@@ -179,7 +179,7 @@ AudioView::AudioView(Session *_session) :
 	});
 	scroll_bar_time->constrained = false;
 
-	dummy_track = new Track(song, SignalType::AUDIO, CreateSynthesizer(session, ""));
+	dummy_track = new Track(song, SignalType::Audio, CreateSynthesizer(session, ""));
 	dummy_layer = new TrackLayer(dummy_track.get());
 	dummy_vtrack = new AudioViewTrack(this, dummy_track.get());
 	dummy_vlayer = new AudioViewLayer(this, dummy_layer.get());
@@ -1111,7 +1111,7 @@ void AudioView::update_menu() {
 	MidiMode common_midi_mode = midi_view_mode;
 	for (auto *t: vtracks)
 		if (t->track)
-			if ((t->track->type == SignalType::MIDI) and (t->midi_mode_wanted != midi_view_mode))
+			if ((t->track->type == SignalType::Midi) and (t->midi_mode_wanted != midi_view_mode))
 				common_midi_mode = MidiMode::DONT_CARE;
 	// view
 	win->check("view-midi-linear", common_midi_mode == MidiMode::LINEAR);
@@ -1166,7 +1166,7 @@ void AudioView::select_expand() {
 			if (!sel.has(t))
 				continue;
 
-			if (t->type == SignalType::BEATS)
+			if (t->type == SignalType::Beats)
 				for (Bar* b: weak(song->bars))
 					test_range(b->range(), r, update);
 
@@ -1574,9 +1574,9 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	auto t = vt->track;
 
 	// midi mode
-	menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
+	menu->enable("menu-midi-mode", t->type == SignalType::Midi);
 	menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
-	menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
+	menu->enable("menu-audio-mode", t->type == SignalType::Audio);
 	menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
 	menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
 	menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
@@ -1591,23 +1591,23 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	menu->check("track-explode", !vt->imploded);
 	menu->enable("track-explode", t->layers.num > 1);
 
-	menu->enable("track-edit-midi", t->type == SignalType::MIDI);
+	menu->enable("track-edit-midi", t->type == SignalType::Midi);
 	menu->enable("track_add_marker", true);//hover->type == Selection::Type::LAYER);
 
 	// convert
-	menu->enable("menu-convert", t->type == SignalType::AUDIO);
-	//menu->enable("track-convert-mono", t->type == SignalType::AUDIO);
-	//menu->enable("track-convert-stereo", t->type == SignalType::AUDIO);
-	menu->enable("track-convert-stereo", t->channels == 1 and t->type == SignalType::AUDIO);
-	menu->enable("track-convert-mono", t->channels == 2 and t->type == SignalType::AUDIO);
+	menu->enable("menu-convert", t->type == SignalType::Audio);
+	//menu->enable("track-convert-mono", t->type == SignalType::Audio);
+	//menu->enable("track-convert-stereo", t->type == SignalType::Audio);
+	menu->enable("track-convert-stereo", t->channels == 1 and t->type == SignalType::Audio);
+	menu->enable("track-convert-mono", t->channels == 2 and t->type == SignalType::Audio);
 	// view
-	menu->enable("menu-audio-mode", t->type == SignalType::AUDIO);
-	menu->enable("track-audio-mode-peaks", t->type == SignalType::AUDIO);
-	menu->enable("track-audio-mode-spectrum", t->type == SignalType::AUDIO);
-	menu->enable("menu-midi-mode", t->type == SignalType::MIDI);
-	menu->enable("track-midi-mode-linear", t->type == SignalType::MIDI);
-	menu->enable("track-midi-mode-tab", t->type == SignalType::MIDI);
-	menu->enable("track-midi-mode-classical", t->type == SignalType::MIDI);
+	menu->enable("menu-audio-mode", t->type == SignalType::Audio);
+	menu->enable("track-audio-mode-peaks", t->type == SignalType::Audio);
+	menu->enable("track-audio-mode-spectrum", t->type == SignalType::Audio);
+	menu->enable("menu-midi-mode", t->type == SignalType::Midi);
+	menu->enable("track-midi-mode-linear", t->type == SignalType::Midi);
+	menu->enable("track-midi-mode-tab", t->type == SignalType::Midi);
+	menu->enable("track-midi-mode-classical", t->type == SignalType::Midi);
 	menu->enable("layer-merge", t->layers.num > 1);
 	menu->enable("layer-mark-dominant", t->layers.num > 1);// and sel.layers.num == 1);
 	menu->enable("layer-add-dominant", t->layers.num > 1);// and sel.layers.num == 1);

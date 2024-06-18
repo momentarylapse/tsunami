@@ -447,7 +447,7 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("Sample.set_value", &Sample::set_value);
 
 	{
-		shared<Sample> sample = new Sample(SignalType::AUDIO);
+		shared<Sample> sample = new Sample(SignalType::Audio);
 		//sample.owner = Tsunami::instance->song;
 		SampleRef sampleref(sample.get());
 		ext->declare_class_size("SampleRef", sizeof(SampleRef));

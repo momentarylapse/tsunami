@@ -31,7 +31,7 @@ Array<UnitTest::Test> TestTrackVersion::tests() {
 
 shared<Song> create_layer_example_data(bool with_fades) {
 	Song *s = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
-	Track *t = s->add_track(SignalType::AUDIO_MONO);
+	Track *t = s->add_track(SignalType::AudioMono);
 	auto *l1 = t->layers[0].get();
 	auto *l2 = t->add_layer();
 	if (with_fades) {

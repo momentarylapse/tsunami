@@ -27,9 +27,9 @@ public:
 	void add_bar_at_cursor(const vec2 &m);
 
 	enum class EditMode {
-		SELECT,
-		ADD_AND_SPLIT,
-		RUBBER,
+		Select,
+		AddAndSplit,
+		Rubber,
 	};
 	void set_edit_mode(EditMode mode);
 	EditMode edit_mode;

@@ -22,16 +22,16 @@ extern const Array<int> POSSIBLE_SAMPLE_RATES;
 
 
 enum class SampleFormat {
-	UNKNOWN,
-	INT_8,
-	INT_16,
-	INT_16_BIGENDIAN,
-	INT_24,
-	INT_24_BIGENDIAN,
-	INT_32,
-	INT_32_BIGENDIAN,
-	FLOAT_32,
-	NUM
+	Unknown,
+	Int8,
+	Int16,
+	Int16Bigendian,
+	Int24,
+	Int24Bigendian,
+	Int32,
+	Int32Bigendian,
+	Float32,
+	Count
 };
 
 
@@ -43,14 +43,14 @@ SampleFormat format_from_code(const string &code);
 
 
 enum class SignalType {
-	AUDIO,
-	BEATS,
-	MIDI,
+	Audio,
+	Beats,
+	Midi,
 
 	// special
-	AUDIO_MONO,
-	AUDIO_STEREO,
-	GROUP
+	AudioMono,
+	AudioStereo,
+	Group
 };
 
 string signal_type_name(SignalType type);

@@ -34,9 +34,9 @@ public:
 	void enable(bool enabled);
 
 	enum Mode {
-		LINEAR,
-		EXPONENTIAL,
-		SQUARE
+		Linear,
+		Exponential,
+		Square
 	};
 	void set_mode(Mode m);
 

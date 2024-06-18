@@ -170,7 +170,7 @@ base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 	session->i(_("loading buffer ") + filename.str());
 
 	Song *aa = new Song(session, session->sample_rate());
-	Track *t = aa->add_track(SignalType::AUDIO);
+	Track *t = aa->add_track(SignalType::Audio);
 	TrackLayer *l = t->layers[0].get();
 	base::promise<AudioBuffer> promise;
 

@@ -41,11 +41,11 @@ void BarEditSpeedDialog::on_ok() {
 	bar_dialog_move_data = is_checked("shift-data");
 	bar_dialog_scale_audio = is_checked("scale-audio");
 
-	int bmode = Bar::EditMode::IGNORE;
+	BarEditMode bmode = BarEditMode::Ignore;
 	if (bar_dialog_move_data) {
-		bmode = Bar::EditMode::STRETCH;
+		bmode = BarEditMode::Stretch;
 		if (bar_dialog_scale_audio)
-			bmode = Bar::EditMode::STRETCH_AND_SCALE_AUDIO;
+			bmode = BarEditMode::StretchAndScaleAudio;
 	}
 
 	foreachb(int i, sel) {

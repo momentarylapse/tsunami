@@ -111,7 +111,7 @@ void SelectionMarker::draw_bar_gap_selector(Painter* p, int bar_gap, const color
 	p->set_color(col);
 	p->set_line_width(2.5f);
 	for (auto *t: view->vlayers)
-		if (t->layer->type == SignalType::BEATS) {
+		if (t->layer->type == SignalType::Beats) {
 			p->draw_line({x2 - 5, t->area.y1}, {x2 + 5, t->area.y1});
 			p->draw_line({x2, t->area.y1}, {x2, t->area.y2});
 			p->draw_line({x2 - 5, t->area.y2}, {x2 + 5, t->area.y2});

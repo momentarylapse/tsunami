@@ -47,8 +47,8 @@ void EffectsConsole::load_data() {
 	if (track) {
 	//	set_string("name", track->name);
 	//	set_options("name", "placeholder=" + track->nice_name());
-		//hide_control("edit_midi_fx", track->type != SignalType::MIDI);
-		//hide_control("edit_synth", track->type != SignalType::MIDI);
+		//hide_control("edit_midi_fx", track->type != SignalType::Midi);
+		//hide_control("edit_synth", track->type != SignalType::Midi);
 
 
 	} else {

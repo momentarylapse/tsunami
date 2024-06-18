@@ -27,7 +27,7 @@ BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 	// get default data from "selected" reference bar
 	if (song->bars.num > 0){
 		foreachi(Bar *b, weak(song->bars), i)
-			if ((i <= index) and (!b->is_pause())){
+			if ((i <= index) and !b->is_pause()){
 				new_bar = *b;
 			}
 	}
@@ -87,10 +87,10 @@ void BarAddDialog::on_ok() {
 	song->begin_action_group("add bars");
 
 	if (!song->time_track())
-		song->add_track(SignalType::BEATS, 0);
+		song->add_track(SignalType::Beats, 0);
 
 	for (int i=0; i<count; i++)
-		song->add_bar(index, new_bar, bar_dialog_move_data ? Bar::EditMode::STRETCH : Bar::EditMode::IGNORE);
+		song->add_bar(index, new_bar, bar_dialog_move_data ? BarEditMode::Stretch : BarEditMode::Ignore);
 	song->end_action_group();
 
 	request_destroy();

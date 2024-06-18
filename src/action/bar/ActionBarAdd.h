@@ -12,16 +12,17 @@
 
 class BarPattern;
 class Bar;
+enum class BarEditMode;
 
 class ActionBarAdd : public ActionGroup {
 public:
-	ActionBarAdd(int index, const BarPattern &pattern, int mode);
+	ActionBarAdd(int index, const BarPattern &pattern, BarEditMode mode);
 
 	void build(Data *d) override;
 
 	int index;
 	Bar *bar;
-	int mode;
+	BarEditMode mode;
 };
 
 #endif /* ACTIONSONGBARADD_H_ */

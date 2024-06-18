@@ -75,11 +75,11 @@ void ViewModeEdit::on_cur_layer_change() {
 }
 
 ViewMode *ViewModeEdit::suggest_mode() {
-	if (view->cur_track()->type == SignalType::MIDI)
+	if (view->cur_track()->type == SignalType::Midi)
 		return view->mode_edit_midi;
-	if (view->cur_track()->type == SignalType::AUDIO)
+	if (view->cur_track()->type == SignalType::Audio)
 		return view->mode_edit_audio;
-	if (view->cur_track()->type == SignalType::BEATS)
+	if (view->cur_track()->type == SignalType::Beats)
 		return view->mode_edit_bars;
 	return view->mode_edit_dummy;
 }

@@ -36,13 +36,13 @@ string module_header(Module *m) {
 SignalType module_in_type(Module *m) {
 	for (auto p: m->port_in)
 		return p->type;
-	return SignalType::GROUP;
+	return SignalType::Group;
 }
 
 SignalType module_out_type(Module *m) {
 	for (auto p: m->port_out)
 		return p->type;
-	return SignalType::GROUP;
+	return SignalType::Group;
 }
 
 color module_color(Module *m) {
@@ -64,14 +64,14 @@ color module_color(Module *m) {
 	if (m->module_category == ModuleCategory::AUDIO_VISUALIZER)
 		//return theme.neon(5); // purple
 		return theme.neon(2); // yellow
-	if (ti == SignalType::AUDIO and to == SignalType::AUDIO)
+	if (ti == SignalType::Audio and to == SignalType::Audio)
 		return theme.neon(2); // yellow
 
-	if (ti == SignalType::BEATS or to == SignalType::BEATS)
+	if (ti == SignalType::Beats or to == SignalType::Beats)
 		return theme.neon(2); // yellow;
-	if (ti == SignalType::MIDI and to == SignalType::MIDI)
+	if (ti == SignalType::Midi and to == SignalType::Midi)
 		return theme.neon(3);
-	if (ti == SignalType::MIDI and to == SignalType::AUDIO)
+	if (ti == SignalType::Midi and to == SignalType::Audio)
 		return theme.neon(2);
 
 	return theme.neon(2); // yellow

@@ -178,11 +178,11 @@ void SignalEditorTab::on_enter_main_view() {
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {
-	if (type == SignalType::AUDIO)
+	if (type == SignalType::Audio)
 		return theme.blue;
-	if (type == SignalType::MIDI)
+	if (type == SignalType::Midi)
 		return color(1, 0.9f,0.6f,0); // theme.green;
-	if (type == SignalType::BEATS)
+	if (type == SignalType::Beats)
 		return theme.red;
 	return theme.white;
 }

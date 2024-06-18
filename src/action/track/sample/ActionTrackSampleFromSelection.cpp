@@ -25,9 +25,9 @@ void ActionTrackSampleFromSelection::build(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	for (TrackLayer *l: s->layers())
 		if (sel.has(l)) {
-			if (l->type == SignalType::AUDIO)
+			if (l->type == SignalType::Audio)
 				CreateSamplesFromLayerAudio(l);
-			else if (l->type == SignalType::MIDI)
+			else if (l->type == SignalType::Midi)
 				CreateSamplesFromLayerMidi(l);
 		}
 }

@@ -47,7 +47,7 @@ void BarDeleteDialog::on_ok() {
 			length += song->bars[i]->length;
 			song->delete_bar(i, false);
 		}
-		song->add_pause(sel[0], length, Bar::EditMode::IGNORE);
+		song->add_pause(sel[0], length, BarEditMode::Ignore);
 	} else {
 
 		foreachb(int i, sel)

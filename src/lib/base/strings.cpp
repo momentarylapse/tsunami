@@ -571,7 +571,7 @@ string f2s(float f, int dez) {
 	char tmp[128], fmt[8];
 	strcpy(fmt, "%.0f");
 	fmt[2] += dez;
-	sprintf(tmp, fmt, f);
+	snprintf(tmp, sizeof(tmp), fmt, f);
 	string t = string(tmp);
 	for (int i=0;i<t.num;i++)
 		if (t[i] == ',')
@@ -607,7 +607,7 @@ string f642s(double f, int dez) {
 	char tmp[128], fmt[8];
 	strcpy(fmt, "%.0f");
 	fmt[2] += dez;
-	sprintf(tmp, fmt, f);
+	snprintf(tmp, sizeof(tmp), fmt, f);
 	string t = string(tmp);
 	for (int i=0;i<t.num;i++)
 		if (t[i] == ',')
@@ -618,7 +618,7 @@ string f642s(double f, int dez) {
 // convert a float to a string
 string f2sf(float f) {
 	char tmp[128];
-	sprintf(tmp, "%f", f);
+	snprintf(tmp, sizeof(tmp), "%f", f);
 	string t = string(tmp);
 	for (int i=0;i<t.num;i++)
 		if (t[i] == ',')
@@ -629,7 +629,7 @@ string f2sf(float f) {
 // convert a float to a string
 string f642sf(double f) {
 	char tmp[128];
-	sprintf(tmp, "%f", f);
+	snprintf(tmp, sizeof(tmp), "%f", f);
 	string t = string(tmp);
 	for (int i=0;i<t.num;i++)
 		if (t[i] == ',')
@@ -650,9 +650,9 @@ string p2s(const void *p) {
 		return "nil";
 	char tmp[64];
 #ifdef OS_WINDOWS
-	sprintf(tmp, "0x%p", p);
+	snprintf(tmp, sizeof(tmp), "0x%p", p);
 #else
-	sprintf(tmp, "%p", p);
+	snprintf(tmp, sizeof(tmp), "%p", p);
 #endif
 	return string(tmp);
 }

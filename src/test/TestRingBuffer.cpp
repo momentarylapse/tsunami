@@ -12,6 +12,8 @@
 #include <thread>
 #include <math.h>
 
+namespace tsunami {
+
 TestRingBuffer::TestRingBuffer() : UnitTest("ring-buffer")
 {
 }
@@ -198,6 +200,8 @@ void TestRingBuffer::test_thread_safety()
 
 	if (errors > 0)
 		throw Failure(format("%d errors after %d samples", errors, total_samples));
+}
+
 }
 
 #endif

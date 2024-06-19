@@ -10,6 +10,8 @@
 
 #include "BottomBar.h"
 
+namespace tsunami {
+
 class DeviceManager;
 class Device;
 enum class DeviceType;
@@ -45,5 +47,7 @@ public:
 	hui::Menu *popup;
 	Device *popup_device;
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_DEVICECONSOLE_H_ */

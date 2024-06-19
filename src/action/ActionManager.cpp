@@ -15,6 +15,7 @@
 #include <assert.h>
 
 
+namespace tsunami {
 
 class DummyActionGroup : public ActionGroup {
 	string _name_;
@@ -204,5 +205,7 @@ string ActionManager::get_current_action() const {
 	if (prev_action)
 		return prev_action->name();
 	return "<none>";
+}
+
 }
 

@@ -10,6 +10,8 @@
 
 #include "AudioSource.h"
 
+namespace tsunami {
+
 class BufferStreamer : public AudioSource {
 public:
 	BufferStreamer(AudioBuffer *buf);
@@ -25,5 +27,7 @@ public:
 	AudioBuffer *buf;
 	int offset;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_BUFFERSTREAMER_H_ */

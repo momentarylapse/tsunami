@@ -14,6 +14,7 @@ namespace os {
 	extern bool is_main_thread();
 }
 
+namespace tsunami {
 
 Log::Log() {
 	allow_debug = hui::config.get_bool("Log.Debug", false);
@@ -22,33 +23,33 @@ Log::Log() {
 
 
 void Log::error(Session *session, const string &message) {
-	add_message(session, Type::ERROR, message, {});
+	add_message(session, Type::Error, message, {});
 }
 
 
 void Log::warn(Session *session, const string &message) {
-	add_message(session, Type::WARNING, message, {});
+	add_message(session, Type::Warning, message, {});
 }
 
 
 void Log::info(Session *session, const string &message) {
-	add_message(session, Type::INFO, message, {});
+	add_message(session, Type::Info, message, {});
 }
 
 
 void Log::debug(Session *session, const string &message) {
 	if (allow_debug)
-		add_message(session, Type::DEBUG, message, {});
+		add_message(session, Type::Debug, message, {});
 }
 
 
 void Log::question(Session *session, const string &message, const Array<string> &responses) {
-	add_message(session, Type::QUESTION, message, responses);
+	add_message(session, Type::Question, message, responses);
 }
 
 
 void Log::status(Session *session, const string &message) {
-	add_message(session, Type::STATUS, message, {});
+	add_message(session, Type::Status, message, {});
 }
 
 
@@ -77,7 +78,7 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 
 	// make sure messages are handled in the gui thread...
 	if (!os::is_main_thread()) {
-		hui::run_later(0.001f, [this, session, type, _message = message, _responses = responses] {
+		hui::run_in_gui_thread([this, session, type, _message = message, _responses = responses] {
 			add_message(session, type, _message, _responses);
 		});
 		return;
@@ -92,7 +93,7 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 
 	int count = 0;
 	for (auto &mm: messages.sub_ref(max(messages.num - 40, 0)))
-		if (m == mm and m.type != Type::STATUS) {
+		if (m == mm and m.type != Type::Status) {
 			count ++;
 			if (count > 8) {
 				blocked.add(m);
@@ -106,18 +107,20 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 	messages.add(m);
 
 	if (allow_console_output) {
-		if (type == Type::ERROR) {
+		if (type == Type::Error) {
 			msg_error(message);
-		} else if (type == Type::WARNING) {
+		} else if (type == Type::Warning) {
 			msg_write(message);
-		} else if (type == Type::QUESTION) {
-		} else if (type == Type::DEBUG) {
+		} else if (type == Type::Question) {
+		} else if (type == Type::Debug) {
 			msg_write(message);
-		} else if (type == Type::STATUS) {
+		} else if (type == Type::Status) {
 		} else {
 			msg_write(message);
 		}
 	}
 
 	out_add_message.notify();
+}
+
 }

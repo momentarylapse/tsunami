@@ -8,9 +8,13 @@
 #include "Action.h"
 
 
+namespace tsunami {
+
 // default behavior for redo...
 void Action::redo(Data *d) {
 	execute(d);
+}
+
 }
 
 

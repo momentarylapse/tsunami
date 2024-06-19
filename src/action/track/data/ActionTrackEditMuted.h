@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../Action.h"
+
+namespace tsunami {
+
 class Track;
 
 class ActionTrackEditMuted : public Action {
@@ -23,3 +26,5 @@ private:
 	bool muted;
 	Track *track;
 };
+
+}

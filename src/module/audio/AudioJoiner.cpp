@@ -9,6 +9,8 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../data/base.h"
 
+namespace tsunami {
+
 AudioJoiner::AudioJoiner() :
 	Module(ModuleCategory::PLUMBING, "AudioJoiner")
 {
@@ -37,4 +39,6 @@ int AudioJoiner::read_audio(int port, AudioBuffer& buf) {
 		}
 	}
 	return result;
+}
+
 }

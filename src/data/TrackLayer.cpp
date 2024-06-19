@@ -35,6 +35,7 @@
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
 
+namespace tsunami {
 
 TrackLayer::TrackLayer(Track *t) {
 	//msg_write("  new TrackLayer " + p2s(this));
@@ -266,4 +267,6 @@ base::set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers) {
 	for (auto l: layers)
 		lset.add(l);
 	return lset;
+}
+
 }

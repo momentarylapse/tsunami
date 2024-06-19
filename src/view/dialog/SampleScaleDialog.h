@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Sample;
 
 class SampleScaleDialog : public hui::Dialog {
@@ -29,5 +31,7 @@ public:
 	void on_ok();
 	void on_close();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_SAMPLESCALEDIALOG_H_ */

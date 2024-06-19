@@ -18,6 +18,9 @@
 #include "../lib/base/iter.h"
 #include <math.h>
 
+
+namespace tsunami {
+
 string i2s_small(int); // MidiData.cpp ?
 
 const string NICE_SEP = u8" \u203a ";
@@ -138,5 +141,7 @@ void Curve::unapply() {
 
 string Curve::get_target(Track *t) {
 	return target.nice_str(t);
+}
+
 }
 

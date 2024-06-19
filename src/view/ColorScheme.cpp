@@ -14,6 +14,7 @@ namespace hui {
 	base::map<string,color> get_style_colors(Panel *p, const string &id);
 }
 
+namespace tsunami {
 
 const float ColorScheme::FONT_SIZE = 10.0f;
 const float ColorScheme::FONT_SIZE_SMALL = FONT_SIZE * 0.8f;
@@ -216,4 +217,6 @@ ColorSchemeSystem::ColorSchemeSystem(hui::Panel *p, const string &id) {
 	hover = White;
 	name = "system";
 	auto_generate(true);
+}
+
 }

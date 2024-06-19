@@ -11,8 +11,9 @@
 #include "../../data/Song.h"
 #include "../Action.h"
 
-class ActionTagEdit : public Action
-{
+namespace tsunami {
+
+class ActionTagEdit : public Action {
 public:
 	ActionTagEdit(int index, const Tag &tag);
 
@@ -23,5 +24,7 @@ private:
 	int index;
 	Tag old_tag, new_tag;
 };
+
+}
 
 #endif /* ACTIONTAGEDIT_H_ */

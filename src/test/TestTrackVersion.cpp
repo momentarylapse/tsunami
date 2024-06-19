@@ -16,6 +16,8 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../Session.h"
 
+namespace tsunami {
+
 TestTrackVersion::TestTrackVersion() : UnitTest("version") {
 }
 
@@ -71,6 +73,8 @@ void TestTrackVersion::test_dominant() {
 	t->mark_dominant({t->layers[1].get()}, r);
 	assert_equal(t->layers[0]->fades.num, 2);
 	assert_equal(t->layers[1]->fades.num, 0);
+}
+
 }
 
 #endif

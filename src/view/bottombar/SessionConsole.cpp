@@ -9,6 +9,8 @@
 #include "../../Tsunami.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 
 string nice_filename(const Path& f);
 
@@ -163,3 +165,4 @@ void SessionConsole::load_data() {
 	}
 }
 
+}

@@ -15,6 +15,8 @@
 #include "../../action/ActionManager.h"
 #include "../../module/audio/SongRenderer.h"
 
+namespace tsunami {
+
 FormatDescriptor::FormatDescriptor(const string &_description, const string &_extensions, int _flags) {
 	description = _description;
 	extensions = _extensions.explode(",");
@@ -98,4 +100,6 @@ void Format::save_song(StorageOperationData* od) {
 	od->num_samples = renderer.get_num_samples();
 	od->renderer = &renderer.out;
 	save_via_renderer(od);
+}
+
 }

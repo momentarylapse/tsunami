@@ -14,6 +14,7 @@
 #include "../../data/Song.h"
 #include "../../data/TrackLayer.h"
 
+namespace tsunami {
 
 int AudioEffect::read_audio(int port, AudioBuffer &buf) {
 	return read(buf);
@@ -72,4 +73,6 @@ int AudioEffect::read(AudioBuffer &buf) {
 
 AudioEffect *CreateAudioEffect(Session *session, const string &name) {
 	return (AudioEffect*)ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, name);
+}
+
 }

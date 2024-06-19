@@ -11,6 +11,9 @@
 #include <mutex>
 #include <cstdio>
 
+
+namespace tsunami {
+
 RingBuffer::RingBuffer(int size) {
 	buf.resize(size);
 	read_pos = 0;
@@ -186,3 +189,5 @@ void RingBuffer::write_ref_done(AudioBuffer &b) {
 // not needed... just to make code more readable
 void RingBuffer::write_ref_cancel(AudioBuffer &b){}
 void RingBuffer::read_ref_cancel(AudioBuffer &b){}
+
+}

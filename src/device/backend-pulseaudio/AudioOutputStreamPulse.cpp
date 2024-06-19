@@ -12,6 +12,8 @@
 #include "../../Session.h"
 #include <pulse/pulseaudio.h>
 
+namespace tsunami {
+
 static const bool STREAM_WARNINGS = true;
 
 
@@ -230,6 +232,8 @@ void AudioOutputStreamPulse::pulse_stream_underflow_callback(pa_stream *s, void 
 	if (STREAM_WARNINGS)
 		printf("pulse: underflow\n");
 	//pa_threaded_mainloop_signal(stream->device_manager->pulse_mainloop, 0);
+}
+
 }
 
 #endif

@@ -10,6 +10,7 @@
 #include "../../Action.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
 
 class ActionSongSetDefaultFormat : public Action {
 public:
@@ -23,3 +24,5 @@ public:
 	SampleFormat format;
 	int compression;
 };
+
+}

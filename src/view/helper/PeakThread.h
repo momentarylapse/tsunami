@@ -11,6 +11,7 @@
 #include "../../lib/threads/Thread.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
 
 class Song;
 class Track;
@@ -53,6 +54,6 @@ private:
 	void notify();
 };
 
-
+}
 
 #endif /* SRC_VIEW_HELPER_PEAKTHREAD_H_ */

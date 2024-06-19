@@ -12,10 +12,13 @@
 #include "../lib/base/optional.h"
 #include <mutex>
 
+class Path;
+
+namespace tsunami {
+
 class ConfigPanel;
 class Module;
 class Session;
-class Path;
 enum class SignalType;
 enum class ModuleCategory;
 class SuckerThread;
@@ -127,5 +130,7 @@ public:
 	void _rebuild_position_estimation_graph();
 	base::optional<int64> estimate_pos() const;
 };
+
+}
 
 #endif /* SRC_MODULE_SIGNALCHAIN_H_ */

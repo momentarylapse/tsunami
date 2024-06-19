@@ -18,6 +18,8 @@
 #include "../../data/SampleRef.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 SampleRefConsole::SampleRefConsole(Session *session, SideBar *_bar):
 	SideBarConsole(_("Sample properties"), "sample-ref-console", session, _bar),
 	in_cur_sample_changed(this, [this] { on_view_cur_sample_change(); })
@@ -126,4 +128,6 @@ void SampleRefConsole::on_view_cur_sample_change() {
 void SampleRefConsole::on_update() {
 	if (!editing)
 		load_data();
+}
+
 }

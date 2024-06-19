@@ -13,6 +13,8 @@
 #include "../../lib/base/iter.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 const Array<SampleFormat> POSSIBLE_FORMATS = {
 	SampleFormat::Int16,
 	SampleFormat::Int24,
@@ -118,4 +120,6 @@ void SongConsole::on_tag_delete() {
 
 void SongConsole::on_update() {
 	load_data();
+}
+
 }

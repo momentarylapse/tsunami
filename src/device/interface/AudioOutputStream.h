@@ -12,6 +12,8 @@
 #include <atomic>
 #include <functional>
 
+namespace tsunami {
+
 class Session;
 class Device;
 class DeviceManager;
@@ -62,5 +64,6 @@ public:
 	SharedData& shared_data;
 };
 
+}
 
 #endif //TSUNAMI_AUDIOOUTPUTSTREAM_H

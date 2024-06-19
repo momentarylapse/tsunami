@@ -10,6 +10,7 @@
 #include "../../data/rhythm/Bar.h"
 #include <assert.h>
 
+namespace tsunami {
 
 ActionBar__Add::ActionBar__Add(int _index, Bar *_bar) {
 	index = _index;
@@ -34,5 +35,7 @@ void ActionBar__Add::undo(Data *d) {
 	s->bars.erase(index);
 	s->bars._update_offsets();
 	s->out_edit_bars.notify();
+}
+
 }
 

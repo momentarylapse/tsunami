@@ -7,6 +7,8 @@
 
 #include "BufferCompressionDialog.h"
 
+namespace tsunami {
+
 const Array<string> COMPRESSION_CODECS = {"ogg", "flac"};
 
 BufferCompressionDialog::BufferCompressionDialog(hui::Window *parent) : hui::Dialog("buffer-compression-dialog", parent) {
@@ -25,5 +27,7 @@ BufferCompressionDialog::BufferCompressionDialog(hui::Window *parent) : hui::Dia
 	event("cancel", [this] {
 		request_destroy();
 	});
+}
+
 }
 

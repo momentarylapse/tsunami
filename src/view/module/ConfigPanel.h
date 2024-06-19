@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Module;
 
 class ConfigPanel : public obs::Node<hui::Panel> {
@@ -31,5 +33,6 @@ public:
 	static bool _hidden_parent_check_;
 };
 
+}
 
 #endif /* SRC_VIEW_MODULE_CONFIGPANEL_H_ */

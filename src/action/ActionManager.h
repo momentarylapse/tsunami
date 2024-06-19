@@ -12,13 +12,16 @@
 #include "../lib/pattern/Observable.h"
 #include "../data/Data.h"
 
-class Data;
-class Action;
-class ActionGroup;
 //class Mutex;
 namespace os {
 	class Timer;
 }
+
+namespace tsunami {
+
+class Data;
+class Action;
+class ActionGroup;
 
 class ActionManager : public obs::Node<VirtualBase> {
 	//friend class Data;
@@ -76,4 +79,6 @@ private:
 	// for merging
 	owned<os::Timer> timer;
 };
+
+}
 

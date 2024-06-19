@@ -5,6 +5,7 @@
 #ifndef TSUNAMI_MIDIINPUTSTREAM_H
 #define TSUNAMI_MIDIINPUTSTREAM_H
 
+namespace tsunami {
 
 class Session;
 class Device;
@@ -42,5 +43,6 @@ public:
 	SharedData& shared_data;
 };
 
+}
 
 #endif //TSUNAMI_MIDIINPUTSTREAM_H

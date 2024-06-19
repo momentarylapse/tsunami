@@ -9,6 +9,8 @@
 #include "ActionTrack__DeleteBuffer.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
@@ -39,4 +41,5 @@ void *ActionTrack__DeleteBuffer::execute(Data *d) {
 	return nullptr;
 }
 
+}
 

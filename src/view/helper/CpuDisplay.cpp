@@ -21,6 +21,8 @@
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 
+namespace tsunami {
+
 static const float UPDATE_DT = 2.0f;
 
 
@@ -356,4 +358,6 @@ void CpuDisplay::update() {
 			}
 	}
 	request_redraw();
+}
+
 }

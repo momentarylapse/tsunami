@@ -10,6 +10,8 @@
 
 #include "MidiPainterMode.h"
 
+namespace tsunami {
+
 class MidiKeyChange;
 class MidiNote;
 enum class NoteModifier;
@@ -43,5 +45,7 @@ public:
 	Array<MidiKeyChange> key_changes;
 	void set_key_changes(const Array<MidiKeyChange> &changes);
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODECLASSICAL_H_ */

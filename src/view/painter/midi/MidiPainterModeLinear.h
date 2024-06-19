@@ -10,6 +10,8 @@
 
 #include "MidiPainterMode.h"
 
+namespace tsunami {
+
 class MidiNote;
 enum class NoteModifier;
 
@@ -40,5 +42,7 @@ public:
 	float pitch_min = 0, pitch_max = 0;
     float clef_line_width = 0;
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODELINEAR_H_ */

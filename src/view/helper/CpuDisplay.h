@@ -19,6 +19,9 @@ namespace scenegraph {
 	class SceneGraph;
 }
 class Painter;
+
+namespace tsunami {
+
 class PerformanceMonitor;
 class Session;
 class AudioView;
@@ -61,5 +64,6 @@ public:
 	float indent_dx;
 };
 
+}
 
 #endif /* SRC_VIEW_HELPER_CPUDISPLAY_H_ */

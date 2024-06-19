@@ -10,6 +10,8 @@
 #include "../../ActionMergable.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 //class Curve;
 
 class ActionTrackCurveEditPoint : public ActionMergable<Curve::Point> {
@@ -23,3 +25,5 @@ private:
 	shared<Curve> curve;
 	int index;
 };
+
+}

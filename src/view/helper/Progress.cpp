@@ -8,6 +8,8 @@
 #include "Progress.h"
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 
 const float PROGRESS_DT = 0.05f;
 
@@ -104,4 +106,6 @@ void ProgressCancelable::__init__(const string &str, hui::Window *parent) {
 
 void ProgressCancelable::__delete__() {
 	this->ProgressCancelable::~ProgressCancelable();
+}
+
 }

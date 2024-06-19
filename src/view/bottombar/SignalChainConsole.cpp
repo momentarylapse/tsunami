@@ -7,6 +7,7 @@
 #include "../../module/SignalChain.h"
 #include "../../storage/Storage.h"
 
+namespace tsunami {
 
 SignalChainConsole::SignalChainConsole(Session *s, BottomBar *bar) :
 		BottomBar::Console(_("Signal Chains"), "signal-chain-console", s, bar)
@@ -86,5 +87,7 @@ void SignalChainConsole::load_data() {
 			desc = "created by user";
 		add_string(id_list, format("<big>%s</big>\n      <small><span alpha=\"50%%\">%s</span></small>", c->name, desc));
 	}
+}
+
 }
 

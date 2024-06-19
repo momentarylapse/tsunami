@@ -10,6 +10,8 @@
 #include "../../../data/TrackMarker.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackDeleteMarker::ActionTrackDeleteMarker(shared<TrackLayer> l, int _index) {
 	layer = l;
 	index = _index;
@@ -30,5 +32,7 @@ void *ActionTrackDeleteMarker::execute(Data *d) {
 void ActionTrackDeleteMarker::undo(Data *d) {
 	layer->markers.insert(marker.get(), index);
 	layer->out_changed.notify();
+}
+
 }
 

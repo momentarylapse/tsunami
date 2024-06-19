@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class AudioBuffer;
 class Sample;
 
@@ -24,5 +26,7 @@ private:
 	shared<Sample> sample;
 	AudioBuffer *buf;
 };
+
+}
 
 #endif /* SRC_ACTION_SAMPLE_ACTIONSAMPLEREPLACEBUFFER_H_ */

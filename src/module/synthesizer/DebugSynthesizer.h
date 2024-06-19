@@ -11,6 +11,7 @@
 #include "Synthesizer.h"
 #include "EnvelopeADSR.h"
 
+namespace tsunami {
 
 class DebugSynthesizer : public Synthesizer {
 public:
@@ -19,5 +20,7 @@ public:
 	PitchRenderer *create_pitch_renderer(int pitch) override;
 	int ttl = 0;
 };
+
+}
 
 #endif /* SRC_MODULE_SYNTH_DEBUGSYNTHESIZER_H_ */

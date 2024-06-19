@@ -25,6 +25,7 @@
 #include "../../lib/os/msg.h"
 #include <math.h>
 
+namespace tsunami {
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l);
 color hash_color(int h);
@@ -388,4 +389,4 @@ int MultiLinePainter::good_samples(const Range &r0) {
 	return best_pos - r0.offset;
 }
 
-
+}

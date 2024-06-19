@@ -11,6 +11,8 @@
 #include "lib/base/pointer.h"
 #include "lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Session;
 class SignalChain;
 class SongRenderer;
@@ -50,5 +52,7 @@ public:
 
 	void update_range(const Range& r);
 };
+
+}
 
 #endif /* SRC_PLAYBACK_H_ */

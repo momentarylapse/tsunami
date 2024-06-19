@@ -10,6 +10,8 @@
 
 #include "../ActionGroup.h"
 
+namespace tsunami {
+
 class Song;
 
 class ActionBarDelete: public ActionGroup {
@@ -21,5 +23,7 @@ public:
 	int index;
 	bool affect_data;
 };
+
+}
 
 #endif /* ACTIONBARDELETE_H_ */

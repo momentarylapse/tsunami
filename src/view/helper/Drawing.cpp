@@ -12,6 +12,8 @@
 #include "../../lib/math/vec2.h"
 
 
+using namespace tsunami;
+
 color color_heat_map(float f) {
 	static const color c[5] = {color(0,0,0,0), color(1,0,0,0.5f), color(1,1,0,0), color(1,1,1,0), color(1,1,1,1)};
 	static const float stop[5] = {0.0f, 0.2f, 0.6f, 0.8f, 1.0f};

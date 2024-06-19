@@ -10,6 +10,7 @@
 
 #include "lib/base/base.h"
 
+namespace tsunami {
 
 class EditMode {
 public:
@@ -34,6 +35,7 @@ public:
 	static const string SignalChain;
 };
 
+}
 
 
 #endif /* SRC_EDITMODES_H_ */

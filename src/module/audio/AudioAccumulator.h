@@ -15,6 +15,8 @@
 #include "../port/Port.h"
 #include <mutex>
 
+namespace tsunami {
+
 class AudioAccumulator : public Module {
 public:
 	AudioAccumulator();
@@ -47,5 +49,7 @@ public:
 
 	ModuleConfiguration* get_config() const override;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOACCUMULATOR_H_ */

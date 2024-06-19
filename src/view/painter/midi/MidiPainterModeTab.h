@@ -10,6 +10,8 @@
 
 #include "MidiPainterMode.h"
 
+namespace tsunami {
+
 class MidiNote;
 
 class MidiPainterModeTab : public MidiPainterMode {
@@ -33,5 +35,7 @@ public:
 	float string_y0 = 0;
 	float clef_line_width = 0;
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODETAB_H_ */

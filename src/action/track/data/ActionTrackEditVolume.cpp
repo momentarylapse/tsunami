@@ -8,6 +8,8 @@
 #include "ActionTrackEditVolume.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 ActionTrackEditVolume::ActionTrackEditVolume(Track *t, float _volume) {
 	track = t;
 	old_value = t->volume;
@@ -32,4 +34,6 @@ bool ActionTrackEditVolume::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->track == track);
+}
+
 }

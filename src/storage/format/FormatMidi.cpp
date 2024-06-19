@@ -20,6 +20,8 @@
 #include "../../lib/os/msg.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 static void dbo(const string &s) {
 	//msg_write(s);
 }
@@ -463,6 +465,6 @@ void FormatMidi::save_song(StorageOperationData* od) {
 
 		od->error(e.message());
 	}
-
+}
 
 }

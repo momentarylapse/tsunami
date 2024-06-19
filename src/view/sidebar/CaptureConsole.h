@@ -13,6 +13,8 @@
 #include "../../data/Song.h"
 #include "../helper/PeakMeterDisplay.h"
 
+namespace tsunami {
+
 class CaptureConsoleMode;
 class Session;
 
@@ -64,5 +66,7 @@ public:
 	bool insert_audio(Track *target, AudioBuffer &buf, int delay);
 	bool insert_midi(Track *target, const MidiEventBuffer &midi, int delay);
 };
+
+}
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLE_H_ */

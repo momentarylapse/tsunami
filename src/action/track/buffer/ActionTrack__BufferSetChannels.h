@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrack__BufferSetChannels : public Action {
@@ -25,5 +27,7 @@ private:
 	int channels;
 	Array<float> temp;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__BUFFERSETCHANNELS_H_ */

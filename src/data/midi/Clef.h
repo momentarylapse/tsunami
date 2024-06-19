@@ -10,11 +10,13 @@
 
 #include "../../lib/base/base.h"
 
+
+namespace tsunami {
+
 class Scale;
 enum class NoteModifier;
 
-class Clef
-{
+class Clef {
 public:
 	Clef(int type, const string &symbol, int offset);
 	enum Type{
@@ -41,5 +43,7 @@ public:
 
 	int position_to_uniclef(int pos) const;
 };
+
+}
 
 #endif /* SRC_DATA_MIDI_CLEF_H_ */

@@ -27,6 +27,8 @@
 #include "../../Session.h"
 #include <math.h>
 
+namespace tsunami {
+
 
 static const int SAMPLE_PREVIEW_WIDTH = 120;
 static const int SAMPLE_PREVIEW_HEIGHT = 36;
@@ -367,5 +369,7 @@ void SampleManagerConsole::end_preview() {
 	preview.chain->stop();
 	preview.chain->unregister();
 	preview.sample = nullptr;
+}
+
 }
 

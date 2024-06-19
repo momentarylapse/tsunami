@@ -10,13 +10,12 @@
 
 #include "../interface/AudioInputStream.h"
 
-
-#if HAS_LIB_PORTAUDIO
 typedef void PaStream;
 struct PaStreamCallbackTimeInfo;
 typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
-#endif
+
+namespace tsunami {
 
 class AudioInputStreamPort : public AudioInputStream {
 public:
@@ -38,6 +37,8 @@ public:
 	                                             void *userData);
 	bool _portaudio_test_error(PaError err, const char *msg);
 };
+
+}
 
 #endif
 

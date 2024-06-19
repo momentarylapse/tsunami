@@ -9,6 +9,8 @@
 
 #include "../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 static bool CHEAT = true;
 
 BufferStreamer::BufferStreamer(AudioBuffer *b) {
@@ -45,3 +47,5 @@ void BufferStreamer::reset_state() {
 /*void BufferStreamer::seek(int pos) {
 	offset = pos;
 }*/
+
+}

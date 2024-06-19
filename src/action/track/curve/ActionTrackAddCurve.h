@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Curve;
 class Track;
 
@@ -23,3 +25,5 @@ private:
 	Track *track;
 	int index;
 };
+
+}

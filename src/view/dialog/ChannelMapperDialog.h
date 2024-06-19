@@ -10,12 +10,15 @@
 
 #include "../../lib/hui/hui.h"
 
-class AudioChannelSelector;
+namespace tsunami {
 
+class AudioChannelSelector;
 
 class ChannelMapDialog : public hui::Dialog {
 public:
 	ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *selector);
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_CHANNELMAPPERDIALOG_H_ */

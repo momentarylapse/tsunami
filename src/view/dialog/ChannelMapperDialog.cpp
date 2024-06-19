@@ -9,6 +9,7 @@
 #include "../module/ConfigPanel.h"
 #include "../../module/audio/AudioChannelSelector.h"
 
+namespace tsunami {
 
 ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *sel) :
 		hui::Dialog("Channel map", 300, 100, parent->win, false) {
@@ -16,4 +17,6 @@ ChannelMapDialog::ChannelMapDialog(hui::Panel *parent, AudioChannelSelector *sel
 	set_title("Channel map");
 	add_grid("", 0, 0, "root");
 	embed(sel->create_panel(), "root", 0, 0);
+}
+
 }

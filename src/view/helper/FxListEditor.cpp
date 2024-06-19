@@ -19,6 +19,7 @@
 #include "../../lib/hui/hui.h"
 #include <cassert>
 
+namespace tsunami {
 
 class TrackSelectionDialog : public hui::Dialog {
 public:
@@ -226,5 +227,7 @@ void FxListEditor::update() {
 	}
 
 	update_list_selection();
+}
+
 }
 

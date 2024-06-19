@@ -10,6 +10,8 @@
 
 #include "../helper/graph/Node.h"
 
+namespace tsunami {
+
 class SignalEditorTab;
 class Module;
 enum class SignalType;
@@ -29,4 +31,4 @@ public:
 	HoverData get_hover_data(const vec2 &m) override;
 };
 
-
+}

@@ -159,7 +159,7 @@ bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 	return false;
 }
 
-HoverData SceneGraph::get_hover_data(const vec2 &m) {
+tsunami::HoverData SceneGraph::get_hover_data(const vec2 &m) {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
@@ -209,7 +209,7 @@ void SceneGraph::set_mouse(const vec2 &_m) {
 	//select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
-void SceneGraph::set_current(const HoverData &h) {
+void SceneGraph::set_current(const tsunami::HoverData &h) {
 	cur_selection = h;
 	out_current_changed();
 }

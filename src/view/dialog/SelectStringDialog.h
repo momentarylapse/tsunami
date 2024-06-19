@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/base/optional.h"
 
+namespace tsunami {
+
 class SelectStringDialog : public hui::Dialog {
 public:
 	SelectStringDialog(hui::Window *parent, const Array<int> &strings);
@@ -20,5 +22,7 @@ public:
 
 	base::optional<int> result;
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_SELECTSTRINGDIALOG_H_ */

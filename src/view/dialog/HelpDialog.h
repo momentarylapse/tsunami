@@ -10,10 +10,13 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class HelpDialog: public hui::Dialog {
 public:
 	HelpDialog(hui::Window *parent);
 };
 
+}
 
 #endif /* SRC_VIEW_DIALOG_HELPDIALOG_H_ */

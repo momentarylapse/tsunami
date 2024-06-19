@@ -14,6 +14,8 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
+namespace tsunami {
+
 class Plugin;
 class Track;
 class TrackLayer;
@@ -39,5 +41,7 @@ public:
 };
 
 MidiEffect *_cdecl CreateMidiEffect(Session *session, const string &name);
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDIEFFECT_H_ */

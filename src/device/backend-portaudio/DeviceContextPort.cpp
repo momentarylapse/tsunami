@@ -14,6 +14,8 @@
 
 #include <portaudio.h>
 
+namespace tsunami {
+
 DeviceContextPort* DeviceContextPort::instance;
 
 DeviceContextPort::DeviceContextPort(Session* session) : DeviceContext(session) {
@@ -90,5 +92,6 @@ bool DeviceContextPort::_test_error(PaError err, Session *session, const string 
 	return false;
 }
 
+}
 
 #endif

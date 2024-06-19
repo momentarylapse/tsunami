@@ -12,8 +12,9 @@
 
 #include "UnitTest.h"
 
-class TestRingBuffer : public UnitTest
-{
+namespace tsunami {
+
+class TestRingBuffer : public UnitTest {
 public:
 	TestRingBuffer();
 
@@ -27,6 +28,8 @@ public:
 	static void test_read_write_ref();
 	static void test_thread_safety();
 };
+
+}
 
 #endif /* SRC_TEST_TESTRINGBUFFER_H_ */
 

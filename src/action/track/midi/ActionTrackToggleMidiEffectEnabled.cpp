@@ -9,6 +9,8 @@
 #include "../../../data/Song.h"
 #include "../../../module/midi/MidiEffect.h"
 
+namespace tsunami {
+
 ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(MidiEffect *_fx) {
 	fx = _fx;
 }
@@ -25,4 +27,5 @@ void ActionTrackToggleMidiEffectEnabled::undo(Data *d) {
 	execute(d);
 }
 
+}
 

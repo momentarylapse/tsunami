@@ -10,6 +10,8 @@
 
 #include "../helper/graph/Node.h"
 
+namespace tsunami {
+
 class Session;
 class BottomBar;
 
@@ -24,6 +26,6 @@ public:
 	Session *session;
 };
 
-
+}
 
 #endif /* SRC_VIEW_MAINVIEW_BOTTOMBAREXPANDBUTTON_H_ */

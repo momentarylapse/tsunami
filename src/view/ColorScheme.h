@@ -15,6 +15,8 @@ namespace hui {
 	class Panel;
 }
 
+namespace tsunami {
+
 extern const color PITCH_COLORS[12];
 
 class ColorScheme {
@@ -109,5 +111,7 @@ public:
 
 
 extern ColorScheme theme;
+
+}
 
 #endif /* SRC_VIEW_COLORSCHEME_H_ */

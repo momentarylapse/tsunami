@@ -16,6 +16,8 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 Action__ShiftData::Action__ShiftData(int _offset, int _shift, BarEditMode _mode) {
 	offset = _offset;
 	shift = _shift;
@@ -77,4 +79,6 @@ void Action__ShiftData::do_shift(Song *s, int delta) {
 			l->out_changed.notify();
 		}
 	}
+}
+
 }

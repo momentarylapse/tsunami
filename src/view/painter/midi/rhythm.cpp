@@ -4,6 +4,7 @@
 #include "../../../data/midi/MidiData.h"
 #include "../../audioview/ViewPort.h"
 
+namespace tsunami {
 
 void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors);
 MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
@@ -206,4 +207,6 @@ Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, Quanti
 	}
 
 	return groups;
+}
+
 }

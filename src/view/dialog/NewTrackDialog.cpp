@@ -23,6 +23,8 @@
 #include "../../Session.h"
 #include "../../lib/base/sort.h"
 
+namespace tsunami {
+
 static const int FAKE_TYPE_PRESET = -1;
 
 void set_bar_pattern(BarPattern &b, const string &pat);
@@ -254,3 +256,4 @@ void NewTrackDialog::on_preset() {
 	on_ok();
 }
 
+}

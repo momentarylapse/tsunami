@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../Action.h"
+
+namespace tsunami {
+
 class AudioEffect;
 
 class ActionTrackSetAudioEffectEnabledWetness: public Action {
@@ -24,3 +27,5 @@ private:
 	bool enabled;
 	float wetness;
 };
+
+}

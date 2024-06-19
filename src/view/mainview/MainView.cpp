@@ -23,6 +23,8 @@
 #include "../../Playback.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 const static float TAB_BAR_HEIGHT = 35;
 
 class TabBarButton : public scenegraph::Node {
@@ -256,5 +258,7 @@ void MainView::update_onscreen_displays() {
 			output_volume_dial->hidden = !session->playback->is_active();
 		}
 	scene_graph->request_redraw();
+}
+
 }
 

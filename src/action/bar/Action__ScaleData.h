@@ -11,10 +11,11 @@
 #include "../Action.h"
 #include "../../data/Range.h"
 
+namespace tsunami {
+
 class Song;
 
-class Action__ScaleData: public Action
-{
+class Action__ScaleData: public Action {
 public:
 	Action__ScaleData(const Range &source, int new_size);
 
@@ -27,5 +28,7 @@ private:
 	Range source;
 	int new_size;
 };
+
+}
 
 #endif /* SRC_ACTION_BAR_ACTION__SCALEDATA_H_ */

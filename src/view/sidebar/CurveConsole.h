@@ -11,6 +11,8 @@
 #include "SideBar.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 class AudioView;
@@ -46,5 +48,7 @@ public:
 
 	owned<hui::Menu> popup_menu;
 };
+
+}
 
 #endif /* CURVECONSOLE_H_ */

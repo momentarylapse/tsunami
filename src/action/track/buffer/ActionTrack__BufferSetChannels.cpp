@@ -9,8 +9,9 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
-ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_layer, int _index, int _channels)
-{
+namespace tsunami {
+
+ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_layer, int _index, int _channels) {
 	layer = _layer;
 	index = _index;
 	channels = _channels;
@@ -18,16 +19,16 @@ ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_laye
 		temp = layer->buffers[index].c[0];
 }
 
-void *ActionTrack__BufferSetChannels::execute(Data *d)
-{
+void *ActionTrack__BufferSetChannels::execute(Data *d) {
 	layer->buffers[index].c[1].exchange(temp);
 	std::swap(layer->buffers[index].channels, channels);
 	layer->buffers[index]._data_was_changed();
 	return nullptr;
 }
 
-void ActionTrack__BufferSetChannels::undo(Data *d)
-{
+void ActionTrack__BufferSetChannels::undo(Data *d) {
 	execute(d);
+}
+
 }
 

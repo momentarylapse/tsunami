@@ -11,6 +11,8 @@
 #include "BeatSource.h"
 #include "../../data/rhythm/BarCollection.h"
 
+namespace tsunami {
+
 class BarStreamer : public BeatSource {
 public:
 	BarStreamer(BarCollection &bars);
@@ -28,6 +30,6 @@ public:
 	int offset;
 };
 
-
+}
 
 #endif /* SRC_MODULE_BEATS_BARSTREAMER_H_ */

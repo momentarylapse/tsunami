@@ -12,6 +12,8 @@
 #include "../lib/hui/hui.h"
 #include "../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Song;
 class MainView;
 class AudioView;
@@ -155,5 +157,7 @@ public:
 
 	Tsunami *app;
 };
+
+}
 
 #endif /* SRC_VIEW_TSUNAMIWINDOW_H_ */

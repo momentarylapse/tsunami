@@ -51,12 +51,13 @@
 #include "../../EditModes.h"
 #include "../../Tsunami.h"
 
+namespace tsunami {
 
 const int AudioView::SNAPPING_DIST = 8;
 
 extern Synthesizer* CreateSynthesizer(Session *session, const string &name);
 
-class AddTrackButton : public scenegraph::Node {
+class AddTrackButton : public ::scenegraph::Node {
 	AudioView *view;
 public:
 	explicit AddTrackButton(AudioView *_view) : scenegraph::Node(theme.TRACK_HANDLE_HEIGHT, theme.TRACK_HANDLE_HEIGHT) {
@@ -1635,15 +1636,15 @@ HoverData &AudioView::hover() {
 	return graph()->hover;
 }
 
-MouseDelayPlanner *AudioView::mdp() {
+scenegraph::MouseDelayPlanner *AudioView::mdp() {
 	return graph()->mdp.get();
 }
 
-void AudioView::mdp_prepare(MouseDelayAction *a) {
+void AudioView::mdp_prepare(scenegraph::MouseDelayAction *a) {
 	graph()->mdp_prepare(a);
 }
 
-void AudioView::mdp_run(MouseDelayAction *a) {
+void AudioView::mdp_run(scenegraph::MouseDelayAction *a) {
 	graph()->mdp_run(a, cursor());
 }
 
@@ -1653,4 +1654,6 @@ void AudioView::mdp_prepare(std::function<void(const vec2&)> update) {
 
 bool view_has_focus(AudioView *view) {
 	return view->win->is_active("area"); //view->id);
+}
+
 }

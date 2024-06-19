@@ -14,6 +14,7 @@
 #include "../../lib/base/algo.h"
 #include "../../lib/hui/Controls/Control.h"
 
+namespace tsunami {
 
 PluginConsole::PluginConsole(Session *s, BottomBar *bar) :
 	BottomBar::Console(_("Plugins"), "plugin-console", s, bar)
@@ -100,4 +101,6 @@ void PluginConsole::update_favotites() {
 			index ++;
 		}
 	hide_control("favorite-grid", favorite_buttons.num == 0);
+}
+
 }

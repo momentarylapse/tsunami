@@ -11,10 +11,13 @@
 #include "../../helper/graph/Node.h"
 #include "../../../data/Range.h"
 
-class AudioView;
 class color;
 
-class Cursor : public scenegraph::NodeFree {
+namespace tsunami {
+
+class AudioView;
+
+class Cursor : public ::scenegraph::NodeFree {
 public:
 	Cursor(AudioView *view, bool end);
 
@@ -31,7 +34,7 @@ public:
 	bool on_left_button_down(const vec2 &m) override;
 };
 
-class SelectionMarker : public scenegraph::NodeFree {
+class SelectionMarker : public ::scenegraph::NodeFree {
 public:
 	SelectionMarker(AudioView *view);
 	bool hover(const vec2 &m) const override { return false; }
@@ -40,5 +43,7 @@ public:
 	void on_draw(Painter *p) override;
 	void draw_bar_gap_selector(Painter* p, int bar_gap, const color &col);
 };
+
+}
 
 #endif /* SRC_VIEW_GRAPH_CURSOR_H_ */

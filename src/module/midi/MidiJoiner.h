@@ -12,6 +12,8 @@
 #include "../port/Port.h"
 #include "../Module.h"
 
+namespace tsunami {
+
 class MidiJoiner : public Module {
 public:
 	MidiJoiner();
@@ -24,5 +26,7 @@ public:
 
 	int read_midi(int port, MidiEventBuffer &buf) override;
 };
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDIJOINER_H_ */

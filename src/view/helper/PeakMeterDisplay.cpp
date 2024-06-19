@@ -12,7 +12,7 @@
 #include "../../module/audio/PeakMeter.h"
 #include <math.h>
 
-
+namespace tsunami {
 
 
 const int PeakMeterDisplay::SPACE_BETWEEN_CHANNELS = 2;
@@ -234,4 +234,6 @@ void PeakMeterDisplay::on_update() {
 
 int PeakMeterDisplay::good_size(int num_channels) {
 	return (CHANNEL_SIZE_RECOMMENDED + SPACE_BETWEEN_CHANNELS) * num_channels - SPACE_BETWEEN_CHANNELS;
+}
+
 }

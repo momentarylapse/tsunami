@@ -11,6 +11,8 @@
 #include <functional>
 #include "BasicGridPainter.h"
 
+namespace tsunami {
+
 class ViewPort;
 class Song;
 class ColorScheme;
@@ -36,5 +38,7 @@ public:
 	SongSelection *sel;
 	ColorScheme &local_theme;
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_GRIDPAINTER_H_ */

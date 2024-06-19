@@ -9,6 +9,8 @@
 #include "../../lib/os/file.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 EnvelopeADSR::EnvelopeADSR() {
 	set(0, 0, 0, 0, 0);
 	reset();
@@ -36,7 +38,7 @@ void EnvelopeADSR::set2(float _initial, float _peak) {
 }
 
 void EnvelopeADSR::reset() {
-	mode = MODE_OFF;
+	mode = Mode::Off;
 	value = 0;
 	just_killed = false;
 }
@@ -62,29 +64,29 @@ void EnvelopeADSR::start(float volume) {
 }
 
 void EnvelopeADSR::end() {
-	if (mode == MODE_ATTACK)
+	if (mode == Mode::Attack)
 		start_attack_zombie();
 	else
 		start_release();
 }
 
 float EnvelopeADSR::get() {
-	if (mode == MODE_ATTACK) {
+	if (mode == Mode::Attack) {
 		value += step_attack;
 		ttl --;
 		if (ttl <= 0)
 			start_decay();
-	} else if (mode == MODE_ATTACK_ZOMBIE) {
+	} else if (mode == Mode::AttackZombie) {
 		value += step_attack;
 		ttl --;
 		if (ttl <= 0)
 			start_release();
-	} else if (mode == MODE_DECAY) {
+	} else if (mode == Mode::Decay) {
 		value += step_decay;
 		ttl --;
 		if (ttl <= 0)
 			start_sustain();
-	} else if (mode == MODE_RELEASE) {
+	} else if (mode == Mode::Release) {
 		value *= factor_release;
 		if (value <= 0.0001f)
 			kill();
@@ -104,7 +106,7 @@ void EnvelopeADSR::start_attack() {
 	if (value < value_initial)
 		value = value_initial;
 
-	mode = MODE_ATTACK;
+	mode = Mode::Attack;
 	ttl = ttl_attack;
 	just_killed = false;
 
@@ -113,12 +115,12 @@ void EnvelopeADSR::start_attack() {
 }
 
 void EnvelopeADSR::start_attack_zombie() {
-	mode = MODE_ATTACK_ZOMBIE;
+	mode = Mode::AttackZombie;
 }
 
 void EnvelopeADSR::start_decay() {
 	value = value_peak;
-	mode = MODE_DECAY;
+	mode = Mode::Decay;
 	ttl = ttl_decay;
 
 	if (ttl <= 0)
@@ -127,17 +129,19 @@ void EnvelopeADSR::start_decay() {
 
 void EnvelopeADSR::start_sustain() {
 	value = value_sustain;
-	mode = MODE_SUSTAIN;
+	mode = Mode::Sustain;
 }
 
 void EnvelopeADSR::start_release() {
 	//value = value_sustain;
-	mode = MODE_RELEASE;
+	mode = Mode::Release;
 	ttl = ttl_release;
 }
 
 void EnvelopeADSR::kill() {
 	value = 0;
-	mode = MODE_OFF;
+	mode = Mode::Off;
 	just_killed = true;
+}
+
 }

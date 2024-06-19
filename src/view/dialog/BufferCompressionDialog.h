@@ -10,6 +10,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
+
 class Song;
 class Range;
 
@@ -20,3 +22,5 @@ public:
 
 	BufferCompressionDialog(hui::Window *parent);
 };
+
+}

@@ -10,6 +10,8 @@
 #include "../../ActionGroup.h"
 #include "../../../data/Range.h"
 
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 class Range;
@@ -45,3 +47,5 @@ public:
 	void set_active(TrackLayer *l, const Range &r, Data *d);
 	void set_inactive(TrackLayer *l, const Range &r, Data *d);
 };
+
+}

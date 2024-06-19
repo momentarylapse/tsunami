@@ -13,6 +13,8 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
+namespace tsunami {
+
 class Plugin;
 class Track;
 class TrackLayer;
@@ -41,5 +43,7 @@ public:
 };
 
 AudioEffect *_cdecl CreateAudioEffect(Session *session, const string &name);
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOEFFECT_H_ */

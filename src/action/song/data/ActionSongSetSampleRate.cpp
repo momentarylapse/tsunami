@@ -8,14 +8,14 @@
 #include "ActionSongSetSampleRate.h"
 #include "../../../data/Song.h"
 
-ActionSongSetSampleRate::ActionSongSetSampleRate(Song *s, int _sample_rate)
-{
+namespace tsunami {
+
+ActionSongSetSampleRate::ActionSongSetSampleRate(Song *s, int _sample_rate) {
 	new_value = _sample_rate;
 	old_value = s->sample_rate;
 }
 
-void *ActionSongSetSampleRate::execute(Data *d)
-{
+void *ActionSongSetSampleRate::execute(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->sample_rate = new_value;
@@ -23,16 +23,16 @@ void *ActionSongSetSampleRate::execute(Data *d)
 	return nullptr;
 }
 
-void ActionSongSetSampleRate::undo(Data *d)
-{
+void ActionSongSetSampleRate::undo(Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->sample_rate = old_value;
 }
 
 
-bool ActionSongSetSampleRate::mergable(Action *a)
-{
+bool ActionSongSetSampleRate::mergable(Action *a) {
 	ActionSongSetSampleRate *aa = dynamic_cast<ActionSongSetSampleRate*>(a);
 	return aa;
+}
+
 }

@@ -12,6 +12,8 @@
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Thread.h"
 
+namespace tsunami {
+
 TestThreads::TestThreads() : UnitTest("threads") {
 }
 
@@ -37,6 +39,8 @@ void TestThreads::test_thread_safety() {
 		sleep(0.01f);
 	t->join();
 	delete t;
+
+}
 
 }
 

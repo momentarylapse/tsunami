@@ -16,8 +16,7 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 
-
-
+namespace tsunami {
 
 class LayerHeaderButton : public scenegraph::NodeRel {
 public:
@@ -230,8 +229,11 @@ bool LayerHeader::on_right_button_down(const vec2 &m) {
 	view->open_popup(view->menu_layer.get());
 	return true;
 }
+
 HoverData LayerHeader::get_hover_data(const vec2 &m) {
 	auto h = Node::get_hover_data(m);
 	h.vlayer = vlayer;
 	return h;
+}
+
 }

@@ -11,11 +11,14 @@
 #include "../../lib/pattern/Observable.h"
 #include "graph/Node.h"
 
-class PeakMeter;
-struct PeakMeterData;
 namespace hui {
 	class Panel;
 }
+
+namespace tsunami {
+
+class PeakMeter;
+struct PeakMeterData;
 
 class PeakMeterDisplay : public scenegraph::Node {
 public:
@@ -63,5 +66,7 @@ private:
 	static const int SPACE_BETWEEN_CHANNELS;
 	static const int CHANNEL_SIZE_RECOMMENDED;
 };
+
+}
 
 #endif /* PEAKMETERDISPLAY_H_ */

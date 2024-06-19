@@ -9,14 +9,14 @@
 
 #include <assert.h>
 
-ActionTagEdit::ActionTagEdit(int _index, const Tag &_tag)
-{
+namespace tsunami {
+
+ActionTagEdit::ActionTagEdit(int _index, const Tag &_tag) {
 	index = _index;
 	new_tag = _tag;
 }
 
-void *ActionTagEdit::execute(Data *d)
-{
+void *ActionTagEdit::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < a->tags.num);
@@ -27,10 +27,11 @@ void *ActionTagEdit::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTagEdit::undo(Data *d)
-{
+void ActionTagEdit::undo(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->tags[index] = old_tag;
+}
+
 }
 

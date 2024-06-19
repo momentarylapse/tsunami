@@ -28,7 +28,7 @@
 #include "../../plugins/PluginManager.h"
 
 
-
+namespace tsunami {
 
 class SignalEditorPlayButton : public scenegraph::NodeRel {
 public:
@@ -344,3 +344,4 @@ SignalEditorModule *SignalEditorTab::get_module(Module *m) {
 	return nullptr;
 }
 
+}

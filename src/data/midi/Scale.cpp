@@ -9,6 +9,9 @@
 #include "Scale.h"
 #include "MidiData.h"
 
+
+namespace tsunami {
+
 const Scale Scale::C_MAJOR = Scale(Scale::Type::MAJOR, 0);
 
 static const NoteModifier scale_major_modifiers[12][7] = {
@@ -26,8 +29,7 @@ static const NoteModifier scale_major_modifiers[12][7] = {
 	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE}, // B
 };
 
-inline int scale_to_major(const Scale &s)
-{
+inline int scale_to_major(const Scale &s) {
 	if (s.type == Scale::Type::MAJOR)
 		return s.root;
 	if (s.type == Scale::Type::LOCRIAN)
@@ -45,8 +47,7 @@ inline int scale_to_major(const Scale &s)
 	return s.root;
 }
 
-Scale::Scale(Type _type, int _root)
-{
+Scale::Scale(Type _type, int _root) {
 	type = _type;
 	root = _root;
 	int ms = scale_to_major(*this);
@@ -62,8 +63,7 @@ Scale::Scale(Type _type, int _root)
 }
 
 // can be parsed
-string Scale::get_type_name_canonical(Type type)
-{
+string Scale::get_type_name_canonical(Type type) {
 	if (type == Type::MAJOR)
 		return "major";
 	if (type == Type::DORIAN)
@@ -81,8 +81,7 @@ string Scale::get_type_name_canonical(Type type)
 	return "???";
 }
 
-string Scale::get_type_name(Type type)
-{
+string Scale::get_type_name(Type type) {
 	if (type == Type::MAJOR)
 		return _("Major");
 	if (type == Type::DORIAN)
@@ -100,23 +99,19 @@ string Scale::get_type_name(Type type)
 	return "???";
 }
 
-string Scale::nice_name() const
-{
+string Scale::nice_name() const {
 	return rel_pitch_name(root) + " " + type_name();
 }
 
-string Scale::type_name() const
-{
+string Scale::type_name() const {
 	return get_type_name(type);
 }
 
-string Scale::encode() const
-{
+string Scale::encode() const {
 	return rel_pitch_name_canonical(root) + "-" + get_type_name_canonical(type);
 }
 
-Scale Scale::parse(const string &text)
-{
+Scale Scale::parse(const string &text) {
 	auto ss = text.explode("-");
 	if (ss.num != 2)
 		return Scale::C_MAJOR;
@@ -128,24 +123,20 @@ Scale Scale::parse(const string &text)
 	return Scale(type, root);
 }
 
-bool Scale::contains(int pitch) const
-{
+bool Scale::contains(int pitch) const {
 	return _contains[pitch % 12];
 }
 
-int uniclef_get_rel(int upos)
-{
+int uniclef_get_rel(int upos) {
 	return upos % 7;
 }
 
-int uniclef_get_octave(int upos)
-{
+int uniclef_get_octave(int upos) {
 	return upos / 7;
 }
 
 // "major scale notation"
-int uniclef_to_pitch(int upos)
-{
+int uniclef_to_pitch(int upos) {
 	const int pp[7] = {0,2,4,5,7,9,11};
 
 	int octave = uniclef_get_octave(upos);
@@ -153,22 +144,21 @@ int uniclef_to_pitch(int upos)
 	return pitch_from_octave_and_rel(pp[rel], octave);
 }
 
-int uniclef_to_pitch(int upos, NoteModifier mod)
-{
+int uniclef_to_pitch(int upos, NoteModifier mod) {
 	return uniclef_to_pitch(upos) + modifier_shift(mod);
 }
 
 // upos in major scale notation
-int Scale::transform_out(int upos, NoteModifier mod) const
-{
+int Scale::transform_out(int upos, NoteModifier mod) const {
 	int pitch = uniclef_to_pitch(upos);
 	return modifier_apply(pitch, mod, get_modifier(upos));
 }
 
-NoteModifier Scale::get_modifier(int upos) const
-{
+NoteModifier Scale::get_modifier(int upos) const {
 	int rel = uniclef_get_rel(upos);
 	return modifiers[rel];
+}
+
 }
 
 

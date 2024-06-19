@@ -12,6 +12,13 @@
 #include "../../../lib/base/optional.h"
 #include "../../../lib/pattern/Observable.h"
 
+
+namespace hui {
+	class Panel;
+}
+
+namespace tsunami {
+
 class Device;
 class AudioInput;
 class MidiInput;
@@ -26,10 +33,6 @@ class Module;
 class SignalChain;
 enum class SignalType;
 class Track;
-
-namespace hui {
-	class Panel;
-}
 
 
 struct SyncPoint {
@@ -85,6 +88,6 @@ struct CaptureTrackData : public obs::Node<VirtualBase> {
 	void add_into_signal_chain(SignalChain *chain, Device *preferred_device = nullptr);
 };
 
-
+}
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURETRACKDATA_H_ */

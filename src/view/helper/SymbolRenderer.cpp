@@ -11,10 +11,11 @@
 #include "../../lib/hui/hui.h"
 #include <math.h>
 
+namespace tsunami {
+
 #define ENABLED 0
 
-namespace SymbolRenderer
-{
+namespace SymbolRenderer {
 
 static bool enabled = ENABLED;
 
@@ -123,4 +124,6 @@ void enable(bool _enabled) {
 	enabled = _enabled;
 }
 
-};
+}
+
+}

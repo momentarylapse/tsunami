@@ -16,6 +16,8 @@
 #include "SampleRef.h"
 #include "../lib/base/iter.h"
 
+namespace tsunami {
+
 SongSelection::SongSelection() {
 	song = nullptr;
 }
@@ -261,4 +263,6 @@ SongSelection SongSelection::minus(const SongSelection &s) const {
 	for (auto b: s._bars)
 		r.set(b, false);
 	return r;
+}
+
 }

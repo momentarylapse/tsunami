@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 
@@ -24,5 +26,7 @@ private:
 	int index;
 	shared<TrackLayer> layer;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_ */

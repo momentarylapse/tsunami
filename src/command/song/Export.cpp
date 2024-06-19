@@ -12,6 +12,7 @@
 #include "../../storage/Storage.h"
 #include "../../Session.h"
 
+namespace tsunami {
 
 shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel) {
 	Song *ss = new Song(song->session, song->sample_rate);
@@ -80,5 +81,7 @@ base::future<void> export_selection(Song *song, const SongSelection& sel, const 
 	if (force_unmute)
 		unmute_all(s.get());
 	return song->session->storage->save(s.get(), filename);
+}
+
 }
 

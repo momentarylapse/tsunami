@@ -11,6 +11,8 @@
 #include "../port/Port.h"
 #include "../Module.h"
 
+namespace tsunami {
+
 class DummyBeatSource;
 
 class BeatSource : public Module {
@@ -43,5 +45,6 @@ public:
 
 BeatSource *CreateBeatSource(Session *session, const string &name);
 
+}
 
 #endif /* SRC_MODULE_BEATS_BEATSOURCE_H_ */

@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Module;
 class ConfigPanel;
 class Session;
@@ -102,5 +104,6 @@ public:
 	ConfigPanelSocket socket;
 };
 
+}
 
 #endif /* SRC_VIEW_MODULE_MODULEPANEL_H_ */

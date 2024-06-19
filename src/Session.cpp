@@ -31,6 +31,8 @@
 #include "view/bottombar/MixingConsole.h"
 #include "view/TsunamiWindow.h"
 
+namespace tsunami {
+
 int Session::next_id = 0;
 Session *Session::GLOBAL = nullptr;
 
@@ -275,4 +277,6 @@ void Session::remove_signal_chain(SignalChain* chain) {
 		if (chain == all_signal_chains[i])
 			all_signal_chains.erase(i);
 	out_remove_signal_chain(chain);
+}
+
 }

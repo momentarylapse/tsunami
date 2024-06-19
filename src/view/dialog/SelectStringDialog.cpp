@@ -8,6 +8,8 @@
 #include "SelectStringDialog.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
+
 SelectStringDialog::SelectStringDialog(hui::Window *parent, const Array<int> &strings) :
 	hui::Dialog("select-string-dialog", parent)
 {
@@ -30,5 +32,7 @@ void SelectStringDialog::on_string() {
 
 void SelectStringDialog::on_cancel() {
 	request_destroy();
+}
+
 }
 

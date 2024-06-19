@@ -10,6 +10,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 ActionTrackMoveBuffer::ActionTrackMoveBuffer(TrackLayer *l, int _index, int _shift) {
 	layer = l;
 	index = _index;
@@ -30,6 +32,8 @@ void *ActionTrackMoveBuffer::execute(Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	b.offset += shift;
 	return nullptr;
+}
+
 }
 
 

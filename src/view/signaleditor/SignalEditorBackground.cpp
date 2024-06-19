@@ -9,6 +9,7 @@
 #include "SignalEditorTab.h"
 #include "../audioview/AudioView.h"
 
+namespace tsunami {
 
 const float MODULE_GRID = 23;
 
@@ -61,5 +62,7 @@ bool SignalEditorBackground::on_left_button_down(const vec2 &m) {
 bool SignalEditorBackground::on_right_button_down(const vec2 &m) {
 	tab->popup_chain();
 	return true;
+}
+
 }
 

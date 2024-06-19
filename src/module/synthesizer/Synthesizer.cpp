@@ -14,6 +14,8 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 PitchRenderer::PitchRenderer(Synthesizer *s, int p) {
 	synth = s;
 	pitch = p;
@@ -211,5 +213,7 @@ bool Synthesizer::is_default() {
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name) {
 	return (Synthesizer*)ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, name);
+}
+
 }
 

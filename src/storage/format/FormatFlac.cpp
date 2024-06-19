@@ -21,6 +21,8 @@
 #if HAS_LIB_FLAC
 #include <FLAC/all.h>
 
+namespace tsunami {
+
 bool flac_tells_samples;
 int flac_offset;
 int flac_samples, flac_file_size;
@@ -248,6 +250,8 @@ void FormatFlac::save_via_renderer(StorageOperationData *od)
 
 	if (encoder)
 		FLAC__stream_encoder_delete(encoder);
+}
+
 }
 
 #endif

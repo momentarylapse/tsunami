@@ -10,6 +10,8 @@
 
 #include "BottomBar.h"
 
+namespace tsunami {
+
 struct SessionLabel;
 
 class SignalChainConsole: public BottomBar::Console {
@@ -28,5 +30,7 @@ public:
 
 	void load_data();
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_SIGNALCHAINCONSOLE_H_ */

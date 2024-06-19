@@ -11,15 +11,18 @@
 #include "../lib/base/base.h"
 #include "../lib/os/path.h"
 
-enum class BackupMode {
-	NONE,
-	TEMP,
-	KEEP
-};
-
 namespace os::fs {
 	class FileStream;
 }
+
+namespace tsunami {
+
+enum class BackupMode {
+	None,
+	Temporary,
+	Keep
+};
+
 class Session;
 
 class BackupManager {
@@ -55,5 +58,7 @@ public:
 	static bool should_notify_found_backups();
 	static void notify_found_backups_done();
 };
+
+}
 
 #endif /* SRC_STUFF_BACKUPMANAGER_H_ */

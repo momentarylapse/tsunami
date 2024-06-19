@@ -17,6 +17,8 @@
 #define MINIMP3_FLOAT_OUTPUT
 #include "../helper/minimp3.h"
 
+namespace tsunami {
+
 FormatDescriptorMp3::FormatDescriptorMp3() :
 	FormatDescriptor("Mp3", "mp3", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
 {
@@ -220,5 +222,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 	if (f)
 		delete f;
+}
+
 }
 

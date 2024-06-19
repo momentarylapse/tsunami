@@ -10,6 +10,9 @@
 
 #include "../../lib/base/base.h"
 
+
+namespace tsunami {
+
 class Clef;
 
 class Instrument {
@@ -63,5 +66,7 @@ public:
 	int highest_usable_string(int pitch) const;
 	int make_string_valid(int pitch, int string) const;
 };
+
+}
 
 #endif /* SRC_DATA_MIDI_INSTRUMENT_H_ */

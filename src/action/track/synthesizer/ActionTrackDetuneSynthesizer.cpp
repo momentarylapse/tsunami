@@ -11,6 +11,8 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, const Temperament &_temp) {
 	track = t;
 	temperament = _temp;
@@ -27,4 +29,6 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d) {
 
 void ActionTrackDetuneSynthesizer::undo(Data *d) {
 	execute(d);
+}
+
 }

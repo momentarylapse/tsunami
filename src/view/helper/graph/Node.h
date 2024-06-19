@@ -15,7 +15,9 @@
 #include "../../../lib/pattern/Observable.h"
 
 class Painter;
+namespace tsunami {
 class HoverData;
+}
 
 namespace scenegraph {
 
@@ -45,7 +47,7 @@ public:
 
 	void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
-	virtual HoverData get_hover_data(const vec2 &m);
+	virtual tsunami::HoverData get_hover_data(const vec2 &m);
 	void add_child(Node *child);
 	void delete_child(Node *child);
 

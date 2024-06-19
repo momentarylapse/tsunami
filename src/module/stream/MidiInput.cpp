@@ -19,6 +19,7 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
+namespace tsunami {
 
 int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 	if (config.free_flow){
@@ -221,5 +222,7 @@ ModuleConfiguration *MidiInput::get_config() const {
 void MidiInput::on_config() {
 	if (config.device != cur_device)
 		update_device();
+}
+
 }
 

@@ -16,6 +16,8 @@
 #include "../../../data/SampleRef.h"
 #include "../midi/ActionTrackAddMidiNote.h"
 
+namespace tsunami {
+
 ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
@@ -47,5 +49,7 @@ void ActionTrackInsertSample::build(Data *d) {
 
 	// delete sub
 	add_sub_action(new ActionTrackDeleteSample(ref), d);
+}
+
 }
 

@@ -11,6 +11,8 @@
 #include "../processing/audio/BufferInterpolator.h"
 #include "../processing/audio/BufferPitchShift.h"
 
+namespace tsunami {
+
 TestInterpolator::TestInterpolator() : UnitTest("interpolator")
 {
 }
@@ -80,6 +82,8 @@ void TestInterpolator::test_pitch_operator() {
 	AudioBuffer buf(1024*8, 2);
 	assert_equal(op.process(buf).length, 14336);
 	assert_equal(op.process(buf).length, 16384);
+}
+
 }
 
 #endif

@@ -11,10 +11,15 @@
 namespace hui {
 class Panel;
 }
+
+namespace tsunami {
+
 class Session;
 
 namespace BreadCrumps {
 	void add(hui::Panel* panel, Session *session);
+}
+
 }
 
 #endif /* SRC_VIEW_HELPER_BREADCRUMPS_H_ */

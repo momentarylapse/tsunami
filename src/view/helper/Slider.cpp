@@ -8,6 +8,8 @@
 #include "Slider.h"
 #include <cmath>
 
+namespace tsunami {
+
 Slider::Slider(hui::Panel *_panel, const string & _id_slider, const string & _id_edit) {
 	panel = _panel;
 	id_slider = _id_slider;
@@ -116,3 +118,4 @@ void Slider::on_edit() {
 	out_value(value);
 }
 
+}

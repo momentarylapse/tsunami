@@ -28,6 +28,8 @@
 #include "TestPointer.h"
 #include "TestSignalChain.h"
 
+namespace tsunami {
+
 Array<string> UnitTest::event_protocoll;
 
 UnitTest::UnitTest(const string &_name) {
@@ -214,4 +216,7 @@ void UnitTest::print_all_names() {
 	for (auto *t: tests)
 		delete t;
 }
+
+}
+
 #endif

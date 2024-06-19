@@ -15,6 +15,8 @@
 #include "../lib/any/any.h"
 #include <shared_mutex>
 
+namespace tsunami {
+
 class Data;
 class AudioEffect;
 class MidiEffect;
@@ -131,6 +133,8 @@ public:
 
 
 int get_track_index(Track *t);
+
+}
 
 
 #endif /* SRC_DATA_SONG_H_ */

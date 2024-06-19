@@ -9,6 +9,9 @@
 #include "../../lib/math/math.h"
 #include <math.h>
 
+
+namespace tsunami {
+
 /*Temperament::Temperament() {
 }*/
 
@@ -106,5 +109,7 @@ bool Temperament::guess_parameters(TemperamentType &type, int &pitch_ref, float 
 	}
 
 	return false;
+}
+
 }
 

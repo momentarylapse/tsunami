@@ -8,6 +8,8 @@
 #include "ActionTrackEditPanning.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 ActionTrackEditPanning::ActionTrackEditPanning(Track *t, float _panning) {
 	track = t;
 	old_value = t->panning;
@@ -32,5 +34,7 @@ bool ActionTrackEditPanning::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->track == track);
+}
+
 }
 

@@ -10,6 +10,8 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, shared<Synthesizer> _synth) {
 	track = t;
 	synth = _synth;
@@ -27,5 +29,7 @@ void *ActionTrackSetSynthesizer::execute(Data *d) {
 	track->out_replace_synthesizer.notify();
 
 	return synth.get();
+}
+
 }
 

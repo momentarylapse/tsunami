@@ -12,6 +12,8 @@
 
 class string;
 
+namespace tsunami {
+
 class Range {
 public:
 	Range();
@@ -60,5 +62,7 @@ public:
 	static Range to(int start, int end);
 	Range scale_rel(const Range &from, const Range &to) const;
 };
+
+}
 
 #endif /* RANGE_H_ */

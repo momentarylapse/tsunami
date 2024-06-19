@@ -8,6 +8,7 @@
 #include "ActionTrackCurveDeletePoint.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
 
 ActionTrackCurveDeletePoint::ActionTrackCurveDeletePoint(shared<Curve> _curve, int _index) {
 	curve = _curve;
@@ -31,4 +32,4 @@ void ActionTrackCurveDeletePoint::undo(Data* d) {
 	curve->points.insert(p, index);
 }
 
-
+}

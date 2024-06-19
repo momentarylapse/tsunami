@@ -12,6 +12,8 @@
 #include "../lib/base/set.h"
 #include "Range.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 class TrackLayer;
@@ -96,5 +98,7 @@ public:
 	SongSelection operator&&(const SongSelection &s) const;
 	SongSelection minus(const SongSelection &s) const;
 };
+
+}
 
 #endif /* SRC_DATA_SONGSELECTION_H_ */

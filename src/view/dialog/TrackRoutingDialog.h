@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 
@@ -25,5 +27,7 @@ public:
 	Song *song;
 	int num_tracks;
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_TRACKROUTINGDIALOG_H_ */

@@ -7,6 +7,8 @@
 
 #include "ActionTagAdd.h"
 
+namespace tsunami {
+
 ActionTagAdd::ActionTagAdd(const Tag &_tag)
 {
 	tag = _tag;
@@ -30,5 +32,7 @@ void ActionTagAdd::undo(Data *d)
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->tags.pop();
+}
+
 }
 

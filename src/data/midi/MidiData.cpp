@@ -12,6 +12,9 @@
 #include "../../lib/base/iter.h"
 #include <math.h>
 
+
+namespace tsunami {
+
 const float MIDDLE_A_DEFAULT_FREQ = 440.0f;
 
 float pitch_to_freq(float pitch) {
@@ -554,4 +557,6 @@ bool MidiNoteBuffer::has(MidiNote* n) const {
 		if (nn == n)
 			return true;
 	return false;
+}
+
 }

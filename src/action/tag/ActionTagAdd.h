@@ -11,6 +11,8 @@
 #include "../../data/Song.h"
 #include "../Action.h"
 
+namespace tsunami {
+
 class ActionTagAdd : public Action
 {
 public:
@@ -23,5 +25,7 @@ public:
 private:
 	Tag tag;
 };
+
+}
 
 #endif /* ACTIONTAGADD_H_ */

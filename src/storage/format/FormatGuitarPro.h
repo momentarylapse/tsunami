@@ -11,6 +11,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class Bar;
 
 class FormatGuitarPro: public Format {
@@ -88,5 +90,7 @@ public:
 	FormatDescriptorGuitarPro();
 	Format *create() override { return new FormatGuitarPro; }
 };
+
+}
 
 #endif /* SRC_STORAGE_FORMATGUITARPRO_H_ */

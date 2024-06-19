@@ -8,6 +8,8 @@
 #include "ActionTrackDeleteMidiNote.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrackDeleteMidiNote::ActionTrackDeleteMidiNote(TrackLayer *l, int _index) {
 	layer = l;
 	index = _index;
@@ -23,4 +25,6 @@ void* ActionTrackDeleteMidiNote::execute(Data* d) {
 void ActionTrackDeleteMidiNote::undo(Data* d) {
 	layer->midi.insert(note, index);
 	layer->out_changed.notify();
+}
+
 }

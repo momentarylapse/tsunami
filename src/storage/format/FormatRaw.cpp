@@ -16,6 +16,7 @@
 #include "../../Session.h"
 #include "../../view/TsunamiWindow.h"
 
+namespace tsunami {
 
 FormatDescriptorRaw::FormatDescriptorRaw() :
 	FormatDescriptor("Raw audio data", "raw", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::READ | Flag::WRITE) {}
@@ -119,5 +120,5 @@ void FormatRaw::load_track(StorageOperationData *od) {
 		delete f;
 }
 
-
+}
 

@@ -15,9 +15,12 @@ namespace kaba {
 	class Script;
 	class Class;
 };
+class Any;
+
+namespace tsunami {
+
 class Session;
 class Module;
-class Any;
 
 class ModuleConfiguration : public VirtualBase {
 public:
@@ -43,5 +46,6 @@ public:
 string var_to_string(const kaba::Class *c, char *v);
 void var_from_string(const kaba::Class *type, char *v, const string &s, int &pos, Session *session);
 
+}
 
 #endif /* SRC_MODULE_MODULECONFIGURATION_H_ */

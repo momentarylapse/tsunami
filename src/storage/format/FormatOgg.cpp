@@ -24,6 +24,7 @@
 #include <vorbis/vorbisfile.h>
 #include <vorbis/vorbisenc.h>
 
+namespace tsunami {
 
 
 string tag_from_vorbis(const string &key)
@@ -259,6 +260,8 @@ void FormatOgg::load_track(StorageOperationData *od) {
 		od->set((float)read / (float)(samples * bytes_per_sample));
 	}
 	ov_clear(&vf);
+}
+
 }
 
 #endif

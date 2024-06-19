@@ -7,6 +7,7 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
 
 class PresetSelectionDialog : public hui::Dialog {
 public:
@@ -22,5 +23,6 @@ public:
 	string selection;
 };
 
+}
 
 #endif //TSUNAMI_PRESETSELECTIONDIALOG_H

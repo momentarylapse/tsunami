@@ -13,9 +13,12 @@
 #include "../lib/base/base.h"
 #include <functional>
 
+class Path;
+
+namespace tsunami {
+
 class AudioBuffer;
 class Range;
-class Path;
 
 class UnitTest {
 public:
@@ -73,6 +76,9 @@ public:
 	static void event(const string &e);
 	static void assert_protocoll(const Array<string> &p);
 };
+
+}
+
 #endif
 
 #endif /* SRC_TEST_UNITTEST_H_ */

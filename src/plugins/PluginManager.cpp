@@ -75,6 +75,8 @@ namespace hui {
 	base::map<string,color> get_style_colors(Panel *p, const string &id);
 }
 
+namespace tsunami {
+
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
 PluginManager::PluginManager() {
@@ -1189,4 +1191,5 @@ bool PluginManager::is_favorite(Session *session, ModuleCategory type, const str
 	return presets->is_favorite(session, type, name);
 }
 
+}
 

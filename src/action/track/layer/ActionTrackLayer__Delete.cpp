@@ -13,6 +13,8 @@
 #include "../../../data/CrossFade.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -43,4 +45,4 @@ void ActionTrackLayer__Delete::undo(Data* d) {
 	a->out_layer_list_changed.notify();
 }
 
-
+}

@@ -11,6 +11,7 @@
 #include "../../Session.h"
 #include "../../lib/os/msg.h"
 
+namespace tsunami {
 
 MidiPreviewSource::MidiPreviewSource() {
 	module_class = "MidiPreviewSource";
@@ -113,5 +114,7 @@ void MidiPreviewSource::end() {
 	} else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
 		set_mode(Mode::END_NOTES);
 	}
+}
+
 }
 

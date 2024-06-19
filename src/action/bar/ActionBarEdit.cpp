@@ -19,6 +19,8 @@
 #include "../track/buffer/ActionTrack__ShrinkBuffer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, BarEditMode _mode) {
 	index = _index;
 	length = b.length;
@@ -85,5 +87,7 @@ void ActionBarEdit::build(Data *d) {
 
 		add_sub_action(new Action__ScaleData(r, length), d);
 	}
+}
+
 }
 

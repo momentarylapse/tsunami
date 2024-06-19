@@ -10,6 +10,9 @@
 #include "Clef.h"
 #include "../../lib/hui/hui.h"
 
+
+namespace tsunami {
+
 Instrument::Instrument() {
 	type = Type::NONE;
 }
@@ -210,4 +213,6 @@ int Instrument::make_string_valid(int pitch, int stringno) const {
 	if (stringno < 0 or stringno >= hus)
 		return hus;
 	return stringno;
+}
+
 }

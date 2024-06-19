@@ -13,6 +13,8 @@
 #include "../port/Port.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
+
 class MidiSplitter : public Module {
 public:
 	MidiSplitter();
@@ -28,5 +30,7 @@ public:
 	MidiEventBuffer buffer;
 	int result = 0;
 };
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDISPLITTER_H_ */

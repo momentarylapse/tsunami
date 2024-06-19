@@ -8,6 +8,8 @@
 #include "ActionTrackMove.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
+
 ActionTrackMove::ActionTrackMove(Track *track, int _target) {
 	origin = get_track_index(track);
 	target = _target;
@@ -28,5 +30,7 @@ void ActionTrackMove::undo(Data *d) {
 	weak(s->tracks).move(target, origin);
 	s->out_track_list_changed.notify();
 	s->out_layer_list_changed.notify();
+}
+
 }
 

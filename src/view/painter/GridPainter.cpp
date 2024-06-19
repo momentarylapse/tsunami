@@ -16,6 +16,7 @@
 #include "../../data/rhythm/Beat.h"
 #include "../../lib/base/iter.h"
 
+namespace tsunami {
 
 color col_inter(const color a, const color &b, float t);
 
@@ -270,4 +271,6 @@ void GridPainter::draw_whatever(Painter *c, int beat_partition) {
 		draw_bars(c, beat_partition);
 	else
 		draw_time(c);
+}
+
 }

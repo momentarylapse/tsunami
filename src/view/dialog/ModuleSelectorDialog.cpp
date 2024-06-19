@@ -11,6 +11,8 @@
 #include "../../plugins/PluginManager.h"
 #include "../../module/Module.h"
 
+namespace tsunami {
+
 ModuleSelectorDialog::Label ModuleSelectorDialog::split_label(const string &s) {
 	Label l;
 	l.full = s;
@@ -121,4 +123,6 @@ base::future<string> ModuleSelectorDialog::choose(hui::Panel *parent, Session *s
 	auto *dlg = new ModuleSelectorDialog(parent->win, type, session, old_name);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
+}
+
 }

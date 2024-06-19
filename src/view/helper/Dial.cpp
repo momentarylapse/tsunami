@@ -10,6 +10,7 @@
 #include "../ColorScheme.h"
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
 
 const float dphi = 2.0f;
 
@@ -131,5 +132,7 @@ bool Dial::on_mouse_wheel(const vec2 &d) {
 string Dial::get_tip() const {
 	//return label;
 	return "";
+}
+
 }
 

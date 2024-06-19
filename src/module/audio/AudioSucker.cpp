@@ -18,7 +18,7 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
-
+namespace tsunami {
 
 void AudioSucker::Config::reset() {
 	channels = 2;
@@ -69,5 +69,7 @@ base::optional<int64> AudioSucker::command(ModuleCommand cmd, int64 param) {
 		return 0;
 	}
 	return base::None;
+}
+
 }
 

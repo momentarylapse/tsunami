@@ -28,6 +28,7 @@
 #include "../../module/stream/AudioOutput.h"
 #include <math.h>
 
+namespace tsunami {
 
 Array<int> track_group_colors(Track *t);
 Array<Track*> track_group_members(Track *group, bool with_self);
@@ -467,4 +468,6 @@ void MixingConsole::on_show() {
 void MixingConsole::on_hide() {
 	peak_meter->enable(false);
 	spectrum_meter->enable(false);
+}
+
 }

@@ -17,6 +17,8 @@
 #include "../../Session.h"
 #include <cmath>
 
+namespace tsunami {
+
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
 	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
 {
@@ -381,4 +383,6 @@ void FormatSoundFont2::read_samples(Stream *f) {
 		samples_read += num_samples;
 		od->set(float(samples_read) / (float)samples_all);
 	}
+}
+
 }

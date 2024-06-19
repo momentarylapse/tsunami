@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestTrackVersion : public UnitTest {
 public:
 	TestTrackVersion();
@@ -24,6 +26,8 @@ public:
 	static void test_inactive_version_ranges_second();
 	static void test_dominant();
 };
+
+}
 
 #endif /* SRC_TEST_TESTTRACKVERSION_H_ */
 

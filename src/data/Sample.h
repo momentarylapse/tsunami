@@ -13,6 +13,8 @@
 #include "../lib/pattern/Observable.h"
 #include "audio/AudioBuffer.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 class SampleRef;
@@ -62,6 +64,7 @@ public:
 	static int create_uid();
 };
 
+}
 
 
 #endif /* SRC_DATA_SAMPLE_H_ */

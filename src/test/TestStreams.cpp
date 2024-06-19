@@ -17,6 +17,8 @@
 #include "../Session.h"
 #include <cstdio>
 
+namespace tsunami {
+
 TestStreams::TestStreams() : UnitTest("streams") {
 }
 
@@ -76,6 +78,8 @@ void TestStreams::test_input_stream() {
 	sleep(2);
 	event("stop");
 	chain->stop();
+
+}
 
 }
 

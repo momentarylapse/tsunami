@@ -11,6 +11,8 @@
 #include "../../../data/Song.h"
 #include "ActionTrack__BufferSetChannels.h"
 
+namespace tsunami {
+
 class ActionTrack__SetChannel : public Action  {
 public:
 	ActionTrack__SetChannel(Track *t, int _channels)
@@ -39,5 +41,7 @@ void ActionTrackSetChannels::build(Data *d) {
 		for (int i=0; i<l->buffers.num; i++)
 			add_sub_action(new ActionTrack__BufferSetChannels(l, i, channels), d);
 	add_sub_action(new ActionTrack__SetChannel(track, channels), d);
+}
+
 }
 

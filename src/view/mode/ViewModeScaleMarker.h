@@ -13,6 +13,8 @@
 #include "../../data/Range.h"
 #include "../../lib/base/base.h"
 
+namespace tsunami {
+
 class TrackMarker;
 class TrackLayer;
 
@@ -37,5 +39,6 @@ public:
 	TrackMarker *marker;
 };
 
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODESCALEMARKER_H_ */

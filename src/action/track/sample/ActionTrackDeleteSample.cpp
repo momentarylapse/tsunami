@@ -12,6 +12,7 @@
 #include "../../../data/Sample.h"
 #include "../../sample/ActionSampleDelete.h"
 
+namespace tsunami {
 
 class ActionTrack__DeleteSample : public Action {
 private:
@@ -51,4 +52,6 @@ void ActionTrackDeleteSample::build(Data *d) {
 
 	if (sample->auto_delete and (sample->ref_count == 0))
 		add_sub_action(new ActionSampleDelete(sample), d);
+}
+
 }

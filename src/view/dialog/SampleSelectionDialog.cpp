@@ -11,6 +11,8 @@
 #include "../../data/Sample.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 string render_sample(Sample *s, AudioView *view);
 
 SampleSelectionDialog::SampleSelectionDialog(Session *_session, hui::Panel *parent, Sample *old) :
@@ -99,4 +101,6 @@ base::future<Sample*> SampleSelectionDialog::select(Session *session, hui::Panel
 	auto s = new SampleSelectionDialog(session, parent, old);
 	hui::fly(s);
 	return s->_promise.get_future();
+}
+
 }

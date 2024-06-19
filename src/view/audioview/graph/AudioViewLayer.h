@@ -11,9 +11,12 @@
 #include "../../helper/graph/Node.h"
 #include "../../../lib/base/map.h"
 
+class Painter;
+
+namespace tsunami {
+
 class Track;
 class TrackLayer;
-class Painter;
 class AudioView;
 class AudioBuffer;
 class SampleRef;
@@ -30,12 +33,12 @@ enum class NoteModifier;
 enum class MidiMode;
 class MidiKeyChange;
 class LayerHeader;
-class ScrollBar;
 class AudioViewTrack;
 class MidiPainter;
+class ScrollBar;
 
 
-class AudioViewLayer : public scenegraph::NodeFree {
+class AudioViewLayer : public ::scenegraph::NodeFree {
 public:
 	AudioViewLayer(AudioView *v, TrackLayer *l);
 	~AudioViewLayer() override;
@@ -114,5 +117,7 @@ public:
 	MidiPainter *midi_context();
 	owned<MidiPainter> _midi_painter;
 };
+
+}
 
 #endif /* SRC_VIEW_GRAPH_AUDIOVIEWLAYER_H_ */

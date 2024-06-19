@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/midi/Temperament.h"
 
+namespace tsunami {
+
 class Track;
 class AudioView;
 
@@ -53,5 +55,7 @@ public:
 
 	int hover;
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_TEMPERAMENTDIALOG_H_ */

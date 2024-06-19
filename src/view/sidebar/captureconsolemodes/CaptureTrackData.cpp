@@ -27,6 +27,7 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include "../../../lib/hui/hui.h"
 
+namespace tsunami {
 
 Array<int> create_default_channel_map(int n_in, int n_out) {
 	Array<int> map;
@@ -205,7 +206,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
 		backup->command(ModuleCommand::SET_INPUT_CHANNELS, track->channels);
 		backup->command(ModuleCommand::ACCUMULATION_STOP, 0);
-		((AudioBackup*)backup)->set_backup_mode(BackupMode::TEMP);
+		reinterpret_cast<AudioBackup*>(backup)->set_backup_mode(BackupMode::Temporary);
 		sucker->set_channels(t->channels);
 		set_map(create_default_channel_map(device->channels, track->channels));
 
@@ -311,4 +312,6 @@ void CaptureTrackData::insert(int pos) {
 	} else if (type() == SignalType::Midi) {
 		insert_midi(pos, delay);
 	}
+}
+
 }

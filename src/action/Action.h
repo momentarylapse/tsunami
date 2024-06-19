@@ -10,6 +10,9 @@
 #include "../data/Data.h"
 #include "../lib/base/pointer.h"
 
+
+namespace tsunami {
+
 class Data;
 
 class Action {
@@ -25,4 +28,6 @@ public:
 
 	virtual bool is_trivial() { return false; }
 };
+
+}
 

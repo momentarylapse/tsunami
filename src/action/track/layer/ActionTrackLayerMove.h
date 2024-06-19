@@ -10,8 +10,9 @@
 
 /*#include "../Action.h"
 
-class ActionLayerMove : public Action
-{
+namespace tsunami {
+
+class ActionLayerMove : public Action {
 public:
 	ActionLayerMove(int source, int target);
 
@@ -19,6 +20,8 @@ public:
 	virtual void undo(Data *d);
 
 	int source, target;
-};*/
+};
+
+}*/
 
 #endif /* SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_ */

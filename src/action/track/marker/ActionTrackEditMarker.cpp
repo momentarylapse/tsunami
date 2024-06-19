@@ -10,6 +10,8 @@
 #include "../../../data/TrackMarker.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackEditMarker::ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m, const Range &_range, const string &_text) {
 	layer = l;
 	marker = m;
@@ -27,5 +29,7 @@ void *ActionTrackEditMarker::execute(Data *d) {
 
 void ActionTrackEditMarker::undo(Data *d) {
 	execute(d);
+}
+
 }
 

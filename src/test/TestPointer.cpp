@@ -12,7 +12,7 @@
 #include "../lib/os/msg.h"
 
 
-
+namespace tsunami {
 
 class X : public Sharable<VirtualBase> {
 	string s;
@@ -158,5 +158,6 @@ void TestPointer::test_shared_array_set_array() {
 	assert_equal(X::instance_count, 0);
 }
 
+}
 
 #endif

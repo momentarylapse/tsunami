@@ -12,6 +12,8 @@
 #include "../../../data/Song.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range) {
 	// prepare...
 	range = _range;
@@ -50,5 +52,7 @@ void *ActionTrackEditBuffer::execute(Data *d) {
 
 	// nothing to do...
 	return nullptr;
+}
+
 }
 

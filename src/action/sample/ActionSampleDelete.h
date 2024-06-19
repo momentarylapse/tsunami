@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class Sample;
 
 class ActionSampleDelete : public Action {
@@ -23,5 +25,7 @@ private:
 	shared<Sample> sample;
 	int index;
 };
+
+}
 
 #endif /* ACTIONSAMPLEDELETE_H_ */

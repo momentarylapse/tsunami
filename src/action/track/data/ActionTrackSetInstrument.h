@@ -9,6 +9,9 @@
 
 #include "../../ActionMergable.h"
 #include "../../../data/midi/Instrument.h"
+
+namespace tsunami {
+
 class Track;
 class MidiNote;
 
@@ -33,3 +36,5 @@ private:
 	};
 	Array<StringChange> string_change;
 };
+
+}

@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../Action.h"
+
+namespace tsunami {
+
 class Track;
 class AudioEffect;
 
@@ -24,3 +27,5 @@ private:
 	shared<AudioEffect> effect;
 	Track *track;
 };
+
+}

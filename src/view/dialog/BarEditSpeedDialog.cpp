@@ -10,6 +10,7 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
 
 BarEditSpeedDialog::BarEditSpeedDialog(hui::Window *parent, Song *_song, const Array<int> &_bars):
 	hui::Dialog("bar-edit-speed-dialog", parent)
@@ -68,4 +69,6 @@ void BarEditSpeedDialog::on_bpm() {
 
 void BarEditSpeedDialog::on_shift_data() {
 	enable("scale-audio", is_checked(""));
+}
+
 }

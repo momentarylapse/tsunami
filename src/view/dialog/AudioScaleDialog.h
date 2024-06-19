@@ -10,6 +10,7 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
 
 namespace BufferInterpolator {
 	enum class Method;
@@ -40,5 +41,7 @@ public:
 
 	static base::future<Data> ask(hui::Window *root, int original_size);
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_AUDIOSCALEDIALOG_H_ */

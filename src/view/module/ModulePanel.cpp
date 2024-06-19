@@ -18,6 +18,8 @@
 
 #include "../../module/audio/AudioEffect.h"
 
+namespace tsunami {
+
 extern const int CONFIG_PANEL_WIDTH = 400;
 extern const int CONFIG_PANEL_HEIGHT = 300;
 extern const int CONFIG_PANEL_MIN_HEIGHT = 200;
@@ -281,4 +283,6 @@ ModuleExternalDialog::ModuleExternalDialog(Module *module, hui::Window *parent, 
 ModuleExternalDialog::~ModuleExternalDialog() {
 	if (socket.module)
 		socket.module->unsubscribe(this);
+}
+
 }

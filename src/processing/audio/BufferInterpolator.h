@@ -9,6 +9,9 @@
 #define SRC_PROCESSING_AUDIO_BUFFERINTERPOLATOR_H_
 
 #include "../../lib/base/base.h"
+
+namespace tsunami {
+
 class AudioBuffer;
 //class RingBuffer;
 
@@ -39,6 +42,8 @@ struct Operator {
 	void reset(float factor);
 	AudioBuffer process(const AudioBuffer &buf);
 };
+
+}
 
 }
 

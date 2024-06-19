@@ -10,10 +10,12 @@
 
 #include "../../helper/graph/Node.h"
 
+namespace tsunami {
+
 class TrackMarker;
 class AudioViewTrack;
 
-class ViewMarker : public scenegraph::Node {
+class ViewMarker : public ::scenegraph::Node {
 public:
 	ViewMarker(AudioViewTrack *parent, TrackMarker *marker);
 
@@ -26,5 +28,7 @@ public:
 
 	TrackMarker *marker;
 };
+
+}
 
 #endif // SRC_VIEW_GRAPH_VIEWMARKER_H_

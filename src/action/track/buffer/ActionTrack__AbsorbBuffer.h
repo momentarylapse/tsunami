@@ -10,10 +10,11 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
-class ActionTrack__AbsorbBuffer : public Action
-{
+class ActionTrack__AbsorbBuffer : public Action {
 public:
 	ActionTrack__AbsorbBuffer(TrackLayer *l, int dest, int src);
 
@@ -26,5 +27,7 @@ private:
 	int dest_old_length;
 	int src_offset, src_length;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ABSORBBUFFERBOX_H_ */

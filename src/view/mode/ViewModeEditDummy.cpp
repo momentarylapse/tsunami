@@ -8,6 +8,8 @@
 #include "ViewModeEditDummy.h"
 #include "../sidebar/SideBar.h"
 
+namespace tsunami {
+
 ViewModeEditDummy::ViewModeEditDummy(AudioView *view) : ViewModeDefault(view) {
 	mode_name = "dummy";
 }
@@ -18,5 +20,7 @@ void ViewModeEditDummy::on_start() {
 
 string ViewModeEditDummy::get_tip() {
 	return "track ALT+(↑,↓)";
+}
+
 }
 

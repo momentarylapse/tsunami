@@ -13,6 +13,9 @@
 #include "../../lib/base/pointer.h"
 #include "Bar.h"
 
+
+namespace tsunami {
+
 class Beat;
 class Bar;
 class Range;
@@ -34,6 +37,8 @@ public:
 
 	void _update_offsets();
 };
+
+}
 
 
 

@@ -9,6 +9,8 @@
 
 #include "../../data/Sample.h"
 
+namespace tsunami {
+
 ActionSampleEditName::ActionSampleEditName(shared<Sample> s, const string &name) {
 	sample = s;
 	new_value = name;
@@ -33,6 +35,8 @@ bool ActionSampleEditName::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->sample == sample.get());
+}
+
 }
 
 

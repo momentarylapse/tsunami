@@ -18,6 +18,8 @@ struct pa_source_info;
 struct pa_operation;
 struct pa_stream;
 
+namespace tsunami {
+
 class DeviceContextPulse : public DeviceContext {
 public:
 	DeviceContextPulse(Session* session);
@@ -47,6 +49,8 @@ public:
 
 	static DeviceContextPulse* instance;
 };
+
+}
 
 #endif
 

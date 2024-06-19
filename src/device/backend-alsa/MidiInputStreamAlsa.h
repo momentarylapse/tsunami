@@ -12,6 +12,8 @@
 
 struct _snd_seq_port_subscribe;
 
+namespace tsunami {
+
 class MidiInputStreamAlsa : public MidiInputStream {
 public:
 	MidiInputStreamAlsa(Session *session, Device *device, SharedData& shared_data);
@@ -26,6 +28,8 @@ public:
 
 	_snd_seq_port_subscribe* subs = nullptr;
 };
+
+}
 
 #endif
 

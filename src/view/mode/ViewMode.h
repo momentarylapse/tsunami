@@ -11,7 +11,13 @@
 #include "../../lib/pattern/Observable.h"
 #include "../../lib/base/set.h"
 
+class Painter;
+class rect;
+class color;
 class vec2;
+
+namespace tsunami {
+
 enum class MidiMode;
 enum class SelectionMode;
 class AudioView;
@@ -24,9 +30,6 @@ class ViewPort;
 class TsunamiWindow;
 class Song;
 class MidiNoteBuffer;
-class Painter;
-class rect;
-class color;
 class Range;
 class Session;
 
@@ -89,5 +92,7 @@ public:
 
 	void set_side_bar(int console);
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODE_H_ */

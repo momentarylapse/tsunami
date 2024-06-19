@@ -12,6 +12,7 @@
 #include "../lib/base/base.h"
 #include "../lib/hui/hui.h"
 
+namespace tsunami {
 
 class AudioOutput;
 class AudioInput;
@@ -97,5 +98,6 @@ public:
 	static Array<ApiDescription> api_descriptions;
 };
 
+}
 
 #endif /* SRC_DEVICE_DEVICEMANAGER_H_ */

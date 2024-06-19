@@ -10,6 +10,7 @@
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
 
 ActionBar__Delete::ActionBar__Delete(int _index) {
 	index = _index;
@@ -37,4 +38,6 @@ void ActionBar__Delete::undo(Data *d) {
 	s->bars.insert(bar, index);
 	s->bars._update_offsets();
 	s->out_edit_bars.notify();
+}
+
 }

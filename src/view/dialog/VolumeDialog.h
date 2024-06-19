@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class VolumeControl;
 
 class VolumeDialog : obs::Node<hui::Dialog> {
@@ -25,6 +27,6 @@ public:
 	static base::future<float> ask(hui::Window *parent, float value0, float min, float max);
 };
 
-
+}
 
 #endif /* SRC_VIEW_DIALOG_VOLUMEDIALOG_H_ */

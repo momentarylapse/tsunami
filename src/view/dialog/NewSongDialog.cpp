@@ -15,6 +15,8 @@
 #include "../../Tsunami.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 void set_bar_pattern(BarPattern &b, const string &pat);
 
 NewSongDialog::NewSongDialog(hui::Window *_parent):
@@ -117,5 +119,7 @@ void NewSongDialog::on_type(SignalType t) {
 void NewSongDialog::on_metronome() {
 	expand("metro-revealer", is_checked(""));
 	manually_changed_metronome_flag = true;
+}
+
 }
 

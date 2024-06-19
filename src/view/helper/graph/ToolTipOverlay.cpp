@@ -4,6 +4,8 @@
 #include "../../ColorScheme.h"
 #include "../../../lib/image/Painter.h"
 
+namespace tsunami {
+
 ToolTipOverlay::ToolTipOverlay() {
 	align.dz = 9999;
 }
@@ -26,4 +28,6 @@ void ToolTipOverlay::on_draw(Painter *p) {
 	/*tip = view->mode->get_tip();
 	if (tip.num > 0)
 		draw_boxed_str(p, {view->song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);*/
+}
+
 }

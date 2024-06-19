@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 
@@ -24,3 +26,5 @@ private:
 	Track *track;
 	shared<TrackLayer> layer;
 };
+
+}

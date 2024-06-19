@@ -15,6 +15,8 @@
 #include "../../data/base.h"
 #include "../../data/Track.h"
 
+namespace tsunami {
+
 ViewModeEdit::ViewModeEdit(AudioView *view) : ViewModeDefault(view) {
 	mode = view->mode_edit_midi;
 }
@@ -130,4 +132,6 @@ void ViewModeEdit::left_click_handle_object(AudioViewLayer *vlayer, const vec2 &
 
 string ViewModeEdit::get_tip() {
 	return mode->get_tip();
+}
+
 }

@@ -20,6 +20,8 @@
 #include "../plugins/Plugin.h"
 #include "../Session.h"
 
+namespace tsunami {
+
 TestPlugins::TestPlugins() : UnitTest("plugins") {
 }
 
@@ -129,6 +131,8 @@ void TestPlugins::test_synthesizer(const string &name) {
 }
 
 void TestPlugins::test_tsunami_plugin(const string &name) {
+}
+
 }
 
 #endif

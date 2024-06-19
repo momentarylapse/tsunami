@@ -17,9 +17,12 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <atomic>
 
+class rect;
+
+namespace tsunami {
+
 class AudioBuffer;
 class Range;
-class rect;
 class PeakThread;
 enum class AudioViewMode;
 
@@ -140,5 +143,7 @@ public:
 	InterThreadFifoBuffer<PeakDataRequest*> requests;
 	InterThreadFifoBuffer<PeakDataRequest*> replies;
 };
+
+}
 
 #endif /* SRC_VIEW_HELPER_PEAKDATABASE_H_ */

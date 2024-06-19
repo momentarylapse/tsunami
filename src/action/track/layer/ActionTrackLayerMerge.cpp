@@ -16,6 +16,8 @@
 #include "../../../module/audio/TrackRenderer.h"
 
 
+namespace tsunami {
+
 ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t) {
 	track = t;
 }
@@ -42,5 +44,6 @@ void ActionTrackLayerMerge::build(Data *d) {
 
 	for (int i=track->layers.num-2; i>=0; i--)
 		add_sub_action(new ActionTrackLayerDelete(track, i), d);
+}
 
 }

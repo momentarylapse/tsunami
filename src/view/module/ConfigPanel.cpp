@@ -12,6 +12,7 @@
 #include "../../Session.h"
 #include "../../module/Module.h"
 
+namespace tsunami {
 
 hui::Panel *ConfigPanel::_hidden_parent_ = nullptr;
 bool ConfigPanel::_hidden_parent_check_ = true;
@@ -55,5 +56,5 @@ void ConfigPanel::changed() {
 	ignore_change = false;
 }
 
-
+}
 

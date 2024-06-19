@@ -11,13 +11,15 @@
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
 
-class Module;
-class Session;
-enum class ModuleCategory;
-
 namespace kaba {
 	class Class;
 }
+
+namespace tsunami {
+
+class Module;
+class Session;
+enum class ModuleCategory;
 
 class ModuleFactory {
 public:
@@ -27,5 +29,7 @@ public:
 	static xfer<Module> _create_special(Session *session, ModuleCategory type, const string &sub_type);
 	static string base_class(ModuleCategory);
 };
+
+}
 
 #endif /* SRC_MODULE_MODULEFACTORY_H_ */

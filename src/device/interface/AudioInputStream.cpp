@@ -5,6 +5,8 @@
 #include "AudioInputStream.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 AudioInputStream::SharedData::SharedData() :
 		buffer(1048576) {
 	chunk_size = DEFAULT_CHUNK_SIZE;
@@ -21,3 +23,5 @@ AudioInputStream::AudioInputStream(Session *_session, SharedData& _shared_data)
 }
 
 AudioInputStream::~AudioInputStream() = default;
+
+}

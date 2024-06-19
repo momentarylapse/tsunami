@@ -9,6 +9,8 @@
 #include "midi/Scale.h"
 #include "../lib/os/msg.h"
 
+namespace tsunami {
+
 TrackMarker::TrackMarker() {
 	//msg_write("new TrackMarker " + p2s(this));
 }
@@ -44,5 +46,7 @@ Scale parse_marker_key(const string &text) {
 	if (!marker_is_key(text))
 		return scale;
 	return Scale::parse(text.sub(6, -2));
+}
+
 }
 

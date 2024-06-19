@@ -8,6 +8,7 @@
 #include "QuestionDialog.h"
 #include "../../lib/base/pointer.h"
 
+namespace tsunami {
 
 bool QuestionDialogIntInt::aborted;
 
@@ -183,3 +184,4 @@ base::future<string> QuestionDialogString::ask(hui::Window *parent, const string
 	return dlg->_promise.get_future();
 }
 
+}

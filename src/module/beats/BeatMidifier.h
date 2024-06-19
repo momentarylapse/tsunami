@@ -10,6 +10,8 @@
 
 #include "../midi/MidiSource.h"
 
+namespace tsunami {
+
 class Port;
 
 class BeatMidifier : public MidiSource {
@@ -21,5 +23,7 @@ public:
 
 	float volume;
 };
+
+}
 
 #endif /* SRC_MODULE_BEATS_BEATMIDIFIER_H_ */

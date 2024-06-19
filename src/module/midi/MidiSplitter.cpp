@@ -10,6 +10,8 @@
 #include "../../data/base.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
+
 // TODO: replace by multi-connection ports/auto splitting
 
 MidiSplitter::MidiSplitter() : Module(ModuleCategory::PLUMBING, "MidiSplitter") {
@@ -35,4 +37,6 @@ int MidiSplitter::read_midi(int port, MidiEventBuffer& buf) {
 	buf = buffer;
 	buf.samples = samples;
 	return result;
+}
+
 }

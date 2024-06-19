@@ -13,6 +13,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestPointer : public UnitTest {
 public:
 	TestPointer();
@@ -26,6 +28,8 @@ public:
 	static void test_shared_array_set_shared_array();
 	static void test_shared_array_set_array();
 };
+
+}
 
 #endif /* SRC_TEST_TESTPOINTER_H_ */
 

@@ -10,6 +10,9 @@
 
 #include "MidiData.h"
 
+
+namespace tsunami {
+
 enum class TemperamentType {
 	CUSTOM,
 	EQUAL_12,
@@ -38,5 +41,7 @@ private:
 	static Temperament create_meantone(int pitch_ref, float freq_ref, float x);
 	static Temperament create_equal12(int pitch_ref, float freq_ref);
 };
+
+}
 
 #endif /* SRC_DATA_MIDI_TEMPERAMENT_H_ */

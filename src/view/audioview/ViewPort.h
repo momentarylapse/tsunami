@@ -11,6 +11,8 @@
 #include "../../lib/math/rect.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Range;
 class Song;
 
@@ -56,5 +58,7 @@ public:
 	rect nice_mapping_area();
 	void show(const Range &r);
 };
+
+}
 
 #endif /* SRC_VIEW_VIEWPORT_H_ */

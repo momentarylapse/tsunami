@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestMixer : public UnitTest {
 public:
 	TestMixer();
@@ -27,6 +29,8 @@ public:
 	static void test_mix_mono_1track_panning_right();
 	static void test_mix_mono_1track_panning_left();
 };
+
+}
 
 #endif /* SRC_TEST_TESTMIXER_H_ */
 

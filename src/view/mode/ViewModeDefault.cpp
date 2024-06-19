@@ -35,12 +35,14 @@
 #include "../../Playback.h"
 #include <math.h>
 
+namespace tsunami {
+
 float marker_alpha_factor(float w, float w_group, bool border);
 Array<Array<TrackMarker*>> group_markers(const Array<TrackMarker*> &markers);
 
 
 
-class MouseDelaySelect : public MouseDelayAction {
+class MouseDelaySelect : public scenegraph::MouseDelayAction {
 public:
 	AudioView *view;
 	SelectionMode mode;
@@ -100,7 +102,7 @@ public:
 	}
 };
 
-class MouseDelayObjectsDnD : public MouseDelayAction {
+class MouseDelayObjectsDnD : public scenegraph::MouseDelayAction {
 public:
 	AudioViewLayer *layer;
 	AudioView *view;
@@ -147,10 +149,10 @@ public:
 };
 
 
-MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s) {
+scenegraph::MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s) {
 	return new MouseDelayObjectsDnD(l, s);
 }
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start) {
+scenegraph::MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start) {
 	return new MouseDelaySelect(v, mode, keep_start);
 }
 
@@ -537,5 +539,7 @@ SongSelection ViewModeDefault::get_selection_for_track_rect(const Range &r, int 
 			_layers.add(vt->layer);
 	}
 	return SongSelection::from_range(song, r).filter(_layers);
+}
+
 }
 

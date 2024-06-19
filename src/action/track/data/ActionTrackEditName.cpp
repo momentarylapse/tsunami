@@ -8,6 +8,8 @@
 #include "ActionTrackEditName.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 ActionTrackEditName::ActionTrackEditName(Track *t, const string &_name) {
 	track = t;
 	old_value = t->name;
@@ -32,4 +34,6 @@ bool ActionTrackEditName::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->track == track);
+}
+
 }

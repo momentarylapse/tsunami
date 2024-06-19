@@ -13,6 +13,8 @@
 #include "../lib/pattern/Observable.h"
 #include <shared_mutex>
 
+namespace tsunami {
+
 class ActionManager;
 class Action;
 class Session;
@@ -57,4 +59,6 @@ public:
 		int i[8];
 	} x_message_data;
 };
+
+}
 

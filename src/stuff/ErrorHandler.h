@@ -7,9 +7,13 @@
 
 #pragma once
 
+namespace tsunami {
+
 class ErrorHandler {
 public:
 	static void init();
 	static void show_backtrace();
 	static void error_handler();
 };
+
+}

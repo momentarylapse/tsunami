@@ -10,6 +10,9 @@
 #include "Node.h"
 
 class Painter;
+
+namespace tsunami {
+
 class Range;
 
 class ScrollBar : public scenegraph::Node {
@@ -57,3 +60,5 @@ class ScrollBarHorizontal : public ScrollBar {
 public:
 	ScrollBarHorizontal();
 };
+
+}

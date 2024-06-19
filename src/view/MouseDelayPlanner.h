@@ -11,12 +11,11 @@
 #include "../lib/base/pointer.h"
 #include <functional>
 
-class AudioView;
-namespace scenegraph {
-	class SceneGraph;
-}
 class Painter;
 class vec2;
+
+namespace scenegraph {
+	class SceneGraph;
 
 class MouseDelayAction {
 public:
@@ -39,7 +38,7 @@ public:
 	float x0 = 0, y0 = 0;
 	int min_move_to_start;
 	bool _started_acting = false;
-	scenegraph::SceneGraph *scene_graph;
+	::scenegraph::SceneGraph *scene_graph;
 	typedef std::function<void()> Callback;
 	owned<MouseDelayAction> action;
 	void prepare(MouseDelayAction *action);
@@ -52,11 +51,18 @@ public:
 	void draw_post(Painter *p);
 };
 
+}
+
+namespace tsunami {
+
+class AudioView;
 class SongSelection;
 class AudioViewLayer;
 enum class SelectionMode;
 
-MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s);
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool override_start);
+scenegraph::MouseDelayAction* CreateMouseDelayObjectsDnD(AudioViewLayer *l, const SongSelection &s);
+scenegraph::MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool override_start);
+
+}
 
 #endif /* SRC_VIEW_MOUSEDELAYPLANNER_H_ */

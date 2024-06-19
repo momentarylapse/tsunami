@@ -9,6 +9,9 @@
 #define SONGCONSOLE_H_
 
 #include "SideBar.h"
+
+namespace tsunami {
+
 class Song;
 
 class SongConsole: public SideBarConsole {
@@ -32,5 +35,7 @@ public:
 	
 	owned<hui::Menu> menu_tags;
 };
+
+}
 
 #endif /* SONGCONSOLE_H_ */

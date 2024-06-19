@@ -23,6 +23,9 @@ namespace hui {
 	class Panel;
 }
 
+class Any;
+
+namespace tsunami {
 
 class ModuleConfiguration;
 class ConfigPanel;
@@ -30,7 +33,6 @@ class Session;
 class Plugin;
 struct OutPort;
 struct InPort;
-class Any;
 class AudioBuffer;
 class MidiEventBuffer;
 class Beat;
@@ -167,6 +169,8 @@ public:
 
 	shared_array<Module> children;
 };
+
+}
 
 
 #endif /* SRC_MODULE_MODULE_H_ */

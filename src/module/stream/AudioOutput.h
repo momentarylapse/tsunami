@@ -19,6 +19,8 @@
 #include "../../device/interface/AudioOutputStream.h"
 #include <atomic>
 
+namespace tsunami {
+
 class DeviceManager;
 class Device;
 class Session;
@@ -109,5 +111,7 @@ private:
 public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };
+
+}
 
 #endif /* SRC_DEVICE_STREAM_AUDIOOUTPUT_H_ */

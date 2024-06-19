@@ -10,6 +10,8 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class ViewModeEditDummy : public ViewModeDefault {
 public:
 	ViewModeEditDummy(AudioView *view);
@@ -18,5 +20,7 @@ public:
 
 	string get_tip() override;
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDITDUMMY_H_ */

@@ -13,6 +13,8 @@
 
 #include "../../../lib/os/msg.h"
 
+using namespace tsunami;
+
 namespace scenegraph {
 
 bool Node::show_debug = false;

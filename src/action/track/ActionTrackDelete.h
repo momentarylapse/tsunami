@@ -9,6 +9,8 @@
 
 #include "../ActionGroup.h"
 
+namespace tsunami {
+
 class Track;
 
 class ActionTrackDelete : public ActionGroup {
@@ -21,3 +23,5 @@ public:
 
 	Track *track;
 };
+
+}

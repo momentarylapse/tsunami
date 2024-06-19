@@ -14,6 +14,8 @@
 #include "../../data/base.h"
 #include "../../lib/math/interpolation.h"
 
+namespace tsunami {
+
 SignalEditorCable::SignalEditorCable(SignalEditorTab *t, const Cable &c) : scenegraph::NodeRel({0,0},0,0) {
 	align.dz = -10;
 	tab = t;
@@ -66,4 +68,6 @@ void SignalEditorCable::on_draw(Painter *p) {
 
 bool SignalEditorCable::hover(const vec2 &m) const {
 	return false;
+}
+
 }

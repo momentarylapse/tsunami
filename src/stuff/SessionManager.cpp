@@ -28,25 +28,27 @@
 #include "../Session.h"
 #include "../Playback.h"
 
+namespace tsunami {
+
 string title_filename(const Path &filename);
 xml::Element signal_chain_to_xml(SignalChain* chain);
 xfer<SignalChain> signal_chain_from_xml(Session *session, xml::Element& root);
 
 
 bool SessionLabel::is_active() const {
-	return flags & Flags::ACTIVE;
+	return flags & Flags::Active;
 }
 
 bool SessionLabel::is_recent() const {
-	return flags & Flags::RECENT;
+	return flags & Flags::Recent;
 }
 
 bool SessionLabel::is_persistent() const {
-	return flags & Flags::PERSISTENT;
+	return flags & Flags::Persistent;
 }
 
 bool SessionLabel::is_backup() const {
-	return flags & Flags::BACKUP;
+	return flags & Flags::Backup;
 }
 
 SessionManager::SessionManager() {
@@ -421,11 +423,11 @@ Array<SessionLabel> SessionManager::enumerate_active_sessions() const {
 	for (auto s: weak(active_sessions)) {
 		if (auto p = s->persistence_data) {
 			if (s->song->filename)
-				sessions.add({SessionLabel::Flags::ACTIVE | SessionLabel::Flags::PERSISTENT, s->song->filename, s, -1});
+				sessions.add({SessionLabel::Flags::Active | SessionLabel::Flags::Persistent, s->song->filename, s, -1});
 			else
-				sessions.add({SessionLabel::Flags::ACTIVE | SessionLabel::Flags::PERSISTENT, p->session_filename, s, -1});
+				sessions.add({SessionLabel::Flags::Active | SessionLabel::Flags::Persistent, p->session_filename, s, -1});
 		} else {
-			sessions.add({SessionLabel::Flags::ACTIVE, s->song->filename, s, -1});
+			sessions.add({SessionLabel::Flags::Active, s->song->filename, s, -1});
 		}
 	}
 	return sessions;
@@ -449,11 +451,11 @@ Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 	//	if (find_for_filename(f))
 	//		continue;
 		if (can_find_associated_session_file(f))
-			sessions.add({SessionLabel::RECENT | SessionLabel::PERSISTENT, f});
+			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, f});
 		else if (f.extension() == "session")
-			sessions.add({SessionLabel::RECENT | SessionLabel::PERSISTENT, associated_song_filename(f)});
+			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, associated_song_filename(f)});
 		else
-			sessions.add({SessionLabel::RECENT, f});
+			sessions.add({SessionLabel::Recent, f});
 	}
 	return sessions;
 }
@@ -469,7 +471,7 @@ Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
 			continue;
 		if (is_recent(p->session_filename))
 			continue;
-		sessions.add({SessionLabel::Flags::PERSISTENT, p->session_filename, p->session, -1});
+		sessions.add({SessionLabel::Flags::Persistent, p->session_filename, p->session, -1});
 	}
 	return sessions;
 }
@@ -484,7 +486,9 @@ Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
 	// backups
 	BackupManager::check_old_files();
 	for (auto &f: BackupManager::files)
-		sessions.add({SessionLabel::Flags::BACKUP, f.filename, nullptr, f.uuid});
+		sessions.add({SessionLabel::Flags::Backup, f.filename, nullptr, f.uuid});
 
 	return sessions;
+}
+
 }

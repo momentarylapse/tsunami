@@ -9,6 +9,8 @@
 #include "../../helper/graph/Node.h"
 #include "../../HoverData.h"
 
+namespace tsunami {
+
 ViewMarker::ViewMarker(AudioViewTrack *parent, TrackMarker *_marker) {
 	marker = _marker;
 	set_perf_name("marker");
@@ -47,3 +49,4 @@ bool ViewMarker::on_right_button_down(const vec2 &m) {
 	return true;
 }
 
+}

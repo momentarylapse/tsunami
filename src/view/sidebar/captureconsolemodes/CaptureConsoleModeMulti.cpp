@@ -17,6 +17,8 @@
 #include "../../../module/SignalChain.h"
 #include "../../../Session.h"
 
+namespace tsunami {
+
 CaptureConsoleModeMulti::CaptureConsoleModeMulti(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {}
@@ -100,3 +102,4 @@ void CaptureConsoleModeMulti::leave() {
 	CaptureConsoleMode::leave();
 }
 
+}

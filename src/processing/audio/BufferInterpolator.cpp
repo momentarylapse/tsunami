@@ -13,6 +13,8 @@
 
 #include <stdio.h>
 
+namespace tsunami {
+
 namespace BufferInterpolator {
 
 void interpolate_channel_linear(const Array<float> &in, Array<float> &out) {
@@ -104,6 +106,8 @@ AudioBuffer Operator::process(const AudioBuffer &buf) {
 		interpolate(buf, r, method);
 	}
 	return r;
+}
+
 }
 
 }

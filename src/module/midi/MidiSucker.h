@@ -11,6 +11,8 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
+namespace tsunami {
+
 class MidiSucker : public Module {
 public:
 	MidiSucker();
@@ -21,5 +23,7 @@ public:
 
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDISUCKER_H_ */

@@ -23,7 +23,7 @@
 #include "../../Session.h"
 
 
-
+namespace tsunami {
 
 
 ViewModeCapture::ViewModeCapture(AudioView *view) :
@@ -98,4 +98,6 @@ void ViewModeCapture::insert() {
 	for (auto &d: data)
 		d.insert(view->get_playback_selection(true).start());
 	song->end_action_group();
+}
+
 }

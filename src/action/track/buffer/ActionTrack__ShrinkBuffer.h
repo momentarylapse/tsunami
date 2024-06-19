@@ -11,6 +11,8 @@
 #include "../../Action.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrack__ShrinkBuffer : public Action {
@@ -26,5 +28,7 @@ private:
 	int old_length, new_length;
 	AudioBuffer buf;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SHRINKBUFFER_H_ */

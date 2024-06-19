@@ -14,6 +14,7 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
+namespace tsunami {
 
 MidiPainterModeLinear::MidiPainterModeLinear(MidiPainter *mp) :
     MidiPainterMode(mp)
@@ -154,4 +155,6 @@ int MidiPainterModeLinear::y2clef(float y, NoteModifier &mod) const {
 void MidiPainterModeLinear::set_linear_range(float _pitch_min, float _pitch_max) {
     pitch_min = _pitch_min;
     pitch_max = _pitch_max;
+}
+
 }

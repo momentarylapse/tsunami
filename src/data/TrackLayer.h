@@ -16,6 +16,7 @@
 #include "../lib/pattern/Observable.h"
 
 
+namespace tsunami {
 
 class AudioBuffer;
 class Song;
@@ -93,5 +94,6 @@ public:
 
 base::set<const TrackLayer*> layer_set(const Array<TrackLayer*> &layers);
 
+}
 
 #endif /* SRC_DATA_TRACKLAYER_H_ */

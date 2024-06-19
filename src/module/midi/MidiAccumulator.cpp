@@ -10,6 +10,7 @@
 #include "../port/Port.h"
 #include "../../data/base.h"
 
+namespace tsunami {
 
 int MidiAccumulator::read_midi(int port, MidiEventBuffer& buf) {
 	if (!in.source)
@@ -49,4 +50,6 @@ base::optional<int64> MidiAccumulator::command(ModuleCommand cmd, int64 param) {
 		return buffer.samples;
 	}
 	return base::None;
+}
+
 }

@@ -9,6 +9,7 @@
 #include "ScrollBar.h"
 #include "../../../lib/hui/Event.h"
 
+namespace tsunami {
 
 ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	align.horizontal = AlignData::Mode::FILL;
@@ -97,4 +98,6 @@ void ScrollPad::set_content(const rect &r) {
 	content_area = r;
 	_update_scrolling();
 	request_redraw();
+}
+
 }

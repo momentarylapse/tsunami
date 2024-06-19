@@ -33,6 +33,7 @@
 #endif
 #include <math.h>
 
+namespace tsunami {
 
 class ChunkedFileFormatNami;
 
@@ -1258,4 +1259,4 @@ void FormatNami::load_song(StorageOperationData *od) {
 	//od->song->updateSelection(Range(0, 0));
 }
 
-
+}

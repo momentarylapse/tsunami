@@ -10,23 +10,22 @@
 #include "../../../data/audio/AudioBuffer.h"
 #include <assert.h>
 
-ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, const Range &r)
-{
+namespace tsunami {
+
+ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, const Range &r) {
 	layer = l;
 	index = _index;
 	range = r;
 }
 
-void ActionTrack__AddBuffer::undo(Data *d)
-{
+void ActionTrack__AddBuffer::undo(Data *d) {
 	// should be zeroes at this point...
 	layer->buffers.erase(index);
 }
 
 
 
-void *ActionTrack__AddBuffer::execute(Data *d)
-{
+void *ActionTrack__AddBuffer::execute(Data *d) {
 	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, index);
 
@@ -37,4 +36,5 @@ void *ActionTrack__AddBuffer::execute(Data *d)
 	return &b;
 }
 
+}
 

@@ -9,13 +9,15 @@
 
 #include "Node.h"
 
-//namespace scenegraph {
-	class ScrollBar;
-	class ScrollBarHorizontal;
 namespace scenegraph {
 	class HBox;
 	class VBox;
 }
+
+namespace tsunami {
+//namespace scenegraph {
+	class ScrollBar;
+	class ScrollBarHorizontal;
 
 class ScrollPad;
 
@@ -61,3 +63,5 @@ public:
 		s->pad = this;
 	}
 };
+
+}

@@ -9,6 +9,9 @@
 #include "../lib/hui/hui.h"
 #include <math.h>
 
+
+namespace tsunami {
+
 const Array<int> POSSIBLE_SAMPLE_RATES = {
 		22050,
 		DEFAULT_SAMPLE_RATE,
@@ -141,6 +144,6 @@ string signal_type_name(SignalType type) {
 	return "???";
 }
 
-
+}
 
 

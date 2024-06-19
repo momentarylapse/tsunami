@@ -12,6 +12,8 @@
 
 class Any;
 
+namespace tsunami {
+
 enum class DeviceType {
 	AUDIO_OUTPUT,
 	AUDIO_INPUT,
@@ -44,5 +46,7 @@ public:
 
 	bool present_old;
 };
+
+}
 
 #endif /* SRC_DEVICE_DEVICE_H_ */

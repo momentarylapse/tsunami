@@ -10,6 +10,8 @@
 #include "../../../data/Track.h"
 #include "../../../data/SampleRef.h"
 
+namespace tsunami {
+
 ActionTrackEditSample::ActionTrackEditSample(shared<SampleRef> _ref, float volume, bool mute) {
 	ref = _ref;
 	old_value.volume = ref->volume;
@@ -42,5 +44,7 @@ bool ActionTrackEditSample::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->ref == ref.get());
+}
+
 }
 

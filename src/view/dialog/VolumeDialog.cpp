@@ -11,6 +11,7 @@
 #include "../../data/base.h"
 #include <math.h>
 
+namespace tsunami {
 
 bool VolumeDialog::maximize;
 
@@ -46,5 +47,7 @@ base::future<float> VolumeDialog::ask(hui::Window *parent, float value0, float m
 	auto dlg = new VolumeDialog(parent, value0, min, max);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
+}
+
 }
 

@@ -17,11 +17,15 @@ float xmax(const Array<float> &a);
 float sum_abs(const Array<complex> &z);
 float max_abs(const Array<complex> &z);
 
+namespace tsunami {
+
 enum class WindowFunction {
 	RECTANGLE,
 	HANN
 };
 
 void apply_window_function(Array<float> &data, WindowFunction wf);
+
+}
 
 #endif /* SRC_PROCESSING_AUDIO_COMMON_H_ */

@@ -10,9 +10,13 @@
 
 #include "../../lib/base/base.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 
 Array<string> diff_song(Song *a, Song *b);
+
+}
 
 #endif /* SRC_COMMAND_SONG_DIFF_H_ */

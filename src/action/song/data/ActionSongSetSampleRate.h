@@ -9,6 +9,8 @@
 
 #include "../../ActionMergable.h"
 
+namespace tsunami {
+
 class Song;
 
 class ActionSongSetSampleRate : public ActionMergable<int> {
@@ -22,3 +24,5 @@ public:
 
 	bool mergable(Action *a) override;
 };
+
+}

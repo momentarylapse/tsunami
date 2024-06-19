@@ -10,6 +10,8 @@
 #include "../../data/Sample.h"
 #include "../../processing/audio/BufferInterpolator.h"
 
+namespace tsunami {
+
 SampleScaleDialog::SampleScaleDialog(hui::Window *parent, Sample *s):
 	hui::Dialog("sample_scale_dialog", parent)
 {
@@ -86,3 +88,4 @@ void SampleScaleDialog::on_close() {
 	request_destroy();
 }
 
+}

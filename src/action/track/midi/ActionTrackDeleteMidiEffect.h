@@ -9,6 +9,9 @@
 
 #include "../../../module/midi/MidiEffect.h"
 #include "../../Action.h"
+
+namespace tsunami {
+
 class Track;
 
 class ActionTrackDeleteMidiEffect: public Action {
@@ -25,3 +28,5 @@ private:
 	Track *track;
 	int index;
 };
+
+}

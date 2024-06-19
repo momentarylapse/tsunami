@@ -16,6 +16,8 @@
 #include "../../view/helper/SymbolRenderer.h"
 #include "../../view/ColorScheme.h"
 
+namespace tsunami {
+
 ColorScheme get_pdf_color_scheme(const Any &params);
 MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_colors, const Any &params);
 float draw_pdf_header(Painter *p, Song *song, float page_width, const ColorScheme &_colors);
@@ -158,5 +160,7 @@ void PdfConfigDialog::on_draw(Painter *p) {
 
 	float m_id[4] = {1, 0, 0, 1};
 	p->set_transform(m_id, {0, 0});
+}
+
 }
 

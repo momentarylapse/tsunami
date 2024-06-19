@@ -10,6 +10,8 @@
 #include "../../lib/hui/hui.h"
 #include "../mainview/MainViewNode.h"
 
+namespace tsunami {
+
 class SignalChain;
 class Session;
 class AudioView;
@@ -68,4 +70,6 @@ public:
 	void popup_chain();
 	void popup_module();
 };
+
+}
 

@@ -12,6 +12,8 @@
 #include "../lib/base/pointer.h"
 #include "../lib/math/rect.h"
 
+namespace tsunami {
+
 class Song;
 class TrackLayer;
 class Sample;
@@ -46,5 +48,7 @@ public:
 	TrackLayer *layer;
 	Song *owner;
 };
+
+}
 
 #endif /* SRC_DATA_SAMPLEREF_H_ */

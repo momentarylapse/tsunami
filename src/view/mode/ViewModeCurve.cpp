@@ -16,6 +16,8 @@
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 
+namespace tsunami {
+
 ViewModeCurve::ViewModeCurve(AudioView* view) :
 	ViewModeDefault(view)
 {
@@ -167,4 +169,6 @@ float ViewModeCurve::screen2value(float y) {
 
 string ViewModeCurve::get_tip() {
 	return "click to add points onto the track,  delete...";
+}
+
 }

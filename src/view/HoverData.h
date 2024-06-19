@@ -14,6 +14,9 @@
 namespace scenegraph {
 	class Node;
 }
+
+namespace tsunami {
+
 class AudioViewTrack;
 class AudioViewLayer;
 class Track;
@@ -77,5 +80,7 @@ public:
 };
 
 bool hover_changed(HoverData &hover, HoverData &hover_old);
+
+}
 
 #endif /* SRC_VIEW_HOVERDATA_H_ */

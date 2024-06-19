@@ -9,17 +9,16 @@
 
 #include <assert.h>
 
-ActionTagDelete::ActionTagDelete(int _index)
-{
+namespace tsunami {
+
+ActionTagDelete::ActionTagDelete(int _index) {
 	index = _index;
 }
 
-ActionTagDelete::~ActionTagDelete()
-{
+ActionTagDelete::~ActionTagDelete() {
 }
 
-void *ActionTagDelete::execute(Data *d)
-{
+void *ActionTagDelete::execute(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < a->tags.num);
@@ -30,10 +29,11 @@ void *ActionTagDelete::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTagDelete::undo(Data *d)
-{
+void ActionTagDelete::undo(Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->tags.insert(old_tag, index);
+}
+
 }
 

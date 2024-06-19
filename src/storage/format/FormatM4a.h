@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatM4a: public Format {
 public:
 	void load_track(StorageOperationData *od) override;
@@ -21,5 +23,7 @@ public:
 	FormatDescriptorM4a();
 	Format *create() override { return new FormatM4a; }
 };
+
+}
 
 #endif /* FORMATMP3_H_ */

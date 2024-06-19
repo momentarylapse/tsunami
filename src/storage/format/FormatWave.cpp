@@ -18,6 +18,7 @@
 #include "../../data/Track.h"
 #include "../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
 
 FormatDescriptorWave::FormatDescriptorWave() :
 	FormatDescriptor("Wave", "wav,wave", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::READ | Flag::WRITE)
@@ -230,6 +231,6 @@ void FormatWave::load_track(StorageOperationData *od) {
 		delete f;
 }
 
-
+}
 
 

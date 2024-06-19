@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../ActionMergable.h"
+
+namespace tsunami {
+
 class Track;
 
 class ActionTrackEditSynthesizer: public ActionMergable<string> {
@@ -25,3 +28,5 @@ public:
 private:
 	Track *track;
 };
+
+}

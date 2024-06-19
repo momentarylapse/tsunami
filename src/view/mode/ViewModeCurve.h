@@ -10,6 +10,8 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class Curve;
 
 class ViewModeCurve : public ViewModeDefault {
@@ -38,5 +40,7 @@ public:
 	Track *cur_track();
 	void set_curve_target(const string &id);
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODECURVE_H_ */

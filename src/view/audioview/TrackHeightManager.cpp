@@ -14,6 +14,8 @@
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 
+namespace tsunami {
+
 TrackHeightManager::TrackHeightManager() {
 	animating = false;
 	t = 0;
@@ -147,5 +149,7 @@ void TrackHeightManager::plan(AudioView *v, Song *__a, const rect &r) {
 		l->area_target = rect(r.x1, r.x2, y0, y0 + l->height);
 		y0 += l->height;
 	}
+}
+
 }
 

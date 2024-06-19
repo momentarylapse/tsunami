@@ -9,6 +9,7 @@
 #include "MidiNote.h"
 
 
+namespace tsunami {
 
 MidiEvent::MidiEvent(int _pos, float _pitch, float _volume) {
 	pos = _pos;
@@ -26,5 +27,7 @@ MidiEvent::MidiEvent(const MidiNote *n) {
 	flags = n->flags;
 	stringno = n->stringno;
 	clef_position = n->clef_position;
+}
+
 }
 

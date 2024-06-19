@@ -9,6 +9,9 @@
 #define ACTIONTRACKSAMPLEFROMSELECTION_H_
 
 #include "../../ActionGroup.h"
+
+namespace tsunami {
+
 class SongSelection;
 class TrackLayer;
 
@@ -25,5 +28,7 @@ private:
 	const SongSelection &sel;
 	bool auto_delete;
 };
+
+}
 
 #endif /* ACTIONTRACKSAMPLEFROMSELECTION_H_ */

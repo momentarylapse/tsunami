@@ -12,8 +12,9 @@
 
 #include "UnitTest.h"
 
-class TestRhythm : public UnitTest
-{
+namespace tsunami {
+
+class TestRhythm : public UnitTest {
 public:
 	TestRhythm();
 
@@ -25,6 +26,8 @@ public:
 	static void test_bar_complex_partition_1();
 	static void test_bar_complex_partition_2();
 };
+
+}
 
 #endif /* SRC_TEST_TESTRHYTHM_H_ */
 

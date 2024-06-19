@@ -9,6 +9,8 @@
 
 #include "../helper/graph/Node.h"
 
+namespace tsunami {
+
 class SignalEditorTab;
 class Module;
 struct Cable;
@@ -28,4 +30,6 @@ public:
 	//string get_tip() override;
 	bool hover(const vec2 &m) const override;
 };
+
+}
 

@@ -11,6 +11,8 @@
 #include "../../data/Song.h"
 #include "LogConsole.h"
 
+namespace tsunami {
+
 string title_filename(const Path &filename);
 
 
@@ -43,16 +45,16 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 		return "<span alpha=\"50%%\">[" + s + "]</span>";
 	};
 
-	if (m.type == Log::Type::ERROR) {
+	if (m.type == Log::Type::Error) {
 		lc->add_string("log_list", format("%s  <span foreground=\"red\">َ<b>Error: %s</b></span>", wrap_source(source), text));
 		//lc->blink();
-	} else if (m.type == Log::Type::WARNING) {
+	} else if (m.type == Log::Type::Warning) {
 		lc->add_string("log_list", format("%s  <span foreground=\"orange\">َ<b>Warning:</b> %s</span>", wrap_source(source), text));
-	} else if (m.type == Log::Type::QUESTION) {
+	} else if (m.type == Log::Type::Question) {
 		lc->add_string("log_list", format("%s  <b>Question:</b> %s", wrap_source(source), text));
-	} else if (m.type == Log::Type::DEBUG) {
+	} else if (m.type == Log::Type::Debug) {
 		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
-	} else if (m.type == Log::Type::STATUS) {
+	} else if (m.type == Log::Type::Status) {
 	} else {
 		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}
@@ -76,4 +78,6 @@ void LogConsole::on_log_add() {
 	for (auto &m: messages.sub_ref(messages_loaded))
 		console_add_message(this, m);
 	messages_loaded = messages.num;
+}
+
 }

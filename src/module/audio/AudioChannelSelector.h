@@ -13,6 +13,8 @@
 #include "../ModuleConfiguration.h"
 #include "PeakMeter.h"
 
+namespace tsunami {
+
 class AudioChannelSelector : public Module {
 public:
 	AudioChannelSelector();
@@ -43,5 +45,7 @@ public:
 
 	owned<PeakMeter> peak_meter;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOCHANNELSELECTOR_H_ */

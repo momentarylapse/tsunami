@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatFlac: public Format {
 public:
 	void load_track(StorageOperationData *od) override;
@@ -21,5 +23,7 @@ public:
 	FormatDescriptorFlac();
 	Format *create() override { return new FormatFlac; }
 };
+
+}
 
 #endif /* FORMATFLAC_H_ */

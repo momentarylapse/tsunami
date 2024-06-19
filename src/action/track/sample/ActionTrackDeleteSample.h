@@ -9,6 +9,9 @@
 #define ACTIONTRACKDELETESAMPLE_H_
 
 #include "../../ActionGroup.h"
+
+namespace tsunami {
+
 class SampleRef;
 
 class ActionTrackDeleteSample : public ActionGroup {
@@ -20,5 +23,7 @@ public:
 private:
 	shared<SampleRef> ref;
 };
+
+}
 
 #endif /* ACTIONTRACKDELETESAMPLE_H_ */

@@ -11,6 +11,7 @@
 #include "Synthesizer.h"
 #include "EnvelopeADSR.h"
 
+namespace tsunami {
 
 class DummySynthesizer : public Synthesizer {
 public:
@@ -25,5 +26,7 @@ public:
 
 	EnvelopeADSR env[MAX_PITCH];
 };
+
+}
 
 #endif /* SRC_MODULE_SYNTH_DUMMYSYNTHESIZER_H_ */

@@ -38,6 +38,8 @@ float max_abs(const Array<complex> &z) {
 	return r;
 }
 
+namespace tsunami {
+
 void apply_window_function(Array<float> &data, WindowFunction wf) {
 	if (wf == WindowFunction::HANN) {
 		for (int k=0; k<data.num; k++) {
@@ -45,4 +47,6 @@ void apply_window_function(Array<float> &data, WindowFunction wf) {
 			data[k] *= s*s * 2;
 		}
 	}
+}
+
 }

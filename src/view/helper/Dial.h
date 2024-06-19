@@ -9,6 +9,7 @@
 
 #include "graph/Node.h"
 
+namespace tsunami {
 
 class Dial : public scenegraph::Node {
 public:
@@ -39,4 +40,6 @@ public:
 
 	string get_tip() const override;
 };
+
+}
 

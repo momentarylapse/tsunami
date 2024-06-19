@@ -10,6 +10,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(shared<TrackLayer> l, int _index, int _offset) {
 	layer = l;
 	index = _index;
@@ -51,6 +53,8 @@ void *ActionTrack__SplitBuffer::execute(Data *d) {
 	b2.set(b, -offset, 1.0f);
 	b.resize(offset);
 	return &b;
+}
+
 }
 
 

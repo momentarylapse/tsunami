@@ -11,6 +11,8 @@
 #include "../lib/os/file.h"
 #include "../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Range;
 class Format;
 class FormatDescriptor;
@@ -80,5 +82,7 @@ public:
 };
 
 Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);
+
+}
 
 #endif /* STORAGE_H_ */

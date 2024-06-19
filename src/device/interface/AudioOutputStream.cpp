@@ -7,6 +7,8 @@
 #include "../../Session.h"
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 const int AudioOutputStream::DEFAULT_PREBUFFER_SIZE = 4096;
 
 static const bool STREAM_WARNINGS = true;
@@ -90,5 +92,7 @@ void AudioOutputStream::signal_out_of_data() {
 		shared_data.played_end_of_stream = true;
 		hui::run_later(0.001f, [this]{ shared_data.callback_played_end_of_stream(); }); // TODO prevent abort before playback really finished
 	}
+}
+
 }
 

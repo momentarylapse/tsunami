@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatWave: public Format {
 public:
 	void load_track(StorageOperationData *od) override;
@@ -21,5 +23,7 @@ public:
 	FormatDescriptorWave();
 	Format *create() override { return new FormatWave; }
 };
+
+}
 
 #endif /* FORMATWAVE_H_ */

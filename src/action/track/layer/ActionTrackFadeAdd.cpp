@@ -8,6 +8,7 @@
 #include "ActionTrackFadeAdd.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
 
 ActionTrackFadeAdd::ActionTrackFadeAdd(TrackLayer* l, int position, CrossFade::Mode mode, int samples) {
 	layer = l;
@@ -27,4 +28,6 @@ void* ActionTrackFadeAdd::execute(Data* d) {
 
 void ActionTrackFadeAdd::undo(Data* d) {
 	layer->fades.erase(index);
+}
+
 }

@@ -9,6 +9,9 @@
 #define ACTIONTRACKINSERTSAMPLE_H_
 
 #include "../../ActionGroup.h"
+
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackInsertSample : public ActionGroup {
@@ -20,5 +23,7 @@ public:
 	TrackLayer *layer;
 	int index;
 };
+
+}
 
 #endif /* ACTIONTRACKINSERTSAMPLE_H_ */

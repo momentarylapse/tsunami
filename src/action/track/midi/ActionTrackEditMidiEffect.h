@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../ActionMergable.h"
+
+namespace tsunami {
+
 class Track;
 class MidiEffect;
 
@@ -26,3 +29,5 @@ public:
 private:
 	MidiEffect *fx;
 };
+
+}

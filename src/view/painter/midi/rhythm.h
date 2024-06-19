@@ -11,6 +11,8 @@
 #include "../../../lib/image/color.h"
 #include <functional>
 
+namespace tsunami {
+
 // rhythm quantization
 static const int QUARTER_PARTITION = 12;
 static const int QUARTER = QUARTER_PARTITION;
@@ -73,3 +75,5 @@ struct QuantizedBar {
 Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, MidiPainter *mp, float spu, std::function<float(MidiNote*)> y_func);
 
 Array<QuantizedNoteGroup> digest_note_groups(Array<QuantizedNote> &ndata, QuantizedBar &qbar);
+
+}

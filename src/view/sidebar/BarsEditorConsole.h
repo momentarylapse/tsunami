@@ -10,6 +10,8 @@
 
 #include "SideBar.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class BarsEditorConsole : public SideBarConsole {
@@ -37,5 +39,7 @@ public:
 
 	TrackLayer *layer;
 };
+
+}
 
 #endif // SRC_VIEW_SIDEBAR_BARSEDITORCONSOLE_H

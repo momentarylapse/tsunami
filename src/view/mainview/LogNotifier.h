@@ -10,6 +10,8 @@
 
 #include "../helper/graph/Node.h"
 
+namespace tsunami {
+
 class Session;
 class LogInfoBox;
 
@@ -37,5 +39,7 @@ public:
 
 	LogInfoBox *info_box;
 };
+
+}
 
 #endif /* SRC_VIEW_MAINVIEW_LOGNOTIFIER_H_ */

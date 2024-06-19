@@ -14,6 +14,8 @@
 #include "view/audioview/AudioView.h"
 #include "lib/hui/hui.h"
 
+namespace tsunami {
+
 Playback::Playback(Session *s) {
 	session = s;
 
@@ -156,5 +158,7 @@ void Playback::seek_relative(float dt) {
 	pos += dt * session->sample_rate();
 	pos = max(pos, renderer->range().offset);
 	set_pos(pos);
+}
+
 }
 

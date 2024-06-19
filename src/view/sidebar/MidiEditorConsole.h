@@ -10,6 +10,8 @@
 
 #include "SideBar.h"
 
+namespace tsunami {
+
 class TrackLayer;
 class Device;
 class ViewModeEditMidi;
@@ -66,5 +68,7 @@ public:
 	TrackLayer *layer;
 	ViewModeEditMidi *mode;
 };
+
+}
 
 #endif /* MIDIEDITORCONSOLE_H_ */

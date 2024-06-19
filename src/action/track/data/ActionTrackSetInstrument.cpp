@@ -9,6 +9,8 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &instrument) {
 	track = t;
 	old_value = t->instrument;
@@ -64,4 +66,6 @@ bool ActionTrackSetInstrument::absorb(ActionMergableBase* a) {
 	new_value = aa->new_value;
 	string_change.append(aa->string_change);
 	return true;
+}
+
 }

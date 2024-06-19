@@ -4,6 +4,8 @@
 
 #include "PresetSelectionDialog.h"
 
+namespace tsunami {
+
 PresetSelectionDialog::PresetSelectionDialog(hui::Window *parent, const Array<string> &_names, bool _save) :
 		hui::Dialog("favorite-dialog", parent) {
 	save = _save;
@@ -46,4 +48,6 @@ void PresetSelectionDialog::on_name() {
 void PresetSelectionDialog::on_ok() {
 	selection = get_string("name");
 	request_destroy();
+}
+
 }

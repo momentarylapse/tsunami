@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Track;
 
 class EditStringsDialog : public hui::Dialog {
@@ -30,5 +32,7 @@ public:
 
 	int gui_num_strings;
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_EDITSTRINGSDIALOG_H_ */

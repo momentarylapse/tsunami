@@ -11,6 +11,8 @@
 
 #include "../../../module/midi/MidiEffect.h"
 
+namespace tsunami {
+
 ActionTrackEditMidiEffect::ActionTrackEditMidiEffect(MidiEffect *_fx) {
 	fx = _fx;
 	old_value = fx->_config_latest_history;
@@ -41,5 +43,7 @@ bool ActionTrackEditMidiEffect::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->fx == fx);
+}
+
 }
 

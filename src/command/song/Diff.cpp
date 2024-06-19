@@ -17,6 +17,7 @@
 #include "../../module/midi/MidiEffect.h"
 #include "../../module/synthesizer/Synthesizer.h"
 
+namespace tsunami {
 
 Array<string> diff_module(Module *a, Module *b, const string &ee) {
 	Array<string> r;
@@ -175,4 +176,6 @@ Array<string> diff_song(Song *a, Song *b) {
 	for (int i=0; i<min(a->tracks.num, b->tracks.num); i++)
 		r += diff_track(a->tracks[i].get(), b->tracks[i].get(), format("track[%d].", i));
 	return r;
+}
+
 }

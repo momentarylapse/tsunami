@@ -10,6 +10,8 @@
 
 #include "BottomBar.h"
 
+namespace tsunami {
+
 class Log;
 
 class LogConsole: public BottomBar::Console {
@@ -24,5 +26,7 @@ public:
 	Log *log;
 	int messages_loaded;
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_LOGCONSOLE_H_ */

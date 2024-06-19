@@ -11,13 +11,16 @@
 #include "../lib/base/pointer.h"
 #include "../lib/pattern/Observable.h"
 
+namespace kaba {
+	class Class;
+};
+
+namespace tsunami {
+
 class Song;
 class Track;
 class AudioEffect;
 class Module;
-namespace kaba {
-	class Class;
-};
 
 
 class CurveTarget {
@@ -68,5 +71,7 @@ public:
 
 	string get_target(Track *t);
 };
+
+}
 
 #endif /* SRC_DATA_CURVE_H_ */

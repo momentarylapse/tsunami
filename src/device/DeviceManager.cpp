@@ -13,6 +13,7 @@
 #include "Device.h"
 #include "../Session.h"
 
+namespace tsunami {
 
 Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
@@ -360,4 +361,6 @@ void DeviceManager::move_device_priority(Device *d, int new_prio) {
 		}
 	write_config();
 	out_changed.notify();
+}
+
 }

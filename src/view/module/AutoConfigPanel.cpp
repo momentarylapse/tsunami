@@ -28,6 +28,8 @@ namespace kaba {
 	string find_enum_label(const Class *type, int value);
 }
 
+namespace tsunami {
+
 bool is_number(char c) {
 	return (c >= '0' and c <= '9');
 }
@@ -645,5 +647,7 @@ AutoConfigPanel::~AutoConfigPanel() {
 void AutoConfigPanel::update() {
 	for (auto a: aa)
 		a->value_to_gui();
+}
+
 }
 

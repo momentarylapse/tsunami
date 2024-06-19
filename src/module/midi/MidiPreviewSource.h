@@ -12,6 +12,7 @@
 #include "MidiSource.h"
 #include <mutex>
 
+namespace tsunami {
 
 class MidiPreviewSource : public MidiSource {
 public:
@@ -47,6 +48,6 @@ private:
 };
 
 
-
+}
 
 #endif /* SRC_MODULE_MIDI_MIDIPREVIEWSOURCE_H_ */

@@ -9,6 +9,7 @@
 
 #include "../beats/BeatSource.h"
 
+namespace tsunami {
 
 MidiEventStreamer::MidiEventStreamer() {
 	module_class = "MidiEventStreamer";
@@ -54,6 +55,6 @@ int MidiEventStreamer::get_pos() const {
 	return offset;
 }
 
-
+}
 
 

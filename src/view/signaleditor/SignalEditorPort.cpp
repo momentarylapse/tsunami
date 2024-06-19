@@ -14,11 +14,13 @@
 #include "../../data/base.h"
 #include "../../module/SignalChain.h"
 
+namespace tsunami {
+
 const float HOVER_RADIUS = 20;
 
 
 
-class MouseDelayCableCreate : public MouseDelayAction {
+class MouseDelayCableCreate : public scenegraph::MouseDelayAction {
 public:
 	SignalEditorTab *tab;
 	SignalEditorModulePort *port;
@@ -104,4 +106,5 @@ HoverData SignalEditorModulePort::get_hover_data(const vec2 &m) {
 	return h;
 }
 
+}
 

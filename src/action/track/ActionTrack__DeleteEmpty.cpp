@@ -11,6 +11,8 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
+
 ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(shared<Track> _track) {
 	index = _track->get_index();
 	track = _track;
@@ -51,4 +53,5 @@ void ActionTrack__DeleteEmpty::undo(Data *d) {
 	a->out_layer_list_changed.notify();
 }
 
+}
 

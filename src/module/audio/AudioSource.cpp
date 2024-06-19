@@ -9,6 +9,8 @@
 #include "../ModuleFactory.h"
 #include "../../data/base.h"
 
+namespace tsunami {
+
 AudioSource::AudioSource() :
 	Module(ModuleCategory::AUDIO_SOURCE, "")
 {
@@ -31,4 +33,6 @@ int AudioSource::read_audio(int port, AudioBuffer& buf) {
 
 AudioSource *CreateAudioSource(Session *session, const string &name) {
 	return (AudioSource*)ModuleFactory::create(session, ModuleCategory::AUDIO_SOURCE, name);
+}
+
 }

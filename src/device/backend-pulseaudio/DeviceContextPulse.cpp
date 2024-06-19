@@ -14,6 +14,8 @@
 
 #include <pulse/pulseaudio.h>
 
+namespace tsunami {
+
 DeviceContextPulse* DeviceContextPulse::instance = nullptr;
 
 
@@ -285,6 +287,8 @@ bool DeviceContextPulse::_test_error(Session *session, const string &msg) {
 	if (e != 0)
 		session->e(msg + ": " + pa_strerror(e));
 	return (e != 0);
+}
+
 }
 
 #endif

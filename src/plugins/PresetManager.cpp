@@ -16,6 +16,8 @@
 #include "../Session.h"
 #include "PresetManager.h"
 
+namespace tsunami {
+
 const string PresetManager::DEFAULT_NAME = ":def:";
 
 PresetManager::PresetManager() {
@@ -297,4 +299,6 @@ const PresetManager::TrackPreset& PresetManager::get_track_preset(Session *sessi
 		if (p.name == name)
 			return p;
 	return dummy_track_preset;
+}
+
 }

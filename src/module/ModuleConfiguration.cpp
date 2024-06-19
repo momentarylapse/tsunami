@@ -22,6 +22,8 @@ namespace kaba {
 	int enum_parse(const string &label, const Class *type);
 }
 
+namespace tsunami {
+
 bool module_config_debug = false;
 
 
@@ -312,4 +314,6 @@ string ModuleConfiguration::auto_conf(const string &name) const {
 void ModuleConfiguration::changed() {
 	if (_module)
 		_module->changed();
+}
+
 }

@@ -6,9 +6,10 @@
  */
 
 #include "BarStreamer.h"
-
 #include "../../data/rhythm/Beat.h"
 #include "../../data/rhythm/Bar.h"
+
+namespace tsunami {
 
 BarStreamer::BarStreamer(BarCollection &_bars) {
 	module_class = "BarStreamer";
@@ -67,4 +68,6 @@ float BarStreamer::beat_fraction() {
 		return (float)(offset - r.offset) / (float)r.length;
 	}
 	return 0;//_beat_fraction;
+}
+
 }

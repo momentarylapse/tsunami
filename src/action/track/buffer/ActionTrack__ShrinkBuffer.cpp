@@ -10,6 +10,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 ActionTrack__ShrinkBuffer::ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length) {
 	layer = l;
 	index = _index;
@@ -47,6 +49,8 @@ void *ActionTrack__ShrinkBuffer::execute(Data *d) {
 	b.resize(new_length);
 
 	return nullptr;
+}
+
 }
 
 

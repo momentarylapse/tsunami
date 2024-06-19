@@ -11,8 +11,9 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
-class Song;
+namespace tsunami {
 
+class Song;
 class MidiProduceData;
 
 class MidiSource : public Module {
@@ -41,5 +42,7 @@ public:
 };
 
 MidiSource *_cdecl CreateMidiSource(Session *session, const string &name);
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDISOURCE_H_ */

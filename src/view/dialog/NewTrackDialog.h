@@ -10,6 +10,8 @@
 #include "../../data/midi/Instrument.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
+
 class Song;
 class Session;
 class Synthesizer;
@@ -48,5 +50,7 @@ public:
 	void on_preset_select();
 	void on_preset();
 };
+
+}
 
 #endif //SRC_VIEW_DIALOG_NEWTRACKDIALOG_H

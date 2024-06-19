@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include <portaudio.h>
 
+namespace tsunami {
+
 AudioInputStreamPort::AudioInputStreamPort(Session *session, Device *device, AudioInputStream::SharedData &shared_data) : AudioInputStream(session, shared_data) {
 
 	int _sample_rate = session->sample_rate();
@@ -106,6 +108,8 @@ bool AudioInputStreamPort::_portaudio_test_error(PaError err, const char *msg) {
 		return true;
 	}
 	return false;
+}
+
 }
 
 #endif

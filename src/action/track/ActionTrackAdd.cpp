@@ -11,6 +11,8 @@
 #include "../../data/TrackLayer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackAdd::ActionTrackAdd(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -43,4 +45,5 @@ void *ActionTrackAdd::execute(Data *d) {
 	return track.get();
 }
 
+}
 

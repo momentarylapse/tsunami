@@ -38,6 +38,8 @@
 #include "view/module/ConfigurationDialog.h"
 #endif
 
+namespace tsunami {
+
 const string AppName = "Tsunami";
 const string AppVersion = "0.7.115.0";
 const string AppNickname = "absolute 2er0";
@@ -323,4 +325,6 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 void Tsunami::load_key_codes() {
 }
 
-HUI_EXECUTE(Tsunami);
+}
+
+HUI_EXECUTE(tsunami::Tsunami);

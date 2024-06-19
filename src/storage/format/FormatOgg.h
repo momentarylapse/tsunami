@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatOgg: public Format {
 public:
 	void load_track(StorageOperationData *od) override;
@@ -21,5 +23,7 @@ public:
 	FormatDescriptorOgg();
 	Format *create() override { return new FormatOgg; }
 };
+
+}
 
 #endif /* FORMATOGG_H_ */

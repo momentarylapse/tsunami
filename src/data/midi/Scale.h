@@ -8,13 +8,15 @@
 #ifndef SRC_DATA_MIDI_SCALE_H_
 #define SRC_DATA_MIDI_SCALE_H_
 
+
+namespace tsunami {
+
 enum class NoteModifier;
 
-class Scale
-{
+class Scale {
 public:
 
-	enum class Type{
+	enum class Type {
 		MAJOR,
 		DORIAN,
 		PHRYGIAN,
@@ -54,6 +56,6 @@ int uniclef_to_pitch(int upos, NoteModifier mod);
 
 
 
-
+}
 
 #endif /* SRC_DATA_MIDI_SCALE_H_ */

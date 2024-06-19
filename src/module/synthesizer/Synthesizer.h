@@ -16,6 +16,12 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
+namespace kaba {
+	class Class;
+}
+
+namespace tsunami {
+
 class Range;
 class AudioBuffer;
 class PluginManager;
@@ -25,9 +31,6 @@ class FileChunkSynthesizer;
 class FileChunkSynthesizerTuning;
 class Session;
 class Synthesizer;
-namespace kaba {
-	class Class;
-}
 
 class PitchRenderer : public VirtualBase {
 public:
@@ -108,5 +111,7 @@ protected:
 };
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name);
+
+}
 
 #endif /* SRC_MODULE_SYNTH_SYNTHESIZER_H_ */

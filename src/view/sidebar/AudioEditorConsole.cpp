@@ -12,7 +12,7 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 
-
+namespace tsunami {
 
 AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Audio editor"), "audio-editor", session, bar)
@@ -129,3 +129,4 @@ void AudioEditorConsole::update() {
 	check("mode-rubber", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::RUBBER);
 }
 
+}

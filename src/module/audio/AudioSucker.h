@@ -12,6 +12,7 @@
 #include "../ModuleConfiguration.h"
 #include "../port/Port.h"
 
+namespace tsunami {
 
 class AudioSucker : public Module {
 public:
@@ -35,5 +36,7 @@ public:
 
 	ModuleConfiguration* get_config() const override;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOSUCKER_H_ */

@@ -18,6 +18,7 @@
 
 #include <stdio.h>
 
+namespace tsunami {
 
 void song_compress_buffers(Song *song, const SongSelection &sel, const string &codec) {
 	for (auto l: song->layers())
@@ -376,4 +377,6 @@ int song_audio_scale_pitch_shift(Song *song, int new_size, BufferInterpolator::M
 			}
 	song->end_action_group();
 	return n_layers;
+}
+
 }

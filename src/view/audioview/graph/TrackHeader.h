@@ -10,11 +10,13 @@
 
 #include "../../helper/graph/Node.h"
 
+namespace tsunami {
+
 class AudioViewTrack;
 class AudioView;
 
 
-class TrackHeader : public scenegraph::NodeRel {
+class TrackHeader : public ::scenegraph::NodeRel {
 public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
@@ -34,6 +36,6 @@ public:
 	void update_geometry_recursive(const rect &target_area) override;
 };
 
-
+}
 
 #endif /* SRC_VIEW_GRAPH_TRACKHEADER_H_ */

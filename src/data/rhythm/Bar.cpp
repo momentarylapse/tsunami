@@ -9,8 +9,12 @@
 #include "Beat.h"
 #include "../../lib/base/iter.h"
 
+
+namespace tsunami {
+
 // MidiData.cpp
 string i2s_small(int i);
+
 
 BarPattern::BarPattern() {
 	length = 0;
@@ -141,5 +145,7 @@ bool Bar::is_pause() {
 
 Range Bar::range() {
 	return Range(offset, length);
+}
+
 }
 

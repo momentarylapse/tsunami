@@ -11,6 +11,8 @@
 #include "lib/base/pointer.h"
 #include "lib/hui/hui.h"
 
+namespace tsunami {
+
 extern const string AppName;
 extern const string AppVersion;
 
@@ -50,6 +52,8 @@ public:
 
 	static Tsunami* instance;
 };
+
+}
 
 
 #endif /* TSUNAMI_H_ */

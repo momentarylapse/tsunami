@@ -10,6 +10,8 @@
 
 #include "ConfigPanel.h"
 
+namespace tsunami {
+
 class AutoConfigData;
 class ModuleConfiguration;
 class Session;
@@ -23,6 +25,8 @@ public:
 };
 
 Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *session);
+
+}
 
 
 #endif /* SRC_VIEW_MODULE_AUTOCONFIGPANEL_H_ */

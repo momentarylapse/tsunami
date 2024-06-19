@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Song;
 class Range;
 
@@ -21,5 +23,7 @@ public:
 	PauseEditDialog(hui::Window *parent, Song *song, int index);
 	void on_ok();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_PAUSEEDITDIALOG_H_ */

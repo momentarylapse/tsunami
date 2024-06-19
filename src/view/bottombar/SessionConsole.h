@@ -11,6 +11,8 @@
 
 #include "BottomBar.h"
 
+namespace tsunami {
+
 struct SessionLabel;
 
 class SessionConsole: public BottomBar::Console {
@@ -32,5 +34,7 @@ public:
 
 	owned<hui::Menu> popup_menu;
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_SESSIONCONSOLE_H_ */

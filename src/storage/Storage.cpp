@@ -35,6 +35,9 @@
 #include "../data/Song.h"
 #include "../data/audio/AudioBuffer.h"
 #include "../data/SongSelection.h"
+#include "../module/audio/BufferStreamer.h"
+
+namespace tsunami {
 
 string Storage::options_in;
 string Storage::options_out;
@@ -376,8 +379,6 @@ FormatDescriptor *Storage::get_format(const string &ext, int flags) {
 	return nullptr;
 }
 
-#include "../module/audio/BufferStreamer.h"
-
 bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	BufferStreamer bs(&buffer);
 	Path filename = temp_saving_file(codec);
@@ -437,4 +438,6 @@ void Storage::mark_file_used(const Path& filename) {
 	for (const auto& ff: recently_used_files)
 		ruf.add(str(ff));
 	hui::config.set_str_array("Storage.RecentFiles", ruf);
+}
+
 }

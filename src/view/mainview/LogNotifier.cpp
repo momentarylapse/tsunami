@@ -13,6 +13,7 @@
 #include "../../Session.h"
 #include "../../stuff/Log.h"
 
+namespace tsunami {
 
 class LogInfoBox : public scenegraph::NodeFree {
 public:
@@ -49,10 +50,10 @@ public:
 		string msg = message.text;
 		float alpha = clamp(message.ttl / 2.0f, 0.0f, 1.0f);
 		color c = theme.background_overlay;
-		if (message.type == Log::Type::ERROR) {
+		if (message.type == Log::Type::Error) {
 			header = "Error";
 			c = color::interpolate(theme.background, Red, 0.3f);
-		} else if (message.type == Log::Type::QUESTION) {
+		} else if (message.type == Log::Type::Question) {
 			header = "Question";
 			c = color::interpolate(theme.background, Orange, 0.3f);
 		} else {
@@ -125,9 +126,9 @@ LogNotifier::LogNotifier(Session *_session) : scenegraph::NodeFree() {
 
 	session->log->out_add_message >> create_sink([this] {
 		auto m = session->log->latest(session);
-		if (m.type == Log::Type::STATUS)
+		if (m.type == Log::Type::Status)
 			set_status(m.text);
-		else if (m.type == Log::Type::ERROR or m.type == Log::Type::QUESTION)
+		else if (m.type == Log::Type::Error or m.type == Log::Type::Question)
 			info_box->add_message(m);
 	});
 }
@@ -165,4 +166,6 @@ void LogNotifier::set_status(const string& text, float size) {
 	status.ttl = 0.8f;
 	status.size = size;
 	request_redraw();
+}
+
 }

@@ -12,6 +12,8 @@
 #include "../../lib/math/rect.h"
 #include "../../lib/os/time.h"
 
+namespace tsunami {
+
 class Song;
 class AudioView;
 class Track;
@@ -32,5 +34,7 @@ public:
 	void plan(AudioView *v, Song *s, const rect &r);
 	void update_immediately(AudioView *v, Song *s, const rect &r);
 };
+
+}
 
 #endif /* SRC_VIEW_TRACKHEIGHTMANAGER_H_ */

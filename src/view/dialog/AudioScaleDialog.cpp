@@ -11,6 +11,8 @@
 #include "../../processing/audio/BufferInterpolator.h"
 #include <math.h>
 
+namespace tsunami {
+
 AudioScaleDialog::AudioScaleDialog(hui::Window *parent, int _original_size):
 	hui::Dialog("audio-scale-dialog", parent)
 {
@@ -106,5 +108,7 @@ base::future<AudioScaleDialog::Data> AudioScaleDialog::ask(hui::Window *parent, 
 	auto dlg = new AudioScaleDialog(parent, original_size);
 	hui::fly(dlg);
 	return dlg->_promise.get_future();
+}
+
 }
 

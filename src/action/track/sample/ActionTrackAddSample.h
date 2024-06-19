@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Sample;
 class SampleRef;
 class TrackLayer;
@@ -27,5 +29,7 @@ private:
 	shared<SampleRef> ref;
 	int pos;
 };
+
+}
 
 #endif /* ACTIONTRACKADDSAMPLE_H_ */

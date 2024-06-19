@@ -12,6 +12,7 @@
 #include "Song.h"
 #include <assert.h>
 
+namespace tsunami {
 
 Sample::Sample(SignalType _type) {
 	//msg_write("  new Sample " + p2s(this));
@@ -108,5 +109,7 @@ void Sample::unset_owner() {
 
 int Sample::create_uid() {
 	return randi(0x7fffffff);
+}
+
 }
 

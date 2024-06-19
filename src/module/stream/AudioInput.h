@@ -16,6 +16,8 @@
 #include "../../data/audio/RingBuffer.h"
 #include "../../device/interface/AudioInputStream.h"
 
+namespace tsunami {
+
 class PluginManager;
 class DeviceManager;
 class Device;
@@ -92,5 +94,7 @@ public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 
 };
+
+}
 
 #endif /* SRC_DEVICE_STREAM_AUDIOINPUT_H_ */

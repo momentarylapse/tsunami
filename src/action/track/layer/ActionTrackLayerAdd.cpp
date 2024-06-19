@@ -11,6 +11,8 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, shared<TrackLayer> l) {
 	track = t;
 	layer = l;
@@ -36,4 +38,4 @@ void ActionTrackLayerAdd::undo(Data* d) {
 	a->out_layer_list_changed.notify();
 }
 
-
+}

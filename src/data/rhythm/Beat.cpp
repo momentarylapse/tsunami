@@ -8,6 +8,8 @@
 #include "Beat.h"
 
 
+namespace tsunami {
+
 Beat::Beat(const Range &r, int _beat_no, int _level, int _bar_index, int _bar_no) {
 	range = r;
 	bar_index = _bar_index;
@@ -22,6 +24,8 @@ Range Beat::sub(int index, int parts) {
 	if (index == parts - 1)
 		return Range(start, range.length - start);
 	return Range(start, length);
+}
+
 }
 
 

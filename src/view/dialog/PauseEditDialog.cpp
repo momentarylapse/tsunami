@@ -10,6 +10,8 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
+
 PauseEditDialog::PauseEditDialog(hui::Window *parent, Song *_song, int _index):
 	hui::Dialog("pause_edit_dialog", parent)
 {
@@ -33,4 +35,6 @@ void PauseEditDialog::on_ok() {
 	song->edit_bar(index, b, bar_dialog_move_data ? BarEditMode::Stretch : BarEditMode::Ignore);
 
 	request_destroy();
+}
+
 }

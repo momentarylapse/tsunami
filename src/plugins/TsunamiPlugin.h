@@ -12,6 +12,8 @@
 
 class Painter;
 
+namespace tsunami {
+
 class TsunamiPlugin : public Module {
 public:
 	TsunamiPlugin();
@@ -32,5 +34,7 @@ public:
 };
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name);
+
+}
 
 #endif /* SRC_PLUGINS_TSUNAMIPLUGIN_H_ */

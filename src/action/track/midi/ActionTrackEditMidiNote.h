@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 class MidiNote;
 class Range;
@@ -28,3 +30,5 @@ private:
 	shared<MidiNote> note;
 	shared<MidiNote> note2;
 };
+
+}

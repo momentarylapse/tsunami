@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 enum class ModuleCategory;
 
 class TestPlugins : public UnitTest {
@@ -28,6 +30,8 @@ public:
 	static void test_synthesizer(const string &name);
 	static void test_tsunami_plugin(const string &name);
 };
+
+}
 
 #endif /* SRC_TEST_TESTPLUGINS_H_ */
 

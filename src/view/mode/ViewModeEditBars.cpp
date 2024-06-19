@@ -13,6 +13,8 @@
 
 void draw_arrow(Painter *p, const vec2 &a, const vec2 &b);
 
+namespace tsunami {
+
 class ActionSongMoveBarGap : public Action {
 	public:
 	ActionSongMoveBarGap(Song *s, int i) {
@@ -51,7 +53,7 @@ class ActionSongMoveBarGap : public Action {
 	int pos0, pos, pos1 = 0;
 };
 
-class MouseDelayBarGapDnD : public MouseDelayAction {
+class MouseDelayBarGapDnD : public scenegraph::MouseDelayAction {
 public:
 	AudioView *view;
 	ActionSongMoveBarGap *action = nullptr;
@@ -83,7 +85,7 @@ public:
 };
 
 
-class MouseDelayDragRubberEndPoint : public MouseDelayAction {
+class MouseDelayDragRubberEndPoint : public scenegraph::MouseDelayAction {
 public:
 	AudioView *view;
 	int *end;
@@ -302,5 +304,7 @@ string ViewModeEditBars::get_tip() {
 		return "split/insert bar [click]    move gap [drag'n'drop]    delete/merge [delete]    track [Alt+↑,↓]";
 	//if (edit_mode == EditMode::SELECT)
 	return "track [Alt+↑,↓]";
+}
+
 }
 

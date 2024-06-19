@@ -12,6 +12,8 @@
 #include "../../../data/Sample.h"
 #include <cassert>
 
+namespace tsunami {
+
 ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, shared<Sample> _sample) {
 	layer = l;
 	pos = _pos;
@@ -43,5 +45,7 @@ void *ActionTrackAddSample::execute(Data *d) {
 
 	layer->samples.add(ref);
 	return ref.get();
+}
+
 }
 

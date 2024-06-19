@@ -11,6 +11,7 @@
 #include "../lib/math/math.h"
 #include "Song.h"
 
+namespace tsunami {
 
 SampleRef::SampleRef(shared<Sample> sample) {
 	//msg_write("  new SampleRef " + p2s(this));
@@ -64,4 +65,6 @@ AudioBuffer& SampleRef::buf() const {
 
 MidiNoteBuffer& SampleRef::midi() const {
 	return origin.get()->midi;
+}
+
 }

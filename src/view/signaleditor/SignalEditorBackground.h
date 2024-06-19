@@ -10,6 +10,8 @@
 #include "../helper/graph/Node.h"
 #include "../helper/graph/Scrollable.h"
 
+namespace tsunami {
+
 class SignalEditorTab;
 
 extern const float MODULE_GRID;
@@ -22,4 +24,6 @@ public:
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_right_button_down(const vec2 &m) override;
 };
+
+}
 

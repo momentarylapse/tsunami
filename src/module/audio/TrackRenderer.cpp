@@ -27,6 +27,8 @@
 
 #include "../../lib/os/msg.h"
 
+namespace tsunami {
+
 
 const int CURVE_CHUNK = 512;
 
@@ -466,4 +468,6 @@ int TrackRenderer::read_basic(AudioBuffer &buf) {
 
 	unapply_curves(track.get());
 	return buf.length;
+}
+
 }

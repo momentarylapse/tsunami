@@ -22,6 +22,8 @@
 #include "../../lib/base/iter.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 hui::Panel *create_dummy_synth_panel() {
 	auto panel = new hui::Panel();
 	panel->add_label("", 0, 0, "");
@@ -217,4 +219,6 @@ void TrackConsole::on_view_cur_track_change() {
 void TrackConsole::on_update() {
 	if (!editing)
 		load_data();
+}
+
 }

@@ -15,6 +15,8 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/Song.h"
 
+namespace tsunami {
+
 static const float PROGRESS_UPDATE_DT = 0.1f;
 
 StorageOperationData::StorageOperationData(Session *_session, Format *_format, const Path &_filename) {
@@ -117,4 +119,6 @@ void StorageOperationData::suggest_default_format(SampleFormat format) {
 void StorageOperationData::suggest_tag(const string &key, const string &value) {
 	//if (track->get_index() == 0)
 		song->add_tag(key, value);
+}
+
 }

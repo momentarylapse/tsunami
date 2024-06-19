@@ -10,6 +10,7 @@
 #include "../../data/base.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
 
 MidiSucker::MidiSucker() :
 	Module(ModuleCategory::PLUMBING, "MidiSucker")
@@ -29,5 +30,7 @@ int MidiSucker::update(int buffer_size) {
 	MidiEventBuffer buf;
 	buf.samples = buffer_size;
 	return in.source->read_midi(buf);
+}
+
 }
 

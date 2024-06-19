@@ -12,6 +12,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class Song;
 class SongConsole;
 class TrackConsole;
@@ -98,5 +100,7 @@ public:
 	virtual void on_leave() {}
 	virtual base::future<bool> test_allow_close();
 };
+
+}
 
 #endif /* BOTTOMBAR_H_ */

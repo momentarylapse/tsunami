@@ -9,6 +9,8 @@
 #include "../../../data/Track.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 ActionTrackDeleteCurve::ActionTrackDeleteCurve(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -27,5 +29,7 @@ void* ActionTrackDeleteCurve::execute(Data* d) {
 void ActionTrackDeleteCurve::undo(Data* d) {
 	track->curves.insert(curve, index);
 	track->out_curve_list_changed.notify();
+}
+
 }
 

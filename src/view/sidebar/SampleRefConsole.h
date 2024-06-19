@@ -9,6 +9,9 @@
 #define SAMPLEREFCONSOLE_H_
 
 #include "SideBar.h"
+
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 class SampleRef;
@@ -43,5 +46,7 @@ public:
 
 	bool editing;
 };
+
+}
 
 #endif /* SAMPLEREFCONSOLE_H_ */

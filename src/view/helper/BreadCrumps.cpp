@@ -10,6 +10,8 @@
 #include "../../EditModes.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 namespace BreadCrumps {
 
 void add(hui::Panel* panel, Session* session) {
@@ -42,6 +44,8 @@ void add(hui::Panel* panel, Session* session) {
 	panel->event("link-to-fx", [session] {
 		session->set_mode(EditMode::DefaultTrackFx);
 	});
+}
+
 }
 
 }

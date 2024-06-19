@@ -10,6 +10,7 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
 
 void set_bar_pattern(BarPattern &b, const string &pat);
 
@@ -118,4 +119,6 @@ void BarReplaceDialog::update_result_bpm() {
 
 void BarReplaceDialog::on_shift_data() {
 	enable("scale-audio", is_checked(""));
+}
+
 }

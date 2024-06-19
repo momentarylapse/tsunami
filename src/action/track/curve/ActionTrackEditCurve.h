@@ -10,6 +10,8 @@
 #include "../../Action.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 class Curve;
 enum class CurveType;
 
@@ -26,3 +28,5 @@ private:
 	float min, max;
 	CurveType type;
 };
+
+}

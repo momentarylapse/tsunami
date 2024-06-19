@@ -20,6 +20,8 @@
 
 #include <stdio.h>
 
+namespace tsunami {
+
 // AudioBuffer is only guaranteed to exist between acquire() and release()!
 
 const int PeakData::PEAK_CHUNK_EXP = 15;
@@ -410,3 +412,4 @@ void PeakDatabase::iterate(float _sample_rate) {
 	process_replies();
 }
 
+}

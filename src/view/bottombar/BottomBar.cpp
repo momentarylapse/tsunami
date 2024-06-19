@@ -15,6 +15,8 @@
 #include "../audioview/AudioView.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 BottomBar::BottomBar(Session *session, hui::Panel *parent) {
 	set_parent(parent);
 	set_id("bottom-bar");
@@ -167,5 +169,7 @@ void BottomBar::Console::blink() {
 	} else {
 		request_notify = true;
 	}
+}
+
 }
 

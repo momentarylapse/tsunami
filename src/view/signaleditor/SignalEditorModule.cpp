@@ -19,6 +19,8 @@
 #include "../../data/base.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 const float MODULE_WIDTH = MODULE_GRID * 7;
 const float MODULE_HEIGHT = MODULE_GRID * 2;
 static const float PORT_SWARM_CENTER_OFFSET = 35;
@@ -102,7 +104,7 @@ static float module_port_out_y(Module *m, int index) {
 }
 
 
-class MouseDelayModuleDnD : public MouseDelayAction {
+class MouseDelayModuleDnD : public scenegraph::MouseDelayAction {
 public:
 	base::set<Module*> sel;
 	SignalEditorTab *tab;
@@ -193,4 +195,6 @@ bool SignalEditorModule::on_right_button_down(const vec2 &m) {
 
 string SignalEditorModule::get_tip() const {
 	return "module: " + module->module_class + "\ncategory: " + Module::category_to_str(module->module_category);
+}
+
 }

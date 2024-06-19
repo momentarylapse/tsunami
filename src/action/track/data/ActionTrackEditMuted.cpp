@@ -8,6 +8,8 @@
 #include "ActionTrackEditMuted.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 ActionTrackEditMuted::ActionTrackEditMuted(Track *t, bool _muted) {
 	track = t;
 	muted = _muted;
@@ -24,4 +26,6 @@ void *ActionTrackEditMuted::execute(Data *d) {
 
 void ActionTrackEditMuted::undo(Data *d) {
 	execute(d);
+}
+
 }

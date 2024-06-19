@@ -10,6 +10,9 @@
 #include "Clef.h"
 #include "Instrument.h"
 
+
+namespace tsunami {
+
 const int MidiNote::UNDEFINED_STRING = -1;
 const int MidiNote::UNDEFINED_CLEF = -123;
 
@@ -54,4 +57,6 @@ bool MidiNote::is(int mask) const {
 
 void MidiNote::set(int mask) {
 	flags |= mask;
+}
+
 }

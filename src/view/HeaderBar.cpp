@@ -15,6 +15,7 @@
 #include "../lib/hui/Controls/ControlMenuButton.h"
 #include "../lib/base/iter.h"
 
+namespace tsunami {
 
 string nice_filename(const Path& f);
 
@@ -129,5 +130,7 @@ void HeaderBar::update() {
 		}*/
 		c->set_menu(menu_load.get());
 	}
+}
+
 }
 

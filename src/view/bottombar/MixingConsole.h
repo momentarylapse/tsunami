@@ -11,7 +11,7 @@
 
 #include "BottomBar.h"
 
-
+namespace tsunami {
 
 
 class PeakMeterDisplay;
@@ -47,5 +47,7 @@ public:
 	
 	void show_fx(Track *t);
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_MIXINGCONSOLE_H_ */

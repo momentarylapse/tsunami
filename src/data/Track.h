@@ -14,7 +14,7 @@
 #include "../lib/base/pointer.h"
 #include "../lib/pattern/Observable.h"
 
-
+namespace tsunami {
 
 class AudioBuffer;
 class Song;
@@ -116,5 +116,7 @@ public:
 
 	Song *song;
 };
+
+}
 
 #endif /* SRC_DATA_TRACK_H_ */

@@ -8,6 +8,8 @@
 #include "ActionTrackEditMidiNote.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrackEditMidiNote::ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote> n, const Range &range, float _pitch, float _volume, int _stringno, int _flags) {
 	note = n;
 	note2 = new MidiNote(range, _pitch, _volume);
@@ -32,5 +34,7 @@ void* ActionTrackEditMidiNote::execute(Data* d) {
 
 void ActionTrackEditMidiNote::undo(Data* d) {
 	execute(d);
+}
+
 }
 

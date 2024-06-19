@@ -13,6 +13,8 @@
 #include <assert.h>
 
 
+namespace tsunami {
+
 // mono/stereo:
 //   always have 2 channels existing and correctly sized
 //   but ignore data in mono
@@ -651,4 +653,6 @@ void AudioBuffer::_data_was_changed() {
 	compressed = nullptr;
 
 	version = next_buffer_version(version);
+}
+
 }

@@ -10,6 +10,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestInterpolator : public UnitTest {
 public:
 	TestInterpolator();
@@ -23,5 +25,7 @@ public:
 	static void test_operator();
 	static void test_pitch_operator();
 };
+
+}
 
 #endif /* SRC_TEST_TESTINTERPOLATOR_H_ */

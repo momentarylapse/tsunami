@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../Action.h"
+
+namespace tsunami {
+
 class MidiEffect;
 
 class ActionTrackToggleMidiEffectEnabled: public Action {
@@ -22,3 +25,5 @@ public:
 private:
 	MidiEffect *fx;
 };
+
+}

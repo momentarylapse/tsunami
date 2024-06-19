@@ -10,6 +10,8 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t) {
 	track = t;
 	old_value = t->synth->_config_latest_history;
@@ -39,5 +41,7 @@ bool ActionTrackEditSynthesizer::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->track == track);
+}
+
 }
 

@@ -12,6 +12,8 @@
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
 
+namespace tsunami {
+
 ActionSampleAdd::ActionSampleAdd(shared<Sample> s) {
 	sample = s;
 }
@@ -31,5 +33,7 @@ void ActionSampleAdd::undo(Data *d) {
 	a->samples.pop();
 	sample->unset_owner();
 	a->out_sample_list_changed.notify();
+}
+
 }
 

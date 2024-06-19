@@ -14,6 +14,8 @@
 #include "ActionTrackLayer__Delete.h"
 #include "ActionTrackFadeDelete.h"
 
+namespace tsunami {
+
 ActionTrackLayerDelete::ActionTrackLayerDelete(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -27,5 +29,7 @@ void ActionTrackLayerDelete::build(Data *d) {
 	add_sub_action(new ActionTrackLayer__Delete(track, index), d);
 	for (int i=l->fades.num-1; i>=0; i--)
 		add_sub_action(new ActionTrackFadeDelete(l, i), d);
+}
+
 }
 

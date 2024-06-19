@@ -7,6 +7,8 @@
 #include "AudioInputStream.h"
 #include "AudioOutputStream.h"
 
+namespace tsunami {
+
 DeviceContext::DeviceContext(Session *_session) {
 	//session = _session;
 }
@@ -50,4 +52,6 @@ public:
 
 MidiInputStream* DeviceContext::create_midi_input_stream(Session *session, Device *device, void* shared_data) {
 	return new MidiInputStreamDummy(session, *reinterpret_cast<MidiInputStream::SharedData*>(shared_data));
+}
+
 }

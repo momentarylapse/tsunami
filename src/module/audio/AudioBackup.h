@@ -16,6 +16,8 @@ namespace os::fs {
 	class FileStream;
 }
 
+namespace tsunami {
+
 enum class BackupMode;
 enum class SampleFormat;
 
@@ -51,5 +53,7 @@ public:
 
 	ModuleConfiguration* get_config() const override;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOBACKUP_H_ */

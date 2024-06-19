@@ -11,6 +11,8 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class ViewModeEdit : public ViewModeDefault {
 public:
 	ViewModeEdit(AudioView *view);
@@ -46,5 +48,7 @@ public:
 
 	bool editing(AudioViewLayer *l);
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDIT_H_ */

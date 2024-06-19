@@ -9,6 +9,8 @@
 
 #include "../../ActionMergable.h"
 
+namespace tsunami {
+
 class Song;
 class Track;
 
@@ -31,4 +33,6 @@ public:
 	};
 	Array<TrackVolume> track_volumes;
 };
+
+}
 

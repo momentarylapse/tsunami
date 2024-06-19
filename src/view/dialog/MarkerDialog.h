@@ -12,6 +12,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/Range.h"
 
+namespace tsunami {
+
 class TrackLayer;
 class TrackMarker;
 
@@ -35,5 +37,7 @@ public:
 	string text;
 	const TrackMarker *marker;
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_MARKERDIALOG_H_ */

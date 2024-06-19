@@ -12,6 +12,8 @@
 #include "../../lib/base/pointer.h"
 #include "../../module/SignalChain.h"
 
+namespace tsunami {
+
 class AudioOutput;
 class Synthesizer;
 class MidiPreviewSource;
@@ -46,5 +48,7 @@ public:
 	void start(const Array<int> &pitch, float volume, float ttl);
 	void end();
 };
+
+}
 
 #endif /* SRC_VIEW_HELPER_MIDIPREVIEW_H_ */

@@ -11,6 +11,8 @@
 
 struct pa_stream;
 
+namespace tsunami {
+
 class AudioInputStreamPulse : public AudioInputStream {
 public:
 	AudioInputStreamPulse(Session *session, Device *device, SharedData& shared_data);
@@ -28,6 +30,8 @@ public:
 	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
 	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
 };
+
+}
 
 #endif
 

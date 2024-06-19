@@ -15,6 +15,8 @@
 #include "../../../Session.h"
 #include "../../../Playback.h"
 
+namespace tsunami {
+
 bool view_has_focus(AudioView *view);
 
 Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
@@ -156,4 +158,6 @@ void SelectionMarker::on_draw(Painter* p) {
 		draw_bar_gap_selector(p, view->cur_selection.index, theme.text_soft1);
 	if (hover.type == HoverData::Type::BAR_GAP)
 		draw_bar_gap_selector(p, view->hover().index, theme.hover);
+}
+
 }

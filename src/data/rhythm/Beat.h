@@ -11,6 +11,8 @@
 #include "../Range.h"
 
 
+namespace tsunami {
+
 class Beat {
 public:
 	Beat(){}
@@ -22,6 +24,8 @@ public:
 	int level;
 	Range sub(int index, int parts);
 };
+
+}
 
 
 #endif /* SRC_DATA_RHYTHM_BEAT_H_ */

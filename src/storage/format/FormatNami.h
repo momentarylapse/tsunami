@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatNami : public Format {
 public:
 	void load_track(StorageOperationData *od) override {}
@@ -26,5 +28,7 @@ public:
 	FormatDescriptorNami();
 	Format *create() override { return new FormatNami; }
 };
+
+}
 
 #endif /* FORMATNAMI_H_ */

@@ -10,15 +10,18 @@
 
 #include "../StorageOperationData.h"
 
-class StorageOperationData;
-struct AudioOutPort;
-class Format;
-class Song;
 namespace os::fs {
 	class FileStream;
 }
 class Stream;
 //class BinaryFormatter;
+
+namespace tsunami {
+
+class StorageOperationData;
+struct AudioOutPort;
+class Format;
+class Song;
 enum class SampleFormat;
 
 const int CHUNK_SIZE = 1 << 18;
@@ -67,5 +70,7 @@ public:
 
 	os::fs::FileStream *f;
 };
+
+}
 
 #endif /* FORMAT_H_ */

@@ -22,6 +22,8 @@
 #include "../lib/base/iter.h"
 #include <assert.h>
 
+namespace tsunami {
+
 Clipboard::Clipboard() {
 	temp = new Song(Session::GLOBAL, DEFAULT_SAMPLE_RATE);
 }
@@ -325,5 +327,7 @@ bool Clipboard::can_copy(AudioView *view) {
 	//if (view->sel._samples.num > 0)
 	//	return true;
 	return false;
+}
+
 }
 

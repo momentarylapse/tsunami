@@ -14,6 +14,8 @@
 #include "../../view/module/ConfigPanel.h"
 #include "../../view/helper/PeakMeterDisplay.h"
 
+namespace tsunami {
+
 
 const int PeakMeter::SPECTRUM_SIZE = 30;
 const float PeakMeter::FREQ_MIN = 40.0f;
@@ -147,4 +149,6 @@ public:
 
 ConfigPanel* PeakMeter::create_panel() {
 	return new PeakMeterPanel(this);
+}
+
 }

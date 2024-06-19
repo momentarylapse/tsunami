@@ -10,6 +10,7 @@
 
 #include "../../ActionMergable.h"
 
+namespace tsunami {
 
 class Track;
 class SampleRef;
@@ -31,5 +32,7 @@ public:
 private:
 	shared<SampleRef> ref;
 };
+
+}
 
 #endif /* ACTIONTRACKEDITSAMPLE_H_ */

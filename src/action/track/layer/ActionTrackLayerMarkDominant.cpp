@@ -11,6 +11,7 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
 
 const int SAMPLES = 2000; // for now, use default value
 
@@ -99,4 +100,6 @@ void ActionTrackLayerMarkDominant::build(Data *d) {
 		bool activate = (layers.find(l) >= 0);
 		add_sub_action(new ActionTrackLayerActivateVersion(l, range, activate), d);
 	}
+}
+
 }

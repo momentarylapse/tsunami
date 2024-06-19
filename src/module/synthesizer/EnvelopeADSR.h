@@ -10,9 +10,10 @@
 
 #include "../../lib/base/base.h"
 
+namespace tsunami {
+
 class EnvelopeADSR {
 public:
-
 	EnvelopeADSR();
 	void __init__();
 
@@ -26,6 +27,15 @@ public:
 	float get();
 	Array<float> read(int n);
 
+	enum class Mode {
+		Off,
+		Attack,
+		AttackZombie,
+		Decay,
+		Sustain,
+		Release
+	};
+
 	// config
 	float step_attack;
 	float step_decay;
@@ -38,7 +48,7 @@ public:
 	int ttl_release;
 
 	// state
-	int mode;
+	Mode mode;
 	int ttl;
 	float value;
 	bool just_killed;
@@ -52,16 +62,8 @@ public:
 	void start_sustain();
 	void start_release();
 	void kill();
-
-
-	enum {
-		MODE_OFF,
-		MODE_ATTACK,
-		MODE_ATTACK_ZOMBIE,
-		MODE_DECAY,
-		MODE_SUSTAIN,
-		MODE_RELEASE
-	};
 };
+
+}
 
 #endif /* SRC_MODULE_SYNTH_ENVELOPEADSR_H_ */

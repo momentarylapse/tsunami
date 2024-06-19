@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestSignalChain : public UnitTest {
 public:
 	TestSignalChain();
@@ -20,6 +22,8 @@ public:
 
 	static void test_synth();
 };
+
+}
 
 #endif /* SRC_TEST_TESTSIGNALCHAIN_H_ */
 

@@ -10,6 +10,8 @@
 #include "../../Action.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackEditBuffer : public Action {
@@ -28,3 +30,5 @@ private:
 	AudioBuffer box;
 	int index;
 };
+
+}

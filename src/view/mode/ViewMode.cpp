@@ -10,6 +10,8 @@
 #include "../sidebar/SideBar.h"
 #include "../TsunamiWindow.h"
 
+namespace tsunami {
+
 ViewMode::ViewMode(AudioView *_view, const string &name) {
 	view = _view;
 	mode_name = name;
@@ -58,4 +60,6 @@ void ViewMode::set_side_bar(int console) {
 		win->side_bar->open(console);
 	else
 		win->side_bar->_hide();
+}
+
 }

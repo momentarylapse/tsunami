@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class AudioBuffer;
 class MidiNoteBuffer;
 class Sample;
@@ -24,5 +26,7 @@ public:
 private:
 	shared<Sample> sample;
 };
+
+}
 
 #endif /* ACTIONSAMPLEADD_H_ */

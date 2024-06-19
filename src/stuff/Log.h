@@ -11,9 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/pattern/Observable.h"
 
-#ifdef ERROR
-#undef ERROR
-#endif
+namespace tsunami {
 
 class Session;
 
@@ -31,12 +29,12 @@ public:
 	void status(Session *session, const string &message);
 
 	enum class Type {
-		ERROR,
-		WARNING,
-		QUESTION,
-		INFO,
-		DEBUG,
-		STATUS
+		Error,
+		Warning,
+		Question,
+		Info,
+		Debug,
+		Status
 	};
 
 	struct Message {
@@ -58,5 +56,7 @@ private:
 	Array<Message> messages;
 	Array<Message> blocked;
 };
+
+}
 
 #endif /* SRC_STUFF_LOG_H_ */

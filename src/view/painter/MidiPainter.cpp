@@ -23,6 +23,7 @@
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../module/ModuleConfiguration.h"
 
+namespace tsunami {
 
 
 MidiKeyChange::MidiKeyChange(double _pos, const Scale &_key) : pos(_pos), key(_key) {}
@@ -491,4 +492,6 @@ float MidiPainter::get_clef_dy() const {
 	if (mode == MidiMode::TAB)
 		return mode_tab.string_dy;
 	return 1;
+}
+
 }

@@ -13,6 +13,7 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/Range.h"
 
+namespace tsunami {
 
 ViewModeScaleMarker::ViewModeScaleMarker(AudioView *view) :
 	ViewModeDefault(view)
@@ -77,5 +78,7 @@ void ViewModeScaleMarker::perform_scale() {
 		layer->edit_marker(marker, view->sel.range(), marker->text);
 
 	session->set_mode(EditMode::Default);
+}
+
 }
 

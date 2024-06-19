@@ -25,6 +25,8 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 
+namespace tsunami {
+
 extern const int CONFIG_PANEL_WIDTH;
 
 SideBar::SideBar(Session *_session, hui::Panel *parent) {
@@ -173,5 +175,7 @@ SideBarConsole::~SideBarConsole() {
 
 base::future<bool> SideBarConsole::test_allow_close() {
 	return base::success<bool>(true);
+}
+
 }
 

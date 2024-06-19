@@ -19,7 +19,7 @@
 #include "../../lib/math/math.h"
 
 
-
+namespace tsunami {
 
 SongRenderer::SongRenderer(Song *s, bool _direct_mode) :
 		in_track_list_changed{this, [this] { update_tracks(); }} {
@@ -321,5 +321,7 @@ void SongRenderer::get_peak(const Track *t, float p[2]) {
 void SongRenderer::clear_peaks() {
 	for (auto &tr: tracks)
 		tr->peak[0] = tr->peak[1] = 0;
+}
+
 }
 

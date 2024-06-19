@@ -20,7 +20,7 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
-
+namespace tsunami {
 
 void AudioChannelSelector::Config::reset() {
 	channels = 2;
@@ -163,4 +163,6 @@ public:
 
 ConfigPanel* AudioChannelSelector::create_panel() {
 	return new ChannelMapPanel(this);
+}
+
 }

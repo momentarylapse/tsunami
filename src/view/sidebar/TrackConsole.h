@@ -10,6 +10,9 @@
 
 
 #include "SideBar.h"
+
+namespace tsunami {
+
 class Track;
 class Slider;
 class ModulePanel;
@@ -52,5 +55,7 @@ public:
 	};
 	void set_mode(Mode m);
 };
+
+}
 
 #endif /* TRACKCONSOLE_H_ */

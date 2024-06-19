@@ -14,8 +14,9 @@
 #include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
 
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
+scenegraph::MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
 
 Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
@@ -125,4 +126,6 @@ HoverData Background::get_hover_data(const vec2 &m) {
 	auto h = view->hover_time(m);
 	h.node = this;
 	return h;
+}
+
 }

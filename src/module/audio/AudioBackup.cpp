@@ -18,12 +18,12 @@ namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
 }
 
-
+namespace tsunami {
 
 void AudioBackup::Config::reset() {
 	channels = 2;
 	format = SampleFormat::Float32;
-	backup_mode = BackupMode::TEMP;
+	backup_mode = BackupMode::Temporary;
 }
 
 string AudioBackup::Config::auto_conf(const string &name) const {
@@ -85,7 +85,7 @@ void AudioBackup::save_chunk(const AudioBuffer &buf) {
 void AudioBackup::start() {
 	if (backup_file)
 		stop();
-	if (config.backup_mode != BackupMode::NONE)
+	if (config.backup_mode != BackupMode::None)
 		backup_file = BackupManager::create_file("raw", session);
 }
 
@@ -117,4 +117,6 @@ base::optional<int64> AudioBackup::command(ModuleCommand cmd, int64 param) {
 		return 0;
 	}
 	return base::None;
+}
+
 }

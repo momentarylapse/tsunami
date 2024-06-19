@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class StorageOperationData;
 
 class RawConfigDialog : public hui::Window {
@@ -22,5 +24,7 @@ public:
 	StorageOperationData *od;
 	bool ok;
 };
+
+}
 
 #endif /* SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_ */

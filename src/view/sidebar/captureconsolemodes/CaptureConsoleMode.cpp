@@ -20,6 +20,7 @@
 #include "../../../Session.h"
 #include "../../../Playback.h"
 
+namespace tsunami {
 
 CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_cc) {
 	cc = _cc;
@@ -160,4 +161,6 @@ void CaptureConsoleMode::leave() {
 	items().clear();
 	session->remove_signal_chain(chain.get());
 	chain = nullptr;
+}
+
 }

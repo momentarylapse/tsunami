@@ -14,6 +14,8 @@
 #include "../port/Port.h"
 #include <mutex>
 
+namespace tsunami {
+
 class MidiAccumulator : public Module {
 public:
 	MidiAccumulator();
@@ -31,5 +33,7 @@ public:
 	bool accumulating;
 	std::mutex mtx_buf;
 };
+
+}
 
 #endif /* SRC_MODULE_MIDI_MIDIACCUMULATOR_H_ */

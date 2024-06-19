@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class Bar;
 
 class ActionBar__Delete: public Action {
@@ -23,5 +25,7 @@ private:
 	shared<Bar> bar;
 	int index;
 };
+
+}
 
 #endif /* SRC_ACTION_BAR_ACTIONBAR__DELETE_H_ */

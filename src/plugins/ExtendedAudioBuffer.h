@@ -11,11 +11,14 @@
 #include "../data/audio/AudioBuffer.h"
 class complex;
 
-class ExtendedAudioBuffer : public AudioBuffer
-{
+namespace tsunami {
+
+class ExtendedAudioBuffer : public AudioBuffer {
 public:
 
 	void get_spectrum(Array<complex> &spec_r, Array<complex> &spec_l, int samples);
 };
+
+}
 
 #endif /* SRC_PLUGINS_EXTENDEDAUDIOBUFFER_H_ */

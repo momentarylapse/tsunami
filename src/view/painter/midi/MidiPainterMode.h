@@ -10,16 +10,19 @@
 
 #include "../../../lib/base/base.h"
 
+class color;
+class Painter;
+
+namespace tsunami {
+
 class ViewPort;
 class Song;
 class ColorScheme;
 class SongSelection;
 class HoverData;
-class Painter;
 class MidiNoteBuffer;
 class MidiPainter;
 class MidiNote;
-class color;
 
 
 
@@ -65,5 +68,7 @@ public:
 	float shadow_hole = 0;
 	float shadow_offset = 0;
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_ */

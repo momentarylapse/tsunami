@@ -10,6 +10,8 @@
 
 #include "SideBar.h"
 
+namespace tsunami {
+
 class Track;
 class ModulePanel;
 class FxListEditor;
@@ -32,5 +34,6 @@ public:
 	owned<FxListEditor> fx_editor;
 };
 
+}
 
 #endif /* SRC_VIEW_SIDEBAR_EFFECTSCONSOLE_H_ */

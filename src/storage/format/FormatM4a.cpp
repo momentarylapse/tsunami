@@ -11,6 +11,8 @@
 #include "../../lib/os/filesystem.h"
 #include "../../lib/os/msg.h"
 
+namespace tsunami {
+
 FormatDescriptorM4a::FormatDescriptorM4a() :
 	FormatDescriptor("Apple lossless audio", "m4a", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
 {
@@ -34,3 +36,4 @@ void FormatM4a::load_track(StorageOperationData *od) {
 	}
 }
 
+}

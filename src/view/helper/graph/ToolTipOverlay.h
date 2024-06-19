@@ -11,6 +11,8 @@
 
 class Painter;
 
+namespace tsunami {
+
 class ToolTipOverlay : public scenegraph::Node {
 public:
 	ToolTipOverlay();
@@ -18,3 +20,5 @@ public:
 	void on_draw(Painter *c) override;
 	bool hover(const vec2 &m) const override { return false; }
 };
+
+}

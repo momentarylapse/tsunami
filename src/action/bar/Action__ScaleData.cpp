@@ -15,6 +15,8 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <assert.h>
 
+namespace tsunami {
+
 Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size) {
 	source = _source;
 	new_size = _new_size;
@@ -89,4 +91,6 @@ void Action__ScaleData::do_scale(Song *s, const Range &r, int new_length) {
 			l->out_changed.notify();
 		}
 	}
+}
+
 }

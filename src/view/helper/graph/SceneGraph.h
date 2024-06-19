@@ -11,15 +11,14 @@
 #include "Node.h"
 #include "../../HoverData.h"
 
-class AudioView;
-class MouseDelayPlanner;
-class MouseDelayAction;
-
 namespace hui {
 	class Panel;
 }
 
 namespace scenegraph {
+
+class MouseDelayPlanner;
+class MouseDelayAction;
 
 class SceneGraph : public Node {
 public:
@@ -42,16 +41,16 @@ public:
 	bool allow_handle_click_when_gaining_focus() const override;
 
 	//ViewNode *get_hover();
-	HoverData get_hover_data(const vec2 &m) override;
+	tsunami::HoverData get_hover_data(const vec2 &m) override;
 
 	void draw(Painter *p);
 	void on_draw(Painter *p) override;
 
 	string get_tip() const override;
 
-	HoverData hover;
-	HoverData cur_selection;
-	void set_current(const HoverData &h);
+	tsunami::HoverData hover;
+	tsunami::HoverData cur_selection;
+	void set_current(const tsunami::HoverData &h);
 
 	owned<MouseDelayPlanner> mdp;
 	void mdp_prepare(MouseDelayAction *action);

@@ -10,6 +10,8 @@
 
 #include "Action.h"
 
+namespace tsunami {
+
 class ActionMergableBase : public Action {
 public:
 
@@ -32,5 +34,7 @@ protected:
 	T new_value;
 	T old_value;
 };
+
+}
 
 #endif /* ACTIONMERGABLE_H_ */

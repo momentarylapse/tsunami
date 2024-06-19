@@ -10,6 +10,8 @@
 #include "../../../module/midi/MidiEffect.h"
 #include <cassert>
 
+namespace tsunami {
+
 ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, shared<MidiEffect> _effect) {
 	track = t;
 	effect = _effect;
@@ -27,5 +29,7 @@ void ActionTrackAddMidiEffect::undo(Data *d) {
 	track->midi_fx.pop();
 	effect->fake_death();
 	track->out_midi_effect_list_changed.notify();
+}
+
 }
 

@@ -8,6 +8,7 @@
 #include "ActionTrackFadeDelete.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
 
 ActionTrackFadeDelete::ActionTrackFadeDelete(TrackLayer* l, int _index) {
 	layer = l;
@@ -23,4 +24,6 @@ void* ActionTrackFadeDelete::execute(Data* d) {
 
 void ActionTrackFadeDelete::undo(Data* d) {
 	layer->fades.insert(fade, index);
+}
+
 }

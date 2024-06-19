@@ -7,6 +7,8 @@
 
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class AudioInputStream;
 class AudioOutputStream;
 class MidiInputStream;
@@ -34,5 +36,6 @@ public:
 	bool fully_initialized = false;
 };
 
+}
 
 #endif //TSUNAMI_DEVICECONTEXT_H

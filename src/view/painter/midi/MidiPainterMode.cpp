@@ -7,7 +7,7 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
-
+namespace tsunami {
 
 void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors) {
 	if (playable)
@@ -57,3 +57,5 @@ void MidiPainterMode::draw_shadow2(Painter *c, float x1, float x2, float y, floa
 MidiPainterMode::MidiPainterMode(MidiPainter *mp) :
     mp(mp), cam(mp->cam), song(mp->song), sel(mp->sel), hover(mp->hover), local_theme(mp->local_theme)
 {}
+
+}

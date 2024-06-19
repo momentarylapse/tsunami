@@ -10,6 +10,8 @@
 #include "../../data/Song.h"
 #include "../ActionGroup.h"
 
+namespace tsunami {
+
 class SongSelection;
 
 class ActionSongDeleteSelection : public ActionGroup {
@@ -23,4 +25,6 @@ public:
 
 	const SongSelection &sel;
 };
+
+}
 

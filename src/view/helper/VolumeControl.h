@@ -15,6 +15,8 @@ namespace hui {
 class Panel;
 }
 
+namespace tsunami {
+
 class VolumeControl : public obs::Node<VirtualBase> {
 public:
 	VolumeControl(hui::Panel* panel, const string& id_slider, const string& id_spin, const string& id_unit);
@@ -57,5 +59,7 @@ private:
 	float amp2slider(float amp) const;
 	float slider2amp(float val) const;
 };
+
+}
 
 #endif /* SRC_VIEW_HELPER_VOLUMECONTROL_H_ */

@@ -9,6 +9,8 @@
 
 #include "../../ActionGroup.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackLayerMakeTrack : public ActionGroup {
@@ -21,3 +23,5 @@ public:
 
 	TrackLayer *layer;
 };
+
+}

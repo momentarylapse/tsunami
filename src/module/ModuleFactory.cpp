@@ -36,6 +36,8 @@
 
 #include "../lib/os/msg.h"
 
+namespace tsunami {
+
 Module* ModuleFactory::_create_special(Session* session, ModuleCategory category, const string& _class) {
 	if (category == ModuleCategory::PLUMBING) {
 		if (_class == "BeatMidifier")
@@ -178,4 +180,6 @@ xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class 
 		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 
 	return m;
+}
+
 }

@@ -12,6 +12,7 @@
 #include "../../module/stream/MidiInput.h"
 #include "../../Session.h"
 
+namespace tsunami {
 
 MidiPreview::MidiPreview(Session *s, Synthesizer *_synth) {
 	session = s;
@@ -72,3 +73,4 @@ void MidiPreview::set_input_device(Device *d) {
 		input->set_device(d);
 }
 
+}

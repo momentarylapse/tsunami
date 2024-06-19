@@ -9,6 +9,8 @@
 
 #include "../../ActionGroup.h"
 
+namespace tsunami {
+
 class Track;
 
 class ActionTrackSetChannels : public ActionGroup {
@@ -22,3 +24,5 @@ private:
 	Track *track;
 	int channels;
 };
+
+}

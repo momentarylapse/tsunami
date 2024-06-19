@@ -17,18 +17,21 @@
 #include "../../data/Range.h"
 #include "../../data/midi/Scale.h"
 
+class color;
+class Painter;
+
+namespace tsunami {
+
 class AudioView;
 class ViewPort;
 class SongSelection;
 class HoverData;
-class Painter;
 class MidiNote;
 class MidiNoteBuffer;
 class Clef;
 class Scale;
 class Song;
 class Range;
-class color;
 class Instrument;
 class Synthesizer;
 class ColorScheme;
@@ -163,5 +166,7 @@ private:
 	void draw_group_ndata(Painter *c, const QuantizedNoteGroup &d, bool neck_offset);
 	void draw_eigth_note_flag(Painter *c, const vec2 &p, float e);
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MIDIPAINTER_H_ */

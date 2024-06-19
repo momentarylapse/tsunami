@@ -13,6 +13,9 @@
 #include "Beat.h"
 
 
+namespace tsunami {
+
+
 // pos is precise... beat length not...
 Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool include_sub_beats, int sub_beat_partition) const {
 	Array<Beat> beats;
@@ -157,5 +160,7 @@ void BarCollection::_update_offsets() {
 		b->offset = pos;
 		pos += b->length;
 	}
+}
+
 }
 

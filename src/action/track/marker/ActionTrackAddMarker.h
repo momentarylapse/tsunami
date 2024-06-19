@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 class TrackMarker;
 class Range;
@@ -26,3 +28,5 @@ private:
 	shared<TrackMarker> marker;
 	TrackLayer *layer;
 };
+
+}

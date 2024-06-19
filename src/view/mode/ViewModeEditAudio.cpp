@@ -12,6 +12,8 @@
 #include "../../processing/audio/BufferInterpolator.h"
 #include "../../processing/audio/BufferPitchShift.h"
 
+namespace tsunami {
+
 struct RubberPoint {
 	int source, target;
 };
@@ -48,7 +50,7 @@ public:
 	}
 };*/
 
-class MouseDelayRubberPoint : public MouseDelayAction {
+class MouseDelayRubberPoint : public scenegraph::MouseDelayAction {
 public:
 	AudioView *view;
 	RubberPoint *p;
@@ -342,5 +344,7 @@ string ViewModeEditAudio::get_tip() {
 		return "EXPERIMENTAL    click in selection to add point    drag to move point    delete point [X]    clear [Shift+X]    apply [Return]    track [Alt+↑,↓]";
 	}
 	return "EXPERIMENTAL    radius [W,S]    track [Alt+↑,↓]";
+}
+
 }
 

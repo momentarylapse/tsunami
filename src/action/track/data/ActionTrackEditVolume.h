@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../ActionMergable.h"
+
+namespace tsunami {
+
 class Track;
 
 class ActionTrackEditVolume : public ActionMergable<float> {
@@ -24,3 +27,5 @@ public:
 private:
 	Track *track;
 };
+
+}

@@ -9,6 +9,8 @@
 #include "../../data/Sample.h"
 #include <algorithm>
 
+namespace tsunami {
+
 ActionSampleReplaceBuffer::ActionSampleReplaceBuffer(shared<Sample> s, AudioBuffer* _buf) {
 	sample = s;
 	buf = _buf;
@@ -22,4 +24,6 @@ void* ActionSampleReplaceBuffer::execute(Data* d) {
 
 void ActionSampleReplaceBuffer::undo(Data* d) {
 	execute(d);
+}
+
 }

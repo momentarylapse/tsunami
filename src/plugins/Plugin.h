@@ -17,6 +17,8 @@ namespace kaba {
 	class Class;
 };
 
+namespace tsunami {
+
 class Session;
 enum class ModuleCategory;
 
@@ -41,5 +43,7 @@ public:
 
 	void *create_instance(Session *session, const string &root_type);
 };
+
+}
 
 #endif /* PLUGIN_H_ */

@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackMoveBuffer : public Action {
@@ -24,5 +26,7 @@ private:
 	int index;
 	int shift;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKMOVEBUFFER_H_ */

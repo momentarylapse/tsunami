@@ -10,6 +10,8 @@
 #include "helper/graph/SceneGraph.h"
 #include <cmath>
 
+namespace scenegraph {
+
 MouseDelayPlanner::MouseDelayPlanner(scenegraph::SceneGraph *sg) {
 	scene_graph = sg;
 	min_move_to_start = hui::config.get_int("View.MouseMinMoveToSelect", 5);
@@ -79,5 +81,5 @@ void MouseDelayPlanner::draw_post(Painter *p) {
 		action->on_draw_post(p);
 }
 
-
+}
 

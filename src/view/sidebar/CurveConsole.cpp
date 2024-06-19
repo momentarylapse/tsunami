@@ -15,6 +15,8 @@
 #include "../../data/Curve.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Curves"), "curve-console", session, bar),
 	in_update{this, [this] { on_update(); }},
@@ -147,5 +149,7 @@ void CurveConsole::on_list_right_click() {
 
 Curve* CurveConsole::curve() {
 	return view->mode_curve->_curve;
+}
+
 }
 

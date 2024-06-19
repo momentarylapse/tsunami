@@ -24,6 +24,7 @@
 #include "../lib/hui/hui.h"
 #include "../stuff/PerformanceMonitor.h"
 
+namespace tsunami {
 
 
 const float DEFAULT_UPDATE_DT = 0.050f;
@@ -577,4 +578,6 @@ int SignalChain::do_suck() {
 void SignalChain::mark_all_modules_as_system() {
 	for (auto *m: weak(modules))
 		m->belongs_to_system = true;
+}
+
 }

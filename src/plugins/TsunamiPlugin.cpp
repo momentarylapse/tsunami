@@ -12,6 +12,7 @@
 #include "../module/Module.h"
 #include "../module/ModuleFactory.h"
 
+namespace tsunami {
 
 TsunamiPlugin::TsunamiPlugin() :
 	Module(ModuleCategory::TSUNAMI_PLUGIN, "")
@@ -35,4 +36,6 @@ void TsunamiPlugin::stop_request() {
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name) {
 	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleCategory::TSUNAMI_PLUGIN, name);
+}
+
 }

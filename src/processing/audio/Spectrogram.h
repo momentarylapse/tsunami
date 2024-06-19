@@ -10,6 +10,8 @@
 
 #include "common.h"
 
+namespace tsunami {
+
 class AudioBuffer;
 
 namespace Spectrogram {
@@ -24,6 +26,8 @@ Array<float> to_db(const Array<float> &data, float db_range, float db_boost);
 
 bytes quantize(const Array<float>& data);
 float dequantize(unsigned char q);
+
+}
 
 }
 

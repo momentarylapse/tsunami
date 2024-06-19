@@ -19,6 +19,8 @@
 #include "../../view/painter/MultiLinePainter.h"
 #include <math.h>
 
+namespace tsunami {
+
 static const color NOTE_COLOR = color(1, 0.3f, 0.3f, 0.3f);
 static const color NOTE_COLOR_TAB = color(1, 0.8f, 0.8f, 0.8f);
 static const float PAGE_WIDTH_A4 = 595.276f; // pts
@@ -168,4 +170,6 @@ void FormatPdf::save_song(StorageOperationData* _od) {
 	delete mlp;
 
 	parser.save(od->filename);
+}
+
 }

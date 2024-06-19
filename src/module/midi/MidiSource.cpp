@@ -12,6 +12,7 @@
 #include "../../data/Song.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
 
 int MidiSource::read_midi(int port, MidiEventBuffer &midi) {
 	int r = read(midi);
@@ -111,5 +112,7 @@ void MidiSource::skip_x(int beats, int sub_beats, int beat_partition) {
 
 MidiSource *CreateMidiSource(Session *session, const string &name) {
 	return (MidiSource*)ModuleFactory::create(session, ModuleCategory::MIDI_SOURCE, name);
+}
+
 }
 

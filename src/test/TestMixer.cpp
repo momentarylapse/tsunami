@@ -18,6 +18,8 @@
 #include "../lib/os/msg.h"
 #include <math.h>
 
+namespace tsunami {
+
 const float sqrt2 = (float)sqrt(2.0);
 
 TestMixer::TestMixer() : UnitTest("mixer") {}
@@ -166,6 +168,8 @@ void TestMixer::test_mix_mono_1track_panning_left() {
 	assert_equal(buf, make_buf({sqrt2, sqrt2, sqrt2, sqrt2}, {0.0f, 0.0f, 0.0f, 0.0f}));
 	delete sr;
 	delete s;
+}
+
 }
 
 #endif

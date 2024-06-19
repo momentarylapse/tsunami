@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Sample;
 class Session;
 class Song;
@@ -37,5 +39,7 @@ public:
 
 	static base::future<Sample*> select(Session *session, hui::Panel *parent, Sample *old);
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_SAMPLESELECTIONDIALOG_H_ */

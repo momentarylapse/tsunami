@@ -11,6 +11,7 @@
 #include "CaptureConsoleMode.h"
 #include "../../../lib/base/base.h"
 
+namespace tsunami {
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode {
 public:
@@ -21,6 +22,6 @@ public:
 	void allow_change_device(bool allow) override;
 };
 
-
+}
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEMIDI_H_ */

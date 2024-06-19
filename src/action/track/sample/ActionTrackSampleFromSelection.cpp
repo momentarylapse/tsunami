@@ -15,6 +15,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../buffer/ActionTrack__DeleteBuffer.h"
 
+namespace tsunami {
+
 ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelection &_sel, bool _auto_delete) :
 	sel(_sel)
 {
@@ -51,4 +53,6 @@ void ActionTrackSampleFromSelection::CreateSamplesFromLayerMidi(TrackLayer *l) {
 	foreachib(MidiNote *n, weak(l->midi), i)
 		if (sel.has(n))
 			add_sub_action(new ActionTrackDeleteMidiNote(l, i), l->song());
+}
+
 }

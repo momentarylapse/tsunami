@@ -10,8 +10,11 @@
 
 #include "../../helper/graph/Node.h"
 
-class Track;
 class Painter;
+
+namespace tsunami {
+
+class Track;
 class AudioView;
 class AudioViewLayer;
 class MidiKeyChange;
@@ -24,7 +27,7 @@ enum class AudioViewMode {
 };
 
 
-class AudioViewTrack : public scenegraph::NodeFree {
+class AudioViewTrack : public ::scenegraph::NodeFree {
 public:
 	AudioViewTrack(AudioView *view, Track *track);
 	~AudioViewTrack() override;
@@ -61,5 +64,7 @@ public:
 
 	bool imploded;
 };
+
+}
 
 #endif /* SRC_VIEW_GRAPH_AUDIOVIEWTRACK_H_ */

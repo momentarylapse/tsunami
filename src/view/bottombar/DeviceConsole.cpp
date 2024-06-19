@@ -10,6 +10,8 @@
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
 
+namespace tsunami {
+
 static string list_id(DeviceType type) {
 	if (type == DeviceType::AUDIO_OUTPUT)
 		return "output-list";
@@ -189,4 +191,6 @@ void DeviceConsole::on_device_erase() {
 	int n = get_int(list_id(type));
 	if (n >= 0)
 		device_manager->remove_device(type, n);
+}
+
 }

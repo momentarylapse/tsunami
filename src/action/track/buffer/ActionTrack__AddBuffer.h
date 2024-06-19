@@ -11,6 +11,8 @@
 #include "../../Action.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 // TODO: move to layer
 
 class TrackLayer;
@@ -27,5 +29,7 @@ private:
 	int index;
 	Range range;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ADDBUFFER_H_ */

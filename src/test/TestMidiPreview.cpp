@@ -16,6 +16,8 @@
 #include "../Session.h"
 #include <thread>
 
+namespace tsunami {
+
 TestMidiPreview::TestMidiPreview() : UnitTest("midi-preview") {}
 
 
@@ -61,6 +63,8 @@ void TestMidiPreview::test_preview_source() {
 	msg_write(chain->do_suck());
 
 	delete preview;
+}
+
 }
 
 #endif

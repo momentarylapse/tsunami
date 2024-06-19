@@ -12,6 +12,8 @@
 
 #include <alsa/asoundlib.h>
 
+namespace tsunami {
+
 DeviceContextAlsa* DeviceContextAlsa::instance;
 
 DeviceContextAlsa::DeviceContextAlsa(Session* session) : DeviceContext(session) {
@@ -82,6 +84,8 @@ void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool seriou
 
 MidiInputStream* DeviceContextAlsa::create_midi_input_stream(Session *session, Device *device, void* shared_data) {
 	return new MidiInputStreamAlsa(session, device, *reinterpret_cast<MidiInputStream::SharedData*>(shared_data));
+}
+
 }
 
 #endif

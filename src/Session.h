@@ -12,6 +12,13 @@
 #include "lib/base/pointer.h"
 #include "lib/pattern/Observable.h"
 
+namespace hui {
+	class Window;
+}
+class Path;
+
+namespace tsunami {
+
 class TsunamiWindow;
 class Log;
 class Song;
@@ -24,12 +31,8 @@ class PluginManager;
 class SessionManager;
 class PerformanceMonitor;
 class SignalChain;
-class Path;
 class Playback;
 struct SessionPersistenceData;
-namespace hui {
-	class Window;
-}
 
 
 // representing one instance/window
@@ -101,5 +104,7 @@ public:
 
 	static Session *GLOBAL;
 };
+
+}
 
 #endif /* SRC_SESSION_H_ */

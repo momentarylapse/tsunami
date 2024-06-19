@@ -9,6 +9,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length) {
 	layer = l;
 	index = _index;
@@ -31,4 +33,5 @@ void ActionTrack__GrowBuffer::undo(Data *d) {
 	b.resize(old_length);
 }
 
+}
 

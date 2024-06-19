@@ -10,6 +10,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrack__SplitBuffer : public Action {
@@ -24,5 +26,7 @@ private:
 	int index;
 	int offset;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SPLITBUFFER_H_ */

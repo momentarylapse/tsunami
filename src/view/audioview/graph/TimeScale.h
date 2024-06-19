@@ -10,9 +10,11 @@
 
 #include "../../helper/graph/Node.h"
 
+namespace tsunami {
+
 class AudioView;
 
-class TimeScale : public scenegraph::NodeRel {
+class TimeScale : public ::scenegraph::NodeRel {
 public:
 	TimeScale(AudioView *view);
 	void on_draw(Painter *p) override;
@@ -26,5 +28,7 @@ public:
 
 	AudioView *view;
 };
+
+}
 
 #endif /* SRC_VIEW_GRAPH_TIMESCALE_H_ */

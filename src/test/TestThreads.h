@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestThreads: public UnitTest {
 public:
 	TestThreads();
@@ -20,6 +22,8 @@ public:
 
 	static void test_thread_safety();
 };
+
+}
 
 #endif /* SRC_TEST_TESTTHREADS_H_ */
 

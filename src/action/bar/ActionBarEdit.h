@@ -10,6 +10,8 @@
 
 #include "../ActionGroup.h"
 
+namespace tsunami {
+
 class Song;
 class BarPattern;
 enum class BarEditMode;
@@ -25,5 +27,7 @@ public:
 	Array<int> beats;
 	BarEditMode mode;
 };
+
+}
 
 #endif /* ACTIONBAREDIT_H_ */

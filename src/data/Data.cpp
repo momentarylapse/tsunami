@@ -9,6 +9,7 @@
 #include "../action/ActionManager.h"
 #include "../lib/threads/Mutex.h"
 
+namespace tsunami {
 
 Data::Data(Session *_session) {
 	action_manager = new ActionManager(this);
@@ -74,6 +75,6 @@ void Data::unlock_shared() {
 	mtx.unlock_shared();
 }
 
-
+}
 
 

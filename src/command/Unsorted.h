@@ -11,6 +11,12 @@
 #include "../lib/base/base.h"
 #include "../lib/base/set.h"
 
+namespace hui {
+	class Window;
+}
+
+namespace tsunami {
+
 class Song;
 class Track;
 class SongSelection;
@@ -24,10 +30,6 @@ class AudioSource;
 class AudioEffect;
 class MidiEffect;
 class MidiSource;
-
-namespace hui {
-	class Window;
-}
 
 namespace BufferInterpolator {
 	enum class Method;
@@ -61,5 +63,6 @@ int song_audio_scale_pitch_shift(Song *song, int new_size, BufferInterpolator::M
 
 void song_delete_shift(Song *song, const SongSelection &sel);
 
+}
 
 #endif /* SRC_COMMAND_UNSORTED_H_ */

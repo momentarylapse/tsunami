@@ -10,6 +10,7 @@
 
 #include "../lib/base/base.h"
 
+namespace tsunami {
 
 float amplitude2db(float amp);
 float db2amplitude(float db);
@@ -54,5 +55,7 @@ enum class SignalType {
 };
 
 string signal_type_name(SignalType type);
+
+}
 
 #endif /* SRC_DATA_BASE_H_ */

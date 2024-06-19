@@ -10,6 +10,8 @@
 #include "../../Session.h"
 #include "../../data/base.h"
 
+namespace tsunami {
+
 BeatSource::BeatSource() :
 	Module(ModuleCategory::BEAT_SOURCE, "")
 {
@@ -33,3 +35,4 @@ BeatSource *CreateBeatSource(Session *session, const string &name) {
 	return (BeatSource*)ModuleFactory::create(session, ModuleCategory::BEAT_SOURCE, name);
 }
 
+}

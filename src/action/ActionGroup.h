@@ -10,6 +10,9 @@
 #include "Action.h"
 #include "../data/Data.h"
 
+
+namespace tsunami {
+
 class Data;
 class ActionManager;
 
@@ -33,4 +36,6 @@ protected:
 private:
 	owned_array<Action> action;
 };
+
+}
 

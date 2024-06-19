@@ -10,6 +10,8 @@
 
 #include "AudioVisualizer.h"
 
+namespace tsunami {
+
 class PeakMeterDisplay;
 class AudioBuffer;
 
@@ -56,5 +58,7 @@ public:
 	static const float FREQ_MIN;
 	static const float FREQ_MAX;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_PEAKMETER_H_ */

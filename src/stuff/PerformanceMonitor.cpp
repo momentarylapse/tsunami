@@ -20,6 +20,8 @@ namespace os {
 	extern void require_main_thread(const string &msg);
 }
 
+namespace tsunami {
+
 // on a slow computer, a group of
 //   start_busy()
 //   end_busy()
@@ -200,4 +202,6 @@ Array<PerfChannelInfo> PerformanceMonitor::get_info() {
 	
 	//std::lock_guard<std::mutex> lock(pm_mutex);
 	return pm_info;
+}
+
 }

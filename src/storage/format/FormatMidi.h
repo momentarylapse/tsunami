@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatMidi: public Format {
 public:
 	void load_track(StorageOperationData *od) override {}
@@ -24,5 +26,7 @@ public:
 	FormatDescriptorMidi();
 	Format *create() override { return new FormatMidi; }
 };
+
+}
 
 #endif /* FORMATMIDI_H_ */

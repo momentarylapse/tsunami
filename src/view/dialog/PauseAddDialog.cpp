@@ -12,6 +12,7 @@
 #include "../../data/Song.h"
 #include "../../data/base.h"
 
+namespace tsunami {
 
 PauseAddDialog::PauseAddDialog(hui::Window *parent, Song *s, int _index):
 	hui::Dialog("pause_add_dialog", parent)
@@ -44,4 +45,6 @@ void PauseAddDialog::on_ok() {
 
 void PauseAddDialog::on_close() {
 	request_destroy();
+}
+
 }

@@ -24,6 +24,8 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Delete.h"
 
+namespace tsunami {
+
 ActionBarDelete::ActionBarDelete(int _index, bool _affect_data) {
 	index = _index;
 	affect_data = _affect_data;
@@ -80,4 +82,6 @@ void ActionBarDelete::build(Data *d) {
 
 		add_sub_action(new Action__ShiftData(r.end(), - r.length, BarEditMode::Stretch), d);
 	}
+}
+
 }

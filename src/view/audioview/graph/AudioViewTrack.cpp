@@ -23,6 +23,8 @@
 #include "../../../data/CrossFade.h"
 #include "../../../module/audio/SongRenderer.h"
 
+namespace tsunami {
+
 const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
 
 
@@ -169,5 +171,7 @@ AudioViewLayer* AudioViewTrack::first_layer() {
 
 bool AudioViewTrack::is_playable() {
 	return view->get_playable_tracks().contains(track);
+}
+
 }
 

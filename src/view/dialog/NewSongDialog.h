@@ -12,6 +12,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
+
 class Song;
 enum class SignalType;
 
@@ -34,5 +36,7 @@ public:
 	void on_ok();
 	void on_metronome();
 };
+
+}
 
 #endif /* NEWDIALOG_H_ */

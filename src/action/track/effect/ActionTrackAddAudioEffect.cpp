@@ -10,6 +10,8 @@
 #include "../../../data/Song.h"
 #include "../../../module/audio/AudioEffect.h"
 
+namespace tsunami {
+
 ActionTrackAddAudioEffect::ActionTrackAddAudioEffect(Track *t, shared<AudioEffect> _effect) {
 	track = t;
 	effect = _effect;
@@ -28,3 +30,4 @@ void ActionTrackAddAudioEffect::undo(Data *d) {
 	track->out_effect_list_changed.notify();
 }
 
+}

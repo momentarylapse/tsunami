@@ -7,9 +7,12 @@
 
 #include "DummyEditorConsole.h"
 
+namespace tsunami {
 
 DummyEditorConsole::DummyEditorConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Editor"), "dummy-editor-console", session, bar)
 {
 	from_resource("dummy-editor");
+}
+
 }

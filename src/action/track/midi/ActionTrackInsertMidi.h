@@ -10,6 +10,8 @@
 #include "../../Action.h"
 #include "../../../data/midi/MidiData.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackInsertMidi : public Action {
@@ -28,3 +30,5 @@ private:
 	Array<int> inserted_at;
 	bool applied;
 };
+
+}

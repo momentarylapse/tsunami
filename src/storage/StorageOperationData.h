@@ -14,11 +14,14 @@
 #include "../lib/os/path.h"
 #include "../lib/os/time.h"
 
-class Song;
-class Progress;
 namespace hui {
 	class Window;
 }
+
+namespace tsunami {
+
+class Song;
+class Progress;
 class AudioBuffer;
 class Track;
 class TrackLayer;
@@ -78,5 +81,7 @@ public:
 
 	bool only_load_metadata;
 };
+
+}
 
 #endif /* SRC_STORAGE_STORAGEOPERATIONDATA_H_ */

@@ -11,6 +11,8 @@
 #include "../../data/Track.h"
 #include "../../data/base.h"
 
+namespace tsunami {
+
 RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent) :
 	hui::Window("raw_config_dialog", parent)
 {
@@ -49,4 +51,6 @@ void RawConfigDialog::on_ok() {
 	od->parameters.map_set("offset", get_int("offset"));
 	ok = true;
 	request_destroy();
+}
+
 }

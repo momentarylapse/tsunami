@@ -10,10 +10,12 @@
 
 #include "../../helper/graph/Node.h"
 
+namespace tsunami {
+
 class AudioView;
 class AudioViewLayer;
 
-class Background : public scenegraph::NodeFree {
+class Background : public ::scenegraph::NodeFree {
 public:
 	Background(AudioView *view);
 
@@ -28,5 +30,7 @@ public:
 	AudioView *view;
 	HoverData get_hover_data(const vec2 &m) override;
 };
+
+}
 
 #endif /* SRC_VIEW_GRAPH_BACKGROUND_H_ */

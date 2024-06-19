@@ -8,6 +8,8 @@
 #include "Range.h"
 #include "../lib/os/file.h"
 
+namespace tsunami {
+
 const int Range::BEGIN = -1000000000; // just less than 0x4000.0000, so that also length < 0x8000.000 (staying positive)
 const int Range::END = 1000000000;
 const Range Range::ALL = Range::to(BEGIN, END);
@@ -156,5 +158,7 @@ Range Range::scale_rel(const Range &from, const Range &to) const {
 		return (double)to.start() + (x - from.start()) * (double)to.length / (double)from.length;
 	};
 	return Range::to((int)map(start()), (int)map(end()));
+}
+
 }
 

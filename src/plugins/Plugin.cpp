@@ -12,6 +12,7 @@
 #include "../lib/os/filesystem.h"
 #include "../lib/os/date.h"
 
+namespace tsunami {
 
 Plugin::Plugin(const Path &_filename, ModuleCategory _type) {
 	type = _type;
@@ -76,4 +77,6 @@ void *Plugin::create_instance(Session *session, const string &root_type) {
 	}
 	session->e(format(_("Plugin file \"%s\" does not define a class derived from %s"), filename, root_type));
 	return nullptr;
+}
+
 }

@@ -8,6 +8,8 @@
 #include "CrossFade.h"
 
 
+namespace tsunami {
+
 Range CrossFade::range() const {
 	return Range(position, samples);
 }
@@ -18,4 +20,6 @@ bool CrossFade::operator ==(const CrossFade &o) const {
 
 bool CrossFade::operator !=(const CrossFade &o) const {
 	return !(*this == o);
+}
+
 }

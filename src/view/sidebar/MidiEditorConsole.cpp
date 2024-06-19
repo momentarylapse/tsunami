@@ -30,8 +30,9 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 
-//int get_track_index_save(Song *song, Track *t);
+namespace tsunami {
 
+//int get_track_index_save(Song *song, Track *t);
 
 
 enum class NoteBaseLength {
@@ -613,4 +614,6 @@ void MidiEditorConsole::on_apply_source() {
 
 void MidiEditorConsole::on_add_key_change() {
 	hui::fly(new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::"));
+}
+
 }

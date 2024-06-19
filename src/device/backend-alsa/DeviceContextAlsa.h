@@ -11,6 +11,8 @@
 
 struct _snd_seq;
 
+namespace tsunami {
+
 class DeviceContextAlsa : public DeviceContext {
 public:
 	DeviceContextAlsa(Session* session);
@@ -24,6 +26,8 @@ public:
 
 	static DeviceContextAlsa* instance;
 };
+
+}
 
 #endif
 

@@ -11,13 +11,16 @@
 #include "../lib/base/future.h"
 #include "../data/midi/Instrument.h"
 
-class Path;
-class Module;
-enum class ModuleCategory;
-enum class SignalType;
 namespace hui {
 	class Window;
 }
+class Path;
+
+namespace tsunami {
+
+class Module;
+enum class ModuleCategory;
+enum class SignalType;
 class Session;
 
 class PresetManager {
@@ -78,3 +81,5 @@ public:
 	};
 	Array<Favorite> favorites;
 };
+
+}

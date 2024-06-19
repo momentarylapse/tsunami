@@ -11,12 +11,12 @@
 #include "../../ActionGroup.h"
 #include "../../../data/Range.h"
 
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 
-
-class ActionTrackCreateBuffers : public ActionGroup
-{
+class ActionTrackCreateBuffers : public ActionGroup {
 public:
 	ActionTrackCreateBuffers(TrackLayer *l, const Range &r);
 
@@ -25,5 +25,7 @@ public:
 	TrackLayer *layer;
 	Range r;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_BUFFER_ACTIONTRACKCREATEBUFFERS_H_ */

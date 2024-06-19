@@ -9,6 +9,8 @@
 #include "../../../data/Song.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 ActionTrackCurveAddPoint::ActionTrackCurveAddPoint(shared<Curve> _curve, int _pos, float _value) {
 	curve = _curve;
 	index = curve->points.num;
@@ -33,5 +35,7 @@ void* ActionTrackCurveAddPoint::execute(Data* d) {
 
 void ActionTrackCurveAddPoint::undo(Data* d) {
 	curve->points.erase(index);
+}
+
 }
 

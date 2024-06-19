@@ -21,6 +21,8 @@
 #include "../../Tsunami.h"
 
 
+namespace tsunami {
+
 SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 		hui::Dialog("settings_dialog", _parent) {
 	view = _view;
@@ -203,4 +205,6 @@ void SettingsDialog::on_qed_find() {
 		Storage::quick_export_directory = dir;
 		set_string("quick_export_dir", dir.str());
 	});
+}
+
 }

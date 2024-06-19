@@ -11,6 +11,9 @@
 #include "../../lib/base/base.h"
 #include "../../data/audio/RingBuffer.h"
 #include "BufferInterpolator.h"
+
+namespace tsunami {
+
 class AudioBuffer;
 
 namespace BufferInterpolator {
@@ -51,6 +54,8 @@ struct Operator {
 
 	AudioBuffer process(const AudioBuffer &buf);
 };
+}
+
 }
 
 #endif /* SRC_PROCESSING_AUDIO_BUFFERPITCHSHIFT_H_ */

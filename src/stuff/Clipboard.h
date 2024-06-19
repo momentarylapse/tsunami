@@ -10,6 +10,9 @@
 
 #include "../lib/base/pointer.h"
 #include "../lib/pattern/Observable.h"
+
+namespace tsunami {
+
 class Song;
 class Track;
 class TrackLayer;
@@ -41,5 +44,7 @@ private:
 	int temp_offset = 0;
 	Array<int> ref_uid;
 };
+
+}
 
 #endif /* SRC_STUFF_CLIPBOARD_H_ */

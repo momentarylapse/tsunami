@@ -10,6 +10,9 @@
 
 #include "Range.h"
 
+
+namespace tsunami {
+
 class CrossFade {
 public:
 
@@ -33,5 +36,7 @@ public:
 	int target;
 	int samples;
 };
+
+}
 
 #endif /* SRC_DATA_CROSSFADE_H_ */

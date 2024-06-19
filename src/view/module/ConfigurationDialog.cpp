@@ -18,6 +18,8 @@
 #include "../../module/audio/SongRenderer.h"
 #include "../audioview/AudioView.h"
 
+namespace tsunami {
+
 extern const int CONFIG_PANEL_DIALOG_WIDTH;
 extern const int CONFIG_PANEL_DIALOG_HEIGHT;
 
@@ -142,4 +144,5 @@ base::future<void> configure_module(hui::Window *win, shared<Module> m) {
 	return dlg->_promise.get_future();
 }
 
+}
 

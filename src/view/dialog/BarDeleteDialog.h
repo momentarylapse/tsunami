@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class Song;
 class Range;
 
@@ -22,5 +24,7 @@ public:
 	void on_ok();
 	void on_replace_by_pause();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_BARDELETEDIALOG_H_ */

@@ -9,8 +9,9 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 
-ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, int _src)
-{
+namespace tsunami {
+
+ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, int _src) {
 	layer = l;
 	dest = _dest;
 	src = _src;
@@ -19,8 +20,7 @@ ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, i
 	dest_old_length = 0;
 }
 
-void *ActionTrack__AbsorbBuffer::execute(Data *d)
-{
+void *ActionTrack__AbsorbBuffer::execute(Data *d) {
 	AudioBuffer &b_src  = layer->buffers[src];
 	AudioBuffer &b_dest = layer->buffers[dest];
 	dest_old_length = b_dest.length;
@@ -39,8 +39,7 @@ void *ActionTrack__AbsorbBuffer::execute(Data *d)
 
 
 
-void ActionTrack__AbsorbBuffer::undo(Data *d)
-{
+void ActionTrack__AbsorbBuffer::undo(Data *d) {
 	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, src);
 	AudioBuffer &b_src  = layer->buffers[src];
@@ -50,6 +49,8 @@ void ActionTrack__AbsorbBuffer::undo(Data *d)
 
 	b_src.set(b_dest, b_dest.offset - b_src.offset, 1.0f);
 	b_dest.resize(dest_old_length);
+}
+
 }
 
 

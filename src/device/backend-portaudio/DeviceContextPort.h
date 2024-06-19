@@ -11,6 +11,8 @@
 
 typedef int PaError;
 
+namespace tsunami {
+
 class DeviceContextPort : public DeviceContext {
 public:
 	DeviceContextPort(Session* session);
@@ -25,6 +27,8 @@ public:
 
 	static DeviceContextPort* instance;
 };
+
+}
 
 #endif
 

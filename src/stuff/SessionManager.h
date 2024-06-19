@@ -14,6 +14,8 @@
 #include "../lib/base/optional.h"
 #include "../lib/os/path.h"
 
+namespace tsunami {
+
 class Session;
 
 struct SessionPersistenceData {
@@ -24,10 +26,10 @@ struct SessionPersistenceData {
 
 struct SessionLabel {
 	enum Flags {
-		ACTIVE = 1,
-		PERSISTENT = 2,
-		BACKUP = 4,
-		RECENT = 8
+		Active = 1,
+		Persistent = 2,
+		Backup = 4,
+		Recent = 8
 	};
 
 	Flags flags;
@@ -72,5 +74,7 @@ public:
 	Array<SessionLabel> enumerate_recently_used_files() const;
 	Array<SessionLabel> enumerate_persistent_sessions() const;
 };
+
+}
 
 #endif /* SRC_STUFF_SESSIONMANAGER_H_ */

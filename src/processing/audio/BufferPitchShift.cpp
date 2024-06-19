@@ -5,6 +5,8 @@
 #include "../../lib/math/complex.h"
 #include <stdio.h>
 
+namespace tsunami {
+
 namespace BufferPitchShift {
 
 // FIXME: this sucks!
@@ -180,6 +182,8 @@ void Operator::reset(float length_factor, BufferInterpolator::Method _scaling_me
 AudioBuffer Operator::process(const AudioBuffer &buf) {
 	auto a = op_stretch.process(buf);
 	return op_inter.process(a);
+}
+
 }
 
 }

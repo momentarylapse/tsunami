@@ -7,6 +7,9 @@
 
 #include "ActionGroup.h"
 
+
+namespace tsunami {
+
 ActionGroup::ActionGroup() {
 }
 
@@ -47,5 +50,7 @@ bool ActionGroup::is_trivial() {
 		if (!a->is_trivial())
 			return false;
 	return true;
+}
+
 }
 

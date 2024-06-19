@@ -14,6 +14,8 @@
 #include <mutex>
 #include <atomic>
 
+namespace tsunami {
+
 class AudioBuffer;
 class RingBuffer;
 class Session;
@@ -46,5 +48,7 @@ public:
 
 	virtual _cdecl void process(AudioBuffer &buf){}
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOVISUALIZER_H_ */

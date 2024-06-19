@@ -9,10 +9,11 @@
 #define SRC_DATA_MIDI_MIDIEVENT_H_
 
 
+namespace tsunami {
+
 class MidiNote;
 
-class MidiEvent
-{
+class MidiEvent {
 public:
 	MidiEvent(){}
 	MidiEvent(int pos, float pitch, float volume);
@@ -24,6 +25,7 @@ public:
 	mutable int stringno, clef_position;
 };
 
+}
 
 
 #endif /* SRC_DATA_MIDI_MIDIEVENT_H_ */

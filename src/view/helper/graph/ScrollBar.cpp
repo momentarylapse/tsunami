@@ -10,6 +10,8 @@
 #include "../../ColorScheme.h"
 #include "../../../lib/image/Painter.h"
 
+namespace tsunami {
+
 // TODO who owns the view_offset? -> callback needed/not?
 // => WE (ScrollBar) own the offset!
 
@@ -160,5 +162,6 @@ void ScrollBar::update_geometry(const rect& target_area) {
 
 bool ScrollBar::content_covered_by_view() const {
 	return (view_offset <= content_offset) and (view_offset + view_size >= content_offset + content_size);
+}
 
 }

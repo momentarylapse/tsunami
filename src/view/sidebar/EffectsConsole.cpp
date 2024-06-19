@@ -23,6 +23,8 @@
 #include "../../lib/base/iter.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 EffectsConsole::EffectsConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Effects"), "fx-console", session, bar)
 {
@@ -82,4 +84,6 @@ void EffectsConsole::on_view_cur_track_change() {
 
 void EffectsConsole::on_update() {
 	load_data();
+}
+
 }

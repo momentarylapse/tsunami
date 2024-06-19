@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/base/optional.h"
 
+namespace tsunami {
+
 class Session;
 enum class ModuleCategory;
 
@@ -39,5 +41,7 @@ public:
 
 	static base::future<string> choose(hui::Panel *parent, Session *session, ModuleCategory type, const base::optional<string> &old_name = base::None);
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_ */

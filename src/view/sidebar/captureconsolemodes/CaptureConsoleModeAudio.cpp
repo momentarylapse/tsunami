@@ -19,6 +19,7 @@
 #include "../../../module/audio/AudioChannelSelector.h"
 #include "../../../device/DeviceManager.h"
 
+namespace tsunami {
 
 CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
@@ -70,4 +71,6 @@ void CaptureConsoleModeAudio::enter() {
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {
 	items()[0].allow_edit(allow);
+}
+
 }

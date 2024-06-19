@@ -19,7 +19,7 @@
 #include "../../../Session.h"
 #include "../../../EditModes.h"
 
-
+namespace tsunami {
 
 class TrackHeaderButton : public scenegraph::NodeRel {
 public:
@@ -236,7 +236,7 @@ void TrackHeader::on_draw(Painter *c) {
 
 bool track_is_in_group(Track *t, Track *g);
 
-class MouseDelayDndTrack : public MouseDelayAction {
+class MouseDelayDndTrack : public ::scenegraph::MouseDelayAction {
 public:
 	AudioViewTrack *vtrack;
 	AudioView *view;
@@ -346,4 +346,6 @@ HoverData TrackHeader::get_hover_data(const vec2 &m) {
 	auto h = Node::get_hover_data(m);
 	h.vlayer = vtrack->first_layer();
 	return h;
+}
+
 }

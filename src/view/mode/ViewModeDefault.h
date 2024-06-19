@@ -10,6 +10,8 @@
 
 #include "ViewMode.h"
 
+namespace tsunami {
+
 class SongSelection;
 class Range;
 class Track;
@@ -45,5 +47,7 @@ public:
 
 	void start_selection_rect(SelectionMode mode, bool keep_start = false);
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEDEFAULT_H_ */

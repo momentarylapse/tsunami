@@ -13,6 +13,7 @@
 
 #include <pulse/pulseaudio.h>
 
+namespace tsunami {
 
 AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioInputStream(session, shared_data) {
 
@@ -174,6 +175,8 @@ bool AudioInputStreamPulse::_pulse_test_error(const char *msg) {
 	if (e != 0)
 		session->e(format("%s (input): %s", msg, pa_strerror(e)));
 	return (e != 0);
+}
+
 }
 
 #endif

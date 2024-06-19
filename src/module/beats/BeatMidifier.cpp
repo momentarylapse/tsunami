@@ -12,6 +12,8 @@
 #include "../../data/rhythm/Beat.h"
 #include "../../data/base.h"
 
+namespace tsunami {
+
 BeatMidifier::BeatMidifier() {
 	module_category = ModuleCategory::PLUMBING;
 	module_class = "BeatMidifier";
@@ -30,4 +32,6 @@ int BeatMidifier::read(MidiEventBuffer &midi) {
 		midi.add_metronome_click(b.range.offset, b.level, volume);
 
 	return r;
+}
+
 }

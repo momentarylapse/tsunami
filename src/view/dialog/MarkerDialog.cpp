@@ -10,6 +10,8 @@
 #include "../../data/TrackMarker.h"
 #include "../../data/midi/Scale.h"
 
+namespace tsunami {
+
 string encode_key(const Scale &key) {
 	return "::key=" + key.encode() + "::";
 }
@@ -72,4 +74,6 @@ void MarkerDialog::on_ok() {
 
 void MarkerDialog::on_close() {
 	request_destroy();
+}
+
 }

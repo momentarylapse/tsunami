@@ -10,8 +10,10 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class SignalChain;
-class CaptureTrackData;
+struct CaptureTrackData;
 
 class ViewModeCapture : public ViewModeDefault {
 public:
@@ -33,5 +35,7 @@ public:
 	
 	void insert();
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODECAPTURE_H_ */

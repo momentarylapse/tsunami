@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
+
 class Song;
 class Range;
 
@@ -33,5 +35,7 @@ public:
 	void update_result_bpm();
 	void on_shift_data();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_BARREPLACEDIALOG_H_ */

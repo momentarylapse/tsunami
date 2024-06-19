@@ -10,6 +10,8 @@
 #include "../../Action.h"
 #include "../../../data/CrossFade.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ActionTrackFadeDelete : public Action {
@@ -25,3 +27,5 @@ public:
 	CrossFade fade;
 	int index;
 };
+
+}

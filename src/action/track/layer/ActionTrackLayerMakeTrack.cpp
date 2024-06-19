@@ -15,6 +15,8 @@
 #include "../../../module/synthesizer/Synthesizer.h"
 #include <utility>
 
+namespace tsunami {
+
 class ActionLayerMoveData : public Action {
 public:
 	ActionLayerMoveData(TrackLayer *_origin, TrackLayer *_dest) {
@@ -60,5 +62,7 @@ void ActionTrackLayerMakeTrack::build(Data *d) {
 	add_sub_action(new ActionTrackAdd(t, orig->get_index() + 1), d);
 	add_sub_action(new ActionLayerMoveData(layer, t->layers[0].get()), d);
 	add_sub_action(new ActionTrackLayerDelete(layer->track, get_layer_index(layer)), d);
+}
+
 }
 

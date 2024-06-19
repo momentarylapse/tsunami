@@ -7,8 +7,10 @@
 
 #pragma once
 
-
 #include "../Action.h"
+
+namespace tsunami {
+
 class Song;
 class Track;
 class TrackLayer;
@@ -58,4 +60,6 @@ private:
 	Array<const Track*> tracks;
 	int param;
 };
+
+}
 

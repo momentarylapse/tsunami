@@ -10,6 +10,8 @@
 
 #include "SideBar.h"
 
+namespace tsunami {
+
 class Song;
 class Sample;
 class AudioOutput;
@@ -71,5 +73,7 @@ public:
 	string id_list;
 	owned<hui::Menu> menu_samples;
 };
+
+}
 
 #endif /* SAMPLEMANAGERCONSOLE_H_ */

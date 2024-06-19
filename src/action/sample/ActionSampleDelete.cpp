@@ -11,6 +11,8 @@
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
 
+namespace tsunami {
+
 ActionSampleDelete::ActionSampleDelete(shared<Sample> s) {
 	sample = s;
 	index = -1;
@@ -36,5 +38,7 @@ void ActionSampleDelete::undo(Data *d) {
 	a->samples.insert(sample, index);
 
 	a->out_sample_list_changed.notify();
+}
+
 }
 

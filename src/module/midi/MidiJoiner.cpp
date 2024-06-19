@@ -9,6 +9,8 @@
 #include "../../data/base.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
+
 MidiJoiner::MidiJoiner() : Module(ModuleCategory::PLUMBING, "MidiJoiner") {
 }
 
@@ -37,4 +39,6 @@ int MidiJoiner::read_midi(int port, MidiEventBuffer& buf) {
 		}
 	}
 	return result;
+}
+
 }

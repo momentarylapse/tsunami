@@ -10,6 +10,8 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ViewModeEditAudio : public ViewModeDefault {
@@ -55,5 +57,7 @@ public:
 	void on_mouse_move(const vec2& m) override;
 	string get_tip() override;
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDITAUDIO_H_ */

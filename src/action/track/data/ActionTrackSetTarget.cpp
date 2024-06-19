@@ -8,6 +8,8 @@
 #include "ActionTrackSetTarget.h"
 #include "../../../data/Track.h"
 
+namespace tsunami {
+
 ActionTrackSetTarget::ActionTrackSetTarget(Track *t, Track *_target) {
 	track = t;
 	target = _target;
@@ -22,4 +24,6 @@ void *ActionTrackSetTarget::execute(Data *d) {
 
 void ActionTrackSetTarget::undo(Data *d) {
 	execute(d);
+}
+
 }

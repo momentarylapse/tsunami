@@ -12,6 +12,8 @@
 #include "../../Session.h"
 #include <alsa/asoundlib.h>
 
+namespace tsunami {
+
 MidiInputStreamAlsa::MidiInputStreamAlsa(Session *session, Device *device, MidiInputStream::SharedData &shared_data) : MidiInputStream(session, shared_data) {
 
 	shared_data.portid = snd_seq_create_simple_port(DeviceContextAlsa::instance->alsa_midi_handle, "Tsunami MIDI in",
@@ -109,6 +111,8 @@ void MidiInputStreamAlsa::read(MidiEventBuffer& buffer) {
 		}
 		snd_seq_free_event(ev);
 	}
+}
+
 }
 
 #endif

@@ -11,6 +11,8 @@
 #include "../../../data/Song.h"
 #include "../../../module/audio/AudioEffect.h"
 
+namespace tsunami {
+
 ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -36,5 +38,7 @@ void ActionTrackDeleteEffect::undo(Data *d) {
 
 	track->fx.insert(effect, index);
 	track->out_effect_list_changed.notify();
+}
+
 }
 

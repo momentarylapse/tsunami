@@ -12,6 +12,8 @@
 #include "AudioSource.h"
 #include "../../lib/base/set.h"
 
+namespace tsunami {
+
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
@@ -109,5 +111,7 @@ public:
 	void get_peak(const Track *track, float p[2]);
 	void clear_peaks();
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_SONGRENDERER_H_ */

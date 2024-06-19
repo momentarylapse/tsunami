@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../ActionMergable.h"
+
+namespace tsunami {
+
 class AudioEffect;
 
 class ActionTrackEditAudioEffect: public ActionMergable<string> {
@@ -25,3 +28,5 @@ public:
 private:
 	AudioEffect *fx;
 };
+
+}

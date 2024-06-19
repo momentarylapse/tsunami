@@ -12,6 +12,7 @@
 #include "../../lib/hui/hui.h"
 #include <portaudio.h>
 
+namespace tsunami {
 
 AudioOutputStreamPort::AudioOutputStreamPort(Session *session, Device *device, SharedData& shared_data) : AudioOutputStream(session, shared_data) {
 
@@ -93,5 +94,6 @@ bool AudioOutputStreamPort::_portaudio_test_error(PaError err, const char *msg) 
 	return false;
 }
 
+}
 
 #endif

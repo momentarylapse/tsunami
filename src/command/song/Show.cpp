@@ -8,6 +8,8 @@
 #include "../../module/midi/MidiEffect.h"
 #include "../../lib/os/msg.h"
 
+namespace tsunami {
+
 void show_song(Song *song) {
 	msg_write(format("  sample-rate: %d", song->sample_rate));
 	msg_write(format("  samples: %d", song->range().length));
@@ -41,4 +43,6 @@ void show_song(Song *song) {
 	msg_write(format("  refs: %d / %d", n, song->samples.num));
 	for (Tag &t: song->tags)
 		msg_write(format("  tag: %s = '%s'", t.key, t.value));
+}
+
 }

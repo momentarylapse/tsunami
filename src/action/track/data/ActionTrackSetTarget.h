@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Track;
 
 class ActionTrackSetTarget : public Action {
@@ -24,3 +26,5 @@ private:
 	Track *track;
 	Track *target;
 };
+
+}

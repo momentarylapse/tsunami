@@ -14,6 +14,9 @@
 #include "MidiNote.h"
 #include "MidiEvent.h"
 
+
+namespace tsunami {
+
 const int MAX_PITCH = 128;
 const int MIDDLE_C = 60;
 const int MIDDLE_A = 69;
@@ -167,5 +170,6 @@ NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod);
 int modifier_apply(int pitch, NoteModifier mod);
 int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod);
 
+}
 
 #endif /* SRC_DATA_MIDI_MIDIDATA_H_ */

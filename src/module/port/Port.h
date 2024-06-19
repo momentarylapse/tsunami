@@ -10,6 +10,8 @@
 
 #include "../../lib/base/base.h"
 
+namespace tsunami {
+
 enum class SignalType;
 
 class Module;
@@ -70,5 +72,7 @@ struct MidiInPort : InPort {
 struct BeatsInPort : InPort {
 	BeatsInPort(Module* module, const string& name = "in");
 };
+
+}
 
 #endif /* SRC_MODULE_PORT_PORT_H_ */

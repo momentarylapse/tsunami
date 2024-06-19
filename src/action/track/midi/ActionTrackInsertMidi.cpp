@@ -8,6 +8,8 @@
 #include "ActionTrackInsertMidi.h"
 #include "../../../data/TrackLayer.h"
 
+namespace tsunami {
+
 ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const MidiNoteBuffer &_midi) {
 	layer = l;;
 	offset = _offset;
@@ -44,5 +46,7 @@ void ActionTrackInsertMidi::undo(Data *d) {
 
 	applied = false;
 	layer->out_changed.notify();
+}
+
 }
 

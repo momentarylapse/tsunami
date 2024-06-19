@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Track;
 class Synthesizer;
 
@@ -25,3 +27,5 @@ private:
 	Track *track;
 	shared<Synthesizer> synth;
 };
+
+}

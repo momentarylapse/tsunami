@@ -13,7 +13,7 @@
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
 
-
+namespace tsunami {
 
 const int F_MIN = 50;
 const int F_MAX = 2000;
@@ -104,4 +104,6 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 		//frequency = fmax
 		pitch = freq_to_pitch(frequency);
 	}
+}
+
 }

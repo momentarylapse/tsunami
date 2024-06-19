@@ -13,6 +13,8 @@
 #include "../lib/os/file.h"
 #include "../lib/os/filesystem.h"
 
+namespace tsunami {
+
 Array<BackupManager::BackupFile> BackupManager::files;
 int BackupManager::next_uuid;
 
@@ -155,4 +157,6 @@ void BackupManager::notify_found_backups_done() {
 	if (files.num == 0)
 		return;
 	hui::config.set_str("Backup.LastNotified", files.back().filename.basename());
+}
+
 }

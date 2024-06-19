@@ -7,6 +7,8 @@
 
 #include "HelpDialog.h"
 
+namespace tsunami {
+
 HelpDialog::HelpDialog(hui::Window *_parent) :
 	hui::Dialog("help-dialog", _parent)
 {
@@ -27,5 +29,7 @@ HelpDialog::HelpDialog(hui::Window *_parent) :
 	event("show-page-1", [select_page] { select_page(1); });
 	event("show-page-2", [select_page] { select_page(2); });
 	event("show-page-3", [select_page] { select_page(3); });
+}
+
 }
 

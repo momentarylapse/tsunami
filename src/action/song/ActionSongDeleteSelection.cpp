@@ -17,6 +17,8 @@
 #include "../track/buffer/ActionTrack__ShrinkBuffer.h"
 #include "../track/buffer/ActionTrack__SplitBuffer.h"
 
+namespace tsunami {
+
 ActionSongDeleteSelection::ActionSongDeleteSelection(const SongSelection &_sel) :
 	sel(_sel)
 {
@@ -78,5 +80,7 @@ void ActionSongDeleteSelection::delete_buffers_from_track_layer(Song* a, Track *
 		}
 		_foreach_it_.update();
 	}
+}
+
 }
 

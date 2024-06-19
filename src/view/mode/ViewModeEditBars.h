@@ -10,6 +10,8 @@
 
 #include "ViewModeDefault.h"
 
+namespace tsunami {
+
 class TrackLayer;
 
 class ViewModeEditBars : public ViewModeDefault {
@@ -46,5 +48,7 @@ public:
 	int rubber_end_target = 0;
 	bool rubber_hover = false;
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDITBARS_H_ */

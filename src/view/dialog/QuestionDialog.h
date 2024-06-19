@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class QuestionDialogInt : hui::Dialog {
 public:
 	QuestionDialogInt(hui::Window *parent, const string &question, const string &options);
@@ -57,5 +59,7 @@ public:
 	base::promise<string> _promise;
 	static base::future<string> ask(hui::Window *parent, const string &question, const string &options = "");
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_QUESTIONDIALOG_H_ */

@@ -10,6 +10,8 @@
 #include "../../lib/math/vec2.h"
 #include <cmath>
 
+namespace tsunami {
+
 color col_inter(const color a, const color &b, float t);
 
 BasicGridPainter::BasicGridPainter() {
@@ -105,4 +107,6 @@ void BasicGridPainter::draw(Painter *p) {
 void BasicGridPainter::draw_empty_background(Painter *p) {
 	p->set_color(colors.bg);
 	p->draw_rect(area);
+}
+
 }

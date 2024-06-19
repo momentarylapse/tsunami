@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatRaw: public Format {
 public:
 	bool get_parameters(StorageOperationData *od, bool save) override;
@@ -22,5 +24,7 @@ public:
 	FormatDescriptorRaw();
 	Format *create() override { return new FormatRaw; }
 };
+
+}
 
 #endif /* FORMATRAW_H_ */

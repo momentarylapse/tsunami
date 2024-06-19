@@ -9,6 +9,7 @@
 
 #include "../lib/hui/hui.h"
 
+namespace tsunami {
 
 Device::Device() {
 	type = (DeviceType)-1;
@@ -78,4 +79,6 @@ Any Device::to_config() const {
 	a["channels"] = channels;
 	a["visible"] = visible;
 	return a;
+}
+
 }

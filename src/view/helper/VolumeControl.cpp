@@ -10,6 +10,7 @@
 #include "../../lib/hui/hui.h"
 #include <math.h>
 
+namespace tsunami {
 
 VolumeControl::VolumeControl(hui::Panel* _panel, const string& _id_slider, const string& _id_spin, const string& _id_unit) {
 	panel = _panel;
@@ -148,5 +149,5 @@ float VolumeControl::get_slider() const {
 	return 0;
 }
 
-
+}
 

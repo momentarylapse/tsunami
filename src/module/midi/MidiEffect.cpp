@@ -16,6 +16,8 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/SongSelection.h"
 
+namespace tsunami {
+
 int MidiEffect::read_midi(int port, MidiEventBuffer &buf) {
 	if (!in.source)
 		return NO_SOURCE;
@@ -64,5 +66,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel) {
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name) {
 	return (MidiEffect*)ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, name);
+}
+
 }
 

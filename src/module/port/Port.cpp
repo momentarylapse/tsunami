@@ -10,6 +10,8 @@
 #include "../../data/base.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 OutPort::OutPort(Module* _module, SignalType _type, const string& _name) {
 	module = _module;
 	type = _type;
@@ -80,4 +82,6 @@ MidiInPort::MidiInPort(Module* module, const string& name) :
 
 BeatsInPort::BeatsInPort(Module* module, const string& name) :
 		InPort(module, SignalType::Beats, name) {
+}
+
 }

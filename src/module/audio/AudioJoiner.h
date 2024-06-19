@@ -11,6 +11,8 @@
 #include "../port/Port.h"
 #include "../Module.h"
 
+namespace tsunami {
+
 class AudioJoiner : public Module {
 public:
 	AudioJoiner();
@@ -23,5 +25,7 @@ public:
 
 	int read_audio(int port, AudioBuffer &buf) override;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOJOINER_H_ */

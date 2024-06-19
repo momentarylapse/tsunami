@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class Song;
 enum class BarEditMode;
 
@@ -26,5 +28,7 @@ private:
 	int offset, shift;
 	BarEditMode mode;
 };
+
+}
 
 #endif /* SRC_ACTION_BAR_ACTION__SHIFTDATA_H_ */

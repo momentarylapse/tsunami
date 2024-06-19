@@ -14,8 +14,9 @@
 #include "../../sample/ActionSampleAdd.h"
 #include "ActionTrackAddSample.h"
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, const AudioBuffer &_buf, bool _auto_delete)
-{
+namespace tsunami {
+
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, const AudioBuffer &_buf, bool _auto_delete) {
 	layer = l;
 	pos = _pos;
 	buf = &_buf;
@@ -24,8 +25,7 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 	auto_delete = _auto_delete;
 }
 
-ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, const MidiNoteBuffer &_midi, bool _auto_delete)
-{
+ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, const MidiNoteBuffer &_midi, bool _auto_delete) {
 	layer = l;
 	pos = _pos;
 	buf = nullptr;
@@ -34,8 +34,7 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 	auto_delete = _auto_delete;
 }
 
-void ActionTrackPasteAsSample::build(Data *d)
-{
+void ActionTrackPasteAsSample::build(Data *d) {
 	if (buf) {
 		sample = new Sample("-paste-", *buf);
 	} else {
@@ -46,8 +45,9 @@ void ActionTrackPasteAsSample::build(Data *d)
 	add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
 }
 
-void *ActionTrackPasteAsSample::execute_return(Data *d)
-{
+void *ActionTrackPasteAsSample::execute_return(Data *d) {
 	return sample;
+}
+
 }
 

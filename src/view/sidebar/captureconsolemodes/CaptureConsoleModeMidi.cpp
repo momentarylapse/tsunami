@@ -17,6 +17,8 @@
 #include "../../../module/SignalChain.h"
 #include "../../../Session.h"
 
+namespace tsunami {
+
 CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {}
@@ -60,4 +62,4 @@ void CaptureConsoleModeMidi::allow_change_device(bool allow) {
 	items()[0].allow_edit(allow);
 }
 
-
+}

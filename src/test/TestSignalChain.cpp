@@ -10,6 +10,8 @@
 #include "TestSignalChain.h"
 #include "../module/synthesizer/DebugSynthesizer.h"
 
+namespace tsunami {
+
 TestSignalChain::TestSignalChain() : UnitTest("signal-chain") {
 }
 
@@ -21,6 +23,8 @@ Array<UnitTest::Test> TestSignalChain::tests() {
 
 void TestSignalChain::test_synth() {
 	DebugSynthesizer synth;
+}
+
 }
 
 #endif

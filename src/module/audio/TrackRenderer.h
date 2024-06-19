@@ -10,6 +10,8 @@
 
 #include "AudioSource.h"
 
+namespace tsunami {
+
 class Track;
 class TrackLayer;
 class AudioEffect;
@@ -65,5 +67,7 @@ public:
 	void on_track_change_data();
 	//void on_layer_change_data();
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_TRACKRENDERER_H_ */

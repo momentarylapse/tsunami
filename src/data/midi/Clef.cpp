@@ -9,6 +9,9 @@
 #include "Scale.h"
 #include "MidiData.h"
 
+
+namespace tsunami {
+
 const Clef Clef::_TREBLE(Clef::Type::TREBLE, u8"\U0001d11e", 5*7-5);
 const Clef Clef::_TREBLE_8(Clef::Type::TREBLE_8, u8"\U0001d120", 4*7-5);
 const Clef Clef::_BASS(Clef::Type::BASS, u8"\U0001d122", 3*7-3);
@@ -103,4 +106,6 @@ int Clef::position_to_pitch(int pos, const Scale &s, NoteModifier mod) const
 int Clef::position_to_uniclef(int pos) const
 {
 	return pos + offset;
+}
+
 }

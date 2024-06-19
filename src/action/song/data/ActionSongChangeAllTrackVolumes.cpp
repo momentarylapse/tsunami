@@ -10,6 +10,8 @@
 #include "../../../data/Track.h"
 #include "../../../lib/base/iter.h"
 
+namespace tsunami {
+
 ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track *t_ref, const Array<const Track*> &_tracks, float _volume) {
 	track_no = t_ref->get_index();
 	new_value = _volume;
@@ -47,4 +49,5 @@ bool ActionSongChangeAllTrackVolumes::mergable(Action *a) {
 	return aa;
 }
 
+}
 

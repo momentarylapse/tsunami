@@ -12,6 +12,7 @@
 #include "../TsunamiWindow.h"
 #include "../../Session.h"
 
+namespace tsunami {
 
 BottomBarExpandButton::BottomBarExpandButton(Session *_session) : Node(50, 50) {
 	align.dz = 200;
@@ -57,4 +58,4 @@ string BottomBarExpandButton::get_tip() const {
 }
 
 
-
+}

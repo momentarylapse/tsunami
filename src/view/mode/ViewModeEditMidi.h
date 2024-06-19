@@ -12,6 +12,8 @@
 #include "../../lib/base/pointer.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 class MidiNoteBuffer;
 class MidiNote;
 class MidiEvent;
@@ -132,5 +134,7 @@ public:
 	void left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) override;
 	string get_tip() override;
 };
+
+}
 
 #endif /* SRC_VIEW_MODE_VIEWMODEEDITMIDI_H_ */

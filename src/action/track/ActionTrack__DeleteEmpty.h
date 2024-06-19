@@ -10,6 +10,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class Track;
 
 class ActionTrack__DeleteEmpty: public Action {
@@ -23,5 +25,7 @@ private:
 	int index;
 	shared<Track> track;
 };
+
+}
 
 #endif /* SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_ */

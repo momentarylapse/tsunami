@@ -10,6 +10,8 @@
 #include "../../data/Range.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
+
 const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
 const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
 
@@ -166,4 +168,6 @@ void ViewPort::dirty_jump(float _pos) {
 	pos_pre_animation = pos;
 	pos_target = pos;
 	animation_time = -1;
+}
+
 }

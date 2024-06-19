@@ -10,6 +10,8 @@
 
 #include "../midi/MidiSource.h"
 
+namespace tsunami {
+
 class Port;
 class AudioBuffer;
 
@@ -37,5 +39,7 @@ public:
 	void _cdecl __init__();
 	void process(MidiEventBuffer &midi, AudioBuffer &buf) override;
 };
+
+}
 
 #endif /* SRC_MODULE_AUDIO_PITCHDETECTOR_H_ */

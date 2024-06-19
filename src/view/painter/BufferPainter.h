@@ -11,11 +11,15 @@
 #include "../../lib/math/rect.h"
 #include "../../lib/image/color.h"
 
+
+class Painter;
+class color;
+
+namespace tsunami {
+
 class AudioView;
 class PeakDatabase;
-class Painter;
 class AudioBuffer;
-class color;
 class Range;
 
 enum class AudioViewMode;
@@ -42,3 +46,5 @@ public:
 	float x0, x1;
 	AudioViewMode mode;
 };
+
+}

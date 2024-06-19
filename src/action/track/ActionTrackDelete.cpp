@@ -16,6 +16,8 @@
 #include "../../data/TrackLayer.h"
 #include "../../data/SampleRef.h"
 
+namespace tsunami {
+
 ActionTrackDelete::ActionTrackDelete(Track *_track) {
 	track = _track;
 }
@@ -38,4 +40,6 @@ void ActionTrackDelete::build(Data *d) {
 
 	// delete the track itself
 	add_sub_action(new ActionTrack__DeleteEmpty(track), d);
+}
+
 }

@@ -9,6 +9,9 @@
 
 #include "../../Action.h"
 #include "../../../data/midi/Temperament.h"
+
+namespace tsunami {
+
 class Track;
 
 class ActionTrackDetuneSynthesizer: public Action {
@@ -24,3 +27,5 @@ private:
 	Track *track;
 	Temperament temperament;
 };
+
+}

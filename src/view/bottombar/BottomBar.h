@@ -12,6 +12,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
+
 class AudioView;
 class Song;
 class DeviceManager;
@@ -83,5 +85,7 @@ public:
 	shared_array<Console> consoles;
 	void add_console(Console *c, const string &list_name);
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_ */

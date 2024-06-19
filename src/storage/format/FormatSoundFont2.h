@@ -10,6 +10,8 @@
 
 #include "Format.h"
 
+namespace tsunami {
+
 class FormatSoundFont2: public Format {
 public:
 	FormatSoundFont2();
@@ -78,5 +80,7 @@ public:
 	FormatDescriptorSoundFont2();
 	Format *create() override { return new FormatSoundFont2; }
 };
+
+}
 
 #endif /* SRC_STORAGE_FORMAT_FORMATSOUNDFONT2_H_ */

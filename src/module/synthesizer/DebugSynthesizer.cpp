@@ -8,6 +8,7 @@
 #include "DebugSynthesizer.h"
 #include "../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
 
 class DebugPitchRenderer : public PitchRenderer {
 public:
@@ -42,4 +43,6 @@ DebugSynthesizer::DebugSynthesizer() {
 
 PitchRenderer *DebugSynthesizer::create_pitch_renderer(int pitch) {
 	return new DebugPitchRenderer(this, pitch);
+}
+
 }

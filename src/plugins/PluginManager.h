@@ -12,14 +12,7 @@
 #include "../lib/base/optional.h"
 #include "../lib/base/future.h"
 
-class Plugin;
-class Module;
-enum class ModuleCategory;
-class PresetManager;
-class TsunamiWindow;
-class SongPlugin;
-class TsunamiPlugin;
-class Session;
+
 namespace hui {
 	class Window;
 	class Panel;
@@ -29,6 +22,17 @@ namespace kaba {
 	class Module;
 	class Class;
 }
+
+namespace tsunami {
+
+class Plugin;
+class Module;
+enum class ModuleCategory;
+class PresetManager;
+class TsunamiWindow;
+class SongPlugin;
+class TsunamiPlugin;
+class Session;
 
 class PluginManager {
 public:
@@ -83,5 +87,7 @@ private:
 	using PluginCallback = std::function<void(const string &)>;
 	void add_plugins_in_dir(const Path &dir, hui::Menu *m, const string &name_space, TsunamiWindow *win, PluginCallback cb);
 };
+
+}
 
 #endif /* PLUGINMANAGER_H_ */

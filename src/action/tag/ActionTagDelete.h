@@ -11,8 +11,9 @@
 #include "../../data/Song.h"
 #include "../Action.h"
 
-class ActionTagDelete : public Action
-{
+namespace tsunami {
+
+class ActionTagDelete : public Action {
 public:
 	ActionTagDelete(int index);
 	virtual ~ActionTagDelete();
@@ -24,5 +25,7 @@ private:
 	int index;
 	Tag old_tag;
 };
+
+}
 
 #endif /* ACTIONTAGDELETE_H_ */

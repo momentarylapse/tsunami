@@ -10,6 +10,8 @@
 
 #include "../ActionMergable.h"
 
+namespace tsunami {
+
 class Sample;
 
 class ActionSampleEditName: public ActionMergable<string> {
@@ -24,5 +26,7 @@ public:
 private:
 	shared<Sample> sample;
 };
+
+}
 
 #endif /* ACTIONSAMPLEEDITNAME_H_ */

@@ -62,6 +62,8 @@
 #include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
 
+namespace tsunami {
+
 extern const string AppName;
 
 
@@ -1181,4 +1183,6 @@ void TsunamiWindow::set_big_panel(ModulePanel* p) {
 		add_grid("", 0, 0, "plugin-grid");
 		embed(big_module_panel.get(), "plugin-grid", 0, 0);
 	}
+}
+
 }

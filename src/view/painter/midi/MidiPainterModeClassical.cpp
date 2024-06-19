@@ -9,6 +9,7 @@
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
 
+namespace tsunami {
 
 MidiPainterModeClassical::MidiPainterModeClassical(MidiPainter *mp) :
     MidiPainterMode(mp)
@@ -188,4 +189,6 @@ int MidiPainterModeClassical::y2clef(float y, NoteModifier &mod) const {
 
 void MidiPainterModeClassical::set_key_changes(const Array<MidiKeyChange> &changes) {
 	key_changes = changes;
+}
+
 }

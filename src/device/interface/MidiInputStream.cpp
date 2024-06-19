@@ -5,6 +5,8 @@
 #include "MidiInputStream.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 MidiInputStream::SharedData::SharedData() {
 }
 
@@ -17,3 +19,5 @@ MidiInputStream::MidiInputStream(Session *_session, SharedData& _shared_data)
 }
 
 MidiInputStream::~MidiInputStream() = default;
+
+}

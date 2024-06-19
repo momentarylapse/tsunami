@@ -8,7 +8,7 @@
 #include "../../Session.h"
 #include "../../EditModes.h"
 
-
+namespace tsunami {
 
 BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	SideBarConsole(_("Metronome editor"), "bars-editor", session, bar)
@@ -77,3 +77,4 @@ void BarsEditorConsole::update() {
 	check("mode-rubber", view->mode_edit_bars->edit_mode == ViewModeEditBars::EditMode::Rubber);
 }
 
+}

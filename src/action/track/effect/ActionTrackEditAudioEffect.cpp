@@ -11,6 +11,8 @@
 
 #include "../../../module/audio/AudioEffect.h"
 
+namespace tsunami {
+
 ActionTrackEditAudioEffect::ActionTrackEditAudioEffect(AudioEffect *_fx) {
 	fx = _fx;
 	old_value = fx->_config_latest_history;
@@ -40,5 +42,7 @@ bool ActionTrackEditAudioEffect::mergable(Action *a) {
 	if (!aa)
 		return false;
 	return (aa->fx == fx);
+}
+
 }
 

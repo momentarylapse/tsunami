@@ -13,6 +13,7 @@
 #include "../../data/Track.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
 
 ActionBar__Edit::ActionBar__Edit(int _index, int _length, Array<int> &_beats, int _divisor) {
 	index = _index;
@@ -45,5 +46,7 @@ void *ActionBar__Edit::execute(Data *d) {
 
 void ActionBar__Edit::undo(Data *d) {
 	execute(d);
+}
+
 }
 

@@ -21,6 +21,8 @@
 #include "Action__ShiftData.h"
 #include "ActionBar__Add.h"
 
+namespace tsunami {
+
 ActionBarAdd::ActionBarAdd(int _index, const BarPattern &pattern, BarEditMode _mode) {
 	index = _index;
 	bar = new Bar(pattern);
@@ -62,5 +64,7 @@ void ActionBarAdd::build(Data *d) {
 			}
 		}
 	}
+}
+
 }
 

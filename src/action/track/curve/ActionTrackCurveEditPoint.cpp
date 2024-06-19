@@ -8,6 +8,8 @@
 #include "ActionTrackCurveEditPoint.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 ActionTrackCurveEditPoint::ActionTrackCurveEditPoint(shared<Curve> _curve, int _index, int _pos, float _value) {
 	curve = _curve;
 	index = _index;
@@ -31,6 +33,7 @@ bool ActionTrackCurveEditPoint::mergable(Action *a) {
 	if (!e)
 		return false;
 	return (curve == e->curve.get()) and (index == e->index);
+}
 
 }
 

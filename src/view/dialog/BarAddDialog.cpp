@@ -12,6 +12,7 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
 
 BarAddDialog::BarAddDialog(hui::Window *parent, Song *s, int _index):
 	hui::Dialog("bar_add_dialog", parent)
@@ -98,4 +99,6 @@ void BarAddDialog::on_ok() {
 
 void BarAddDialog::on_close() {
 	request_destroy();
+}
+
 }

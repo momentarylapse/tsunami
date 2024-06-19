@@ -9,15 +9,17 @@
 #include "pattern/Observable.h"
 #include "math/vec2.h"
 
-
-class Session;
 class rect;
 class Painter;
-class ColorScheme;
 namespace scenegraph {
 	class SceneGraph;
 	class Node;
 }
+
+namespace tsunami {
+
+class Session;
+class ColorScheme;
 class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
@@ -62,5 +64,6 @@ public:
 	void set_theme(const string &name);
 };
 
+}
 
 #endif //TSUNAMI_MAINVIEW_H

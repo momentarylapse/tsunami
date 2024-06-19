@@ -11,6 +11,8 @@
 #include "CaptureConsoleMode.h"
 #include "../../../lib/base/base.h"
 
+namespace tsunami {
+
 class AudioInput;
 class PeakMeter;
 class Device;
@@ -26,5 +28,7 @@ public:
 	void enter() override;
 	void allow_change_device(bool allow) override;
 };
+
+}
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODEAUDIO_H_ */

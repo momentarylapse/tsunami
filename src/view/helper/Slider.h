@@ -12,6 +12,7 @@
 #include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
 
+namespace tsunami {
 
 class Slider : public obs::Node<VirtualBase> {
 public:
@@ -54,5 +55,7 @@ private:
 	Mode mode;
 	hui::Panel *panel;
 };
+
+}
 
 #endif /* SLIDER_H_ */

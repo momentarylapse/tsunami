@@ -11,6 +11,8 @@
 #include "Range.h"
 #include "../module/audio/AudioEffect.h"
 
+namespace tsunami {
+
 class AudioEffect;
 class Scale;
 
@@ -31,6 +33,7 @@ public:
 bool marker_is_key(const string &text);
 Scale parse_marker_key(const string &text);
 
+}
 
 
 #endif /* SRC_DATA_TRACKMARKER_H_ */

@@ -13,6 +13,7 @@
 class Painter;
 class vec2;
 
+namespace tsunami {
 
 namespace SymbolRenderer {
 	struct Symbol;
@@ -23,6 +24,8 @@ namespace SymbolRenderer {
 	float width(Painter *p, float size, const string &s, bool bold = false);
 
 	void enable(bool enabled);
-};
+}
+
+}
 
 #endif /* SRC_VIEW_HELPER_SYMBOLRENDERER_H_ */

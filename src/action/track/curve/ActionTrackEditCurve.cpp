@@ -9,6 +9,8 @@
 #include "../../../data/Track.h"
 #include "../../../data/Curve.h"
 
+namespace tsunami {
+
 ActionTrackEditCurve::ActionTrackEditCurve(Track *t, shared<Curve> _curve, const string &_name, float _min, float _max, CurveType _type) {
 	track = t;
 	curve = _curve;
@@ -30,6 +32,8 @@ void* ActionTrackEditCurve::execute(Data* d) {
 
 void ActionTrackEditCurve::undo(Data* d) {
 	execute(d);
+}
+
 }
 
 

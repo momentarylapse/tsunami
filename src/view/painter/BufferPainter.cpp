@@ -19,6 +19,7 @@
 #include "../../processing/audio/Spectrogram.h"
 #include "../../Session.h"
 
+namespace tsunami {
 
 BufferPainter::BufferPainter(AudioView *_view) {
 	view = _view;
@@ -266,5 +267,7 @@ void BufferPainter::set_color(const color &fg, const color &bg) {
 
 void BufferPainter::set_clip(const Range &r) {
 	view->cam.range2screen_clip(r, area, x0, x1);
+}
+
 }
 

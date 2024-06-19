@@ -16,6 +16,8 @@ namespace hui {
 	class Window;
 }
 
+namespace tsunami {
+
 class Progress : public obs::Node<VirtualBase> {
 public:
 	Progress(const string &str, hui::Window *parent);
@@ -51,5 +53,7 @@ public:
 	void _cdecl __init__(const string &str, hui::Window *parent);
 	void _cdecl __delete__() override;
 };
+
+}
 
 #endif /* PROGRESS_H_ */

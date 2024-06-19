@@ -34,6 +34,8 @@
 #include "../../module/midi/MidiAccumulator.h"
 #include "../../Session.h"
 
+namespace tsunami {
+
 void align_to_beats(Song *s, Range &r, int beat_partition);
 
 const float EDIT_PITCH_SHOW_COUNT = 30.0f;
@@ -204,7 +206,7 @@ private:
 	Range range;
 };
 
-class MouseDelayNotesDnD : public MouseDelayAction {
+class MouseDelayNotesDnD : public scenegraph::MouseDelayAction {
 public:
 	AudioViewLayer *layer;
 	AudioView *view;
@@ -271,7 +273,7 @@ public:
 	}
 };
 
-class MouseDelayNotesScaleDnD : public MouseDelayAction {
+class MouseDelayNotesScaleDnD : public scenegraph::MouseDelayAction {
 public:
 	AudioViewLayer *layer;
 	AudioView *view;
@@ -500,7 +502,7 @@ void ViewModeEditMidi::on_end() {
 		v->scroll_bar->hidden = true;
 }
 
-class MouseDelayAddMidi : public MouseDelayAction {
+class MouseDelayAddMidi : public scenegraph::MouseDelayAction {
 public:
 	AudioViewLayer *vlayer;
 	AudioView *view;
@@ -1224,4 +1226,6 @@ SongSelection ViewModeEditMidi::get_selection_for_rect(const Range &r, int y0, i
 
 SongSelection ViewModeEditMidi::get_selection_for_range(const Range &r) {
 	return ViewModeDefault::get_selection_for_range(r).filter(SongSelection::Mask::MIDI_NOTES);
+}
+
 }

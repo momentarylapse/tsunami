@@ -15,6 +15,8 @@
 #include "../../storage/Storage.h"
 #include "../../lib/base/sort.h"
 
+namespace tsunami {
+
 SignalChainPanel::SignalChainPanel(Session *session, SideBar *bar) :
 		SideBarConsole(_("Signal Chain"), "signal-chain-panel", session, bar),
 		in_editor_module_selected(this, [this] (Module *m) {
@@ -126,4 +128,6 @@ void SignalChainPanel::on_save_as() {
 			c->save(filename);
 		});
 	}
+}
+
 }

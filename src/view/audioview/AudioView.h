@@ -22,6 +22,15 @@ namespace hui{
 	class Menu;
 }
 
+namespace scenegraph {
+	class SceneGraph;
+	class Node;
+	class MouseDelayPlanner;
+	class MouseDelayAction;
+}
+
+namespace tsunami {
+
 class Song;
 class Track;
 class TrackLayer;
@@ -50,16 +59,10 @@ class ScrollBar;
 class Session;
 class BufferPainter;
 class GridPainter;
-namespace scenegraph {
-	class SceneGraph;
-	class Node;
-}
 class TimeScale;
 class Cursor;
 class AddTrackButton;
 class SelectionMarker;
-class MouseDelayPlanner;
-class MouseDelayAction;
 class CpuDisplay;
 class PeakMeterDisplay;
 class Dial;
@@ -157,9 +160,9 @@ public:
 	bool hide_selection;
 
 
-	MouseDelayPlanner *mdp();
-	void mdp_prepare(MouseDelayAction *action);
-	void mdp_run(MouseDelayAction *action);
+	scenegraph::MouseDelayPlanner *mdp();
+	void mdp_prepare(scenegraph::MouseDelayAction *action);
+	void mdp_run(scenegraph::MouseDelayAction *action);
 	void mdp_prepare(std::function<void(const vec2&)> update);
 
 
@@ -341,5 +344,7 @@ public:
 
 	owned<PeakDatabase> peak_database;
 };
+
+}
 
 #endif /* AUDIOVIEW_H_ */

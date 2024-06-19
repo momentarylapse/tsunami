@@ -14,19 +14,19 @@
 #include "../../../data/Song.h"
 #include "../../../data/audio/AudioBuffer.h"
 
-ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_r)
-{
+namespace tsunami {
+
+ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_r) {
 	layer = l;
 	r = _r;
 }
 
-void ActionTrackCreateBuffers::build(Data *d)
-{
+void ActionTrackCreateBuffers::build(Data *d) {
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;
 	int n_before = -1;
-	foreachi(AudioBuffer &b, layer->buffers, i){
+	foreachi(AudioBuffer &b, layer->buffers, i) {
 		if ((r.offset >= b.offset) and (r.offset <= b.offset + b.length))
 			n_pos = i;
 		if (r.offset >= b.offset)
@@ -36,7 +36,7 @@ void ActionTrackCreateBuffers::build(Data *d)
 //	msg_write(n_pos);
 //	msg_write(n_before);
 
-	if (n_pos >= 0){
+	if (n_pos >= 0) {
 		//msg_write("inside");
 
 		// use base buffers
@@ -45,7 +45,7 @@ void ActionTrackCreateBuffers::build(Data *d)
 		// too small?
 		if (r.end() > b.offset + b.length)
 			add_sub_action(new ActionTrack__GrowBuffer(layer, n_pos, r.end() - b.offset), d);
-	}else{
+	} else {
 
 		// insert new buffers
 		n_pos = n_before + 1;
@@ -62,5 +62,7 @@ void ActionTrackCreateBuffers::build(Data *d)
 
 	// return subarray (as reference...)
 	//buf.set_as_ref(*b, pos - b->offset, length);
+}
+
 }
 

@@ -11,16 +11,18 @@
 #include "../../lib/base/pointer.h"
 #include "../../lib/pattern/Observable.h"
 
-class Session;
-class Track;
-class Module;
-class ModulePanel;
-enum class ConfigPanelMode;
 namespace hui {
 	class Panel;
 	class Menu;
 }
 
+namespace tsunami {
+
+class Session;
+class Track;
+class Module;
+class ModulePanel;
+enum class ConfigPanelMode;
 
 //todo set/unset track...
 class FxListEditor : public obs::Node<VirtualBase> {
@@ -51,4 +53,6 @@ public:
 	void update_list_selection();
 	void update();
 };
+
+}
 

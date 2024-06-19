@@ -12,6 +12,8 @@
 #include "../../Tsunami.h"
 #include <math.h>
 
+namespace tsunami {
+
 const int RELATIVE_NUM_PITCHES = 2;
 
 TemperamentDialog::TemperamentDialog(Track *t, AudioView *v, hui::Window *parent) :
@@ -273,4 +275,6 @@ void TemperamentDialog::on_close() {
 void TemperamentDialog::on_ok() {
 	track->detune_synthesizer(temperament);
 	request_destroy();
+}
+
 }

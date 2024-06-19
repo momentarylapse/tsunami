@@ -10,6 +10,8 @@
 
 #include "BottomBar.h"
 
+namespace tsunami {
+
 //class PluginPanel;
 //class ConfigPanel;
 class ModulePanel;
@@ -38,5 +40,7 @@ public:
 	};
 	Array<FavoriteButtonData> favorite_buttons;
 };
+
+}
 
 #endif /* SRC_VIEW_BOTTOMBAR_PLUGINCONSOLE_H_ */

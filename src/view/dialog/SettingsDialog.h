@@ -10,6 +10,8 @@
 
 #include "../../lib/hui/hui.h"
 
+namespace tsunami {
+
 class AudioView;
 class DeviceConsole;
 
@@ -48,5 +50,7 @@ private:
 	AudioView *view;
 	DeviceConsole *device_console = nullptr;
 };
+
+}
 
 #endif /* SETTINGSDIALOG_H_ */

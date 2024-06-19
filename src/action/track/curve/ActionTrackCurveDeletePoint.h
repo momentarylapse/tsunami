@@ -9,6 +9,8 @@
 
 #include "../../Action.h"
 
+namespace tsunami {
+
 class Curve;
 
 class ActionTrackCurveDeletePoint : public Action {
@@ -23,3 +25,5 @@ private:
 	int pos;
 	float value;
 };
+
+}

@@ -15,6 +15,7 @@
 #include "../../lib/os/time.h"
 #include "../../processing/audio/Spectrogram.h"
 
+namespace tsunami {
 
 InterThreadMessenger::~InterThreadMessenger() {
 	flush();
@@ -147,5 +148,7 @@ void PeakThread::update_buffer(AudioBuffer &buf) {
 
 void PeakThread::notify() {
 	messenger.notify_x();
+}
+
 }
 

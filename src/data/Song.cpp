@@ -39,6 +39,7 @@
 #include "../lib/hui/language.h"
 #include <assert.h>
 
+namespace tsunami {
 
 int get_track_index(Track *t) {
 	if (t)
@@ -381,5 +382,7 @@ Array<TrackLayer*> Song::layers() const {
 	for (Track *t: weak(tracks))
 		layers.append(weak(t->layers));
 	return layers;
+}
+
 }
 

@@ -10,10 +10,9 @@
 #include "../../painter/GridPainter.h"
 #include "../../../module/audio/SongRenderer.h"
 
+namespace tsunami {
 
-MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
-
-
+scenegraph::MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode mode, bool keep_start);
 
 
 
@@ -171,4 +170,6 @@ HoverData TimeScale::get_hover_data(const vec2 &m) {
 	auto h = view->hover_time(m);
 	h.node = this;
 	return h;
+}
+
 }

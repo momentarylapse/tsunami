@@ -12,6 +12,12 @@
 #include "../../../lib/base/pointer.h"
 #include "../../../lib/pattern/Observable.h"
 
+namespace hui {
+	class Panel;
+}
+
+namespace tsunami {
+
 class CaptureConsole;
 class Song;
 class Track;
@@ -25,10 +31,7 @@ class AudioChannelSelector;
 class PeakMeter;
 class PeakMeterDisplay;
 class Device;
-class CaptureTrackData;
-namespace hui {
-	class Panel;
-}
+struct CaptureTrackData;
 enum class SignalType;
 
 class CaptureConsoleMode : public obs::Node<VirtualBase> {
@@ -66,5 +69,6 @@ public:
 	void update_device_list();
 };
 
+}
 
 #endif /* SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURECONSOLEMODE_H_ */

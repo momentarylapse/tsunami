@@ -9,6 +9,8 @@
 
 #include "../Action.h"
 
+namespace tsunami {
+
 class Track;
 
 class ActionTrackMove: public Action {
@@ -22,3 +24,5 @@ public:
 
 	int origin, target;
 };
+
+}

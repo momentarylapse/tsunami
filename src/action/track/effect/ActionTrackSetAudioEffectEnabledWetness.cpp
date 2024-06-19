@@ -9,6 +9,8 @@
 #include "../../../module/audio/AudioEffect.h"
 #include "../../../data/Song.h"
 
+namespace tsunami {
+
 ActionTrackSetAudioEffectEnabledWetness::ActionTrackSetAudioEffectEnabledWetness(AudioEffect *_fx, bool _enabled, float _wetness) {
 	fx = _fx;
 	enabled = _enabled;
@@ -26,6 +28,8 @@ void *ActionTrackSetAudioEffectEnabledWetness::execute(Data *d) {
 
 void ActionTrackSetAudioEffectEnabledWetness::undo(Data *d) {
 	execute(d);
+}
+
 }
 
 

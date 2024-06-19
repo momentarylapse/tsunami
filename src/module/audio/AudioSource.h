@@ -11,6 +11,8 @@
 #include "../Module.h"
 #include "../port/Port.h"
 
+namespace tsunami {
+
 class BeatSource;
 
 class AudioSource : public Module {
@@ -28,5 +30,7 @@ public:
 };
 
 AudioSource *_cdecl CreateAudioSource(Session *session, const string &name);
+
+}
 
 #endif /* SRC_MODULE_AUDIO_AUDIOSOURCE_H_ */

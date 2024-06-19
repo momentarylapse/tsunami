@@ -12,6 +12,8 @@
 #include "../data/rhythm/Beat.h"
 #include "../lib/os/msg.h"
 
+namespace tsunami {
+
 TestRhythm::TestRhythm() : UnitTest("rhythm") {
 }
 
@@ -67,6 +69,8 @@ void TestRhythm::test_bar_complex_partition_2() {
 
 	auto beats = bar.get_beats(0, true, 2);
 	assert_equal(beat_offsets(beats), {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95});
+}
+
 }
 
 #endif

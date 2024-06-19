@@ -18,6 +18,8 @@ class Painter;
 class rect;
 class color;
 
+namespace tsunami {
+
 class GridColors {
 public:
 	color bg, bg_sel;
@@ -54,3 +56,5 @@ public:
 	double min_grid_dist;
 	GridColors colors;
 };
+
+}

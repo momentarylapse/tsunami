@@ -54,6 +54,8 @@
 #include "../lib/hui/language.h"
 #include "../lib/threads/Mutex.h"
 
+namespace tsunami {
+
 
 Track::Track(Song *_song, SignalType _type, Synthesizer *_synth) {
 	//msg_write("  new Track " + p2s(this));
@@ -311,6 +313,8 @@ void Track::curve_delete_point(Curve *curve, int index) {
 
 void Track::curve_edit_point(Curve *curve, int index, int pos, float value) {
 	song->execute(new ActionTrackCurveEditPoint(curve, index, pos, value));
+}
+
 }
 
 

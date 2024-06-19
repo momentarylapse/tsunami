@@ -17,12 +17,14 @@
 #include "../../module/port/Port.h"
 #include <atomic>
 
+struct pa_stream;
+struct pa_operation;
+
+namespace tsunami {
+
 class DeviceManager;
 class Device;
 class Session;
-
-struct pa_stream;
-struct pa_operation;
 
 class AudioOutputStreamPulse : public AudioOutputStream {
 public:
@@ -47,6 +49,8 @@ public:
 	static void pulse_stream_success_callback(pa_stream *s, int success, void *userdata);
 	static void pulse_stream_state_callback(pa_stream *s, void *userdata);
 };
+
+}
 
 #endif
 

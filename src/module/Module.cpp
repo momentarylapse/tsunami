@@ -20,6 +20,8 @@
 #include "../view/module/ConfigPanel.h"
 #include "../view/module/AutoConfigPanel.h"
 
+namespace tsunami {
+
 
 const int Module::NOT_ENOUGH_DATA = 0;
 const int Module::END_OF_STREAM = -2;
@@ -292,5 +294,7 @@ void Module::perf_set_parent(Module *m) {
 		PerformanceMonitor::set_parent(perf_channel, m->perf_channel);
 	else
 		PerformanceMonitor::set_parent(perf_channel, -1);
+}
+
 }
 

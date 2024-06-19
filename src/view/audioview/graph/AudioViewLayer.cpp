@@ -41,6 +41,8 @@
 #include "../../../module/audio/SongRenderer.h"
 #include "../../../stuff/PerformanceMonitor.h"
 
+namespace tsunami {
+
 
 
 const int PITCH_SHOW_COUNT = 30;
@@ -702,4 +704,6 @@ MidiPainter* AudioViewLayer::midi_context() {
 	mp->set_key_changes(midi_key_changes);
 	mp->set_linear_range(edit_pitch_min, edit_pitch_max);
 	return mp;
+}
+
 }

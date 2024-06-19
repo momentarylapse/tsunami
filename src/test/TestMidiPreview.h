@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestMidiPreview: public UnitTest {
 public:
 	TestMidiPreview();
@@ -21,6 +23,8 @@ public:
 	static void test_preview();
 	static void test_preview_source();
 };
+
+}
 
 #endif /* SRC_TEST_TESTMIDIPREVIEW_H_ */
 

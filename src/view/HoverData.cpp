@@ -10,6 +10,7 @@
 #include "audioview/graph/AudioViewTrack.h"
 #include "../data/midi/MidiData.h"
 
+namespace tsunami {
 
 HoverData::HoverData() {
 	clear();
@@ -50,5 +51,7 @@ void HoverData::clear() {
 	pos_snap = 0;
 	range = Range::NONE;
 	y0 = y1 = 0;
+}
+
 }
 

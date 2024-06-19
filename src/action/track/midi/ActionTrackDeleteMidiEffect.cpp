@@ -9,6 +9,8 @@
 #include "../../../data/Track.h"
 #include <assert.h>
 
+namespace tsunami {
+
 ActionTrackDeleteMidiEffect::ActionTrackDeleteMidiEffect(Track *t, int _index) {
 	track = t;
 	index = _index;
@@ -32,5 +34,7 @@ void ActionTrackDeleteMidiEffect::undo(Data *d) {
 
 	track->midi_fx.insert(effect, index);
 	track->out_midi_effect_list_changed.notify();
+}
+
 }
 

@@ -14,6 +14,7 @@
 #include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
+#include "../../lib/os/time.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
@@ -24,6 +25,7 @@ namespace os {
 	extern void require_main_thread(const string &msg);
 }
 
+namespace tsunami {
 
 void AudioOutput::Config::reset() {
 	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
@@ -196,8 +198,6 @@ void AudioOutput::set_device(Device *d) {
 	out_changed.notify();
 }
 
-#include "../../lib/os/time.h"
-
 void AudioOutput::start() {
 	os::sleep(0.1f);
 	os::require_main_thread("out.start");
@@ -360,4 +360,6 @@ int64 AudioOutput::get_samples_requested() const {
 
 ModuleConfiguration *AudioOutput::get_config() const {
 	return (ModuleConfiguration*)&config;
+}
+
 }

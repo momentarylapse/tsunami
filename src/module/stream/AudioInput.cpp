@@ -31,6 +31,8 @@ namespace os {
 	extern void require_main_thread(const string&);
 }
 
+namespace tsunami {
+
 
 int AudioInput::read_audio(int port, AudioBuffer &buf) {
 	//buf.set_channels(stream->num_channels);
@@ -218,4 +220,6 @@ base::optional<int64> AudioInput::samples_recorded() {
 
 ModuleConfiguration *AudioInput::get_config() const {
 	return (ModuleConfiguration*)&config;
+}
+
 }

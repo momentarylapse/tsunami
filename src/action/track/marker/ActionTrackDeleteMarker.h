@@ -8,6 +8,9 @@
 #pragma once
 
 #include "../../Action.h"
+
+namespace tsunami {
+
 class TrackLayer;
 class TrackMarker;
 
@@ -25,3 +28,5 @@ private:
 	shared<TrackMarker> marker;
 	shared<TrackLayer> layer;
 };
+
+}

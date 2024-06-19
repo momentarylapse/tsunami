@@ -11,6 +11,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
 
+namespace tsunami {
 
 class DummyPitchRenderer : public PitchRenderer {
 public:
@@ -123,4 +124,6 @@ void DummySynthesizer::on_config() {
 			env[i].set2(0, 0.45f);
 		}
 	}
+}
+
 }

@@ -9,6 +9,8 @@
 
 /*#include "../../Data/Song.h"
 
+namespace tsunami {
+
 ActionLayerMove::ActionLayerMove(int _source, int _target)
 {
 	source = _source;
@@ -34,5 +36,7 @@ void ActionLayerMove::undo(Data* d)
 	a->layers.move(target, source);
 	for (Track *t: a->tracks)
 		t->layers.move(target, source);
+}
+
 }
 */

@@ -22,6 +22,7 @@
 #include "../../Playback.h"
 #include "../../EditModes.h"
 
+namespace tsunami {
 
 bool _capture_console_force_complex_ = false;
 
@@ -214,5 +215,7 @@ void CaptureConsole::on_putput_tick() {
 
 bool CaptureConsole::has_data() {
 	return state != State::EMPTY;
+}
+
 }
 

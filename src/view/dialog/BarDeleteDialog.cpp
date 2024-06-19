@@ -11,6 +11,8 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/Song.h"
 
+namespace tsunami {
+
 extern bool bar_dialog_move_data;
 static bool bar_dialog_replace_by_pause = false;
 
@@ -57,4 +59,6 @@ void BarDeleteDialog::on_ok() {
 	song->end_action_group();
 
 	request_destroy();
+}
+
 }

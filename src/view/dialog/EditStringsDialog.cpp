@@ -8,6 +8,8 @@
 #include "EditStringsDialog.h"
 #include "../../data/Track.h"
 
+namespace tsunami {
+
 EditStringsDialog::EditStringsDialog(hui::Window *_parent, const Array<int> &_strings) :
 	hui::Dialog("edit-strings-dialog", _parent)
 {
@@ -90,5 +92,7 @@ void EditStringsDialog::on_add_first() {
 	strings.add(69);
 
 	hui::run_later(0.001f, [this] { update(); });
+}
+
 }
 

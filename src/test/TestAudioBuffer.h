@@ -12,6 +12,8 @@
 
 #include "UnitTest.h"
 
+namespace tsunami {
+
 class TestAudioBuffer : public UnitTest {
 public:
 	TestAudioBuffer();
@@ -25,6 +27,8 @@ public:
 	static void test_ref();
 	static void test_ref_write();
 };
+
+}
 
 #endif /* SRC_TEST_TESTAUDIOBUFFER_H_ */
 

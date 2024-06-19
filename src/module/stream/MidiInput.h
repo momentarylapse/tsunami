@@ -14,12 +14,15 @@
 #include "../../device/interface/MidiInputStream.h"
 #include "../../data/midi/MidiData.h"
 
-class Device;
-class DeviceManager;
-class Session;
 namespace os {
 	class Timer;
 }
+
+namespace tsunami {
+
+class Device;
+class DeviceManager;
+class Session;
 
 class MidiInput : public Module {
 public:
@@ -93,5 +96,7 @@ private:
 public:
 	base::optional<int64> command(ModuleCommand cmd, int64 param) override;
 };
+
+}
 
 #endif /* SRC_MODULE_STREAM_MIDIINPUT_H_ */

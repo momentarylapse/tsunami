@@ -10,6 +10,8 @@
 #include "TestAudioBuffer.h"
 #include "../data/audio/AudioBuffer.h"
 
+namespace tsunami {
+
 TestAudioBuffer::TestAudioBuffer() : UnitTest("audio-buffer") {
 }
 
@@ -88,6 +90,8 @@ void TestAudioBuffer::test_ref_write() {
 
 	buf.ref(1, 2).set_zero();
 	assert_equal(buf, make_buf({1,0,70,4,5}, {-1,0,-3,17,-5}));
+}
+
 }
 
 #endif

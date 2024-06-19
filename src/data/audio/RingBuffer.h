@@ -11,6 +11,8 @@
 #include "AudioBuffer.h"
 #include <atomic>
 
+namespace tsunami {
+
 class RingBuffer {
 public:
 	RingBuffer(int size);
@@ -53,5 +55,7 @@ public:
 	std::atomic<int> available_read;
 	std::atomic<int> available_write;
 };
+
+}
 
 #endif /* SRC_DATA_AUDIO_RINGBUFFER_H_ */

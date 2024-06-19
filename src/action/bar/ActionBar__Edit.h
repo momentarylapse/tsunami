@@ -10,8 +10,9 @@
 
 #include "../Action.h"
 
-class ActionBar__Edit : public Action
-{
+namespace tsunami {
+
+class ActionBar__Edit : public Action {
 public:
 	ActionBar__Edit(int index, int length, Array<int> &beats, int divisor);
 
@@ -23,5 +24,7 @@ private:
 	Array<int> beats;
 	int index;
 };
+
+}
 
 #endif /* SRC_ACTION_BAR_ACTIONBAR__EDIT_H_ */

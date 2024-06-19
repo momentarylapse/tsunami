@@ -13,6 +13,8 @@
 #include "../../lib/fft/fft.h"
 #include "../../lib/threads/Thread.h"
 
+namespace tsunami {
+
 namespace Spectrogram {
 
 
@@ -106,6 +108,7 @@ float dequantize(unsigned char q) {
 	return (float)q / 254.0f;
 }
 
+}
 
 }
 

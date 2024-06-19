@@ -10,9 +10,12 @@
 
 #include "Format.h"
 
+class Painter;
+
+namespace tsunami {
+
 class MidiPainter;
 class ViewPort;
-class Painter;
 class Range;
 class ColorScheme;
 
@@ -36,5 +39,7 @@ public:
 	FormatDescriptorPdf();
 	Format *create() override { return new FormatPdf; }
 };
+
+}
 
 #endif /* SRC_STORAGE_FORMAT_FORMATPDF_H_ */

@@ -10,6 +10,8 @@
 
 #include "../ActionGroup.h"
 
+namespace tsunami {
+
 class BarPattern;
 class Bar;
 enum class BarEditMode;
@@ -24,5 +26,7 @@ public:
 	Bar *bar;
 	BarEditMode mode;
 };
+
+}
 
 #endif /* ACTIONSONGBARADD_H_ */

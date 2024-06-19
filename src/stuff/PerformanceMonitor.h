@@ -11,6 +11,7 @@
 #include "../lib/base/base.h"
 #include "../lib/pattern/Observable.h"
 
+namespace tsunami {
 
 struct PerfChannelStat {
 	float cpu, avg;
@@ -42,5 +43,7 @@ public:
 	static void start_busy(int channel);
 	static void end_busy(int channel);
 };
+
+}
 
 #endif /* SRC_STUFF_PERFORMANCEMONITOR_H_ */

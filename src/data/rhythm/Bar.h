@@ -11,6 +11,9 @@
 #include "../../lib/base/pointer.h"
 #include "../Range.h"
 
+
+namespace tsunami {
+
 class BarCollection;
 class Beat;
 
@@ -70,6 +73,8 @@ enum class BarEditMode {
 	Stretch,
 	StretchAndScaleAudio
 };
+
+}
 
 
 

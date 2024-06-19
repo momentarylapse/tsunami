@@ -18,6 +18,8 @@
 #include "../../lib/os/formatter.h"
 #include "../../lib/os/msg.h"
 
+namespace tsunami {
+
 const int BEAT_PARTITION = 12;
 
 FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
@@ -1115,4 +1117,6 @@ void FormatGuitarPro::read_beat_fx()
 	}
 	if ((flags2 & 0x02) != 0)
 		f->read_byte();
+}
+
 }

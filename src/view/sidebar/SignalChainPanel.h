@@ -7,6 +7,8 @@
 
 #include "SideBar.h"
 
+namespace tsunami {
+
 class Session;
 enum class ModuleCategory;
 class SignalChain;
@@ -48,6 +50,8 @@ public:
 
 	ModulePanel *module_panel = nullptr;
 };
+
+}
 
 
 #endif //TSUNAMI_SIGNALCHAINPANEL_H

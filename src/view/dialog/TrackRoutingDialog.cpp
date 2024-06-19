@@ -10,6 +10,8 @@
 #include "../../data/Song.h"
 #include "../../data/Track.h"
 
+namespace tsunami {
+
 TrackRoutingDialog::TrackRoutingDialog(hui::Window *parent, Song *_song):
 	hui::Dialog("track-routing-dialog", parent)
 {
@@ -71,4 +73,6 @@ void TrackRoutingDialog::on_add_group() {
 	[[maybe_unused]] auto *t = song->add_track(SignalType::Group);
 	song->end_action_group();
 	load();
+}
+
 }

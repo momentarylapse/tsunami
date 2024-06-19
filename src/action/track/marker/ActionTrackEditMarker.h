@@ -10,6 +10,8 @@
 #include "../../Action.h"
 #include "../../../data/Range.h"
 
+namespace tsunami {
+
 class TrackLayer;
 class TrackMarker;
 
@@ -28,3 +30,5 @@ private:
 	Range range;
 	string text;
 };
+
+}

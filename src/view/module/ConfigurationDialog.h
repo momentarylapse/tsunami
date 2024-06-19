@@ -14,10 +14,13 @@
 namespace hui {
 	class Window;
 }
+
+namespace tsunami {
+
 class Module;
 
 base::future<void> configure_module(hui::Window *win, shared<Module> m);
 
-
+}
 
 #endif /* SRC_VIEW_MODULE_CONFIGURATIONDIALOG_H_ */

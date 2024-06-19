@@ -11,17 +11,21 @@
 #include "../../lib/base/base.h"
 #include "../../lib/base/pointer.h"
 
+
+class Painter;
+class Any;
+class vec2;
+
+namespace tsunami {
+
 class Song;
 class Track;
 class MidiPainter;
 class ColorScheme;
 class ViewPort;
 class Range;
-class Painter;
-class Any;
 class SongSelection;
 class HoverData;
-class vec2;
 
 class MultiLinePainter {
 public:
@@ -89,5 +93,7 @@ public:
 	float draw_next_line(Painter *p, int &offset, const vec2 &pos);
 	float get_line_dy();
 };
+
+}
 
 #endif /* SRC_VIEW_PAINTER_MULTILINEPAINTER_H_ */

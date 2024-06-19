@@ -11,6 +11,8 @@
 #include "../../lib/hui/hui.h"
 #include "../../data/Range.h"
 
+namespace tsunami {
+
 class Song;
 
 class PauseAddDialog : public hui::Dialog {
@@ -22,5 +24,7 @@ public:
 	void on_ok();
 	void on_close();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_PAUSEADDDIALOG_H_ */

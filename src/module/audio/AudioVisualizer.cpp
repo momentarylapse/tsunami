@@ -15,6 +15,8 @@
 #include "../../lib/hui/Callback.h"
 #include "../../lib/hui/Application.h"
 
+namespace tsunami {
+
 int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
 	if (!in.source)
 		return NO_SOURCE;
@@ -88,6 +90,8 @@ void AudioVisualizer::flip() {
 	else
 		next_writing = 1;
 	current_reading = 1 - next_writing;
+}
+
 }
 
 

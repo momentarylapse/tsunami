@@ -15,6 +15,8 @@ struct PaStreamCallbackTimeInfo;
 typedef unsigned long PaStreamCallbackFlags;
 typedef int PaError;
 
+namespace tsunami {
+
 class AudioOutputStreamPort : public AudioOutputStream {
 public:
 	AudioOutputStreamPort(Session *session, Device *device, SharedData& shared_data);
@@ -35,6 +37,8 @@ public:
 												 PaStreamCallbackFlags statusFlags,
 												 void *userData);
 };
+
+}
 
 #endif
 

@@ -11,6 +11,7 @@
 #include "MidiSource.h"
 #include "../../data/midi/MidiData.h"
 
+namespace tsunami {
 
 class MidiEventStreamer : public MidiSource {
 public:
@@ -29,6 +30,8 @@ public:
 	bool ignore_end;
 	bool loop;
 };
+
+}
 
 
 #endif /* SRC_MODULE_MIDI_MIDIEVENTSTREAMER_H_ */

@@ -12,6 +12,8 @@
 #include "../../data/Range.h"
 #include "../../data/rhythm/Bar.h"
 
+namespace tsunami {
+
 class Song;
 
 class BarAddDialog : public hui::Dialog {
@@ -30,5 +32,7 @@ public:
 	void on_ok();
 	void on_close();
 };
+
+}
 
 #endif /* SRC_VIEW_DIALOG_BARADDDIALOG_H_ */

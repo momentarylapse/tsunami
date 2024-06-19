@@ -14,6 +14,7 @@
 #include "../../data/SampleRef.h"
 #include "../../data/audio/AudioBuffer.h"
 
+namespace tsunami {
 
 ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &sel, bool move_buffers) {
 	for (auto t: weak(a->tracks)) {
@@ -95,5 +96,5 @@ bool ActionSongMoveSelection::is_trivial() {
 	return (param == 0);
 }
 
-
+}
 

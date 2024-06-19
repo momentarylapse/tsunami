@@ -12,6 +12,7 @@
 #include "../Range.h"
 #include <shared_mutex>
 
+namespace tsunami {
 
 enum class SampleFormat;
 
@@ -75,5 +76,7 @@ public:
 	bool has_compressed() const;
 	void _data_was_changed();
 };
+
+}
 
 #endif /* SRC_AUDIO_AUDIOBUFFER_H_ */

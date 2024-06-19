@@ -21,14 +21,6 @@ namespace hui {
 	void show_crash_window();
 }
 
-
-void ErrorHandler::init() {
-	// windows: let VS handle things for now...
-#ifndef OS_WINDOWS
-	hui::SetErrorFunction(error_handler);
-#endif
-}
-
 namespace kaba {
 	//class StackFrameInfo;
 	struct StackFrameInfo {
@@ -43,6 +35,15 @@ namespace kaba {
 	StackFrameInfo get_func_from_rip(void *rip);
 
 	string _cdecl var_repr(const void *p, const Class *type);
+}
+
+namespace tsunami {
+
+void ErrorHandler::init() {
+	// windows: let VS handle things for now...
+#ifndef OS_WINDOWS
+	hui::SetErrorFunction(error_handler);
+#endif
 }
 
 #ifdef COMPILER_GCC
@@ -202,5 +203,7 @@ void ErrorHandler::error_handler() {
 
 	hui::show_crash_window();
 	exit(1);
+}
+
 }
 

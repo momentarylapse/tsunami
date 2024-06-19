@@ -11,6 +11,9 @@
 #include "../../lib/base/pointer.h"
 #include "../Range.h"
 
+
+namespace tsunami {
+
 class Scale;
 class Clef;
 class Instrument;
@@ -55,6 +58,8 @@ public:
 	static const int UNDEFINED_CLEF;
 	static const int UNDEFINED_STRING;
 };
+
+}
 
 
 #endif /* SRC_DATA_MIDI_MIDINOTE_H_ */

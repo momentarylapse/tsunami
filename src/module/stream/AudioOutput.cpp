@@ -85,8 +85,7 @@ void AudioOutput::_create_dev() {
 	if (!device_manager->audio_api_initialized())
 		return;
 	session->debug("out", "create device");
-
-
+	
 	stream = device_manager->audio_context->create_audio_output_stream(session, cur_device, &shared_data);
 
 	if (!stream) {
@@ -271,12 +270,12 @@ void AudioOutput::on_config() {
 
 void AudioOutput::on_played_end_of_stream() {
 	//printf("---------ON PLAY END OF STREAM\n");
-	out_play_end_of_stream.notify();
+	out_play_end_of_stream();
 }
 
 void AudioOutput::on_read_end_of_stream() {
 	//printf("---------ON READ END OF STREAM\n");
-	out_read_end_of_stream.notify();
+	out_read_end_of_stream();
 }
 
 void AudioOutput::reset_state() {

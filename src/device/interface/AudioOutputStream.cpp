@@ -90,7 +90,9 @@ void AudioOutputStream::signal_out_of_data() {
 	if (shared_data.read_end_of_stream and !shared_data.played_end_of_stream) {
 		//printf("end of data...\n");
 		shared_data.played_end_of_stream = true;
-		hui::run_later(0.001f, [this]{ shared_data.callback_played_end_of_stream(); }); // TODO prevent abort before playback really finished
+		hui::run_in_gui_thread([this]{
+			shared_data.callback_played_end_of_stream();
+		}); // TODO prevent abort before playback really finished
 	}
 }
 

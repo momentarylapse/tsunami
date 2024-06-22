@@ -477,7 +477,7 @@ void SignalChain::stop() {
 			m->command(ModuleCommand::STOP, 0);
 	}
 	state = State::PAUSED;
-	out_state_changed.notify();
+	out_state_changed();
 }
 
 void SignalChain::stop_hard() {
@@ -486,7 +486,7 @@ void SignalChain::stop_hard() {
 	_stop_sucking_hard();
 	reset_state();
 	state = State::UNPREPARED;
-	out_state_changed.notify();
+	out_state_changed();
 }
 
 
@@ -526,8 +526,8 @@ bool SignalChain::is_active() {
 
 // running in gui thread!
 void SignalChain::on_module_play_end_of_stream() {
-	out_play_end_of_stream.notify();
-	//session->debug("auto stop");
+	out_play_end_of_stream();
+	//session->debug("chain", "auto stop");
 	stop_hard();
 }
 

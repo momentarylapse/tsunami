@@ -130,9 +130,16 @@ void DeviceManager::remove_device(DeviceType type, int index) {
 	write_config();
 }
 
+DeviceManager::ApiDescription find_api_description(DeviceManager::ApiType api) {
+	for (auto &d: DeviceManager::api_descriptions)
+		if (d.type == api)
+			return d;
+	return DeviceManager::api_descriptions.back();
+}
+
 void DeviceManager::write_config() {
-	string audio_api_name = api_descriptions[(int)audio_api].name;
-	string midi_api_name = api_descriptions[(int)midi_api].name;
+	string audio_api_name = find_api_description(audio_api).name;
+	string midi_api_name = find_api_description(midi_api).name;
 
 	//hui::Config.set_float("Devices.OutputVolume", output_volume);
 	hui::config.set("Devices.Output[" + audio_api_name + "]", devs2any(output_devices));
@@ -152,15 +159,15 @@ void DeviceManager::update_devices(bool serious) {
 }
 
 
-static int select_api(const string &preferred_name, int mode) {
-	int best = -1;
+static DeviceManager::ApiType select_api(const string &preferred_name, int mode) {
+	DeviceManager::ApiType best = DeviceManager::ApiType::DUMMY;
 	for (int i=(int)DeviceManager::ApiType::NUM_APIS-1; i>=0; i--) {
 		auto &a = DeviceManager::api_descriptions[i];
 		if (!a.available or ((a.mode & mode) == 0))
 			continue;
 		if (a.name == preferred_name)
-			return i;
-		best = i;//a.index;
+			return a.type;
+		best = a.type;
 	}
 	return best;
 }
@@ -189,11 +196,11 @@ void DeviceManager::init() {
 	}
 	hui::config.migrate("Output.Volume", "Devices.OutputVolume");
 
-	audio_api = (ApiType)select_api(hui::config.get_str("Devices.AudioApi", "porteaudio"), 1);
-	string audio_api_name = api_descriptions[(int)audio_api].name;
+	audio_api = select_api(hui::config.get_str("Devices.AudioApi", "porteaudio"), 1);
+	string audio_api_name = find_api_description(audio_api).name;
 	session->i(_("audio library selected: ") + audio_api_name);
 	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", "alsa"), 2);
-	string midi_api_name = api_descriptions[(int)midi_api].name;
+	string midi_api_name = find_api_description(midi_api).name;
 	session->i(_("midi library selected: ") + midi_api_name);
 
 	hui::config.set_str("Devices.AudioApi", audio_api_name);
@@ -216,8 +223,7 @@ void DeviceManager::init() {
 	});
 	audio_context->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
 		Device *d = get_device_create(dd.type, dd.internal_name);
-		d->name = dd.name;
-		d->channels = dd.channels;
+		*d = dd;
 		d->present = true;
 		set_device_config(d);
 	});

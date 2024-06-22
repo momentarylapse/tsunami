@@ -19,7 +19,7 @@ Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
-	{"-none-", DeviceManager::ApiType::NONE, 3, true}
+	{"dummy", DeviceManager::ApiType::DUMMY, 3, true}
 };
 
 
@@ -86,8 +86,8 @@ DeviceManager::DeviceManager(Session *_session) {
 
 	session = _session;
 
-	audio_api = ApiType::NONE;
-	midi_api = ApiType::NONE;
+	audio_api = ApiType::DUMMY;
+	midi_api = ApiType::DUMMY;
 
 	dummy_device = new Device(DeviceType::NONE, "dummy");
 

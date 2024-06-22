@@ -42,10 +42,10 @@ public:
 	void kill_library();
 
 	enum class ApiType {
+		DUMMY,
 		ALSA,
 		PULSE,
 		PORTAUDIO,
-		NONE,
 		NUM_APIS
 	};
 	ApiType audio_api;
@@ -91,7 +91,7 @@ public:
 
 	struct ApiDescription {
 		string name;
-		DeviceManager::ApiType type;
+		ApiType type;
 		int mode;
 		bool available;
 	};

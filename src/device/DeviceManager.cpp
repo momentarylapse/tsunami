@@ -9,6 +9,7 @@
 #include "interface/DeviceContext.h"
 #include "backend-pulseaudio/DeviceContextPulse.h"
 #include "backend-portaudio/DeviceContextPort.h"
+#include "backend-pipewire/DeviceContextPipewire.h"
 #include "backend-alsa/DeviceContextAlsa.h"
 #include "backend-coreaudio/DeviceContextCoreAudio.h"
 #include "backend-coremidi/DeviceContextCoreMidi.h"
@@ -22,6 +23,7 @@ Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
+	{"pipewire", DeviceManager::ApiType::PIPEWIRE, 1, HAS_LIB_PIPEWIRE},
 	{"coreaudio", DeviceManager::ApiType::COREAUDIO, 1, HAS_LIB_COREAUDIO},
 	{"coremidi", DeviceManager::ApiType::COREMIDI, 2, HAS_LIB_COREMIDI},
 	{"dummy", DeviceManager::ApiType::DUMMY, 3, true}
@@ -79,6 +81,10 @@ DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType a
 #if HAS_LIB_COREMIDI
 	if (api == DeviceManager::ApiType::COREMIDI)
 		return new DeviceContextCoreMidi(session);
+#endif
+#if HAS_LIB_PIPEWIRE
+	if (api == DeviceManager::ApiType::PIPEWIRE)
+		return new DeviceContextPipewire(session);
 #endif
 #if HAS_LIB_ALSA
 	if (api == DeviceManager::ApiType::ALSA)
@@ -199,7 +205,7 @@ static string suggest_default_audio_api() {
 	return "coreaudio";
 #endif
 #ifdef OS_LINUX
-	return "coreaudio";
+	return "pulseaudio";
 #endif
 	return "portaudio";
 }

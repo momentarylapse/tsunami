@@ -126,6 +126,9 @@ set(SOURCE
 	src/device/backend-coreaudio/DeviceContextCoreAudio.cpp
 	src/device/backend-coremidi/DeviceContextCoreMidi.cpp
 	src/device/backend-coremidi/MidiInputStreamCoreMidi.cpp
+	src/device/backend-pipewire/AudioInputStreamPipewire.cpp
+	src/device/backend-pipewire/AudioOutputStreamPipewire.cpp
+	src/device/backend-pipewire/DeviceContextPipewire.cpp
 	src/device/backend-portaudio/AudioInputStreamPort.cpp
 	src/device/backend-portaudio/AudioOutputStreamPort.cpp
 	src/device/backend-portaudio/DeviceContextPort.cpp
@@ -744,6 +747,23 @@ else()
 endif(APPLE)
 
 
+
+# lib: pipewire (optional)
+set(LIB_PIPEWIRE_ENABLED true CACHE BOOL "Use pipewire library?")
+pkg_check_modules(LIBPIPEWIRE03 libpipewire-0.3)
+if(LIBPIPEWIRE03_FOUND)
+	target_include_directories(tsunami PUBLIC ${LIBPIPEWIRE03_INCLUDE_DIRS})
+	target_link_directories(tsunami PUBLIC ${LIBPIPEWIRE03_LIBRARY_DIRS})
+	list(APPEND DEPS ${LIBPIPEWIRE03_LIBRARIES})
+	target_compile_options(tsunami PUBLIC ${LIBPIPEWIRE03_CFLAGS_OTHER})
+else()
+	set(LIB_PIPEWIRE_ENABLED false CACHE BOOL "pipewire library not found" FORCE)
+endif()
+if(${LIB_PIPEWIRE_ENABLED})
+	target_compile_definitions(tsunami PUBLIC HAS_LIB_PIPEWIRE=1)
+else()
+	target_compile_definitions(tsunami PUBLIC HAS_LIB_PIPEWIRE=0)
+endif()
 
 # lib: unwind (optional)
 set(LIB_UNWIND_ENABLED true CACHE BOOL "Use unwind library?")

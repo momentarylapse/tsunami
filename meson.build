@@ -91,6 +91,15 @@ else
 	add_project_arguments('-DHAS_LIB_COREMIDI=0', language : ['cpp'])
 endif
 
+# optional dependency: pipewire
+d = cc.find_library('pipewire', required : false)
+if d.found()
+	add_project_arguments('-DHAS_LIB_PIPEWIRE=1', language : ['cpp'])
+	deps += [d]
+else
+	add_project_arguments('-DHAS_LIB_PIPEWIRE=0', language : ['cpp'])
+endif
+
 # optional dependency: unwind
 d = cc.find_library('unwind', required : false)
 if d.found()
@@ -241,6 +250,9 @@ sources = [
 	'src/device/backend-coreaudio/DeviceContextCoreAudio.cpp',
 	'src/device/backend-coremidi/DeviceContextCoreMidi.cpp',
 	'src/device/backend-coremidi/MidiInputStreamCoreMidi.cpp',
+	'src/device/backend-pipewire/AudioInputStreamPipewire.cpp',
+	'src/device/backend-pipewire/AudioOutputStreamPipewire.cpp',
+	'src/device/backend-pipewire/DeviceContextPipewire.cpp',
 	'src/device/backend-portaudio/AudioInputStreamPort.cpp',
 	'src/device/backend-portaudio/AudioOutputStreamPort.cpp',
 	'src/device/backend-portaudio/DeviceContextPort.cpp',

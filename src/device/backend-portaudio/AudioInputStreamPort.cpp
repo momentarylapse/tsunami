@@ -82,23 +82,11 @@ int AudioInputStreamPort::portaudio_stream_request_callback(const void *inputBuf
 
 
 	if (in) {
-		//if (input->is_capturing()) {
-
-			RingBuffer &buf = stream->shared_data.buffer;
-			AudioBuffer b;
-			buf.write_ref(b, frames);
-			b.deinterleave(in, stream->shared_data.num_channels);
-			buf.write_ref_done(b);
-
-			int done = b.length;
-			if (done < (int)frames) {
-				buf.write_ref(b, frames - done);
-				b.deinterleave(&in[stream->shared_data.num_channels * done], stream->shared_data.num_channels);
-				buf.write_ref_done(b);
-			}
-		//}
+		stream->handle_input(in, (int)frames);
 	} else {
-		hui::run_later(0.001f, [=] { stream->session->w("stream callback error"); });
+		hui::run_in_gui_thread([stream] {
+			stream->session->w("stream callback error");
+		});
 	}
 	return 0;
 }

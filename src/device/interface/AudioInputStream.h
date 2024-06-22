@@ -32,6 +32,8 @@ public:
 	AudioInputStream(Session* session, SharedData& shared_data);
 	virtual ~AudioInputStream();
 
+	void handle_input(const float* data, int num_samples);
+
 
 	static constexpr int DEFAULT_CHUNK_SIZE = 512;
 

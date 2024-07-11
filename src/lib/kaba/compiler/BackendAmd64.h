@@ -15,7 +15,7 @@ namespace kaba {
 
 class BackendAmd64 : public BackendX86 {
 public:
-	BackendAmd64(Serializer *serializer);
+	explicit BackendAmd64(Serializer *serializer);
 	~BackendAmd64() override;
 
 	void implement_return(const SerialNodeParam &p) override;

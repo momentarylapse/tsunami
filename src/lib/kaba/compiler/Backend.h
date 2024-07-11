@@ -51,6 +51,8 @@ public:
 
 	bool is_reg_root_used_in_interval(Asm::RegRoot reg_root, int first, int last);
 	int find_unused_reg(int first, int last, int size, Asm::RegRoot exclude = (Asm::RegRoot)-1);
+	int vreg_alloc(int size, Asm::RegID preg = Asm::RegID::INVALID);
+	void vreg_free(int vreg);
 	Asm::RegID reg_resize(Asm::RegID reg, int size);
 
 	SerialNodeParam param_vreg(const Class *type, int vreg, Asm::RegID preg = (Asm::RegID)-1);

@@ -135,7 +135,11 @@ MAKE_OP_FOR(double)
 static int op_int32_mod(int a, int b) { return a % b; }
 static int op_int32_shr(int a, int b) { return a >> b; }
 static int op_int32_shl(int a, int b) { return a << b; }
-//static int op_int32_passthrough(int i) { return i; }
+	//static int op_int32_passthrough(int i) { return i; }
+static int op_int32_and(int a, int b) { return a & b; }
+static int op_int32_or(int a, int b) { return a | b; }
+static int64 op_int64_and(int64 a, int64 b) { return a & b; }
+static int64 op_int64_or(int64 a, int64 b) { return a | b; }
 static int64 op_int64_mod(int64 a, int64 b) { return a % b; }
 static int64 op_int64_shr(int64 a, int64 b) { return a >> b; }
 static int64 op_int64_shl(int64 a, int64 b) { return a << b; }
@@ -604,8 +608,8 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_GREATER_EQUAL, &op_int_ge);
 		add_operator(OperatorID::SMALLER, TypeBool, TypeInt, TypeInt, InlineID::INT32_SMALLER, &op_int_l);
 		add_operator(OperatorID::SMALLER_EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_SMALLER_EQUAL, &op_int_le);
-		add_operator(OperatorID::BIT_AND, TypeInt, TypeInt, TypeInt, InlineID::INT32_AND);
-		add_operator(OperatorID::BIT_OR, TypeInt, TypeInt, TypeInt, InlineID::INT32_OR);
+		add_operator(OperatorID::BIT_AND, TypeInt, TypeInt, TypeInt, InlineID::INT32_AND, &op_int32_and);
+		add_operator(OperatorID::BIT_OR, TypeInt, TypeInt, TypeInt, InlineID::INT32_OR, &op_int32_or);
 		add_operator(OperatorID::SHIFT_RIGHT, TypeInt, TypeInt, TypeInt, InlineID::INT32_SHIFT_RIGHT, &op_int32_shr);
 		add_operator(OperatorID::SHIFT_LEFT, TypeInt, TypeInt, TypeInt, InlineID::INT32_SHIFT_LEFT, &op_int32_shl);
 		add_operator(OperatorID::NEGATIVE, TypeInt, nullptr, TypeInt, InlineID::INT32_NEGATIVE, &op_int_neg);
@@ -633,8 +637,8 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeInt64, TypeInt64, InlineID::INT64_GREATER_EQUAL, &op_int64_ge);
 		add_operator(OperatorID::SMALLER, TypeBool, TypeInt64, TypeInt64, InlineID::INT64_SMALLER, &op_int64_l);
 		add_operator(OperatorID::SMALLER_EQUAL, TypeBool, TypeInt64, TypeInt64, InlineID::INT64_SMALLER_EQUAL, &op_int64_le);
-		add_operator(OperatorID::BIT_AND, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_AND);
-		add_operator(OperatorID::BIT_OR, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_OR);
+		add_operator(OperatorID::BIT_AND, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_AND, &op_int64_and);
+		add_operator(OperatorID::BIT_OR, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_OR, &op_int64_or);
 		add_operator(OperatorID::SHIFT_RIGHT, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_SHIFT_RIGHT, &op_int64_shr);
 		add_operator(OperatorID::SHIFT_LEFT, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_SHIFT_LEFT, &op_int64_shl);
 		add_operator(OperatorID::NEGATIVE, TypeInt64, nullptr, TypeInt64, InlineID::INT64_NEGATIVE, &op_int64_neg);

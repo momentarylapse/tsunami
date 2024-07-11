@@ -14,6 +14,8 @@ const int FULL_CONSTRUCTOR_MAX_PARAMS = 8;
 
 extern const Class* TypeNoValueError;
 
+int type_alignment(const Class* t);
+
 
 AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 	parser = p;
@@ -403,6 +405,7 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 extern const Class* TypeDynamicArray;
 extern const Class* TypeCallableBase;
 
+
 void AutoImplementerInternal::complete_type(Class *t, int array_size, int token_id) {
 
 	auto params = t->param;
@@ -457,8 +460,10 @@ void AutoImplementerInternal::complete_type(Class *t, int array_size, int token_
 	} else if (t->is_product()) {
 		int offset = 0;
 		for (auto&& [i,cc]: enumerate(params)) {
+			int align = type_alignment(cc);
+			offset = mem_align(offset, align);
 			t->elements.add(ClassElement(format("e%d", i), cc, offset));
-			offset += cc->size;
+			offset += mem_align(cc->size, align);
 		}
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_enum()) {

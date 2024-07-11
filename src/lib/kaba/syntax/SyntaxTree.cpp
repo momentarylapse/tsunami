@@ -1355,9 +1355,10 @@ void SyntaxTree::map_local_variables_to_stack() {
 			f->_var_size = 0;
 
 			for (auto v: weak(f->var)) {
-				int s = mem_align(v->type->size, 4);
-				v->_offset = f->_var_size;// + s;
-				f->_var_size += s;
+				int align = (v->type->size > 4) ? 8 : 4;
+				int s = mem_align((int)v->type->size, align);
+				v->_offset = mem_align(f->_var_size, align);
+				f->_var_size = v->_offset + s;
 			}
 		}
 	}

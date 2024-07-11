@@ -16,44 +16,22 @@ namespace Asm {
 
 struct CPUInstructionARM {
 	InstID inst;
-	int code, filter;
+	unsigned code, filter;
 	int p1, p2, p3;
 };
 static Array<CPUInstructionARM> cpu_instructions_arm;
 
 
 
-enum {
-	AP_NONE,
-	AP_REG_0,
-	AP_FREG_0_5,
-	AP_REG_8,
-	AP_REG_12,
-	AP_FREG_12_22,
-	AP_REG_16,
-	AP_REG_16_W21,
-	AP_FREG_16_7,
-	AP_REG_SET,
-	AP_OFFSET24_0,
-	AP_IMM12_0,
-	AP_SHIFTED12_0,
-	AP_DEREF_REG_16_OFFSET,
-	AP_SHIFTER_0X12_I25,
-	AP_XX_R12_W21_UPI23,
-	AP_XX_R12_W21_UPI23_BYTE,
-};
+void add_inst_arm(InstID inst, unsigned int code, unsigned int filter, int param1, int param2 = AP_NONE, int param3 = AP_NONE) {
+	CPUInstructionARM i{
+		.inst = inst,
+		.code = code,
+		.filter = filter,
+		.p1 = param1,
+		.p2 = param2,
+		.p3 = param3};
 
-
-void add_inst_arm(InstID inst, int code, int filter, int param1, int param2 = AP_NONE, int param3 = AP_NONE) {
-	CPUInstructionARM i;
-	i.inst = inst;
-	i.code = code;
-	i.filter = filter;
-	i.p1 = param1;
-	i.p2 = param2;
-	i.p3 = param3;
-
-	//i.name = GetInstructionName(inst);
 	cpu_instructions_arm.add(i);
 }
 
@@ -63,11 +41,19 @@ RegID s_reg(int n) {
 	return (RegID)((int)RegID::S0 + n);
 }
 
+RegID d_reg(int n) {
+	return (RegID)((int)RegID::D0 + n);
+}
+
 RegID r_reg(int n) {
 	return (RegID)((int)RegID::R0 + n);
 }
 
-void arm_init() {
+RegID w_reg(int n) {
+	return (RegID)((int)RegID::W0 + n);
+}
+
+void arm32_init() {
 	registers.clear();
 	for (int i=0; i<16; i++)
 		add_reg(format("r%d", i), r_reg(i), RegGroup::GENERAL, SIZE_32, (RegRoot)((int)RegRoot::R0 + i));
@@ -178,6 +164,156 @@ void arm_init() {
 	add_inst_arm(InstID::FTOSIZS, 0x0ebd0ac0, 0x0fbf0fd0, AP_FREG_12_22, AP_FREG_0_5);
 }
 
+
+
+void arm64_init() {
+	registers.clear();
+	for (int i=0; i<32; i++)
+		add_reg(format("r%d", i), r_reg(i), RegGroup::GENERAL, SIZE_64, (RegRoot)((int)RegRoot::R0 + i));
+	for (int i=0; i<32; i++)
+		add_reg(format("w%d", i), w_reg(i), RegGroup::GENERAL, SIZE_32, (RegRoot)((int)RegRoot::R0 + i));
+	for (int i=0; i<32; i++)
+		add_reg(format("s%d", i), s_reg(i), RegGroup::VFP, SIZE_32, (RegRoot)((int)RegRoot::S0 + i));
+	for (int i=0; i<32; i++)
+		add_reg(format("d%d", i), d_reg(i), RegGroup::VFP, SIZE_64, (RegRoot)((int)RegRoot::S0 + i));
+
+	// create easy to access array
+	register_by_id.clear();
+	for (auto &r: registers) {
+		if (register_by_id.num <= (int)r.id)
+			register_by_id.resize((int)r.id + 1);
+		RegisterByID(r.id) = &r;
+	}
+
+	cpu_instructions_arm.clear();
+
+	// multiple possibilities...
+	add_inst_arm(InstID::MOV,  0x91000000, 0xfffffc00, AP_REG_0P5, AP_REG_5P5); // 64bit
+	add_inst_arm(InstID::MOV,  0xaa0003e0, 0xffe0ffe0, AP_REG_0P5, AP_REG_16P5); // 64bit - mostly for disassembly
+
+	// "sxtw"
+	add_inst_arm(InstID::MOVSX, 0x93407c00, 0xfffffc00, AP_REG_0P5, AP_WREG_5P5);
+
+	add_inst_arm(InstID::SUB,  0xd1000000, 0xff800000, AP_REG_0P5, AP_REG_5P5, AP_IMM12_10SH); // 64bit
+	add_inst_arm(InstID::SUB,  0x51000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_IMM12_10); // 32bit
+	add_inst_arm(InstID::SUB,  0xcb000000, 0xffe00000, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::SUB,  0x4b000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+
+	add_inst_arm(InstID::ADD,  0x8b000000, 0xffe00000, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::ADD,  0x0b000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	add_inst_arm(InstID::ADD,  0x91000000, 0xff800000, AP_REG_0P5, AP_REG_5P5, AP_IMM12_10SH); // 64bit
+	add_inst_arm(InstID::ADD,  0x11000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_IMM12_10); // 32bit
+
+	add_inst_arm(InstID::MUL,  0x9b007c00, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	add_inst_arm(InstID::MUL,  0x1b007c00, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+
+	// signed:
+	add_inst_arm(InstID::DIV, 0x9ac00c00, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::DIV, 0x1ac00c00, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	// unsigned:
+	//add_inst_arm(InstID::UDIV, 0x9ac00c00, 0xffe0fc0, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	//add_inst_arm(InstID::UDIV, 0x1ac00c00, 0xffe0fc0, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+
+	add_inst_arm(InstID::XOR, 0xca000000, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::XOR, 0x4a000000, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	add_inst_arm(InstID::OR, 0xaa000000, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::OR, 0x2a000000, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	add_inst_arm(InstID::AND, 0x8a000000, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::AND, 0x0a000000, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+
+	// "lsl"
+	add_inst_arm(InstID::SHL, 0x9ac02000, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::SHL, 0x1ac02000, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+	// "lsr"
+	add_inst_arm(InstID::SHR, 0x9ac02400, 0xffe0fc00, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::SHR, 0x1ac02400, 0xffe0fc00, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+
+	add_inst_arm(InstID::STR,  0xf9000000, 0xffc00000, AP_REG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM12P10); // 64bit
+	add_inst_arm(InstID::STR,  0xb9000000, 0xffc00000, AP_WREG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM12P10); // 32bit
+	add_inst_arm(InstID::STUR,  0xf8000000, 0xffe00000, AP_REG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM9P12); // 64bit
+	add_inst_arm(InstID::STUR,  0xb8000000, 0xffe00000, AP_REG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM9P12); // 32bit
+	add_inst_arm(InstID::STRB,  0x39000000, 0xffe00000, AP_WREG_0P5, AP_DEREF_S8_REG_5P5_PLUS_IMM12P10); // 8bit
+
+	add_inst_arm(InstID::STP_POSTINDEX, 0xa8800000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+	add_inst_arm(InstID::STP_PREINDEX, 0xa9800000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+	add_inst_arm(InstID::STP, 0xa9000000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+	// p[2] = [Rn + imm7@15 * 4/8] (32bit / 64bit)
+
+	add_inst_arm(InstID::LDR,  0xb9400000, 0xffc00000, AP_WREG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM12P10); // 32bit
+	add_inst_arm(InstID::LDR,  0xf9400000, 0xffc00000, AP_REG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM12P10); // 64bit
+	add_inst_arm(InstID::LDUR,  0xf8400000, 0xffe00000, AP_REG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM9P12); // 64bit
+	add_inst_arm(InstID::LDUR,  0xb8400000, 0xffe00000, AP_REG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM9P12); // 32bit
+	add_inst_arm(InstID::LDRB,  0x39400000, 0xffe00000, AP_WREG_0P5, AP_DEREF_S8_REG_5P5_PLUS_IMM12P10); // 8bit
+
+	add_inst_arm(InstID::LDP_POSTINDEX,  0xa8c00000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+	add_inst_arm(InstID::LDP_PREINDEX,  0xa9c00000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+	add_inst_arm(InstID::LDP,  0xa9400000, 0xffc00000, AP_REG_0P5, AP_REG_10P5, AP_DEREF_S128_REG_5P5_PLUS_IMM7P15); // 64bit
+
+	add_inst_arm(InstID::LDRSW,  0xb8800400, 0xffe00c00, AP_REG_0P5, AP_REG_5P5, AP_IMM9_12);
+	add_inst_arm(InstID::LDRSW,  0xb9800000, 0xffe00000, AP_REG_0P5, AP_REG_5P5, AP_IMM12_10);
+
+	add_inst_arm(InstID::RET, 0xd65f03c0, 0xffffffff, AP_NONE);
+	add_inst_arm(InstID::RET, 0xd65f0000, 0xfffffc1f, AP_REG_5P5);
+
+	add_inst_arm(InstID::ADR, 0x10000000, 0x9f000000, AP_REG_0P5);
+	add_inst_arm(InstID::ADRP, 0x90000000, 0x9f000000, AP_REG_0P5);
+
+	add_inst_arm(InstID::MOV, 0xd2800000, 0xff800000, AP_REG_0P5, AP_IMM16E2_5); // 64bit
+	add_inst_arm(InstID::MOV, 0x52800000, 0xff800000, AP_WREG_0P5, AP_IMM16E2_5); // 32bit
+
+	add_inst_arm(InstID::BL, 0x94000000, 0xfc000000, AP_IMM26X4REL_0);
+	add_inst_arm(InstID::B, 0x14000000, 0xfc000000, AP_IMM26X4REL_0);
+	add_inst_arm(InstID::BLR, 0xd63f0000, 0xfffffc1f, AP_REG_5P5);
+	add_inst_arm(InstID::B, 0x54000000, 0xff000010, AP_IMM19X4REL_5, AP_IMM4_0);
+
+	add_inst_arm(InstID::SUBS, 0xeb000000, 0xffe00000, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64bit
+	add_inst_arm(InstID::SUBS, 0x6b000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32bit
+
+	add_inst_arm(InstID::CSET, 0x9a9f07e0, 0xffff0fe0, AP_REG_0P5, AP_IMM4_12); // 64bit
+	add_inst_arm(InstID::CSET, 0x1a9f07e0, 0xffff0fe0, AP_WREG_0P5, AP_IMM4_12); // 32bit
+
+	add_inst_arm(InstID::TBZ, 0x36000000, 0xff000000, AP_WREG_0P5, AP_IMM4_19, AP_IMM14X4REL_5);
+	add_inst_arm(InstID::TBNZ, 0x37000000, 0xff000000, AP_WREG_0P5, AP_IMM4_19, AP_IMM14X4REL_5);
+
+	add_inst_arm(InstID::AND, 0x92000000, 0xff800000, AP_REG_0P5, AP_REG_5P5, AP_IMM13SRNMASK_10); // 64bit
+	add_inst_arm(InstID::AND, 0x12000000, 0xff800000, AP_WREG_0P5, AP_WREG_5P5, AP_IMM13SRNMASK_10); // 32bit
+	add_inst_arm(InstID::AND, 0x8a000000, 0xffe00000, AP_REG_0P5, AP_REG_5P5, AP_REG_16P5); // 64 bit
+	add_inst_arm(InstID::AND, 0x0a000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_WREG_16P5); // 32 bit
+
+	add_inst_arm(InstID::FMOV, 0x1e204000, 0xfffffc00, AP_SREG_0P5, AP_SREG_5P5); // f32
+	add_inst_arm(InstID::FMOV, 0x1e604000, 0xfffffc00, AP_DREG_0P5, AP_DREG_5P5); // f64
+	add_inst_arm(InstID::FMOV, 0x1e201000, 0xffe01fe0, AP_SREG_0P5, AP_IMM8F32_13); // f32
+	add_inst_arm(InstID::FMOV, 0x1e601000, 0xffe01fe0, AP_DREG_0P5, AP_IMM8F64_13); // f64
+
+	add_inst_arm(InstID::FMOV, 0x1e270000, 0xfffffc00, AP_SREG_0P5, AP_WREG_5P5); // f32
+	add_inst_arm(InstID::FMOV, 0x9e670000, 0xfffffc00, AP_DREG_0P5, AP_REG_5P5); // f64
+	add_inst_arm(InstID::FMOV, 0x1e260000, 0xfffffc00, AP_WREG_0P5, AP_SREG_5P5); // f32
+	add_inst_arm(InstID::FMOV, 0x9e660000, 0xfffffc00, AP_REG_0P5, AP_DREG_5P5); // f64
+
+	add_inst_arm(InstID::STR, 0xbd000000, 0xffe00000, AP_SREG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM12P10); // f32
+	add_inst_arm(InstID::STR, 0xfd000000, 0xffe00000, AP_DREG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM12P10); // f64
+	add_inst_arm(InstID::LDR, 0xbd400000, 0xffe00000, AP_SREG_0P5, AP_DEREF_S32_REG_5P5_PLUS_IMM12P10); // f32
+	add_inst_arm(InstID::LDR, 0xfd400000, 0xffe00000, AP_DREG_0P5, AP_DEREF_S64_REG_5P5_PLUS_IMM12P10); // f64
+	add_inst_arm(InstID::FADD, 0x1e202800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f32
+	add_inst_arm(InstID::FADD, 0x1e602800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f64
+	add_inst_arm(InstID::FSUB, 0x1e203800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f32
+	add_inst_arm(InstID::FSUB, 0x1e603800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f64
+	add_inst_arm(InstID::FMUL, 0x1e200800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f32
+	add_inst_arm(InstID::FMUL, 0x1e600800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f64
+	add_inst_arm(InstID::FDIV, 0x1e201800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f32
+	add_inst_arm(InstID::FDIV, 0x1e601800, 0xffe0fc00, AP_SREG_0P5, AP_SREG_5P5, AP_SREG_16P5); // f64
+
+	add_inst_arm(InstID::FCMP, 0x1e202000, 0xffe0fc1f, AP_SREG_5P5, AP_SREG_16P5); // f32
+	add_inst_arm(InstID::FCMP, 0x1e602000, 0xffe0fc1f, AP_DREG_5P5, AP_DREG_16P5); // f64
+
+	add_inst_arm(InstID::SCVTF, 0x1e220000, 0xfffffc00, AP_SREG_0P5, AP_WREG_5P5); // i32 -> f32
+	add_inst_arm(InstID::SCVTF, 0x1e620000, 0xfffffc00, AP_DREG_0P5, AP_WREG_5P5); // i32 -> f64
+	add_inst_arm(InstID::SCVTF, 0x9e220000, 0xfffffc00, AP_SREG_0P5, AP_REG_5P5); // i64 -> f32
+	add_inst_arm(InstID::SCVTF, 0x9e620000, 0xfffffc00, AP_DREG_0P5, AP_REG_5P5); // i64 -> f64
+
+	add_inst_arm(InstID::FCVTZS, 0x1e380000, 0xfffffc00, AP_WREG_0P5, AP_SREG_5P5); // f32 -> i32
+}
+
 const int NUM_ARM_DATA_INSTRUCTIONS = 32;
 
 InstID ARM_DATA_INSTRUCTIONS[NUM_ARM_DATA_INSTRUCTIONS] = {
@@ -260,6 +396,15 @@ InstructionParam param_xxx(int code, bool bb) {
 	return p;
 }
 
+int64 arm_imm_float_encode(unsigned int i, int N) {
+	const int E = (N == 64) ? 11 : 8;
+	const int F = N - E - 1;
+	int64 ff = (i & 0x80) << (N - 8) | ((~i) & 0x40) << (N - 8) | (i & 0x30) << (F - 4) | (i & 0x0f) << (F - 4);
+	for (int k=0; k<E-3; k++)
+		ff |= (i & 0x40) << (F - 4 + k);
+	return ff;
+}
+
 InstructionParam disarm_param(int code, int p) {
 	if (p == AP_FREG_0_5) {
 		int fm = (code & 0x0000000f) << 1;
@@ -279,8 +424,59 @@ InstructionParam disarm_param(int code, int p) {
 	} else if (p == AP_REG_0) {
 		int fm = (code & 0x0000000f);
 		return param_reg(r_reg(fm));
+	} else if (p == AP_REG_0P5) {
+		int fm = (code & 0x0000001f);
+		return param_reg(r_reg(fm));
+	} else if (p == AP_WREG_0P5) {
+		int fm = (code & 0x0000001f);
+		return param_reg(w_reg(fm));
+	} else if (p == AP_SREG_0P5) {
+		int fm = (code & 0x0000001f);
+		return param_reg(s_reg(fm));
+	} else if (p == AP_DREG_0P5) {
+		int fm = (code & 0x0000001f);
+		return param_reg(d_reg(fm));
+	} else if (p == AP_REG_5P5) {
+		int fm = (code & 0x000003e0) >> 5;
+		return param_reg(r_reg(fm));
+	} else if (p == AP_DEREF_S64_REG_5P5_PLUS_IMM12P10 or p == AP_DEREF_S32_REG_5P5_PLUS_IMM12P10 or p == AP_DEREF_S8_REG_5P5_PLUS_IMM12P10) {
+		int fm = (code & 0x000003e0) >> 5;
+		int imm = (code & 0x003ffc00) >> 10;
+		int size = SIZE_64;
+		if (p == AP_DEREF_S32_REG_5P5_PLUS_IMM12P10)
+			size = SIZE_32;
+		if (p == AP_DEREF_S8_REG_5P5_PLUS_IMM12P10)
+			size = SIZE_8;
+		return param_deref_reg_shift(r_reg(fm), imm * size, size);
+	} else if (p == AP_DEREF_S64_REG_5P5_PLUS_IMM9P12 or p == AP_DEREF_S32_REG_5P5_PLUS_IMM9P12) {
+		int fm = (code & 0x000003e0) >> 5;
+		int imm = (code & 0x001ff000) >> 12;
+		if (imm & 0x100)
+			imm |= 0xffffff00;
+		int size = SIZE_64;
+		if (p == AP_DEREF_S32_REG_5P5_PLUS_IMM9P12)
+			size = SIZE_32;
+		return param_deref_reg_shift(r_reg(fm), imm, size); // UNSCALED!
+	} else if (p == AP_DEREF_S128_REG_5P5_PLUS_IMM7P15) {
+		int fm = (code & 0x000003e0) >> 5;
+		int imm = (code & 0x003f8000) >> 15;
+		if (imm & 0x40)
+			imm |= 0xffffff80;
+		return param_deref_reg_shift(r_reg(fm), imm * 8, SIZE_128);
+	} else if (p == AP_WREG_5P5) {
+		int fm = (code & 0x000003e0) >> 5;
+		return param_reg(w_reg(fm));
+	} else if (p == AP_SREG_5P5) {
+		int fm = (code & 0x000003e0) >> 5;
+		return param_reg(s_reg(fm));
+	} else if (p == AP_DREG_5P5) {
+		int fm = (code & 0x000003e0) >> 5;
+		return param_reg(d_reg(fm));
 	} else if (p == AP_REG_8) {
 		int fm = (code & 0x00000f00) >> 8;
+		return param_reg(r_reg(fm));
+	} else if (p == AP_REG_10P5) {
+		int fm = (code & 0x0000fc00) >> 10;
 		return param_reg(r_reg(fm));
 	} else if (p == AP_REG_12) {
 		int fd = (code & 0x0000f000) >> 12;
@@ -288,6 +484,18 @@ InstructionParam disarm_param(int code, int p) {
 	} else if (p == AP_REG_16) {
 		int fn = (code & 0x000f0000) >> 16;
 		return param_reg(r_reg(fn));
+	} else if (p == AP_REG_16P5) {
+		int fn = (code & 0x001f0000) >> 16;
+		return param_reg(r_reg(fn));
+	} else if (p == AP_WREG_16P5) {
+		int fn = (code & 0x001f0000) >> 16;
+		return param_reg(w_reg(fn));
+	} else if (p == AP_SREG_16P5) {
+		int fn = (code & 0x001f0000) >> 16;
+		return param_reg(s_reg(fn));
+	} else if (p == AP_DREG_16P5) {
+		int fn = (code & 0x001f0000) >> 16;
+		return param_reg(d_reg(fn));
 	} else if (p == AP_REG_16_W21) {
 		int fm = (code & 0x000f0000) >> 16;
 		auto p = param_reg(r_reg(fm));
@@ -310,6 +518,47 @@ InstructionParam disarm_param(int code, int p) {
 		return param_xxx(code, true);
 	} else if (p == AP_REG_SET) {
 		return param_reg_set(code & 0xffff);
+	} else if (p == AP_IMM12_10) {
+		return param_imm((code & 0x003ffc00) >> 10, SIZE_64);
+	} else if (p == AP_IMM16E2_5) {
+		int e = (code & 0x00600000) >> 21;
+		return param_imm(((int64)(code & 0x001fffe0) >> 5) << (e * 16), SIZE_64);
+	} else if (p == AP_IMM12_10SH) {
+		if (code & 0x00400000)
+			return param_imm((code & 0x003ffc00) << 2, SIZE_64);
+		else
+			return param_imm((code & 0x003ffc00) >> 10, SIZE_64);
+	} else if (p == AP_IMM9_12) {
+		return param_imm((code & 0x001ff000) >> 12, SIZE_64);
+	} else if (p == AP_IMM4_0) {
+		return param_imm((code & 0x0000000f), SIZE_8);
+	} else if (p == AP_IMM4_12) {
+		return param_imm((code & 0x0000f000) >> 12, SIZE_8);
+	} else if (p == AP_IMM4_19) {
+		return param_imm((code & 0x00780000) >> 19, SIZE_8);
+	} else if (p == AP_IMM8F32_13) {
+		unsigned int i = (code & 0x001fe000) >> 13;
+		return param_imm(arm_imm_float_encode(i, 32), SIZE_32);
+	} else if (p == AP_IMM8F64_13) {
+		unsigned int i = (code & 0x001fe000) >> 13;
+		return param_imm(arm_imm_float_encode(i, 64), SIZE_64);
+	} if (p == AP_IMM13SRNMASK_10) {
+		unsigned int s = (code & 0x0000fc00) >> 10; // how many 1s (-1)
+		unsigned int r = (code & 0x003f0000) >> 10; // 0s but negative TODO use
+		int64 mask = 0xffffffffffffffff >> (64 - s - 1);
+		return param_imm(mask, SIZE_64);
+	} else if (p == AP_IMM26X4REL_0) {
+		if (code & 0x02000000) // sign
+			return param_imm((code & 0x03ffffff) << 2 | 0xfffffffffc000000, SIZE_64);
+		return param_imm((code & 0x03ffffff) << 2, SIZE_64);
+	} else if (p == AP_IMM14X4REL_5) {
+		if (code & 0x00040000) // sign
+			return param_imm(((code & 0x0007ffe0) >> 5) << 2 | 0xffffffffffff0000, SIZE_64);
+		return param_imm(((code & 0x0007ffe0) >> 5) << 2, SIZE_64);
+	} else if (p == AP_IMM19X4REL_5) {
+		if (code & 0x00800000) // sign
+			return param_imm(((code & 0x00ffffe0) >> 5) << 2 | 0xffffffffffe00000, SIZE_64);
+		return param_imm(((code & 0x00ffffe0) >> 5) << 2, SIZE_64);
 	} else if (p != AP_NONE) {
 		msg_error("disasm_param... unhandled " + i2s(p));
 	}
@@ -340,15 +589,18 @@ string arm_disassemble(void *_code_,int length,bool allow_comments) {
 	for (int ni=0; ni<length/4; ni++) {
 		int cur = code[ni];
 
-		[[maybe_unused]] int x = (cur >> 25) & 0x7;
+	//	[[maybe_unused]] int x = (cur >> 25) & 0x7;
 
 		buf += i2h(cur, 4);
 		buf += "    ";
 
 		InstructionWithParams iwp;
 		iwp = disarm_general(cur);
-		iwp.condition = (ArmCond)((cur >> 28) & 0xf);
-
+		if (instruction_set.set == InstructionSet::ARM64) {
+			iwp.condition = ArmCond::Always;
+		} else {
+			iwp.condition = (ArmCond)((cur >> 28) & 0xf);
+		}
 
 		buf += iwp.str() + "\n";
 	}
@@ -356,9 +608,16 @@ string arm_disassemble(void *_code_,int length,bool allow_comments) {
 }
 
 int arm_reg_no(Register *r) {
-	if (r)
-		if (((int)r->id >= (int)RegID::R0) and ((int)r->id <= (int)RegID::R15))
+	if (r) {
+		if (((int)r->id >= (int)RegID::R0) and ((int)r->id <= (int)RegID::R31))
 			return (int)r->id - (int)RegID::R0;
+		if (((int)r->id >= (int)RegID::W0) and ((int)r->id <= (int)RegID::W31))
+			return (int)r->id - (int)RegID::W0;
+		if (((int)r->id >= (int)RegID::S0) and ((int)r->id <= (int)RegID::S31))
+			return (int)r->id - (int)RegID::S0;
+		if (((int)r->id >= (int)RegID::D0) and ((int)r->id <= (int)RegID::D31))
+			return (int)r->id - (int)RegID::D0;
+	}
 	raise_error("ARM: invalid register: " + r->name);
 	return -1;
 }
@@ -463,7 +722,7 @@ inline bool label_after_now(InstructionWithParamsList *list, int label_no, int n
 	return list->label[label_no].inst_no > now;
 }
 
-void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n) {
+void InstructionWithParamsList::add_instruction_arm32(char *oc, int &ocs, int n) {
 	InstructionWithParams &iwp = (*this)[n];
 	current_inst = n;
 	state.reset(this);
@@ -625,11 +884,202 @@ void InstructionWithParamsList::add_instruction_arm(char *oc, int &ocs, int n) {
 		}
 	} else if (arm_ass_gen(iwp, code)) {
 	} else {
-		raise_error("cannot assemble instruction: " + iwp.str());
+		raise_error("can not assemble instruction: " + iwp.str());
 	}
 
 	*(int*)&oc[ocs] = code;
 	ocs += 4;
 }
 
+
+bool arm_encode_imm(unsigned int&code, int pf, int64 value, bool already_relative) {
+	if (pf == AP_IMM12_10SH) {
+		if ((value & 0xfffffffffffff000) == 0)
+			code |= value << 10;
+		else if ((value & 0xffffffffff000fff) == 0)
+			code |= value >> 2;
+		else
+			return false; //raise_error("immediate not supported");
+		return true;
+	} else if (pf == AP_IMM12_10) {
+		if ((value & 0xfffffffffffff000) == 0)
+			code |= (int)value << 10;
+		else
+			return false;
+		return true;
+	} else if (pf == AP_IMM4_0) {
+		if ((value & 0xfffffffffffffff0) == 0)
+			code |= (int)value;
+		else
+			return false;
+		return true;
+	} else if (pf == AP_IMM4_12) {
+		if ((value & 0xfffffffffffffff0) == 0)
+			code |= (unsigned int)value << 12;
+		else
+			return false;
+		return true;
+	} else if (pf == AP_IMM16E2_5) {
+		if ((value & 0xffffffffffff0000) == 0)
+			code |= (int)value << 5;
+		else if ((value & 0xffffffff0000ffff) == 0)
+			code |= (unsigned int)(value >> (16 - 5)) & 0x001fffe0 | 0x00200000;
+		else if ((value & 0xffff0000ffffffff) == 0)
+			code |= (unsigned int)(value >> (32 - 5)) & 0x001fffe0 | 0x00400000;
+		else if ((value & 0x0000ffffffffffff) == 0)
+			code |= (unsigned int)(value >> (48 - 5)) & 0x001fffe0 | 0x00600000;
+		else
+			return false;
+		return true;
+	} else if (pf == AP_IMM13SRNMASK_10) {
+		// TODO!
+		if (value == 0x01)
+			return true;
+		return false;
+	} else if (pf == AP_IMM26X4REL_0 or pf == AP_IMM19X4REL_5 or pf == AP_IMM14X4REL_5) {
+		int bits = 26;
+		int offset = 0;
+		if (pf == AP_IMM19X4REL_5) {
+			bits = 19;
+			offset = 5;
+		} else if (pf == AP_IMM14X4REL_5) {
+			bits = 14;
+			offset = 5;
+		}
+		int64 val = value;
+		if (!already_relative)
+			// TODO use CurrentMetaInfo->code_origin
+			val = value - (int_p)&code; // relative to rip
+		//if ((val & 0xfffffffff0000003) == 0)
+		if ((val < (2<<(bits+2))) and (val >= -((int64)2<<(bits+2))))
+			code |= (((unsigned int)(val) >> 2) & (0xffffffff >> (32 - bits))) << offset;
+		else
+			return false;
+		return true;
+	}
+	//msg_write("WRONG IMM");
+	return false;
+}
+
+bool apply_param(InstructionWithParamsList& list, int ocs, unsigned int&code, const InstructionParam& p, int pf, bool allow_wanted_labels) {
+	if (pf == AP_NONE and p.type == ParamType::NONE)
+		return true;
+	if (p.type == ParamType::REGISTER and !p.deref) {
+		if ((pf == AP_REG_0P5 or pf == AP_REG_5P5 or pf == AP_REG_10P5 or pf == AP_REG_16P5) and (p.reg->id >= RegID::R0 and p.reg->id <= RegID::R31)) {
+			auto r = arm_reg_no(p.reg);
+			if (pf == AP_REG_0P5)
+				code |= r << 0;
+			else if (pf == AP_REG_5P5)
+				code |= r << 5;
+			else if (pf == AP_REG_10P5)
+				code |= r << 10;
+			else if (pf == AP_REG_16P5)
+				code |= r << 16;
+			return true;
+		}
+		if ((pf == AP_WREG_0P5 or pf == AP_WREG_5P5 or pf == AP_WREG_16P5) and (p.reg->id >= RegID::W0 and p.reg->id <= RegID::W31)) {
+			auto r = arm_reg_no(p.reg);
+			if (pf == AP_WREG_0P5)
+				code |= r << 0;
+			else if (pf == AP_WREG_5P5)
+				code |= r << 5;
+			else if (pf == AP_WREG_16P5)
+				code |= r << 16;
+			return true;
+		}
+		if ((pf == AP_SREG_0P5 or pf == AP_SREG_5P5 or pf == AP_SREG_16P5) and (p.reg->id >= RegID::S0 and p.reg->id <= RegID::S31)) {
+			auto r = arm_reg_no(p.reg);
+			if (pf == AP_SREG_0P5)
+				code |= r << 0;
+			else if (pf == AP_SREG_5P5)
+				code |= r << 5;
+			else if (pf == AP_SREG_16P5)
+				code |= r << 16;
+			return true;
+		}
+		if ((pf == AP_DREG_0P5 or pf == AP_DREG_5P5 or pf == AP_DREG_16P5) and (p.reg->id >= RegID::D0 and p.reg->id <= RegID::D31)) {
+			auto r = arm_reg_no(p.reg);
+			if (pf == AP_DREG_0P5)
+				code |= r << 0;
+			else if (pf == AP_DREG_5P5)
+				code |= r << 5;
+			else if (pf == AP_DREG_16P5)
+				code |= r << 16;
+			return true;
+		}
+		return false;
+	}
+	if (p.type == ParamType::REGISTER and p.deref) {
+		if ((pf == AP_DEREF_S64_REG_5P5_PLUS_IMM12P10 or pf == AP_DEREF_S32_REG_5P5_PLUS_IMM12P10 or pf == AP_DEREF_S8_REG_5P5_PLUS_IMM12P10) and (p.reg->id >= RegID::R0 and p.reg->id <= RegID::R31)) {
+			int size = SIZE_64;
+			if (pf == AP_DEREF_S32_REG_5P5_PLUS_IMM12P10)
+				size = SIZE_32;
+			if (pf == AP_DEREF_S8_REG_5P5_PLUS_IMM12P10)
+				size = SIZE_8;
+			if ((p.value & (size - 1)) or ((p.value / size) & 0xfffffffffffff000))
+				return false;
+			auto r = arm_reg_no(p.reg);
+			code |= r << 5;
+			code |= ((int)(p.value / size) & 0x00000fff) << 10;
+			return true;
+		}
+		if ((pf == AP_DEREF_S128_REG_5P5_PLUS_IMM7P15) and (p.reg->id >= RegID::R0 and p.reg->id <= RegID::R31)) {
+			if ((p.value & 0x07) or (p.value & 0xfffffffffffffc00))
+				return false;
+			auto r = arm_reg_no(p.reg);
+			code |= r << 5;
+			code |= ((int)(p.value / SIZE_64) & 0x0000007f) << 15;
+			return true;
+		}
+		return false;
+	}
+	if (p.type == ParamType::IMMEDIATE) {
+		if (p.is_label) {
+			if (allow_wanted_labels)
+				list.add_wanted_label(ocs, p.value, ocs/4, true, false, pf);
+			return true;
+		} else {
+			return arm_encode_imm(code, pf, p.value, false);
+		}
+	}
+	return false;
+}
+
+void InstructionWithParamsList::add_instruction_arm64(char *oc, int &ocs, int n) {
+	InstructionWithParams &iwp = (*this)[n];
+	current_inst = n;
+	state.reset(this);
+
+	if (iwp.inst == InstID::ALIGN_OPCODE)
+		return;
+
+	unsigned int& code = *(unsigned int*)&oc[ocs];
+	code = 0;
+	bool found = false;
+
+	//msg_write("assemble: " + iwp.str());
+
+	for (const auto& i: cpu_instructions_arm)
+		if (i.inst == iwp.inst) {
+			//msg_write("...");
+			code = i.code;
+			if (!apply_param(*this, ocs, code, iwp.p[0], i.p1, false))
+				continue;
+			if (!apply_param(*this, ocs, code, iwp.p[1], i.p2, false))
+				continue;
+			if (!apply_param(*this, ocs, code, iwp.p[2], i.p3, false))
+				continue;
+			found = true;
+
+			apply_param(*this, ocs, code, iwp.p[0], i.p1, true);
+			apply_param(*this, ocs, code, iwp.p[1], i.p2, true);
+			apply_param(*this, ocs, code, iwp.p[2], i.p3, true);
+			break;
+		}
+
+	if (!found)
+		raise_error("can not assemble instruction: " + iwp.str());
+
+	ocs += 4;
+}
 };

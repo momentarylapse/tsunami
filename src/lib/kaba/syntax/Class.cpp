@@ -76,8 +76,8 @@ bool Class::fully_parsed() const {
 	return flags_has(flags, Flags::FULLY_PARSED);
 }
 
-bool Class::_amd64_allow_pass_in_xmm() const {
-	return flags_has(flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+bool Class::_return_in_float_registers() const {
+	return flags_has(flags, Flags::RETURN_IN_FLOAT_REGISTERS);
 }
 
 bool reachable_from(const Class *ns, const Class *observer_ns) {
@@ -224,7 +224,7 @@ bool Class::uses_call_by_reference() const {
 }
 
 bool Class::uses_return_by_memory() const {
-	if (_amd64_allow_pass_in_xmm())
+	if (_return_in_float_registers())
 		return false;
 	return (!force_call_by_value() and !is_pointer_raw() and !is_reference() and !is_pointer_alias()) or is_array() or is_optional();
 }

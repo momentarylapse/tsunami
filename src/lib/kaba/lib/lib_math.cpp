@@ -404,17 +404,17 @@ void SIAddPackageMath(Context *c) {
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
-		flags_set(((Class*)TypeFloat32)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-		flags_set(((Class*)TypeFloat64)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-		if (config.target.abi == Abi::AMD64_GNU) {
+		flags_set(((Class*)TypeFloat32)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+		flags_set(((Class*)TypeFloat64)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+		if (config.target.abi == Abi::AMD64_GNU or config.target.abi == Abi::ARM64_GNU) {
 			// not on windows!
-			flags_set(((Class*)TypeComplex)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypeVec2)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypeQuaternion)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypeVec3)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypeColor)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypePlane)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
-			flags_set(((Class*)TypeRect)->flags, Flags::AMD64_ALLOW_PASS_IN_XMM);
+			flags_set(((Class*)TypeComplex)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeVec2)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeQuaternion)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeVec3)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeColor)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypePlane)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeRect)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
 		}
 	}
 

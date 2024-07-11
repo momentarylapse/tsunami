@@ -69,6 +69,24 @@ int Backend::find_unused_reg(int first, int last, int size, Asm::RegRoot exclude
 	return -1;
 }
 
+int Backend::vreg_alloc(int size, Asm::RegID preg) {
+	int vreg;
+	if (preg != Asm::RegID::INVALID)
+		vreg = cmd.add_virtual_reg(reg_resize(preg, size));
+	else
+		// TODO simpler search! (only allow linear command creation?)
+		vreg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, size);
+
+	// called before first using command
+	cmd.set_virtual_reg(vreg, cmd.cmd.num, 999999); // start only
+	return vreg;
+}
+
+void Backend::vreg_free(int vreg) {
+	// called after last using command
+	cmd.virtual_reg[vreg].last = cmd.cmd.num - 1;
+}
+
 Asm::RegID Backend::reg_resize(Asm::RegID reg, int size) {
 	if (size == 2) {
 		msg_error("size = 2");

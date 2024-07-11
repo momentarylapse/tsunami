@@ -10,6 +10,7 @@
 #include "BackendAmd64.h"
 #include "BackendX86.h"
 #include "BackendARM.h"
+#include "BackendArm64.h"
 #include "Serializer.h"
 #include "../Interpreter.h"
 #include "../asm/asm.h"
@@ -802,6 +803,8 @@ Backend *create_backend(Serializer *s) {
 		return new BackendAmd64(s);
 	if (config.target.instruction_set == Asm::InstructionSet::X86)
 		return new BackendX86(s);
+	if (config.target.instruction_set == Asm::InstructionSet::ARM64)
+		return new BackendArm64(s);
 	if (config.target.is_arm())
 		return new BackendARM(s);
 	s->module->do_error("unable to create a backend for the architecture");
@@ -823,34 +826,34 @@ void Compiler::assemble_function(int index, Function *f, Asm::InstructionWithPar
 		f->block->show(TypeVoid);
 
 	if (config.target.interpreted) {
-		auto x = new Serializer(module, list);
-		x->cur_func_index = index;
-		x->serialize_function(f);
-		x->fix_return_by_ref();
+		auto serializer = new Serializer(module, list);
+		serializer->cur_func_index = index;
+		serializer->serialize_function(f);
+		serializer->fix_return_by_ref();
 		if (!module->interpreter)
 			module->interpreter = new Interpreter(module);
-		module->interpreter->add_function(f, x);
+		module->interpreter->add_function(f, serializer);
 		return;
 	}
 
 
-	auto x = new Serializer(module, list);
-	x->cur_func_index = index;
-	x->serialize_function(f);
-	x->fix_return_by_ref();
-	auto be = create_backend(x);
+	auto serializer = new Serializer(module, list);
+	serializer->cur_func_index = index;
+	serializer->serialize_function(f);
+	serializer->fix_return_by_ref();
+	auto backend = create_backend(serializer);
 
 	try {
-		be->process(f, index);
-		be->assemble();
+		backend->process(f, index);
+		backend->assemble();
 	} catch (Exception &e) {
 		throw e;
 	} catch (Asm::Exception &e) {
 		throw Exception(e, module, f);
 	}
-	module->functions_to_link.append(be->list->wanted_label);
-	delete be;
-	delete x;
+	module->functions_to_link.append(backend->list->wanted_label);
+	delete backend;
+	delete serializer;
 
 }
 
@@ -903,7 +906,7 @@ void Compiler::compile_functions(char *oc, int &ocs) {
 
 	// assemble into opcode
 	try {
-		list->optimize(oc, ocs);
+//		list->optimize(oc, ocs);
 		list->compile(oc, ocs);
 	} catch(Asm::Exception &e) {
 		list->show();

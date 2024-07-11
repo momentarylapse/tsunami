@@ -349,7 +349,13 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 
 	{InstID::B,		"b"},
 	{InstID::BL,		"bl"},
+	{InstID::BLR,		"blr"},
 	{InstID::BLX,		"blx"},
+	{InstID::TBZ,		"tbz"},
+	{InstID::TBNZ,		"tbnz"},
+	{InstID::ADR,		"adr"},
+	{InstID::ADRP,		"adrp"},
+	{InstID::CSET,		"cset"},
 
 	{InstID::MULS, "muls"},
 	{InstID::ADDS, "adds"},
@@ -366,9 +372,18 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 	{InstID::MVNS, "movns"},
 
 	{InstID::LDR,		"ldr"},
+	{InstID::LDUR,		"ldur"},
 	{InstID::LDRB,		"ldrb"},
+	{InstID::LDRSW,		"ldrsw"},
+	{InstID::LDP,		"ldp"},
+	{InstID::LDP_PREINDEX,		"ldp!"},
+	{InstID::LDP_POSTINDEX,		"ldp_post"},
 //	{inst_str,		"str"},
+	{InstID::STUR,		"stur"},
 	{InstID::STRB,		"strb"},
+	{InstID::STP,		"stp"},
+	{InstID::STP_PREINDEX,		"stp!"},
+	{InstID::STP_POSTINDEX,		"stp_post"},
 
 	{InstID::LDMIA,		"ldmia"},
 	{InstID::LDMIB,		"ldmib"},
@@ -418,6 +433,10 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 	{InstID::FMSR,	"fmsr"},
 	{InstID::FLDS,	"flds"},
 	{InstID::FSTS,	"fsts"},
+	{InstID::FMOV,	"fmov"},
+	{InstID::FCMP,	"fcmp"},
+	{InstID::SCVTF,	"scvtf"},
+	{InstID::FCVTZS,	"fcvtzs"},
 
 	{InstID::MODULO, "modulo"},
 	{InstID::LABEL, "-label-"},
@@ -763,8 +782,10 @@ void init(InstructionSet set) {
 		if (instruction_names[i].inst != (InstID)i)
 			msg_error(format("%s  %d  !=  %d", instruction_names[i].name, (int)instruction_names[i].inst, i));
 
-	if ((set == InstructionSet::ARM32) || (set == InstructionSet::ARM64))
-		arm_init();
+	if (set == InstructionSet::ARM32)
+		arm32_init();
+	else if (set == InstructionSet::ARM64)
+		arm64_init();
 	else if ((set == InstructionSet::X86) || (set == InstructionSet::AMD64))
 		x86_init();
 
@@ -1168,6 +1189,7 @@ void parse_parameter(InstructionParam &p, const string &param, InstructionWithPa
 		raise_error("unknown parameter:  \"" + param + "\"\n");
 }
 
+
 void insert_val(char *oc, int &ocs, int64 val, int size) {
 	if (size == SIZE_8) {
 		oc[ocs] = (char)val;
@@ -1184,6 +1206,9 @@ void insert_val(char *oc, int &ocs, int64 val, int size) {
 		*(int*)&oc[ocs - 2] = (*(int*)&oc[ocs - 2] & 0xfffff000) | ((int)val & 0x00000fff);
 	} else if (size == SIZE_12) {
 		*(int*)&oc[ocs - 2] = (*(int*)&oc[ocs - 2] & 0xfffff000) | ((int)val & 0x00000fff);
+	} else if (size == AP_IMM26X4REL_0 or size == AP_IMM19X4REL_5 or size == AP_IMM14X4REL_5) {
+		if (!arm_encode_imm(*(unsigned int*)&oc[ocs], size, val, true))
+			msg_error("failed to insert target location");
 	} else if (size == SIZE_8S2) {
 		oc[ocs] = (char)(val >> 2);
 	} else if (size > 0) {
@@ -1205,14 +1230,16 @@ void InstructionWithParamsList::link_wanted_labels(void *oc) {
 				size = 2;
 			if (size == SIZE_8S2)
 				size = 1;
+			if (size == AP_IMM26X4REL_0 or size == AP_IMM19X4REL_5 or size == AP_IMM14X4REL_5)
+				size = -4;
 
 			// TODO first byte after command
-			if (instruction_set.set == InstructionSet::ARM32) { // ARM64?!?
+			if (instruction_set.set == InstructionSet::ARM32 or instruction_set.set == InstructionSet::ARM64) {
 				value -= CurrentMetaInfo->code_origin + w.pos + size + 4;
-				InstID inst = (*this)[w.inst_no].inst;
+			/*	InstID inst = (*this)[w.inst_no].inst;
 				if ((inst == InstID::BL) or (inst == InstID::B) or (inst == InstID::CALL) or (inst == InstID::JMP)) {
 					value = value >> 2;
-				}
+				}*/
 			} else {
 				value -= CurrentMetaInfo->code_origin + w.pos + size;
 			}
@@ -1605,8 +1632,10 @@ void InstructionWithParamsList::compile(void *oc, int &ocs) {
 			break;
 
 		// opcode
-		if ((instruction_set.set == InstructionSet::ARM32) or (instruction_set.set == InstructionSet::ARM64))
-			add_instruction_arm((char*)oc, ocs, i);
+		if (instruction_set.set == InstructionSet::ARM64)
+			add_instruction_arm64((char*)oc, ocs, i);
+		else if (instruction_set.set == InstructionSet::ARM32)
+			add_instruction_arm32((char*)oc, ocs, i);
 		else
 			add_instruction((char*)oc, ocs, i);
 	}

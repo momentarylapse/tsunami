@@ -11,6 +11,7 @@
 #include "../CompilerConfiguration.h"
 
 
+
 #if 0
 #include "../../os/msg.h"
 void db_out(const string &s) {
@@ -29,7 +30,9 @@ extern const Class *TypeCallableBase;
 #define CALL_DEBUG_X		0
 
 // call-by-reference dummy
-class CBR {};
+class CBR {
+	int _dummy_[1024];
+};
 
 class vec2 { float a; float b; };
 class vec3 { float a; float b; float c; };
@@ -41,7 +44,7 @@ void call0_void(void *ff, void *ret, const Array<void*> &param) {
 
 template<class R>
 void call0(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,R>::value) {
+	if constexpr (std::is_same<CBR,R>::value) {
 		//msg_write("CBR return (1p)!!!");
 		((void(*)(void*))ff)(ret);
 	} else {
@@ -51,7 +54,7 @@ void call0(void *ff, void *ret, const Array<void*> &param) {
 
 template<class A>
 void call1_void_x(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,A>::value) {
+	if constexpr (std::is_same<CBR,A>::value) {
 		db_out("CBR -> void");
 		((void(*)(void*))ff)(param[0]);
 	} else {
@@ -62,8 +65,8 @@ void call1_void_x(void *ff, void *ret, const Array<void*> &param) {
 
 template<class R, class A>
 void call1(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,R>::value) {
-		if (std::is_same<CBR,A>::value) {
+	if constexpr (std::is_same<CBR,R>::value) {
+		if constexpr (std::is_same<CBR,A>::value) {
 			db_out("CBR -> CBR");
 			((void(*)(void*, void*))ff)(ret, param[0]);
 		} else {
@@ -71,7 +74,7 @@ void call1(void *ff, void *ret, const Array<void*> &param) {
 			((void(*)(void*, A))ff)(ret, *(A*)param[0]);
 		}
 	} else {
-		if (std::is_same<CBR,A>::value) {
+		if constexpr (std::is_same<CBR,A>::value) {
 			db_out("CBR -> x");
 			*(R*)ret = ((R(*)(void*))ff)(param[0]);
 		} else {
@@ -83,11 +86,11 @@ void call1(void *ff, void *ret, const Array<void*> &param) {
 
 template<class R, class A, class B>
 void call2(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,R>::value) {
-		if (std::is_same<CBR,A>::value and std::is_same<CBR,B>::value) {
+	if constexpr (std::is_same<CBR,R>::value) {
+		if constexpr (std::is_same<CBR,A>::value and std::is_same<CBR,B>::value) {
 			db_out("CBR CBR -> CBR");
 			((void(*)(void*, void*, void*))ff)(ret, param[0], param[1]);
-		} else if (std::is_same<CBR,A>::value) {
+		} else if constexpr (std::is_same<CBR,A>::value) {
 			db_out("CBR x -> CBR");
 			((void(*)(void*, void*, B))ff)(ret, param[0], *(B*)param[1]);
 		} else {
@@ -96,7 +99,7 @@ void call2(void *ff, void *ret, const Array<void*> &param) {
 		}
 
 	} else {
-		if (std::is_same<CBR,A>::value) {
+		if constexpr (std::is_same<CBR,A>::value) {
 			db_out("CBR x -> x");
 			*(R*)ret = ((R(*)(void*, B))ff)(param[0], *(B*)param[1]);
 		} else {
@@ -108,7 +111,7 @@ void call2(void *ff, void *ret, const Array<void*> &param) {
 
 template<class R, class A, class B, class C>
 void call3(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,R>::value) {
+	if constexpr (std::is_same<CBR,R>::value) {
 		((void(*)(void*, A, B, C))ff)(ret, *(A*)param[0], *(B*)param[1], *(C*)param[2]);
 	} else {
 		*(R*)ret = ((R(*)(A, B, C))ff)(*(A*)param[0], *(B*)param[1], *(C*)param[2]);
@@ -117,12 +120,130 @@ void call3(void *ff, void *ret, const Array<void*> &param) {
 
 template<class R, class A, class B, class C, class D>
 void call4(void *ff, void *ret, const Array<void*> &param) {
-	if (std::is_same<CBR,R>::value) {
+	if constexpr (std::is_same<CBR,R>::value) {
 		((void(*)(void*, A, B, C, D))ff)(ret, *(A*)param[0], *(B*)param[1], *(C*)param[2], *(D*)param[3]);
 	} else {
 		*(R*)ret = ((R(*)(A, B, C, D))ff)(*(A*)param[0], *(B*)param[1], *(C*)param[2], *(D*)param[3]);
 	}
 }
+
+#ifdef CPU_ARM64
+bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param, const Class *return_type, const Array<const Class*> &ptype) {
+	const int N = 6; // #regs
+	static int64 temp[N*4+2];
+	memset(&temp, 0, sizeof(temp));
+	// r0..5, s0..5, ret, f, r0:out, s0:out
+
+	temp[N*2+1] = (int_p)ff;
+
+	if (return_type->uses_return_by_memory()) {
+		//msg_write("RET BY MEM");
+		temp[N*2] = (int_p)ret;
+	}
+
+	int nrreg = 0;
+	int nsreg = 0;
+	for (int i=0; i<param.num; i++) {
+		if (ptype[i] == TypeInt32 or ptype[i]->is_enum())
+			temp[nrreg ++] = *(int*)param[i];
+		else if (ptype[i] == TypeInt8 or ptype[i] == TypeBool)
+			temp[nrreg ++] = *(char*)param[i];
+		else if (ptype[i] == TypeInt64 or ptype[i]->is_some_pointer())
+			temp[nrreg ++] = *(int64*)param[i];
+		else if (ptype[i] == TypeFloat32)
+			temp[N + nsreg ++] = *(int*)param[i]; // float
+		else if (ptype[i]->uses_return_by_memory())
+			temp[nrreg ++] = (int_p)param[i];
+		else
+			return false;
+	}
+	if (nrreg >= N or nsreg >= N)
+		return false;
+
+	//msg_write(format("call...  %d %d", nrreg, nsreg));
+
+	int64* p = &temp[0];
+
+	__asm__(
+		"mov x20, %0\n"
+		"ldr x0, [x20]\n" // -> r0
+		"add x20, x20, 0x08\n"
+		"ldr x1, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr x2, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr x3, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr x4, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr x5, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr s0, [x20]\n" // -> s0
+		"add x20, x20, 0x08\n"
+		"ldr s1, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr s2, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr s3, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr s4, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr s5, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"ldr x8, [x20]\n" // -> r8
+		"add x20, x20, 0x08\n"
+		"ldr x7, [x20]\n" // -> fp
+		"add x20, x20, 0x08\n"
+		"blr x7\n"
+		"str x0, [x20]\n" // -> r0:out
+		"add x20, x20, 0x08\n"
+		"str x1, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str x2, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str x3, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str x5, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str x6, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str s0, [x20]\n" // -> s0:out
+		"add x20, x20, 0x08\n"
+		"str s1, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str s2, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str s3, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str s4, [x20]\n"
+		"add x20, x20, 0x08\n"
+		"str s5, [x20]\n"
+		 :
+		 : "r"(p)
+		 : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "s0", "s1", "s2", "s3", "s4", "s5");
+
+	/*msg_write("ok");
+	msg_write(temp[N*2+2]);
+	msg_write(f2s(*(float*)&temp[N*2+3], 3));
+	exit(1);*/
+	//msg_write(bytes(&temp, sizeof(temp)).hex());
+
+	if (return_type == TypeInt or return_type->is_enum()) {
+		*(int*)ret = (int)temp[N*2+2];
+	} else if (return_type == TypeInt64 or return_type->is_some_pointer()) {
+		*(int64*)ret = temp[N*2+2];
+	} else if (return_type == TypeInt8 or return_type == TypeBool) {
+		*(char*)ret = (char)temp[N*2+2];
+	} else if (return_type->_return_in_float_registers()) {
+		//msg_error("ret in float");
+		for (int i=0; i<return_type->size/4; i++)
+			((int*)ret)[i] = (int)temp[N*3+2+i];
+	}
+	//msg_write(return_type->name + "  " + i2s(return_type->size));
+	//msg_write("=>  " + bytes(ret, return_type->size).hex());
+	return true;
+}
+#endif
 
 // void*,int,int64,float,float64,char,bool,string,vector,complex
 
@@ -132,6 +253,10 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 	// TODO handle return in member functions on windows...
 //	if ((config.abi == Abi::AMD64_WINDOWS) and !f->is_static() and f->name_space->uses_call_by_reference() and f->literal_return_type->uses_return_by_memory())
 //		return false;
+
+#ifdef CPU_ARM64
+	return call_function_pointer_arm64(ff, ret, param, return_type, ptype);
+#else
 
 	if (ptype.num == 0) {
 		if (return_type == TypeVoid) {
@@ -325,7 +450,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		}
-		if (return_type->_amd64_allow_pass_in_xmm() and (return_type->size == 16)) { // rect, color, plane, quaternion
+		if (return_type->_return_in_float_registers() and (return_type->size == 16)) { // rect, color, plane, quaternion
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
 				call4<vec4,float,float,float,float>(ff, ret, param);
 				return true;
@@ -340,6 +465,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 	}
 	db_out(".... NOPE");
 	return false;
+#endif
 }
 
 bool call_function(Function *f, void *ret, const Array<void*> &param) {

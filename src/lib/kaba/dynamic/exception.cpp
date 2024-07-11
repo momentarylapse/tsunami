@@ -226,6 +226,23 @@ void just_die(KabaException *kaba_exception, const Array<StackFrameInfo> &trace)
 	exit(1);
 }
 
+void clean_up_block(Block *b, const StackFrameInfo& r) {
+	dbo("  block " + p2s(b));
+	for (Variable *v: b->vars) {
+		// for now, ignore temporary variables...
+		if (v->name.head(1) == "-")
+			continue;
+
+		char *p = (char*)r.rbp + v->_offset;
+		dbo("   " + v->type->name + " " + v->name + "  " + p2s(p));
+		if (auto cf = v->type->get_destructor()) {
+			dbo("call destr: " + cf->long_name());
+			typedef void destructor_func(void *);
+			if (auto* f = (destructor_func*)cf->address)
+				f(p);
+		}
+	}
+}
 
 #ifdef CPU_AMD64
 
@@ -293,25 +310,6 @@ Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
-
-void clean_up_block(Block *b, const StackFrameInfo& r) {
-	dbo("  block " + p2s(b));
-	for (Variable *v: b->vars) {
-		// for now, ignore temporary variables...
-		if (v->name.head(1) == "-")
-			continue;
-
-		char *p = (char*)r.rbp + v->_offset;
-		dbo("   " + v->type->name + " " + v->name + "  " + p2s(p));
-		auto cf = v->type->get_destructor();
-		if (cf) {
-			dbo("call destr: " + cf->long_name());
-			typedef void con_func(void *);
-			if (con_func * f = (con_func*)cf->address)
-				f(p);
-		}
-	}
-}
 
 StackFrameInfo get_current_stack_frame() {
 	void *rbp = nullptr;
@@ -390,6 +388,143 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 #endif
 }
 #pragma GCC pop_options
+
+
+#elif defined(CPU_ARM64)
+
+/*--------------------------------------------------------------*\
+	  ARM64
+\*--------------------------------------------------------------*/
+
+StackFrameInfo get_current_stack_frame() {
+	void *rbp = nullptr;
+	void *rsp = nullptr;
+
+#if defined(OS_LINUX) || defined(OS_MAC)
+	// get stack frame base pointer rbp
+	asm volatile("mov x0, x29\n"
+			"mov %0, x0\n"
+			"mov x0, sp\n"
+			"mov %1, x0\n"
+			: "=r" (rbp), "=r" (rsp)
+			:
+			: "x0");
+
+	//printf("rbp=%p   rsp=%p    local=%p\n", rbp, rsp, &rsp);
+
+	// check sanity
+	void **local = (void**)&rsp;
+	// rbp  >  local > rsp
+	assert((rbp > rsp) and (rbp > local) and (local > rsp));
+	assert((int_p)rbp - (int_p)rsp < 10000);
+
+#else
+
+	// TODO
+
+#endif
+
+	return {nullptr, rsp, rbp};
+}
+
+Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
+	Array<StackFrameInfo> trace;
+
+	void **rbp = (void**)frame.rbp;
+
+	void **rsp = nullptr;
+	//msg_write("stack trace");
+	//printf("rbp=%p     ...%p\n", rbp, &rsp);
+
+	while (true) {
+		rsp = rbp;
+		rbp = (void**)*rsp;
+		rsp ++;
+		//printf("-- rsp: %p\n", rsp);
+		//printf("-- rbp: %p\n", rbp);
+		void *rip = *rsp;
+		//printf("-- rip: %p\n", rip);
+		rsp ++;
+		//printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
+		auto r = get_func_from_rip(rip);
+		if (r.f) {
+			r.rsp = rsp;
+			r.rbp = rbp;
+			trace.add(r);
+			dbo(r.str());
+
+		} else {
+			//dbo("unknown function...: " + p2s(rip));
+			break;
+		}
+	}
+	return trace;
+}
+
+void relink_return(void *rip, void *rbp, void *rsp) {
+	/*static void* rbp2 = nullptr;
+#if defined(OS_LINUX) || defined(OS_MAC)
+	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
+	// ARGH....
+	asm volatile("mov %1, %%rsp\n\t"
+			"pop %%rbp\n\t" // pop rbp
+			"pop %%rax\n\t" // pop rip
+			"push %2\n\t" // push rip
+			"ret"
+		: "=r" (rbp2)
+		: "r" (rsp), "r" (rip)
+		: );
+
+	//	printf("rbp=%p\n", rbp2);
+#endif
+*/
+}
+
+void kaba_raise_exception(KabaException *kaba_exception) {
+#if defined(OS_LINUX) || defined(OS_MAC)
+	auto frame = get_current_stack_frame();
+
+	void *return_rsp = nullptr;
+	void *return_rip = nullptr;
+
+	auto trace = get_stack_trace(frame);
+
+	const Class *ex_type = get_type(kaba_exception);
+
+	for (auto r: trace) {
+
+		dbo(r.str());
+		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
+
+		for (Block *b: ebd.needs_killing)
+			clean_up_block(b, r);
+
+		if (ebd.except_block) {
+			dbo("except_block block: " + p2s(ebd.except_block));
+
+			if (ebd.except->params.num > 0) {
+				auto v = ebd.except_block->vars[0];
+				void **p = (void**)((int_p)r.rbp + v->_offset);
+				*p = kaba_exception;
+			}
+
+			// TODO special return
+			return_rsp = (void*)((int_p)r.rsp - 16);
+			return_rip = ebd.except_block->_start;
+			break;
+		}
+	}
+
+	// caught?
+	if (return_rsp)
+		relink_return(return_rip, frame.rbp, return_rsp);
+
+	just_die(kaba_exception, trace);
+
+#else
+	just_die(kaba_exception, {});
+#endif
+}
 
 #else
 

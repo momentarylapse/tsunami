@@ -55,7 +55,6 @@ void BackendARM::correct() {
 	cmd.next_cmd_target(0);
 	add_function_intro_params(cur_func);
 	serializer->cmd_list_out("x:b", "post paramtrafo");
-
 }
 
 void BackendARM::implement_mov_chunk(kaba::SerialNode &c, int i, int size) {
@@ -71,7 +70,7 @@ void BackendARM::implement_mov_chunk(kaba::SerialNode &c, int i, int size) {
 		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeInt8), param_shift(p2, j, TypeInt8));
 }
 
-int first_bit(int i) {
+static int first_bit(int i) {
 	for (int b=0; b<32; b++)
 		if ((i & (1 << b)) != 0)
 			return b;
@@ -299,6 +298,8 @@ void BackendARM::correct_implement_commands() {
 		auto &c = cmd.cmd[i];
 		//msg_write("CORRECT  " + c.str(serializer));
 		if (c.inst == Asm::InstID::LABEL)
+			continue;
+		if (c.inst == Asm::InstID::ASM)
 			continue;
 		if (c.inst == Asm::InstID::MOV) {
 			int size = c.p[0].type->size;
@@ -537,7 +538,7 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 	return reg;
 }
 
-bool arm_type_uses_int_register(const Class *t) {
+static bool arm_type_uses_int_register(const Class *t) {
 	return (t == TypeInt) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
@@ -785,7 +786,8 @@ namespace armhelper {
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar) {
 	if ((p.kind == NodeKind::VAR_TEMP) and (p.p == v)) {
 		p.kind = NodeKind::LOCAL_MEMORY;//stackvar.kind;
-		p.p = stackvar.p;
+		p.p = stackvar.p + p.shift;
+		p.shift = 0;
 	} else if ((p.kind == NodeKind::DEREF_VAR_TEMP) and (p.p == v)) {
 		p.kind = NodeKind::DEREF_LOCAL_MEMORY;
 		p.p = stackvar.p;
@@ -831,10 +833,13 @@ Asm::InstructionParam BackendARM::prepare_param(Asm::InstID inst, SerialNodePara
 			do_error("prepare_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
+		if (config.target.instruction_set == Asm::InstructionSet::ARM64)
+			return Asm::param_deref_reg_shift(Asm::RegID::R31, p.p + p.shift, p.type->size);
+		else
+			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
 		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
 		//	param_size = -1; // lea doesn't need size...
-			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
+			//s->DoErrorInternal("prepare_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
 		if ((imm_allowed) and (p.type->is_pointer_raw())) {
@@ -846,7 +851,7 @@ Asm::InstructionParam BackendARM::prepare_param(Asm::InstID inst, SerialNodePara
 		}
 	} else if (p.kind == NodeKind::IMMEDIATE) {
 		if (p.shift > 0)
-			do_error("get_param: immediate + shift");
+			do_error("prepare_param: immediate + shift");
 		return Asm::param_imm(p.p, p.type->size);
 	} else {
 		do_error("prepare_param: unexpected param..." + p.str(serializer));
@@ -904,7 +909,6 @@ void BackendARM::assemble() {
 		}
 	}
 	list->add2(Asm::InstID::ALIGN_OPCODE);
-
 }
 
 

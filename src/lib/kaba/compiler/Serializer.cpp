@@ -33,19 +33,6 @@ Serializer::Serializer(Module *m, Asm::InstructionWithParamsList *_list) {
 	num_labels = 0;
 
 	cmd.ser = this;
-
-	p_eax = param_preg(TypeReg32, Asm::RegID::EAX);
-	p_eax_int = param_preg(TypeInt, Asm::RegID::EAX);
-	p_rax = param_preg(TypeReg64, Asm::RegID::RAX);
-
-	p_deref_eax = param_deref_preg(TypePointer, Asm::RegID::EAX);
-
-	p_ax = param_preg(TypeReg16, Asm::RegID::AX);
-	p_al = param_preg(TypeReg8, Asm::RegID::AL);
-	p_al_bool = param_preg(TypeBool, Asm::RegID::AL);
-	p_al_char = param_preg(TypeInt8, Asm::RegID::AL);
-	p_xmm0 = param_preg(TypeReg128, Asm::RegID::XMM0);
-	p_xmm1 = param_preg(TypeReg128, Asm::RegID::XMM1);
 }
 
 Serializer::~Serializer() {
@@ -672,6 +659,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
 		case InlineID::SHARED_POINTER_INIT:
+			// FIXME does this work for 64bit?!?
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param_imm(TypeInt, 0));
 			break;
 		case InlineID::INT8_ASSIGN:
@@ -1564,9 +1552,11 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 
 	if (true) {
 	// TODO super important!!!!!!
-	if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
+	if (config.target.is_arm()) {
+		int align = (s > 4) ? 8 : 4;
+		stack_offset = mem_align(stack_offset, align);
 		v.stack_offset = stack_offset;
-		stack_offset += s;
+		stack_offset += mem_align(s, align);
 
 	} else {
 		stack_offset += s;
@@ -1574,14 +1564,13 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 	}
 	} else {
 		v.stack_offset = so.find_free(v.type->size);
-		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
+		if (config.target.is_arm()) {
 			stack_offset = v.stack_offset + s;
 		} else {
 			stack_offset = - v.stack_offset;
 		}
 	}
-//	msg_write("=>");
-//	msg_write(v.stack_offset);
+	//msg_write(format("STACK VAR  %s =>  %d", v.type->name, v.stack_offset));
 
 	if (stack_offset > stack_max_size)
 		stack_max_size = stack_offset;
@@ -1705,80 +1694,6 @@ void Serializer::simplify_float_store() {
 		}
 	}
 }
-
-
-Asm::InstructionParam Serializer::get_param(Asm::InstID inst, SerialNodeParam &p) {
-	if (p.kind == NodeKind::NONE) {
-		return Asm::param_none;
-	} else if (p.kind == NodeKind::LABEL) {
-		return Asm::param_label(p.p, p.type->size);
-	} else if (p.kind == NodeKind::DEREF_LABEL) {
-		return Asm::param_deref_label(p.p, p.type->size);
-	} else if (p.kind == NodeKind::REGISTER) {
-		if (p.shift > 0)
-			module->do_error_internal("get_param: reg + shift");
-		return Asm::param_reg(p.as_reg());
-		//param_size = p.type->size;
-	} else if (p.kind == NodeKind::DEREF_REGISTER) {
-		if (p.shift != 0)
-			return Asm::param_deref_reg_shift(p.as_reg(), p.shift, p.type->size);
-		else
-			return Asm::param_deref_reg(p.as_reg(), p.type->size);
-	} else if (p.kind == NodeKind::MEMORY) {
-		int size = p.type->size;
-		// compiler self-test
-		if ((size != 1) and (size != 2) and (size != 4) and (size != 8))
-			module->do_error_internal("get_param: evil global of type " + p.type->name);
-		return Asm::param_deref_imm(p.p + p.shift, size);
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		if (config.target.is_arm()) {
-			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
-		} else {
-			return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
-		}
-		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
-		//	param_size = -1; // lea doesn't need size...
-			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
-	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
-		bool imm_allowed = Asm::get_instruction_allow_const(inst);
-		if ((imm_allowed) and (p.type->is_pointer_raw())) {
-			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
-		} else if ((p.type->size <= 4) and (imm_allowed)) {
-			return Asm::param_imm(*(int*)(p.p + p.shift), p.type->size);
-		} else {
-			return Asm::param_deref_imm(p.p + p.shift, p.type->size);
-		}
-	} else if (p.kind == NodeKind::IMMEDIATE) {
-		if (p.shift > 0)
-			module->do_error_internal("get_param: immediate + shift");
-		return Asm::param_imm(p.p, p.type->size);
-	} else
-		module->do_error_internal("get_param: unexpected param..." + kind2str(p.kind));
-	return Asm::param_none;
-}
-
-
-void Serializer::assemble_cmd(SerialNode &c) {
-	// translate parameters
-	Asm::InstructionParam p1 = get_param(c.inst, c.p[0]);
-	Asm::InstructionParam p2 = get_param(c.inst, c.p[1]);
-
-	// assemble instruction
-	//list->current_line = c.
-	list->add2(c.inst, p1, p2);
-}
-
-void Serializer::assemble_cmd_arm(SerialNode &c) {
-	// translate parameters
-	Asm::InstructionParam p1 = get_param(c.inst, c.p[0]);
-	Asm::InstructionParam p2 = get_param(c.inst, c.p[1]);
-	Asm::InstructionParam p3 = get_param(c.inst, c.p[2]);
-
-	// assemble instruction
-	//list->current_line = c.
-	list->add_arm(c.cond, c.inst, p1, p2, p3);
-}
-
 
 void Serializer::do_error(const string &msg) {
 	module->do_error_internal(msg);

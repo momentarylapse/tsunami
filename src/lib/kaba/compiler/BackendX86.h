@@ -15,7 +15,7 @@ namespace kaba {
 
 class BackendX86 : public Backend {
 public:
-	BackendX86(Serializer *serializer);
+	explicit BackendX86(Serializer *serializer);
 	~BackendX86() override;
 
 	void process(Function *f, int index) override;

@@ -147,7 +147,7 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 
 void BackendX86::implement_return(const SerialNodeParam &p) {
 	if (p.kind != NodeKind::NONE) {
-		if (cur_func->effective_return_type->_amd64_allow_pass_in_xmm()) {
+		if (cur_func->effective_return_type->_return_in_float_registers()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
 			//		cmd.add_cmd(Asm::InstID::FLD, t);
 			if (cur_func->effective_return_type == TypeFloat32) {
@@ -1044,14 +1044,10 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 			do_error("prepare_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
 	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
-		if (config.target.instruction_set == Asm::InstructionSet::ARM32) {
-			return Asm::param_deref_reg_shift(Asm::RegID::R13, p.p + p.shift, p.type->size);
-		} else {
-			return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
-		}
+		return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
 		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
 		//	param_size = -1; // lea doesn't need size...
-			//s->DoErrorInternal("get_param: evil local of type " + p.type->name);
+			//s->DoErrorInternal("prepare_param: evil local of type " + p.type->name);
 	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
 		if (imm_allowed and p.type->is_pointer_raw()) {
@@ -1063,7 +1059,7 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 		}
 	} else if (p.kind == NodeKind::IMMEDIATE) {
 		if (p.shift > 0)
-			do_error("get_param: immediate + shift");
+			do_error("prepare_param: immediate + shift");
 		return Asm::param_imm(p.p, p.type->size);
 	} else {
 		do_error("prepare_param: unexpected param..." + p.str(serializer));

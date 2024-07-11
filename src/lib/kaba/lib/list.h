@@ -265,7 +265,6 @@ public:
 	}
 };
 
-
 template<class T>
 void lib_create_list(const Class *tt, bool allow_str = true) {
 	auto t = const_cast<Class*>(tt);

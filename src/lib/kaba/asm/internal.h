@@ -94,7 +94,8 @@ struct ParserState {
 extern ParserState state;
 
 
-void arm_init();
+void arm32_init();
+void arm64_init();
 string arm_disassemble(void *_code_,int length,bool allow_comments);
 
 void x86_init();
@@ -148,6 +149,61 @@ struct InstructionName {
 };
 extern const InstructionName instruction_names[];
 
+
+bool arm_encode_imm(unsigned int&code, int pf, int64 value, bool already_relative);
+
+// (ARM) parameter encodings
+enum {
+	AP_NONE,
+	AP_REG_0 = 10000, // allow to mix with SIZE_XXX
+	AP_REG_0P5,
+	AP_WREG_0P5,
+	AP_FREG_0_5,
+	AP_SREG_0P5,
+	AP_DREG_0P5,
+	AP_REG_5P5,
+	AP_WREG_5P5,
+	AP_SREG_5P5,
+	AP_DREG_5P5,
+	AP_REG_8,
+	AP_REG_10P5,
+	AP_REG_12,
+	AP_FREG_12_22,
+	AP_REG_16, // arm32
+	AP_REG_16P5, // arm64
+	AP_REG_16_W21,
+	AP_WREG_16P5,
+	AP_SREG_16P5,
+	AP_DREG_16P5,
+	AP_FREG_16_7,
+	AP_REG_SET,
+	AP_OFFSET24_0,
+	AP_IMM12_0,
+	AP_IMM12_10,
+	AP_IMM12_10SH,
+	AP_IMM9_12,
+	AP_IMM16E2_5,
+	AP_IMM4_0,
+	AP_IMM4_12,
+	AP_IMM4_19,
+	AP_IMM8F32_13,
+	AP_IMM8F64_13,
+	AP_IMM26X4REL_0, // relative to rip x4
+	AP_IMM14X4REL_5, // relative to rip x4
+	AP_IMM19X4REL_5, // ..
+	AP_IMM13SRNMASK_10,
+	AP_SHIFTED12_0,
+	AP_DEREF_REG_16_OFFSET,
+	AP_DEREF_S8_REG_5P5_PLUS_IMM12P10, // imm NOT scaled
+	AP_DEREF_S32_REG_5P5_PLUS_IMM12P10, // imm scaled x 4
+	AP_DEREF_S64_REG_5P5_PLUS_IMM12P10, // imm scaled x 8
+	AP_DEREF_S128_REG_5P5_PLUS_IMM7P15, // imm scaled x 16
+	AP_DEREF_S32_REG_5P5_PLUS_IMM9P12, // imm NOT scaled!
+	AP_DEREF_S64_REG_5P5_PLUS_IMM9P12, // imm NOT scaled!
+	AP_SHIFTER_0X12_I25,
+	AP_XX_R12_W21_UPI23,
+	AP_XX_R12_W21_UPI23_BYTE,
+};
 
 
 }

@@ -19,6 +19,8 @@ namespace kaba {
 
 string type_list_to_str(const Array<const Class*> &params);
 
+int type_alignment(const Class *t);
+
 TemplateManager::TemplateManager(Context *c) {
 	context = c;
 	implicit_class_registry = new ImplicitClassRegistry(c);
@@ -329,10 +331,15 @@ string product_class_name(const Array<const Class*> &classes) {
 	return "("+name+")";
 }
 
+int type_alignment(const Class* t);
+
 int product_class_size(const Array<const Class*> &classes) {
 	int size = 0;
-	for (auto &c: classes)
-		size += c->size;
+	for (auto &c: classes) {
+		int align = type_alignment(c);
+		size = mem_align(size, align);
+		size += mem_align(c->size, align);
+	}
 	return size;
 }
 
@@ -549,8 +556,6 @@ const Class *TemplateManager::request_callable_fp(SyntaxTree *tree, const Array<
 	//return make_class(name, Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
 }
 
-bool type_needs_alignment(const Class *t);
-
 // inner callable: params [A,B,C,D,E]
 // captures: [-,x0,-,-,x1]
 // class CallableBind
@@ -580,8 +585,7 @@ const Class *TemplateManager::request_callable_bind(SyntaxTree *tree, const Arra
 		auto c = b;
 		if (capture_via_ref[i])
 			c = request_pointer(tree, c, token_id);
-		if (type_needs_alignment(b))
-			offset = mem_align(offset, 4);
+		offset = mem_align(offset, type_alignment(b));
 		auto el = ClassElement(format("capture%d%s", i, capture_via_ref[i] ? "_ref" : ""), c, offset);
 		offset += c->size;
 		t->elements.add(el);

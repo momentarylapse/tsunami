@@ -332,10 +332,15 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 	p->session = session;
 	session->win->show();
 
-	if (auto ef = e.find("file")) {
+	Path song_filename;
+	if (os::fs::exists(associated_song_filename(p->session_filename))) {
+		song_filename = associated_song_filename(p->session_filename);
+	} else if (auto ef = e.find("file")) {
 		if (ef->value("path") != "")
-			session->storage->load(session->song.get(), ef->value("path"));
+			song_filename = ef->value("path");
 	}
+	if (!song_filename.is_empty())
+		session->storage->load(session->song.get(), song_filename);
 
 	if (auto ev = e.find("view")) {
 		auto es = ev->find("selection");

@@ -106,8 +106,19 @@ void try_init_global_var(const Class *type, char* g_var, SyntaxTree *ps) {
 	typedef void init_func(void *);
 	//msg_write("global init: " + v.type->name);
 	auto ff = (init_func*)(int_p)cf->address;
-	if (ff)
+	if (ff) {
+#ifdef OS_MAC
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+		pthread_jit_write_protect_np(1);
+#endif
+#endif
 		ff(g_var);
+#ifdef OS_MAC
+#if MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+		pthread_jit_write_protect_np(0);
+#endif
+#endif
+	}
 }
 
 void init_all_global_objects(SyntaxTree *ps, const Class *c) {

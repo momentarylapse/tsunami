@@ -897,7 +897,7 @@ bool arm_encode_imm(unsigned int&code, int pf, int64 value, bool already_relativ
 		if ((value & 0xfffffffffffff000) == 0)
 			code |= value << 10;
 		else if ((value & 0xffffffffff000fff) == 0)
-			code |= value >> 2;
+			code |= (unsigned int)(value >> 2) | 0x00400000;
 		else
 			return false; //raise_error("immediate not supported");
 		return true;

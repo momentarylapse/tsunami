@@ -254,7 +254,7 @@ int BackendArm64::_to_register(const SerialNodeParam &p, int force_register) {
 
 int BackendArm64::_reference_to_register_64(const SerialNodeParam &p, int force_register, const Class *type) {
 	if (!type)
-		type = module->tree->get_pointer(p.type, -1);
+		type = module->tree->type_ref(p.type, -1);
 
 	int reg = force_register;
 	if (reg < 0)
@@ -816,7 +816,7 @@ void BackendArm64::fc_end(const CallData& d, const Array<SerialNodeParam> &param
 }
 
 static bool reachable_arm64(int64 a, void *b) {
-	return (abs((int_p)a - (int_p)b) < 0x10000000);
+	return (abs((int_p)a - (int_p)b) < 0x4000000);
 }
 
 void BackendArm64::add_function_call(Function *f, const Array<SerialNodeParam> &params, const SerialNodeParam &ret) {
@@ -832,9 +832,7 @@ void BackendArm64::add_function_call(Function *f, const Array<SerialNodeParam> &
 			insert_cmd(Asm::InstID::BL, param_imm(TypePointer, f->address)); // the actual call
 			// function pointer will be shifted later...
 		} else {
-			int vreg = vreg_alloc(8);
-			//_to_register(param_lookup(TypePointer, add_global_ref((void*)(int_p)f->address)), vreg);
-			_to_register(param_imm(TypeInt64, (int_p)f->address), vreg);
+			int vreg = _to_register(param_imm(TypeInt64, (int_p)f->address));
 			insert_cmd(Asm::InstID::BLR, param_vreg_auto(TypePointer, vreg));
 			vreg_free(vreg);
 		}

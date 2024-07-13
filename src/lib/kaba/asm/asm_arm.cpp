@@ -549,7 +549,7 @@ InstructionParam disarm_param(int code, int p) {
 		return param_imm(mask, SIZE_64);
 	} else if (p == AP_IMM26X4REL_0) {
 		if (code & 0x02000000) // sign
-			return param_imm((code & 0x03ffffff) << 2 | 0xfffffffffc000000, SIZE_64);
+			return param_imm((code & 0x03ffffff) << 2 | 0xfffffffff0000000, SIZE_64);
 		return param_imm((code & 0x03ffffff) << 2, SIZE_64);
 	} else if (p == AP_IMM14X4REL_5) {
 		if (code & 0x00040000) // sign
@@ -951,7 +951,7 @@ bool arm_encode_imm(unsigned int&code, int pf, int64 value, bool already_relativ
 			// TODO use CurrentMetaInfo->code_origin
 			val = value - (int_p)&code; // relative to rip
 		//if ((val & 0xfffffffff0000003) == 0)
-		if ((val < (2<<(bits+2))) and (val >= -((int64)2<<(bits+2))))
+		if ((abs(val) < (1<<(bits+1))) )// and (val >= -((int64)1<<(bits+1))))
 			code |= (((unsigned int)(val) >> 2) & (0xffffffff >> (32 - bits))) << offset;
 		else
 			return false;

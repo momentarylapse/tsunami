@@ -519,6 +519,10 @@ const Class *SyntaxTree::get_pointer(const Class *base, int token_id) {
 	return request_implicit_class_pointer(base, token_id);
 }
 
+const Class *SyntaxTree::type_ref(const Class *base, int token_id) {
+	return request_implicit_class_reference(base, token_id);
+}
+
 const Class *SyntaxTree::request_implicit_class_pointer(const Class *base, int token_id) {
 	return module->context->template_manager->request_pointer(this, base, token_id);
 }
@@ -571,7 +575,7 @@ shared<Node> SyntaxTree::conv_cbr(shared<Node> c, Variable *var) {
 	// convert
 	if ((c->kind == NodeKind::VAR_LOCAL) and (c->as_local() == var)) {
 		auto r = add_node_local(var);
-		r->set_type(get_pointer(c->type, c->token_id));
+		r->set_type(type_ref(c->type, c->token_id));
 		return r->deref();
 	}
 	return c;
@@ -626,7 +630,7 @@ shared<Node> SyntaxTree::conv_calls(shared<Node> c) {
 
 		// return: array reference (-> dereference)
 		if (c->type->is_array() /*or c->type->is_super_array()*/) {
-			r->set_type(get_pointer(c->type, c->token_id));
+			r->set_type(type_ref(c->type, c->token_id));
 			return r->deref();
 		}
 		if (changed)
@@ -709,7 +713,7 @@ void SyntaxTree::convert_call_by_reference() {
 		// parameter: array/class as reference
 		for (auto v: weak(f->var).sub_ref(0, f->num_params))
 			if (v->type->uses_call_by_reference() or flags_has(v->flags, Flags::OUT)) {
-				v->type = get_pointer(v->type, -1);
+				v->type = type_ref(v->type, -1);
 
 				// usage inside the function
 				transform_block(f->block.get(), [this, v](shared<Node> n) {
@@ -748,7 +752,7 @@ void SyntaxTree::simplify_shift_deref() {
 }
 
 InlineID __get_pointer_add_int() {
-	if (config.target.instruction_set == Asm::InstructionSet::AMD64)
+	if (config.target.pointer_size == 8)
 		return InlineID::INT64_ADD_INT32;
 	return InlineID::INT32_ADD;
 }
@@ -758,7 +762,7 @@ shared<Node> conv_break_down_med_level(SyntaxTree *tree, shared<Node> c) {
 	if (c->kind == NodeKind::DYNAMIC_ARRAY) {
 		return tree->conv_break_down_low_level(
 				add_node_parray(
-						c->params[0]->change_type(tree->get_pointer(c->type, c->token_id)),
+						c->params[0]->change_type(tree->type_ref(c->type, c->token_id)),
 						c->params[1], c->type));
 	}
 	return c;
@@ -783,7 +787,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 						c->params[1], // ref
 						add_node_const(add_constant_int(el_type->size))),
 				c->token_id,
-				get_pointer(el_type, c->token_id))->deref();
+				type_ref(el_type, c->token_id))->deref();
 
 	} else if (c->kind == NodeKind::POINTER_AS_ARRAY) {
 
@@ -802,7 +806,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 						c->params[1], // index
 						add_node_const(add_constant_int(el_type->size))),
 				c->token_id,
-				get_pointer(el_type, c->token_id))->deref();
+				type_ref(el_type, c->token_id))->deref();
 	} else if (c->kind == NodeKind::ADDRESS_SHIFT) {
 
 		auto *el_type = c->type;
@@ -821,7 +825,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 				c->params[0]->ref(this), // struct
 				add_node_const(add_constant_int(c->link_no)),
 				c->token_id,
-				get_pointer(el_type, c->token_id))->deref();
+				type_ref(el_type, c->token_id))->deref();
 
 	} else if (c->kind == NodeKind::DEREF_ADDRESS_SHIFT) {
 
@@ -842,7 +846,7 @@ shared<Node> SyntaxTree::conv_break_down_low_level(shared<Node> c) {
 				c->params[0], // ref struct
 				add_node_const(add_constant_int(c->link_no)),
 				c->token_id,
-				get_pointer(el_type, c->token_id))->deref();
+				type_ref(el_type, c->token_id))->deref();
 	}
 	return c;
 }

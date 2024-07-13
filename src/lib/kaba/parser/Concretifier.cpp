@@ -151,7 +151,8 @@ shared<Node> Concretifier::link_special_operator_is(shared<Node> param1, shared<
 	// vtable1
 	const Class *t1 = param1->type;
 	if (t1->is_some_pointer()) {
-		param1->type = tree->get_pointer(TypePointer, token_id);
+		// FIXME is this safe?
+		param1->type = tree->type_ref(TypePointer, token_id);
 		param1 = param1->deref();
 		t1 = t1->param[0];
 	}

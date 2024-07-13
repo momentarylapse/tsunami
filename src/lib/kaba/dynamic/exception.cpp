@@ -397,59 +397,55 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 \*--------------------------------------------------------------*/
 
 StackFrameInfo get_current_stack_frame() {
-	void *rbp = nullptr;
-	void *rsp = nullptr;
+	StackFrameInfo frame;
+	int local;
+	void *local_address = (void*)&local; // an address on the current stack
 
 #if defined(OS_LINUX) || defined(OS_MAC)
-	// get stack frame base pointer rbp
-	asm volatile("mov x0, x29\n"
-			"mov %0, x0\n"
-			"mov x0, sp\n"
-			"mov %1, x0\n"
-			: "=r" (rbp), "=r" (rsp)
-			:
-			: "x0");
-
-	//printf("rbp=%p   rsp=%p    local=%p\n", rbp, rsp, &rsp);
+	asm volatile("mov %0, x29\n" // base/frame pointer
+			"mov %1, sp\n" // stack pointer
+			: "=r" (frame.rbp), "=r" (frame.rsp)
+			: : );
+	//printf("rsp=%p    rbp=%p   local=%p\n", frame.rsp, frame.rbp, local_address);
 
 	// check sanity
-	void **local = (void**)&rsp;
-	// rbp  >  local > rsp
-	assert((rbp > rsp) and (rbp > local) and (local > rsp));
-	assert((int_p)rbp - (int_p)rsp < 10000);
+	// rbp  >  local  >  rsp
+	assert((frame.rbp > frame.rsp) and (frame.rbp >= local_address) and (local_address >= frame.rsp));
+	assert((int_p)frame.rbp - (int_p)frame.rsp < 10000);
 
 #else
 
-	// TODO
+	msg_error("exception - reading stack frame not implemented for this architecture");
+	exit(1);
 
 #endif
 
-	return {nullptr, rsp, rbp};
+	return frame;
 }
 
 Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 	Array<StackFrameInfo> trace;
 
-	void **rbp = (void**)frame.rbp;
+	StackFrameInfo cur = frame;
 
-	void **rsp = nullptr;
 	//msg_write("stack trace");
-	//printf("rbp=%p     ...%p\n", rbp, &rsp);
+	//printf("rbp=%p     sp=%p\n", cur.rbp, &cur.rsp);
 
 	while (true) {
-		rsp = rbp;
-		rbp = (void**)*rsp;
-		rsp ++;
-		//printf("-- rsp: %p\n", rsp);
-		//printf("-- rbp: %p\n", rbp);
-		void *rip = *rsp;
-		//printf("-- rip: %p\n", rip);
-		rsp ++;
-		//printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", rip, rsp, rbp);
-		auto r = get_func_from_rip(rip);
+		//printf("unroll   rbp=%p   ...%p\n", cur.rbp, &cur.rsp);
+		// next (previous/caller) stack frame
+		StackFrameInfo next;
+		next.rsp = (void*)((int_p)cur.rbp + 16);
+		next.rbp = ((void**)cur.rbp)[0]; //(void*)((int_p)cur.rbp - 16);
+		next.rip = ((void**)cur.rbp)[1];
+
+		cur = next;
+
+		//printf("unwind  =>   rip=%p   rsp=%p   rbp=%p\n", cur.rip, cur.rsp, cur.rbp);
+		auto r = get_func_from_rip(cur.rip);
 		if (r.f) {
-			r.rsp = rsp;
-			r.rbp = rbp;
+			r.rsp = cur.rsp;
+			r.rbp = cur.rbp;
 			trace.add(r);
 			dbo(r.str());
 
@@ -461,63 +457,58 @@ Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 	return trace;
 }
 
-void relink_return(void *rip, void *rbp, void *rsp) {
-	/*static void* rbp2 = nullptr;
+void relink_return(const StackFrameInfo& frame) {
 #if defined(OS_LINUX) || defined(OS_MAC)
-	dbo(format("relink to rip=%s, rbp=%s  rsp=%s\n", p2s(rip), p2s(rbp), p2s(rsp)));
-	// ARGH....
-	asm volatile("mov %1, %%rsp\n\t"
-			"pop %%rbp\n\t" // pop rbp
-			"pop %%rax\n\t" // pop rip
-			"push %2\n\t" // push rip
+	dbo(format("relink to rip=%s  rsp=%s   rbp=%s\n", p2s(frame.rip), p2s(frame.rsp), p2s(frame.rbp)));
+	asm volatile(
+			"mov x29,  %0\n" // base/frame pointer
+			"mov sp,  %1\n" // stack pointer
+			"mov x30,  %2\n" // rip
 			"ret"
-		: "=r" (rbp2)
-		: "r" (rsp), "r" (rip)
-		: );
-
-	//	printf("rbp=%p\n", rbp2);
+		: : "r" (frame.rbp), "r" (frame.rsp), "r" (frame.rip) : );
 #endif
-*/
+	msg_error("catching exceptions not implemented on this architecture");
+	exit(1);
 }
 
 void kaba_raise_exception(KabaException *kaba_exception) {
 #if defined(OS_LINUX) || defined(OS_MAC)
-	auto frame = get_current_stack_frame();
+	auto current_frame = get_current_stack_frame();
 
-	void *return_rsp = nullptr;
-	void *return_rip = nullptr;
+	StackFrameInfo return_frame;
 
-	auto trace = get_stack_trace(frame);
+	auto trace = get_stack_trace(current_frame);
 
 	const Class *ex_type = get_type(kaba_exception);
 
-	for (auto r: trace) {
+	for (const auto& f: trace) {
 
-		dbo(r.str());
-		auto ebd = get_blocks(r.s, r.f, r.rip, ex_type);
+		dbo(f.str());
+		auto ebd = get_blocks(f.s, f.f, f.rip, ex_type);
 
-		for (Block *b: ebd.needs_killing)
-			clean_up_block(b, r);
+	// FIXME
+	//	for (Block *b: ebd.needs_killing)
+	//		clean_up_block(b, r);
 
 		if (ebd.except_block) {
 			dbo("except_block block: " + p2s(ebd.except_block));
 
 			if (ebd.except->params.num > 0) {
 				auto v = ebd.except_block->vars[0];
-				void **p = (void**)((int_p)r.rbp + v->_offset);
+				void **p = (void**)((int_p)f.rsp + v->_offset);
 				*p = kaba_exception;
 			}
 
 			// TODO special return
-			return_rsp = (void*)((int_p)r.rsp - 16);
-			return_rip = ebd.except_block->_start;
+			return_frame = f;
+			return_frame.rip = ebd.except_block->_start;
 			break;
 		}
 	}
 
 	// caught?
-	if (return_rsp)
-		relink_return(return_rip, frame.rbp, return_rsp);
+	if (return_frame.rip)
+		relink_return(return_frame);
 
 	just_die(kaba_exception, trace);
 

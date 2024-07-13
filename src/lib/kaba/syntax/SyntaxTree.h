@@ -72,6 +72,7 @@ public:
 	Class *create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
 	Class *create_new_class_no_check(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
 	const Class *get_pointer(const Class *base, int token_id = -1);
+	const Class *type_ref(const Class *base, int token_id = -1);
 	const Class *request_implicit_class_pointer(const Class *parent, int token_id);
 	const Class *request_implicit_class_shared(const Class *parent, int token_id);
 	const Class *request_implicit_class_shared_not_null(const Class *parent, int token_id);

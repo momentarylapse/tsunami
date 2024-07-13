@@ -89,7 +89,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 		// for i=>el in self
 		//    el = other[i]
 
-		auto *v_el = f->block->add_var("el", tree->get_pointer(t_el));
+		auto *v_el = f->block->add_var("el", tree->type_ref(t_el));
 		auto *v_i = f->block->add_var("i", TypeInt);
 
 		Block *b = new Block(f, f->block.get());
@@ -118,7 +118,7 @@ void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 	if (auto f_del = te->get_destructor()) {
 
 		auto *var_i = f->block->add_var("i", TypeInt);
-		auto *var_el = f->block->add_var("el", tree->get_pointer(t->get_array_element()));
+		auto *var_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
 
 		Block *b = new Block(f, f->block.get());
 
@@ -293,7 +293,7 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		// for i=>e in self
 		//     if e != other[i]
 		//         return false
-		auto *v_el = f->block->add_var("el", tree->get_pointer(t->get_array_element()));
+		auto *v_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
 		auto *v_i = f->block->add_var("i", TypeInt);
 
 		Block *b = new Block(f, f->block.get());

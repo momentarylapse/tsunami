@@ -224,8 +224,10 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 		if (!call_function(f, &new_addr, p))
 			return c;
 
-		c->params[0]->link_no = new_addr;
-		return c->params[0].get();
+		auto r = c->params[0]->shallow_copy();
+		r->link_no = new_addr;
+		r->type = c->type;
+		return r;
 
 	} else if (c->kind == NodeKind::REFERENCE) {
 		auto p0 = c->params[0];

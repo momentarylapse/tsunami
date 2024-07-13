@@ -119,7 +119,7 @@ void Serializer::add_member_function_call(Function *cf, const Array<SerialNodePa
 SerialNodeParam Serializer::add_reference(const SerialNodeParam &param, const Class *type) {
 	SerialNodeParam ret;
 	if (!type)
-		type = syntax_tree->get_pointer(param.type, -1);
+		type = syntax_tree->type_ref(param.type, -1);
 	ret.type = type;
 	ret.shift = 0;
 	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {

@@ -159,7 +159,7 @@ void Function::update_parameters_after_parsing() {
 	// return by memory
 	if (literal_return_type->uses_return_by_memory())
 		//if (!__get_var(Identifier::RETURN_VAR))
-			block->add_var(Identifier::RETURN_VAR, owner()->get_pointer(literal_return_type));
+			block->add_var(Identifier::RETURN_VAR, owner()->type_ref(literal_return_type));
 
 	// class function
 	if (is_member()) {

@@ -69,7 +69,7 @@ int Cursor::pos() const {
 		return view->sel.range_raw.start();
 }
 
-bool Cursor::hover(const vec2 &m) const {
+bool Cursor::has_hover(const vec2 &m) const {
 	float x = view->cam.sample2screen(pos());
 	for (auto *v: view->vlayers)
 		if (view->sel.has(v->layer)) {
@@ -137,13 +137,12 @@ void SelectionMarker::on_draw(Painter* p) {
 				if (sel.has(l->layer))
 					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
 		} else if (view->selection_mode == SelectionMode::RECT) {
-			float x1, x2;
 			view->cam.range2screen_clip(sel.range(), view->clip, x1, x2);
 			p->set_color(theme.selection_internal);
 			p->set_fill(false);
-			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
+			p->draw_rect(rect(x1, x2, (float)hover.y0, (float)hover.y1));
 			p->set_fill(true);
-			p->draw_rect(rect(x1, x2, hover.y0, hover.y1));
+			p->draw_rect(rect(x1, x2, (float)hover.y0, (float)hover.y1));
 		}
 	}
 

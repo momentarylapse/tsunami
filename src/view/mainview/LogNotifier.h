@@ -20,7 +20,7 @@ public:
 	LogNotifier(Session* session);
 	~LogNotifier();
 
-	bool hover(const vec2 &m) const override { return false; }
+	bool has_hover(const vec2 &m) const override { return false; }
 
 	void on_draw(Painter *p) override;
 

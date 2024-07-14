@@ -66,7 +66,7 @@ void SignalEditorCable::on_draw(Painter *p) {
 	SignalEditorTab::draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), arrow_len);
 }
 
-bool SignalEditorCable::hover(const vec2 &m) const {
+bool SignalEditorCable::has_hover(const vec2 &m) const {
 	return false;
 }
 

@@ -498,9 +498,9 @@ InstructionParam disarm_param(int code, int p) {
 		return param_reg(d_reg(fn));
 	} else if (p == AP_REG_16_W21) {
 		int fm = (code & 0x000f0000) >> 16;
-		auto p = param_reg(r_reg(fm));
-		p.write_back = ((code >> 21) & 1);
-		return p;
+		auto param = param_reg(r_reg(fm));
+		param.write_back = ((code >> 21) & 1);
+		return param;
 	} else if (p == AP_DEREF_REG_16_OFFSET) {
 		int Rn = (code >> 16) & 0xf;
 		bool up = ((code >> 23) & 1);
@@ -544,7 +544,7 @@ InstructionParam disarm_param(int code, int p) {
 		return param_imm(arm_imm_float_encode(i, 64), SIZE_64);
 	} if (p == AP_IMM13SRNMASK_10) {
 		unsigned int s = (code & 0x0000fc00) >> 10; // how many 1s (-1)
-		unsigned int r = (code & 0x003f0000) >> 10; // 0s but negative TODO use
+		[[maybe_unused]] unsigned int r = (code & 0x003f0000) >> 10; // 0s but negative TODO use
 		int64 mask = 0xffffffffffffffff >> (64 - s - 1);
 		return param_imm(mask, SIZE_64);
 	} else if (p == AP_IMM26X4REL_0) {
@@ -923,11 +923,11 @@ bool arm_encode_imm(unsigned int&code, int pf, int64 value, bool already_relativ
 		if ((value & 0xffffffffffff0000) == 0)
 			code |= (int)value << 5;
 		else if ((value & 0xffffffff0000ffff) == 0)
-			code |= (unsigned int)(value >> (16 - 5)) & 0x001fffe0 | 0x00200000;
+			code |= ((unsigned int)(value >> (16 - 5)) & 0x001fffe0) | 0x00200000;
 		else if ((value & 0xffff0000ffffffff) == 0)
-			code |= (unsigned int)(value >> (32 - 5)) & 0x001fffe0 | 0x00400000;
+			code |= ((unsigned int)(value >> (32 - 5)) & 0x001fffe0) | 0x00400000;
 		else if ((value & 0x0000ffffffffffff) == 0)
-			code |= (unsigned int)(value >> (48 - 5)) & 0x001fffe0 | 0x00600000;
+			code |= ((unsigned int)(value >> (48 - 5)) & 0x001fffe0) | 0x00600000;
 		else
 			return false;
 		return true;

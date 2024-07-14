@@ -538,6 +538,7 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 	return reg;
 }
 
+[[maybe_unused]]
 static bool arm_type_uses_int_register(const Class *t) {
 	return (t == TypeInt) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }

@@ -39,7 +39,7 @@ bool SceneGraph::on_left_button_down(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_left_button_down(m))
 				return true;
 	return false;
@@ -52,7 +52,7 @@ bool SceneGraph::on_left_button_up(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_left_button_up(m))
 				return true;
 	return false;
@@ -65,7 +65,7 @@ bool SceneGraph::on_left_double_click(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_left_double_click(m))
 				return true;
 	return false;
@@ -78,7 +78,7 @@ bool SceneGraph::on_right_button_down(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_right_button_down(m))
 				return true;
 	return false;
@@ -90,7 +90,7 @@ bool SceneGraph::on_right_button_up(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_right_button_up(m))
 				return true;
 	return false;
@@ -104,7 +104,7 @@ bool SceneGraph::on_mouse_move(const vec2 &m) {
 
 		auto nodes = collect_children_down();
 		for (auto *c: nodes)
-			if (c->hover(m))
+			if (c->has_hover(m))
 				if (c->on_mouse_move(m))
 					return true;
 	}
@@ -118,7 +118,7 @@ bool SceneGraph::on_mouse_wheel(const vec2 &d) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_mouse_wheel(d))
 				return true;
 	return false;
@@ -127,7 +127,7 @@ bool SceneGraph::on_mouse_wheel(const vec2 &d) {
 bool SceneGraph::on_key_down(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		//if (c->hover(m))
+		//if (c->has_hover(m))
 		if (c->on_key_down(key))
 			return true;
 	return false;
@@ -136,7 +136,7 @@ bool SceneGraph::on_key_down(int key) {
 bool SceneGraph::on_key_up(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		//if (c->hover(m))
+		//if (c->has_hover(m))
 		if (c->on_key_up(key))
 			return true;
 	return false;
@@ -145,7 +145,7 @@ bool SceneGraph::on_key_up(int key) {
 bool SceneGraph::on_gesture(const string &id, const vec2 &m, const vec2 &param) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			if (c->on_gesture(id, m, param))
 				return true;
 	return false;
@@ -154,7 +154,7 @@ bool SceneGraph::on_gesture(const string &id, const vec2 &m, const vec2 &param) 
 bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			return c->allow_handle_click_when_gaining_focus();
 	return false;
 }
@@ -163,7 +163,7 @@ tsunami::HoverData SceneGraph::get_hover_data(const vec2 &m) {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			return c->get_hover_data(m);
 
 	return {};
@@ -173,7 +173,7 @@ string SceneGraph::get_tip() const {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
-		if (c->hover(m))
+		if (c->has_hover(m))
 			return c->get_tip();
 	return "";
 }

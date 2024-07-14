@@ -43,7 +43,7 @@ public:
 	virtual bool on_key_down(int key) { return false; }
 	virtual bool on_key_up(int key) { return false; }
 
-	virtual bool hover(const vec2 &m) const;
+	virtual bool has_hover(const vec2 &m) const;
 
 	void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
@@ -109,14 +109,14 @@ class HBox : public Node {
 public:
 	HBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(const vec2 &m) const override { return false; }
+	bool has_hover(const vec2 &m) const override { return false; }
 };
 
 class VBox : public Node {
 public:
 	VBox();
 	void update_geometry_recursive(const rect &target_area) override;
-	bool hover(const vec2 &m) const override { return false; }
+	bool has_hover(const vec2 &m) const override { return false; }
 };
 
 }

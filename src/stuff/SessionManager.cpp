@@ -114,8 +114,8 @@ void SessionManager::load_session_map_legacy() {
 			xml::Parser parser;
 			try {
 				parser.load(directory() | e);
-				auto &e = parser.elements[0];
-				if (auto ef = e.find("file")) {
+				[[maybe_unused]] auto &e = parser.elements[0];
+				if ([[maybe_unused]] auto ef = e.find("file")) {
 	//				if (ef->value("path") != "")
 	//					session_map[ef->value("path")] = l.name;
 				}

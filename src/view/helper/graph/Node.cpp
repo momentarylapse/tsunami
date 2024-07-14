@@ -65,7 +65,7 @@ Node::~Node() {
 			graph()->hover = {};
 }
 
-bool Node::hover(const vec2 &m) const {
+bool Node::has_hover(const vec2 &m) const {
 	if (hidden)
 		return false;
 	return area.inside(m);

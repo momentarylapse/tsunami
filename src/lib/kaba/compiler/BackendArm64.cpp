@@ -525,7 +525,6 @@ void BackendArm64::correct_implement_commands() {
 			vreg_free(sreg2);
 
 		} else if (c.inst == Asm::InstID::UCOMISS) { // fcmp
-			auto inst = c.inst;
 			auto p0 = c.p[0];
 			auto p1 = c.p[1];
 
@@ -701,10 +700,6 @@ void BackendArm64::implement_return(const SerialNodeParam &p) {
 		insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::R31), param_preg(TypePointer, Asm::RegID::R31), param_imm(TypeInt, (stack_max_size + 16) & 0xfff000));
 
 	insert_cmd(Asm::InstID::RET);
-}
-
-static bool arm_type_uses_int_register(const Class *t) {
-	return (t == TypeInt) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 BackendArm64::CallData BackendArm64::fc_begin(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {

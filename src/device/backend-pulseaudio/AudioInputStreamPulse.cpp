@@ -133,19 +133,19 @@ void AudioInputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t n
 }
 
 void AudioInputStreamPulse::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto stream = static_cast<AudioInputStreamPulse*>(userdata);
+	[[maybe_unused]] auto stream = static_cast<AudioInputStreamPulse*>(userdata);
 	//msg_write("--success");
 	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 void AudioInputStreamPulse::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto stream = static_cast<AudioInputStreamPulse*>(userdata);
+	[[maybe_unused]] auto stream = static_cast<AudioInputStreamPulse*>(userdata);
 	//printf("--state\n");
 	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 void AudioInputStreamPulse::pulse_input_notify_callback(pa_stream *p, void *userdata) {
-	auto stream = static_cast<AudioInputStreamPulse*>(userdata);
+	[[maybe_unused]] auto stream = static_cast<AudioInputStreamPulse*>(userdata);
 	printf("sstate... %p:  ", p);
 	int s = pa_stream_get_state(p);
 	if (s == PA_STREAM_UNCONNECTED)

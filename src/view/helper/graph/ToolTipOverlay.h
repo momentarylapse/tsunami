@@ -18,7 +18,7 @@ public:
 	ToolTipOverlay();
 
 	void on_draw(Painter *c) override;
-	bool hover(const vec2 &m) const override { return false; }
+	bool has_hover(const vec2 &m) const override { return false; }
 };
 
 }

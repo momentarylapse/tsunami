@@ -18,8 +18,8 @@ static const bool STREAM_WARNINGS = true;
 
 
 
-static int nnn = 0;
-static int xxx_total_read = 0;
+[[maybe_unused]] static int nnn = 0;
+[[maybe_unused]] static int xxx_total_read = 0;
 
 
 AudioOutputStreamPulse::AudioOutputStreamPulse(Session *session, Device *device, SharedData& shared_data) : AudioOutputStream(session, shared_data) {
@@ -215,13 +215,13 @@ void AudioOutputStreamPulse::pulse_stream_request_callback(pa_stream *p, size_t 
 }
 
 void AudioOutputStreamPulse::pulse_stream_success_callback(pa_stream *s, int success, void *userdata) {
-	auto stream = static_cast<AudioOutputStreamPulse*>(userdata);
+	[[maybe_unused]] auto stream = static_cast<AudioOutputStreamPulse*>(userdata);
 	//msg_write("--success");
 	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }
 
 void AudioOutputStreamPulse::pulse_stream_state_callback(pa_stream *s, void *userdata) {
-	auto stream = static_cast<AudioOutputStreamPulse*>(userdata);
+	[[maybe_unused]] auto stream = static_cast<AudioOutputStreamPulse*>(userdata);
 	//printf("--state\n");
 	pa_threaded_mainloop_signal(DeviceContextPulse::instance->pulse_mainloop, 0);
 }

@@ -22,7 +22,7 @@ public:
 	Cursor(AudioView *view, bool end);
 
 	void on_draw(Painter *p) override;
-	bool hover(const vec2 &m) const override;
+	bool has_hover(const vec2 &m) const override;
 	string get_tip() const override;
 
 	int pos() const;
@@ -37,7 +37,7 @@ public:
 class SelectionMarker : public ::scenegraph::NodeFree {
 public:
 	SelectionMarker(AudioView *view);
-	bool hover(const vec2 &m) const override { return false; }
+	bool has_hover(const vec2 &m) const override { return false; }
 
 	AudioView *view;
 	void on_draw(Painter *p) override;

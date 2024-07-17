@@ -1,11 +1,19 @@
 #if HAS_LIB_COREAUDIO
 
+#include <CoreServices/CoreServices.h>
+#include <CoreAudio/CoreAudio.h>
+
 #include "DeviceContextCoreAudio.h"
 #include "AudioOutputStreamCoreAudio.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
-#include "../../lib/hui/language.h"
+#include "../../lib/os/msg.h"
+
+
+//	https://developer.apple.com/library/archive/documentation/MusicAudio/Conceptual/CoreAudioOverview/ARoadmaptoCommonTasks/ARoadmaptoCommonTasks.html#//apple_ref/doc/uid/TP40003577-CH6-SW1
+//	https://developer.apple.com/library/archive/technotes/tn2091/_index.html
+//	https://developer.apple.com/library/archive/samplecode/CAPlayThrough/Listings/AudioDevice_cpp.html#//apple_ref/doc/uid/DTS10004443-AudioDevice_cpp-DontLinkElementID_5
 
 namespace tsunami {
 
@@ -37,11 +45,146 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 		return;
 
 
-	// system default
-	auto *def = device_manager->get_device_create(DeviceType::AUDIO_OUTPUT, "");
-	def->channels = 2;
-	def->default_by_lib = true;
-	def->present = true;
+	AudioComponentDescription acd = {
+		.componentType = ::kAudioUnitType_Output,
+		//.componentSubType = ::kAudioUnitSubType_DefaultOutput,
+		.componentSubType = ::kAudioUnitSubType_HALOutput,
+		.componentManufacturer = ::kAudioUnitManufacturer_Apple
+	};
+
+	if (false) {
+		AudioComponent comp = nullptr;
+		while (true) {
+			comp = AudioComponentFindNext(comp, &acd);
+			if (!comp)
+				break;
+			AudioComponentDescription description;
+			AudioComponentGetDescription(comp, &description);
+			//	msg_write("FOUND: " + p2s(comp) + "  " + i2s(description.componentManufacturer));
+			CFStringRef name;// = CFStringCreateMutable(kCFAllocatorDefault, 1024);
+			AudioComponentCopyName(comp, &name);
+			string nn = CFStringGetCStringPtr(name, kCFStringEncodingUTF8);
+			msg_write("FOUND OUTPUT: " + nn);
+			CFRelease(name);
+		}
+	}
+
+
+	auto check_device = [device_manager] (AudioDeviceID id, DeviceType type, bool is_default) {
+
+		UInt32 propsize = sizeof(Float32);
+		UInt32 mSafetyOffset;
+		UInt32 mBufferSizeFrames;
+		AudioStreamBasicDescription     mFormat;
+
+		AudioObjectPropertyScope theScope = (type == DeviceType::AUDIO_INPUT) ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
+		AudioObjectPropertyAddress theAddress1 = {
+			kAudioDevicePropertySafetyOffset,
+			theScope,
+			0}; // channel
+
+		AudioObjectGetPropertyData(id,
+									&theAddress1,
+									0,
+									nullptr,
+									&propsize,
+									&mSafetyOffset);
+
+
+		propsize = sizeof(UInt32);
+		theAddress1.mSelector = kAudioDevicePropertyBufferFrameSize;
+		AudioObjectGetPropertyData(id,
+									&theAddress1,
+									0,
+									nullptr,
+									&propsize,
+									&mBufferSizeFrames);
+
+		propsize = sizeof(AudioStreamBasicDescription);
+		theAddress1.mSelector = kAudioDevicePropertyStreamFormat;
+		AudioObjectGetPropertyData(id,
+									&theAddress1,
+									0,
+									nullptr,
+									&propsize,
+									&mFormat);
+
+		if (mFormat.mChannelsPerFrame == 0)
+			return;
+
+		char temp[1024];
+		UInt32 len = sizeof(temp);
+		AudioObjectPropertyAddress theAddress2 = { kAudioDevicePropertyDeviceName,
+												  theScope,
+												  0 }; // channel
+		AudioObjectGetPropertyData(id, &theAddress2, 0, nullptr, &len, temp);
+
+
+		Device* dev = device_manager->get_device_create(type, temp);
+		dev->name = temp;
+		dev->index_in_lib = (int)id;
+		dev->channels = mFormat.mChannelsPerFrame;
+		dev->present = true;
+		dev->default_by_lib = is_default;
+		//out_device_found(dev);
+		device_manager->set_device_config(dev);
+	};
+
+
+	UInt32 propsize;
+	Array<AudioDeviceID> devids;
+	AudioDeviceID default_devid = 0;
+
+// output
+	// default
+	AudioObjectPropertyAddress theAddress0 = {
+			kAudioHardwarePropertyDefaultOutputDevice,
+			kAudioDevicePropertyScopeOutput,
+			kAudioObjectPropertyElementMain
+	};
+	propsize = sizeof(AudioDeviceID);
+	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &default_devid);
+
+	// all
+	theAddress0 = {
+			kAudioHardwarePropertyDevices,
+			//kAudioObjectPropertyScopeGlobal,
+			kAudioDevicePropertyScopeOutput,
+			kAudioObjectPropertyElementMain
+	};
+	AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize);
+	devids.resize(propsize / sizeof(AudioDeviceID));
+	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &devids[0]);
+
+	// update
+	check_device(default_devid, DeviceType::AUDIO_OUTPUT, true);
+	for (auto id: devids)
+		check_device(id, DeviceType::AUDIO_OUTPUT, id == default_devid);
+
+// input
+	// default
+	theAddress0 = {
+		kAudioHardwarePropertyDefaultInputDevice,
+		kAudioDevicePropertyScopeInput,
+		kAudioObjectPropertyElementMain
+	};
+	propsize = sizeof(AudioDeviceID);
+	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &default_devid);
+
+	// all
+	theAddress0 = {
+		kAudioHardwarePropertyDevices,
+		kAudioDevicePropertyScopeInput,
+		kAudioObjectPropertyElementMain
+	};
+	AudioObjectGetPropertyDataSize(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize);
+	devids.resize(propsize / sizeof(AudioDeviceID));
+	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &devids[0]);
+
+	// update
+	check_device(default_devid, DeviceType::AUDIO_INPUT, true);
+	for (auto id: devids)
+		check_device(id, DeviceType::AUDIO_INPUT, id == default_devid);
 }
 
 }

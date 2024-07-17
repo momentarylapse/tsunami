@@ -10,7 +10,6 @@
 
 #include "../lib/pattern/Observable.h"
 #include "../lib/base/base.h"
-#include "../lib/hui/hui.h"
 
 namespace tsunami {
 

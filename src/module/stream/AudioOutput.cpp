@@ -15,6 +15,7 @@
 #include "../../lib/kaba/lib/extern.h"
 #include "../../plugins/PluginManager.h"
 #include "../../lib/os/time.h"
+#include "../../lib/hui/hui.h"
 
 namespace kaba {
 	VirtualTable* get_vtable(const VirtualBase *p);
@@ -178,7 +179,7 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 	if (size == END_OF_STREAM) {
 		//printf(" -> end  STREAM\n");
 		shared_data.read_end_of_stream = true;
-		hui::run_later(0.001f,  [this] { on_read_end_of_stream(); });
+		hui::run_in_gui_thread([this] { on_read_end_of_stream(); });
 		shared_data.ring_buf.write_ref_cancel(b);
 		return size;
 	}

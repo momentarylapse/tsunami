@@ -13,6 +13,7 @@
 #include "../../data/base.h"
 #include "../../lib/kaba/lib/extern.h"
 #include "../../lib/os/time.h"
+#include "../../lib/hui/language.h"
 #include "../../plugins/PluginManager.h"
 
 namespace kaba {

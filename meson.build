@@ -75,6 +75,14 @@ else
 	add_project_arguments('-DHAS_LIB_PORTAUDIO=0', language : ['cpp'])
 endif
 
+# optional dependency: coreaudio
+if 
+	add_project_arguments('-DHAS_LIB_COREAUDIO=1', language : ['cpp'])
+	deps += []
+else
+	add_project_arguments('-DHAS_LIB_COREAUDIO=0', language : ['cpp'])
+endif
+
 # optional dependency: unwind
 d = cc.find_library('unwind', required : false)
 if d.found()
@@ -221,6 +229,8 @@ sources = [
 	'src/data/TrackMarker.cpp',
 	'src/device/backend-alsa/DeviceContextAlsa.cpp',
 	'src/device/backend-alsa/MidiInputStreamAlsa.cpp',
+	'src/device/backend-coreaudio/AudioOutputStreamCoreAudio.cpp',
+	'src/device/backend-coreaudio/DeviceContextCoreAudio.cpp',
 	'src/device/backend-portaudio/AudioInputStreamPort.cpp',
 	'src/device/backend-portaudio/AudioOutputStreamPort.cpp',
 	'src/device/backend-portaudio/DeviceContextPort.cpp',

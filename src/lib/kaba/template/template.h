@@ -39,25 +39,32 @@ public:
 class TemplateManager {
 public:
 
-	TemplateManager(Context *c);
-	void copy_from(TemplateManager *m);
+	explicit TemplateManager(Context* c);
+	void copy_from(TemplateManager* m);
+	void clear_from_module(Module* m);
+
+// functions
+
+	using FunctionCreateF = std::function<Function*(SyntaxTree*, const Array<const Class*>&, int)>;
 	
-	void add_function_template(Function *f, const Array<string> &param_names);
-	Function *request_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
-	Function *request_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id);
+	void add_function_template(Function* f_template, const Array<string>& param_names, FunctionCreateF f_create = nullptr);
+	Function* request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
+	Function* request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id);
+
+// classes
 
 	using ClassCreateF = std::function<const Class*(SyntaxTree *, const Array<const Class*>&, int)>;
 
 	Class *add_class_template(SyntaxTree *tree, const string &name, const Array<string> &param_names, ClassCreateF f);
-	const Class *request_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
-	const Class *request_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, Block *block, const Class *ns, int token_id);
-
-	void clear_from_module(Module *m);
+	const Class *request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
+	const Class *request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, Block *block, const Class *ns, int token_id);
 
 	const Class *find_implicit_legacy(const string &name, Class::Type type, int array_size, const Array<const Class*> &params);
 	void add_implicit_legacy(const Class* t);
-	void add_explicit(SyntaxTree *tree, const Class* t, const Class* t0, const Array<const Class*> &params, int array_size = 0);
+	void add_explicit_class_instance(SyntaxTree *tree, const Class* t_instance, const Class* t_template, const Array<const Class*> &params, int array_size = 0);
 
+
+// convenience
 
 	const Class *request_pointer(SyntaxTree *tree, const Class *parent, int token_id);
 	const Class *request_shared(SyntaxTree *tree, const Class *parent, int token_id);
@@ -89,6 +96,7 @@ private:
 	struct FunctionTemplate {
 		Function *func;
 		Array<string> params;
+		FunctionCreateF f_create;
 		Array<FunctionInstance> instances;
 	};
 	Array<FunctionTemplate> function_templates;
@@ -106,13 +114,13 @@ private:
 	};
 	Array<ClassTemplate> class_templates;
 
-	FunctionTemplate &get_template(SyntaxTree *tree, Function *f0, int token_id);
-	ClassTemplate &get_template(SyntaxTree *tree, const Class *c0, int token_id);
+	FunctionTemplate &get_function_template(SyntaxTree *tree, Function *f0, int token_id);
+	ClassTemplate &get_class_template(SyntaxTree *tree, const Class *c0, int token_id);
 
 	Function *full_copy(SyntaxTree *tree, Function *f0);
 	shared<Node> node_replace(SyntaxTree *tree, shared<Node> n, const Array<string> &names, const Array<const Class*> &params);
-	Function *instantiate(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
-	const Class *instantiate(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id);
+	Function *instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
+	const Class *instantiate_class(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id);
 
 	void match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f);
 };

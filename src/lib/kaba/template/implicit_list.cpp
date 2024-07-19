@@ -12,18 +12,18 @@
 namespace kaba {
 
 static shared<Node> sa_num(shared<Node> node) {
-	return node->shift(config.target.pointer_size, TypeInt);
+	return node->shift(config.target.pointer_size, TypeInt32);
 }
 
 /*static shared<Node> sa_data(shared<Node> node) {
-	return node->shift(config.pointer_size, TypeInt);
+	return node->shift(config.pointer_size, TypeInt32);
 }*/
 
 void AutoImplementer::_add_missing_function_headers_for_list(Class *t) {
 	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
 	add_func_header(t, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, "resize", TypeVoid, {TypeInt}, {"num"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "resize", TypeVoid, {TypeInt32}, {"num"}, nullptr, Flags::MUTABLE);
 	if (t->param[0]->is_pointer_owned() or t->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0]->param[0], -1);
 		auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
@@ -42,7 +42,7 @@ void AutoImplementer::_add_missing_function_headers_for_list(Class *t) {
 		if (class_can_assign(t->param[0]))
 			add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
 	}
-	add_func_header(t, "remove", TypeVoid, {TypeInt}, {"index"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, "remove", TypeVoid, {TypeInt32}, {"index"}, nullptr, Flags::MUTABLE);
 	if (class_can_equal(t->param[0]))
 		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
 }
@@ -51,7 +51,7 @@ void AutoImplementer::implement_list_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	auto te = t->get_array_element();
-	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt});
+	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt32});
 	f->block->add(add_node_member_call(ff,
 			self, -1,
 			{const_int(te->size)}));
@@ -73,7 +73,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 	auto n_other = add_node_local(f->__get_var("other"));
 	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
 
-	if (auto f_resize = t->get_member_func("resize", TypeVoid, {TypeInt})) {
+	if (auto f_resize = t->get_member_func("resize", TypeVoid, {TypeInt32})) {
 		// self.resize(other.num)
 		auto n_other_num = sa_num(n_other);
 
@@ -90,7 +90,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 		//    el = other[i]
 
 		auto *v_el = f->block->add_var("el", tree->type_ref(t_el));
-		auto *v_i = f->block->add_var("i", TypeInt);
+		auto *v_i = f->block->add_var("i", TypeInt32);
 
 		Block *b = new Block(f, f->block.get());
 
@@ -117,7 +117,7 @@ void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 // delete...
 	if (auto f_del = te->get_destructor()) {
 
-		auto *var_i = f->block->add_var("i", TypeInt);
+		auto *var_i = f->block->add_var("i", TypeInt32);
 		auto *var_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
 
 		Block *b = new Block(f, f->block.get());
@@ -148,8 +148,8 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 	if (!f)
 		return;
 	auto te = t->get_array_element();
-	auto *var = f->block->add_var("i", TypeInt);
-	f->block->add_var("num_old", TypeInt);
+	auto *var = f->block->add_var("i", TypeInt32);
+	f->block->add_var("num_old", TypeInt32);
 
 	auto num = add_node_local(f->__get_var("num"));
 
@@ -190,7 +190,7 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 
 	{
 		// resize
-		auto c_resize = add_node_member_call(t->get_member_func("__mem_resize__", TypeVoid, {TypeInt}), self);
+		auto c_resize = add_node_member_call(t->get_member_func("__mem_resize__", TypeVoid, {TypeInt32}), self);
 		c_resize->set_param(1, num);
 		f->block->add(c_resize);
 	}
@@ -243,7 +243,7 @@ void AutoImplementer::implement_list_remove(Function *f, const Class *t) {
 
 	{
 		// resize
-		auto c_remove = add_node_member_call(t->get_member_func("__mem_remove__", TypeVoid, {TypeInt}), self);
+		auto c_remove = add_node_member_call(t->get_member_func("__mem_remove__", TypeVoid, {TypeInt32}), self);
 		c_remove->set_param(1, index);
 		f->block->params.add(c_remove);
 	}
@@ -261,7 +261,7 @@ void AutoImplementer::implement_list_add(Function *f, const Class *t) {
 	{
 		// resize(self.num + 1)
 		auto cmd_add = add_node_operator_by_inline(InlineID::INT32_ADD, sa_num(self), const_int(1));
-		auto cmd_resize = add_node_member_call(t->get_member_func("resize", TypeVoid, {TypeInt}), self);
+		auto cmd_resize = add_node_member_call(t->get_member_func("resize", TypeVoid, {TypeInt32}), self);
 		cmd_resize->set_param(1, cmd_add);
 		b->add(cmd_resize);
 	}
@@ -294,7 +294,7 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		//     if e != other[i]
 		//         return false
 		auto *v_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
-		auto *v_i = f->block->add_var("i", TypeInt);
+		auto *v_i = f->block->add_var("i", TypeInt32);
 
 		Block *b = new Block(f, f->block.get());
 
@@ -357,8 +357,8 @@ void AutoImplementer::_implement_functions_for_list(const Class *t) {
 	implement_list_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
 	implement_list_destructor(prepare_auto_impl(t, t->get_destructor()), t);
 	implement_list_clear(prepare_auto_impl(t, t->get_member_func("clear", TypeVoid, {})), t);
-	implement_list_resize(prepare_auto_impl(t, t->get_member_func("resize", TypeVoid, {TypeInt})), t);
-	implement_list_remove(prepare_auto_impl(t, t->get_member_func("remove", TypeVoid, {TypeInt})), t);
+	implement_list_resize(prepare_auto_impl(t, t->get_member_func("resize", TypeVoid, {TypeInt32})), t);
+	implement_list_remove(prepare_auto_impl(t, t->get_member_func("remove", TypeVoid, {TypeInt32})), t);
 	implement_list_add(prepare_auto_impl(t, t->get_member_func("add", TypeVoid, {nullptr})), t);
 	if (t->param[0]->is_pointer_owned() or t->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0]->param[0], -1);

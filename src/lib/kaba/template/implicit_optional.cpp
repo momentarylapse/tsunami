@@ -15,7 +15,7 @@ extern const Class *TypeNoValueError;
 extern const Class *TypeNone;
 
 shared<Node> AutoImplementer::optional_has_value(shared<Node> node) {
-	return node->shift(node->type->size - 1, TypeBool);
+	return node->shift(node->type->param[0]->size, TypeBool);
 }
 
 shared<Node> AutoImplementer::optional_data(shared<Node> node) {

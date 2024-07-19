@@ -52,20 +52,20 @@ void SIAddPackageThread(Context *c) {
 		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&ThreadedWork::__init__), Flags::MUTABLE);
 		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, thread_p(&ThreadedWork::__delete__), Flags::MUTABLE);
 		class_add_func("run", TypeBool, thread_p(&ThreadedWork::run), Flags::MUTABLE);
-			func_add_param("total_size", TypeInt);
-			func_add_param("partition_size", TypeInt);
+			func_add_param("total_size", TypeInt32);
+			func_add_param("partition_size", TypeInt32);
 		class_add_func_virtual("on_step", TypeVoid, thread_p(&ThreadedWork::on_step));
-			func_add_param("index", TypeInt);
-			func_add_param("worker_id", TypeInt);
+			func_add_param("index", TypeInt32);
+			func_add_param("worker_id", TypeInt32);
 		class_add_func_virtual("on_status", TypeBool, thread_p(&ThreadedWork::on_status));
-		class_add_func("get_total", TypeInt, thread_p(&ThreadedWork::get_total));
-		class_add_func("get_done", TypeInt, thread_p(&ThreadedWork::get_done));
+		class_add_func("get_total", TypeInt32, thread_p(&ThreadedWork::get_total));
+		class_add_func("get_done", TypeInt32, thread_p(&ThreadedWork::get_done));
 #ifdef KABA_EXPORT_THREADS
 		class_set_vtable(ThreadedWork);
 #endif
 
 
-	add_func("get_num_cores", TypeInt, thread_p(&Thread::get_num_cores), Flags::STATIC);
+	add_func("get_num_cores", TypeInt32, thread_p(&Thread::get_num_cores), Flags::STATIC);
 	add_func("exit", TypeVoid, thread_p(&Thread::exit), Flags::STATIC);
 }
 

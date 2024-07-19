@@ -10,7 +10,7 @@ namespace kaba {
 }
 const void *_get_class(int t) {
 	if (t == Any::TYPE_INT)
-		return kaba::TypeInt;
+		return kaba::TypeInt32;
 	if (t == Any::TYPE_FLOAT)
 		return kaba::TypeFloat32;
 	if (t == Any::TYPE_BOOL)

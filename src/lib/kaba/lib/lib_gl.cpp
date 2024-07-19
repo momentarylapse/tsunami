@@ -181,16 +181,16 @@ void SIAddPackageGl(Context *c) {
 		class_add_func("create_cube", TypeVoid, gl_p(&nix::VertexBuffer::create_cube), Flags::MUTABLE);
 			func_add_param("a", TypeVec3);
 			func_add_param("b", TypeVec3);
-		class_add_func("count", TypeInt, gl_p(&nix::VertexBuffer::count));
+		class_add_func("count", TypeInt32, gl_p(&nix::VertexBuffer::count));
 
 
 	add_class(TypeTexture);
-		class_add_element("width", TypeInt, gl_p(&nix::Texture::width));
-		class_add_element("height", TypeInt, gl_p(&nix::Texture::height));
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::Texture::_pointer_ref_counter));
+		class_add_element("width", TypeInt32, gl_p(&nix::Texture::width));
+		class_add_element("height", TypeInt32, gl_p(&nix::Texture::height));
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, gl_p(&nix::Texture::_pointer_ref_counter));
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init__), Flags::MUTABLE);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::MUTABLE);
 		class_add_func("set_options", TypeVoid, gl_p(&nix::Texture::set_options), Flags::MUTABLE);
@@ -213,32 +213,32 @@ void SIAddPackageGl(Context *c) {
 	add_class(TypeVolumeTexture);
 		class_derive_from(TypeTexture);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_volume__), Flags::MUTABLE);
-			func_add_param("nx", TypeInt);
-			func_add_param("ny", TypeInt);
-			func_add_param("nz", TypeInt);
+			func_add_param("nx", TypeInt32);
+			func_add_param("ny", TypeInt32);
+			func_add_param("nz", TypeInt32);
 			func_add_param("format", TypeString);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE | Flags::MUTABLE);
 
 	add_class(TypeImageTexture);
 		class_derive_from(TypeTexture);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_image__), Flags::MUTABLE);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE | Flags::MUTABLE);
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_depth__), Flags::MUTABLE);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE | Flags::MUTABLE);
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture);
 		class_add_func(Identifier::Func::INIT, TypeVoid, gl_p(&KabaTexture::__init_cube__), Flags::MUTABLE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 			func_add_param("format", TypeString);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::OVERRIDE | Flags::MUTABLE);
 
@@ -248,7 +248,7 @@ void SIAddPackageGl(Context *c) {
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaFrameBuffer::__delete__), Flags::MUTABLE);
 		class_add_func("area", TypeRect, gl_p(&nix::FrameBuffer::area));
 		class_add_func("clear_color", TypeVoid, gl_p(&nix::FrameBuffer::clear_color), Flags::MUTABLE);
-			func_add_param("index", TypeInt);
+			func_add_param("index", TypeInt32);
 			func_add_param("c", TypeColor);
 		class_add_func("clear_depth", TypeVoid, gl_p(&nix::FrameBuffer::clear_depth), Flags::MUTABLE);
 			func_add_param("z", TypeFloat32);
@@ -256,39 +256,39 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("attachments", TypeTextureSharedNNList);
 		class_add_func("update", TypeVoid, gl_p(&nix::FrameBuffer::update_x), Flags::MUTABLE);
 			func_add_param("attachments", TypeTextureSharedNNList);
-			func_add_param("face", TypeInt);
+			func_add_param("face", TypeInt32);
 		class_add_func("read", TypeVoid, gl_p(&nix::FrameBuffer::read));
 			func_add_param("image", TypeImage, Flags::OUT);
 		//class_add_const("DEFAULT", TypeFrameBufferP, gl_p(&nix::FrameBuffer::DEFAULT));
-		class_add_element("width", TypeInt, gl_p(&nix::FrameBuffer::width));
-		class_add_element("height", TypeInt, gl_p(&nix::FrameBuffer::height));
+		class_add_element("width", TypeInt32, gl_p(&nix::FrameBuffer::width));
+		class_add_element("height", TypeInt32, gl_p(&nix::FrameBuffer::height));
 		class_add_element("color_attachments", TypeTextureSharedNNList, gl_p(&nix::FrameBuffer::color_attachments));
 		class_add_element("depth_buffer", TypeDepthBufferP, gl_p(&nix::FrameBuffer::depth_buffer));
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::FrameBuffer::_pointer_ref_counter));
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, gl_p(&nix::FrameBuffer::_pointer_ref_counter));
 
 	add_class(TypeShader);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&KabaShader::__delete__), Flags::MUTABLE);
-		class_add_func("location", TypeInt, gl_p(&nix::Shader::get_location));
+		class_add_func("location", TypeInt32, gl_p(&nix::Shader::get_location));
 			func_add_param("name", TypeString);
 		class_add_func("link_uniform_block", TypeVoid, gl_p(&nix::Shader::link_uniform_block), Flags::MUTABLE);
 			func_add_param("name", TypeString);
-			func_add_param("binding", TypeInt);
+			func_add_param("binding", TypeInt32);
 		class_add_func("set_float_l", TypeVoid, gl_p(&nix::Shader::set_float_l), Flags::MUTABLE);
-			func_add_param("loc", TypeInt);
+			func_add_param("loc", TypeInt32);
 			func_add_param("f", TypeFloat32);
 		class_add_func("set_matrix_l", TypeVoid, gl_p(&nix::Shader::set_matrix_l), Flags::MUTABLE);
-			func_add_param("loc", TypeInt);
+			func_add_param("loc", TypeInt32);
 			func_add_param("m", TypeMat4);
 		class_add_func("set_color_l", TypeVoid, gl_p(&nix::Shader::set_color_l), Flags::MUTABLE);
-			func_add_param("loc", TypeInt);
+			func_add_param("loc", TypeInt32);
 			func_add_param("c", TypeColor);
 		class_add_func("set_int_l", TypeVoid, gl_p(&nix::Shader::set_int_l), Flags::MUTABLE);
-			func_add_param("loc", TypeInt);
-			func_add_param("i", TypeInt);
+			func_add_param("loc", TypeInt32);
+			func_add_param("i", TypeInt32);
 		class_add_func("set_floats_l", TypeVoid, gl_p(&nix::Shader::set_floats_l), Flags::MUTABLE);
-			func_add_param("loc", TypeInt);
+			func_add_param("loc", TypeInt32);
 			func_add_param("data", TypeFloatP);
-			func_add_param("num", TypeInt);
+			func_add_param("num", TypeInt32);
 		class_add_func("set_float", TypeVoid, gl_p(&nix::Shader::set_float), Flags::MUTABLE);
 			func_add_param("name", TypeString);
 			func_add_param("f", TypeFloat32);
@@ -300,28 +300,28 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("c", TypeColor);
 		class_add_func("set_int", TypeVoid, gl_p(&nix::Shader::set_int), Flags::MUTABLE);
 			func_add_param("name", TypeString);
-			func_add_param("i", TypeInt);
+			func_add_param("i", TypeInt32);
 		class_add_func("set_floats", TypeVoid, gl_p(&nix::Shader::set_floats), Flags::MUTABLE);
 			func_add_param("name", TypeString);
 			func_add_param("data", TypeFloatP);
-			func_add_param("num", TypeInt);
+			func_add_param("num", TypeInt32);
 		class_add_func("dispatch", TypeVoid, gl_p(&nix::Shader::dispatch), Flags::MUTABLE);
-			func_add_param("nx", TypeInt);
-			func_add_param("ny", TypeInt);
-			func_add_param("nz", TypeInt);
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, gl_p(&nix::Shader::_pointer_ref_counter));
+			func_add_param("nx", TypeInt32);
+			func_add_param("ny", TypeInt32);
+			func_add_param("nz", TypeInt32);
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, gl_p(&nix::Shader::_pointer_ref_counter));
 
 
 	add_class(TypeBuffer);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, gl_p(&nix::Buffer::__delete__), Flags::MUTABLE);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update), Flags::MUTABLE);
 			func_add_param("data", TypeReference);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update_array), Flags::MUTABLE);
 			func_add_param("data", TypeDynamicArray);
 		class_add_func("read", TypeVoid, gl_p(&nix::Buffer::read));
 			func_add_param("data", TypeReference);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("read", TypeVoid, gl_p(&nix::Buffer::read_array));
 			func_add_param("data", TypeDynamicArray);
 
@@ -371,7 +371,7 @@ void SIAddPackageGl(Context *c) {
 		func_add_param("dest", TypeAlpha);
 	add_func("set_stencil", TypeVoid, gl_p(&nix::set_stencil), Flags::STATIC);
 		func_add_param("mode", TypeStencilOp);
-		func_add_param("param", TypeInt);
+		func_add_param("param", TypeInt32);
 	add_func("set_projection_perspective", TypeVoid, gl_p(&nix::set_projection_perspective), Flags::STATIC);
 	add_func("set_projection_perspective_ext", TypeVoid, gl_p(&nix::set_projection_perspective_ext), Flags::STATIC);
 		func_add_param("center", TypeVec2);
@@ -406,18 +406,18 @@ void SIAddPackageGl(Context *c) {
 	add_func("bind_textures", TypeVoid, gl_p(&nix::set_textures), Flags::STATIC);
 		func_add_param("t", TypeTexturePList); // -> ref[]
 	add_func("bind_texture", TypeVoid, gl_p(&nix::bind_texture), Flags::STATIC);
-		func_add_param("binding", TypeInt);
+		func_add_param("binding", TypeInt32);
 		func_add_param("t", TypeTextureP); // -> ref
 	add_func("set_shader", TypeVoid, gl_p(&nix::set_shader), Flags::STATIC);
 		func_add_param("s", TypeShaderP); // -> ref
 	add_func("bind_buffer", TypeVoid, gl_p(&nix::bind_buffer), Flags::STATIC);
-		func_add_param("binding", TypeInt);
+		func_add_param("binding", TypeInt32);
 		func_add_param("buf", TypeBufferP); // -> ref
 	add_func("bind_image", TypeVoid, gl_p(&nix::bind_image), Flags::STATIC);
-		func_add_param("binding", TypeInt);
+		func_add_param("binding", TypeInt32);
 		func_add_param("t", TypeTextureP); // -> ref
-		func_add_param("level", TypeInt);
-		func_add_param("layer", TypeInt);
+		func_add_param("level", TypeInt32);
+		func_add_param("layer", TypeInt32);
 		func_add_param("writable", TypeBool);
 	add_func("screen_shot_to_image", TypeVoid, gl_p(&nix::screen_shot_to_image), Flags::STATIC);
 		func_add_param("im", TypeImage);

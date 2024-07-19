@@ -93,9 +93,9 @@ SyntaxTree::SyntaxTree(Module *_module) {
 	module = _module;
 	asm_meta_info = new Asm::MetaInfo(config.target.pointer_size);
 
-	base_class = new Class(Class::Type::NAMESPACE, "-base-", 0, this);
+	base_class = new Class(Class::Type::NAMESPACE, "-base-", 0, 1, this);
 	_base_class = base_class;
-	implicit_symbols = new Class(Class::Type::NAMESPACE, "-implicit-", 0, this);
+	implicit_symbols = new Class(Class::Type::NAMESPACE, "-implicit-", 0, 1, this);
 	root_of_all_evil = new Function("-root-", TypeVoid, base_class, Flags::STATIC);
 }
 
@@ -212,7 +212,7 @@ Constant *SyntaxTree::add_constant(const Class *type, Class *name_space) {
 }
 
 Constant *SyntaxTree::add_constant_int(int value) {
-	auto *c = add_constant(TypeInt);
+	auto *c = add_constant(TypeInt32);
 	c->as_int() = value;
 	return c;
 }
@@ -274,6 +274,9 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 
 	// recursively up the namespaces
 	while (ns) {
+		/*for (const auto&& [_name, t]: ns->type_aliases)
+			if (_name == name)
+				return {add_node_class(t, token_id)};*/
 
 		// named constants
 		for (auto *c: weak(ns->constants))
@@ -502,7 +505,7 @@ Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int si
 Class *SyntaxTree::create_new_class_no_check(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
 	//msg_write("CREATE " + name);
 
-	Class *t = new Class(type, name, size, this, parent, params);
+	Class *t = new Class(type, name, size, 1, this, parent, params);
 	t->token_id = token_id;
 	owned_classes.add(t);
 	
@@ -1073,7 +1076,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// ...for_var += 1
 		shared<Node> cmd_inc;
-		if (var->type == TypeInt) {
+		if (var->type == TypeInt32) {
 			if (step->as_const()->as_int() == 1)
 				cmd_inc = add_node_operator_by_inline(InlineID::INT32_INCREASE, var, nullptr);
 			else
@@ -1112,7 +1115,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		if (array->type->is_dict()) {
 			static int for_index_count = 0;
 			string index_name = format("-for_dict_index_%d-", for_index_count++);
-			index = add_node_local(b->add_var(index_name, TypeInt));
+			index = add_node_local(b->add_var(index_name, TypeInt32));
 		}
 
 
@@ -1126,7 +1129,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		shared<Node> val1;
 		if (array->type->usable_as_list() or array->type->is_dict()) {
 			// array.num
-			val1 = array->shift(config.target.pointer_size, TypeInt, array->token_id);
+			val1 = array->shift(config.target.pointer_size, TypeInt32, array->token_id);
 		} else {
 			// array.size
 			val1 = add_node_const(add_constant_int(array->type->array_length));

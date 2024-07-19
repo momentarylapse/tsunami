@@ -200,7 +200,7 @@ SerialNodeParam param_label(const Class *type, int m) {
 }
 
 SerialNodeParam param_label32(int m) {
-	return param_label(TypeInt, m);
+	return param_label(TypeInt32, m);
 }
 
 SerialNodeParam param_deref_label(const Class *type, int m) {

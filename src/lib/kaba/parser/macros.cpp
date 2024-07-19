@@ -28,7 +28,7 @@ string MacroName[NumMacroNames] = {
 	"#immortal",
 };
 
-void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse) {
+void Parser::handle_legacy_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse) {
 	string filename;
 	string source;
 
@@ -90,7 +90,7 @@ void Parser::handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just
 }
 
 // ... maybe some time later
-void Parser::parse_macros(bool just_analyse) {
+void Parser::parse_legacy_macros(bool just_analyse) {
 	int NumIfDefs = 0;
 	bool IfDefed[1024];
 	
@@ -98,7 +98,7 @@ void Parser::parse_macros(bool just_analyse) {
 
 		if (Exp.lines[i].tokens[0].name[0] == '#') {
 			Exp.jump(Exp.lines[i].token_ids[0]);
-			handle_macro(i, NumIfDefs, IfDefed, just_analyse);
+			handle_legacy_macro(i, NumIfDefs, IfDefed, just_analyse);
 		} else {
 #if 0
 			Exp.cur = Exp.cur_line->exp[Exp.cur_exp].name;

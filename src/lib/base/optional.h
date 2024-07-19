@@ -93,8 +93,8 @@ public:
 	}
 
 private:
-	char _value[sizeof(T)];
-	bool _is_set;
+	alignas(T) char _value[sizeof(T)];
+	alignas(T) bool _is_set;
 
 	void _init() {
 		if (_is_set)

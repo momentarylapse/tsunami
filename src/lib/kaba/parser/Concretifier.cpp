@@ -372,22 +372,25 @@ void Concretifier::concretify_all_params(shared<Node> &node, Block *block, const
 		}
 };
 
+shared<Node> apply_macro(Concretifier *con, Function* f, shared<Node> node, shared_array<Node>& params, Block *block, const Class *ns) {
+	if (f->num_params != params.num)
+		con->do_error(format("can not pass %d parameters to a macro expecting %d", params.num, f->num_params), node);
 
-shared<Node> check_macro(Concretifier *con, shared<Node> node, Block *block, const Class *ns) {
-	if (node->is_function()) {
-		auto f = node->as_func();
-		if (f->is_macro()) {
-			if (f->num_params > 0)
-				con->do_error("macro with parameters not allowed yet", node);
-			if (f->literal_return_type != TypeVoid)
-				con->do_error("macro with return value not allowed yet", node);
-
-			return (Node*)f->block.get();
+	auto b = cp_node(f->block.get());
+	con->tree->transform_block((Block*)b.get(), [con, f, params] (shared<Node> n) {
+		if (n->kind == NodeKind::ABSTRACT_TOKEN) {
+			for (int i=0; i<params.num; i++) {
+				if (n->as_token() == f->var[i]->name) {
+					//con->do_error("FOUND PARRAM", n);
+					return params[i];
+				}
+			}
 		}
-	}
-	return node;
-}
+		return n;
+	});
 
+	return con->concretify_block(b, block, ns);
+}
 
 shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, const Class *ns) {
 
@@ -405,10 +408,11 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 
 	auto params = node->params.sub_ref(1);
 
-
 	// make links callable
 	for (auto&& [i,l]: enumerate(weak(links))) {
 		if (l->kind == NodeKind::FUNCTION) {
+			if (l->as_func()->is_macro())
+				return apply_macro(this, l->as_func(), l, params, block, ns);
 			if (l->as_func()->is_template())
 				links[i] = make_func_node_callable(match_template_params(l, params, block, ns));
 			else
@@ -436,7 +440,7 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 			do_error(format("this %s does not seem callable", kind2str(l->kind)), l);
 		}
 	}
-	return check_macro(this, try_to_match_apply_params(links, params), block, ns);
+	return try_to_match_apply_params(links, params);
 }
 
 shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *block, const Class *ns) {
@@ -475,7 +479,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		if (index->kind == NodeKind::CLASS) {
 			auto c1 = operand->as_class();
 			auto c2 = index->as_class();
-			if (auto cc = context->template_manager->request_instance(tree, c1, {c2}, block, ns, node->token_id)) {
+			if (auto cc = context->template_manager->request_class_instance(tree, c1, {c2}, block, ns, node->token_id)) {
 				return add_node_class(cc, node->token_id);
 			}
 		}
@@ -488,7 +492,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 			return tree->conv_eval_const_func(n);
 		});
 
-		if (index->type != TypeInt)
+		if (index->type != TypeInt32)
 			do_error(format("array size must be of type 'int', not '%s'", index->type->name), index);
 		if (index->kind != NodeKind::CONSTANT)
 			do_error("array size must be compile-time constant", index);
@@ -513,7 +517,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		}
 		for (auto l: weak(links)) {
 			auto f = l->as_func();
-			if (auto ff = context->template_manager->request_instance(tree, f, tt, block, ns, node->token_id)) {
+			if (auto ff = context->template_manager->request_function_instance(tree, f, tt, block, ns, node->token_id)) {
 				auto tf = add_node_func_name(ff);
 				tf->params = l->params; // in case we have a member instance
 				return tf;
@@ -551,7 +555,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		index = tree->transform_node(index, [this] (shared<Node> n) {
 			return tree->conv_eval_const_func(n);
 		});
-		if (index->type != TypeInt)
+		if (index->type != TypeInt32)
 			do_error("tuple index must be of type 'int'", index);
 		if (index->kind != NodeKind::CONSTANT)
 			do_error("tuple index must be compile-time constant", index);
@@ -570,7 +574,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		return f;
 	}
 
-	if (index->type != TypeInt)
+	if (index->type != TypeInt32)
 		do_error(format("array index needs to be of type 'int', not '%s'", index->type->long_name()), index);
 
 	index = tree->transform_node(index, [this] (shared<Node> n) {
@@ -876,7 +880,7 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	string index_name = format("-for_index_%d-", for_index_count ++);
 	if (node->params[1])
 		index_name = node->params[1]->as_token();
-	auto index = block->add_var(index_name, TypeInt);
+	auto index = block->add_var(index_name, TypeInt32);
 	node->set_param(1, add_node_local(index));
 
 	// block
@@ -955,12 +959,12 @@ shared<Node> implement_len(shared<Node> node, Concretifier *con, Block *block, c
 		return add_node_const(con->tree->add_constant_int(node->type->array_length), token_id);
 
 	// __length__() function?
-	if (auto *f = node->type->get_member_func(Identifier::Func::LENGTH, TypeInt, {}))
+	if (auto *f = node->type->get_member_func(Identifier::Func::LENGTH, TypeInt32, {}))
 		return add_node_member_call(f, node, node->token_id);
 
 	// element "int num/length"?
 	for (auto &e: node->type->elements)
-		if (e.type == TypeInt and (e.name == "length" or e.name == "num")) {
+		if (e.type == TypeInt32 and (e.name == "length" or e.name == "num")) {
 			return node->shift(e.offset, e.type, node->token_id);
 		}
 
@@ -1801,11 +1805,11 @@ const Class *type_more_dominant(const Class *a, const Class *b) {
 	auto is_x = [a, b] (const Class *t1, const Class *t2) {
 		return ((a == t1 and b == t2) or (a == t2 and b == t1));
 	};
-	if (is_x(TypeInt, TypeFloat32))
+	if (is_x(TypeInt32, TypeFloat32))
 		return TypeFloat32;
-	if (is_x(TypeInt, TypeFloat64))
+	if (is_x(TypeInt32, TypeFloat64))
 		return TypeFloat64;
-	if (is_x(TypeInt, TypeInt64))
+	if (is_x(TypeInt32, TypeInt64))
 		return TypeInt64;
 	if (is_x(TypeInt64, TypeFloat64))
 		return TypeFloat64;
@@ -1943,7 +1947,9 @@ shared<Node> Concretifier::make_func_node_callable(const shared<Node> l) {
 
 shared<Node> Concretifier::match_template_params(const shared<Node> l, const shared_array<Node> &params, Block *block, const Class *ns) {
 	auto f0 = l->as_func();
-	auto ff = context->template_manager->request_instance_matching(tree, f0, params, block, ns, l->token_id);
+	auto _params = params;
+	force_concrete_types(_params);
+	auto ff = context->template_manager->request_function_instance_matching(tree, f0, _params, block, ns, l->token_id);
 	auto r = l->shallow_copy();
 	r->link_no = (int_p)ff;
 	return r;
@@ -1965,7 +1971,7 @@ shared<Node> Concretifier::make_func_pointer_node_callable(const shared<Node> l)
 }
 
 shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *param_type, int token_id) {
-	//if ((t == TypeInt) and (param_type == TypeFloat32))
+	//if ((t == TypeInt32) and (param_type == TypeFloat32))
 	//	return add_node_call(get_existence("f2i", nullptr, nullptr, false)[0]->as_func());
 	if (param_type->is_some_pointer_not_null())
 		param_type = param_type->param[0];
@@ -1981,7 +1987,7 @@ shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *para
 }
 
 shared_array<Node> Concretifier::turn_class_into_constructor(const Class *t, const shared_array<Node> &params, int token_id) {
-	if (((t == TypeInt) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeInt8)) and (params.num == 1))
+	if (((t == TypeInt32) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeInt8)) and (params.num == 1))
 		return {tree->make_fake_constructor(t, params[0]->type, token_id)};
 
 	// constructor
@@ -2257,7 +2263,7 @@ shared<Node> Concretifier::try_build_pipe_map_array(const shared<Node> &input, N
 	auto var = block->add_var(vname, tree->request_implicit_class_reference(el_type, token_id));
 	flags_clear(var->flags, Flags::MUTABLE);
 	n_for->set_param(0, add_node_local(var));
-	auto index = block->add_var(viname, TypeInt);
+	auto index = block->add_var(viname, TypeInt32);
 	n_for->set_param(1, add_node_local(index));
 
 	auto out = add_node_call(f->as_func(), f->token_id);
@@ -2387,7 +2393,7 @@ shared<Node> Concretifier::build_lambda_new(const shared<Node> &param, const sha
 	Function *f = tree->add_function(name, TypeUnknown, tree->base_class, Flags::STATIC);
 
 	//f->abstract_param_types.add();
-	[[maybe_unused]] auto v = f->add_param(param->as_token(), TypeInt, Flags::NONE);
+	[[maybe_unused]] auto v = f->add_param(param->as_token(), TypeInt32, Flags::NONE);
 	parser->post_process_function_header(f, {}, tree->base_class, Flags::STATIC);
 
 	// body

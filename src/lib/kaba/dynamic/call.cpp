@@ -228,7 +228,7 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	exit(1);*/
 	//msg_write(bytes(&temp, sizeof(temp)).hex());
 
-	if (return_type == TypeInt or return_type->is_enum()) {
+	if (return_type == TypeInt32 or return_type->is_enum()) {
 		*(int*)ret = (int)temp[N*2+2];
 	} else if (return_type == TypeInt64 or return_type->is_some_pointer()) {
 		*(int64*)ret = temp[N*2+2];
@@ -262,7 +262,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 		if (return_type == TypeVoid) {
 			call0_void(ff, ret, param);
 			return true;
-		} else if (return_type == TypeInt) {
+		} else if (return_type == TypeInt32) {
 			call0<int>(ff, ret, param);
 			return true;
 		} else if (return_type == TypeFloat32) {
@@ -274,7 +274,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 		}
 	} else if (ptype.num == 1) {
 		if (return_type == TypeVoid) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt32) {
 				call1_void_x<int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
@@ -301,8 +301,8 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 #endif
 				return true;
 			}
-		} else if (return_type == TypeInt) {
-			if (ptype[0] == TypeInt or ptype[0]->is_enum()) {
+		} else if (return_type == TypeInt32) {
+			if (ptype[0] == TypeInt32 or ptype[0]->is_enum()) {
 				call1<int,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeInt8) {
@@ -316,12 +316,12 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		} else if (return_type == TypeInt64) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt32) {
 				call1<int64,int>(ff, ret, param);
 				return true;
 			}
 		} else if (return_type == TypeBool or return_type == TypeInt8) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt32) {
 				call1<char,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
@@ -332,7 +332,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		} else if (return_type == TypeFloat32) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt32) {
 				call1<float,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
@@ -353,7 +353,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
-			if (ptype[0] == TypeInt) {
+			if (ptype[0] == TypeInt32) {
 				call1<CBR,int>(ff, ret, param);
 				return true;
 			} else if (ptype[0] == TypeFloat32) {
@@ -368,12 +368,12 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			}
 		}
 	} else if (ptype.num == 2) {
-		if (return_type == TypeInt) {
-			if ((ptype[0] == TypeInt) and (ptype[1] == TypeInt)) {
+		if (return_type == TypeInt32) {
+			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
 				call2<int,int,int>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt)) {
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
 				call2<int,CBR,int>(ff, ret, param);
 				return true;
 			}
@@ -398,7 +398,7 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			if ((ptype[0] == TypeInt64) and (ptype[1] == TypeInt64)) {
 				call2<int64,int64,int64>(ff, ret, param);
 				return true;
-			} else if ((ptype[0] == TypeInt64) and (ptype[1] == TypeInt)) {
+			} else if ((ptype[0] == TypeInt64) and (ptype[1] == TypeInt32)) {
 				call2<int64,int64,int>(ff, ret, param);
 				return true;
 			}
@@ -413,13 +413,13 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
-			if ((ptype[0] == TypeInt) and (ptype[1] == TypeInt)) {
+			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
 				call2<CBR,int,int>(ff, ret, param);
 				return true;
 			} else if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
 				call2<CBR,float,float>(ff, ret, param);
 				return true;
-			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt)) {
+			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
 				call2<CBR,CBR,int>(ff, ret, param);
 				return true;
 			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {

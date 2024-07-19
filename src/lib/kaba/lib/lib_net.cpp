@@ -60,12 +60,12 @@ void SIAddPackageNet(Context *c) {
 
 	add_class(TypeNetAddress);
 		class_add_element("host", TypeString, net_p(&NetAddress::host));
-		class_add_element("port", TypeInt, net_p(&NetAddress::port));
+		class_add_element("port", TypeInt32, net_p(&NetAddress::port));
 		class_add_func(Identifier::Func::INIT, TypeVoid, net_p(&NetAddress::__init__), Flags::MUTABLE);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, net_p(&NetAddress::__delete__), Flags::MUTABLE);
 
 	add_class(TypeSocket);
-		class_add_element("uid", TypeInt, net_p(&Socket::uid));
+		class_add_element("uid", TypeInt32, net_p(&Socket::uid));
 		class_add_func(Identifier::Func::INIT, TypeVoid, net_p(&Socket::__init__), Flags::MUTABLE);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, net_p(&Socket::__delete__), Flags::MUTABLE);
 		class_add_func("accept", TypeSocketXfer, net_p(&Socket::accept), Flags::MUTABLE);
@@ -76,7 +76,7 @@ void SIAddPackageNet(Context *c) {
 			func_add_param("target", TypeNetAddress);
 		class_add_func("get_sender", TypeNetAddress, net_p(&Socket::get_sender), Flags::MUTABLE);
 		class_add_func("read", TypeString, net_p(&Socket::read), Flags::MUTABLE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("write", TypeBool, net_p(&Socket::write), Flags::MUTABLE);
 			func_add_param("buf", TypeString);
 		class_add_func("can_read", TypeBool, net_p(&Socket::can_read));
@@ -84,20 +84,20 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("is_connected", TypeBool, net_p(&Socket::is_connected));
 
 		class_add_func("listen", TypeSocketXfer, net_p(&__socket_listen__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
-			func_add_param("port", TypeInt);
+			func_add_param("port", TypeInt32);
 			func_add_param("block", TypeBool);
 		class_add_func("connect", TypeSocketXfer, net_p(&__socket_connect__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
 			func_add_param("addr", TypeString);
-			func_add_param("port", TypeInt);
+			func_add_param("port", TypeInt32);
 		class_add_func("create_udp", TypeSocketXfer, net_p(&__socket_create_udp__), Flags::STATIC | Flags::RAISES_EXCEPTIONS);
-			func_add_param("port", TypeInt);
+			func_add_param("port", TypeInt32);
 
 	add_class(TypeBinaryBuffer);
 		class_add_element("data", TypeString, net_p(&BinaryBuffer::data));
 		class_add_func(Identifier::Func::INIT, TypeVoid, net_p(&BinaryBuffer::__init__), Flags::MUTABLE);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, net_p(&BinaryBuffer::__delete__), Flags::MUTABLE);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int&))&BinaryBuffer::operator>>), Flags::MUTABLE);
-			func_add_param("i", TypeInt, Flags::OUT);
+			func_add_param("i", TypeInt32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(float&))&BinaryBuffer::operator>>), Flags::MUTABLE);
 			func_add_param("f", TypeFloat32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool&))&BinaryBuffer::operator>>), Flags::MUTABLE);
@@ -112,10 +112,10 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("start_block", TypeVoid, net_p(&BinaryBuffer::start_block), Flags::MUTABLE);
 		class_add_func("end_block", TypeVoid, net_p(&BinaryBuffer::end_block), Flags::MUTABLE);
 		class_add_func("set_pos", TypeVoid, net_p(&BinaryBuffer::set_pos), Flags::MUTABLE);
-			func_add_param("pos", TypeInt);
-		class_add_func("get_pos", TypeInt, net_p(&BinaryBuffer::get_pos));
+			func_add_param("pos", TypeInt32);
+		class_add_func("get_pos", TypeInt32, net_p(&BinaryBuffer::get_pos));
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int))&BinaryBuffer::operator<<), Flags::MUTABLE);
-			func_add_param("i", TypeInt);
+			func_add_param("i", TypeInt32);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(float))&BinaryBuffer::operator<<), Flags::MUTABLE);
 			func_add_param("f", TypeFloat32);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool))&BinaryBuffer::operator<<), Flags::MUTABLE);

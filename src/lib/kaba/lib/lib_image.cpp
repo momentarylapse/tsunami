@@ -40,36 +40,36 @@ void SIAddPackageImage(Context *c) {
 
 	
 	add_class(TypeImage);
-		class_add_element("width", TypeInt, &Image::width);
-		class_add_element("height", TypeInt, &Image::height);
-		class_add_element("mode", TypeInt, &Image::mode);
+		class_add_element("width", TypeInt32, &Image::width);
+		class_add_element("height", TypeInt32, &Image::height);
+		class_add_element("mode", TypeInt32, &Image::mode);
 		class_add_element("data", TypeIntList, &Image::data);
 		class_add_element("error", TypeBool, &Image::error);
 		class_add_element("alpha_used", TypeBool, &Image::alpha_used);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &Image::__init_ext__, Flags::MUTABLE);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 			func_add_param("c", TypeColor);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &Image::__init__, Flags::MUTABLE);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &Image::__delete__, Flags::MUTABLE);
 		class_add_func("create", TypeVoid, &Image::create, Flags::MUTABLE);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 			func_add_param("c", TypeColor);
 		class_add_func("load", TypeImageXfer, &Image::load, Flags::STATIC);
 			func_add_param("filename", TypePath);
 		class_add_func("save", TypeVoid, &Image::save);
 			func_add_param("filename", TypePath);
 		class_add_func("scale", TypeImageXfer, &Image::scale);
-			func_add_param("width", TypeInt);
-			func_add_param("height", TypeInt);
+			func_add_param("width", TypeInt32);
+			func_add_param("height", TypeInt32);
 		class_add_func("set_pixel", TypeVoid, &Image::set_pixel, Flags::MUTABLE);
-			func_add_param("x", TypeInt);
-			func_add_param("y", TypeInt);
+			func_add_param("x", TypeInt32);
+			func_add_param("y", TypeInt32);
 			func_add_param("c", TypeColor);
 		class_add_func("get_pixel", TypeColor, &Image::get_pixel, Flags::PURE);
-			func_add_param("x", TypeInt);
-			func_add_param("y", TypeInt);
+			func_add_param("x", TypeInt32);
+			func_add_param("y", TypeInt32);
 		class_add_func("get_pixel_smooth", TypeColor, &Image::get_pixel_interpolated, Flags::PURE);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
@@ -81,8 +81,8 @@ void SIAddPackageImage(Context *c) {
 
 	add_class(TypeBasePainter);
 		class_derive_from(TypeObject, DeriveFlags::COPY_VTABLE);
-		class_add_element("width", TypeInt, &Painter::width);
-		class_add_element("height", TypeInt, &Painter::height);
+		class_add_element("width", TypeInt32, &Painter::width);
+		class_add_element("height", TypeInt32, &Painter::height);
 		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &ImagePainter::__delete__, Flags::MUTABLE);
 		//class_add_func_virtual("end", TypeVoid, &HuiPainter::end));
 		class_add_func_virtual("set_color", TypeVoid, &Painter::set_color); // Flags::MUTABLE ...nope... let's allow const references for now...

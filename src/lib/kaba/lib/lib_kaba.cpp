@@ -130,13 +130,13 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeClassElement);
 		class_add_element("name", TypeString, &ClassElement::name);
 		class_add_element("type", TypeClassRef, &ClassElement::type);
-		class_add_element("offset", TypeInt, &ClassElement::offset);
+		class_add_element("offset", TypeInt32, &ClassElement::offset);
 
 
 	add_class(TypeClass);
 		class_add_element("name", TypeString, &Class::name);
-		class_add_element("size", TypeInt, &Class::size);
-		class_add_element("type", TypeInt, &Class::type);
+		class_add_element("size", TypeInt32, &Class::size);
+		class_add_element("type", TypeInt32, &Class::type);
 		class_add_element("parent", TypeClassP, &Class::parent);
 		class_add_element("param", TypeClassRefList, &Class::param);
 		class_add_element("namespace", TypeClassP, &Class::name_space);
@@ -145,7 +145,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("classes", TypeClassRefList, &Class::classes);
 		class_add_element("constants", TypeConstantRefList, &Class::constants);
 		class_add_element("static_variables", TypeVariableRefList, &Class::static_variables);
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, &Class::_pointer_ref_counter);
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, &Class::_pointer_ref_counter);
 		class_add_func("is_derived_from", TypeBool, &Class::is_derived_from, Flags::PURE);
 			func_add_param("c", TypeClassRef);
 		class_add_func("is_pointer_raw", TypeBool, &Class::is_pointer_raw, Flags::PURE);
@@ -178,7 +178,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("signature", TypeString, &Function::signature, Flags::PURE);
 			func_add_param("ns", TypeClassP);
 		class_add_element("namespace", TypeClassP, &Function::name_space);
-		class_add_element("num_params", TypeInt, &Function::num_params);
+		class_add_element("num_params", TypeInt32, &Function::num_params);
 		class_add_element("var", TypeVariableRefList, &Function::var);
 		class_add_element("param_type", TypeClassRefList, &Function::literal_param_type);
 		class_add_element("return_type", TypeClassRef, &Function::literal_return_type);
@@ -189,8 +189,8 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("is_selfref", TypeBool, &Function::is_selfref, Flags::PURE);
 		class_add_func("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::PURE);
 		class_add_func("needs_overriding", TypeBool, &Function::needs_overriding, Flags::PURE);
-		class_add_element("virtual_index", TypeInt, &Function::virtual_index);
-		class_add_element("inline_index", TypeInt, &Function::inline_no);
+		class_add_element("virtual_index", TypeInt32, &Function::virtual_index);
+		class_add_element("inline_index", TypeInt32, &Function::inline_no);
 		class_add_element("code", TypeFunctionCodeRef, &Function::address);
 		class_add_func(Identifier::Func::STR, TypeString, &FunctionX::repr, Flags::PURE);
 
@@ -209,7 +209,7 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeModule);
 		class_add_element("name", TypeString, &Module::filename);
 		class_add_element("used_by_default", TypeBool, &Module::used_by_default);
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, &Module::_pointer_ref_counter);
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, &Module::_pointer_ref_counter);
 		class_add_func("classes", TypeClassRefList, &Module::classes, Flags::PURE);
 		class_add_func("functions", TypeFunctionRefList, &Module::functions, Flags::PURE);
 		class_add_func("variables", TypeVariableRefList, &Module::variables, Flags::PURE);
@@ -220,14 +220,14 @@ void SIAddPackageKaba(Context *c) {
 	
 	add_class(TypeStatement);
 		class_add_element("name", TypeString, &Statement::name);
-		class_add_element("id", TypeInt, &Statement::id);
-		class_add_element("num_params", TypeInt, &Statement::num_params);
+		class_add_element("id", TypeInt32, &Statement::id);
+		class_add_element("num_params", TypeInt32, &Statement::num_params);
 	
 	add_class(TypeSpecialFunction);
 		class_add_element("name", TypeString, &SpecialFunction::name);
-		class_add_element("id", TypeInt, &SpecialFunction::id);
-		class_add_element("min_params", TypeInt, &SpecialFunction::min_params);
-		class_add_element("max_params", TypeInt, &SpecialFunction::max_params);
+		class_add_element("id", TypeInt32, &SpecialFunction::id);
+		class_add_element("min_params", TypeInt32, &SpecialFunction::min_params);
+		class_add_element("max_params", TypeInt32, &SpecialFunction::max_params);
 
 	add_class(TypeContext);
 		class_add_element("packages", TypeModuleRefList, &Context::packages);
@@ -246,7 +246,7 @@ void SIAddPackageKaba(Context *c) {
 
 	add_func("disassemble", TypeString, &Asm::disassemble, Flags::STATIC | Flags::PURE);
 		func_add_param("p", TypePointer);
-		func_add_param("length", TypeInt);
+		func_add_param("length", TypeInt32);
 		func_add_param("comments", TypeBool);
 	add_func("show_func", TypeVoid, &show_func, Flags::STATIC);
 		func_add_param("f", TypeFunction);

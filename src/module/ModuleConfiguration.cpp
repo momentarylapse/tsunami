@@ -45,7 +45,7 @@ Array<kaba::ClassElement> get_unique_elements(const kaba::Class *c) {
 }
 
 Any var_to_any(const kaba::Class *c, const char *v) {
-	if (c == kaba::TypeInt) {
+	if (c == kaba::TypeInt32) {
 		return Any(*(const int*)v);
 	} else if (c == kaba::TypeInt8) {
 		return Any((int)*(const char*)v);
@@ -118,7 +118,7 @@ string get_next(const string &var_temp, int &pos) {
 void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
 	if (pos >= s.num)
 		return;
-	if (type == kaba::TypeInt) {
+	if (type == kaba::TypeInt32) {
 		*(int*)v = get_next(s, pos)._int();
 	} else if (type == kaba::TypeInt8) {
 		*(char*)v = get_next(s, pos)._int();
@@ -180,7 +180,7 @@ int h2i(const string &h) {
 }
 
 void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *session) {
-	if (type == kaba::TypeInt) {
+	if (type == kaba::TypeInt32) {
 		*(int*)v = a._int();
 	} else if (type == kaba::TypeInt8) {
 		*(char*)v = a._int();

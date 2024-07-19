@@ -30,10 +30,10 @@ void AutoImplementerFutureCore::complete_type(Class *t, int array_size, int toke
 	add_missing_function_headers(t);
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
-	t->elements.add(ClassElement(Identifier::SHARED_COUNT, TypeInt, 0));
+	t->elements.add(ClassElement(Identifier::SHARED_COUNT, TypeInt32, 0));
 	t->elements.add(ClassElement("cb_success", t_callback, 4));
 	t->elements.add(ClassElement("cb_fail", t_callback_fail, 4 + config.target.pointer_size));
-	t->elements.add(ClassElement("state", TypeInt, 4 + config.target.pointer_size * 2));
+	t->elements.add(ClassElement("state", TypeInt32, 4 + config.target.pointer_size * 2));
 	t->elements.add(ClassElement("result", t->param[0], 8 + config.target.pointer_size * 2));
 }
 
@@ -55,7 +55,7 @@ void AutoImplementerFuture::implement_future_constructor(Function *f, const Clas
 	/*auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	auto te = t->get_array_element();
-	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt});
+	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt32});
 	f->block->add(add_node_member_call(ff,
 			self, -1,
 			{add_node_const(tree->add_constant_int(te->size + TypeString->size))}));*/

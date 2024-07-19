@@ -19,8 +19,6 @@ namespace kaba {
 
 string type_list_to_str(const Array<const Class*> &params);
 
-int type_alignment(const Class *t);
-
 TemplateManager::TemplateManager(Context *c) {
 	context = c;
 	implicit_class_registry = new ImplicitClassRegistry(c);
@@ -33,12 +31,13 @@ void TemplateManager::copy_from(TemplateManager *t) {
 }
 
 
-void TemplateManager::add_function_template(Function *f, const Array<string> &param_names) {
+void TemplateManager::add_function_template(Function *f_template, const Array<string> &param_names, FunctionCreateF f_create) {
 	if (config.verbose)
 		msg_write("ADD FUNC TEMPLATE");
 	FunctionTemplate t;
-	t.func = f;
+	t.func = f_template;
 	t.params = param_names;
+	t.f_create = f_create;
 	function_templates.add(t);
 }
 
@@ -46,7 +45,7 @@ Class *TemplateManager::add_class_template(SyntaxTree *tree, const string &name,
 	if (config.verbose)
 		msg_write("ADD CLASS TEMPLATE " + name);
 	//msg_write("add class template  " + c->long_name());
-	Class *c = new Class(Class::Type::REGULAR, name, 0, tree);
+	Class *c = new Class(Class::Type::REGULAR, name, 0, 1, tree);
 	flags_set(c->flags, Flags::TEMPLATE);
 	ClassTemplate t;
 	t._class = c;
@@ -110,24 +109,24 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	return f;
 }
 
-Function *TemplateManager::request_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
-	auto &t = get_template(tree, f0, token_id);
+Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+	auto &t = get_function_template(tree, f0, token_id);
 	
-	// already instanciated?
+	// already instantiated?
 	for (auto &i: t.instances)
 		if (i.params == params)
 			return i.f;
 	
 	// new
 	FunctionInstance ii;
-	ii.f = instantiate(tree, t, params, block, ns, token_id);
+	ii.f = instantiate_function(tree, t, params, block, ns, token_id);
 	ii.params = params;
 	t.instances.add(ii);
 	return ii.f;
 }
 
-const Class *TemplateManager::request_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, Block *block, const Class *ns, int token_id) {
-	auto &t = get_template(tree, c0, token_id);
+const Class *TemplateManager::request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, Block *block, const Class *ns, int token_id) {
+	auto &t = get_class_template(tree, c0, token_id);
 
 	// already instanciated?
 	for (auto &i: t.instances)
@@ -136,15 +135,15 @@ const Class *TemplateManager::request_instance(SyntaxTree *tree, const Class *c0
 
 	// new
 	ClassInstance ii;
-	ii.c = instantiate(tree, t, params, array_size, token_id);
+	ii.c = instantiate_class(tree, t, params, array_size, token_id);
 	ii.array_size = array_size;
 	ii.params = params;
 	t.instances.add(ii);
 	return ii.c;
 }
 
-const Class *TemplateManager::request_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
-	return request_instance(tree, c0, params, 0, block, ns, token_id);
+const Class *TemplateManager::request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+	return request_class_instance(tree, c0, params, 0, block, ns, token_id);
 }
 
 void TemplateManager::match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f) {
@@ -177,10 +176,10 @@ void TemplateManager::match_parameter_type(shared<Node> p, const Class *t, std::
 	}*/
 }
 
-Function *TemplateManager::request_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id) {
+Function *TemplateManager::request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id) {
 	if (config.verbose)
 		msg_write("____MATCHING");
-	auto &t = get_template(tree, f0, token_id);
+	auto &t = get_function_template(tree, f0, token_id);
 
 	Array<const Class*> arg_types;
 	arg_types.resize(t.params.num);
@@ -200,11 +199,9 @@ Function *TemplateManager::request_instance_matching(SyntaxTree *tree, Function 
 	if (params.num != f0->abstract_param_types.num)
 		tree->do_error(format("not able to match all template parameters: %d parameters given, %d expected", params.num, f0->abstract_param_types.num), token_id);
 
-
 	for (auto&& [i,p]: enumerate(weak(params))) {
 		if (p->type == TypeUnknown)
 			tree->do_error(format("parameter #%d '%s' has undecided type when trying to match template arguments", i+1, f0->var[i]->name), token_id);
-		//f0->abstract_param_types[i]->show();
 		match_parameter_type(f0->abstract_param_types[i], p->type, set_match_type);
 	}
 
@@ -213,10 +210,10 @@ Function *TemplateManager::request_instance_matching(SyntaxTree *tree, Function 
 			tree->do_error("not able to match all template parameters", token_id);
 
 
-	return request_instance(tree, f0, arg_types, block, ns, token_id);
+	return request_function_instance(tree, f0, arg_types, block, ns, token_id);
 }
 
-TemplateManager::FunctionTemplate &TemplateManager::get_template(SyntaxTree *tree, Function *f0, int token_id) {
+TemplateManager::FunctionTemplate &TemplateManager::get_function_template(SyntaxTree *tree, Function *f0, int token_id) {
 	for (auto &t: function_templates)
 		if (t.func == f0)
 			return t;
@@ -225,7 +222,7 @@ TemplateManager::FunctionTemplate &TemplateManager::get_template(SyntaxTree *tre
 	return function_templates[0];
 }
 
-TemplateManager::ClassTemplate &TemplateManager::get_template(SyntaxTree *tree, const Class *c0, int token_id) {
+TemplateManager::ClassTemplate &TemplateManager::get_class_template(SyntaxTree *tree, const Class *c0, int token_id) {
 	for (auto &t: class_templates)
 		if (t._class == c0)
 			return t;
@@ -251,26 +248,30 @@ shared<Node> TemplateManager::node_replace(SyntaxTree *tree, shared<Node> n, con
 	});
 }
 
-Function *TemplateManager::instantiate(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
 	if (config.verbose)
 		msg_write("INSTANTIATE TEMPLATE");
 	Function *f0 = t.func;
-	auto f = full_copy(tree, f0);
-	f->name += format("[%s]", type_list_to_str(params));
 
-	// replace in parameters/return type
-	for (int i=0; i<f->num_params; i++) {
-		f->abstract_param_types[i] = node_replace(tree, f->abstract_param_types[i], t.params, params);
-		//f->abstract_param_types[i]->show();
+	Function *f = nullptr;
+	if (t.f_create) {
+		f = t.f_create(tree, params, token_id);
+	} else {
+		f = full_copy(tree, f0);
+		f->name += format("[%s]", type_list_to_str(params));
+
+		// replace in parameters/return type
+		for (int i=0; i<f->num_params; i++) {
+			f->abstract_param_types[i] = node_replace(tree, f->abstract_param_types[i], t.params, params);
+			//f->abstract_param_types[i]->show();
+		}
+		if (f->abstract_return_type)
+			f->abstract_return_type = node_replace(tree, f->abstract_return_type, t.params, params);
+
+		// replace in body
+		for (int i=0; i<f->block->params.num; i++)
+			f->block->params[i] = node_replace(tree, f->block->params[i], t.params, params);
 	}
-	if (f->abstract_return_type)
-		f->abstract_return_type = node_replace(tree, f->abstract_return_type, t.params, params);
-
-	// replace in body
-	for (int i=0; i<f->block->params.num; i++)
-		f->block->params[i] = node_replace(tree, f->block->params[i], t.params, params);
-	
-	//f->show();
 
 	// concretify
 	try {
@@ -331,39 +332,42 @@ string product_class_name(const Array<const Class*> &classes) {
 	return "("+name+")";
 }
 
-int type_alignment(const Class* t);
-
 int product_class_size(const Array<const Class*> &classes) {
 	int size = 0;
+	int total_align = 1;
 	for (auto &c: classes) {
-		int align = type_alignment(c);
-		size = mem_align(size, align);
-		size += mem_align(c->size, align);
+		total_align = max(total_align, c->alignment);
+		size = mem_align(size, c->alignment);
+		size += c->size;
 	}
+	size = mem_align(size, total_align);
 	return size;
 }
 
-static int _make_optional_size(const Class *t) {
-	if (t->size >= 8)
-		return mem_align(t->size, 8) + 1;
-	if (t->size >= 4)
-		return mem_align(t->size, 4) + 1;
-	return t->size + 1;
+int product_class_alignment(const Array<const Class*> &classes) {
+	int align = 1;
+	for (auto &c: classes)
+		align = max(align, c->alignment);
+	return align;
 }
 
-const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id) {
+int _make_optional_size(const Class *t) {
+	return mem_align(t->size + 1, t->alignment);
+}
+
+const Class *TemplateManager::instantiate_class(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id) {
 	if (config.verbose)
 		msg_write("INSTANTIATE TEMPLATE CLASS  " + t._class->name + " ... " + params[0]->name);
 	const Class *c0 = t._class;
 
-	auto create_class = [this, tree] (const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
+	auto create_class = [this, tree] (const string &name, Class::Type type, int size, int alignment, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
 		/*msg_write("CREATE " + name);
 		msg_write(p2s(tree));
 		msg_write(p2s(tree->implicit_symbols.get()));*/
 
 		auto ns = tree->implicit_symbols.get();
 
-		Class *t = new Class(type, name, size, tree, parent, params);
+		Class *t = new Class(type, name, size, alignment, tree, parent, params);
 		t->token_id = token_id;
 		tree->owned_classes.add(t);
 
@@ -376,39 +380,39 @@ const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, co
 	// so far, only special cases:
 	Class *c = nullptr;
 	if (c0 == TypeRawT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 //		c = create_class(format("%s[%s]", Identifier::RAW_POINTER, params[0]->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeReferenceT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "&", Class::Type::REFERENCE, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "&", Class::Type::REFERENCE, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeSharedT)
-		c = create_class(format("%s[%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeSharedNotNullT)
-		c = create_class(format("%s![%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s![%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeOwnedT)
-		c = create_class(format("%s[%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeOwnedNotNullT)
-		c = create_class(format("%s![%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s![%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeXferT)
-		c = create_class(format("%s[%s]", Identifier::XFER, params[0]->name), Class::Type::POINTER_XFER_NOT_NULL, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::XFER, params[0]->name), Class::Type::POINTER_XFER_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeAliasT)
-		c = create_class(format("%s[%s]", Identifier::ALIAS, params[0]->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::ALIAS, params[0]->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 	else if (c0 == TypeArrayT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "[" + i2s(array_size) + "]", Class::Type::ARRAY, params[0]->size * array_size, array_size, nullptr, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "[" + i2s(array_size) + "]", Class::Type::ARRAY, params[0]->size * array_size, params[0]->alignment, array_size, nullptr, params, token_id);
 	else if (c0 == TypeListT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "[]", Class::Type::LIST, config.target.dynamic_array_size, -1, TypeDynamicArray, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "[]", Class::Type::LIST, config.target.dynamic_array_size, config.target.pointer_size, -1, TypeDynamicArray, params, token_id);
 	else if (c0 == TypeDictT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "{}", Class::Type::DICT, config.target.dynamic_array_size, -1, TypeDictBase, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "{}", Class::Type::DICT, config.target.dynamic_array_size, config.target.pointer_size, -1, TypeDictBase, params, token_id);
 	else if (c0 == TypeOptionalT)
-		c = create_class(class_name_might_need_parantheses(params[0]) + "?", Class::Type::OPTIONAL, _make_optional_size(params[0]), 0, nullptr, params, token_id);
+		c = create_class(class_name_might_need_parantheses(params[0]) + "?", Class::Type::OPTIONAL, _make_optional_size(params[0]), params[0]->alignment, 0, nullptr, params, token_id);
 	else if (c0 == TypeProductT)
-		c = create_class(product_class_name(params), Class::Type::PRODUCT, product_class_size(params), 0, nullptr, params, token_id);
+		c = create_class(product_class_name(params), Class::Type::PRODUCT, product_class_size(params), product_class_alignment(params), 0, nullptr, params, token_id);
 	else if (c0 == TypeFutureT) {
-		c = create_class(format("%s[%s]", Identifier::FUTURE, params[0]->name), Class::Type::REGULAR, sizeof(base::future<void>), 0, nullptr, params, token_id);
+		c = create_class(format("%s[%s]", Identifier::FUTURE, params[0]->name), Class::Type::REGULAR, sizeof(base::future<void>), config.target.pointer_size, 0, nullptr, params, token_id);
 		AutoImplementerFuture ai(nullptr, tree);
 		ai.complete_type(c, array_size, token_id);
 		return c;
 	} else if (c0 == TypeFutureCoreT) {
-		c = create_class(format("@futurecore[%s]", params[0]->name), Class::Type::REGULAR, sizeof(base::_promise_core_<void>) + params[0]->size, 0, nullptr, params, token_id);
+		c = create_class(format("@futurecore[%s]", params[0]->name), Class::Type::REGULAR, sizeof(base::_promise_core_<void>) + params[0]->size, config.target.pointer_size, 0, nullptr, params, token_id);
 		AutoImplementerFutureCore ai(nullptr, tree);
 		ai.complete_type(c, array_size, token_id);
 		return c;
@@ -425,59 +429,59 @@ const Class *TemplateManager::instantiate(SyntaxTree *tree, ClassTemplate &t, co
 
 
 const Class *TemplateManager::request_pointer(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeRawT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeRawT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_shared(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeSharedT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeSharedT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_shared_not_null(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeSharedNotNullT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeSharedNotNullT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_owned(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeOwnedT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeOwnedT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_owned_not_null(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeOwnedNotNullT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeOwnedNotNullT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_xfer(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeXferT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeXferT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_alias(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeAliasT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeAliasT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_reference(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_instance(tree, TypeReferenceT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeReferenceT, {base}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_list(SyntaxTree *tree, const Class *element_type, int token_id) {
-	return request_instance(tree, TypeListT, {element_type}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeListT, {element_type}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_array(SyntaxTree *tree, const Class *element_type, int num_elements, int token_id) {
-	return request_instance(tree, TypeArrayT, {element_type}, num_elements, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeArrayT, {element_type}, num_elements, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_dict(SyntaxTree *tree, const Class *element_type, int token_id) {
-	return request_instance(tree, TypeDictT, {element_type}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeDictT, {element_type}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_optional(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_instance(tree, TypeOptionalT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeOptionalT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_future(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_instance(tree, TypeFutureT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeFutureT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::request_futurecore(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_instance(tree, TypeFutureCoreT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeFutureCoreT, {param}, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 
@@ -502,14 +506,14 @@ string make_callable_signature(const Array<const Class*> &params, const Class *r
 
 
 
-const Class *xxx_create_class(TemplateManager *tm, SyntaxTree *tree, const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
+const Class *xxx_create_class(TemplateManager *tm, SyntaxTree *tree, const string &name, Class::Type type, int size, int alignment, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
 	/*msg_write("CREATE " + name);
 	msg_write(p2s(tree));
 	msg_write(p2s(tree->implicit_symbols.get()));*/
 
 	auto ns = tree->implicit_symbols.get();
 
-	Class *t = new Class(type, name, size, tree, parent, params);
+	Class *t = new Class(type, name, size, alignment, tree, parent, params);
 	t->token_id = token_id;
 	tree->owned_classes.add(t);
 
@@ -524,7 +528,7 @@ const Class *xxx_create_class(TemplateManager *tm, SyntaxTree *tree, const strin
 
 
 // X[], X{}, X*, X shared, (X,Y,Z), X->Y
-const Class *xxx_request_implicit_class(TemplateManager *tm, SyntaxTree *tree, const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
+const Class *xxx_request_implicit_class(TemplateManager *tm, SyntaxTree *tree, const string &name, Class::Type type, int size, int alignment, int array_size, const Class *parent, const Array<const Class*> &params, int token_id) {
 	//msg_write("make class " + name + " ns=" + ns->long_name());// + " params=" + param->long_name());
 
 	// check if it already exists
@@ -534,7 +538,7 @@ const Class *xxx_request_implicit_class(TemplateManager *tm, SyntaxTree *tree, c
 
 
 	// add new class
-	auto t = xxx_create_class(tm, tree, name, type, size, array_size, parent, params, token_id);
+	auto t = xxx_create_class(tm, tree, name, type, size, alignment, array_size, parent, params, token_id);
 	tm->add_implicit_legacy(t);
 	return t;
 };
@@ -551,8 +555,8 @@ const Class *TemplateManager::request_callable_fp(SyntaxTree *tree, const Array<
 		params_ret = {};
 	params_ret.add(ret);
 
-	auto ff = xxx_request_implicit_class(this, tree, "Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, token_id);
-	return xxx_request_implicit_class(this, tree, name, Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {ff}, token_id);
+	auto ff = xxx_request_implicit_class(this, tree, "Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, config.target.pointer_size, 0, nullptr, params_ret, token_id);
+	return xxx_request_implicit_class(this, tree, name, Class::Type::POINTER_RAW, config.target.pointer_size, config.target.pointer_size, 0, nullptr, {ff}, token_id);
 	//return make_class(name, Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, base_class);
 }
 
@@ -577,7 +581,7 @@ const Class *TemplateManager::request_callable_bind(SyntaxTree *tree, const Arra
 
 	static int unique_bind_counter = 0;
 
-	auto t = (Class*)xxx_create_class(this, tree, format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, 0, nullptr, outer_params_ret, token_id);
+	auto t = (Class*)xxx_create_class(this, tree, format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, config.target.pointer_size, 0, nullptr, outer_params_ret, token_id);
 	int offset = t->size;
 	for (auto [i,b]: enumerate(captures)) {
 		if (!b)
@@ -585,7 +589,7 @@ const Class *TemplateManager::request_callable_bind(SyntaxTree *tree, const Arra
 		auto c = b;
 		if (capture_via_ref[i])
 			c = request_pointer(tree, c, token_id);
-		offset = mem_align(offset, type_alignment(b));
+		offset = mem_align(offset, b->alignment);
 		auto el = ClassElement(format("capture%d%s", i, capture_via_ref[i] ? "_ref" : ""), c, offset);
 		offset += c->size;
 		t->elements.add(el);
@@ -601,7 +605,7 @@ const Class *TemplateManager::request_callable_bind(SyntaxTree *tree, const Arra
 }
 
 const Class *TemplateManager::request_product(SyntaxTree *tree, const Array<const Class*> &classes, int token_id) {
-	return request_instance(tree, TypeProductT, classes, nullptr, tree->implicit_symbols.get(), token_id);
+	return request_class_instance(tree, TypeProductT, classes, nullptr, tree->implicit_symbols.get(), token_id);
 }
 
 const Class *TemplateManager::find_implicit_legacy(const string &name, Class::Type type, int array_size, const Array<const Class*> &params) {
@@ -611,11 +615,11 @@ void TemplateManager::add_implicit_legacy(const Class* t) {
 	implicit_class_registry->add(t);
 }
 
-void TemplateManager::add_explicit(SyntaxTree *tree, const Class* c, const Class* c0, const Array<const Class*> &params, int array_size) {
-	auto &t = get_template(tree, c0, -1);
+void TemplateManager::add_explicit_class_instance(SyntaxTree *tree, const Class* c_instance, const Class* c_template, const Array<const Class*> &params, int array_size) {
+	auto &t = get_class_template(tree, c_template, -1);
 
 	ClassInstance ii;
-	ii.c = c;
+	ii.c = c_instance;
 	ii.params = params;
 	ii.array_size = array_size;
 	t.instances.add(ii);

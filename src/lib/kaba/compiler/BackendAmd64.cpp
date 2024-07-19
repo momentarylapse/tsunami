@@ -133,7 +133,7 @@ void BackendAmd64::implement_mov_chunk(const SerialNodeParam &p1, const SerialNo
 	for (int offset=0; offset<size-7; offset+=8)
 		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt64), param_shift(p2, offset, TypeInt64));
 	for (int offset=8*(size/8); offset<size-3; offset+=4)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt), param_shift(p2, offset, TypeInt));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt32), param_shift(p2, offset, TypeInt32));
 	for (int offset=4*(size/4); offset<size; offset++)
 		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt8), param_shift(p2, offset, TypeInt8));
 }
@@ -196,7 +196,7 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 	} else if (f->_label >= 0) {
 		if (f->owner() == module->tree) {
 			// 32bit call distance
-			insert_cmd(Asm::InstID::CALL, param_label(TypeInt, f->_label));
+			insert_cmd(Asm::InstID::CALL, param_label(TypeInt32, f->_label));
 		} else {
 			// 64bit call distance
 			insert_cmd(Asm::InstID::MOV, p_rax, param_label(TypePointer, f->_label));
@@ -224,7 +224,7 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 }
 
 bool amd64_type_uses_int_register(const Class *t) {
-	return (t == TypeInt) or (t == TypeInt64) or (t == TypeInt16) or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == TypeInt32) or (t == TypeInt64) or (t == TypeInt16) or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
@@ -291,7 +291,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 		// stack pointer is already low enough to include stack parameters
 		// to compensate the following push's pre-increase rsp
 		if (push_size > 127)
-			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt, push_size));
+			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt32, push_size));
 		else if (push_size > 0)
 			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt8, push_size));
 		//}

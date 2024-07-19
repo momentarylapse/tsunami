@@ -42,11 +42,12 @@ bool type_match_up(const Class *given, const Class *wanted);
 
 
 
-Class::Class(Type _type, const string &_name, int64 _size, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
+Class::Class(Type _type, const string &_name, int64 _size, int _alignment, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
 	flags = Flags::FULLY_PARSED;
 	name = _name;
 	owner = _owner;
 	size = _size;
+	alignment = _alignment;
 	type = _type;
 	array_length = 0;
 	parent = _parent;

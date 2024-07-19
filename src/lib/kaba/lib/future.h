@@ -66,7 +66,8 @@ inline void lib_create_future(const Class *tt, const Class *pp, const Class *t_c
 			func_add_param("cb", t_cb);
 			func_add_param("cb_fail", TypeCallback);
 
-	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
+	cur_package->context->template_manager->add_explicit_class_instance(
+			cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
 }
 
 template<>
@@ -83,7 +84,8 @@ inline void lib_create_future<void>(const Class *tt, const Class *pp, const Clas
 			func_add_param("cb", t_cb);
 			func_add_param("cb_fail", TypeCallback);
 
-	cur_package->context->template_manager->add_explicit(cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
+	cur_package->context->template_manager->add_explicit_class_instance(
+			cur_package->tree.get(), tt, TypeFutureT, {pp}, 0);
 }
 
 }

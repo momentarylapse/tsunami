@@ -17,7 +17,7 @@ namespace kaba {
 	Array<string> dict_get_keys(const DynamicArray& a);
 
 	static shared<Node> sa_num(shared<Node> node) {
-		return node->shift(config.target.pointer_size, TypeInt);
+		return node->shift(config.target.pointer_size, TypeInt32);
 	}
 	int dict_row_size(const Class *t_val) {
 		return mem_align(t_val->size,config.target.pointer_size) + TypeString->size;
@@ -43,7 +43,7 @@ void AutoImplementer::implement_dict_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
 
 	auto te = t->get_array_element();
-	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt});
+	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt32});
 	f->block->add(add_node_member_call(ff,
 			self, -1,
 			{const_int(dict_row_size(te))}));
@@ -223,7 +223,7 @@ void AutoImplementer::implement_dict_set(Function *f, const Class *t) {
 	{
 		// __mem_resize__(self.num + 1)
 		auto cmd_add = add_node_operator_by_inline(InlineID::INT32_ADD, sa_num(self), const_int(1));
-		auto cmd_resize = add_node_member_call(t->get_member_func("__mem_resize__", TypeVoid, {TypeInt}), self);
+		auto cmd_resize = add_node_member_call(t->get_member_func("__mem_resize__", TypeVoid, {TypeInt32}), self);
 		cmd_resize->set_param(1, cmd_add);
 		f->block->add(cmd_resize);
 	}

@@ -129,7 +129,7 @@ void AutoImplementer::implement_shared_assign(Function *f, const Class *t) {
 	auto tt = self->type->param[0];
 	bool found = false;
 	for (auto &e: tt->elements)
-		if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt) {
+		if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt32) {
 			// count ++
 			auto count = SHARED_P(self)->deref()->shift(e.offset, e.type);
 			auto inc = add_node_operator_by_inline(InlineID::INT32_INCREASE, count, nullptr);
@@ -163,7 +163,7 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 
 	shared<Node> count;
 	for (auto &e: tt->elements)
-		if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt)
+		if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt32)
 			count = SHARED_P(self)->deref_shift(e.offset, e.type, -1);
 	if (!count)
 		do_error_implicit(f, format("class '%s' is not a shared class (declare with '%s class' or add an element 'int %s')", tt->long_name(), Identifier::SHARED, Identifier::SHARED_COUNT));

@@ -3,6 +3,7 @@
 #define CLASS_H_
 
 #include "../../base/pointer.h"
+#include "../../base/map.h"
 
 namespace kaba {
 
@@ -73,12 +74,13 @@ public:
 	};
 	
 	//Class();
-	Class(Type type, const string &name, int64 size, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
+	Class(Type type, const string &name, int64 size, int alignment, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
 	~Class();
 	string name;
 	string long_name() const;
 	string cname(const Class *ns = nullptr) const;
 	int64 size; // complete size of type
+	int alignment;
 	int array_length;
 	Type type;
 	Flags flags;
@@ -107,12 +109,15 @@ public:
 	bool is_callable_fp() const;
 	bool is_callable_bind() const;
 	bool fully_parsed() const;
+
 	Array<ClassElement> elements;
 	Array<ClassInitializers> initializers;
 	shared_array<Function> functions;
 	shared_array<Variable> static_variables;
 	shared_array<Constant> constants;
 	shared_array<const Class> classes;
+	base::map<string, const Class*> type_aliases;
+
 	const Class *parent; // derived from
 	Array<const Class*> param; // for pointers/arrays etc
 	const Class *name_space;
@@ -169,10 +174,8 @@ extern const Class *TypeInt8;
 extern const Class *TypeInt16;
 extern const Class *TypeInt32;
 extern const Class *TypeInt64;
-extern const Class *TypeInt;
 extern const Class *TypeFloat32;
 extern const Class *TypeFloat64;
-extern const Class *TypeFloat;
 extern const Class *TypeCString;
 extern const Class *TypeString;
 extern const Class *TypeBytes;

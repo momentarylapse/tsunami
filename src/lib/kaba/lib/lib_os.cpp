@@ -249,7 +249,7 @@ void SIAddPackageOSPath(Context *c) {
 		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::PURE);
 		class_add_func("__bool__", TypeBool, &KabaPath::__bool__, Flags::PURE);
 		class_add_func("parent", TypePath, &Path::parent, Flags::PURE);
-		class_add_func("compare", TypeInt, &Path::compare, Flags::PURE);
+		class_add_func("compare", TypeInt32, &Path::compare, Flags::PURE);
 			func_add_param("p", TypePath);
 		class_add_func("relative_to", TypePath, &Path::relative_to, Flags::PURE);
 			func_add_param("p", TypePath);
@@ -327,22 +327,22 @@ void SIAddPackageOS(Context *c) {
 	lib_create_pointer_shared<KabaFileStream>(TypeFileStreamSharedNN, TypeFileStreamXfer);
 
 	add_class(TypeStream);
-		class_add_element(Identifier::SHARED_COUNT, TypeInt, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
+		class_add_element(Identifier::SHARED_COUNT, TypeInt32, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
 		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaFileStream::__delete__);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaFileStream::__delete__, Flags::MUTABLE);
 
 		class_add_func("read", TypeBytes, &KabaStream::_read_size, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-			func_add_param("size", TypeInt);
-		class_add_func("read", TypeInt, &KabaStream::_read_bytes, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+			func_add_param("size", TypeInt32);
+		class_add_func("read", TypeInt32, &KabaStream::_read_bytes, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("s", TypeBytes);
-		class_add_func("write", TypeInt, &KabaStream::_write, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-		//class_add_func_virtual("write", TypeInt, &FileStream::write);
+		class_add_func("write", TypeInt32, &KabaStream::_write, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+		//class_add_func_virtual("write", TypeInt32, &FileStream::write);
 			func_add_param("s", TypeBytes);
 
 		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_bool, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("b", TypeBool);
 		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_int, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-			func_add_param("i", TypeInt);
+			func_add_param("i", TypeInt32);
 		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_float, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("x", TypeFloat32);
 		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_vector, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
@@ -352,7 +352,7 @@ void SIAddPackageOS(Context *c) {
 		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_bool, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("b", TypeBool, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_int, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-			func_add_param("i", TypeInt, Flags::OUT);
+			func_add_param("i", TypeInt32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_float, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
 			func_add_param("x", TypeFloat32, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_vector, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
@@ -364,7 +364,7 @@ void SIAddPackageOS(Context *c) {
 		// we get a base-class-pointer... \(O_O)/
 		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &Stream::__delete__);
 		//class_add_func_virtual("write", TypeVoid, Stream::write);
-		//class_add_element(Identifier::SHARED_COUNT, TypeInt, &Stream::_pointer_ref_counter);
+		//class_add_element(Identifier::SHARED_COUNT, TypeInt32, &Stream::_pointer_ref_counter);
 		//const_cast<Class*>(TypeStream)->elements.back().offset = offsetof(Stream, _pointer_ref_counter);
 		class_set_vtable(KabaStream);
 
@@ -378,12 +378,12 @@ void SIAddPackageOS(Context *c) {
 		//class_add_func("getCDate", TypeDate, &File::GetDateCreation);
 		class_add_func("mtime", TypeDate, &os::fs::FileStream::mtime);
 		//class_add_func("getADate", TypeDate, &FileStream::GetDateAccess);
-		class_add_func("size", TypeInt, &KabaFileStream::size32);
-		class_add_func("pos", TypeInt, &KabaFileStream::_pos);//os::fs::FileStream::get_pos);
+		class_add_func("size", TypeInt32, &KabaFileStream::size32);
+		class_add_func("pos", TypeInt32, &KabaFileStream::_pos);//os::fs::FileStream::get_pos);
 		class_add_func("set_pos", TypeVoid, &KabaFileStream::_set_pos, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-			func_add_param("pos", TypeInt);
+			func_add_param("pos", TypeInt32);
 		class_add_func("seek", TypeVoid, &KabaFileStream::_seek, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
-			func_add_param("delta", TypeInt);
+			func_add_param("delta", TypeInt32);
 		class_add_func("is_end", TypeBool, &KabaFileStream::is_end);
 		{
 			os::fs::FileStream my_instance(-1, Stream::Mode::NONE);
@@ -432,7 +432,7 @@ void SIAddPackageOS(Context *c) {
 			func_add_param("path", TypePath);
 		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_int, Flags::MUTABLE);
 			func_add_param("name", TypeString);
-			func_add_param("value", TypeInt);
+			func_add_param("value", TypeInt32);
 		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set_float, Flags::MUTABLE); // FIXME: operator preference...
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeFloat32);
@@ -445,9 +445,9 @@ void SIAddPackageOS(Context *c) {
 		class_add_func(Identifier::Func::SET, TypeVoid, &Configuration::set, Flags::MUTABLE);
 			func_add_param("name", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func("get_int", TypeInt, &Configuration::get_int);
+		class_add_func("get_int", TypeInt32, &Configuration::get_int);
 			func_add_param("name", TypeString);
-			func_add_param("default", TypeInt);
+			func_add_param("default", TypeInt32);
 		class_add_func("get_float", TypeFloat32, &Configuration::get_float);
 			func_add_param("name", TypeString);
 			func_add_param("default", TypeFloat32);

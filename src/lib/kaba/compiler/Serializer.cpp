@@ -140,7 +140,7 @@ SerialNodeParam Serializer::add_reference(const SerialNodeParam &param, const Cl
 			if (param.kind == NodeKind::VAR_LOCAL) {
 				int r = find_unused_reg(-1, -1, 4);
 				add_temp(type, ret);
-				add_cmd(Asm::InstID::ADD, param_vreg(TypePointer, r), param_preg(TypePointer, Asm::RegID::R13), param_const(TypeInt, param.p));
+				add_cmd(Asm::InstID::ADD, param_vreg(TypePointer, r), param_preg(TypePointer, Asm::RegID::R13), param_const(TypeInt32, param.p));
 				add_cmd(Asm::InstID::MOV, ret, param_vreg(TypePointer, r));
 			} else {
 				DoError("reference in ARM: " + param.str());
@@ -411,7 +411,7 @@ void Serializer::add_virtual_function_call(Function *f, const Array<SerialNodePa
 	auto t2 = add_temp(TypePointer);
 	auto t3 = add_temp(TypeFunctionCodeRef);
 	cmd.add_cmd(Asm::InstID::MOV, t1, params[0]); // self
-	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt, config.target.pointer_size * f->virtual_index)); // vtable + n
+	cmd.add_cmd(Asm::InstID::ADD, t2, deref_temp(t1, TypePointer), param_imm(TypeInt32, config.target.pointer_size * f->virtual_index)); // vtable + n
 	cmd.add_cmd(Asm::InstID::MOV, t3, deref_temp(t2, TypeFunctionCodeRef)); // vtable[n]
 	cmd.add_cmd(Asm::InstID::CALL_MEMBER, ret, t3); // the actual call
 }
@@ -552,7 +552,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			// malloc()
 			auto f = syntax_tree->required_func_global("@malloc");
 			auto type = com->params[0]->as_func()->name_space; // ret.type->param[0]
-			add_function_call(f, {param_imm(TypeInt, type->size)}, ret);
+			add_function_call(f, {param_imm(TypeInt32, type->size)}, ret);
 
 			// __init__()
 			auto sub = com->params[0]->shallow_copy();
@@ -592,7 +592,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			cmd.add_label(label_finish);
 			}break;
 		case StatementID::ASM:
-			cmd.add_cmd(Asm::InstID::ASM, param_imm(TypeInt, com->params[0]->as_const()->as_int()));
+			cmd.add_cmd(Asm::InstID::ASM, param_imm(TypeInt32, com->params[0]->as_const()->as_int()));
 			break;
 		case StatementID::PASS:
 			break;
@@ -603,7 +603,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 				do_error("implicit raw_function_pointer() for os not implemented yet (i.e. don't use callables/function pointers)");
 			auto func = serialize_node(com->params[0].get(), block, index);
 			auto t1 = add_temp(TypePointer);
-			cmd.add_cmd(Asm::InstID::ADD, t1, func, param_imm(TypeInt, config.function_address_offset)); // Function* pointer
+			cmd.add_cmd(Asm::InstID::ADD, t1, func, param_imm(TypeInt32, config.function_address_offset)); // Function* pointer
 			cmd.add_cmd(Asm::InstID::MOV, ret, deref_temp(t1, TypeFunctionCodeRef)); // the actual code pointer
 			return ret;}
 		default:
@@ -660,7 +660,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			break;
 		case InlineID::SHARED_POINTER_INIT:
 			// FIXME does this work for 64bit?!?
-			cmd.add_cmd(Asm::InstID::MOV, param[0], param_imm(TypeInt, 0));
+			cmd.add_cmd(Asm::InstID::MOV, param[0], param_imm(TypeInt32, 0));
 			break;
 		case InlineID::INT8_ASSIGN:
 		case InlineID::BOOL_ASSIGN:
@@ -675,7 +675,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				// chunk cmp
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
 				for (int k=0; k<param[0].type->size/4; k++) {
-					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt), param_shift(param[1], k*4, TypeInt));
+					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt32), param_shift(param[1], k*4, TypeInt32));
 					cmd.add_cmd(Asm::InstID::SETZ, ret);
 					if (k < param[0].type->size/4 - 1)
 						cmd.add_cmd(Asm::InstID::JNZ, param_label32(label_after_cmp));
@@ -691,7 +691,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				// chunk cmp
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
 				for (int k=0; k<param[0].type->size/4; k++) {
-					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt), param_shift(param[1], k*4, TypeInt));
+					cmd.add_cmd(Asm::InstID::CMP, param_shift(param[0], k*4, TypeInt32), param_shift(param[1], k*4, TypeInt32));
 					cmd.add_cmd(Asm::InstID::SETNZ, ret);
 					if (k < param[0].type->size/4 - 1)
 						cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_cmp));
@@ -797,16 +797,16 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			break;
 		case InlineID::INT32_NEGATIVE:
 		case InlineID::INT64_NEGATIVE:
-			cmd.add_cmd(Asm::InstID::SUB, ret, param_imm(TypeInt, 0x0), param[0]);
+			cmd.add_cmd(Asm::InstID::SUB, ret, param_imm(TypeInt32, 0x0), param[0]);
 			break;
 		case InlineID::INT32_INCREASE:
-			cmd.add_cmd(Asm::InstID::ADD, param[0], param_imm(TypeInt, 0x1));
+			cmd.add_cmd(Asm::InstID::ADD, param[0], param_imm(TypeInt32, 0x1));
 			break;
 		case InlineID::INT64_INCREASE:
 			cmd.add_cmd(Asm::InstID::ADD, param[0], param_imm(TypeInt64, 0x1));
 			break;
 		case InlineID::INT32_DECREASE:
-			cmd.add_cmd(Asm::InstID::SUB, param[0], param_imm(TypeInt, 0x1));
+			cmd.add_cmd(Asm::InstID::SUB, param[0], param_imm(TypeInt32, 0x1));
 			break;
 		case InlineID::INT64_DECREASE:
 			cmd.add_cmd(Asm::InstID::SUB, param[0], param_imm(TypeInt64, 0x1));
@@ -880,7 +880,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			break;
 
 		case InlineID::FLOAT32_NEGATIVE:
-			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt, 0x80000000));
+			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt32, 0x80000000));
 			break;
 // bool/char
 		case InlineID::INT8_EQUAL:
@@ -1036,7 +1036,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			break;
 		case InlineID::VEC3_NEGATIVE:
 			for (int i=0;i<3;i++)
-				cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt, 0x80000000));
+				cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt32, 0x80000000));
 			break;
 		default:
 			do_error("inline function unimplemented: " + com->as_func()->signature(TypeVoid));
@@ -1088,8 +1088,8 @@ void Serializer::fix_return_by_ref() {
 			p.shift = 0;
 			for (int j=0;j<s/4;j++){
 				AddDereference(p, p_deref);
-				cmd.add_cmd(Asm::inst_mov, p_deref, param_shift(param[0], j * 4, TypeInt));
-				cmd.add_cmd(Asm::inst_add, p, param_const(TypeInt, (void*)0x4));
+				cmd.add_cmd(Asm::inst_mov, p_deref, param_shift(param[0], j * 4, TypeInt32));
+				cmd.add_cmd(Asm::inst_add, p, param_const(TypeInt32, (void*)0x4));
 			}*/
 
 			// test
@@ -1103,7 +1103,7 @@ void Serializer::fix_return_by_ref() {
 			cmd.add_cmd(Asm::InstID::MOV, p_edx, p_ret_addr);
 			add_dereference(p_edx, p_deref_edx, TypeReg32);
 			for (int j=0;j<s/4;j++)
-				cmd.add_cmd(Asm::InstID::MOV, param_shift(p_deref_edx, j * 4, TypeInt), param_shift(params[0], j * 4, TypeInt));
+				cmd.add_cmd(Asm::InstID::MOV, param_shift(p_deref_edx, j * 4, TypeInt32), param_shift(params[0], j * 4, TypeInt32));
 			add_reg_channel(Asm::REG_EDX, c_0, cmd.cmd.num - 1);
 #endif
 

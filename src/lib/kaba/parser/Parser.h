@@ -32,8 +32,8 @@ public:
 
 	void parse_buffer(const string &buffer, bool just_analyse);
 
-	void parse_macros(bool just_analyse);
-	void handle_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
+	void parse_legacy_macros(bool just_analyse);
+	void handle_legacy_macro(int &line_no, int &NumIfDefs, bool *IfDefed, bool just_analyse);
 
 	void do_error(const string &msg, shared<Node> node);
 	void do_error(const string &msg, int token_id);

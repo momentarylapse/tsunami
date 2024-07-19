@@ -151,6 +151,11 @@ ImportSource resolve_import_sub(ImportSource source, const string &name) {
 
 	ImportSource r = source;
 	if (source._class) {
+		for (const auto&& [_name, type]: source._class->type_aliases)
+			if (_name == name) {
+				r._class = type;
+				return r;
+			}
 		for (auto c: weak(source._class->classes))
 			if (c->name == name) {
 				r._class = c;
@@ -210,6 +215,9 @@ ImportSource resolve_import_source(Parser *parser, const Array<string> &name, in
 }
 
 [[maybe_unused]] static bool _class_contains(const Class *c, const string &name) {
+	for (const auto&& [_name, type]: c->type_aliases)
+		if (_name == name)
+			return true;
 	for (auto *cc: weak(c->classes))
 		if (cc->name == name)
 			return true;
@@ -227,6 +235,8 @@ void namespace_import_contents(SyntaxTree *tree, Scope &dest, const Class *sourc
 		if (!ok)
 			tree->do_error(format("can not import class '%s' since symbol '%s' is already in scope", source->long_name(), name));
 	};
+	for (const auto&& [name, type]: source->type_aliases)
+		check(dest.add_class(name, type), name);
 	for (auto *c: weak(source->classes))
 		check(dest.add_class(c->name, c), c->name);
 	for (auto *f: weak(source->functions))

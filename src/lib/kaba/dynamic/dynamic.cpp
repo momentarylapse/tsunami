@@ -25,7 +25,7 @@ extern const Class *TypeSpecialFunction;
 
 
 void var_assign(void *pa, const void *pb, const Class *type) {
-	if ((type == TypeInt) or (type == TypeFloat32)) {
+	if ((type == TypeInt32) or (type == TypeFloat32)) {
 		*(int*)pa = *(int*)pb;
 	} else if ((type == TypeBool) or (type == TypeInt8)) {
 		*(char*)pa = *(char*)pb;
@@ -63,7 +63,7 @@ void array_clear(void *p, const Class *type) {
 }
 
 void array_resize(void *p, const Class *type, int num) {
-	auto *f = type->get_member_func("resize", TypeVoid, {TypeInt});
+	auto *f = type->get_member_func("resize", TypeVoid, {TypeInt32});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not resize an array of type " + type->long_name()));
 	typedef void func_t(void*, int);
@@ -235,7 +235,7 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 	} else if (type->is_enum()) {
 		return find_enum_label(type, *reinterpret_cast<const int*>(p));
 	} else if (type->is_optional()) {
-		if (*reinterpret_cast<const bool*>((int_p)p + type->size - 1))
+		if (*reinterpret_cast<const bool*>((int_p)p + type->param[0]->size))
 			return var_repr_str(p, type->param[0], as_repr);
 		return "nil";
 	} else if (type->is_list()) {
@@ -308,7 +308,7 @@ string _cdecl var2str(const void *p, const Class *type) {
 }
 
 Any _cdecl dynify(const void *var, const Class *type) {
-	if (type == TypeInt or type->is_enum())
+	if (type == TypeInt32 or type->is_enum())
 		return Any(*(int*)var);
 	if (type == TypeFloat32)
 		return Any(*(float*)var);

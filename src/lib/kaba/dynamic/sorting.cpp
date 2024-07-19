@@ -180,7 +180,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 			_array_sort_pf<string>(rr, sfunc, stable);
 		else if (by_type == TypePath)
 			_array_sort_pf<Path>(rr, sfunc, stable);
-		else if (by_type == TypeInt)
+		else if (by_type == TypeInt32)
 			_array_sort_pf<int>(rr, sfunc, stable);
 		else if (by_type == TypeFloat32)
 			_array_sort_pf<float>(rr, sfunc, stable);
@@ -193,7 +193,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 			_array_sort_p<string>(rr, offset, stable);
 		else if (by_type == TypePath)
 			_array_sort_p<Path>(rr, offset, stable);
-		else if (by_type == TypeInt)
+		else if (by_type == TypeInt32)
 			_array_sort_p<int>(rr, offset, stable);
 		else if (by_type == TypeFloat32)
 			_array_sort_p<float>(rr, offset, stable);
@@ -206,7 +206,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 			_array_sort<string>(rr, offset, stable);
 		else if (by_type == TypePath)
 			_array_sort<Path>(rr, offset, stable);
-		else if (by_type == TypeInt)
+		else if (by_type == TypeInt32)
 			_array_sort<int>(rr, offset, stable);
 		else if (by_type == TypeFloat32)
 			_array_sort<float>(rr, offset, stable);

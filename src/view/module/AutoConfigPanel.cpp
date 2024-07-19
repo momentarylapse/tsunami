@@ -578,7 +578,7 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			}
-		} else if (e.type == kaba::TypeInt) {
+		} else if (e.type == kaba::TypeInt32) {
 			if (cc == "sample-format") {
 				auto *a = new AutoConfigDataSampleFormat(e.name);
 				a->value = (int*)((char*)config + e.offset);

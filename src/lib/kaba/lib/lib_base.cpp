@@ -16,6 +16,8 @@
 #include <math.h>
 #include <cstdio>
 
+#include "future.h"
+
 namespace kaba {
 
 extern const Class *TypeDynamicArray;
@@ -319,23 +321,23 @@ void SIAddPackageBase(Context *c) {
 
 	// internal
 	TypeUnknown			= add_type  ("@unknown", 0); // should not appear anywhere....or else we're screwed up!
-	TypeReg128			= add_type  ("@reg128", 16, Flags::FORCE_CALL_BY_VALUE);
-	TypeReg64			= add_type  ("@reg64", 8, Flags::FORCE_CALL_BY_VALUE);
-	TypeReg32			= add_type  ("@reg32", 4, Flags::FORCE_CALL_BY_VALUE);
-	TypeReg16			= add_type  ("@reg16", 2, Flags::FORCE_CALL_BY_VALUE);
-	TypeReg8			= add_type  ("@reg8", 1, Flags::FORCE_CALL_BY_VALUE);
+	TypeReg128			= add_type_simple  ("@reg128", 16, 16, Flags::FORCE_CALL_BY_VALUE);
+	TypeReg64			= add_type_simple  ("@reg64", 8, 8, Flags::FORCE_CALL_BY_VALUE);
+	TypeReg32			= add_type_simple  ("@reg32", 4, 4, Flags::FORCE_CALL_BY_VALUE);
+	TypeReg16			= add_type_simple  ("@reg16", 2, 2, Flags::FORCE_CALL_BY_VALUE);
+	TypeReg8			= add_type_simple  ("@reg8", 1, 1, Flags::FORCE_CALL_BY_VALUE);
 	TypeObject			= add_type  ("Object", sizeof(VirtualBase)); // base for most virtual classes
 	TypeDynamic			= add_type  ("@dynamic", 0);
 
 	// "real"
-	TypeVoid			= add_type  ("void", 0, Flags::FORCE_CALL_BY_VALUE);
-	TypeBool			= add_type  ("bool", sizeof(bool), Flags::FORCE_CALL_BY_VALUE);
-	TypeInt8			= add_type  ("i8", 1, Flags::FORCE_CALL_BY_VALUE);
-	TypeInt16			= add_type  ("i16", 2, Flags::FORCE_CALL_BY_VALUE);
-	TypeInt32			= add_type  ("i32", sizeof(int32), Flags::FORCE_CALL_BY_VALUE);
-	TypeInt64			= add_type  ("i64", sizeof(int64), Flags::FORCE_CALL_BY_VALUE);
-	TypeFloat32			= add_type  ("f32", sizeof(float), Flags::FORCE_CALL_BY_VALUE);
-	TypeFloat64			= add_type  ("f64", sizeof(double), Flags::FORCE_CALL_BY_VALUE);
+	TypeVoid			= add_type_simple  ("void", 0, 1, Flags::FORCE_CALL_BY_VALUE);
+	TypeBool			= add_type_simple  ("bool", sizeof(bool), 1, Flags::FORCE_CALL_BY_VALUE);
+	TypeInt8			= add_type_simple  ("i8", 1, 1, Flags::FORCE_CALL_BY_VALUE);
+	TypeInt16			= add_type_simple  ("i16", 2, 2, Flags::FORCE_CALL_BY_VALUE);
+	TypeInt32			= add_type_simple  ("i32", sizeof(int32), 4, Flags::FORCE_CALL_BY_VALUE);
+	TypeInt64			= add_type_simple  ("i64", sizeof(int64), 8, Flags::FORCE_CALL_BY_VALUE);
+	TypeFloat32			= add_type_simple  ("f32", sizeof(float), 4, Flags::FORCE_CALL_BY_VALUE);
+	TypeFloat64			= add_type_simple  ("f64", sizeof(double), 8, Flags::FORCE_CALL_BY_VALUE);
 	TypeDynamicArray	= add_type  ("@DynamicArray", config.target.dynamic_array_size);
 	TypeDictBase		= add_type  ("@DictBase",   config.target.dynamic_array_size);
 	TypeSharedPointer	= add_type  ("@SharedPointer", config.target.pointer_size);
@@ -343,12 +345,9 @@ void SIAddPackageBase(Context *c) {
 
 	TypeNoValueError    = add_type  ("NoValueError", sizeof(KabaException));
 
-
-	// select default float type
-	TypeFloat = TypeFloat32;
-	(const_cast<Class*>(TypeFloat))->name = "float";
-	TypeInt = TypeInt32;
-	(const_cast<Class*>(TypeInt32))->name = "int";
+	// type aliases
+	cur_package->tree->base_class->type_aliases.add({"int", TypeInt32});
+	cur_package->tree->base_class->type_aliases.add({"float", TypeFloat32});
 
 
 	add_class(TypeObject);
@@ -357,34 +356,34 @@ void SIAddPackageBase(Context *c) {
 		class_set_vtable(VirtualBase);
 
 	add_class(TypeDynamicArray);
-		class_add_element("num", TypeInt, config.target.pointer_size);
+		class_add_element("num", TypeInt32, config.target.pointer_size);
 		class_add_func("swap", TypeVoid, &DynamicArray::simple_swap, Flags::MUTABLE);
-			func_add_param("i1", TypeInt);
-			func_add_param("i2", TypeInt);
+			func_add_param("i1", TypeInt32);
+			func_add_param("i2", TypeInt32);
 		class_add_func(Identifier::Func::SUBARRAY, TypeDynamicArray, &DynamicArray::ref_subarray, Flags::REF);
-			func_add_param("start", TypeInt);
-			func_add_param("end", TypeInt);
+			func_add_param("start", TypeInt32);
+			func_add_param("end", TypeInt32);
 		// low level operations
 		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init, Flags::MUTABLE);
-			func_add_param("element_size", TypeInt);
+			func_add_param("element_size", TypeInt32);
 		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear, Flags::MUTABLE);
 		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget, Flags::MUTABLE);
 		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize, Flags::MUTABLE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single, Flags::MUTABLE);
-			func_add_param("index", TypeInt);
+			func_add_param("index", TypeInt32);
 
 	add_class(TypeDictBase);
-		class_add_element("num", TypeInt, config.target.pointer_size);
+		class_add_element("num", TypeInt32, config.target.pointer_size);
 		// low level operations
 		class_add_func("__mem_init__", TypeVoid, &DynamicArray::init, Flags::MUTABLE);
-			func_add_param("element_size", TypeInt);
+			func_add_param("element_size", TypeInt32);
 		class_add_func("__mem_clear__", TypeVoid, &DynamicArray::simple_clear, Flags::MUTABLE);
 		class_add_func("__mem_forget__", TypeVoid, &DynamicArray::forget, Flags::MUTABLE);
 		class_add_func("__mem_resize__", TypeVoid, &DynamicArray::simple_resize, Flags::MUTABLE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("__mem_remove__", TypeVoid, &DynamicArray::delete_single, Flags::MUTABLE);
-			func_add_param("index", TypeInt);
+			func_add_param("index", TypeInt32);
 
 	add_class(TypeSharedPointer);
 		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
@@ -471,11 +470,11 @@ void SIAddPackageBase(Context *c) {
 	const_cast<Class*>(TypeNone)->name = "None";
 	TypePointerList = add_type_list(TypePointer);
 	TypeBoolList    = add_type_list(TypeBool);
-	TypeIntP        = add_type_p_raw(TypeInt);
-	TypeIntOptional = add_type_optional(TypeInt);
-	TypeIntList     = add_type_list(TypeInt);
-	TypeFloatP      = add_type_p_raw(TypeFloat);
-	TypeFloatList   = add_type_list(TypeFloat);
+	TypeIntP        = add_type_p_raw(TypeInt32);
+	TypeIntOptional = add_type_optional(TypeInt32);
+	TypeIntList     = add_type_list(TypeInt32);
+	TypeFloatP      = add_type_p_raw(TypeFloat32);
+	TypeFloatList   = add_type_list(TypeFloat32);
 	TypeFloat64List = add_type_list(TypeFloat64);
 	TypeBytes      = add_type_list(TypeInt8);
 	TypeCString     = add_type_array(TypeInt8, 256);
@@ -486,8 +485,8 @@ void SIAddPackageBase(Context *c) {
 	TypeStringList  = add_type_list(TypeString);
 	capture_implicit_type(TypeBytes, "bytes"); // bytes := i8[]
 
-	TypeIntDict     = add_type_dict(TypeInt);
-	TypeFloatDict   = add_type_dict(TypeFloat);
+	TypeIntDict     = add_type_dict(TypeInt32);
+	TypeFloatDict   = add_type_dict(TypeFloat32);
 	TypeStringDict  = add_type_dict(TypeString);
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
@@ -550,7 +549,7 @@ void SIAddPackageBase(Context *c) {
 	add_class(TypeInt8);
 		class_add_func(Identifier::Func::STR, TypeString, &kaba_int8_to_str, Flags::PURE);
 		//class_add_func(Identifier::Func::REPR, TypeString, &kaba_char_repr, Flags::PURE);
-		class_add_func("__int__", TypeInt, &kaba_cast<char,int>, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<char,int>, Flags::PURE);
 			func_set_inline(InlineID::INT8_TO_INT32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt8, TypeInt8, InlineID::INT8_ASSIGN);
 		add_operator(OperatorID::EQUAL, TypeBool, TypeInt8, TypeInt8, InlineID::INT8_EQUAL);
@@ -572,57 +571,57 @@ void SIAddPackageBase(Context *c) {
 		class_add_element("low", TypeInt8, 0);
 		class_add_element("high", TypeInt8, 1);
 		class_add_func(Identifier::Func::STR, TypeString, &kaba_i16_to_str, Flags::PURE);
-		class_add_func("__int__", TypeInt, &kaba_cast<unsigned short,int>, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<unsigned short,int>, Flags::PURE);
 		//	func_set_inline(InlineID::INT16_TO_INT32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt16, InlineID::CHUNK_ASSIGN);
 		//add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt32, InlineID::INT16_ASSIGN_INT32);
 		class_add_func("__assign__", TypeVoid, &kaba_i16_from_i32, Flags::MUTABLE);
-			func_add_param("o", TypeInt);
+			func_add_param("o", TypeInt32);
 
 
 	add_class(TypeInt32);
 		class_add_func(Identifier::Func::STR, TypeString, &i2s, Flags::PURE);
 		class_add_func(Identifier::Func::FORMAT, TypeString, &kaba_int_format, Flags::PURE);
 			func_add_param("fmt", TypeString);
-		class_add_func("__float__", TypeFloat32, &kaba_cast<int,float>, Flags::PURE);
+		class_add_func("__f32__", TypeFloat32, &kaba_cast<int,float>, Flags::PURE);
 			func_set_inline(InlineID::INT32_TO_FLOAT32);
 		class_add_func("__f64__", TypeFloat64, &kaba_cast<int,double>, Flags::PURE);
 		class_add_func("__i8__", TypeInt8, &kaba_cast<int,char>, Flags::PURE);
 			func_set_inline(InlineID::INT32_TO_INT8);
 		class_add_func("__i64__", TypeInt64, &kaba_cast<int,int64>, Flags::PURE);
 			func_set_inline(InlineID::INT32_TO_INT64);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt, TypeInt, InlineID::INT32_ASSIGN);
-		add_operator(OperatorID::ADD, TypeInt, TypeInt, TypeInt, InlineID::INT32_ADD, &op_int_add);
-		add_operator(OperatorID::SUBTRACT, TypeInt, TypeInt, TypeInt, InlineID::INT32_SUBTRACT, &op_int_sub);
-		add_operator(OperatorID::MULTIPLY, TypeInt, TypeInt, TypeInt, InlineID::INT32_MULTIPLY, &op_int_mul);
-		add_operator(OperatorID::DIVIDE, TypeInt, TypeInt, TypeInt, InlineID::INT32_DIVIDE, &op_int_div);
-		add_operator(OperatorID::EXPONENT, TypeInt, TypeInt, TypeInt, InlineID::NONE, &xop_exp<int>);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeInt, TypeInt, InlineID::INT32_ADD_ASSIGN);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeInt, TypeInt, InlineID::INT32_SUBTRACT_ASSIGN);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeInt, TypeInt, InlineID::INT32_MULTIPLY_ASSIGN);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeInt, TypeInt, InlineID::INT32_DIVIDE_ASSIGN);
-		add_operator(OperatorID::MODULO, TypeInt, TypeInt, TypeInt, InlineID::INT32_MODULO, &op_int32_mod);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_EQUAL, &op_int_eq);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_NOT_EQUAL, &op_int_neq);
-		add_operator(OperatorID::GREATER, TypeBool, TypeInt, TypeInt, InlineID::INT32_GREATER, &op_int_g);
-		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_GREATER_EQUAL, &op_int_ge);
-		add_operator(OperatorID::SMALLER, TypeBool, TypeInt, TypeInt, InlineID::INT32_SMALLER, &op_int_l);
-		add_operator(OperatorID::SMALLER_EQUAL, TypeBool, TypeInt, TypeInt, InlineID::INT32_SMALLER_EQUAL, &op_int_le);
-		add_operator(OperatorID::BIT_AND, TypeInt, TypeInt, TypeInt, InlineID::INT32_AND, &op_int32_and);
-		add_operator(OperatorID::BIT_OR, TypeInt, TypeInt, TypeInt, InlineID::INT32_OR, &op_int32_or);
-		add_operator(OperatorID::SHIFT_RIGHT, TypeInt, TypeInt, TypeInt, InlineID::INT32_SHIFT_RIGHT, &op_int32_shr);
-		add_operator(OperatorID::SHIFT_LEFT, TypeInt, TypeInt, TypeInt, InlineID::INT32_SHIFT_LEFT, &op_int32_shl);
-		add_operator(OperatorID::NEGATIVE, TypeInt, nullptr, TypeInt, InlineID::INT32_NEGATIVE, &op_int_neg);
-		add_operator(OperatorID::INCREASE, TypeVoid, TypeInt, nullptr, InlineID::INT32_INCREASE);
-		add_operator(OperatorID::DECREASE, TypeVoid, TypeInt, nullptr, InlineID::INT32_DECREASE);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt32, TypeInt32, InlineID::INT32_ASSIGN);
+		add_operator(OperatorID::ADD, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_ADD, &op_int_add);
+		add_operator(OperatorID::SUBTRACT, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_SUBTRACT, &op_int_sub);
+		add_operator(OperatorID::MULTIPLY, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_MULTIPLY, &op_int_mul);
+		add_operator(OperatorID::DIVIDE, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_DIVIDE, &op_int_div);
+		add_operator(OperatorID::EXPONENT, TypeInt32, TypeInt32, TypeInt32, InlineID::NONE, &xop_exp<int>);
+		add_operator(OperatorID::ADDS, TypeVoid, TypeInt32, TypeInt32, InlineID::INT32_ADD_ASSIGN);
+		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeInt32, TypeInt32, InlineID::INT32_SUBTRACT_ASSIGN);
+		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeInt32, TypeInt32, InlineID::INT32_MULTIPLY_ASSIGN);
+		add_operator(OperatorID::DIVIDES, TypeVoid, TypeInt32, TypeInt32, InlineID::INT32_DIVIDE_ASSIGN);
+		add_operator(OperatorID::MODULO, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_MODULO, &op_int32_mod);
+		add_operator(OperatorID::EQUAL, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_EQUAL, &op_int_eq);
+		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_NOT_EQUAL, &op_int_neq);
+		add_operator(OperatorID::GREATER, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_GREATER, &op_int_g);
+		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_GREATER_EQUAL, &op_int_ge);
+		add_operator(OperatorID::SMALLER, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_SMALLER, &op_int_l);
+		add_operator(OperatorID::SMALLER_EQUAL, TypeBool, TypeInt32, TypeInt32, InlineID::INT32_SMALLER_EQUAL, &op_int_le);
+		add_operator(OperatorID::BIT_AND, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_AND, &op_int32_and);
+		add_operator(OperatorID::BIT_OR, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_OR, &op_int32_or);
+		add_operator(OperatorID::SHIFT_RIGHT, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_SHIFT_RIGHT, &op_int32_shr);
+		add_operator(OperatorID::SHIFT_LEFT, TypeInt32, TypeInt32, TypeInt32, InlineID::INT32_SHIFT_LEFT, &op_int32_shl);
+		add_operator(OperatorID::NEGATIVE, TypeInt32, nullptr, TypeInt32, InlineID::INT32_NEGATIVE, &op_int_neg);
+		add_operator(OperatorID::INCREASE, TypeVoid, TypeInt32, nullptr, InlineID::INT32_INCREASE);
+		add_operator(OperatorID::DECREASE, TypeVoid, TypeInt32, nullptr, InlineID::INT32_DECREASE);
 
 	add_class(TypeInt64);
 		class_add_func(Identifier::Func::STR, TypeString, &i642s, Flags::PURE);
-		class_add_func("__int__", TypeInt, &kaba_cast<int64,int>, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<int64,int>, Flags::PURE);
 			func_set_inline(InlineID::INT64_TO_INT32);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt64, TypeInt64, InlineID::INT64_ASSIGN);
 		add_operator(OperatorID::ADD, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_ADD, &op_int64_add);
-		add_operator(OperatorID::ADD, TypeInt64, TypeInt64, TypeInt, InlineID::INT64_ADD_INT32, &op_int64_add_int); // needed by internal address calculations!
+		add_operator(OperatorID::ADD, TypeInt64, TypeInt64, TypeInt32, InlineID::INT64_ADD_INT32, &op_int64_add_int); // needed by internal address calculations!
 		add_operator(OperatorID::SUBTRACT, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_SUBTRACT, &op_int64_sub);
 		add_operator(OperatorID::MULTIPLY, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_MULTIPLY, &op_int64_mul);
 		add_operator(OperatorID::DIVIDE, TypeInt64, TypeInt64, TypeInt64, InlineID::INT64_DIVIDE, &op_int64_div);
@@ -648,10 +647,10 @@ void SIAddPackageBase(Context *c) {
 	add_class(TypeFloat32);
 		class_add_func(Identifier::Func::STR, TypeString, &kaba_float2str, Flags::PURE);
 		class_add_func("str2", TypeString, &f2s, Flags::PURE);
-			func_add_param("decimals", TypeInt);
+			func_add_param("decimals", TypeInt32);
 		class_add_func(Identifier::Func::FORMAT, TypeString, &kaba_float_format, Flags::PURE);
 			func_add_param("fmt", TypeString);
-		class_add_func("__int__", TypeInt, &kaba_cast<float,int>, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<float,int>, Flags::PURE);
 			func_set_inline(InlineID::FLOAT32_TO_INT32);    // sometimes causes floating point exceptions...
 		class_add_func("__f64__", TypeFloat64, &kaba_cast<float,double>, Flags::PURE);
 			func_set_inline(InlineID::FLOAT32_TO_FLOAT64);
@@ -676,9 +675,9 @@ void SIAddPackageBase(Context *c) {
 
 	add_class(TypeFloat64);
 		class_add_func(Identifier::Func::STR, TypeString, &kaba_float642str, Flags::PURE);
-		class_add_func("__float__", TypeFloat32, &kaba_cast<double,float>, Flags::PURE);
+		class_add_func("__f32__", TypeFloat32, &kaba_cast<double,float>, Flags::PURE);
 			func_set_inline(InlineID::FLOAT64_TO_FLOAT32);
-		class_add_func("__int__", TypeInt, &kaba_cast<double,int>, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<double,int>, Flags::PURE);
 		add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloat64, TypeFloat64, InlineID::FLOAT64_ASSIGN);
 		add_operator(OperatorID::ADD, TypeFloat64, TypeFloat64, TypeFloat64, InlineID::FLOAT64_ADD, &op_double_add);
 		add_operator(OperatorID::SUBTRACT, TypeFloat64, TypeFloat64, TypeFloat64, InlineID::FLOAT64_SUBTRACT, &op_double_sub);
@@ -708,15 +707,15 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::GREATER, TypeBool, TypeString, TypeString, InlineID::NONE, &string::operator>);
 		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeString, TypeString, InlineID::NONE, &string::operator>=);
 		class_add_func("head", TypeString, &string::head, Flags::PURE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("tail", TypeString, &string::tail, Flags::PURE);
-			func_add_param("size", TypeInt);
+			func_add_param("size", TypeInt32);
 		class_add_func("find", TypeIntOptional, &KabaString::_find, Flags::PURE);
 			func_add_param("str", TypeString);
-			func_add_param_def("start", TypeInt, 0);
-		class_add_func("compare", TypeInt, &string::compare, Flags::PURE);
+			func_add_param_def("start", TypeInt32, 0);
+		class_add_func("compare", TypeInt32, &string::compare, Flags::PURE);
 			func_add_param("str", TypeString);
-		class_add_func("icompare", TypeInt, &string::icompare, Flags::PURE);
+		class_add_func("icompare", TypeInt32, &string::icompare, Flags::PURE);
 			func_add_param("str", TypeString);
 		class_add_func("replace", TypeString, &string::replace, Flags::PURE);
 			func_add_param("sub", TypeString);
@@ -726,24 +725,24 @@ void SIAddPackageBase(Context *c) {
 		class_add_func("parse_tokens", TypeStringList, &string::parse_tokens, Flags::PURE);
 			func_add_param("splitters", TypeString);
 		class_add_func("repeat", TypeString, &string::repeat, Flags::PURE);
-			func_add_param("n", TypeInt);
+			func_add_param("n", TypeInt32);
 		class_add_func("lower", TypeString, &string::lower, Flags::PURE);
 		class_add_func("upper", TypeString, &string::upper, Flags::PURE);
 		class_add_func("reverse", TypeString, &string::reverse, Flags::PURE);
-		class_add_func("hash", TypeInt, &string::hash, Flags::PURE);
+		class_add_func("hash", TypeInt32, &string::hash, Flags::PURE);
 		class_add_func("hex", TypeString, &string::hex, Flags::PURE);
 		class_add_func("unhex", TypeBytes, &string::unhex, Flags::PURE);
 		class_add_func("match", TypeBool, &string::match, Flags::PURE);
 			func_add_param("glob", TypeString);
-		class_add_func("__int__", TypeInt, &string::_int, Flags::PURE);
+		class_add_func("__i32__", TypeInt32, &string::_int, Flags::PURE);
 		class_add_func("__i64__", TypeInt64, &string::i64, Flags::PURE);
-		class_add_func("__float__", TypeFloat32, &string::_float, Flags::PURE);
+		class_add_func("__f32__", TypeFloat32, &string::_float, Flags::PURE);
 		class_add_func("__f64__", TypeFloat64, &string::f64, Flags::PURE);
 		class_add_func("trim", TypeString, &string::trim, Flags::PURE);
 		class_add_func("escape", TypeString, &string::escape, Flags::PURE);
 		class_add_func("unescape", TypeString, &string::unescape, Flags::PURE);
 		class_add_func("utf8_to_utf32", TypeIntList, &string::utf8_to_utf32, Flags::PURE);
-		class_add_func("utf8_length", TypeInt, &string::utf8len, Flags::PURE);
+		class_add_func("utf8_length", TypeInt32, &string::utf8len, Flags::PURE);
 		class_add_func("encode", TypeBytes, &KabaString::encode, Flags::PURE);
 		class_add_func("decode", TypeString, &KabaString::decode, Flags::PURE | Flags::STATIC);
 			func_add_param("b", TypeBytes);
@@ -758,13 +757,13 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::EQUAL, TypeBool, TypeBytes, TypeBytes, InlineID::NONE, &bytes::operator==);
 		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeBytes, TypeBytes, InlineID::NONE, &bytes::operator!=);
 		class_add_func("reverse", TypeString, &bytes::reverse, Flags::PURE);
-		class_add_func("hash", TypeInt, &bytes::hash, Flags::PURE);
+		class_add_func("hash", TypeInt32, &bytes::hash, Flags::PURE);
 		class_add_func("md5", TypeString, &bytes::md5, Flags::PURE);
 		class_add_func("hex", TypeString, &bytes::hex, Flags::PURE);
 		class_add_func("utf8", TypeString, &KabaBytes::utf8, Flags::PURE);
 		class_add_func("find", TypeIntOptional, &KabaBytes::_find, Flags::PURE);
 			func_add_param("str", TypeBytes);
-			func_add_param_def("start", TypeInt, 0);
+			func_add_param_def("start", TypeInt32, 0);
 		//class_add_func(Identifier::Func::REPR, TypeString, &bytes::hex, Flags::PURE);
 	//	class_add_func(Identifier::Func::FORMAT, TypeString, &KabaString::format, Flags::PURE);
 	//		func_add_param("fmt", TypeString);
@@ -798,12 +797,12 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::MULTIPLY, TypeIntList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::mul_values);
 		add_operator(OperatorID::DIVIDE, TypeIntList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::div_values);
 		add_operator(OperatorID::EXPONENT, TypeIntList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::exp_values);
-		add_operator(OperatorID::ADD, TypeIntList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::add_values_scalar);
-		add_operator(OperatorID::SUBTRACT, TypeIntList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::sub_values_scalar);
-		add_operator(OperatorID::MULTIPLY, TypeIntList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::mul_values_scalar);
-		add_operator(OperatorID::DIVIDE, TypeIntList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::div_values_scalar);
-		add_operator(OperatorID::EXPONENT, TypeIntList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::exp_values_scalar);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::assign_values_scalar);
+		add_operator(OperatorID::ADD, TypeIntList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::add_values_scalar);
+		add_operator(OperatorID::SUBTRACT, TypeIntList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::sub_values_scalar);
+		add_operator(OperatorID::MULTIPLY, TypeIntList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::mul_values_scalar);
+		add_operator(OperatorID::DIVIDE, TypeIntList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::div_values_scalar);
+		add_operator(OperatorID::EXPONENT, TypeIntList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::exp_values_scalar);
+		add_operator(OperatorID::ASSIGN, TypeVoid, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::assign_values_scalar);
 		add_operator(OperatorID::SMALLER, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::lt_values);
 		add_operator(OperatorID::SMALLER_EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::le_values);
 		add_operator(OperatorID::GREATER, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::gt_values);
@@ -811,14 +810,14 @@ void SIAddPackageBase(Context *c) {
 		// don't we prefer  int[] == int[] -> bool ???
 		add_operator(OperatorID::EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::eq_values);
 		add_operator(OperatorID::NOT_EQUAL, TypeBoolList, TypeIntList, TypeIntList, InlineID::NONE, &XList<int>::ne_values);
-		add_operator(OperatorID::SMALLER, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::lt_values_scalar);
-		add_operator(OperatorID::SMALLER_EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::le_values_scalar);
-		add_operator(OperatorID::GREATER, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::gt_values_scalar);
-		add_operator(OperatorID::GREATER_EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::ge_values_scalar);
-		add_operator(OperatorID::EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::eq_values_scalar);
-		add_operator(OperatorID::NOT_EQUAL, TypeBoolList, TypeIntList, TypeInt, InlineID::NONE, &XList<int>::ne_values_scalar);
+		add_operator(OperatorID::SMALLER, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::lt_values_scalar);
+		add_operator(OperatorID::SMALLER_EQUAL, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::le_values_scalar);
+		add_operator(OperatorID::GREATER, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::gt_values_scalar);
+		add_operator(OperatorID::GREATER_EQUAL, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::ge_values_scalar);
+		add_operator(OperatorID::EQUAL, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::eq_values_scalar);
+		add_operator(OperatorID::NOT_EQUAL, TypeBoolList, TypeIntList, TypeInt32, InlineID::NONE, &XList<int>::ne_values_scalar);
 		class_add_func(Identifier::Func::CONTAINS, TypeBool, &XList<int>::__contains__, Flags::PURE);
-			func_add_param("i", TypeInt);
+			func_add_param("i", TypeInt32);
 
 	add_class(TypeFloatList);
 		class_add_func(Identifier::Func::STR, TypeString, &XList<float>::str, Flags::PURE);
@@ -890,9 +889,9 @@ void SIAddPackageBase(Context *c) {
 			func_add_param("x", TypeString);
 		class_add_func("clear", TypeVoid, &StringList::clear, Flags::MUTABLE);
 		class_add_func("remove", TypeVoid, &StringList::erase, Flags::MUTABLE);
-			func_add_param("index", TypeInt);
+			func_add_param("index", TypeInt32);
 		class_add_func("resize", TypeVoid, &StringList::resize, Flags::MUTABLE);
-			func_add_param("num", TypeInt);
+			func_add_param("num", TypeInt32);
 		class_add_func("join", TypeString, &StringList::join, Flags::PURE);
 			func_add_param("glue", TypeString);
 		class_add_func(Identifier::Func::STR, TypeString, &StringList::str, Flags::PURE);
@@ -939,9 +938,9 @@ void SIAddPackageBase(Context *c) {
 	add_func("p2s", TypeString, &p2s, Flags::STATIC | Flags::PURE);
 		func_add_param("p", TypePointer);
 	add_func("char", TypeString, &kaba_char2str, Flags::STATIC | Flags::PURE);
-		func_add_param("c", TypeInt);
+		func_add_param("c", TypeInt32);
 	add_func("hex", TypeString, &kaba_int32_hex, Flags::STATIC | Flags::PURE);
-		func_add_param("i", TypeInt);
+		func_add_param("i", TypeInt32);
 	// debug output
 	/*add_func("cprint", TypeVoid, &_cstringout, Flags::STATIC);
 		func_add_param("str", TypeCString);*/
@@ -950,42 +949,42 @@ void SIAddPackageBase(Context *c) {
 	add_ext_var("_print_postfix", TypeString, &os::terminal::_print_postfix_);
 	add_func("as_binary", TypeBytes, &kaba_binary, Flags::STATIC);
 		func_add_param("p", TypeReference, Flags::REF);
-		func_add_param("length", TypeInt);
+		func_add_param("length", TypeInt32);
 	// memory
 	add_func("@malloc", TypePointer, &kaba_malloc, Flags::STATIC);
-		func_add_param("size", TypeInt);
+		func_add_param("size", TypeInt32);
 	add_func("@free", TypeVoid, &free, Flags::STATIC);
 		func_add_param("p", TypePointer);
 
 	// basic testing
 	add_func("_ping", TypeVoid, &kaba_ping, Flags::STATIC);
 	add_func("_int_out", TypeVoid, &kaba_int_out, Flags::STATIC);
-		func_add_param("i", TypeInt);
+		func_add_param("i", TypeInt32);
 	add_func("_float_out", TypeVoid, &kaba_float_out, Flags::STATIC);
 		func_add_param("f", TypeFloat32);
 	add_func("_call_float", TypeVoid, &_x_call_float, Flags::STATIC);
 	add_func("_float_ret", TypeFloat32, &kaba_float_ret, Flags::STATIC);
-	add_func("_int_ret", TypeInt, &kaba_int_ret, Flags::STATIC);
+	add_func("_int_ret", TypeInt32, &kaba_int_ret, Flags::STATIC);
 	add_func("_xxx", TypeVoid, &kaba_xxx, Flags::STATIC);
-		func_add_param("a", TypeInt);
-		func_add_param("b", TypeInt);
-		func_add_param("c", TypeInt);
-		func_add_param("d", TypeInt);
-		func_add_param("e", TypeInt);
-		func_add_param("f", TypeInt);
-		func_add_param("g", TypeInt);
-		func_add_param("h", TypeInt);
-	add_ext_var("_extern_variable", TypeInt, &extern_variable1);
+		func_add_param("a", TypeInt32);
+		func_add_param("b", TypeInt32);
+		func_add_param("c", TypeInt32);
+		func_add_param("d", TypeInt32);
+		func_add_param("e", TypeInt32);
+		func_add_param("f", TypeInt32);
+		func_add_param("g", TypeInt32);
+		func_add_param("h", TypeInt32);
+	add_ext_var("_extern_variable", TypeInt32, &extern_variable1);
 
 
-	add_type_cast(10, TypeInt, TypeFloat32, "int.__float__");
-	add_type_cast(10, TypeInt, TypeFloat64, "int.__f64__");
-	add_type_cast(10, TypeInt, TypeInt64, "int.__i64__");
-	add_type_cast(200, TypeInt64, TypeInt, "i64.__int__");
-	add_type_cast(10, TypeFloat32, TypeFloat64,"float.__f64__");
-	add_type_cast(200, TypeFloat32, TypeInt, "float.__int__");
-	add_type_cast(200, TypeInt, TypeInt8, "int.__i8__");
-	add_type_cast(20, TypeInt8, TypeInt, "i8.__int__");
+	add_type_cast(10, TypeInt32, TypeFloat32, "i32.__f32__");
+	add_type_cast(10, TypeInt32, TypeFloat64, "i32.__f64__");
+	add_type_cast(10, TypeInt32, TypeInt64, "i32.__i64__");
+	add_type_cast(200, TypeInt64, TypeInt32, "i64.__i32__");
+	add_type_cast(10, TypeFloat32, TypeFloat64,"f32.__f64__");
+	add_type_cast(200, TypeFloat32, TypeInt32, "f32.__i32__");
+	add_type_cast(200, TypeInt32, TypeInt8, "i32.__i8__");
+	add_type_cast(20, TypeInt8, TypeInt32, "i8.__i32__");
 	//add_type_cast(30, TypeBoolList, TypeBool, "bool[].__bool__");
 	add_type_cast(50, TypePointer, TypeBool, "p2b");
 	//add_type_cast(50, TypePointer, TypeString, "p2s");

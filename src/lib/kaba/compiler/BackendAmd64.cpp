@@ -362,7 +362,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 		param.add(f->var[i].get());
 
 	// windows: self before return
-	if ((param.num == 2) and (config.target.abi == Abi::AMD64_WINDOWS) and param[1]->type->is_some_pointer()) {
+	if ((config.target.abi == Abi::AMD64_WINDOWS) and (f->literal_return_type->uses_return_by_memory()) and f->is_member() and param.num >= 2 and param[1]->type->is_some_pointer()) {
 		param.swap(0, 1);
 	}
 

@@ -260,6 +260,7 @@ DynamicArray DynamicArray::ref_subarray(int start, int end) const {
 }
 
 
+#if 0
 
 // Array<char>
 template <> void Array<char>::add(const char &item)
@@ -301,7 +302,7 @@ template <> void Array<float>::operator = (const Array<float> &a)
 template <> void Array<float>::operator += (const Array<float> &a)
 {	DynamicArray::simple_append(&a);	}
 
-
+#endif
 
 /*template <> void Array<char>::insert(char c, int pos)
 {

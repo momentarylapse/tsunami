@@ -724,6 +724,25 @@ endif(APPLE)
 
 
 
+# lib: coremidi (optional)
+if(APPLE)
+        set(LIB_COREMIDI_ENABLED true CACHE BOOL "Use coremidi library?")
+        find_library(COREMIDI_LIBRARY CoreAudio)
+        find_library(COREFOUNDATION_LIBRARY CoreFoundation)
+        message(STATUS "coremidi:  ${CORMIDI_LIBRARY}")
+        if(${LIB_COREMIDI_ENABLED})
+                #list(APPEND DEPS ${COREMIDI_LIBRARY})
+                list(APPEND DEPS "-framework CoreMidi" "-framework AudioToolbox" "-framework AudioUnit" "-framework CoreFoundation" "-framework CoreServices")
+                target_compile_definitions(tsunami PUBLIC HAS_LIB_COREMIDI=1)
+        else()
+                target_compile_definitions(tsunami PUBLIC HAS_LIB_COREMIDI=0)
+        endif()
+else()
+        target_compile_definitions(tsunami PUBLIC HAS_LIB_COREMIDI=0)
+endif(APPLE)
+
+
+
 # lib: unwind (optional)
 set(LIB_UNWIND_ENABLED true CACHE BOOL "Use unwind library?")
 pkg_check_modules(LIBUNWIND libunwind)

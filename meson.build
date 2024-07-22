@@ -83,6 +83,14 @@ else
 	add_project_arguments('-DHAS_LIB_COREAUDIO=0', language : ['cpp'])
 endif
 
+# optional dependency: coremidi
+if 
+	add_project_arguments('-DHAS_LIB_COREMIDI=1', language : ['cpp'])
+	deps += []
+else
+	add_project_arguments('-DHAS_LIB_COREMIDI=0', language : ['cpp'])
+endif
+
 # optional dependency: unwind
 d = cc.find_library('unwind', required : false)
 if d.found()

@@ -124,6 +124,7 @@ set(SOURCE
 	src/device/backend-alsa/MidiInputStreamAlsa.cpp
 	src/device/backend-coreaudio/AudioOutputStreamCoreAudio.cpp
 	src/device/backend-coreaudio/DeviceContextCoreAudio.cpp
+	src/device/backend-coremidi/DeviceContextCoreMidi.cpp
 	src/device/backend-portaudio/AudioInputStreamPort.cpp
 	src/device/backend-portaudio/AudioOutputStreamPort.cpp
 	src/device/backend-portaudio/DeviceContextPort.cpp

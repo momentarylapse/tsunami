@@ -185,6 +185,7 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 	check_device(default_devid, DeviceType::AUDIO_INPUT, true);
 	for (auto id: devids)
 		check_device(id, DeviceType::AUDIO_INPUT, id == default_devid);
+
 }
 
 }

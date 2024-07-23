@@ -11,6 +11,7 @@
 #include "backend-portaudio/DeviceContextPort.h"
 #include "backend-alsa/DeviceContextAlsa.h"
 #include "backend-coreaudio/DeviceContextCoreAudio.h"
+#include "backend-coremidi/DeviceContextCoreMidi.h"
 #include "Device.h"
 #include "../Session.h"
 #include "../lib/hui/hui.h"
@@ -22,6 +23,7 @@ Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
 	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
 	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
 	{"coreaudio", DeviceManager::ApiType::COREAUDIO, 1, HAS_LIB_COREAUDIO},
+	{"coremidi", DeviceManager::ApiType::COREMIDI, 2, HAS_LIB_COREMIDI},
 	{"dummy", DeviceManager::ApiType::DUMMY, 3, true}
 };
 
@@ -73,6 +75,10 @@ DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType a
 #if HAS_LIB_PORTAUDIO
 	if (api == DeviceManager::ApiType::PORTAUDIO)
 		return new DeviceContextPort(session);
+#endif
+#if HAS_LIB_COREMIDI
+	if (api == DeviceManager::ApiType::COREMIDI)
+		return new DeviceContextCoreMidi(session);
 #endif
 #if HAS_LIB_ALSA
 	if (api == DeviceManager::ApiType::ALSA)
@@ -188,6 +194,26 @@ void migrate_dev_config(const string& key, DeviceType type) {
 	}
 }
 
+static string suggest_default_audio_api() {
+#ifdef OS_MAC
+	return "coreaudio";
+#endif
+#ifdef OS_LINUX
+	return "coreaudio";
+#endif
+	return "portaudio";
+}
+
+static string suggest_default_midi_api() {
+#ifdef OS_MAC
+	return "coremidi";
+#endif
+#ifdef OS_LINUX
+	return "alsa";
+#endif
+	return "";
+}
+
 void DeviceManager::init() {
 	if (initialized)
 		return;
@@ -204,10 +230,10 @@ void DeviceManager::init() {
 	}
 	hui::config.migrate("Output.Volume", "Devices.OutputVolume");
 
-	audio_api = select_api(hui::config.get_str("Devices.AudioApi", "porteaudio"), 1);
+	audio_api = select_api(hui::config.get_str("Devices.AudioApi", suggest_default_audio_api()), 1);
 	string audio_api_name = find_api_description(audio_api).name;
 	session->i(_("audio library selected: ") + audio_api_name);
-	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", "alsa"), 2);
+	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", suggest_default_midi_api()), 2);
 	string midi_api_name = find_api_description(midi_api).name;
 	session->i(_("midi library selected: ") + midi_api_name);
 

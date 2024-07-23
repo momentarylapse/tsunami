@@ -46,6 +46,7 @@ public:
 		PULSE,
 		PORTAUDIO,
 		COREAUDIO,
+		COREMIDI,
 		NUM_APIS
 	};
 	ApiType audio_api;

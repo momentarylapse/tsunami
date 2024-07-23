@@ -59,6 +59,12 @@ void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool se
 		//out_device_found(dev);
 		device_manager->set_device_config(dev);
 	}
+
+	// default
+	auto *def = device_manager->get_device_create(DeviceType::MIDI_INPUT, "");
+	def->default_by_lib = true;
+	def->present = true;
+	device_manager->set_device_config(def);
 }
 
 MidiInputStream* DeviceContextCoreMidi::create_midi_input_stream(Session *session, Device *device, void* shared_data) {

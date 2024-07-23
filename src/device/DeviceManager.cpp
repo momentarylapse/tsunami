@@ -256,7 +256,7 @@ void DeviceManager::init() {
 		update_devices(true);
 	});
 	audio_context->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
-		msg_write("DEVICE FOUND..." + dd.name);
+		//msg_write("DEVICE FOUND..." + dd.name);
 		Device *d = get_device_create(dd.type, dd.internal_name);
 		*d = dd;
 		d->present = true;

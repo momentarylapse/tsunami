@@ -13,9 +13,14 @@
 
 namespace tsunami {
 
+/*string mac_error_str(OSStatus err) {
+	auto s = SecCopyErrorMessageString(err, nullptr);
+}*/
+
 static void MyMIDIReceiveBlock(const MIDIEventList *evtlist, void * __nullable srcConnRefCon) {
 	msg_write("in");
 }
+
 void MyMIDIReadProc(const MIDIPacketList *pktlist, void* readProcRefCon, void* srcConnRefCon) {
 	auto stream = reinterpret_cast<MidiInputStreamCoreMidi*>(srcConnRefCon);
 	//msg_write(p2s(stream));
@@ -54,17 +59,19 @@ MidiInputStreamCoreMidi::MidiInputStreamCoreMidi(Session *session, Device *devic
 		error = true;
 	}
 
-	result = MIDIPortConnectSource((MIDIPortRef)port, (MIDIEndpointRef)device->index_in_lib, this);
-	if (result) {
-		session->e(string("Error connecting to midi source: ") + i2s(result));
-		error = true;
+	if (device->index_in_lib >= 0) {
+		result = MIDIPortConnectSource((MIDIPortRef)port, (MIDIEndpointRef)device->index_in_lib, this);
+		if (result) {
+			session->e(string("Error connecting to midi source: ") + i2s(result));
+			error = true;
+		} else {
+			endpoit_ref = device->index_in_lib;
+		}
 	}
-	endpoit_ref = device->index_in_lib;
 }
 
 MidiInputStreamCoreMidi::~MidiInputStreamCoreMidi() {
-	if (endpoit_ref >= 0)
-		MIDIPortDisconnectSource((MIDIPortRef)port, (MIDIEndpointRef)endpoit_ref);
+	MidiInputStreamCoreMidi::unconnect();
 	if (port >= 0)
 		MIDIPortDispose((MIDIPortRef)port);
 }
@@ -85,6 +92,9 @@ bool MidiInputStreamCoreMidi::update_device(Device* device) {
 }
 
 bool MidiInputStreamCoreMidi::unconnect() {
+	if (endpoit_ref >= 0)
+		MIDIPortDisconnectSource((MIDIPortRef)port, (MIDIEndpointRef)endpoit_ref);
+	endpoit_ref = -1;
 	return true;
 }
 

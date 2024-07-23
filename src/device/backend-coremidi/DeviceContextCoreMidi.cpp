@@ -4,6 +4,7 @@
 #include <CoreMidi/CoreMidi.h>
 
 #include "DeviceContextCoreMidi.h"
+#include "MidiInputStreamCoreMidi.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
@@ -16,6 +17,10 @@ DeviceContextCoreMidi* DeviceContextCoreMidi::instance;
 
 DeviceContextCoreMidi::DeviceContextCoreMidi(Session* session) : DeviceContext(session) {
 	instance = this;
+
+	CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, "tsunami", kCFStringEncodingMacRoman);
+	MIDIClientCreate(name, nullptr, nullptr, (MIDIClientRef*)&client);
+	CFRelease(name);
 }
 
 DeviceContextCoreMidi::~DeviceContextCoreMidi() {
@@ -54,6 +59,10 @@ void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool se
 		//out_device_found(dev);
 		device_manager->set_device_config(dev);
 	}
+}
+
+MidiInputStream* DeviceContextCoreMidi::create_midi_input_stream(Session *session, Device *device, void* shared_data) {
+	return new MidiInputStreamCoreMidi(session, device, *reinterpret_cast<MidiInputStream::SharedData*>(shared_data));
 }
 
 }

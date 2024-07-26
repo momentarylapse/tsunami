@@ -470,12 +470,6 @@ Function *SyntaxTree::required_func_global(const string &name, int token_id) {
 	return links[0]->as_func();
 }
 
-
-void SyntaxTree::add_missing_function_headers_for_class(Class *t) {
-	AutoImplementerInternal a(nullptr, this);
-	a.add_missing_function_headers_for_class(t);
-}
-
 // expression naming a type
 // we are currently in <namespace>... (no explicit namespace for <name>)
 const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion) {
@@ -494,7 +488,7 @@ const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class 
 	return nullptr;
 }
 
-
+// used by "class/enum XYZ"
 Class *SyntaxTree::create_new_class(const string &name, Class::Type type, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
 	if (find_root_type_by_name(name, ns, false))
 		do_error(format("class '%s' already exists", name), token_id);
@@ -507,6 +501,7 @@ Class *SyntaxTree::create_new_class_no_check(const string &name, Class::Type typ
 
 	Class *t = new Class(type, name, size, 1, this, parent, params);
 	t->token_id = token_id;
+	t->array_length = array_size;
 	owned_classes.add(t);
 	
 	// link namespace
@@ -514,7 +509,7 @@ Class *SyntaxTree::create_new_class_no_check(const string &name, Class::Type typ
 	t->name_space = ns;
 	
 	AutoImplementerInternal ai(nullptr, this);
-	ai.complete_type(t, array_size, token_id);
+	ai.complete_type(t);
 	return t;
 }
 

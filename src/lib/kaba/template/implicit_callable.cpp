@@ -38,6 +38,14 @@ void AutoImplementer::_add_missing_function_headers_for_callable_fp(Class *t) {
 			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
+Array<const Class*> suggest_callable_bind_param_types(const Class *fp) {
+	Array<const Class*> r;
+	for (int i=0; i<fp->param.num-1; i++)
+		if ((fp->array_length & (1 << i)) == 0)
+			r.add(fp->param[i]);
+	return r;
+}
+
 void AutoImplementer::_add_missing_function_headers_for_callable_bind(Class *t) {
 	auto types = get_callable_capture_types(t);
 	types.insert(TypePointer, 0);
@@ -45,7 +53,7 @@ void AutoImplementer::_add_missing_function_headers_for_callable_bind(Class *t) 
 			{"p", "a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::MUTABLE);
 	add_func_header(t, Identifier::Func::CALL,
 			get_callable_return_type(t),
-			get_callable_param_types(t),
+			suggest_callable_bind_param_types(t),
 			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
@@ -118,7 +126,7 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 	shared_array<Node> params;
 
 	for (auto *v: weak(f->var)) {
-		//msg_write("V " + v->name);
+		//msg_write("V " + v->name + ": " + v->type->name);
 		if (v->name.num == 1) {
 			//db_add_print_label_node(this, f->block, "  param " + v->name + ": ", add_node_local(v));
 			params.add(add_node_local(v));
@@ -126,7 +134,7 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 		}
 	}
 	for (auto &e: t->elements) {
-		//msg_write("E " + e.name);
+		//msg_write("E " + e.name + ": " + e.type->name);
 		if (e.name.head(7) == "capture") {
 			int n = e.name.replace("capture", "").replace("_ref", "")._int();
 			params.insert(self->shift(e.offset, e.type), n);

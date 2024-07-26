@@ -26,7 +26,7 @@ void AutoImplementerFutureCore::add_missing_function_headers(Class *t) {
 	//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 }
 
-void AutoImplementerFutureCore::complete_type(Class *t, int array_size, int token_id) {
+void AutoImplementerFutureCore::complete_type(Class *t) {
 	add_missing_function_headers(t);
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
@@ -66,7 +66,7 @@ void AutoImplementerFuture::implement_functions(const Class *t) {
 	implement_list_destructor(prepare_auto_impl(t, t->get_destructor()), t);*/
 }
 
-void AutoImplementerFuture::complete_type(Class *t, int array_size, int token_id) {
+void AutoImplementerFuture::complete_type(Class *t) {
 	add_missing_function_headers(t);
 /*	auto t_core = context->template_manager->request_futurecore(tree, t->param[0], t->token_id);
 	auto t_core_p = context->template_manager->request_shared_not_null(tree, t_core, t->token_id);

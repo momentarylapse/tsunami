@@ -27,7 +27,6 @@ public:
 
 	void _add_missing_function_headers_for_regular(Class *t);
 	void _add_missing_function_headers_for_array(Class *t);
-	void _add_missing_function_headers_for_list(Class *t);
 	void _add_missing_function_headers_for_dict(Class *t);
 	void _add_missing_function_headers_for_optional(Class *t);
 	void _add_missing_function_headers_for_enum(Class *t);
@@ -131,17 +130,9 @@ public:
 	static shared<Node> optional_data(shared<Node> node);
 
 	static bool needs_new(Function *f);
-	static Array<string> class_func_param_names(Function *cf);
-	static bool has_user_constructors(const Class *t);
 	void remove_inherited_constructors(Class *t);
 	void redefine_inherited_constructors(Class *t);
 	void add_full_constructor(Class *t);
-	static bool class_can_fully_construct(const Class *t);
-	static bool class_can_default_construct(const Class *t);
-	static bool class_can_destruct(const Class *t);
-	static bool class_can_assign(const Class *t);
-	static bool class_can_elements_assign(const Class *t);
-	static bool class_can_equal(const Class *t);
 
 	static Function* prepare_auto_impl(const Class *t, Function *f);
 
@@ -151,13 +142,23 @@ public:
 	Context *context;
 };
 
+
+Array<string> class_func_param_names(Function *cf);
+bool has_user_constructors(const Class *t);
+bool class_can_fully_construct(const Class *t);
+bool class_can_default_construct(const Class *t);
+bool class_can_destruct(const Class *t);
+bool class_can_assign(const Class *t);
+bool class_can_elements_assign(const Class *t);
+bool class_can_equal(const Class *t);
+
 // TODO split
 class AutoImplementerInternal : public AutoImplementer {
 public:
 	AutoImplementerInternal(Parser *p, SyntaxTree *tree) : AutoImplementer(p, tree) {}
 	void implement_functions(const Class *t);
 	void add_missing_function_headers_for_class(Class *t);
-	void complete_type(Class *t, int array_size, int token_id);
+	void complete_type(Class *t);
 };
 
 }

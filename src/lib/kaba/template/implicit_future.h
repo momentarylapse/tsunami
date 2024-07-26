@@ -21,7 +21,7 @@ public:
 
 	void implement_future_core_constructor(Function *f, const Class *t);
 
-	void complete_type(Class *t, int array_size, int token_id);
+	void complete_type(Class *t);
 };
 
 class AutoImplementerFuture : public AutoImplementer {
@@ -33,7 +33,7 @@ public:
 
 	void implement_future_constructor(Function *f, const Class *t);
 
-	void complete_type(Class *t, int array_size, int token_id);
+	void complete_type(Class *t);
 };
 
 }

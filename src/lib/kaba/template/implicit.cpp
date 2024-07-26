@@ -199,7 +199,7 @@ bool AutoImplementer::needs_new(Function *f) {
 	return f->needs_overriding();
 }
 
-Array<string> AutoImplementer::class_func_param_names(Function *cf) {
+Array<string> class_func_param_names(Function *cf) {
 	Array<string> names;
 	auto *f = cf;
 	for (int i=0; i<f->num_params; i++)
@@ -207,7 +207,7 @@ Array<string> AutoImplementer::class_func_param_names(Function *cf) {
 	return names;
 }
 
-bool AutoImplementer::has_user_constructors(const Class *t) {
+bool has_user_constructors(const Class *t) {
 	for (auto *cc: t->get_constructors())
 		if (!cc->needs_overriding())
 			return true;
@@ -242,7 +242,7 @@ void AutoImplementer::add_full_constructor(Class *t) {
 	flags_set(f->flags, Flags::__INIT_FILL_ALL_PARAMS);
 }
 
-bool AutoImplementer::class_can_fully_construct(const Class *t) {
+bool class_can_fully_construct(const Class *t) {
 	if (t->vtable.num > 0)
 		return false;
 	if (t->elements.num > FULL_CONSTRUCTOR_MAX_PARAMS)
@@ -260,7 +260,7 @@ bool AutoImplementer::class_can_fully_construct(const Class *t) {
 	return num_el > 0;
 }
 
-bool AutoImplementer::class_can_default_construct(const Class *t) {
+bool class_can_default_construct(const Class *t) {
 	if (!t->needs_constructor())
 		return true;
 	if (t->get_default_constructor())
@@ -272,7 +272,7 @@ bool AutoImplementer::class_can_default_construct(const Class *t) {
 	return false;
 }
 
-bool AutoImplementer::class_can_destruct(const Class *t) {
+bool class_can_destruct(const Class *t) {
 	if (!t->needs_destructor())
 		return true;
 	if (t->get_destructor())
@@ -284,7 +284,7 @@ bool AutoImplementer::class_can_destruct(const Class *t) {
 	return false;
 }
 
-bool AutoImplementer::class_can_assign(const Class *t) {
+bool class_can_assign(const Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return true;
 	if (t->get_assign())
@@ -297,7 +297,7 @@ bool AutoImplementer::class_can_assign(const Class *t) {
 }
 
 // _should_ we make it possible to assign?
-bool AutoImplementer::class_can_elements_assign(const Class *t) {
+bool class_can_elements_assign(const Class *t) {
 	for (auto &e: t->elements)
 		if (!e.hidden())
 			if (!class_can_assign(e.type))
@@ -305,7 +305,7 @@ bool AutoImplementer::class_can_elements_assign(const Class *t) {
 	return true;
 }
 
-bool AutoImplementer::class_can_equal(const Class *t) {
+bool class_can_equal(const Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return true;
 	if (t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t}))
@@ -319,9 +319,7 @@ void AutoImplementerInternal::add_missing_function_headers_for_class(Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return;
 
-	if (t->is_list()) {
-		_add_missing_function_headers_for_list(t);
-	} else if (t->is_array()) {
+	if (t->is_array()) {
 		_add_missing_function_headers_for_array(t);
 	} else if (t->is_dict()) {
 		_add_missing_function_headers_for_dict(t);
@@ -404,21 +402,21 @@ extern const Class* TypeDynamicArray;
 extern const Class* TypeCallableBase;
 
 
-void AutoImplementerInternal::complete_type(Class *t, int array_size, int token_id) {
+void AutoImplementerInternal::complete_type(Class *t) {
 
 	auto params = t->param;
 	// ->derive_from() will overwrite params!!!
 
-	t->array_length = max(array_size, 0);
+	t->array_length = max(t->array_length, 0);
 	if (t->is_list() or t->is_dict()) {
 		t->derive_from(TypeDynamicArray); // we already set its size!
 		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create a dynamic array from type '%s', missing default constructor", params[0]->long_name()), token_id);
+			tree->do_error(format("can not create a dynamic array from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
 		t->param = params;
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_array()) {
 		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()), token_id);
+			tree->do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
 		t->param = params;
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_pointer_raw()) {
@@ -440,7 +438,7 @@ void AutoImplementerInternal::complete_type(Class *t, int array_size, int token_
 		add_missing_function_headers_for_class(t);
 	} else if (t->is_optional()) {
 		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create an optional from type '%s', missing default constructor", params[0]->long_name()), token_id);
+			tree->do_error(format("can not create an optional from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
 		add_missing_function_headers_for_class(t);
 	} else if (t->type == Class::Type::FUNCTION) {
 		t->derive_from(TypeFunction);

@@ -151,8 +151,8 @@ public:
 	shared<Node> build_pipe_len(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
 	shared<Node> build_pipe_map(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id);
 	shared<Node> build_lambda_new(const shared<Node> &param, const shared<Node> &expression, Block *block, const Class *ns, int token_id);
-	shared<Node> try_build_pipe_map_array(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
-	shared<Node> try_build_pipe_map_optional(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
+	shared<Node> try_build_pipe_map_array_unwrap(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
+	shared<Node> try_build_pipe_map_optional_unwrap(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
 	shared<Node> try_build_pipe_map_direct(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id);
 
 

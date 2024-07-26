@@ -86,13 +86,23 @@ const Class *give_useful_type(Concretifier *con, shared<Node> node) {
 // usable for pointer AND Callable class!
 Array<const Class*> get_callable_param_types(const Class *fp) {
 	if (fp->is_pointer_raw())
-		return fp->param[0]->param.sub_ref(0, -1); // skip return value
+		return get_callable_param_types(fp->param[0]);
+
+	// TODO look at call() signature
+
+	if (fp->is_callable_bind()) {
+		Array<const Class*> r;
+		for (int i=0; i<fp->param.num-1; i++)
+			if ((fp->array_length & (1 << i)) == 0)
+				r.add(fp->param[i]);
+		return r;
+	}
 	return fp->param.sub_ref(0, -1); // skip return value
 }
 
 const Class *get_callable_return_type(const Class *fp) {
 	if (fp->is_pointer_raw())
-		return fp->param[0]->param.back();
+		return get_callable_return_type(fp->param[0]);
 	return fp->param.back();
 }
 
@@ -479,7 +489,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		if (index->kind == NodeKind::CLASS) {
 			auto c1 = operand->as_class();
 			auto c2 = index->as_class();
-			if (auto cc = context->template_manager->request_class_instance(tree, c1, {c2}, block, ns, node->token_id)) {
+			if (auto cc = context->template_manager->request_class_instance(tree, c1, {c2}, node->token_id)) {
 				return add_node_class(cc, node->token_id);
 			}
 		}
@@ -1163,7 +1173,8 @@ shared<Node> Concretifier::concretify_statement_raise(shared<Node> node, Block *
 }
 
 // inner_callable: (A,B,C,D,E)->R
-// captures:       [-,x0,-,-,x1]
+// captures:       [-,x,-,-,y]
+// => outer:       (A,  C,D  )->R
 shared<Node> create_bind(Concretifier *concretifier, shared<Node> inner_callable, const shared_array<Node> &captures, const Array<bool> &capture_via_ref) {
 	SyntaxTree *tree = concretifier->tree;
 	int token_id = inner_callable->token_id;
@@ -1184,8 +1195,9 @@ shared<Node> create_bind(Concretifier *concretifier, shared<Node> inner_callable
 			outer_call_types.add(param_types[i]);
 
 	auto bind_wrapper_type = tree->request_implicit_class_callable_bind(param_types, return_type, capture_types, capture_via_ref, token_id);
+	auto bind_return_type = tree->request_implicit_class_callable_fp(outer_call_types, return_type, token_id);
 
-	// "new bind(f, x0, x1, ...)"
+	// "new bind(f, x, y, ...)"
 	for (auto *cf: bind_wrapper_type->get_constructors()) {
 		auto cmd_new = add_node_statement(StatementID::NEW);
 		auto con = add_node_constructor(cf);
@@ -1197,7 +1209,7 @@ shared<Node> create_bind(Concretifier *concretifier, shared<Node> inner_callable
 		con->kind = NodeKind::CALL_FUNCTION;
 		con->type = TypeVoid;
 
-		cmd_new->type = tree->request_implicit_class_callable_fp(outer_call_types, return_type, token_id);
+		cmd_new->type = bind_return_type;
 		cmd_new->set_param(0, con);
 		cmd_new->token_id = inner_callable->token_id;
 		return cmd_new;
@@ -1255,22 +1267,22 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 
 	tree->base_class->add_function(tree, f, false, false);
 
-	// find captures
-	base::set<Variable*> captures;
-	auto find_captures = [block, &captures](shared<Node> n) {
+// --- find captures
+	base::set<Variable*> captured_variables;
+	auto find_captures = [block, &captured_variables](shared<Node> n) {
 		if (n->kind == NodeKind::VAR_LOCAL) {
 			auto v = n->as_local();
 			for (auto vv: block->function->var)
 				if (v == vv)
-					captures.add(v);
+					captured_variables.add(v);
 		}
 		return n;
 	};
 	tree->transform_block(f->block.get(), find_captures);
 
 
-	// no captures?
-	if (captures.num == 0) {
+// --- no captures?
+	if (captured_variables.num == 0) {
 		f->update_parameters_after_parsing();
 		return add_node_func_name(f);
 	}
@@ -1292,31 +1304,32 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		return true;
 	};
 
-	// replace captured variables by adding more parameters to f
-	for (auto v: captures) {
+// --- replace captured variables by adding more parameters to f
+	for (auto v: captured_variables) {
 		if (config.verbose)
 			msg_write("  * " + v->name);
 
 		bool via_ref = should_capture_via_ref(v);
 		capture_via_ref.add(via_ref);
-		auto cap_type = via_ref ? tree->request_implicit_class_reference(v->type, -1) : v->type;
+		auto cap_type = via_ref ? tree->request_implicit_class_reference(v->type, node->token_id) : v->type;
 
 
-		auto vvv = f->add_param(v->name, cap_type, Flags::NONE);
+		auto new_param = f->add_param(v->name, cap_type, Flags::NONE);
 		//if (!flags_has(flags, Flags::OUT))
 		//flags_set(v->flags, Flags::CONST);
 
 
 
-		auto replace_local = [v,vvv,cap_type,via_ref](shared<Node> n) {
+		auto replace_local = [v,new_param,cap_type,via_ref](shared<Node> n) {
 			if (n->kind == NodeKind::VAR_LOCAL)
 				if (n->as_local() == v) {
 					if (via_ref) {
-						n->link_no = (int_p)vvv;
+						//return add_node_local(new_param)->deref();
+						n->link_no = (int_p)new_param;
 						n->type = cap_type;
 						return n->deref();
 					} else {
-						n->link_no = (int_p)vvv;
+						n->link_no = (int_p)new_param;
 					}
 				}
 			return n;
@@ -1326,10 +1339,10 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 
 	f->update_parameters_after_parsing();
 
-	auto create_inner_lambda = wrap_function_into_callable(f, node->token_id);
+	auto inner_lambda = wrap_function_into_callable(f, node->token_id);
 
 	shared_array<Node> capture_nodes;
-	for (auto&& [i,c]: enumerate(captures)) {
+	for (auto&& [i,c]: enumerate(captured_variables)) {
 		if (capture_via_ref[i])
 			capture_nodes.add(add_node_local(c)->ref(tree));
 		else
@@ -1340,7 +1353,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		capture_via_ref.insert(false, 0);
 	}
 
-	return create_bind(this, create_inner_lambda, capture_nodes, capture_via_ref);
+	return create_bind(this, inner_lambda, capture_nodes, capture_via_ref);
 }
 
 shared<Node> Concretifier::concretify_statement(shared<Node> node, Block *block, const Class *ns) {
@@ -1822,16 +1835,13 @@ shared<Node> Concretifier::wrap_node_into_callable(shared<Node> node) {
 	auto f = node->as_func();
 	auto callable = wrap_function_into_callable(f, node->token_id);
 	if (f->is_member() and node->params.num > 0 and node->params[0]) {
-		//if (f->literal_param_type.num > 1)
-		//	do_error("wrapping member functions with parameters into callables currently not implemented...", node);
-		shared_array<Node> captures = {node->params[0]};
+		shared_array<Node> captures = {node->params[0]->ref(tree)}; // self
 		Array<bool> capture_via_ref = {true};
 		for (int i=1; i<f->literal_param_type.num; i++) {
 			captures.add(nullptr);
 			capture_via_ref.add(false);
 		}
-		auto b = create_bind(this, callable, captures, capture_via_ref);
-		return b;
+		return create_bind(this, callable, captures, capture_via_ref);
 	}
 	return callable;
 }
@@ -2246,7 +2256,7 @@ shared<Node> Concretifier::build_pipe_filter(const shared<Node> &input, const sh
 	return concretify_node(n, block, ns);
 }
 
-shared<Node> Concretifier::try_build_pipe_map_array(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
+shared<Node> Concretifier::try_build_pipe_map_array_unwrap(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
 	if (input->type->param[0] != pt)
 		return nullptr;
 	// -> map(func, array)
@@ -2288,7 +2298,7 @@ shared<Node> Concretifier::try_build_pipe_map_array(const shared<Node> &input, N
 	return rrr;
 }
 
-shared<Node> Concretifier::try_build_pipe_map_optional(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
+shared<Node> Concretifier::try_build_pipe_map_optional_unwrap(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
 	if (input->type->param[0] != pt)
 		return nullptr;
 
@@ -2296,7 +2306,12 @@ shared<Node> Concretifier::try_build_pipe_map_optional(const shared<Node> &input
 }
 
 shared<Node> Concretifier::try_build_pipe_map_direct(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
-	auto out = add_node_call(f->as_func(), f->token_id);
+
+	shared<Node> out;
+	if (f->as_func()->is_template())
+		out = make_func_node_callable(match_template_params(f, {input}, block, ns));
+	else
+		out = add_node_call(f->as_func(), f->token_id);
 
 	Array<CastingData> casts;
 	Array<const Class*> wanted;
@@ -2310,6 +2325,7 @@ shared<Node> Concretifier::build_pipe_map(const shared<Node> &input, const share
 
 	auto funcs = concretify_node_multi(rhs, block, ns);
 	for (auto f: weak(funcs)) {
+		//f->show();
 
 
 		/*if (f->kind != NodeKind::SPECIAL_FUNCTION_NAME) {
@@ -2332,12 +2348,12 @@ shared<Node> Concretifier::build_pipe_map(const shared<Node> &input, const share
 
 		// array |> func
 		if (input->type->is_list())
-			if (auto x = try_build_pipe_map_array(input, f, rt, p[0], block, ns, token_id))
+			if (auto x = try_build_pipe_map_array_unwrap(input, f, rt, p[0], block, ns, token_id))
 				return x;
 
 		// optional |> func
 		if (input->type->is_optional())
-			if (auto x = try_build_pipe_map_optional(input, f, rt, p[0], block, ns, token_id))
+			if (auto x = try_build_pipe_map_optional_unwrap(input, f, rt, p[0], block, ns, token_id))
 				return x;
 
 		if (auto x = try_build_pipe_map_direct(input, f, rt, p[0], block, ns, token_id))

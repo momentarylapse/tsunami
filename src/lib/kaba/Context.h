@@ -20,7 +20,6 @@ class Class;
 class TypeCast;
 class Operator;
 class TemplateManager;
-class ImplicitClassRegistry;
 class ExternalLinkData;
 
 class Exception : public Asm::Exception {

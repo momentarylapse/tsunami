@@ -172,8 +172,8 @@ const Class *add_type_simple(const string &name, int size, int alignment, Flags 
 }
 
 
-const Class *add_class_template(const string &name, const Array<string>& params, TemplateManager::ClassCreateF f) {
-	auto t = cur_package->context->template_manager->add_class_template(cur_package->tree.get(), name, params, f);
+const Class *add_class_template(const string &name, const Array<string>& params, TemplateClassInstantiator* instantiator) {
+	auto t = cur_package->context->template_manager->add_class_template(cur_package->tree.get(), name, params, instantiator);
 	__add_class__(t, nullptr);
 	return t;
 }
@@ -189,6 +189,7 @@ extern const Class *TypeArrayT;
 extern const Class *TypeListT;
 extern const Class *TypeDictT;
 extern const Class *TypeFutureT;
+extern const Class *TypeCallableFPT;
 
 const Class *add_type_p_raw(const Class *sub_type) {
 	//string name = format("%s[%s]", Identifier::RAW_POINTER, sub_type->name);
@@ -262,8 +263,7 @@ const Class *add_type_array(const Class *sub_type, int array_length) {
 
 // dynamic array
 const Class *add_type_list(const Class *sub_type) {
-	string name = sub_type->name + "[]";
-	Class *t = new Class(Class::Type::LIST, name, config.target.dynamic_array_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
+	auto t = cur_package->context->template_manager->declare_new_class(cur_package->tree.get(), TypeListT, {sub_type}, 0, -1);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(
 			cur_package->tree.get(),
@@ -347,17 +347,17 @@ public:
 string make_callable_signature(const Array<const Class*> &param, const Class *ret);
 
 const Class *add_type_func(const Class *ret_type, const Array<const Class*> &params) {
-	string name = make_callable_signature(params, ret_type);
 
 	auto params_ret = params;
 	if ((params.num == 1) and (params[0] == TypeVoid))
 		params_ret = {};
 	params_ret.add(ret_type);
 
-	//auto ff = cur_package->syntax->make_class("Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, 0, nullptr, params_ret, cur_package->syntax->base_class);
-	Class *ff = new Class(Class::Type::CALLABLE_FUNCTION_POINTER, "XCallable[" + name + "]", /*TypeCallableBase->size*/ sizeof(KabaCallable<void()>), config.target.pointer_size, cur_package->tree.get(), nullptr, params_ret);
+
+	string name = make_callable_signature(params, ret_type);
+
+	auto ff = cur_package->context->template_manager->declare_new_class(cur_package->tree.get(), TypeCallableFPT, params_ret, 0, -1);
 	__add_class__(ff, cur_package->tree->base_class);
-	cur_package->context->template_manager->add_implicit_legacy(ff);
 
 	// simple register parameter?
 	auto ptr_param = [] (const Class *p) {
@@ -389,13 +389,6 @@ const Class *add_type_func(const Class *ret_type, const Array<const Class*> &par
 	auto pp = const_cast<Class*>(cur_package->tree->request_implicit_class_pointer(ff, -1));
 	pp->name = name;
 	return pp;
-	//return cur_package->tree->request_implicit_class(name, Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, {ff}, -1);
-
-	/*auto c = cur_package->syntax->make_class_callable_fp(params, ret_type);
-	add_class(c);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &kaba_callable_fp_init);
-			func_add_param("fp", TypePointer);
-	return c;*/
 }
 
 //------------------------------------------------------------------------------------------------//

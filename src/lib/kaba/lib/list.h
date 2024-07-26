@@ -18,7 +18,7 @@
 #include <cstdint>
 
 template<> inline string str(const uint8_t& c) {
-	return format("0x%02x", (int)c);
+	return format("0x%02x", (unsigned int)c);
 }
 
 namespace kaba {

@@ -139,7 +139,6 @@ public:
 	void simplify_shift_deref();
 	void simplify_ref_deref();
 
-	void add_missing_function_headers_for_class(Class *t);
 	const Class *find_root_type_by_name(const string &name, const Class *_namespace, bool allow_recursion);
 
 	void show(const string &stage);

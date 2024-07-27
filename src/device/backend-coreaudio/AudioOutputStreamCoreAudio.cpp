@@ -40,8 +40,6 @@ AudioOutputStreamCoreAudio::AudioOutputStreamCoreAudio(Session *session, Device 
 	}
 
 
-	OSErr err;
-
 	AudioComponentDescription acd = {
 		.componentType = ::kAudioUnitType_Output,
 		.componentSubType = ::kAudioUnitSubType_DefaultOutput,
@@ -49,12 +47,16 @@ AudioOutputStreamCoreAudio::AudioOutputStreamCoreAudio(Session *session, Device 
 	};
 
 	output = AudioComponentFindNext(nullptr, &acd);
-	if (!output) 
+	if (!output) {
 		session->e("CoreAudio: Can't find default output");
+		return;
+	}
 
-	err = AudioComponentInstanceNew(output, &tone_unit);
-	if (err) 
+	OSStatus err = AudioComponentInstanceNew(output, &tone_unit);
+	if (err) {
 		session->e(format("CoreAudio: Error creating unit: %d", (int)err));
+		return;
+	}
 
 	AURenderCallbackStruct input = {
 		.inputProc = AudioOutputStreamCoreAudio::request_callback,

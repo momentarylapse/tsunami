@@ -5,7 +5,6 @@
 
 #include "../interface/AudioOutputStream.h"
 
-#include <AudioUnit/AUAudioUnit.h>
 #include <AudioUnit/AudioUnit.h>
 
 namespace tsunami {

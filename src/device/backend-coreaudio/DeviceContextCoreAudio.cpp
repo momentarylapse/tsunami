@@ -1,9 +1,10 @@
 #if HAS_LIB_COREAUDIO
 
-#include <CoreServices/CoreServices.h>
+//#include <CoreServices/CoreServices.h>
 #include <CoreAudio/CoreAudio.h>
 
 #include "DeviceContextCoreAudio.h"
+#include "AudioInputStreamCoreAudio.h"
 #include "AudioOutputStreamCoreAudio.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
@@ -35,9 +36,9 @@ AudioOutputStream* DeviceContextCoreAudio::create_audio_output_stream(Session *s
 	return new AudioOutputStreamCoreAudio(session, device, *reinterpret_cast<AudioOutputStream::SharedData*>(shared_data));
 }
 
-//AudioInputStream* DeviceContextCoreAudio::create_audio_input_stream(Session *session, Device *device, void* shared_data) {
-//	return new AudioInputStreamCoreAudio(session, device, *reinterpret_cast<AudioInputStream::SharedData*>(shared_data));
-//}
+AudioInputStream* DeviceContextCoreAudio::create_audio_input_stream(Session *session, Device *device, void* shared_data) {
+	return new AudioInputStreamCoreAudio(session, device, *reinterpret_cast<AudioInputStream::SharedData*>(shared_data));
+}
 
 
 void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool serious) {

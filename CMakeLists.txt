@@ -122,6 +122,7 @@ set(SOURCE
 	src/data/TrackMarker.cpp
 	src/device/backend-alsa/DeviceContextAlsa.cpp
 	src/device/backend-alsa/MidiInputStreamAlsa.cpp
+	src/device/backend-coreaudio/AudioInputStreamCoreAudio.cpp
 	src/device/backend-coreaudio/AudioOutputStreamCoreAudio.cpp
 	src/device/backend-coreaudio/DeviceContextCoreAudio.cpp
 	src/device/backend-coremidi/DeviceContextCoreMidi.cpp

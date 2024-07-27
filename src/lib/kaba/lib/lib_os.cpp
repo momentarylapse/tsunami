@@ -312,7 +312,7 @@ void SIAddPackageOS(Context *c) {
 	auto TypeFileStreamXfer = add_type_p_xfer(TypeFileStream);
 	auto TypeFileStreamSharedNN = add_type_p_shared_not_null(TypeFileStream);
 	auto TypeFilesystem = add_type("fs", 0);
-	const_cast<Class*>(TypeFilesystem)->type = Class::Type::NAMESPACE;
+	const_cast<Class*>(TypeFilesystem)->from_template = TypeNamespaceT;
 	auto TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
 	TypeOsConfiguration = add_type("Configuration", sizeof(Configuration));

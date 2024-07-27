@@ -62,6 +62,10 @@ const Class *TypeOptionalT;
 const Class *TypeProductT;
 const Class *TypeFutureT;
 const Class *TypeFutureCoreT;
+const Class *TypeEnumT;
+const Class *TypeStructT;
+const Class *TypeInterfaceT;
+const Class *TypeNamespaceT;
 
 string class_name_might_need_parantheses(const Class *t);
 
@@ -307,248 +311,6 @@ Array<int> enum_all(const Class *e) {
 
 
 
-class TemplateClassInstantiatorPointerRaw : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "*", Class::Type::POINTER_RAW, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-		//return create_class(format("%s[%s]", Identifier::RAW_POINTER, params[0]->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorReference : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "&", Class::Type::REFERENCE, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerShared : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s[%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerSharedNotNull : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s![%s]", Identifier::SHARED, params[0]->name), Class::Type::POINTER_SHARED_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerOwned : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s[%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerOwnedNotNull : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s![%s]", Identifier::OWNED, params[0]->name), Class::Type::POINTER_OWNED_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerXfer : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s[%s]", Identifier::XFER, params[0]->name), Class::Type::POINTER_XFER_NOT_NULL, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorPointerAlias : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s[%s]", Identifier::ALIAS, params[0]->name), Class::Type::POINTER_ALIAS, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorArray : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "[" + i2s(array_size) + "]", Class::Type::ARRAY, params[0]->size * array_size, params[0]->alignment, array_size, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorDict : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "{}", Class::Type::DICT, config.target.dynamic_array_size, config.target.pointer_size, 0, TypeDictBase, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-
-string make_callable_signature_t(const Array<const Class*> &_params) {
-	auto ret = _params.back();
-	auto params = _params.sub_ref(0, _params.num - 1);
-	// maybe some day...
-	string signature;// = param->name;
-	for (int i=0; i<params.num; i++) {
-		if (i > 0)
-			signature += ",";
-		signature += class_name_might_need_parantheses(params[i]);
-	}
-	if (params.num == 0)
-		signature = "void";
-	if (params.num > 1)
-		signature = "(" + signature + ")";
-	if (params.num == 0 or (params.num == 1 and params[0] == TypeVoid)) {
-		signature = "void";
-	}
-	return signature + "->" + class_name_might_need_parantheses(ret);
-}
-
-class TemplateClassInstantiatorCallableFP : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		string name = make_callable_signature_t(params);
-		return create_raw_class(tree, "@Callable[" + name + "]", Class::Type::CALLABLE_FUNCTION_POINTER, TypeCallableBase->size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorCallableBind : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-
-		static int unique_bind_counter = 0;
-		//	auto t = TemplateClassInstantiator::create_raw_class(tree, format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, config.target.pointer_size, magic, nullptr, outer_params_ret, token_id);
-		auto t = create_raw_class(tree, format(":bind-%d:", unique_bind_counter++), Class::Type::CALLABLE_BIND, TypeCallableBase->size, config.target.pointer_size, array_size, nullptr, params, token_id);
-
-		auto pp = t->param;
-		t->derive_from(TypeCallableBase);
-		t->functions.clear(); // don't inherit call() with specific types!
-		t->param = pp;
-
-		int offset = t->size;
-		for (int i=0; i<16; i++)
-			if ((array_size & (1 << i))) {
-				auto b = params[i];
-				if ((array_size & ((1 << i) << 16)))
-					b = tree->request_implicit_class_reference(b, token_id);
-				offset = mem_align(offset, b->alignment);
-				auto el = ClassElement(format("capture%d", i), b, offset);
-				offset += b->size;
-				t->elements.add(el);
-			}
-		t->size = offset;
-
-		for (auto &e: t->elements)
-			if (e.name == "_fp")
-				e.type = tree->module->context->template_manager->request_callable_fp(tree, params.sub_ref(0, params.num-1), params.back(), token_id);
-
-		return t;
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.add_missing_function_headers_for_class(c);
-	}
-};
-
-int _make_optional_size(const Class *t) {
-	return mem_align(t->size + 1, t->alignment);
-}
-
-class TemplateClassInstantiatorOptional : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "?", Class::Type::OPTIONAL, _make_optional_size(params[0]), params[0]->alignment, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorProduct : public TemplateClassInstantiator {
-	static string product_class_name(const Array<const Class*> &classes) {
-		string name;
-		for (auto &c: classes) {
-			if (name != "")
-				name += ",";
-			name += c->name;
-		}
-		return "("+name+")";
-	}
-
-	static int product_class_size(const Array<const Class*> &classes) {
-		int size = 0;
-		int total_align = 1;
-		for (auto &c: classes) {
-			total_align = max(total_align, c->alignment);
-			size = mem_align(size, c->alignment);
-			size += c->size;
-		}
-		size = mem_align(size, total_align);
-		return size;
-	}
-
-	static int product_class_alignment(const Array<const Class*> &classes) {
-		int align = 1;
-		for (auto &c: classes)
-			align = max(align, c->alignment);
-		return align;
-	}
-
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, product_class_name(params), Class::Type::PRODUCT, product_class_size(params), product_class_alignment(params), 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerInternal ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorFuture : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("%s[%s]", Identifier::FUTURE, params[0]->name), Class::Type::REGULAR, sizeof(base::future<void>), config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerFuture ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
-
-class TemplateClassInstantiatorFutureCore : public TemplateClassInstantiator {
-	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
-		return create_raw_class(tree, format("@futurecore[%s]", params[0]->name), Class::Type::REGULAR, sizeof(base::_promise_core_<void>) + params[0]->size, config.target.pointer_size, 0, nullptr, params, token_id);
-	}
-	void add_function_headers(Class* c) override {
-		AutoImplementerFutureCore ai(nullptr, c->owner);
-		ai.complete_type(c);
-	}
-};
 
 void SIAddXCommands(Context *c) {
 
@@ -601,6 +363,30 @@ void SIAddPackageBase(Context *c) {
 	cur_package->tree->base_class->type_aliases.add({"float", TypeFloat32});
 
 
+
+	TypeRawT = add_class_template("ptr", {"T"}, new TemplateClassInstantiatorPointerRaw);
+	TypeXferT = add_class_template("xfer", {"T"}, new TemplateClassInstantiatorPointerXfer);
+	TypeSharedT = add_class_template("shared", {"T"}, new TemplateClassInstantiatorPointerShared);
+	TypeSharedNotNullT = add_class_template("shared!", {"T"}, new TemplateClassInstantiatorPointerSharedNotNull);
+	TypeOwnedT = add_class_template("owned", {"T"}, new TemplateClassInstantiatorPointerOwned);
+	TypeOwnedNotNullT = add_class_template("owned!", {"T"}, new TemplateClassInstantiatorPointerOwnedNotNull);
+	TypeAliasT = add_class_template("@alias", {"T"}, new TemplateClassInstantiatorPointerAlias);
+	TypeReferenceT = add_class_template("ref", {"T"}, new TemplateClassInstantiatorReference);
+	TypeArrayT = add_class_template("@Array", {"T"}, new TemplateClassInstantiatorArray);
+	TypeListT = add_class_template("@List", {"T"}, new TemplateClassInstantiatorList);
+	TypeDictT = add_class_template("@Dict", {"T"}, new TemplateClassInstantiatorDict);
+	TypeCallableFPT = add_class_template("@CallableFP", {"T..."}, new TemplateClassInstantiatorCallableFP);
+	TypeCallableBindT = add_class_template("@Bind", {"T..."}, new TemplateClassInstantiatorCallableBind);
+	TypeOptionalT = add_class_template("@Optional", {"T"}, new TemplateClassInstantiatorOptional);
+	TypeProductT = add_class_template("@Product", {"T"}, new TemplateClassInstantiatorProduct);
+	TypeFutureCoreT = add_class_template("@FutureCore", {"T"}, new TemplateClassInstantiatorFutureCore);
+	TypeFutureT = add_class_template("future", {"T"}, new TemplateClassInstantiatorFuture);
+	TypeStructT = add_class_template("@Struct", {"T"}, nullptr);
+	TypeEnumT = add_class_template("@Enum", {"T"}, new TemplateClassInstantiatorEnum);
+	TypeInterfaceT = add_class_template("@Interface", {"T"}, nullptr);
+	TypeNamespaceT = add_class_template("@Namespace", {"T"}, nullptr);
+
+
 	add_class(TypeObject);
 		class_add_func(Identifier::Func::INIT, TypeVoid, &_VirtualBase::__init__, Flags::MUTABLE);
 		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &VirtualBase::__delete__, Flags::MUTABLE);
@@ -639,25 +425,6 @@ void SIAddPackageBase(Context *c) {
 	add_class(TypeSharedPointer);
 		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
 			func_set_inline(InlineID::SHARED_POINTER_INIT);
-
-
-	TypeRawT = add_class_template("ptr", {"T"}, new TemplateClassInstantiatorPointerRaw);
-	TypeXferT = add_class_template("xfer", {"T"}, new TemplateClassInstantiatorPointerXfer);
-	TypeSharedT = add_class_template("shared", {"T"}, new TemplateClassInstantiatorPointerShared);
-	TypeSharedNotNullT = add_class_template("shared!", {"T"}, new TemplateClassInstantiatorPointerSharedNotNull);
-	TypeOwnedT = add_class_template("owned", {"T"}, new TemplateClassInstantiatorPointerOwned);
-	TypeOwnedNotNullT = add_class_template("owned!", {"T"}, new TemplateClassInstantiatorPointerOwnedNotNull);
-	TypeAliasT = add_class_template("@alias", {"T"}, new TemplateClassInstantiatorPointerAlias);
-	TypeReferenceT = add_class_template("ref", {"T"}, new TemplateClassInstantiatorReference);
-	TypeArrayT = add_class_template("@Array", {"T"}, new TemplateClassInstantiatorArray);
-	TypeListT = add_class_template("@List", {"T"}, new TemplateClassInstantiatorList);
-	TypeDictT = add_class_template("@Dict", {"T"}, new TemplateClassInstantiatorDict);
-	TypeCallableFPT = add_class_template("@CallableFP", {"T..."}, new TemplateClassInstantiatorCallableFP);
-	TypeCallableBindT = add_class_template("@Bind", {"T..."}, new TemplateClassInstantiatorCallableBind);
-	TypeOptionalT = add_class_template("@Optional", {"T"}, new TemplateClassInstantiatorOptional);
-	TypeProductT = add_class_template("@Product", {"T"}, new TemplateClassInstantiatorProduct);
-	TypeFutureCoreT = add_class_template("@FutureCore", {"T"}, new TemplateClassInstantiatorFutureCore);
-	TypeFutureT = add_class_template("future", {"T"}, new TemplateClassInstantiatorFuture);
 
 
 	TypeObjectP			= add_type_p_raw(TypeObject);

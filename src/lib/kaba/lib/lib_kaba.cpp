@@ -136,7 +136,7 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeClass);
 		class_add_element("name", TypeString, &Class::name);
 		class_add_element("size", TypeInt32, &Class::size);
-		class_add_element("type", TypeInt32, &Class::type);
+		class_add_element("from_template", TypeClassP, &Class::from_template);
 		class_add_element("parent", TypeClassP, &Class::parent);
 		class_add_element("param", TypeClassRefList, &Class::param);
 		class_add_element("namespace", TypeClassP, &Class::name_space);

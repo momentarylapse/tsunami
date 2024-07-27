@@ -41,7 +41,7 @@ Class *TemplateManager::add_class_template(SyntaxTree *tree, const string &name,
 	if (config.verbose)
 		msg_write("ADD CLASS TEMPLATE " + name);
 	//msg_write("add class template  " + c->long_name());
-	Class *c = new Class(Class::Type::REGULAR, name, 0, 1, tree);
+	Class *c = new Class(nullptr, name, 0, 1, tree);
 	flags_set(c->flags, Flags::TEMPLATE);
 	auto m = new TemplateClassInstanceManager(c, param_names, instantiator);
 	class_managers.add(m);
@@ -101,7 +101,7 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	return f;
 }
 
-Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, int token_id) {
 	auto &t = get_function_template(tree, f0, token_id);
 	
 	// already instantiated?
@@ -111,7 +111,7 @@ Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function 
 	
 	// new
 	FunctionInstance ii;
-	ii.f = instantiate_function(tree, t, params, block, ns, token_id);
+	ii.f = instantiate_function(tree, t, params, token_id);
 	ii.params = params;
 	t.instances.add(ii);
 	return ii.f;
@@ -161,7 +161,7 @@ void TemplateManager::match_parameter_type(shared<Node> p, const Class *t, std::
 	}*/
 }
 
-Function *TemplateManager::request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id) {
+Function *TemplateManager::request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, int token_id) {
 	if (config.verbose)
 		msg_write("____MATCHING");
 	auto &t = get_function_template(tree, f0, token_id);
@@ -195,7 +195,7 @@ Function *TemplateManager::request_function_instance_matching(SyntaxTree *tree, 
 			tree->do_error("not able to match all template parameters", token_id);
 
 
-	return request_function_instance(tree, f0, arg_types, block, ns, token_id);
+	return request_function_instance(tree, f0, arg_types, token_id);
 }
 
 TemplateManager::FunctionTemplate &TemplateManager::get_function_template(SyntaxTree *tree, Function *f0, int token_id) {
@@ -233,7 +233,7 @@ shared<Node> TemplateManager::node_replace(SyntaxTree *tree, shared<Node> n, con
 	});
 }
 
-Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id) {
+Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id) {
 	if (config.verbose)
 		msg_write("INSTANTIATE TEMPLATE");
 	Function *f0 = t.func;
@@ -355,14 +355,14 @@ Class* TemplateClassInstanceManager::declare_instance(SyntaxTree *tree, const Ar
 }
 
 
-Class* TemplateClassInstantiator::create_raw_class(SyntaxTree* tree, const string& name, Class::Type type, int size, int alignment, int array_size, const Class* parent, const Array<const Class*>& params, int token_id) {
+Class* TemplateClassInstantiator::create_raw_class(SyntaxTree* tree, const string& name, const Class* from_template, int size, int alignment, int array_size, const Class* parent, const Array<const Class*>& params, int token_id) {
 	/*msg_write("CREATE " + name);
 	msg_write(p2s(tree));
 	msg_write(p2s(tree->implicit_symbols.get()));*/
 
 	auto ns = tree->implicit_symbols.get();
 
-	Class *t = new Class(type, name, size, alignment, tree, parent, params);
+	Class *t = new Class(from_template, name, size, alignment, tree, parent, params);
 	t->token_id = token_id;
 	t->array_length = array_size;
 	tree->owned_classes.add(t);
@@ -373,6 +373,25 @@ Class* TemplateClassInstantiator::create_raw_class(SyntaxTree* tree, const strin
 	return t;
 }
 
+// skip the "self" parameter!
+Function* TemplateClassInstantiator::add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf, Flags flags, const shared_array<Node> &def_params) {
+	Function *f = t->owner->add_function(name, return_type, t, flags); // always member-function??? no...?
+	f->auto_declared = true;
+	f->token_id = t->token_id;
+	for (auto&& [i,p]: enumerate(param_types)) {
+		f->literal_param_type.add(p);
+		f->block->add_var(param_names[i], p, Flags::NONE);
+		f->num_params ++;
+	}
+	f->default_parameters = def_params;
+	f->update_parameters_after_parsing();
+	if (config.verbose)
+		msg_write("ADD HEADER " + f->signature(TypeVoid));
+
+	bool override = cf;
+	t->add_function(t->owner, f, false, override);
+	return f;
+}
 
 
 const Class *TemplateManager::request_pointer(SyntaxTree *tree, const Class *base, int token_id) {

@@ -398,7 +398,7 @@ void SIAddPackageMath(Context *c) {
 	auto TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vec3>));
 	auto TypeRandom = add_type("Random", sizeof(Random));
 	auto TypeFFT = add_type("fft", 0);
-	const_cast<Class*>(TypeFFT)->type = Class::Type::NAMESPACE;
+	const_cast<Class*>(TypeFFT)->from_template = TypeNamespaceT;
 
 	const_cast<Class*>(TypeVec3)->alignment = 4; // would be updated too late, otherwise...
 	auto TypeVec3Optional = add_type_optional(TypeVec3);

@@ -316,32 +316,8 @@ bool class_can_equal(const Class *t) {
 void AutoImplementerInternal::add_missing_function_headers_for_class(Class *t) {
 	if (t->owner != tree)
 		return;
-	if (t->is_pointer_raw() or t->is_reference())
-		return;
 
-	if (t->is_array()) {
-		_add_missing_function_headers_for_array(t);
-	} else if (t->is_dict()) {
-		_add_missing_function_headers_for_dict(t);
-	} else if (t->is_pointer_shared() or t->is_pointer_shared_not_null()) {
-		_add_missing_function_headers_for_shared(t);
-	} else if (t->is_pointer_owned() or t->is_pointer_owned_not_null()) {
-		_add_missing_function_headers_for_owned(t);
-	} else if (t->is_pointer_xfer_not_null()) {
-		_add_missing_function_headers_for_xfer(t);
-	} else if (t->is_pointer_alias()) {
-		_add_missing_function_headers_for_alias(t);
-	} else if (t->is_product()) {
-		_add_missing_function_headers_for_product(t);
-	} else if (t->is_callable_fp()) {
-		_add_missing_function_headers_for_callable_fp(t);
-	} else if (t->is_callable_bind()) {
-		_add_missing_function_headers_for_callable_bind(t);
-	} else if (t->is_enum()) {
-		_add_missing_function_headers_for_enum(t);
-	} else if (t->is_optional()) {
-		_add_missing_function_headers_for_optional(t);
-	} else { // regular classes
+	{ // regular classes
 		_add_missing_function_headers_for_regular(t);
 	}
 }
@@ -396,76 +372,6 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 	// recursion
 	//for (auto *c: sub_classes)
 	//	implement_functions(c);
-}
-
-extern const Class* TypeDynamicArray;
-extern const Class* TypeCallableBase;
-
-
-void AutoImplementerInternal::complete_type(Class *t) {
-
-	auto params = t->param;
-	// ->derive_from() will overwrite params!!!
-
-	t->array_length = max(t->array_length, 0);
-	if (t->is_list() or t->is_dict()) {
-		t->derive_from(TypeDynamicArray); // we already set its size!
-		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create a dynamic array from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
-		t->param = params;
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_array()) {
-		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create an array from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
-		t->param = params;
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_pointer_raw()) {
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-	} else if (t->is_reference()) {
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-	} else if (t->is_pointer_xfer_not_null()) {
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-	} else if (t->is_pointer_alias()) {
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-	} else if (t->is_pointer_shared() or t->is_pointer_shared_not_null()) {
-		//t->derive_from(TypeSharedPointer);
-		//flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE); // FIXME why not?!?
-		t->param = params;
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_pointer_owned() or t->is_pointer_owned_not_null()) {
-		flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
-		t->param = params;
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_optional()) {
-		if (!class_can_default_construct(params[0]))
-			tree->do_error(format("can not create an optional from type '%s', missing default constructor", params[0]->long_name()), t->token_id);
-		add_missing_function_headers_for_class(t);
-	} else if (t->type == Class::Type::FUNCTION) {
-		t->derive_from(TypeFunction);
-		t->param = params;
-	} else if (t->is_callable_fp()) {
-		t->derive_from(TypeCallableBase);
-		t->functions.clear(); // don't inherit call() with specific types!
-		t->param = params;
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_callable_bind()) {
-		t->derive_from(TypeCallableBase);
-		t->functions.clear(); // don't inherit call() with specific types!
-		t->param = params;
-		//add_missing_function_headers_for_class(t); // later... depending on the bind variables
-	} else if (t->is_product()) {
-		int offset = 0;
-		for (auto&& [i,cc]: enumerate(params)) {
-			offset = mem_align(offset, cc->alignment);
-			t->elements.add(ClassElement(format("e%d", i), cc, offset));
-			offset += cc->size;
-		}
-		add_missing_function_headers_for_class(t);
-	} else if (t->is_enum()) {
-		t->flags = Flags::FORCE_CALL_BY_VALUE; // FORCE_CALL_BY_VALUE
-		kaba::add_class(t);
-		//add_missing_function_headers_for_class(t); // later... might need to parse @noauto first
-	}
 }
 
 

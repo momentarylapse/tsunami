@@ -288,7 +288,7 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 					if (ff->name == Identifier::Func::SET and ff->literal_return_type == TypeVoid and ff->num_params == 3) {
 						if (ff->literal_param_type[1] != index->type)
 							continue;
-						CastingData cast;
+						CastingDataSingle cast;
 						if (!type_match_with_cast(param2, false, ff->literal_param_type[2], cast))
 							continue;
 						//msg_write(ff->signature());
@@ -328,10 +328,10 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 
 
 	// needs type casting?
-	CastingData c1 = {TypeCastId::NONE, 0};
-	CastingData c2 = {TypeCastId::NONE, 0};
-	CastingData c1_best = {TypeCastId::NONE, 1000};
-	CastingData c2_best = {TypeCastId::NONE, 1000};
+	CastingDataSingle c1 = {TypeCastId::NONE, 0};
+	CastingDataSingle c2 = {TypeCastId::NONE, 0};
+	CastingDataSingle c1_best = {TypeCastId::NONE, 1000};
+	CastingDataSingle c2_best = {TypeCastId::NONE, 1000};
 	const Class *t1_best = nullptr, *t2_best = nullptr;
 	Operator *op_found = nullptr;
 	Function *op_cf_found = nullptr;
@@ -421,12 +421,10 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 	// make links callable
 	for (auto&& [i,l]: enumerate(weak(links))) {
 		if (l->kind == NodeKind::FUNCTION) {
-			if (l->as_func()->is_macro())
-				return apply_macro(this, l->as_func(), l, params, block, ns);
-			if (l->as_func()->is_template())
-				links[i] = make_func_node_callable(match_template_params(l, params, block, ns));
-			else
-				links[i] = make_func_node_callable(l);
+			auto f = l->as_func();
+			if (f->is_macro())
+				return apply_macro(this, f, l, params, block, ns);
+			links[i] = make_func_node_callable(l);
 		} else if (l->kind == NodeKind::CLASS) {
 			auto *t = l->as_class();
 			return try_to_match_apply_params(turn_class_into_constructor(t, params, node->token_id), params);
@@ -450,7 +448,12 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 			do_error(format("this %s does not seem callable", kind2str(l->kind)), l);
 		}
 	}
-	return try_to_match_apply_params(links, params);
+
+	if (links.num > 0)
+		return try_to_match_apply_params(links, params);
+
+	do_error("not callable", node);
+	return nullptr;
 }
 
 shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *block, const Class *ns) {
@@ -527,7 +530,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 		}
 		for (auto l: weak(links)) {
 			auto f = l->as_func();
-			if (auto ff = context->template_manager->request_function_instance(tree, f, tt, block, ns, node->token_id)) {
+			if (auto ff = context->template_manager->request_function_instance(tree, f, tt, node->token_id)) {
 				auto tf = add_node_func_name(ff);
 				tf->params = l->params; // in case we have a member instance
 				return tf;
@@ -1899,7 +1902,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 			do_error("inhomogeneous abstract array", node);
 
 		for (int i=0; i<node->params.num; i++) {
-			CastingData cast;
+			CastingDataSingle cast;
 			type_match_with_cast(node->params[i].get(), false, t, cast);
 			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
@@ -1921,7 +1924,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 			do_error("inhomogeneous abstract dict", node);
 
 		for (int i=1; i<node->params.num; i+=2) {
-			CastingData cast;
+			CastingDataSingle cast;
 			type_match_with_cast(node->params[i].get(), false, t, cast);
 			node->params[i] = apply_type_cast(cast, node->params[i].get(), t);
 		}
@@ -1955,14 +1958,20 @@ shared<Node> Concretifier::make_func_node_callable(const shared<Node> l) {
 	return r;
 }
 
-shared<Node> Concretifier::match_template_params(const shared<Node> l, const shared_array<Node> &params, Block *block, const Class *ns) {
+shared<Node> Concretifier::match_template_params(const shared<Node> l, const shared_array<Node> &params, bool allow_fail) {
 	auto f0 = l->as_func();
 	auto _params = params;
 	force_concrete_types(_params);
-	auto ff = context->template_manager->request_function_instance_matching(tree, f0, _params, block, ns, l->token_id);
-	auto r = l->shallow_copy();
-	r->link_no = (int_p)ff;
-	return r;
+	try {
+		auto ff = context->template_manager->request_function_instance_matching(tree, f0, _params, l->token_id);
+		auto r = l->shallow_copy();
+		r->link_no = (int_p)ff;
+		return r;
+	} catch (...) {
+		if (allow_fail)
+			return nullptr;
+		throw;
+	}
 }
 
 shared<Node> Concretifier::make_func_pointer_node_callable(const shared<Node> l) {
@@ -2035,8 +2044,8 @@ shared<Node> Concretifier::link_unary_operator(AbstractOperator *po, shared<Node
 
 	// needs type casting?
 	if (!ok) {
-		CastingData current;
-		CastingData best = {-1, 10000};
+		CastingDataSingle current;
+		CastingDataSingle best = {-1, 10000};
 		const Class *t_best = nullptr;
 		for (auto _op: weak(context->global_operators))
 			if (po == _op->abstract)
@@ -2139,6 +2148,7 @@ shared<Node> check_const_params(SyntaxTree *tree, shared<Node> n) {
 	return n;
 }
 
+// links can include calls to templates!
 shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &links, shared_array<Node> &_params) {
 	//force_concrete_types(params);
 	// no, keep params FLEXIBLE
@@ -2148,45 +2158,51 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 		params.insert(links[0]->params[0], 0);
 
 	// direct match...
-	for (shared<Node> operand: links) {
-		if (!direct_param_match(operand, params))
-			continue;
-
-		return check_const_params(tree, apply_params_direct(operand, params));
+	for (auto& operand: links) {
+		if (direct_param_match(operand, params))
+			return check_const_params(tree, apply_params_direct(operand, params));
 	}
 
-
 	// advanced match...
-	Array<CastingData> casts;
-	Array<const Class*> wanted;
-	int min_penalty = 1000000;
+	CastingDataCall casts;
+	casts.penalty = 10000000;
 	shared<Node> chosen;
-	for (auto operand: links) {
-		Array<CastingData> cur_casts;
-		Array<const Class*> cur_wanted;
-		int cur_penalty;
-		if (!param_match_with_cast(operand, params, cur_casts, cur_wanted, &cur_penalty))
+	for (auto& operand: links) {
+
+		// type casting?
+		CastingDataCall cur_casts;
+		if (!param_match_with_cast(operand, params, cur_casts))
 			continue;
-		if (cur_penalty < min_penalty){
+		if (cur_casts.penalty < casts.penalty){
 			casts = cur_casts;
-			wanted = cur_wanted;
 			chosen = operand;
-			min_penalty = cur_penalty;
 		}
 	}
 
 	if (chosen)
-		return check_const_params(tree, apply_params_with_cast(chosen, params, casts, wanted));
+		return check_const_params(tree, apply_params_with_cast(chosen, params, casts));
 
 
-	// error message
+// error messages
 
 	if (links.num == 0)
 		do_error("can not call ...WTF??", -1); //, links[0]);
 
+	for (auto operand: links) {
+		if (operand->kind == NodeKind::CALL_FUNCTION) {
+			auto f = operand->as_func();
+			if (f->is_template()) {
+				if (auto ff = match_template_params(operand, params, true)) {
+				} else {
+					do_error("template parameter matching or instantiation failed", operand);
+				}
+			}
+		}
+	}
+
 	if (links.num == 1) {
-		param_match_with_cast(links[0], params, casts, wanted, &min_penalty);
-		do_error("invalid function parameters: " + param_match_with_cast_error(params, wanted), links[0]);
+		param_match_with_cast(links[0], params, casts);
+		do_error("invalid function parameters: " + param_match_with_cast_error(params, casts.wanted), links[0]);
 	}
 
 	string found = type_list_to_str(type_list_from_nodes(params));
@@ -2278,15 +2294,13 @@ shared<Node> Concretifier::try_build_pipe_map_array_unwrap(const shared<Node> &i
 
 	auto out = add_node_call(f->as_func(), f->token_id);
 
-	Array<CastingData> casts;
-	Array<const Class*> wanted;
-	int penalty;
+	CastingDataCall casts;
 	auto nvar = add_node_local(var);
 
-	if (!param_match_with_cast(out, {nvar}, casts, wanted, &penalty))
+	if (!param_match_with_cast(out, {nvar}, casts))
 		return nullptr; //do_error("pipe: " + param_match_with_cast_error({input}, wanted), f);
 
-	auto n_exp = check_const_params(tree, apply_params_with_cast(out, {nvar}, casts, wanted));
+	auto n_exp = check_const_params(tree, apply_params_with_cast(out, {nvar}, casts));
 	n_exp = concretify_node(n_exp, block, ns);
 
 //	n_for->type = TypeUnknown;
@@ -2307,18 +2321,12 @@ shared<Node> Concretifier::try_build_pipe_map_optional_unwrap(const shared<Node>
 
 shared<Node> Concretifier::try_build_pipe_map_direct(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
 
-	shared<Node> out;
-	if (f->as_func()->is_template())
-		out = make_func_node_callable(match_template_params(f, {input}, block, ns));
-	else
-		out = add_node_call(f->as_func(), f->token_id);
+	shared<Node> out = add_node_call(f->as_func(), f->token_id);
 
-	Array<CastingData> casts;
-	Array<const Class*> wanted;
-	int penalty;
-	if (!param_match_with_cast(out, {input}, casts, wanted, &penalty))
+	CastingDataCall casts;
+	if (!param_match_with_cast(out, {input}, casts))
 		return nullptr; //do_error("pipe: " + param_match_with_cast_error({input}, wanted), f);
-	return check_const_params(tree, apply_params_with_cast(out, {input}, casts, wanted));
+	return check_const_params(tree, apply_params_with_cast(out, {input}, casts));
 }
 
 shared<Node> Concretifier::build_pipe_map(const shared<Node> &input, const shared<Node> &rhs, Block *block, const Class *ns, int token_id) {
@@ -2462,7 +2470,7 @@ shared<Node> Concretifier::check_param_link(shared<Node> link, const Class *want
 	if (type_match_up(given, wanted))
 		return link;
 
-	CastingData cast;
+	CastingDataSingle cast;
 	if (type_match_with_cast(link, false, wanted, cast))
 		return apply_type_cast(cast, link, wanted);
 
@@ -2489,17 +2497,35 @@ bool Concretifier::direct_param_match(const shared<Node> operand, const shared_a
 	return true;
 }
 
-bool Concretifier::param_match_with_cast(const shared<Node> operand, const shared_array<Node> &params, Array<CastingData> &casts, Array<const Class*> &wanted, int *max_penalty) {
+bool Concretifier::param_match_with_cast(const shared<Node> _operand, const shared_array<Node> &params, CastingDataCall &casts) {
+
+	shared<Node> operand = _operand;
+
+	// template deduction
+	if (operand->kind == NodeKind::CALL_FUNCTION) {
+		auto f = operand->as_func();
+		if (f->is_template()) {
+			if (auto ff = match_template_params(operand, params, true)) {
+				casts.func_override = ff->as_func();
+				// TODO extra penalty...
+				operand->link_no = (int_p)ff->as_func();
+			} else {
+				return false;
+			}
+		}
+	}
+
+
 	int mandatory_params;
-	wanted = get_wanted_param_types(operand, mandatory_params);
-	if ((params.num < mandatory_params) or (params.num > wanted.num))
+	casts.wanted = get_wanted_param_types(operand, mandatory_params);
+	if ((params.num < mandatory_params) or (params.num > casts.wanted.num))
 		return false;
-	casts.resize(params.num);
-	*max_penalty = 0;
+	casts.params.resize(params.num);
+	casts.penalty = 0;
 	for (int p=0; p<params.num; p++) {
-		if (!type_match_with_cast(params[p], false, wanted[p], casts[p]))
+		if (!type_match_with_cast(params[p], false, casts.wanted[p], casts.params[p]))
 			return false;
-		*max_penalty = max(*max_penalty, casts[p].penalty);
+		casts.penalty = max(casts.penalty, casts.params[p].penalty);
 	}
 	return true;
 }
@@ -2508,7 +2534,7 @@ string Concretifier::param_match_with_cast_error(const shared_array<Node> &param
 	if (wanted.num != params.num)
 		return format("%d parameters given, %d expected", params.num, wanted.num);
 	for (int p=0; p<params.num; p++) {
-		CastingData cast;
+		CastingDataSingle cast;
 		if (!type_match_with_cast(params[p], false, wanted[p], cast)) {
 			auto pt = give_useful_type(this, params[p]);
 			if (params.num > 1)
@@ -2527,10 +2553,19 @@ shared<Node> Concretifier::apply_params_direct(shared<Node> operand, const share
 	return r;
 }
 
-shared<Node> Concretifier::apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const Array<CastingData> &casts, const Array<const Class*> &wanted, int offset) {
+shared<Node> Concretifier::apply_params_with_cast(shared<Node> operand, const shared_array<Node> &params, const CastingDataCall &casts, int offset) {
 	auto r = operand->shallow_copy();
+
+	// function template instantiation
+	if (casts.func_override) {
+		r->link_no = (int_p)casts.func_override;
+		r->type = casts.func_override->literal_return_type;
+		r->set_num_params(casts.func_override->num_params);
+	}
+
+	// parameter casts
 	for (int p=0; p<params.num; p++) {
-		auto pp = apply_type_cast(casts[p], params[p], wanted[p]);
+		auto pp = apply_type_cast(casts.params[p], params[p], casts.wanted[p]);
 		r->set_param(p+offset, pp);
 	}
 

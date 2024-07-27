@@ -22,23 +22,6 @@ shared<Node> AutoImplementer::optional_data(shared<Node> node) {
 	return node->change_type(node->type->param[0]);
 }
 
-void AutoImplementer::_add_missing_function_headers_for_optional(Class *t) {
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {t->param[0]}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypeNone}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
-	//if (t->param[0]->get_destructor())
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t->param[0]}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
-	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
-	//add_func_header(t, "_get_p", t->param[0], {}, {}, nullptr, Flags::REF);
-	if (t->param[0]->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})) {
-		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
-		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t->param[0]}, {"other"}, nullptr, Flags::PURE);
-	}
-}
 
 void AutoImplementer::implement_optional_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
@@ -252,6 +235,37 @@ void AutoImplementer::_implement_functions_for_optional(const Class *t) {
 	implement_optional_has_value(prepare_auto_impl(t, t->get_member_func("__bool__", TypeBool, {})), t);
 	implement_optional_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t);
 	implement_optional_equal_raw(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})), t);
+}
+
+
+
+int _make_optional_size(const Class *t) {
+	return mem_align(t->size + 1, t->alignment);
+}
+
+
+Class* TemplateClassInstantiatorOptional::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "?", TypeOptionalT, _make_optional_size(params[0]), params[0]->alignment, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorOptional::add_function_headers(Class* t) {
+	if (!class_can_default_construct(t->param[0]))
+		t->owner->do_error(format("can not create an optional from type '%s', missing default constructor", t->param[0]->long_name()), t->token_id);
+
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {t->param[0]}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {TypeNone}, {"value"}, nullptr, Flags::AUTO_CAST | Flags::MUTABLE);
+	//if (t->param[0]->get_destructor())
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t->param[0]}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::OPTIONAL_HAS_VALUE, TypeBool, {}, {}, nullptr, Flags::PURE);
+	add_func_header(t, "__bool__", TypeBool, {}, {}, nullptr, Flags::PURE);
+	//add_func_header(t, "_get_p", t->param[0], {}, {}, nullptr, Flags::REF);
+	if (t->param[0]->get_member_func(Identifier::Func::EQUAL, TypeBool, {t->param[0]})) {
+		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t}, {"other"}, nullptr, Flags::PURE);
+		add_func_header(t, Identifier::Func::EQUAL, TypeBool, {t->param[0]}, {"other"}, nullptr, Flags::PURE);
+	}
 }
 
 }

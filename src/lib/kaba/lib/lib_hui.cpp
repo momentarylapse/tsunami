@@ -125,7 +125,7 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiEventRef = add_type_ref(TypeHuiEvent);
 	auto TypeHuiPainter = add_type("Painter", sizeof(hui::Painter));
 	auto TypeHuiClipboard = add_type("clipboard", 0);
-	const_cast<Class*>(TypeHuiClipboard)->type = Class::Type::NAMESPACE;
+	const_cast<Class*>(TypeHuiClipboard)->from_template = TypeNamespaceT;
 
 	auto TypeHuiStringFuture = add_type("future[string]", sizeof(base::future<string>));
 	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(base::future<Path>));

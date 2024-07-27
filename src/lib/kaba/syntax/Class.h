@@ -48,33 +48,9 @@ DeriveFlags operator|(DeriveFlags a, DeriveFlags b);
 
 class Class : public Sharable<base::Empty> {
 public:
-
-	enum class Type {
-		REGULAR, // COMMON/BASIC
-		STRUCT,
-		ARRAY, // fixed [N]
-		LIST, // dynamic []
-		POINTER_RAW,
-		POINTER_SHARED,
-		POINTER_SHARED_NOT_NULL,
-		POINTER_OWNED,
-		POINTER_OWNED_NOT_NULL,
-		POINTER_XFER_NOT_NULL,
-		POINTER_ALIAS,
-		REFERENCE,
-		ENUM,
-		NAMESPACE,
-		FUNCTION,
-		DICT,
-		PRODUCT, // (a,b) in (A x B)
-		OPTIONAL,
-		INTERFACE,
-		CALLABLE_FUNCTION_POINTER,
-		CALLABLE_BIND,
-	};
 	
 	//Class();
-	Class(Type type, const string &name, int64 size, int alignment, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
+	Class(const Class* from_template, const string &name, int64 size, int alignment, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});
 	~Class();
 	string name;
 	string long_name() const;
@@ -82,7 +58,7 @@ public:
 	int64 size; // complete size of type
 	int alignment;
 	int array_length;
-	Type type;
+	const Class* from_template;
 	Flags flags;
 
 	bool is_regular() const;
@@ -196,6 +172,28 @@ extern const Class *TypeFunction;
 extern const Class *TypeFunctionRef;
 extern const Class *TypeFunctionCode;
 extern const Class *TypeFunctionCodeRef;
+
+extern const Class *TypeRawT;
+extern const Class *TypeXferT;
+extern const Class *TypeSharedT;
+extern const Class *TypeSharedNotNullT;
+extern const Class *TypeOwnedT;
+extern const Class *TypeOwnedNotNullT;
+extern const Class *TypeAliasT;
+extern const Class *TypeReferenceT;
+extern const Class *TypeArrayT;
+extern const Class *TypeListT;
+extern const Class *TypeDictT;
+extern const Class *TypeCallableFPT;
+extern const Class *TypeCallableBindT;
+extern const Class *TypeOptionalT;
+extern const Class *TypeProductT;
+extern const Class *TypeFutureT;
+extern const Class *TypeFutureCoreT;
+extern const Class *TypeEnumT;
+extern const Class *TypeStructT;
+extern const Class *TypeInterfaceT;
+extern const Class *TypeNamespaceT;
 
 };
 

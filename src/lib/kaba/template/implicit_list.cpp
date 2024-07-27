@@ -348,44 +348,39 @@ void AutoImplementer::_implement_functions_for_list(const Class *t) {
 
 
 Class* TemplateClassInstantiatorList::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
-	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "[]", Class::Type::LIST, config.target.dynamic_array_size, config.target.pointer_size, -1, TypeDynamicArray, params, token_id);
+	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "[]", TypeListT, config.target.dynamic_array_size, config.target.pointer_size, -1, TypeDynamicArray, params, token_id);
 }
 
 void TemplateClassInstantiatorList::add_function_headers(Class* c) {
-	//ai.complete_type(c, array_size, token_id);
-
 	c->derive_from(TypeDynamicArray); // we already set its size!
 	if (!class_can_default_construct(c->param[0]))
 		c->owner->do_error(format("can not create a dynamic array from type '%s', missing default constructor", c->param[0]->long_name()), c->token_id);
-	AutoImplementerInternal ai(nullptr, c->owner);
-	//ai.add_missing_function_headers_for_class(c);
 
-
-	ai.add_func_header(c, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	ai.add_func_header(c, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	ai.add_func_header(c, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	ai.add_func_header(c, "resize", TypeVoid, {TypeInt32}, {"num"}, nullptr, Flags::MUTABLE);
+	add_func_header(c, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(c, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(c, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(c, "resize", TypeVoid, {TypeInt32}, {"num"}, nullptr, Flags::MUTABLE);
 	if (c->param[0]->is_pointer_owned() or c->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = c->owner->request_implicit_class_xfer(c->param[0]->param[0], -1);
 		auto t_xfer_list = c->owner->request_implicit_class_list(t_xfer, -1);
-		ai.add_func_header(c, "add", TypeVoid, {t_xfer}, {"x"}, nullptr, Flags::MUTABLE);
-		ai.add_func_header(c, Identifier::Func::OWNED_GIVE, t_xfer_list, {}, {}, nullptr, Flags::MUTABLE);
-		//ai.add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"});
-		ai.add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, "add", TypeVoid, {t_xfer}, {"x"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::Func::OWNED_GIVE, t_xfer_list, {}, {}, nullptr, Flags::MUTABLE);
+		//add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"});
+		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"}, nullptr, Flags::MUTABLE);
 	} else if (c->param[0]->is_pointer_xfer_not_null()) {
-		//	ai.add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
-		ai.add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+		//	add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
+		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
 	} else if (c->param[0]->is_reference()) {
-		ai.add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
-		ai.add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
+		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
 	} else {
-		ai.add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"}, nullptr, Flags::MUTABLE);
 		if (class_can_assign(c->param[0]))
-			ai.add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+			add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
 	}
-	ai.add_func_header(c, "remove", TypeVoid, {TypeInt32}, {"index"}, nullptr, Flags::MUTABLE);
+	add_func_header(c, "remove", TypeVoid, {TypeInt32}, {"index"}, nullptr, Flags::MUTABLE);
 	if (class_can_equal(c->param[0]))
-		ai.add_func_header(c, Identifier::Func::EQUAL, TypeBool, {c}, {"other"}, nullptr, Flags::PURE);
+		add_func_header(c, Identifier::Func::EQUAL, TypeBool, {c}, {"other"}, nullptr, Flags::PURE);
 }
 
 }

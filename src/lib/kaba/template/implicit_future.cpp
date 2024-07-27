@@ -10,6 +10,7 @@
 #include "template.h"
 #include "../parser/Parser.h"
 #include "../../os/msg.h"
+#include "../../base/future.h"
 
 namespace kaba {
 
@@ -71,6 +72,25 @@ void AutoImplementerFuture::complete_type(Class *t) {
 /*	auto t_core = context->template_manager->request_futurecore(tree, t->param[0], t->token_id);
 	auto t_core_p = context->template_manager->request_shared_not_null(tree, t_core, t->token_id);
 	t->elements.add(ClassElement("core", t_core_p, 0));*/
+}
+
+
+
+
+Class* TemplateClassInstantiatorFuture::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::FUTURE, params[0]->name), TypeFutureT, sizeof(base::future<void>), config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorFuture::add_function_headers(Class* c) {
+	AutoImplementerFuture ai(nullptr, c->owner);
+	ai.complete_type(c);
+}
+
+Class* TemplateClassInstantiatorFutureCore::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("@futurecore[%s]", params[0]->name), TypeFutureCoreT, sizeof(base::_promise_core_<void>) + params[0]->size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorFutureCore::add_function_headers(Class* c) {
+	AutoImplementerFutureCore ai(nullptr, c->owner);
+	ai.complete_type(c);
 }
 
 }

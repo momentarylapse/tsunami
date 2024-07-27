@@ -33,7 +33,8 @@ public:
 	const Class* create_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id);
 
 	// helpers
-	static Class* create_raw_class(SyntaxTree* tree, const string& name, Class::Type type, int size, int alignment, int array_size, const Class* parent, const Array<const Class*>& params, int token_id);
+	static Class* create_raw_class(SyntaxTree* tree, const string& name, const Class* from_template, int size, int alignment, int array_size, const Class* parent, const Array<const Class*>& params, int token_id);
+	static Function* add_func_header(Class* t, const string& name, const Class* return_type, const Array<const Class*>& param_types, const Array<string>& param_names, Function* cf = nullptr, Flags flags = Flags::NONE, const shared_array<Node>& def_params = {});
 };
 
 class TemplateClassInstanceManager : public Sharable<base::Empty> {
@@ -67,8 +68,8 @@ public:
 	using FunctionCreateF = std::function<Function*(SyntaxTree*, const Array<const Class*>&, int)>;
 	
 	void add_function_template(Function* f_template, const Array<string>& param_names, FunctionCreateF f_create = nullptr);
-	Function* request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
-	Function* request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, Block *block, const Class *ns, int token_id);
+	Function* request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, int token_id);
+	Function* request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, int token_id);
 
 // classes
 	Class *add_class_template(SyntaxTree* tree, const string& name, const Array<string>& param_names, TemplateClassInstantiator* instantiator);
@@ -122,7 +123,7 @@ private:
 
 	Function *full_copy(SyntaxTree *tree, Function *f0);
 	shared<Node> node_replace(SyntaxTree *tree, shared<Node> n, const Array<string> &names, const Array<const Class*> &params);
-	Function *instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, Block *block, const Class *ns, int token_id);
+	Function *instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id);
 	//const Class *instantiate_class(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id);
 
 	void match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f);
@@ -131,11 +132,95 @@ private:
 
 
 
+class TemplateClassInstantiatorPointerRaw : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorReference : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorPointerShared : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorPointerSharedNotNull : public TemplateClassInstantiatorPointerShared {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+};
+
+class TemplateClassInstantiatorPointerOwned : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorPointerOwnedNotNull : public TemplateClassInstantiatorPointerOwned {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+};
+
+class TemplateClassInstantiatorPointerXfer : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorPointerAlias : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
 
 class TemplateClassInstantiatorList : public TemplateClassInstantiator {
 	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
 	void add_function_headers(Class* c) override;
 };
+
+class TemplateClassInstantiatorArray : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorDict : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorOptional : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorEnum : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorProduct : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorCallableFP : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorCallableBind : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorFuture : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorFutureCore : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+string class_name_might_need_parantheses(const Class *t);
 
 }
 

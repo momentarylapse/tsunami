@@ -1512,13 +1512,13 @@ void Parser::parse_enum(Class *_namespace) {
 
 	// class name
 	int token0 = Exp.cur_token();
-	auto _class = tree->create_new_class(Exp.consume(), Class::Type::ENUM, sizeof(int), -1, nullptr, {}, _namespace, token0);
+	auto _class = tree->create_new_class(Exp.consume(), TypeEnumT, sizeof(int), -1, nullptr, {}, _namespace, token0);
 
 	// as shared|@noauto
 	if (try_consume(Identifier::AS))
 		_class->flags = parse_flags(_class->flags);
 
-	auto_implementer.add_missing_function_headers_for_class(_class);
+	context->template_manager->request_class_instance(tree, TypeEnumT, {_class}, token0);
 
 	expect_new_line_with_indent();
 	Exp.next_line();
@@ -1600,14 +1600,14 @@ void parser_class_add_element(Parser *p, Class *_class, const string &name, cons
 	}
 }
 
-Class::Type parse_class_type(const string& e) {
+const Class* parse_class_type(const string& e) {
 	if (e == Identifier::INTERFACE)
-		return Class::Type::INTERFACE;
+		return TypeInterfaceT;
 	if (e == Identifier::NAMESPACE)
-		return Class::Type::NAMESPACE;
+		return TypeNamespaceT;
 	if (e == Identifier::STRUCT)
-		return Class::Type::STRUCT;
-	return Class::Type::REGULAR;
+		return TypeStructT;
+	return nullptr;
 }
 
 Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
@@ -1631,7 +1631,7 @@ Class *Parser::parse_class_header(Class *_namespace, int &offset0) {
 		if (!_class)
 			tree->module->do_error_internal("class declaration ...not found " + name);
 		_class->token_id = token_id;
-		_class->type = class_type;
+		_class->from_template = class_type;
 	}
 
 	// parent class
@@ -1826,7 +1826,7 @@ shared<Node> Parser::parse_and_eval_const(Block *block, const Class *type) {
 	auto cv = parse_operand_greedy(block, true);
 
 	if (type) {
-		CastingData cast;
+		CastingDataSingle cast;
 		if (con.type_match_with_cast(cv, false, type, cast)) {
 			cv = con.apply_type_cast(cast, cv, type);
 		} else {
@@ -2147,7 +2147,7 @@ void Parser::parse_all_class_names_in_block(Class *ns, int indent0) {
 				Exp.next();
 				if (Exp.cur == Identifier::OVERRIDE)
 					continue;
-				Class *t = tree->create_new_class(Exp.cur, Class::Type::REGULAR, 0, 0, nullptr, {}, ns, Exp.cur_token());
+				Class *t = tree->create_new_class(Exp.cur, nullptr, 0, 0, nullptr, {}, ns, Exp.cur_token());
 				flags_clear(t->flags, Flags::FULLY_PARSED);
 
 				Exp.next_line();

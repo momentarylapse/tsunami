@@ -57,7 +57,7 @@ bool func_pointer_match_up(const Class *given, const Class *wanted) {
 }
 
 bool is_same_kind_of_pointer(const Class *a, const Class *b) {
-	return (a->is_some_pointer() and (a->type == b->type));
+	return (a->is_some_pointer() and (a->from_template == b->from_template));
 }
 
 // can be re-interpreted as...?
@@ -138,7 +138,7 @@ shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted)
 	if (type == wanted)
 		return node;
 
-	CastingData cast;
+	CastingDataSingle cast;
 	if (type_match_with_cast(node, false, wanted, cast)) {
 		if (cast.cast == TypeCastId::NONE) {
 			auto c = node->shallow_copy();
@@ -187,7 +187,7 @@ bool Concretifier::type_match_tuple_as_contructor(shared<Node> node, Function *f
 
 	penalty = 20;
 	for (auto&& [i,e]: enumerate(weak(node->params))) {
-		CastingData cast;
+		CastingDataSingle cast;
 		if (!type_match_with_cast(e, false, f_constructor->literal_param_type[i+1], cast))
 			return false;
 		penalty += cast.penalty;
@@ -195,7 +195,7 @@ bool Concretifier::type_match_tuple_as_contructor(shared<Node> node, Function *f
 	return true;
 }
 
-bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingData &cd) {
+bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, const Class *wanted, CastingDataSingle &cd) {
 	cd.penalty = 0;
 	cd.cast = TypeCastId::NONE;
 	cd.pre_deref_count = 0;
@@ -205,7 +205,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 
 
 	if (given->is_some_pointer_not_null()) {
-		CastingData cd_sub;
+		CastingDataSingle cd_sub;
 		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub)) {
 			cd = cd_sub;
 			cd.pre_deref_count ++;
@@ -275,7 +275,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeUnknown) {
 		if (wanted->is_list()) {
 			auto t = wanted->get_array_element();
-			CastingData cast;
+			CastingDataSingle cast;
 			for (auto *e: weak(node->params)) {
 				if (!type_match_with_cast(e, false, t, cast))
 					return false;
@@ -321,7 +321,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	if (node->kind == NodeKind::DICT_BUILDER and given == TypeUnknown) {
 		if (wanted->is_dict()) {
 			auto t = wanted->get_array_element();
-			CastingData cast;
+			CastingDataSingle cast;
 			for (auto&& [i,e]: enumerate(node->params)) {
 				if ((i % 2) == 1) {
 					if (!type_match_with_cast(e, false, t, cast))
@@ -354,7 +354,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	// single parameter auto-constructor?
 	for (auto *f: wanted->get_constructors())
 		if (f->num_params == 2 and flags_has(f->flags, Flags::AUTO_CAST)) {
-			CastingData c;
+			CastingDataSingle c;
 			if (type_match_with_cast(node, false, f->literal_param_type[1], c)) {
 				cd.cast = TypeCastId::AUTO_CONSTRUCTOR;
 				cd.f = f;
@@ -371,7 +371,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	return false;
 }
 
-shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared<Node> node, const Class *wanted) {
+shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, shared<Node> node, const Class *wanted) {
 	if (cast.cast == TypeCastId::NONE)
 		return node;
 	if (cast.cast == TypeCastId::DEREFERENCE)
@@ -383,7 +383,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 	if (cast.cast == TypeCastId::ABSTRACT_LIST) {
 		if (wanted == TypeDynamicArray) // whatever, anything is ok!
 			return force_concrete_type(node);
-		CastingData cd2;
+		CastingDataSingle cd2;
 		for (auto&& [i,e]: enumerate(node->params)) {
 			if (!type_match_with_cast(e, false, wanted->get_array_element(), cd2)) {
 				do_error("nope????", node);
@@ -401,7 +401,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 	if (cast.cast == TypeCastId::ABSTRACT_DICT) {
 		//if (wanted == TypeDict)
 		//	return force_concrete_type(node);
-		CastingData cd2;
+		CastingDataSingle cd2;
 		for (auto&& [i,e]: enumerate(node->params)) {
 			if ((i % 2) == 1) {
 				if (!type_match_with_cast(e, false, wanted->get_array_element(), cd2)) {
@@ -418,25 +418,29 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 	}
 
 	if (cast.cast == TypeCastId::TUPLE_AS_CONSTRUCTOR) {
-		Array<CastingData> c;
-		c.resize(node->params.num);
+		CastingDataCall c;
+		c.params.resize(node->params.num);
 		auto f = cast.f;
 
 		for (auto&& [i,e]: enumerate(node->params))
-			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c[i])) {
+			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c.params[i])) {
 				do_error("tuple as constructor...mismatch", e);
 			}
 		auto cmd = add_node_constructor(f);
-		return apply_params_with_cast(cmd, node->params, c, f->literal_param_type.sub_ref(1), 1);
+		c.wanted = f->literal_param_type.sub_ref(1);
+		return apply_params_with_cast(cmd, node->params, c, 1);
 	}
 	if (cast.cast == TypeCastId::AUTO_CONSTRUCTOR) {
 		auto f = cast.f;
-		CastingData c;
+		CastingDataSingle c;
 		if (!type_match_with_cast(node, false, f->literal_param_type[1], c)) {
 			do_error("auto constructor...mismatch", node);
 		}
 		auto cmd = add_node_constructor(f);
-		return apply_params_with_cast(cmd, {node}, {c}, f->literal_param_type.sub_ref(1), 1);
+		CastingDataCall cc;
+		cc.params = {c};
+		cc.wanted = f->literal_param_type.sub_ref(1);
+		return apply_params_with_cast(cmd, {node}, cc, 1);
 	}
 	if ((cast.cast == TypeCastId::MAKE_SHARED) or (cast.cast == TypeCastId::MAKE_OWNED)) {
 		if (!cast.f)
@@ -455,7 +459,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingData &cast, shared
 	return c;
 }
 
-shared<Node> Concretifier::apply_type_cast(const CastingData &cast, shared<Node> node, const Class *wanted) {
+shared<Node> Concretifier::apply_type_cast(const CastingDataSingle &cast, shared<Node> node, const Class *wanted) {
 	if (cast.pre_deref_count > 0) {
 		for (int i=0; i<cast.pre_deref_count; i++)
 			node = node->deref();

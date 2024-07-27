@@ -183,9 +183,6 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 	//	return class_repr(reinterpret_cast<const Class*>(p));
 	} else if (type->is_callable_fp() or type->is_callable_bind()) {
 		return callable_repr(p, type);
-	} else if (type == TypeFunction or type->type == Class::Type::FUNCTION) {
-		// probably not...
-		return func_repr(reinterpret_cast<const Function*>(p));
 	} else if (type == TypeSpecialFunction) {
 		return format("<special function %s>", reinterpret_cast<const SpecialFunction*>(p)->name);
 	} else if (type == TypeAny) {

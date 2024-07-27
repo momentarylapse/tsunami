@@ -26,17 +26,6 @@ public:
 	void do_error_implicit(Function *f, const string &msg);
 
 	void _add_missing_function_headers_for_regular(Class *t);
-	void _add_missing_function_headers_for_array(Class *t);
-	void _add_missing_function_headers_for_dict(Class *t);
-	void _add_missing_function_headers_for_optional(Class *t);
-	void _add_missing_function_headers_for_enum(Class *t);
-	void _add_missing_function_headers_for_product(Class *t);
-	void _add_missing_function_headers_for_shared(Class *t);
-	void _add_missing_function_headers_for_owned(Class *t);
-	void _add_missing_function_headers_for_xfer(Class *t);
-	void _add_missing_function_headers_for_alias(Class *t);
-	void _add_missing_function_headers_for_callable_fp(Class *t);
-	void _add_missing_function_headers_for_callable_bind(Class *t);
 
 	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE, const shared_array<Node> &def_params = {});
 
@@ -158,7 +147,6 @@ public:
 	AutoImplementerInternal(Parser *p, SyntaxTree *tree) : AutoImplementer(p, tree) {}
 	void implement_functions(const Class *t);
 	void add_missing_function_headers_for_class(Class *t);
-	void complete_type(Class *t);
 };
 
 }

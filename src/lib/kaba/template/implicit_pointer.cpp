@@ -15,23 +15,13 @@ namespace kaba {
 
 extern const Class* TypeNone;
 
+
 /*static shared<Node> shared_p(shared<Node> n) {
 	return n->change_type(tree->get_pointer(t->param[0]));
 }*/
 #define SHARED_P(N)       (N->change_type(tree->get_pointer(t->param[0])))
 //#define SHARED_COUNTER(N) (SHARED_P(self)->deref()->shift(e.offset, e.type))
 
-void AutoImplementer::_add_missing_function_headers_for_shared(Class *t) {
-	auto t_xfer = tree->request_implicit_class_xfer(t->param[0], -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	// do we really need this, or can we use auto cast xfer[X] -> shared[X]?!?
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t_xfer}, {"p"}, nullptr, Flags::STATIC);
-}
 
 
 struct XX {
@@ -49,34 +39,6 @@ struct XX {
 	int *p;
 };
 
-
-void AutoImplementer::_add_missing_function_headers_for_owned(Class *t) {
-	[[maybe_unused]] auto t_p = tree->get_pointer(t->param[0]);
-	auto t_xfer = tree->request_implicit_class_xfer(t->param[0], -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-//	f->address_preprocess = mf(&XX::__del__);
-//	f->address = (int_p)f->address_preprocess;
-	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	//f->address_preprocess = mf(&XX::__del__);
-	//f->address = (int_p)f->address_preprocess;
-	add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
-	//auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
-	//flags_set(assign->var.back()->flags, Flags::OUT);
-	//add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t->param[0]->get_pointer()}, {"p"}, nullptr, Flags::STATIC);
-}
-
-void AutoImplementer::_add_missing_function_headers_for_xfer(Class *t) {
-	auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
-	assign->inline_no = InlineID::POINTER_ASSIGN;
-}
-
-void AutoImplementer::_add_missing_function_headers_for_alias(Class *t) {
-	auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
-	assign->inline_no = InlineID::POINTER_ASSIGN;
-}
 
 void AutoImplementer::implement_shared_constructor(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::SELF));
@@ -371,6 +333,101 @@ void AutoImplementer::_implement_functions_for_alias(const Class *t) {
 }
 
 
+
+Class* TemplateClassInstantiatorPointerRaw::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "*", TypeRawT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+	//return create_class(format("%s[%s]", Identifier::RAW_POINTER, params[0]->name), Class::Type::POINTER_RAW, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+
+void TemplateClassInstantiatorPointerRaw::add_function_headers(Class* c) {
+	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
+};
+
+
+
+Class* TemplateClassInstantiatorReference::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "&", TypeReferenceT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorReference::add_function_headers(Class* c) {
+	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
+}
+
+
+Class* TemplateClassInstantiatorPointerShared::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::SHARED, params[0]->name), TypeSharedT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorPointerShared::add_function_headers(Class* t) {
+	//flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE); // FIXME why not?!?
+	//t->derive_from(TypeSharedPointer);
+
+	auto t_xfer = t->owner->request_implicit_class_xfer(t->param[0], -1);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	// do we really need this, or can we use auto cast xfer[X] -> shared[X]?!?
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t_xfer}, {"p"}, nullptr, Flags::STATIC);
+}
+
+
+Class* TemplateClassInstantiatorPointerSharedNotNull::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s![%s]", Identifier::SHARED, params[0]->name), TypeSharedNotNullT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+
+
+Class* TemplateClassInstantiatorPointerOwned::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::OWNED, params[0]->name), TypeOwnedT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorPointerOwned::add_function_headers(Class* t) {
+	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+
+
+	[[maybe_unused]] auto t_p = t->owner->get_pointer(t->param[0]);
+	auto t_xfer = t->owner->request_implicit_class_xfer(t->param[0], -1);
+	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	//	f->address_preprocess = mf(&XX::__del__);
+	//	f->address = (int_p)f->address_preprocess;
+	add_func_header(t, Identifier::Func::SHARED_CLEAR, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	//f->address_preprocess = mf(&XX::__del__);
+	//f->address = (int_p)f->address_preprocess;
+	add_func_header(t, Identifier::Func::OWNED_GIVE, t_xfer, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t_xfer}, {"other"}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {TypeNone}, {"other"}, nullptr, Flags::MUTABLE);
+	//auto assign = add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
+	//flags_set(assign->var.back()->flags, Flags::OUT);
+	//add_func_header(t, Identifier::Func::SHARED_CREATE, t, {t->param[0]->get_pointer()}, {"p"}, nullptr, Flags::STATIC);
+}
+
+
+Class* TemplateClassInstantiatorPointerOwnedNotNull::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s![%s]", Identifier::OWNED, params[0]->name), TypeOwnedNotNullT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+
+
+Class* TemplateClassInstantiatorPointerXfer::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::XFER, params[0]->name), TypeXferT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorPointerXfer::add_function_headers(Class* c) {
+	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
+
+	auto assign = add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"});
+	assign->inline_no = InlineID::POINTER_ASSIGN;
+}
+
+
+Class* TemplateClassInstantiatorPointerAlias::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::ALIAS, params[0]->name), TypeAliasT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
+}
+
+void TemplateClassInstantiatorPointerAlias::add_function_headers(Class* c) {
+	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
+
+	auto assign = add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"});
+	assign->inline_no = InlineID::POINTER_ASSIGN;
+}
 
 }
 

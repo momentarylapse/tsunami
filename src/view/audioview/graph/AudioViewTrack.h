@@ -22,8 +22,8 @@ class TrackHeader;
 enum class MidiMode;
 
 enum class AudioViewMode {
-	PEAKS,
-	SPECTRUM
+	Peaks,
+	Spectrum
 };
 
 
@@ -51,7 +51,7 @@ public:
 	AudioViewLayer *first_layer();
 	Array<int> reference_tracks;
 	bool solo;
-	static const float MIN_GRID_DIST;
+	static const float MinGridDist;
 
 	bool is_playable();
 

@@ -21,7 +21,7 @@ int AudioEffect::read_audio(int port, AudioBuffer &buf) {
 }
 
 AudioEffect::AudioEffect() :
-	Module(ModuleCategory::AUDIO_EFFECT, "")
+	Module(ModuleCategory::AudioEffect, "")
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	apply_to_whole_buffer = false;
@@ -72,7 +72,7 @@ int AudioEffect::read(AudioBuffer &buf) {
 
 
 AudioEffect *CreateAudioEffect(Session *session, const string &name) {
-	return (AudioEffect*)ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, name);
+	return (AudioEffect*)ModuleFactory::create(session, ModuleCategory::AudioEffect, name);
 }
 
 }

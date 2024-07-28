@@ -106,13 +106,13 @@ int CaptureTrackData::get_sync_delay() {
 
 void CaptureTrackData::accumulate(bool acc) {
 	if (acc and enabled) {
-		accumulator->command(ModuleCommand::ACCUMULATION_START, 0);
+		accumulator->command(ModuleCommand::AccumulationStart, 0);
 		if (backup)
-			backup->command(ModuleCommand::ACCUMULATION_START, 0);
+			backup->command(ModuleCommand::AccumulationStart, 0);
 	} else {
-		accumulator->command(ModuleCommand::ACCUMULATION_STOP, 0);
+		accumulator->command(ModuleCommand::AccumulationStop, 0);
 		if (backup)
-			backup->command(ModuleCommand::ACCUMULATION_STOP, 0);
+			backup->command(ModuleCommand::AccumulationStop, 0);
 	}
 }
 
@@ -187,13 +187,13 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 			device = chain->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
 
 		// create modules
-		input = chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioInput").get();
+		input = chain->addx<AudioOutput>(ModuleCategory::Stream, "AudioInput").get();
 		//c.peak_meter = (PeakMeter*)chain->add(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-		channel_selector = chain->addx<AudioChannelSelector>(ModuleCategory::PLUMBING, "AudioChannelSelector").get();
+		channel_selector = chain->addx<AudioChannelSelector>(ModuleCategory::Plumbing, "AudioChannelSelector").get();
 		peak_meter = channel_selector->peak_meter.get();
-		accumulator = chain->add(ModuleCategory::PLUMBING, "AudioAccumulator").get();
-		backup = chain->add(ModuleCategory::PLUMBING, "AudioBackup").get();
-		auto sucker = chain->addx<AudioSucker>(ModuleCategory::PLUMBING, "AudioSucker").get();
+		accumulator = chain->add(ModuleCategory::Plumbing, "AudioAccumulator").get();
+		backup = chain->add(ModuleCategory::Plumbing, "AudioBackup").get();
+		auto sucker = chain->addx<AudioSucker>(ModuleCategory::Plumbing, "AudioSucker").get();
 
 		// configure
 		audio_input()->set_device(device);
@@ -203,9 +203,9 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		channel_selector->out_state_changed >> create_sink([&] {
 			peak_meter_display->set_channel_map(channel_map());
 		});
-		accumulator->command(ModuleCommand::SET_INPUT_CHANNELS, t->channels);
-		backup->command(ModuleCommand::SET_INPUT_CHANNELS, track->channels);
-		backup->command(ModuleCommand::ACCUMULATION_STOP, 0);
+		accumulator->command(ModuleCommand::SetInputChannels, t->channels);
+		backup->command(ModuleCommand::SetInputChannels, track->channels);
+		backup->command(ModuleCommand::AccumulationStop, 0);
 		reinterpret_cast<AudioBackup*>(backup)->set_backup_mode(BackupMode::Temporary);
 		sucker->set_channels(t->channels);
 		set_map(create_default_channel_map(device->channels, track->channels));
@@ -221,13 +221,13 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 			device = chain->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
 
 		// create modules
-		input = (MidiInput*)chain->addx<MidiInput>(ModuleCategory::STREAM, "MidiInput").get();
-		accumulator = chain->add(ModuleCategory::PLUMBING, "MidiAccumulator").get();
+		input = (MidiInput*)chain->addx<MidiInput>(ModuleCategory::Stream, "MidiInput").get();
+		accumulator = chain->add(ModuleCategory::Plumbing, "MidiAccumulator").get();
 		//backup = chain->add(ModuleCategory::PLUMBING, "MidiBackup");
 		synth = (Synthesizer*)chain->_add(t->synth->copy()).get();
-		peak_meter = chain->addx<PeakMeter>(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter").get();
+		peak_meter = chain->addx<PeakMeter>(ModuleCategory::AudioVisualizer, "PeakMeter").get();
 		//auto *sucker = chain->add(ModuleType::PLUMBING, "MidiSucker");
-		auto *out = chain->add(ModuleCategory::STREAM, "AudioOutput").get();
+		auto *out = chain->add(ModuleCategory::Stream, "AudioOutput").get();
 
 		// configure
 		midi_input()->set_device(device);

@@ -19,7 +19,7 @@ enum class DeviceType;
 class DeviceConsole: public BottomBar::Console {
 public:
 	DeviceConsole(Session *session, BottomBar *bar);
-	virtual ~DeviceConsole();
+	~DeviceConsole() override;
 
 	void update_full();
 	void change_data();
@@ -31,10 +31,10 @@ public:
 	void on_device_erase();
 	void on_device_hide();
 	enum class SortMode {
-		UP,
-		DOWN,
-		TOP,
-		BOTTOM
+		Up,
+		Down,
+		Top,
+		Bottom
 	};
 	void on_device_sort(SortMode mode);
 

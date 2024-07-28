@@ -17,7 +17,7 @@ class BottomBar;
 
 class BottomBarExpandButton : public scenegraph::Node {
 public:
-	BottomBarExpandButton(Session *session);
+	explicit BottomBarExpandButton(Session *session);
 	BottomBar *bottom_bar() const;
 	void on_draw(Painter *p) override;
 	bool on_left_button_down(const vec2 &m) override;

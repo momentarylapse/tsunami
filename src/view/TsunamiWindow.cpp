@@ -150,9 +150,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	add_action_checkable("track-midi-mode-classical");
 	event("track-midi-mode-classical", [this] { on_layer_midi_mode_classical(); });
 	add_action_checkable("track-audio-mode-peaks");
-	event("track-audio-mode-peaks", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS); });
+	event("track-audio-mode-peaks", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::Peaks); });
 	add_action_checkable("track-audio-mode-spectrum");
-	event("track-audio-mode-spectrum", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM); });
+	event("track-audio-mode-spectrum", [this] { view->cur_vtrack()->set_audio_mode(AudioViewMode::Spectrum); });
 	
 	add_action_checkable("track-muted");
 	//event("track-muted", [this] { view->cur_track()->set_muted(!view->cur_track()->muted); });
@@ -200,7 +200,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("show-signal-chain", [this] { session->set_mode(EditMode::XSignalEditor); });
 	event("show-mastering-console", [this] { on_mastering_console(); });
 	event("show-fx-console", [this] { on_fx_console(); });
-	event("show-session-console", [this] { bottom_bar->open(BottomBar::SESSION_CONSOLE); });
+	event("show-session-console", [this] { bottom_bar->open(BottomBar::Index::SessionConsole); });
 	event("sample_from_selection", [this] { on_sample_from_selection(); });
 	event("sample-insert", [this] { on_insert_sample(); });
 	set_key_code("sample-insert", hui::KEY_I + hui::KEY_CONTROL);
@@ -505,15 +505,15 @@ void TsunamiWindow::on_mode_edit_checked() {
 }
 
 void TsunamiWindow::on_layer_midi_mode_linear() {
-	view->cur_vtrack()->set_midi_mode(MidiMode::LINEAR);
+	view->cur_vtrack()->set_midi_mode(MidiMode::Linear);
 }
 
 void TsunamiWindow::on_layer_midi_mode_tab() {
-	view->cur_vtrack()->set_midi_mode(MidiMode::TAB);
+	view->cur_vtrack()->set_midi_mode(MidiMode::Tab);
 }
 
 void TsunamiWindow::on_layer_midi_mode_classical() {
-	view->cur_vtrack()->set_midi_mode(MidiMode::CLASSICAL);
+	view->cur_vtrack()->set_midi_mode(MidiMode::Classical);
 }
 
 void TsunamiWindow::on_song_properties() {
@@ -548,7 +548,7 @@ void TsunamiWindow::on_marker_resize() {
 }
 
 void TsunamiWindow::on_show_log() {
-	bottom_bar->open(BottomBar::LOG_CONSOLE);
+	bottom_bar->open(BottomBar::Index::LogConsole);
 }
 
 void TsunamiWindow::on_undo() {
@@ -690,11 +690,11 @@ void TsunamiWindow::on_sample_manager() {
 }
 
 void TsunamiWindow::on_mixing_console() {
-	bottom_bar->toggle(BottomBar::MIXING_CONSOLE);
+	bottom_bar->toggle(BottomBar::Index::MixingConsole);
 }
 
 void TsunamiWindow::on_plugin_console() {
-	bottom_bar->toggle(BottomBar::PLUGIN_CONSOLE);
+	bottom_bar->toggle(BottomBar::Index::PluginConsole);
 }
 
 void TsunamiWindow::on_fx_console() {
@@ -837,15 +837,15 @@ void TsunamiWindow::on_select_expand() {
 }
 
 void TsunamiWindow::on_view_midi_default() {
-	view->set_midi_view_mode(MidiMode::LINEAR);
+	view->set_midi_view_mode(MidiMode::Linear);
 }
 
 void TsunamiWindow::on_view_midi_tab() {
-	view->set_midi_view_mode(MidiMode::TAB);
+	view->set_midi_view_mode(MidiMode::Tab);
 }
 
 void TsunamiWindow::on_view_midi_score() {
-	view->set_midi_view_mode(MidiMode::CLASSICAL);
+	view->set_midi_view_mode(MidiMode::Classical);
 }
 
 void TsunamiWindow::on_zoom_in() {
@@ -890,9 +890,9 @@ void TsunamiWindow::update_menu() {
 	check("play-loop", view->looping());
 	enable("record", !session->in_mode(EditMode::Capture));
 	// view
-	check("show-mixing-console", bottom_bar->is_active(BottomBar::MIXING_CONSOLE));
-	check("show_signal_chain", bottom_bar->is_active(BottomBar::SIGNAL_CHAIN_CONSOLE));
-	check("show-plugin-console", bottom_bar->is_active(BottomBar::PLUGIN_CONSOLE));
+	check("show-mixing-console", bottom_bar->is_active(BottomBar::Index::MixingConsole));
+	check("show_signal_chain", bottom_bar->is_active(BottomBar::Index::SignalChainConsole));
+	check("show-plugin-console", bottom_bar->is_active(BottomBar::Index::PluginConsole));
 	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
 
 	string title = title_filename(song->filename) + " - " + AppName;

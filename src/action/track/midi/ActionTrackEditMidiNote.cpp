@@ -16,7 +16,7 @@ ActionTrackEditMidiNote::ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote>
 	note2->stringno = _stringno;
 	note2->flags = _flags;
 	note2->clef_position = -1;
-	note2->modifier = NoteModifier::UNKNOWN;
+	note2->modifier = NoteModifier::Unknown;
 	layer = l;
 }
 

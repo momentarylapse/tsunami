@@ -270,7 +270,7 @@ void PluginManager::link_app_data() {
 
 
 	{
-		Module module(ModuleCategory::AUDIO_EFFECT, "");
+		Module module(ModuleCategory::AudioEffect, "");
 		ext->declare_class_size("Module", sizeof(Module));
 		ext->declare_class_element("Module.name", &Module::module_class);
 		ext->declare_class_element("Module.session", &Module::session);
@@ -1023,46 +1023,46 @@ void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const stri
 void PluginManager::find_plugins() {
 
 	// "audio-source"
-	find_plugins_in_dir("audio-source", "", ModuleCategory::AUDIO_SOURCE);
+	find_plugins_in_dir("audio-source", "", ModuleCategory::AudioSource);
 
 	// "audio-effect"
-	find_plugins_in_dir("audio-effect", "channels", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "dynamics", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "echo", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "filter", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "pitch", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "repair", ModuleCategory::AUDIO_EFFECT);
-	find_plugins_in_dir("audio-effect", "sound", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("audio-effect", "channels", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "dynamics", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "echo", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "filter", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "pitch", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "repair", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio-effect", "sound", ModuleCategory::AudioEffect);
 	// hidden...
-	find_plugins_in_dir("audio-effect", "special", ModuleCategory::AUDIO_EFFECT);
+	find_plugins_in_dir("audio-effect", "special", ModuleCategory::AudioEffect);
 
 	// "audio-visualizer"
-	find_plugins_in_dir("audio-visualizer", "", ModuleCategory::AUDIO_VISUALIZER);
+	find_plugins_in_dir("audio-visualizer", "", ModuleCategory::AudioVisualizer);
 
 	// "midi-source"
-	find_plugins_in_dir("midi-source", "", ModuleCategory::MIDI_SOURCE);
+	find_plugins_in_dir("midi-source", "", ModuleCategory::MidiSource);
 
 	// "midi-effect"
-	find_plugins_in_dir("midi-effect", "", ModuleCategory::MIDI_EFFECT);
+	find_plugins_in_dir("midi-effect", "", ModuleCategory::MidiEffect);
 
 	// "beat-source"
-	find_plugins_in_dir("beat-source", "", ModuleCategory::BEAT_SOURCE);
+	find_plugins_in_dir("beat-source", "", ModuleCategory::BeatSource);
 
 	// "pitch-detector"
-	find_plugins_in_dir("pitch-detector", "", ModuleCategory::PITCH_DETECTOR);
+	find_plugins_in_dir("pitch-detector", "", ModuleCategory::PitchDetector);
 
 	// rest
-	find_plugins_in_dir("independent", "debug", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "file-edit", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "file-management", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "file-visualization", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "games", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "live-performance", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "practice", ModuleCategory::TSUNAMI_PLUGIN);
-	find_plugins_in_dir("independent", "special", ModuleCategory::TSUNAMI_PLUGIN);
+	find_plugins_in_dir("independent", "debug", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file-edit", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file-management", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file-visualization", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "games", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "live-performance", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "practice", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "special", ModuleCategory::TsunamiPlugin);
 
 	// "Synthesizer"
-	find_plugins_in_dir("synthesizer", "", ModuleCategory::SYNTHESIZER);
+	find_plugins_in_dir("synthesizer", "", ModuleCategory::Synthesizer);
 }
 
 void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
@@ -1139,23 +1139,23 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 		if (pf.type == type)
 			names.add(pf.name);
 
-	if (type == ModuleCategory::AUDIO_SOURCE) {
+	if (type == ModuleCategory::AudioSource) {
 		names.add("SongRenderer");
 		//names.add("BufferStreamer");
-	} else if (type == ModuleCategory::MIDI_EFFECT) {
+	} else if (type == ModuleCategory::MidiEffect) {
 		names.add("Dummy");
-	} else if (type == ModuleCategory::BEAT_SOURCE) {
+	} else if (type == ModuleCategory::BeatSource) {
 		//names.add("BarStreamer");
-	} else if (type == ModuleCategory::AUDIO_VISUALIZER) {
+	} else if (type == ModuleCategory::AudioVisualizer) {
 		names.add("PeakMeter");
-	} else if (type == ModuleCategory::SYNTHESIZER) {
+	} else if (type == ModuleCategory::Synthesizer) {
 		names.add("Dummy");
 		//names.add("Sample");
-	} else if (type == ModuleCategory::STREAM) {
+	} else if (type == ModuleCategory::Stream) {
 		names.add("AudioInput");
 		names.add("AudioOutput");
 		names.add("MidiInput");
-	} else if (type == ModuleCategory::PLUMBING) {
+	} else if (type == ModuleCategory::Plumbing) {
 		names.add("AudioBackup");
 		names.add("AudioChannelSelector");
 		names.add("AudioJoiner");
@@ -1166,14 +1166,14 @@ Array<string> PluginManager::find_module_sub_types(ModuleCategory type) {
 		names.add("MidiSplitter");
 		names.add("MidiAccumulator");
 		names.add("MidiSucker");
-	} else if (type == ModuleCategory::PITCH_DETECTOR) {
+	} else if (type == ModuleCategory::PitchDetector) {
 		names.add("Dummy");
 	}
 	return names;
 }
 
 Array<string> PluginManager::find_module_sub_types_grouped(ModuleCategory type) {
-	if ((type == ModuleCategory::AUDIO_EFFECT) or (type == ModuleCategory::TSUNAMI_PLUGIN)) {
+	if ((type == ModuleCategory::AudioEffect) or (type == ModuleCategory::TsunamiPlugin)) {
 		Array<string> names;
 		for (auto &pf: plugin_files)
 			if (pf.type == type)

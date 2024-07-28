@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-const float ViewPort::BORDER_FACTOR = 1.0f / 25.0f;
-const float ViewPort::BORDER_FACTOR_RIGHT = ViewPort::BORDER_FACTOR * 8;
+const float ViewPort::BorderFactor = 1.0f / 25.0f;
+const float ViewPort::BorderFactorRight = ViewPort::BorderFactor * 8;
 
 ViewPort::ViewPort() {
 	pixels_per_sample = 1.0f;
@@ -123,8 +123,8 @@ void ViewPort::set_range(const Range &r) {
 void ViewPort::make_sample_visible(int sample, int samples_ahead) {
 	double x = sample2screen(sample);
 	float border = dsample2screen(samples_ahead);
-	float dx = area.width() * BORDER_FACTOR;
-	float dxr = min(area.width() * BORDER_FACTOR_RIGHT, dx + border);
+	float dx = area.width() * BorderFactor;
+	float dxr = min(area.width() * BorderFactorRight, dx + border);
 
 	if (samples_ahead > 0) {
 		// playback: always jump until the cursor is on the left border
@@ -146,8 +146,8 @@ rect ViewPort::nice_mapping_area() {
 	if (x1 - x0 > 800)
 		x0 += theme.TRACK_HANDLE_WIDTH;
 	float w = x1 - x0;
-	x0 += w * BORDER_FACTOR;
-	x1 -= w * BORDER_FACTOR;
+	x0 += w * BorderFactor;
+	x1 -= w * BorderFactor;
 	return rect(x0, x1, area.y1, area.y2);
 }
 

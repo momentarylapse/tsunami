@@ -25,7 +25,7 @@
 
 namespace tsunami {
 
-const float AudioViewTrack::MIN_GRID_DIST = 10.0f;
+const float AudioViewTrack::MinGridDist = 10.0f;
 
 
 AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) :
@@ -33,10 +33,10 @@ AudioViewTrack::AudioViewTrack(AudioView *_view, Track *_track) :
 	view = _view;
 	track = _track;
 	solo = false;
-	audio_mode = AudioViewMode::PEAKS;
-	midi_mode_wanted = MidiMode::CLASSICAL;
+	audio_mode = AudioViewMode::Peaks;
+	midi_mode_wanted = MidiMode::Classical;
 	if (view)
-		if (view->midi_view_mode != MidiMode::DONT_CARE)
+		if (view->midi_view_mode != MidiMode::DontCare)
 			midi_mode_wanted = view->midi_view_mode;
 
 	imploded = false;
@@ -119,8 +119,8 @@ void AudioViewTrack::set_audio_mode(AudioViewMode mode) {
 }
 
 MidiMode AudioViewTrack::midi_mode() {
-	if ((midi_mode_wanted == MidiMode::TAB) and (track->instrument.string_pitch.num > 0))
-		return MidiMode::TAB;
+	if ((midi_mode_wanted == MidiMode::Tab) and (track->instrument.string_pitch.num > 0))
+		return MidiMode::Tab;
 	return midi_mode_wanted;
 }
 

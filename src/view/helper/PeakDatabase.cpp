@@ -294,7 +294,7 @@ void PeakDatabase::invalidate_all() {
 
 PeakData& PeakDatabase::_get(AudioBuffer &b, AudioViewMode mode) {
 	auto *map = &peak_data;
-	if (mode == AudioViewMode::SPECTRUM)
+	if (mode == AudioViewMode::Spectrum)
 		map = &spectrogram_data;
 
 	int index = map->find(b.uid);
@@ -328,7 +328,7 @@ void PeakDatabase::release(PeakData& p) {
 }
 
 void PeakDatabase::update_peaks_now(AudioBuffer &buf) {
-	auto &p = _get(buf, AudioViewMode::PEAKS);
+	auto &p = _get(buf, AudioViewMode::Peaks);
 	if (p.state == PeakData::State::OutOfSync) {
 
 		int n = p._update_peaks_prepare(buf);
@@ -382,14 +382,14 @@ void PeakDatabase::process_replies() {
 	int n = replies.size();
 	for (int i=0; i<n; i++) {
 		auto r = replies.pop();
-		if (r->peak_data.mode == AudioViewMode::PEAKS) {
+		if (r->peak_data.mode == AudioViewMode::Peaks) {
 			if (peak_data.contains(r->uid)) {
 				auto& p = peak_data[r->uid];
 				p->peaks.exchange(r->peak_data.peaks);
 				p->peak_length = p->buffer->length; // FIXME!!!!
 				p->state = PeakData::State::Ok;
 			}
-		} else if (r->peak_data.mode == AudioViewMode::SPECTRUM) {
+		} else if (r->peak_data.mode == AudioViewMode::Spectrum) {
 			if (spectrogram_data.contains(r->uid)) {
 				auto& p = spectrogram_data[r->uid];
 				p->spectrogram.exchange(r->peak_data.spectrogram);

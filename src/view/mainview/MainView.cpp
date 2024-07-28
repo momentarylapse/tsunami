@@ -253,7 +253,7 @@ void MainView::update_onscreen_displays() {
 	output_volume_dial->hidden = true;
 
 	if (session->win->bottom_bar)
-		if (!session->win->bottom_bar->is_active(BottomBar::MIXING_CONSOLE)) {
+		if (!session->win->bottom_bar->is_active(BottomBar::Index::MixingConsole)) {
 			peak_meter_display->hidden = !session->playback->is_active();
 			output_volume_dial->hidden = !session->playback->is_active();
 		}

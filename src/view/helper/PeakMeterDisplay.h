@@ -30,7 +30,7 @@ public:
 	};
 	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
 	PeakMeterDisplay(PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
-	virtual ~PeakMeterDisplay();
+	~PeakMeterDisplay() override;
 
 	void set_source(PeakMeter *source);
 

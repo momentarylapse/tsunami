@@ -17,8 +17,8 @@ class LogInfoBox;
 
 class LogNotifier : public scenegraph::NodeFree {
 public:
-	LogNotifier(Session* session);
-	~LogNotifier();
+	explicit LogNotifier(Session* session);
+	~LogNotifier() override;
 
 	bool has_hover(const vec2 &m) const override { return false; }
 

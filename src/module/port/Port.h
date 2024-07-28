@@ -39,15 +39,15 @@ struct OutPort {
 };
 
 struct AudioOutPort : OutPort {
-	AudioOutPort(Module *module, const string &name = "out");
+	explicit AudioOutPort(Module *module, const string &name = "out");
 };
 
 struct MidiOutPort : OutPort {
-	MidiOutPort(Module *module, const string &name = "out");
+	explicit MidiOutPort(Module *module, const string &name = "out");
 };
 
 struct BeatsOutPort : OutPort {
-	BeatsOutPort(Module *module, const string &name = "out");
+	explicit BeatsOutPort(Module *module, const string &name = "out");
 };
 
 
@@ -62,15 +62,15 @@ struct InPort {
 };
 
 struct AudioInPort : InPort {
-	AudioInPort(Module* module, const string& name = "in");
+	explicit AudioInPort(Module* module, const string& name = "in");
 };
 
 struct MidiInPort : InPort {
-	MidiInPort(Module* module, const string& name = "in");
+	explicit MidiInPort(Module* module, const string& name = "in");
 };
 
 struct BeatsInPort : InPort {
-	BeatsInPort(Module* module, const string& name = "in");
+	explicit BeatsInPort(Module* module, const string& name = "in");
 };
 
 }

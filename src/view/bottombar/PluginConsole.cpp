@@ -45,7 +45,7 @@ void PluginConsole::on_enter() {
 }
 
 void PluginConsole::on_add_button() {
-	ModuleSelectorDialog::choose(this, session, ModuleCategory::TSUNAMI_PLUGIN).then([this] (const string &name) {
+	ModuleSelectorDialog::choose(this, session, ModuleCategory::TsunamiPlugin).then([this] (const string &name) {
 		session->execute_tsunami_plugin(name);
 		
 		// TODO: have PluginManager send notifications...?
@@ -54,7 +54,7 @@ void PluginConsole::on_add_button() {
 }
 
 void PluginConsole::on_add_plugin(TsunamiPlugin *plugin) {
-	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FIXED_WIDTH | ConfigPanelMode::DELETE | ConfigPanelMode::PROFILES);
+	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FixedWidth | ConfigPanelMode::Delete | ConfigPanelMode::Profiles);
 	p->set_options(p->root_control->id, "class=card");
 	p->set_func_delete([this, plugin] {
 		plugin->stop_request();
@@ -87,11 +87,11 @@ void PluginConsole::update_favotites() {
 	favorite_buttons.clear();
 
 	// add new
-	auto list = session->plugin_manager->find_module_sub_types(ModuleCategory::TSUNAMI_PLUGIN);
+	auto list = session->plugin_manager->find_module_sub_types(ModuleCategory::TsunamiPlugin);
 	set_target("favorite-grid");
 	int index = 0;
 	for (auto &p: list)
-		if (session->plugin_manager->is_favorite(session, ModuleCategory::TSUNAMI_PLUGIN, p)) {
+		if (session->plugin_manager->is_favorite(session, ModuleCategory::TsunamiPlugin, p)) {
 			string name = p;
 			string id = format("favorite-button-%d", index);
 			add_button("!flat,height=40,big\\" + p.head(1), 0, index+2, id);

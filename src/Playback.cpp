@@ -20,9 +20,9 @@ Playback::Playback(Session *s) {
 	session = s;
 
 	signal_chain = session->create_signal_chain_system("playback");
-	renderer = signal_chain->addx<SongRenderer>(ModuleCategory::AUDIO_SOURCE, "SongRenderer");
-	peak_meter = signal_chain->addx<PeakMeter>(ModuleCategory::AUDIO_VISUALIZER, "PeakMeter");
-	output_stream = signal_chain->addx<AudioOutput>(ModuleCategory::STREAM, "AudioOutput");
+	renderer = signal_chain->addx<SongRenderer>(ModuleCategory::AudioSource, "SongRenderer");
+	peak_meter = signal_chain->addx<PeakMeter>(ModuleCategory::AudioVisualizer, "PeakMeter");
+	output_stream = signal_chain->addx<AudioOutput>(ModuleCategory::Stream, "AudioOutput");
 	output_stream->set_volume(hui::config.get_float("Output.Volume", 1.0f));
 	signal_chain->connect(renderer.get(), 0, peak_meter.get(), 0);
 	signal_chain->connect(peak_meter.get(), 0, output_stream.get(), 0);
@@ -79,7 +79,7 @@ void Playback::prepare(const Range &range, bool allow_loop) {
 	renderer->set_range(range);
 	renderer->allow_layers(view()->get_playable_layers());
 
-	signal_chain->command(ModuleCommand::PREPARE_START, 0);
+	signal_chain->command(ModuleCommand::PrepareStart, 0);
 }
 
 void Playback::set_loop(bool loop) {

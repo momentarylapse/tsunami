@@ -20,6 +20,7 @@ namespace tsunami {
 
 enum class MidiMode;
 enum class SelectionMode;
+enum class SideBarIndex;
 class AudioView;
 class AudioViewTrack;
 class AudioViewLayer;
@@ -90,7 +91,7 @@ public:
 	TsunamiWindow *win;
 	Song *song;
 
-	void set_side_bar(int console);
+	void set_side_bar(SideBarIndex console);
 };
 
 }

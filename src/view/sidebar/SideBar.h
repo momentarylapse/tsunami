@@ -31,10 +31,29 @@ class AudioView;
 class SideBarConsole;
 class Session;
 
+
+enum class SideBarIndex {
+	SongConsole,
+	SampleConsole,
+	TrackConsole,
+	EffectsConsole,
+	DummyEditorConsole,
+	AudioEditorConsole,
+	MidiEditorConsole,
+	BarsEditorConsole,
+	CurveConsole,
+	SamplerefConsole,
+	CaptureConsole,
+	SignalChainConsole,
+	Count
+};
+
 class SideBar : public obs::Node<hui::Panel> {
 public:
 	SideBar(Session *session, hui::Panel *parent);
 	~SideBar() override;
+
+	using Index = SideBarIndex;
 
 	void on_close();
 	void on_choose();
@@ -42,25 +61,9 @@ public:
 	void _show();
 	void _hide();
 
-	enum {
-		SONG_CONSOLE,
-		SAMPLE_CONSOLE,
-		TRACK_CONSOLE,
-		EFFECTS_CONSOLE,
-		DUMMY_EDITOR_CONSOLE,
-		AUDIO_EDITOR_CONSOLE,
-		MIDI_EDITOR_CONSOLE,
-		BARS_EDITOR_CONSOLE,
-		CURVE_CONSOLE,
-		SAMPLEREF_CONSOLE,
-		CAPTURE_CONSOLE,
-		SIGNAL_CHAIN_CONSOLE,
-		NUM_CONSOLES
-	};
-
-	void choose(int console);
-	void open(int console);
-	bool is_active(int console);
+	void choose(Index console);
+	void open(Index console);
+	bool is_active(Index console) const;
 	int active_console;
 	bool visible;
 

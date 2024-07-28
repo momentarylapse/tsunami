@@ -43,8 +43,8 @@ string AudioOutput::Config::auto_conf(const string &name) const {
 
 
 AudioOutput::AudioOutput(Session *_session) :
-	Module(ModuleCategory::STREAM, "AudioOutput") {
-	state = State::UNPREPARED_NO_DEVICE_NO_DATA;
+	Module(ModuleCategory::Stream, "AudioOutput") {
+	state = State::UnpreparedNoDeviceNoData;
 	session = _session;
 
 	config.volume = 1;
@@ -101,10 +101,10 @@ void AudioOutput::_create_dev() {
 		return;
 	}
 
-	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
-		_set_state(State::UNPREPARED_NO_DATA);
-	else if (state == State::UNPREPARED_NO_DEVICE)
-		_set_state(State::PAUSED);
+	if (state == State::UnpreparedNoDeviceNoData)
+		_set_state(State::UnpreparedNoData);
+	else if (state == State::UnpreparedNoDevice)
+		_set_state(State::Paused);
 }
 
 void AudioOutput::_kill_dev() {
@@ -118,7 +118,7 @@ void AudioOutput::_kill_dev() {
 	}
 
 	shared_data.clear_data_state();
-	_set_state(State::UNPREPARED_NO_DEVICE_NO_DATA);
+	_set_state(State::UnpreparedNoDeviceNoData);
 }
 
 
@@ -128,14 +128,14 @@ void AudioOutput::stop() {
 }
 
 void AudioOutput::_pause() {
-	if (state != State::PLAYING)
+	if (state != State::Playing)
 		return;
 	session->debug("out", "pause");
 
 	if (stream)
 		stream->pause();
 
-	_set_state(State::PAUSED);
+	_set_state(State::Paused);
 }
 
 void AudioOutput::_set_state(State s) {
@@ -144,7 +144,7 @@ void AudioOutput::_set_state(State s) {
 }
 
 void AudioOutput::_unpause() {
-	if (state != State::PAUSED)
+	if (state != State::Paused)
 		return;
 	session->debug("out", "unpause");
 
@@ -154,7 +154,7 @@ void AudioOutput::_unpause() {
 	if (stream)
 		stream->unpause();
 
-	_set_state(State::PLAYING);
+	_set_state(State::Playing);
 }
 
 int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
@@ -168,7 +168,7 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 	// read data
 	size = in.source->read_audio(b);
 
-	if (size == NOT_ENOUGH_DATA) {
+	if (size == Return::NotEnoughData) {
 		//printf(" -> no data\n");
 		// keep trying...
 		shared_data.ring_buf.write_ref_cancel(b);
@@ -176,7 +176,7 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 	}
 
 	// out of data?
-	if (size == END_OF_STREAM) {
+	if (size == Return::EndOfStream) {
 		//printf(" -> end  STREAM\n");
 		shared_data.read_end_of_stream = true;
 		hui::run_in_gui_thread([this] { on_read_end_of_stream(); });
@@ -223,10 +223,10 @@ void AudioOutput::_fill_prebuffer() {
 		return;
 	stream->pre_buffer();
 
-	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
-		_set_state(State::UNPREPARED_NO_DEVICE);
-	else if (state == State::UNPREPARED_NO_DATA)
-		_set_state(State::PAUSED);
+	if (state == State::UnpreparedNoDeviceNoData)
+		_set_state(State::UnpreparedNoDevice);
+	else if (state == State::UnpreparedNoData)
+		_set_state(State::Paused);
 }
 
 int AudioOutput::get_available() {
@@ -252,14 +252,14 @@ void AudioOutput::set_prebuffer_size(int size) {
 
 void AudioOutput::update_device() {
 	auto old_state = state;
-	if (state == State::PLAYING)
+	if (state == State::Playing)
 		_pause();
 	if (has_device())
 		_kill_dev();
 
 	cur_device = config.device;
 
-	if (old_state == State::PLAYING)
+	if (old_state == State::Playing)
 		start();
 }
 
@@ -280,43 +280,43 @@ void AudioOutput::on_read_end_of_stream() {
 }
 
 void AudioOutput::reset_state() {
-	if (state == State::UNPREPARED_NO_DEVICE_NO_DATA)
+	if (state == State::UnpreparedNoDeviceNoData)
 		return;
-	if (state == State::PLAYING)
+	if (state == State::Playing)
 		_pause();
 	os::require_main_thread("out.reset");
 
-	if (state == State::PAUSED) {
+	if (state == State::Paused) {
 		session->debug("out", "flush");
 		if (stream)
 			stream->flush();
-		_set_state(State::UNPREPARED_NO_DATA);
+		_set_state(State::UnpreparedNoData);
 	}
 
 	shared_data.clear_data_state();
 }
 
 base::optional<int64> AudioOutput::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::START) {
+	if (cmd == ModuleCommand::Start) {
 		start();
 		return 0;
-	} else if (cmd == ModuleCommand::STOP) {
+	} else if (cmd == ModuleCommand::Stop) {
 		stop();
 		return 0;
-	} else if (cmd == ModuleCommand::PREPARE_START) {
+	} else if (cmd == ModuleCommand::PrepareStart) {
 		if (!has_data())
 			_fill_prebuffer();
 		if (!has_device())
 			_create_dev();
 		return 0;
-	} else if (cmd == ModuleCommand::SUCK) {
+	} else if (cmd == ModuleCommand::Suck) {
 		if (shared_data.ring_buf.available() >= shared_data.prebuffer_size)
 			return 0;
 		//printf("suck %d    av %d\n", param, ring_buf.available());
 		return (int64)_read_stream_into_ring_buffer((int)param);
-	} else if (cmd == ModuleCommand::SAMPLE_COUNT_MODE) {
-		return (int64)SampleCountMode::CONSUMER;
-	} else if (cmd == ModuleCommand::GET_SAMPLE_COUNT) {
+	} else if (cmd == ModuleCommand::SampleCountMode) {
+		return (int64)SampleCountMode::Consumer;
+	} else if (cmd == ModuleCommand::GetSampleCount) {
 		if (auto s = estimate_samples_played())
 			return *s;
 		return 0;
@@ -325,15 +325,15 @@ base::optional<int64> AudioOutput::command(ModuleCommand cmd, int64 param) {
 }
 
 bool AudioOutput::is_playing() {
-	return (state == State::PLAYING) or (state == State::PAUSED);
+	return (state == State::Playing) or (state == State::Paused);
 }
 
 bool AudioOutput::has_data() const {
-	return state != State::UNPREPARED_NO_DATA and state != State::UNPREPARED_NO_DEVICE_NO_DATA;
+	return state != State::UnpreparedNoData and state != State::UnpreparedNoDeviceNoData;
 }
 
 bool AudioOutput::has_device() const {
-	return state != State::UNPREPARED_NO_DEVICE and state != State::UNPREPARED_NO_DEVICE_NO_DATA;
+	return state != State::UnpreparedNoDevice and state != State::UnpreparedNoDeviceNoData;
 }
 
 base::optional<int> AudioOutput::get_latency() {

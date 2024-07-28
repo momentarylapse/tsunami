@@ -15,18 +15,18 @@ namespace tsunami {
 const Scale Scale::C_MAJOR = Scale(Scale::Type::MAJOR, 0);
 
 static const NoteModifier scale_major_modifiers[12][7] = {
-	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // C
-	{NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::FLAT}, // Db
-	{NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // D
-	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT}, // Eb
-	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE}, // E
-	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT}, // F
-	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE}, // F#
-	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE}, // G
-	{NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::FLAT}, // Ab
-	{NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::NONE}, // A
-	{NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::NONE, NoteModifier::FLAT}, // Bb
-	{NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE, NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::SHARP,NoteModifier::NONE}, // B
+	{NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None}, // C
+	{NoteModifier::None, NoteModifier::Flat, NoteModifier::Flat, NoteModifier::None, NoteModifier::Flat, NoteModifier::Flat, NoteModifier::Flat}, // Db
+	{NoteModifier::Sharp,NoteModifier::None, NoteModifier::None, NoteModifier::Sharp,NoteModifier::None, NoteModifier::None, NoteModifier::None}, // D
+	{NoteModifier::None, NoteModifier::None, NoteModifier::Flat, NoteModifier::None, NoteModifier::None, NoteModifier::Flat, NoteModifier::Flat}, // Eb
+	{NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None, NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None, NoteModifier::None}, // E
+	{NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::Flat}, // F
+	{NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None}, // F#
+	{NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::Sharp,NoteModifier::None, NoteModifier::None, NoteModifier::None}, // G
+	{NoteModifier::None, NoteModifier::Flat, NoteModifier::Flat, NoteModifier::None, NoteModifier::None, NoteModifier::Flat, NoteModifier::Flat}, // Ab
+	{NoteModifier::Sharp,NoteModifier::None, NoteModifier::None, NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None, NoteModifier::None}, // A
+	{NoteModifier::None, NoteModifier::None, NoteModifier::Flat, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::Flat}, // Bb
+	{NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None, NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::Sharp,NoteModifier::None}, // B
 };
 
 inline int scale_to_major(const Scale &s) {

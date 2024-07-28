@@ -32,14 +32,14 @@ public:
 	BottomBar(Session *session, hui::Panel *parent);
 
 
-	enum {
-		MIXING_CONSOLE,
-	//	SIGNAL_EDITOR,
-		SIGNAL_CHAIN_CONSOLE,
-		PLUGIN_CONSOLE,
-		DEVICE_CONSOLE,
-		SESSION_CONSOLE,
-		LOG_CONSOLE
+	enum class Index {
+		MixingConsole,
+	//	SignalEditor,
+		SignalChainConsole,
+		PluginConsole,
+		DeviceConsole,
+		SessionConsole,
+		LogConsole
 	};
 
 
@@ -67,9 +67,9 @@ public:
 
 	void choose(Console *console);
 	void open(Console *console);
-	void open(int console_index);
-	void toggle(int console_index);
-	bool is_active(int console_index);
+	void open(Index console_index);
+	void toggle(Index console_index);
+	bool is_active(Index console_index) const;
 	Console *active_console;
 	bool visible;
 
@@ -80,7 +80,7 @@ public:
 	SessionConsole *session_console;
 	LogConsole *log_console;
 
-	int index(Console *console);
+	Index index(Console *console);
 
 	shared_array<Console> consoles;
 	void add_console(Console *c, const string &list_name);

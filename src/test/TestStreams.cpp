@@ -50,7 +50,7 @@ public:
 void TestStreams::test_output_stream() {
 	auto chain = ownify(new SignalChain(Session::GLOBAL, "test"));
 	auto source = chain->_add(new DebugAudioSource);
-	auto stream = chain->add(ModuleCategory::STREAM, "AudioOutput");
+	auto stream = chain->add(ModuleCategory::Stream, "AudioOutput");
 	chain->connect(source.get(), 0, stream.get(), 0);
 
 	event("play");
@@ -69,8 +69,8 @@ void TestStreams::test_output_stream() {
 
 void TestStreams::test_input_stream() {
 	auto chain = ownify(new SignalChain(Session::GLOBAL, "test"));
-	auto a = chain->add(ModuleCategory::STREAM, "AudioInput");
-	auto b = chain->add(ModuleCategory::PLUMBING, "AudioSucker");
+	auto a = chain->add(ModuleCategory::Stream, "AudioInput");
+	auto b = chain->add(ModuleCategory::Plumbing, "AudioSucker");
 	chain->connect(a.get(), 0, b.get(), 0);
 
 	event("capture");

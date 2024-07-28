@@ -39,10 +39,10 @@ DeviceConsole::DeviceConsole(Session *session, BottomBar *bar) :
 	}
 	event("device-delete", [this] { on_device_erase(); });
 	event("device-hide", [this] { on_device_hide(); });
-	event("device-sort-up", [this] { on_device_sort(SortMode::UP); });
-	event("device-sort-down", [this] { on_device_sort(SortMode::DOWN); });
-	event("device-sort-top", [this] { on_device_sort(SortMode::TOP); });
-	event("device-sort-bottom", [this] { on_device_sort(SortMode::BOTTOM); });
+	event("device-sort-up", [this] { on_device_sort(SortMode::Up); });
+	event("device-sort-down", [this] { on_device_sort(SortMode::Down); });
+	event("device-sort-top", [this] { on_device_sort(SortMode::Top); });
+	event("device-sort-bottom", [this] { on_device_sort(SortMode::Bottom); });
 
 	popup = hui::create_resource_menu("popup-menu-device", this);
 
@@ -172,13 +172,13 @@ void DeviceConsole::on_device_sort(SortMode mode) {
 
 	auto& list = device_manager->device_list(type);
 	int target = n;
-	if (mode == SortMode::UP)
+	if (mode == SortMode::Up)
 		target = max(n - 1, 0);
-	if (mode == SortMode::DOWN)
+	if (mode == SortMode::Down)
 		target = min(n + 1, list.num - 1);
-	if (mode == SortMode::TOP)
+	if (mode == SortMode::Top)
 		target = 0;
-	if (mode == SortMode::BOTTOM)
+	if (mode == SortMode::Bottom)
 		target = list.num - 1;
 	device_manager->move_device_priority(list[n], target);
 

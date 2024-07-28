@@ -29,7 +29,7 @@ extern const int CONFIG_PANEL_DIALOG_HEIGHT = 380;
 
 
 float module_wetness(Module *m) {
-	if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
+	if (m->module_category == ModuleCategory::AudioEffect) {
 		auto fx = reinterpret_cast<AudioEffect*>(m);
 		return fx->wetness;
 	}
@@ -65,9 +65,9 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 		panel->hide_control("save_favorite", true);
 	}
 
-	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::ENABLE) == 0);
-	panel->hide_control("replace", (int)(mode & ConfigPanelMode::REPLACE) == 0);
-	panel->hide_control("wetness", (int)(mode & ConfigPanelMode::WETNESS) == 0);
+	panel->hide_control("enabled", (int)(mode & ConfigPanelMode::Enable) == 0);
+	panel->hide_control("replace", (int)(mode & ConfigPanelMode::Replace) == 0);
+	panel->hide_control("wetness", (int)(mode & ConfigPanelMode::Wetness) == 0);
 
 	panel->event("enabled", [this] { on_enabled(); });
 	panel->event("wetness", [this] { on_wetness(); });
@@ -84,8 +84,8 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 	auto *mb = (hui::ControlMenuButton*)panel->_get_control_("menu");
 	if (mb and mb->menu) {
 		menu = mb->menu;
-		menu->enable("delete", (int)(mode & ConfigPanelMode::DELETE));
-		menu->enable("replace", (int)(mode & ConfigPanelMode::REPLACE));
+		menu->enable("delete", (int)(mode & ConfigPanelMode::Delete));
+		menu->enable("replace", (int)(mode & ConfigPanelMode::Replace));
 	}
 
 	module->out_changed >> create_sink([this] { on_change(); });
@@ -145,7 +145,7 @@ void ConfigPanelSocket::on_external() {
 void ConfigPanelSocket::on_change() {
 	panel->check("enabled", module->enabled);
 
-	if (module->module_category == ModuleCategory::AUDIO_EFFECT)
+	if (module->module_category == ModuleCategory::AudioEffect)
 		panel->set_string("wetness", format("%.0f%%", module_wetness(module) * 100));
 }
 
@@ -213,14 +213,14 @@ ModulePanel::ModulePanel(Module *module, hui::Panel *_parent, ConfigPanelMode mo
 	socket.integrate(this);
 
 
-	if (int(mode & ConfigPanelMode::FIXED_WIDTH)) {
+	if (int(mode & ConfigPanelMode::FixedWidth)) {
 		set_options("grid", "noexpandx");
 		set_options("content", format("width=%d", CONFIG_PANEL_WIDTH));
 	} else {
 		set_options("grid", "expandx");
 		//set_options("content", format("expandx", CONFIG_PANEL_WIDTH));
 	}
-	if (int(mode & ConfigPanelMode::FIXED_HEIGHT)) {
+	if (int(mode & ConfigPanelMode::FixedHeight)) {
 		set_options("content", format("height=%d", CONFIG_PANEL_HEIGHT));
 		set_options("grid", "noexpandy");
 	} else {

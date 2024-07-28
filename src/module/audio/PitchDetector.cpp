@@ -29,7 +29,7 @@ int freq_to_index(float f) {
 }
 
 PitchDetector::PitchDetector() {
-	module_category = ModuleCategory::PITCH_DETECTOR;
+	module_category = ModuleCategory::PitchDetector;
 	loud_enough = false;
 	volume = 0;
 	frequency = 0;
@@ -90,10 +90,10 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 				imax2 = i * 1.5f;
 			}
 		}
-	max /= sqrt(buf.length) * 2 * pi;
+	max /= sqrt((float)buf.length) * 2 * pi;
 	volume = clamp(max / THRESHOLD / 2, 0.0f, 1.0f);
 	loud_enough = (max > THRESHOLD);
-	float fmax = get_freq(imax);
+	float fmax = get_freq((float)imax);
 
 	// update values with some inertia
 	if (loud_enough) {
@@ -102,7 +102,7 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 		else
 			frequency = fmax;
 		//frequency = fmax
-		pitch = freq_to_pitch(frequency);
+		pitch = (int)freq_to_pitch(frequency);
 	}
 }
 

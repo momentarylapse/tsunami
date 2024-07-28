@@ -103,7 +103,7 @@ void MidiPainterModeClassical::draw_note(Painter *c, const MidiNote *n, MidiNote
 		mp->draw_simple_note(c, x1, x2, y, 0, col, col_shadow, false);
 	}
 
-	if ((n->modifier != NoteModifier::NONE) and mp->quality._highest_details) {
+	if ((n->modifier != NoteModifier::None) and mp->quality._highest_details) {
 		c->set_color(local_theme.text);
 		//c->setColor(ColorInterpolate(col, colors.text, 0.5f));
 		SymbolRenderer::draw(c, {x - mp->modifier_font_size*1.0f, y - mp->modifier_font_size*0.5f}, mp->modifier_font_size, modifier_symbol(n->modifier));
@@ -156,7 +156,7 @@ void MidiPainterModeClassical::draw_key_symbol(Painter *c, const MidiKeyChange &
 	//c->set_font_size(clef_dy);
 
 	for (int i=0; i<7; i++) {
-		if (kc.key.modifiers[i] != NoteModifier::NONE)
+		if (kc.key.modifiers[i] != NoteModifier::None)
 			SymbolRenderer::draw(c, {x + 18 + mp->modifier_font_size*3.0f + mp->modifier_font_size*0.6f*(i % 3), clef_pos_to_screen((i - mp->clef->offset + 7*20) % 7) - mp->modifier_font_size/2}, mp->modifier_font_size, modifier_symbol(kc.key.modifiers[i]));
 	}
 	c->set_font_size(local_theme.FONT_SIZE);
@@ -183,7 +183,7 @@ int MidiPainterModeClassical::y2pitch(float y, NoteModifier modifier) const {
 }
 
 int MidiPainterModeClassical::y2clef(float y, NoteModifier &mod) const {
-	mod = NoteModifier::UNKNOWN;//modifier;
+	mod = NoteModifier::Unknown;//modifier;
 	return screen_to_clef_pos(y);
 }
 

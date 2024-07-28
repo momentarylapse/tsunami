@@ -17,9 +17,9 @@
 namespace tsunami {
 
 
-const int PeakMeter::SPECTRUM_SIZE = 30;
-const float PeakMeter::FREQ_MIN = 40.0f;
-const float PeakMeter::FREQ_MAX = 4000.0f;
+const int PeakMeter::SpectrumSize = 30;
+const float PeakMeter::FreqMin = 40.0f;
+const float PeakMeter::FreqMax = 4000.0f;
 
 PeakMeterData::PeakMeterData() {
 	reset();
@@ -29,7 +29,7 @@ void PeakMeterData::reset() {
 	peak = 0;
 	super_peak = super_peak_t = 0;
 	spec.clear();
-	spec.resize(PeakMeter::SPECTRUM_SIZE);
+	spec.resize(PeakMeter::SpectrumSize);
 }
 
 float PeakMeterData::get_sp() {
@@ -80,7 +80,7 @@ void PeakMeter::clear_data() {
 }
 
 inline float PeakMeter::i_to_freq(int i) {
-	return FREQ_MIN * exp( (float)i / (float)SPECTRUM_SIZE * log(FREQ_MAX / FREQ_MIN));
+	return FreqMin * exp( (float)i / (float)SpectrumSize * log(FreqMax / FreqMin));
 }
 
 void PeakMeter::request_spectrum() {
@@ -97,9 +97,9 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 
 		Array<complex> zz;
 		fft::r2c(buf.c[i], zz);
-		c.spec.resize(SPECTRUM_SIZE);
+		c.spec.resize(SpectrumSize);
 		float sample_rate = (float)session->sample_rate();
-		for (int i=0;i<SPECTRUM_SIZE;i++) {
+		for (int i=0;i<SpectrumSize;i++) {
 			float f0 = i_to_freq(i);
 			float f1 = i_to_freq(i + 1);
 			int n0 = f0 * buf.length / sample_rate;
@@ -108,7 +108,7 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 			for (int n=n0; n<n1; n++)
 				if (n < zz.num)
 					s = max(s, zz[n].abs_sqr());
-			c.spec[i] = sqrt(sqrt(s) / (float)SPECTRUM_SIZE / pi / 2);
+			c.spec[i] = sqrt(sqrt(s) / (float)SpectrumSize / pi / 2);
 		}
 	}
 }

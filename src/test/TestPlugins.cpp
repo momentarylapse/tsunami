@@ -31,23 +31,23 @@ Array<UnitTest::Test> TestPlugins::tests() {
 	auto *pm = Session::GLOBAL->plugin_manager;
 	for (auto &pf: pm->plugin_files)
 		list.add({"compile:" + pf.filename.str(), [pf]{ test_compile(pf.type, pf.filename); }});
-	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AUDIO_EFFECT);
+	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AudioEffect);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")
 			list.add({"audio-effect:" + name, [name]{ test_audio_effect(name); }});
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AUDIO_SOURCE);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AudioSource);
 	for (auto &name: names)
 		list.add({"audio-source:" + name, [name]{ test_audio_source(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MIDI_EFFECT);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MidiEffect);
 	for (auto &name: names)
 		list.add({"midi-effect:" + name, [name]{ test_midi_effect(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MIDI_SOURCE);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::MidiSource);
 	for (auto &name: names)
 		list.add({"midi-source:" + name, [name]{ test_midi_source(name); }});
 
-	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::SYNTHESIZER);
+	names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::Synthesizer);
 	for (auto &name: names)
 		list.add({"synthesizer:" + name, [name]{ test_synthesizer(name); }});
 
@@ -119,8 +119,8 @@ void TestPlugins::test_midi_source(const string &name) {
 
 void TestPlugins::test_synthesizer(const string &name) {
 	auto chain = ownify(new SignalChain(Session::GLOBAL, "chain"));
-	auto source = chain->add(ModuleCategory::MIDI_SOURCE, "Metronome");
-	auto synth = chain->add(ModuleCategory::SYNTHESIZER, name);
+	auto source = chain->add(ModuleCategory::MidiSource, "Metronome");
+	auto synth = chain->add(ModuleCategory::Synthesizer, name);
 	chain->connect(source.get(), 0, synth.get(), 0);
 
 	AudioBuffer buf;

@@ -87,7 +87,7 @@ void PeakThread::on_run() {
 
 		auto r = db->requests.pop();
 
-		if (r->peak_data.mode == AudioViewMode::PEAKS) {
+		if (r->peak_data.mode == AudioViewMode::Peaks) {
 			int n = r->peak_data._update_peaks_prepare(r->buffer);
 
 			Thread::cancelation_point();
@@ -100,7 +100,7 @@ void PeakThread::on_run() {
 					Thread::cancelation_point();
 				}
 			}
-		} else if (r->peak_data.mode == AudioViewMode::SPECTRUM) {
+		} else if (r->peak_data.mode == AudioViewMode::Spectrum) {
 
 			PerformanceMonitor::start_busy(perf_channel);
 			prepare_spectrum(r, db->sample_rate);

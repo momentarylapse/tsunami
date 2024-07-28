@@ -11,19 +11,19 @@
 
 namespace tsunami {
 
-MidiJoiner::MidiJoiner() : Module(ModuleCategory::PLUMBING, "MidiJoiner") {
+MidiJoiner::MidiJoiner() : Module(ModuleCategory::Plumbing, "MidiJoiner") {
 }
 
 // if A or B is end-of-stream... just ignore and suck the other!
 int MidiJoiner::read_midi(int port, MidiEventBuffer& buf) {
 	bool first = true;
-	int result = NO_SOURCE;
+	int result = Return::NoSource;
 	for (auto p: port_in) {
 		if (!p->source)
 			continue;
 		if (first) {
 			result = p->source->read_midi(buf);
-			if (result == NOT_ENOUGH_DATA) {
+			if (result == Return::NotEnoughData) {
 				// better to wait...
 				return result;
 			}

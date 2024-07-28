@@ -21,7 +21,7 @@ namespace tsunami {
 class Progress : public obs::Node<VirtualBase> {
 public:
 	Progress(const string &str, hui::Window *parent);
-	~Progress() override {};
+	~Progress() override = default;
 
 	void _cdecl __init__(const string &str, hui::Window *parent);
 	void _cdecl __delete__() override;
@@ -48,7 +48,7 @@ class ProgressCancelable : public Progress {
 public:
 	ProgressCancelable(const string &str, hui::Window *parent);
 	ProgressCancelable();
-	~ProgressCancelable() override {};
+	~ProgressCancelable() override = default;
 
 	void _cdecl __init__(const string &str, hui::Window *parent);
 	void _cdecl __delete__() override;

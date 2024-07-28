@@ -16,7 +16,7 @@ class AudioView;
 
 class TimeScale : public ::scenegraph::NodeRel {
 public:
-	TimeScale(AudioView *view);
+	explicit TimeScale(AudioView *view);
 	void on_draw(Painter *p) override;
 
 	bool allow_handle_click_when_gaining_focus() const override { return false; }

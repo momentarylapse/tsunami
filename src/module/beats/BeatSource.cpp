@@ -13,7 +13,7 @@
 namespace tsunami {
 
 BeatSource::BeatSource() :
-	Module(ModuleCategory::BEAT_SOURCE, "")
+	Module(ModuleCategory::BeatSource, "")
 {
 }
 
@@ -32,7 +32,7 @@ int BeatSource::read_beats(int port, Array<Beat> &beats, int samples) {
 
 
 BeatSource *CreateBeatSource(Session *session, const string &name) {
-	return (BeatSource*)ModuleFactory::create(session, ModuleCategory::BEAT_SOURCE, name);
+	return (BeatSource*)ModuleFactory::create(session, ModuleCategory::BeatSource, name);
 }
 
 }

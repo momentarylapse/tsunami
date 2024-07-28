@@ -99,9 +99,9 @@ public:
 	void stop_hard();
 
 	enum class State {
-		UNPREPARED,
-		ACTIVE,
-		PAUSED
+		Unprepared,
+		Active,
+		Paused
 	};
 	State state;
 	bool is_prepared();

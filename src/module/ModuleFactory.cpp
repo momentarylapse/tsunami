@@ -39,7 +39,7 @@
 namespace tsunami {
 
 Module* ModuleFactory::_create_special(Session* session, ModuleCategory category, const string& _class) {
-	if (category == ModuleCategory::PLUMBING) {
+	if (category == ModuleCategory::Plumbing) {
 		if (_class == "BeatMidifier")
 			return new BeatMidifier;
 		if (_class == "AudioJoiner")
@@ -60,31 +60,31 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 			return new MidiAccumulator;
 		if (_class == "MidiSucker")
 			return new MidiSucker;
-	} else if (category == ModuleCategory::AUDIO_SOURCE) {
+	} else if (category == ModuleCategory::AudioSource) {
 		if (_class == "SongRenderer")
 			return new SongRenderer(session->song.get(), true);
-	} else if (category == ModuleCategory::AUDIO_EFFECT) {
+	} else if (category == ModuleCategory::AudioEffect) {
 		if (_class == "Dummy" or _class == "")
 			return new AudioEffect;
-	} else if (category == ModuleCategory::MIDI_EFFECT) {
+	} else if (category == ModuleCategory::MidiEffect) {
 		if (_class == "Dummy" or _class == "")
 			return new MidiEffect;
-	} else if (category == ModuleCategory::MIDI_SOURCE) {
+	} else if (category == ModuleCategory::MidiSource) {
 		if (_class == "MidiEventStreamer")
 			return new MidiEventStreamer;
-	} else if (category == ModuleCategory::SYNTHESIZER) {
+	} else if (category == ModuleCategory::Synthesizer) {
 		if (_class == "Dummy" or _class == "")
 			return new DummySynthesizer;
-	} else if (category == ModuleCategory::PITCH_DETECTOR) {
+	} else if (category == ModuleCategory::PitchDetector) {
 		if (_class == "Dummy" or _class == "")
 			return new DummyPitchDetector;
-	} else if (category == ModuleCategory::BEAT_SOURCE) {
+	} else if (category == ModuleCategory::BeatSource) {
 		if (_class == "BarStreamer")
 			{}//return new BarStreamer()
-	} else if (category == ModuleCategory::AUDIO_VISUALIZER) {
+	} else if (category == ModuleCategory::AudioVisualizer) {
 		if (_class == "PeakMeter")
 			return new PeakMeter;
-	} else if (category == ModuleCategory::STREAM) {
+	} else if (category == ModuleCategory::Stream) {
 		if (_class == "AudioOutput")
 			return new AudioOutput(session);
 		if (_class == "AudioInput")
@@ -96,17 +96,17 @@ Module* ModuleFactory::_create_special(Session* session, ModuleCategory category
 }
 
 xfer<Module> ModuleFactory::_create_dummy(ModuleCategory type) {
-	if (type == ModuleCategory::SYNTHESIZER)
+	if (type == ModuleCategory::Synthesizer)
 		return new DummySynthesizer;
-	if (type == ModuleCategory::AUDIO_SOURCE)
+	if (type == ModuleCategory::AudioSource)
 		return new AudioSource;
-	if (type == ModuleCategory::AUDIO_VISUALIZER)
+	if (type == ModuleCategory::AudioVisualizer)
 		return new AudioVisualizer;
-	if (type == ModuleCategory::MIDI_SOURCE)
+	if (type == ModuleCategory::MidiSource)
 		return new MidiSource;
-	if (type == ModuleCategory::AUDIO_EFFECT)
+	if (type == ModuleCategory::AudioEffect)
 		return new AudioEffect;
-	if (type == ModuleCategory::MIDI_EFFECT)
+	if (type == ModuleCategory::MidiEffect)
 		return new MidiEffect;
 	return new Module(type, "<dummy>");
 }
@@ -123,7 +123,7 @@ void _extract_subtype_and_config(ModuleCategory type, const string &s, string &s
 		subtype = s.head(pp);
 		config = s.sub(pp + 1);
 	}
-	if ((type == ModuleCategory::SYNTHESIZER) and (subtype == ""))
+	if ((type == ModuleCategory::Synthesizer) and (subtype == ""))
 		subtype = "Dummy";
 }
 
@@ -153,11 +153,11 @@ xfer<Module> ModuleFactory::create(Session* session, ModuleCategory type, const 
 	m->set_session_etc(session, sub_type);
 
 	// type specific initialization
-	if (type == ModuleCategory::SYNTHESIZER)
+	if (type == ModuleCategory::Synthesizer)
 		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 	
 	if (config != "")
-		m->config_from_string(Module::VERSION_LATEST, config);
+		m->config_from_string(Module::VersionNumber::Latest, config);
 
 	return m;
 }
@@ -170,13 +170,13 @@ xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class 
 	auto m = reinterpret_cast<Module*>(type->create_instance());
 	if (!m) {
 		session->e("failed to instanciate class: " + type->long_name());
-		m = new Module(ModuleCategory::OTHER, "");
+		m = new Module(ModuleCategory::Other, "");
 	}
 
 	m->set_session_etc(session, type->owner->module->filename.basename_no_ext());
 
 	// type specific initialization
-	if (m->module_category == ModuleCategory::SYNTHESIZER)
+	if (m->module_category == ModuleCategory::Synthesizer)
 		reinterpret_cast<Synthesizer*>(m)->set_sample_rate(session->sample_rate());
 
 	return m;

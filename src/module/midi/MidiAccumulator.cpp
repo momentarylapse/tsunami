@@ -14,7 +14,7 @@ namespace tsunami {
 
 int MidiAccumulator::read_midi(int port, MidiEventBuffer& buf) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 
 	int r = in.source->read_midi(buf);
 
@@ -27,7 +27,7 @@ int MidiAccumulator::read_midi(int port, MidiEventBuffer& buf) {
 }
 
 MidiAccumulator::MidiAccumulator() :
-	Module(ModuleCategory::PLUMBING, "MidiAccumulator")
+	Module(ModuleCategory::Plumbing, "MidiAccumulator")
 {
 	accumulating = false;
 }
@@ -37,16 +37,16 @@ void MidiAccumulator::_accumulate(bool enable) {
 }
 
 base::optional<int64> MidiAccumulator::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::ACCUMULATION_START) {
+	if (cmd == ModuleCommand::AccumulationStart) {
 		_accumulate(true);
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_STOP) {
+	} else if (cmd == ModuleCommand::AccumulationStop) {
 		_accumulate(false);
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
+	} else if (cmd == ModuleCommand::AccumulationClear) {
 		buffer.clear();
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
+	} else if (cmd == ModuleCommand::AccumulationGetSize) {
 		return buffer.samples;
 	}
 	return base::None;

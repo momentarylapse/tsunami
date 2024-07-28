@@ -52,7 +52,7 @@ SignalChainPanel::~SignalChainPanel() = default;
 
 void SignalChainPanel::fill_module_list(const string& search) {
 	modules.clear();
-	for (int c=0; c<(int)ModuleCategory::SIGNAL_CHAIN; c++) {
+	for (int c=0; c<(int)ModuleCategory::SignalChain; c++) {
 		auto names = session->plugin_manager->find_module_sub_types((ModuleCategory) c);
 		for (auto &n: names)
 			if (n.lower().find(search) >= 0) //.match("*" + search + "*"))
@@ -61,7 +61,7 @@ void SignalChainPanel::fill_module_list(const string& search) {
 //	modules = base::sorted(modules, [] (const string& a, const string& b) { return a <= b; });
 
 	reset(id_list);
-	auto cat_prev = ModuleCategory::TSUNAMI_PLUGIN; // invalid
+	auto cat_prev = ModuleCategory::TsunamiPlugin; // invalid
 	for (auto& m: modules) {
 		string cat;
 		if (m.category != cat_prev) {
@@ -102,8 +102,8 @@ void SignalChainPanel::set_module(Module *m) {
 	hide_control("grid-module", !m);
 
 	if (m) {
-		module_panel = new ModulePanel(m, parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES |
-												  ConfigPanelMode::REPLACE);
+		module_panel = new ModulePanel(m, parent, ConfigPanelMode::FixedHeight | ConfigPanelMode::Profiles |
+												  ConfigPanelMode::Replace);
 		embed(module_panel, "grid-module", 0, 0);
 	} else {
 		session->set_mode(EditMode::SignalChain);

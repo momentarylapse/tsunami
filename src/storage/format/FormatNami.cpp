@@ -142,7 +142,7 @@ public:
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
-		int version = Module::VERSION_LEGACY;
+		int version = Module::VersionNumber::Legacy;
 		if (_chunk_version >= 1)
 			version = f->read_int();
 		if (_chunk_version >= 2)
@@ -175,7 +175,7 @@ public:
 		f->read_int();
 		f->read_int();
 		string params = f->read_str();
-		me->config_from_string(Module::VERSION_LEGACY, params);
+		me->config_from_string(Module::VersionNumber::Legacy, params);
 		string temp = f->read_str();
 		if (temp.find("disabled") >= 0)
 			me->enabled = false;
@@ -559,7 +559,7 @@ public:
 		string temp = f->read_str();
 
 		if (version == 0)
-			version = Module::VERSION_LEGACY;
+			version = Module::VersionNumber::Legacy;
 
 		me = CreateMidiEffect(cur_op(this)->session, name);
 		me->config_from_string(version, params);
@@ -827,7 +827,7 @@ public:
 		Session *session = cur_op(this)->session;
 		string name = f->read_str();
 		string param = f->read_str();
-		int version = Module::VERSION_LEGACY;
+		int version = Module::VersionNumber::Legacy;
 		f->read_str();
 		int _v = f->read_int();
 		if (_v > 0) {

@@ -20,14 +20,14 @@ namespace tsunami {
 
 int MidiEffect::read_midi(int port, MidiEventBuffer &buf) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 	int r = in.source->read_midi(buf);
 	process(buf);
 	return r;
 }
 
 MidiEffect::MidiEffect() :
-	Module(ModuleCategory::MIDI_EFFECT, "")
+	Module(ModuleCategory::MidiEffect, "")
 {
 }
 
@@ -65,7 +65,7 @@ void MidiEffect::process_layer(TrackLayer *l, const SongSelection &sel) {
 
 
 MidiEffect *CreateMidiEffect(Session *session, const string &name) {
-	return (MidiEffect*)ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, name);
+	return (MidiEffect*)ModuleFactory::create(session, ModuleCategory::MidiEffect, name);
 }
 
 }

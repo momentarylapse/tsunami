@@ -50,20 +50,20 @@ SignalType module_out_type(Module *m) {
 color module_color(Module *m) {
 	auto ti = module_in_type(m);
 	auto to = module_out_type(m);
-	if (m->module_category == ModuleCategory::STREAM)
+	if (m->module_category == ModuleCategory::Stream)
 		return theme.neon(0); // red
-	if (m->module_category == ModuleCategory::SYNTHESIZER)
+	if (m->module_category == ModuleCategory::Synthesizer)
 		return theme.neon(3); // green
-	if (m->module_category == ModuleCategory::PLUMBING) {
+	if (m->module_category == ModuleCategory::Plumbing) {
 		if (sa_contains({"AudioSucker", "MidiSucker", "BeatMidifier"}, m->module_class))
 			return theme.neon(1); // orange
 		return theme.text_soft3;
 	}
-	if (m->module_category == ModuleCategory::AUDIO_SOURCE)
+	if (m->module_category == ModuleCategory::AudioSource)
 		//return theme.neon(4); // blue
 		//return theme.neon(3); // green
 		return theme.neon(1); // orange
-	if (m->module_category == ModuleCategory::AUDIO_VISUALIZER)
+	if (m->module_category == ModuleCategory::AudioVisualizer)
 		//return theme.neon(5); // purple
 		return theme.neon(2); // yellow
 	if (ti == SignalType::Audio and to == SignalType::Audio)

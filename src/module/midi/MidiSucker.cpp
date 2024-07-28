@@ -13,12 +13,12 @@
 namespace tsunami {
 
 MidiSucker::MidiSucker() :
-	Module(ModuleCategory::PLUMBING, "MidiSucker")
+	Module(ModuleCategory::Plumbing, "MidiSucker")
 {
 }
 
 base::optional<int64> MidiSucker::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::SUCK) {
+	if (cmd == ModuleCommand::Suck) {
 		return (int64)update((int)param);
 	}
 	return base::None;
@@ -26,7 +26,7 @@ base::optional<int64> MidiSucker::command(ModuleCommand cmd, int64 param) {
 
 int MidiSucker::update(int buffer_size) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 	MidiEventBuffer buf;
 	buf.samples = buffer_size;
 	return in.source->read_midi(buf);

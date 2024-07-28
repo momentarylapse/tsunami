@@ -19,7 +19,7 @@ namespace tsunami {
 
 int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 	int r = in.source->read_audio(buf);
 	if (r <= 0)
 		return r;
@@ -50,7 +50,7 @@ int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
 }
 
 AudioVisualizer::AudioVisualizer() :
-	Module(ModuleCategory::AUDIO_VISUALIZER, "")
+	Module(ModuleCategory::AudioVisualizer, "")
 {
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;

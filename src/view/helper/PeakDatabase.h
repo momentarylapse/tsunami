@@ -109,7 +109,7 @@ struct PeakDataRequest {
 class PeakDatabase : public obs::Node<VirtualBase> {
 public:
 	PeakDatabase();
-	~PeakDatabase();
+	~PeakDatabase() override;
 
 	//bytes& get_peaks(AudioBuffer &b, int level4);
 	//bytes& get_spectrogram(AudioBuffer &b);

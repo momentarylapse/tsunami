@@ -34,9 +34,9 @@ public:
 	void _kill_dev();
 
 	enum class State {
-		NO_DEVICE,
-		CAPTURING,
-		PAUSED,
+		NoDevice,
+		Capturing,
+		Paused,
 	} state;
 
 	bool _cdecl start();

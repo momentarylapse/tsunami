@@ -21,8 +21,8 @@ public:
 	ViewPort();
 	void __init__();
 
-	static const float BORDER_FACTOR;
-	static const float BORDER_FACTOR_RIGHT;
+	static const float BorderFactor;
+	static const float BorderFactorRight;
 
 	double pos;
 	double pos_pre_animation;

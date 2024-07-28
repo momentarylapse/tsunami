@@ -22,13 +22,13 @@ public:
 	void o(const string &str);
 	int read(MidiEventBuffer &midi) override;
 	enum class Mode {
-		WAITING,
-		START_NOTES,
-		CHANGE_NOTES,
-		ACTIVE_NOTES,
-		END_NOTES,
-		FLUSH,
-		END_OF_STREAM
+		Waiting,
+		StartNotes,
+		ChangeNotes,
+		ActiveNotes,
+		EndNotes,
+		Flush,
+		EndOfStream
 	};
 	Mode mode;
 	string mode_str(Mode mode);

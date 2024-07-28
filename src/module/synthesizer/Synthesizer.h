@@ -35,7 +35,7 @@ class Synthesizer;
 class PitchRenderer : public VirtualBase {
 public:
 	PitchRenderer(Synthesizer *synth, int pitch);
-	virtual ~PitchRenderer(){}
+	~PitchRenderer() override = default;
 
 	void _cdecl __init__(Synthesizer *synth, int pitch);
 	void _cdecl __delete__() override;

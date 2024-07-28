@@ -20,7 +20,8 @@ class TrackHeader : public ::scenegraph::NodeRel {
 public:
 	AudioView *view;
 	AudioViewTrack *vtrack;
-	TrackHeader(AudioViewTrack *t);
+
+	explicit TrackHeader(AudioViewTrack *t);
 	void on_draw(Painter *c) override;
 	HoverData get_hover_data(const vec2 &m) override;
 	

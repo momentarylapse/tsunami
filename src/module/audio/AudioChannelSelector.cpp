@@ -35,7 +35,7 @@ string AudioChannelSelector::Config::auto_conf(const string &name) const {
 
 
 
-AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::PLUMBING, "AudioChannelSelector") {
+AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::Plumbing, "AudioChannelSelector") {
 	peak_meter = new PeakMeter;
 
 	auto _class = session->plugin_manager->get_class("AudioChannelSelectorConfig");
@@ -53,7 +53,7 @@ ModuleConfiguration *AudioChannelSelector::get_config() const {
 
 int AudioChannelSelector::read_audio(int port, AudioBuffer& buf) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 
 
 	AudioBuffer buf_in;
@@ -89,7 +89,7 @@ void AudioChannelSelector::apply(const AudioBuffer &buf_in, AudioBuffer &buf_out
 }
 
 base::optional<int64> AudioChannelSelector::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+	if (cmd == ModuleCommand::SetInputChannels) {
 		config.channels = (int)param;
 		peak_meter->command(cmd, param);
 		changed();

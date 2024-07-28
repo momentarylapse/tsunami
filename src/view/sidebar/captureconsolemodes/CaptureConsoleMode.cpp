@@ -143,7 +143,7 @@ void CaptureConsoleMode::accumulation_stop() {
 
 void CaptureConsoleMode::accumulation_clear() {
 	accumulation_stop();
-	chain->command(ModuleCommand::ACCUMULATION_CLEAR, 0);
+	chain->command(ModuleCommand::AccumulationClear, 0);
 }
 
 void CaptureConsoleMode::leave() {

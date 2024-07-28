@@ -132,12 +132,12 @@ AudioView::AudioView(Session *_session) :
 
 	set_perf_name("audioview");
 
-	midi_view_mode = (MidiMode)hui::config.get_int("View.MidiMode", (int)MidiMode::CLASSICAL);
+	midi_view_mode = (MidiMode)hui::config.get_int("View.MidiMode", (int)MidiMode::Classical);
 
 	playback_range_locked = false;
 
-	selection_mode = SelectionMode::NONE;
-	selection_snap_mode = SelectionSnapMode::NONE;
+	selection_mode = SelectionMode::None;
+	selection_snap_mode = SelectionSnapMode::None;
 	hide_selection = false;
 
 	// modes
@@ -435,7 +435,7 @@ void AudioView::snap_to_grid(int &pos) {
 	bool found = false;
 	int new_pos = pos;
 
-	if (selection_snap_mode == SelectionSnapMode::NONE) {
+	if (selection_snap_mode == SelectionSnapMode::None) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST);
 
 		int sub_beats = 0;
@@ -447,14 +447,14 @@ void AudioView::snap_to_grid(int &pos) {
 		for (Beat &b: beats)
 			_update_find_min(new_pos, found, dmin, pos, b.range.offset);
 
-	} else if (selection_snap_mode == SelectionSnapMode::BAR) {
+	} else if (selection_snap_mode == SelectionSnapMode::Bar) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
 		auto bars = song->bars.get_bars(cam.range());
 		for (Bar *b: bars) {
 			_update_find_min(new_pos, found, dmin, pos, b->range().start());
 			_update_find_min(new_pos, found, dmin, pos, b->range().end());
 		}
-	} else if (selection_snap_mode == SelectionSnapMode::PART) {
+	} else if (selection_snap_mode == SelectionSnapMode::Part) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST) * 1000;
 		auto parts = song->get_parts();
 		for (auto *p: parts) {
@@ -776,8 +776,8 @@ void AudioView::check_consistency() {
 
 	// illegal midi mode?
 	for (auto *t: vtracks)
-		if ((t->midi_mode() == MidiMode::TAB) and (t->track->instrument.string_pitch.num == 0))
-			t->set_midi_mode(MidiMode::CLASSICAL);
+		if ((t->midi_mode() == MidiMode::Tab) and (t->track->instrument.string_pitch.num == 0))
+			t->set_midi_mode(MidiMode::Classical);
 }
 
 void AudioView::implode_track(Track *t) {
@@ -1113,11 +1113,11 @@ void AudioView::update_menu() {
 	for (auto *t: vtracks)
 		if (t->track)
 			if ((t->track->type == SignalType::Midi) and (t->midi_mode_wanted != midi_view_mode))
-				common_midi_mode = MidiMode::DONT_CARE;
+				common_midi_mode = MidiMode::DontCare;
 	// view
-	win->check("view-midi-linear", common_midi_mode == MidiMode::LINEAR);
-	win->check("view-midi-tab", common_midi_mode == MidiMode::TAB);
-	win->check("view-midi-classical", common_midi_mode == MidiMode::CLASSICAL);
+	win->check("view-midi-linear", common_midi_mode == MidiMode::Linear);
+	win->check("view-midi-tab", common_midi_mode == MidiMode::Tab);
+	win->check("view-midi-classical", common_midi_mode == MidiMode::Classical);
 }
 
 void AudioView::set_midi_view_mode(MidiMode mode) {
@@ -1578,11 +1578,11 @@ void AudioView::prepare_menu(hui::Menu *menu) {
 	menu->enable("menu-midi-mode", t->type == SignalType::Midi);
 	menu->enable("track-midi-mode-tab", t->instrument.string_pitch.num > 0);
 	menu->enable("menu-audio-mode", t->type == SignalType::Audio);
-	menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::LINEAR);
-	menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::CLASSICAL);
-	menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::TAB);
-	menu->check("track-audio-mode-peaks", vt->audio_mode == AudioViewMode::PEAKS);
-	menu->check("track-audio-mode-spectrum", vt->audio_mode == AudioViewMode::SPECTRUM);
+	menu->check("track-midi-mode-linear", vt->midi_mode() == MidiMode::Linear);
+	menu->check("track-midi-mode-classical", vt->midi_mode() == MidiMode::Classical);
+	menu->check("track-midi-mode-tab", vt->midi_mode() == MidiMode::Tab);
+	menu->check("track-audio-mode-peaks", vt->audio_mode == AudioViewMode::Peaks);
+	menu->check("track-audio-mode-spectrum", vt->audio_mode == AudioViewMode::Spectrum);
 	
 	// mute/solo
 	menu->check("track-muted", t->muted);

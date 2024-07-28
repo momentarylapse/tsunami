@@ -17,7 +17,7 @@ class Log;
 class LogConsole: public BottomBar::Console {
 public:
 	LogConsole(Session *session, BottomBar *bar);
-	virtual ~LogConsole();
+	~LogConsole() override;
 
 	void reload();
 

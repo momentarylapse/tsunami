@@ -98,11 +98,11 @@ void BottomBar::add_console(BottomBar::Console *c, const string &list_name) {
 	c->hide();
 }
 
-int BottomBar::index(BottomBar::Console *console) {
+BottomBar::Index BottomBar::index(BottomBar::Console *console) {
 	foreachi (auto c, weak(consoles), i)
 		if (console == c)
-			return i;
-	return -1;
+			return (Index)i;
+	return (Index)-1;
 }
 
 void BottomBar::on_choose() {
@@ -124,7 +124,7 @@ void BottomBar::choose(BottomBar::Console *console) {
 		active_console->show();
 		active_console->on_enter();
 	}
-	set_int("choose", index(active_console));
+	set_int("choose", (int)index(active_console));
 
 	out_changed.notify();
 }
@@ -137,11 +137,11 @@ void BottomBar::open(BottomBar::Console *console) {
 	out_changed.notify();
 }
 
-void BottomBar::open(int console_index) {
-	open(weak(consoles)[console_index]);
+void BottomBar::open(Index console_index) {
+	open(weak(consoles)[(int)console_index]);
 }
 
-void BottomBar::toggle(int console_index) {
+void BottomBar::toggle(Index console_index) {
 	if (is_active(console_index)) {
 		_hide();
 	} else {
@@ -149,8 +149,8 @@ void BottomBar::toggle(int console_index) {
 	}
 }
 
-bool BottomBar::is_active(int console_index) {
-	return (active_console == consoles[console_index]) and visible;
+bool BottomBar::is_active(Index console_index) const {
+	return (active_console == consoles[(int)console_index]) and visible;
 }
 
 

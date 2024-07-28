@@ -42,11 +42,11 @@ MidiNote *MidiNote::copy(int offset) const {
 
 void MidiNote::reset_clef() {
 	clef_position = UNDEFINED_CLEF;
-	modifier = NoteModifier::UNKNOWN;
+	modifier = NoteModifier::Unknown;
 }
 
 void MidiNote::update_clef_pos(const Clef &clef, const Instrument &instrument, const Scale& scale) const {
-	if ((clef_position <= UNDEFINED_CLEF) or (modifier == NoteModifier::UNKNOWN)) {
+	if ((clef_position <= UNDEFINED_CLEF) or (modifier == NoteModifier::Unknown)) {
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}
 }

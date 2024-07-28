@@ -253,16 +253,16 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			session->win->hide();
 			Module *m = nullptr;
 			if (a[0] == "fx") {
-				m = ModuleFactory::create(session, ModuleCategory::AUDIO_EFFECT, a[1]);
+				m = ModuleFactory::create(session, ModuleCategory::AudioEffect, a[1]);
 				configure_module(session->win.get(), m);
 			} else if (a[0] == "mfx") {
-				m = ModuleFactory::create(session, ModuleCategory::MIDI_EFFECT, a[1]);
+				m = ModuleFactory::create(session, ModuleCategory::MidiEffect, a[1]);
 				configure_module(session->win.get(), m);
 			} else if (a[0] == "synth") {
-				m = ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, a[1]);
+				m = ModuleFactory::create(session, ModuleCategory::Synthesizer, a[1]);
 				configure_module(session->win.get(), m);
 			} else if (a[0] == "vis") {
-				m = ModuleFactory::create(session, ModuleCategory::AUDIO_VISUALIZER, a[1]);
+				m = ModuleFactory::create(session, ModuleCategory::AudioVisualizer, a[1]);
 				auto *dlg = new hui::Window("", 800, 600);
 				dlg->add_grid("", 0, 0, "root");
 				ConfigPanel::_hidden_parent_ = dlg;

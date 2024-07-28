@@ -32,7 +32,7 @@ string AudioSucker::Config::auto_conf(const string &name) const {
 
 
 AudioSucker::AudioSucker(Session *session) :
-	Module(ModuleCategory::PLUMBING, "AudioSucker")
+	Module(ModuleCategory::Plumbing, "AudioSucker")
 {
 	auto _class = session->plugin_manager->get_class("AudioSuckerConfig");
 	if (_class->elements.num == 0) {
@@ -49,7 +49,7 @@ ModuleConfiguration *AudioSucker::get_config() const {
 
 int AudioSucker::do_suck(int buffer_size) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 	AudioBuffer temp;
 	temp.set_channels(config.channels);
 	temp.resize(buffer_size);
@@ -62,9 +62,9 @@ void AudioSucker::set_channels(int _channels) {
 }
 
 base::optional<int64> AudioSucker::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::SUCK)
+	if (cmd == ModuleCommand::Suck)
 		return do_suck(param);
-	if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+	if (cmd == ModuleCommand::SetInputChannels) {
 		set_channels(param);
 		return 0;
 	}

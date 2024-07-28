@@ -27,27 +27,27 @@ const int NUM_DRUM_CLEF_POSITIONS = 19;
 const DrumClefPosition DrumClefPositions[NUM_DRUM_CLEF_POSITIONS] =
 {
 	// drums
-	{DrumPitch::BASS, 1, NoteModifier::NONE}, // "F"
-	{DrumPitch::BASS_ACCOUSTIC, 1, NoteModifier::NONE},
-	{DrumPitch::TOM_FLOOR_LOW, 3, NoteModifier::NONE}, // "A"
-	{DrumPitch::TOM_FLOOR_HI, 3, NoteModifier::NONE},
-	{DrumPitch::TOM_LOW, 6, NoteModifier::NONE}, // "D"
-	{DrumPitch::TOM_LOW_MID, 6, NoteModifier::NONE},
-	{DrumPitch::TOM_HI_MID, 7, NoteModifier::NONE}, // "E"
-	{DrumPitch::TOM_HI, 7, NoteModifier::NONE},
-	{DrumPitch::SNARE, 5, NoteModifier::NONE}, // "C"
-	{DrumPitch::SNARE_ELECTRONIC, 5, NoteModifier::NONE},
+	{DrumPitch::Bass, 1, NoteModifier::None}, // "F"
+	{DrumPitch::BassAccoustic, 1, NoteModifier::None},
+	{DrumPitch::TomFloorLow, 3, NoteModifier::None}, // "A"
+	{DrumPitch::TomFloorHi, 3, NoteModifier::None},
+	{DrumPitch::TomLow, 6, NoteModifier::None}, // "D"
+	{DrumPitch::TomLowMid, 6, NoteModifier::None},
+	{DrumPitch::TomHiMid, 7, NoteModifier::None}, // "E"
+	{DrumPitch::TomHi, 7, NoteModifier::None},
+	{DrumPitch::Snare, 5, NoteModifier::None}, // "C"
+	{DrumPitch::SnareElectronic, 5, NoteModifier::None},
 
 	// cymbals
-	{DrumPitch::HIHAT_PEDAL, -1, NoteModifier::NONE}, // "D"
-	{DrumPitch::HIHAT_OPEN, 9, NoteModifier::SHARP}, // "G"
-	{DrumPitch::HIHAT_CLOSED, 9, NoteModifier::FLAT},
-	{DrumPitch::RIDE_1, 8, NoteModifier::NONE}, // "F"
-	{DrumPitch::RIDE_2, 8, NoteModifier::NONE},
-	{DrumPitch::BELL_RIDE, 8, NoteModifier::FLAT},
-	{DrumPitch::CRASH_1, 10, NoteModifier::NONE}, // "A"
-	{DrumPitch::CRASH_2, 11, NoteModifier::NONE}, // "B"
-	{DrumPitch::CHINESE, 13, NoteModifier::NONE}, // "D"
+	{DrumPitch::HihatPedal, -1, NoteModifier::None}, // "D"
+	{DrumPitch::HihatOpen, 9, NoteModifier::Sharp}, // "G"
+	{DrumPitch::HihatClosed, 9, NoteModifier::Flat},
+	{DrumPitch::Ride1, 8, NoteModifier::None}, // "F"
+	{DrumPitch::Ride2, 8, NoteModifier::None},
+	{DrumPitch::BellRide, 8, NoteModifier::Flat},
+	{DrumPitch::Crash1, 10, NoteModifier::None}, // "A"
+	{DrumPitch::Crash2, 11, NoteModifier::None}, // "B"
+	{DrumPitch::Chinese, 13, NoteModifier::None}, // "D"
 };
 
 /*
@@ -79,14 +79,14 @@ int Clef::pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) c
 				return DrumClefPositions[i].clef_pos;
 			}
 
-		modifier = NoteModifier::SHARP;
+		modifier = NoteModifier::Sharp;
 		return 13;
 	}
 	int octave = pitch_get_octave(pitch);
 	int rel = pitch_to_rel(pitch);
 
 	const int pp[12] = {0,0,1,2,2,3,3,4,4,5,6,6};
-	const NoteModifier ss[12] = {NoteModifier::NONE,NoteModifier::SHARP,NoteModifier::NONE,NoteModifier::FLAT,NoteModifier::NONE,NoteModifier::NONE,NoteModifier::SHARP,NoteModifier::NONE,NoteModifier::SHARP,NoteModifier::NONE,NoteModifier::FLAT,NoteModifier::NONE};
+	const NoteModifier ss[12] = {NoteModifier::None,NoteModifier::Sharp,NoteModifier::None,NoteModifier::Flat,NoteModifier::None,NoteModifier::None,NoteModifier::Sharp,NoteModifier::None,NoteModifier::Sharp,NoteModifier::None,NoteModifier::Flat,NoteModifier::None};
 
 	modifier = ss[rel];
 	return pp[rel] + 7 * octave - offset;

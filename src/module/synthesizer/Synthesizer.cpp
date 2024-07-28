@@ -33,17 +33,17 @@ void PitchRenderer::__delete__() {
 int Synthesizer::read_audio(int port, AudioBuffer &buf) {
 	auto source = in.source;
 	if (!source)
-		return NO_SOURCE;
+		return Return::NoSource;
 //	printf("synth read %d\n", buf.length);
 	source_run_out = false;
 	// get from source...
 	events.samples = buf.length;
 	int n = source->read_midi(events);
-	if (n == NOT_ENOUGH_DATA){
+	if (n == Return::NotEnoughData){
 //		printf(" no data\n");
-		return NOT_ENOUGH_DATA;
+		return Return::NotEnoughData;
 	}
-	if (n == END_OF_STREAM) {
+	if (n == Return::EndOfStream) {
 		source_run_out = true;
 
 		// if source end_of_stream but still active rendering
@@ -54,7 +54,7 @@ int Synthesizer::read_audio(int port, AudioBuffer &buf) {
 	//printf("  %d  %d\n", synth->active_pitch.num, n);
 	if (has_run_out_of_data()){
 //		printf(" eos\n");
-		return END_OF_STREAM;
+		return Return::EndOfStream;
 	}
 
 //	printf("...%d  %d  ok\n", n, buf.length);
@@ -73,7 +73,7 @@ int Synthesizer::read_audio(int port, AudioBuffer &buf) {
 
 
 Synthesizer::Synthesizer() :
-	Module(ModuleCategory::SYNTHESIZER, "")
+	Module(ModuleCategory::Synthesizer, "")
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
@@ -212,7 +212,7 @@ bool Synthesizer::is_default() {
 }
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name) {
-	return (Synthesizer*)ModuleFactory::create(session, ModuleCategory::SYNTHESIZER, name);
+	return (Synthesizer*)ModuleFactory::create(session, ModuleCategory::Synthesizer, name);
 }
 
 }

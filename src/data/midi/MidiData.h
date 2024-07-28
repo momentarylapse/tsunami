@@ -29,11 +29,11 @@ class SongSelection;
 class MidiNoteBuffer;
 
 enum class MidiMode {
-	LINEAR,
-	TAB,
-	CLASSICAL,
-	DRUM,
-	DONT_CARE
+	Linear,
+	Tab,
+	Classical,
+	Drum,
+	DontCare
 };
 
 
@@ -104,49 +104,49 @@ string drum_pitch_name(int pitch);
 
 
 enum DrumPitch {
-	BASS_ACCOUSTIC = 35,
-	BASS = 36,
-	SIDE_STICK = 37,
-	SNARE = 38,
-	CLAP = 39,
-	SNARE_ELECTRONIC = 40,
-	TOM_FLOOR_LOW = 41,
-	HIHAT_CLOSED = 42,
-	TOM_FLOOR_HI = 43,
-	HIHAT_PEDAL = 44,
-	TOM_LOW = 45,
-	HIHAT_OPEN = 46,
-	TOM_LOW_MID = 47,
-	TOM_HI_MID = 48,
-	CRASH_1 = 49,
-	TOM_HI = 50,
-	RIDE_1 = 51,
-	CHINESE = 52,
-	BELL_RIDE = 53,
-	TAMBOURINE = 54,
-	SPLASH = 55,
-	COWBELL = 56,
-	CRASH_2 = 57,
-	VIBRASLASH = 58,
-	RIDE_2 = 59,
-	BONGO_HI = 60,
-	BONGO_LOW = 61,
+	BassAccoustic = 35,
+	Bass = 36,
+	SideStick = 37,
+	Snare = 38,
+	Clap = 39,
+	SnareElectronic = 40,
+	TomFloorLow = 41,
+	HihatClosed = 42,
+	TomFloorHi = 43,
+	HihatPedal = 44,
+	TomLow = 45,
+	HihatOpen = 46,
+	TomLowMid = 47,
+	TomHiMid = 48,
+	Crash1 = 49,
+	TomHi = 50,
+	Ride1 = 51,
+	Chinese = 52,
+	BellRide = 53,
+	Tambourine = 54,
+	Splash = 55,
+	Cowbell = 56,
+	Crash2 = 57,
+	Vibraslash = 58,
+	Ride2 = 59,
+	BongoHi = 60,
+	BongoLow = 61,
 };
 
 enum class ChordType {
-	MINOR,
-	MAJOR,
-	DIMINISHED,
-	AUGMENTED,
-	MINOR_SEVENTH,
-	MAJOR_SEVENTH,
-	MINOR_MAJOR_SEVENTH,
-	DIMINISHED_SEVENTH,
-	HALF_DIMINISHED_SEVENTH,
-	DOMINANT_SEVENTH,
-	AUGMENTED_SEVENTH,
-	AUGMENTED_MAJOR_SEVENTH,
-	NUM
+	Minor,
+	Major,
+	Diminished,
+	Augmented,
+	MinorSeventh,
+	MajorSeventh,
+	MinorMajorSeventh,
+	DiminishedSeventh,
+	HalfDiminishedSeventh,
+	DominantSeventh,
+	AugmentedSeventh,
+	AugmentedMajorSeventh,
+	Count
 };
 
 string chord_type_name(ChordType type);
@@ -155,11 +155,11 @@ Array<int> chord_notes(ChordType type, int inversion, int pitch);
 
 
 enum class NoteModifier {
-	NONE,
-	SHARP,
-	FLAT,
-	NATURAL,
-	UNKNOWN = -1,
+	None,
+	Sharp,
+	Flat,
+	Natural,
+	Unknown = -1,
 };
 
 string modifier_symbol(NoteModifier mod);

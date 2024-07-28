@@ -12,7 +12,7 @@
 namespace tsunami {
 
 AudioSource::AudioSource() :
-	Module(ModuleCategory::AUDIO_SOURCE, "")
+	Module(ModuleCategory::AudioSource, "")
 {
 }
 
@@ -32,7 +32,7 @@ int AudioSource::read_audio(int port, AudioBuffer& buf) {
 }
 
 AudioSource *CreateAudioSource(Session *session, const string &name) {
-	return (AudioSource*)ModuleFactory::create(session, ModuleCategory::AUDIO_SOURCE, name);
+	return (AudioSource*)ModuleFactory::create(session, ModuleCategory::AudioSource, name);
 }
 
 }

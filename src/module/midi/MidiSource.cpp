@@ -20,7 +20,7 @@ int MidiSource::read_midi(int port, MidiEventBuffer &midi) {
 }
 
 MidiSource::MidiSource() :
-	Module(ModuleCategory::MIDI_SOURCE, "")
+	Module(ModuleCategory::MidiSource, "")
 {
 	produce_pos = 0;
 	read_pos = 0;
@@ -111,7 +111,7 @@ void MidiSource::skip_x(int beats, int sub_beats, int beat_partition) {
 
 
 MidiSource *CreateMidiSource(Session *session, const string &name) {
-	return (MidiSource*)ModuleFactory::create(session, ModuleCategory::MIDI_SOURCE, name);
+	return (MidiSource*)ModuleFactory::create(session, ModuleCategory::MidiSource, name);
 }
 
 }

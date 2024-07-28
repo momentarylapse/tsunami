@@ -49,11 +49,11 @@ FxListEditor::FxListEditor(Track *t, hui::Panel *p, const string &_id, bool hexp
 	panel = p;
 	id_list = _id;
 	track = t;
-	module_panel_mode = ConfigPanelMode::FIXED_WIDTH;
+	module_panel_mode = ConfigPanelMode::FixedWidth;
 	if (hexpand)
-		module_panel_mode = ConfigPanelMode::FIXED_HEIGHT;
-	module_panel_mode = module_panel_mode | ConfigPanelMode::PROFILES | ConfigPanelMode::ENABLE | ConfigPanelMode::DELETE;
-	module_panel_mode = module_panel_mode | ConfigPanelMode::WETNESS;
+		module_panel_mode = ConfigPanelMode::FixedHeight;
+	module_panel_mode = module_panel_mode | ConfigPanelMode::Profiles | ConfigPanelMode::Enable | ConfigPanelMode::Delete;
+	module_panel_mode = module_panel_mode | ConfigPanelMode::Wetness;
 	assert(track);
 	event_ids.add(panel->event_x(id_list, "hui:select", [this] { on_select(); }));
 	event_ids.add(panel->event_x(id_list, "hui:change", [this] { on_edit(); }));
@@ -104,7 +104,7 @@ void FxListEditor::select_module(Module *m) {
 	if (selected_module) {
 		config_panel = new ModulePanel(m, panel, module_panel_mode);
 
-		if (m->module_category == ModuleCategory::AUDIO_EFFECT) {
+		if (m->module_category == ModuleCategory::AudioEffect) {
 			auto fx = reinterpret_cast<AudioEffect*>(m);
 			config_panel->set_func_enable([this, fx](bool enabled) {
 				track->enable_effect(fx, enabled);
@@ -200,7 +200,7 @@ void FxListEditor::on_copy_from_track() {
 }
 
 void FxListEditor::on_add() {
-	ModuleSelectorDialog::choose(panel->win, session(), ModuleCategory::AUDIO_EFFECT).then([this] (const string &name) {
+	ModuleSelectorDialog::choose(panel->win, session(), ModuleCategory::AudioEffect).then([this] (const string &name) {
 		auto effect = CreateAudioEffect(session(), name);
 		track->add_effect(effect);
 	});

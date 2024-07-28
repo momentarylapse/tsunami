@@ -80,8 +80,8 @@ void TrackRenderer::reset_state() {
 	if (midi_streamer)
 		fill_midi_streamer();
 
-	for (AudioEffect *fx: weak(fx))
-		fx->reset_state();
+	for (AudioEffect *_fx: weak(fx))
+		_fx->reset_state();
 	synth->reset_state();
 }
 

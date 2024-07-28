@@ -49,9 +49,9 @@ public:
 		while (true) {
 			if (sucking) {
 				int r = chain->do_suck();
-				if (r == Module::END_OF_STREAM)
+				if (r == Module::Return::EndOfStream)
 					break;
-				if (r == Module::NOT_ENOUGH_DATA) {
+				if (r == Module::Return::NotEnoughData) {
 					os::sleep(chain->no_data_wait);
 					continue;
 				}
@@ -65,11 +65,11 @@ public:
 
 
 SignalChain::SignalChain(Session *s, const string &_name) :
-	Module(ModuleCategory::SIGNAL_CHAIN, "")
+	Module(ModuleCategory::SignalChain, "")
 {
 	session = s;
 	name = _name;
-	state = State::UNPREPARED;
+	state = State::Unprepared;
 	hui_runner = -1;
 	tick_dt = DEFAULT_UPDATE_DT;
 	if (ugly_hack_slow)
@@ -233,16 +233,16 @@ void SignalChain::_rebuild_position_estimation_graph() {
 	position_estimation_graph = {};
 
 	for (auto m: weak(modules)) {
-		auto mode = m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
-		if (mode == (int64)SampleCountMode::CONSUMER) {
+		auto mode = m->command(ModuleCommand::SampleCountMode, 0);
+		if (mode == (int64)SampleCountMode::Consumer) {
 			position_estimation_graph.consumer = m;
 			while (true) {
 				auto r = find_connected(m, 0, 0);
 				if (!r)
 					break;
 				m = (*r).m;
-				mode = m->command(ModuleCommand::SAMPLE_COUNT_MODE, 0);
-				if (mode == (int64)SampleCountMode::TRANSLATOR) {
+				mode = m->command(ModuleCommand::SampleCountMode, 0);
+				if (mode == (int64)SampleCountMode::Translator) {
 					position_estimation_graph.mappers.add(m);
 				}
 			}
@@ -256,10 +256,10 @@ base::optional<int64> SignalChain::estimate_pos() const {
 	if (!g.consumer)
 		return base::None;
 
-	auto p0 = g.consumer->command(ModuleCommand::GET_SAMPLE_COUNT, 0);
+	auto p0 = g.consumer->command(ModuleCommand::GetSampleCount, 0);
 	for (auto m: g.mappers)
 		if (p0)
-			p0 = m->command(ModuleCommand::GET_SAMPLE_COUNT, *p0);
+			p0 = m->command(ModuleCommand::GetSampleCount, *p0);
 	return p0;
 }
 
@@ -331,7 +331,7 @@ xfer<SignalChain> signal_chain_from_xml(Session *session, xml::Element& root) {
 			string sub_type = e.value("class");
 			string name = e.value("name");
 			string sys = e.value("system");
-			int version = e.value("version", i2s(Module::VERSION_LEGACY))._int();
+			int version = e.value("version", i2s(Module::VersionNumber::Legacy))._int();
 			shared<Module> m;
 			/*if ((i < 3) and (this == session->signal_chain)) {
 				m = modules[i];
@@ -428,35 +428,35 @@ void SignalChain::reset_state() {
 }
 
 void SignalChain::prepare_start() {
-	if (state != State::UNPREPARED)
+	if (state != State::Unprepared)
 		return;
 	session->debug("chain", "prepare");
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto *m: weak(modules))
-			m->command(ModuleCommand::PREPARE_START, 0);
+			m->command(ModuleCommand::PrepareStart, 0);
 	}
 	_start_sucking();
-	state = State::PAUSED;
+	state = State::Paused;
 }
 
 void SignalChain::start() {
-	if (state == State::ACTIVE)
+	if (state == State::Active)
 		return;
 	session->debug("chain", "start");
 
-	if (state == State::UNPREPARED)
+	if (state == State::Unprepared)
 		prepare_start();
 	_start_sucking();
 
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto *m: weak(modules))
-			m->command(ModuleCommand::START, 0);
+			m->command(ModuleCommand::Start, 0);
 	}
 
-	state = State::ACTIVE;
+	state = State::Active;
 	out_state_changed.notify();
 	hui_runner = hui::run_repeated(tick_dt, [this] {
 		out_tick.notify();
@@ -464,7 +464,7 @@ void SignalChain::start() {
 }
 
 void SignalChain::stop() {
-	if (state != State::ACTIVE)
+	if (state != State::Active)
 		return;
 	session->debug("chain", "stop");
 	_stop_sucking_soft();
@@ -474,9 +474,9 @@ void SignalChain::stop() {
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 		for (auto *m: weak(modules))
-			m->command(ModuleCommand::STOP, 0);
+			m->command(ModuleCommand::Stop, 0);
 	}
-	state = State::PAUSED;
+	state = State::Paused;
 	out_state_changed();
 }
 
@@ -485,23 +485,23 @@ void SignalChain::stop_hard() {
 	stop();
 	_stop_sucking_hard();
 	reset_state();
-	state = State::UNPREPARED;
+	state = State::Unprepared;
 	out_state_changed();
 }
 
 
 bool SignalChain::is_prepared() {
-	return state != State::UNPREPARED;
+	return state != State::Unprepared;
 }
 
 base::optional<int64> SignalChain::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::START) {
+	if (cmd == ModuleCommand::Start) {
 		start();
 		return 0;
-	} else if (cmd == ModuleCommand::STOP) {
+	} else if (cmd == ModuleCommand::Stop) {
 		stop();
 		return 0;
-	} else if (cmd == ModuleCommand::PREPARE_START) {
+	} else if (cmd == ModuleCommand::PrepareStart) {
 		prepare_start();
 		return 0;
 	} else {
@@ -521,7 +521,7 @@ base::optional<int64> SignalChain::command(ModuleCommand cmd, int64 param) {
 }
 
 bool SignalChain::is_active() {
-	return state == State::ACTIVE;
+	return state == State::Active;
 }
 
 // running in gui thread!
@@ -566,9 +566,9 @@ void SignalChain::_stop_sucking_hard() {
 int SignalChain::do_suck() {
 	std::lock_guard<std::mutex> lock(mutex);
 	PerformanceMonitor::start_busy(perf_channel);
-	int s = END_OF_STREAM;
+	int s = Return::EndOfStream;
 	for (auto *m: weak(modules)) {
-		if (auto r = m->command(ModuleCommand::SUCK, buffer_size))
+		if (auto r = m->command(ModuleCommand::Suck, buffer_size))
 			s = max(s, (int)*r);
 	}
 	PerformanceMonitor::end_busy(perf_channel);

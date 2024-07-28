@@ -126,7 +126,7 @@ int SongRenderer::read(AudioBuffer &buf) {
 
 	int size = min(buf.length, _range.end() - pos);
 	if (size <= 0)
-		return END_OF_STREAM;
+		return Return::EndOfStream;
 
 
 	bar_streamer->bars = song->bars;
@@ -227,9 +227,9 @@ void SongRenderer::reset_state() {
 }
 
 base::optional<int64> SongRenderer::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::SAMPLE_COUNT_MODE)
-		return (int64)SampleCountMode::TRANSLATOR;
-	if (cmd == ModuleCommand::GET_SAMPLE_COUNT)
+	if (cmd == ModuleCommand::SampleCountMode)
+		return (int64)SampleCountMode::Translator;
+	if (cmd == ModuleCommand::GetSampleCount)
 		return map_to_pos(param);
 	return base::None;
 }

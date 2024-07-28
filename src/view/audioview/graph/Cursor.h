@@ -36,7 +36,7 @@ public:
 
 class SelectionMarker : public ::scenegraph::NodeFree {
 public:
-	SelectionMarker(AudioView *view);
+	explicit SelectionMarker(AudioView *view);
 	bool has_hover(const vec2 &m) const override { return false; }
 
 	AudioView *view;

@@ -22,7 +22,7 @@ class TrackMixer;
 class MixingConsole: public BottomBar::Console {
 public:
 	MixingConsole(Session *session, BottomBar *bar);
-	virtual ~MixingConsole();
+	~MixingConsole() override;
 
 	void load_data();
 

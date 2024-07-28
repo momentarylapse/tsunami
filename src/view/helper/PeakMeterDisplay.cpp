@@ -185,10 +185,10 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 		c->set_color(bg);
 		c->draw_rect(area);
 		c->set_color(theme.text);
-		float dx = 1.0f / (float)PeakMeter::SPECTRUM_SIZE * w;
+		float dx = 1.0f / (float)PeakMeter::SpectrumSize * w;
 		int n = min(100, channels[0].spec.num);
 		for (int i=0; i<n; i++) {
-			float x0 = area.x1 + (float)i / (float)PeakMeter::SPECTRUM_SIZE * w;
+			float x0 = area.x1 + (float)i / (float)PeakMeter::SpectrumSize * w;
 			float hh = h * channels[0].spec[i]; //max(channels[0].spec[i], channels[1].spec[i]);
 			// TODO stereo?
 			c->draw_rect(rect(x0, x0 + dx, area.y2 - hh, area.y2));

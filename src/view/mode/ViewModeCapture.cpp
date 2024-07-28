@@ -34,7 +34,7 @@ ViewModeCapture::ViewModeCapture(AudioView *view) :
 }
 
 void ViewModeCapture::on_start() {
-	set_side_bar(SideBar::CAPTURE_CONSOLE);
+	set_side_bar(SideBarIndex::CaptureConsole);
 }
 
 void ViewModeCapture::on_end() {
@@ -66,7 +66,7 @@ void ViewModeCapture::draw_post(Painter *c) {
 		}
 	}
 	
-	if (auto l = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0))
+	if (auto l = chain->command(ModuleCommand::AccumulationGetSize, 0))
 		view->draw_time_line(c, offset + *l, theme.capture_marker, false, true);
 }
 

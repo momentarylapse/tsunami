@@ -174,42 +174,42 @@ void SessionManager::end_session(Session *session) {
 }
 
 string midi_mode_str(MidiMode m) {
-	if (m == MidiMode::CLASSICAL)
+	if (m == MidiMode::Classical)
 		return "classical";
-	if (m == MidiMode::TAB)
+	if (m == MidiMode::Tab)
 		return "tab";
-	if (m == MidiMode::LINEAR)
+	if (m == MidiMode::Linear)
 		return "linear";
-	if (m == MidiMode::DRUM)
+	if (m == MidiMode::Drum)
 		return "drum";
 	return "?";
 }
 
 string audio_mode_str(AudioViewMode m) {
-	if (m == AudioViewMode::PEAKS)
+	if (m == AudioViewMode::Peaks)
 		return "peaks";
-	if (m == AudioViewMode::SPECTRUM)
+	if (m == AudioViewMode::Spectrum)
 		return "spectrum";
 	return "?";
 }
 
 base::optional<MidiMode> parse_midi_mode(const string& s) {
 	if (s == "classical")
-		return MidiMode::CLASSICAL;
+		return MidiMode::Classical;
 	if (s == "tab")
-		return MidiMode::TAB;
+		return MidiMode::Tab;
 	if (s == "linear")
-		return MidiMode::LINEAR;
+		return MidiMode::Linear;
 	if (s == "drum")
-		return MidiMode::DRUM;
+		return MidiMode::Drum;
 	return base::None;
 }
 
 base::optional<AudioViewMode> parse_audio_mode(const string& s) {
 	if (s == "peaks")
-		return AudioViewMode::PEAKS;
+		return AudioViewMode::Peaks;
 	if (s == "spectrum")
-		return AudioViewMode::SPECTRUM;
+		return AudioViewMode::Spectrum;
 	return base::None;
 }
 

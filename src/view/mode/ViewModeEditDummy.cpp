@@ -15,7 +15,7 @@ ViewModeEditDummy::ViewModeEditDummy(AudioView *view) : ViewModeDefault(view) {
 }
 
 void ViewModeEditDummy::on_start() {
-	set_side_bar(SideBar::DUMMY_EDITOR_CONSOLE);
+	set_side_bar(SideBar::Index::DummyEditorConsole);
 }
 
 string ViewModeEditDummy::get_tip() {

@@ -20,11 +20,11 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	from_resource("audio-editor");
 
 	event("mode-peaks", [this] {
-		view->cur_vtrack()->set_audio_mode(AudioViewMode::PEAKS);
+		view->cur_vtrack()->set_audio_mode(AudioViewMode::Peaks);
 		update();
 	});
 	event("mode-spectrum", [this] {
-		view->cur_vtrack()->set_audio_mode(AudioViewMode::SPECTRUM);
+		view->cur_vtrack()->set_audio_mode(AudioViewMode::Spectrum);
 		update();
 	});
 
@@ -89,13 +89,13 @@ void AudioEditorConsole::on_edit_mode(int m) {
 }
 
 void AudioEditorConsole::on_action_source() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_SOURCE).then([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AudioSource).then([this] (const string &name) {
 		session->win->on_menu_execute_audio_source(name);
 	});
 }
 
 void AudioEditorConsole::on_action_effect() {
-	ModuleSelectorDialog::choose(win, session, ModuleCategory::AUDIO_EFFECT).then([this] (const string &name) {
+	ModuleSelectorDialog::choose(win, session, ModuleCategory::AudioEffect).then([this] (const string &name) {
 		session->win->on_menu_execute_audio_effect(name);
 	});
 }
@@ -119,8 +119,8 @@ void AudioEditorConsole::set_layer(TrackLayer *t) {
 
 void AudioEditorConsole::update() {
 	if (view->cur_vtrack()) {
-		check("mode-peaks", view->cur_vtrack()->audio_mode == AudioViewMode::PEAKS);
-		check("mode-spectrum", view->cur_vtrack()->audio_mode == AudioViewMode::SPECTRUM);
+		check("mode-peaks", view->cur_vtrack()->audio_mode == AudioViewMode::Peaks);
+		check("mode-spectrum", view->cur_vtrack()->audio_mode == AudioViewMode::Spectrum);
 	}
 
 	check("mode-select", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::SELECT);

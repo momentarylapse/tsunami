@@ -190,7 +190,7 @@ void CaptureConsole::on_new_version() {
 void CaptureConsole::update_time() {
 	if (!chain)
 		return;
-	if (auto s = chain->command(ModuleCommand::ACCUMULATION_GET_SIZE, 0))
+	if (auto s = chain->command(ModuleCommand::AccumulationGetSize, 0))
 		set_string("time", song->get_time_str_long((int)*s));
 }
 

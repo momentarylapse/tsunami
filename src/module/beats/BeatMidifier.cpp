@@ -15,7 +15,7 @@
 namespace tsunami {
 
 BeatMidifier::BeatMidifier() {
-	module_category = ModuleCategory::PLUMBING;
+	module_category = ModuleCategory::Plumbing;
 	module_class = "BeatMidifier";
 
 	volume = 1.0f;

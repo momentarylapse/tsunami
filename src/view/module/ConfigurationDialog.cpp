@@ -30,9 +30,9 @@ public:
 	ConfigPanelSocket socket;
 
 	static ConfigPanelMode config_panel_mode(shared<Module> m) {
-		if (m->module_category == ModuleCategory::AUDIO_EFFECT)
-			return ConfigPanelMode::PROFILES | ConfigPanelMode::WETNESS;
-		return ConfigPanelMode::PROFILES;
+		if (m->module_category == ModuleCategory::AudioEffect)
+			return ConfigPanelMode::Profiles | ConfigPanelMode::Wetness;
+		return ConfigPanelMode::Profiles;
 	}
 
 	ConfigurationDialog(shared<Module> m, hui::Window *parent) :
@@ -48,14 +48,14 @@ public:
 			request_destroy();
 		});
 
-		if (module->module_category == ModuleCategory::AUDIO_EFFECT) {
+		if (module->module_category == ModuleCategory::AudioEffect) {
 			socket.set_func_set_wetness([this] (float w) {
 				reinterpret_cast<AudioEffect*>(module.get())->wetness = w;
 				module->out_changed();
 			});
 		}
 
-		if (module->module_category != ModuleCategory::AUDIO_EFFECT and module->module_category != ModuleCategory::AUDIO_SOURCE)
+		if (module->module_category != ModuleCategory::AudioEffect and module->module_category != ModuleCategory::AudioSource)
 			hide_control("preview", true);
 
 		event("ok", [this]{ on_ok(); });
@@ -87,13 +87,13 @@ public:
 
 		playback = new Playback(module->session);
 		auto c = playback->signal_chain.get();
-		if (module->module_category == ModuleCategory::AUDIO_EFFECT) {
+		if (module->module_category == ModuleCategory::AudioEffect) {
 			playback->renderer->set_range(module->session->view->sel.range());
 			playback->renderer->allow_layers({module->session->view->cur_layer()});
 
 			// TODO remove other effects?
 			playback->renderer->preview_effect = (AudioEffect*)module.get();
-		} else if (module->module_category == ModuleCategory::AUDIO_SOURCE) {
+		} else if (module->module_category == ModuleCategory::AudioSource) {
 			c->disconnect_out(playback->renderer.get(), 0);
 			c->_add(module);
 			c->connect(module.get(), 0, (Module*)playback->peak_meter.get(), 0);

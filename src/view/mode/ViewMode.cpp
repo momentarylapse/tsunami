@@ -34,11 +34,11 @@ HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 }
 
 SongSelection ViewMode::get_selection(const Range &r, SelectionMode mode) {
-	if (mode == SelectionMode::TIME)
+	if (mode == SelectionMode::Time)
 		return get_selection_for_range(r);
-	if (mode == SelectionMode::RECT)
+	if (mode == SelectionMode::Rect)
 		return get_selection_for_rect(r, hover().y0, hover().y1);
-	if (mode == SelectionMode::TRACK_RECT)
+	if (mode == SelectionMode::TrackRect)
 		return get_selection_for_track_rect(r, hover().y0, hover().y1);
 	return SongSelection();
 }
@@ -55,8 +55,8 @@ SongSelection ViewMode::get_selection_for_track_rect(const Range &r, int y0, int
 	return SongSelection();
 }
 
-void ViewMode::set_side_bar(int console) {
-	if (console >= 0)
+void ViewMode::set_side_bar(SideBarIndex console) {
+	if ((int)console >= 0)
 		win->side_bar->open(console);
 	else
 		win->side_bar->_hide();

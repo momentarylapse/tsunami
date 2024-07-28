@@ -19,17 +19,17 @@ struct RubberPoint {
 };
 
 enum RubberHoverType {
-	SOURCE,
-	TARGET,
-	NONE = -1
+	Source,
+	Target,
+	None = -1
 };
 
 struct RubberData {
 	Array<RubberPoint> points;
 	int hover = -1;
-	RubberHoverType hover_type = RubberHoverType::NONE;
+	RubberHoverType hover_type = RubberHoverType::None;
 	int selected = -1;
-	RubberHoverType selected_type = RubberHoverType::NONE;
+	RubberHoverType selected_type = RubberHoverType::None;
 };
 static RubberData rubber;
 
@@ -63,7 +63,7 @@ public:
 	void on_start(const vec2 &m) override {
 	}
 	void on_update(const vec2 &m) override {
-		if (type == RubberHoverType::TARGET) {
+		if (type == RubberHoverType::Target) {
 			p->target = view->cam.screen2sample(m.x);
 		} else {
 			int d = view->cam.screen2sample(m.x) - p->source;
@@ -91,7 +91,7 @@ ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 
 
 void ViewModeEditAudio::on_start() {
-	set_side_bar(SideBar::AUDIO_EDITOR_CONSOLE);
+	set_side_bar(SideBar::Index::AudioEditorConsole);
 }
 
 void ViewModeEditAudio::on_end() {
@@ -161,9 +161,9 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 			// source
 			color c = theme.red.with_alpha(0.7f);
 			p->set_line_width(2);
-			if ((rubber.hover_type == RubberHoverType::SOURCE) and (rubber.hover == i))
+			if ((rubber.hover_type == RubberHoverType::Source) and (rubber.hover == i))
 				c.a = 1; //theme.hoverify(c);
-			if ((rubber.selected_type == RubberHoverType::SOURCE) and (rubber.selected == i))
+			if ((rubber.selected_type == RubberHoverType::Source) and (rubber.selected == i))
 				p->set_line_width(4);
 			p->set_color(c);
 			x1 = view->cam.sample2screen(q.source);
@@ -172,9 +172,9 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 			// target
 			c = theme.green.with_alpha(0.7f);
 			p->set_line_width(2);
-			if ((rubber.hover_type == RubberHoverType::TARGET) and (rubber.hover == i))
+			if ((rubber.hover_type == RubberHoverType::Target) and (rubber.hover == i))
 				c.a = 1; //theme.hoverify(c);
-			if ((rubber.selected_type == RubberHoverType::TARGET) and (rubber.selected == i))
+			if ((rubber.selected_type == RubberHoverType::Target) and (rubber.selected == i))
 				p->set_line_width(4);
 			p->set_color(c);
 			x2 = view->cam.sample2screen(q.target);
@@ -215,7 +215,7 @@ float step(float t) {
 
 void ViewModeEditAudio::on_mouse_move(const vec2& m) {
 	rubber.hover = -1;
-	rubber.hover_type = RubberHoverType::NONE;
+	rubber.hover_type = RubberHoverType::None;
 
 	if (!cur_vlayer()->is_cur_hover())
 		return;
@@ -226,10 +226,10 @@ void ViewModeEditAudio::on_mouse_move(const vec2& m) {
 			float tx = view->cam.sample2screen(q.target);
 			if (fabs(tx - m.x) < 10) {
 				rubber.hover = i;
-				rubber.hover_type = RubberHoverType::TARGET;
+				rubber.hover_type = RubberHoverType::Target;
 			} else if (fabs(sx - m.x) < 10) {
 				rubber.hover = i;
-				rubber.hover_type = RubberHoverType::SOURCE;
+				rubber.hover_type = RubberHoverType::Source;
 			}
 		}
 	}
@@ -279,7 +279,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer, const vec
 		} else if (rubber.hover < 0) {
 			rubber.points.add({smx, smx});
 			rubber.hover = rubber.points.num - 1;
-			rubber.hover_type = RubberHoverType::TARGET;
+			rubber.hover_type = RubberHoverType::Target;
 		}
 
 	} else { // SELECT

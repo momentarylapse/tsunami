@@ -27,7 +27,7 @@ ViewModeCurve::ViewModeCurve(AudioView* view) :
 
 
 void ViewModeCurve::on_start() {
-	set_side_bar(SideBar::CURVE_CONSOLE);
+	set_side_bar(SideBar::Index::CurveConsole);
 }
 
 AudioViewTrack *ViewModeCurve::cur_vtrack() {

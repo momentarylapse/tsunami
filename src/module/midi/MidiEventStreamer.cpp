@@ -13,7 +13,7 @@ namespace tsunami {
 
 MidiEventStreamer::MidiEventStreamer() {
 	module_class = "MidiEventStreamer";
-	module_category = ModuleCategory::MIDI_SOURCE;
+	module_category = ModuleCategory::MidiSource;
 	offset = 0;
 	ignore_end = false;
 	loop = false;
@@ -27,7 +27,7 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 		if (loop)
 			offset = 0;
 		else if (!ignore_end)
-			return END_OF_STREAM;
+			return Return::EndOfStream;
 	}
 
 	Range r = Range(offset, n);

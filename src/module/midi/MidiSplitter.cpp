@@ -14,12 +14,12 @@ namespace tsunami {
 
 // TODO: replace by multi-connection ports/auto splitting
 
-MidiSplitter::MidiSplitter() : Module(ModuleCategory::PLUMBING, "MidiSplitter") {
+MidiSplitter::MidiSplitter() : Module(ModuleCategory::Plumbing, "MidiSplitter") {
 }
 
 int MidiSplitter::read_midi(int port, MidiEventBuffer& buf) {
 	if (!in.source)
-		return NO_SOURCE;
+		return Return::NoSource;
 
 	int first_connected_port = base::find_index_if(port_out, [] (auto p) {
 		return p->_connection_count > 0;
@@ -32,7 +32,7 @@ int MidiSplitter::read_midi(int port, MidiEventBuffer& buf) {
 	}
 
 	if (buf.samples != buffer.samples)
-		return NOT_ENOUGH_DATA;
+		return Return::NotEnoughData;
 	int samples = buf.samples;
 	buf = buffer;
 	buf.samples = samples;

@@ -30,10 +30,10 @@ static const int FAKE_TYPE_PRESET = -1;
 void set_bar_pattern(BarPattern &b, const string &pat);
 
 hui::Panel *create_synth_panel(Synthesizer *synth, Session *session, NewTrackDialog *parent) {
-	auto *p = new ModulePanel(synth, parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
+	auto *p = new ModulePanel(synth, parent, ConfigPanelMode::FixedHeight | ConfigPanelMode::Profiles | ConfigPanelMode::Replace);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, session, synth] {
-		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, synth->module_class).then([parent, session] (const string &name) {
+		ModuleSelectorDialog::choose(parent, session, ModuleCategory::Synthesizer, synth->module_class).then([parent, session] (const string &name) {
 			parent->set_synthesizer(CreateSynthesizer(session, name));
 		});
 	});

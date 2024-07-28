@@ -65,9 +65,9 @@ protected:
 	DeviceManager *dev_man;
 
 	enum class State {
-		NO_DEVICE,
-		CAPTURING,
-		PAUSED,
+		NoDevice,
+		Capturing,
+		Paused,
 	} state;
 
 

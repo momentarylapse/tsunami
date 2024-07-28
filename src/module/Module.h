@@ -39,54 +39,53 @@ class Beat;
 
 enum class ModuleCategory {
 	// plug-ins
-	AUDIO_SOURCE,
-	AUDIO_EFFECT,
-	MIDI_SOURCE,
-	MIDI_EFFECT,
-	SYNTHESIZER,
-	BEAT_SOURCE,
-	AUDIO_VISUALIZER,
+	AudioSource,
+	AudioEffect,
+	MidiSource,
+	MidiEffect,
+	Synthesizer,
+	BeatSource,
+	AudioVisualizer,
 	// other
-	STREAM,
-	PITCH_DETECTOR,
-	PLUMBING,
+	Stream,
+	PitchDetector,
+	Plumbing,
 	// recursion!
-	SIGNAL_CHAIN,
-	PORT_IN,
-	PORT_OUT,
+	SignalChain,
+	PortIn,
+	PortOut,
 	// plug-in (not really Modules)
-	SONG_PLUGIN,
-	TSUNAMI_PLUGIN,
+	SongPlugin,
+	TsunamiPlugin,
 	// internal stuff
-	OTHER,
+	Other,
 };
 
 enum class ModuleCommand {
-	START,
-	STOP,
-	PREPARE_START,
-	ACCUMULATION_START,
-	ACCUMULATION_STOP,
-	ACCUMULATION_CLEAR,
-	ACCUMULATION_GET_SIZE,
-	SUCK,
-	SET_INPUT_CHANNELS,
-	SAMPLE_COUNT_MODE,
-	GET_SAMPLE_COUNT,
+	Start,
+	Stop,
+	PrepareStart,
+	AccumulationStart,
+	AccumulationStop,
+	AccumulationClear,
+	AccumulationGetSize,
+	Suck,
+	SetInputChannels,
+	SampleCountMode,
+	GetSampleCount,
 };
 
 enum class SampleCountMode {
-	NONE,
-	CONSUMER,
-	PRODUCER,
-	TRANSLATOR
+	None,
+	Consumer,
+	Producer,
+	Translator
 };
 
 class Module : public Sharable<obs::Node<VirtualBase>> {
 public:
-
 	Module(ModuleCategory category, const string &_class);
-	virtual ~Module();
+	~Module() override;
 	void _cdecl __init__(ModuleCategory category, const string &_class);
 	void _cdecl __delete__() override;
 
@@ -127,8 +126,10 @@ public:
 
 	virtual ModuleConfiguration *get_config() const;
 	int version() const;
-	static const int VERSION_LATEST = -1;
-	static const int VERSION_LEGACY = -2;
+	enum VersionNumber {
+		Latest = -1,
+		Legacy = -2
+	};
 
 	string config_to_string() const;
 	Any config_to_any() const;
@@ -148,10 +149,11 @@ public:
 	virtual base::optional<int64> command(ModuleCommand cmd, int64 param) { return base::None; }
 
 
-
-	static const int END_OF_STREAM;
-	static const int NOT_ENOUGH_DATA;
-	static const int NO_SOURCE;
+	enum Return {
+		EndOfStream = -2,
+		NotEnoughData = 0,
+		NoSource = 0
+	};
 
 	// ports
 	Array<InPort*> port_in;

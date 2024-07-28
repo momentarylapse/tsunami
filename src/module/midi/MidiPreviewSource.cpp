@@ -15,7 +15,7 @@ namespace tsunami {
 
 MidiPreviewSource::MidiPreviewSource() {
 	module_class = "MidiPreviewSource";
-	mode = Mode::END_OF_STREAM;
+	mode = Mode::EndOfStream;
 	ttl = -1;
 	volume = 1.0f;
 	debug = false;
@@ -30,56 +30,56 @@ int MidiPreviewSource::read(MidiEventBuffer &midi) {
 	std::lock_guard<std::mutex> lock(mutex);
 
 	o("mps.read");
-	if (mode == Mode::END_OF_STREAM) {
+	if (mode == Mode::EndOfStream) {
 		o("  - end of stream");
-		return END_OF_STREAM;
+		return Return::EndOfStream;
 	}
 
-	if (mode == Mode::START_NOTES) {
+	if (mode == Mode::StartNotes) {
 		for (int p: pitch_queued)
 			midi.add(MidiEvent(0, p, volume));
 		pitch_active = pitch_queued;
-		set_mode(Mode::ACTIVE_NOTES);
-	} else if (mode == Mode::END_NOTES) {
+		set_mode(Mode::ActiveNotes);
+	} else if (mode == Mode::EndNotes) {
 		for (int p: pitch_active)
 			midi.add(MidiEvent(0, p, 0));
-		set_mode(Mode::FLUSH);
+		set_mode(Mode::Flush);
 		ttl = session->sample_rate() * 2;
-	} else if (mode == Mode::CHANGE_NOTES) {
+	} else if (mode == Mode::ChangeNotes) {
 		for (int p: pitch_active)
 			midi.add(MidiEvent(0, p, 0));
 		for (int p: pitch_queued)
 			midi.add(MidiEvent(0, p, volume));
 		pitch_active = pitch_queued;
-		set_mode(Mode::ACTIVE_NOTES);
+		set_mode(Mode::ActiveNotes);
 	}
 
 	if (ttl >= 0) {
 		ttl -= midi.samples;
 		if (ttl < 0) {
-			if (mode == Mode::ACTIVE_NOTES)
-				set_mode(Mode::END_NOTES);
-			else if (mode == Mode::FLUSH)
-				set_mode(Mode::END_OF_STREAM);
+			if (mode == Mode::ActiveNotes)
+				set_mode(Mode::EndNotes);
+			else if (mode == Mode::Flush)
+				set_mode(Mode::EndOfStream);
 		}
 	}
 	return midi.samples;
 }
 
 string MidiPreviewSource::mode_str(Mode mode) {
-	if (mode == Mode::WAITING)
+	if (mode == Mode::Waiting)
 		return "wait";
-	if (mode == Mode::START_NOTES)
+	if (mode == Mode::StartNotes)
 		return "start";
-	if (mode == Mode::CHANGE_NOTES)
+	if (mode == Mode::ChangeNotes)
 		return "change";
-	if (mode == Mode::ACTIVE_NOTES)
+	if (mode == Mode::ActiveNotes)
 		return "active";
-	if (mode == Mode::END_NOTES)
+	if (mode == Mode::EndNotes)
 		return "end";
-	if (mode == Mode::FLUSH)
+	if (mode == Mode::Flush)
 		return "flush";
-	if (mode == Mode::END_OF_STREAM)
+	if (mode == Mode::EndOfStream)
 		return "eos";
 	return "???";
 }
@@ -97,10 +97,10 @@ void MidiPreviewSource::start(const Array<int> &_pitch, int _ttl, float _volume)
 	ttl = _ttl;
 	volume = _volume;
 
-	if ((mode == Mode::WAITING) or (mode == Mode::END_OF_STREAM) or (mode == Mode::FLUSH)) {
-		set_mode(Mode::START_NOTES);
-	} else if ((mode == Mode::END_NOTES) or (mode == Mode::FLUSH) or (mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
-		set_mode(Mode::CHANGE_NOTES);
+	if ((mode == Mode::Waiting) or (mode == Mode::EndOfStream) or (mode == Mode::Flush)) {
+		set_mode(Mode::StartNotes);
+	} else if ((mode == Mode::EndNotes) or (mode == Mode::Flush) or (mode == Mode::ActiveNotes) or (mode == Mode::ChangeNotes)) {
+		set_mode(Mode::ChangeNotes);
 	}
 }
 
@@ -108,11 +108,11 @@ void MidiPreviewSource::end() {
 	o("END");
 	std::lock_guard<std::mutex> lock(mutex);
 
-	if (mode == Mode::START_NOTES) {
+	if (mode == Mode::StartNotes) {
 		// skip queue
-		set_mode(Mode::WAITING);
-	} else if ((mode == Mode::ACTIVE_NOTES) or (mode == Mode::CHANGE_NOTES)) {
-		set_mode(Mode::END_NOTES);
+		set_mode(Mode::Waiting);
+	} else if ((mode == Mode::ActiveNotes) or (mode == Mode::ChangeNotes)) {
+		set_mode(Mode::EndNotes);
 	}
 }
 

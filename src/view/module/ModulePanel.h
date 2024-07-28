@@ -19,15 +19,15 @@ class Session;
 
 
 enum class ConfigPanelMode {
-	NONE = 0,
-	PROFILES = 2,
-	ENABLE = 4,
-	DELETE = 8,
-	CLOSE = 16,
-	REPLACE = 32,
-	WETNESS = 64,
-	FIXED_WIDTH = 256,
-	FIXED_HEIGHT = 512,
+	None = 0,
+	Profiles = 2,
+	Enable = 4,
+	Delete = 8,
+	Close = 16,
+	Replace = 32,
+	Wetness = 64,
+	FixedWidth = 256,
+	FixedHeight = 512,
 };
 inline ConfigPanelMode operator&(ConfigPanelMode a, ConfigPanelMode b) {
 	return (ConfigPanelMode)( (int)a & (int)b );

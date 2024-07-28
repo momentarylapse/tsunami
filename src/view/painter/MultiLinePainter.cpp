@@ -64,7 +64,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 
 	y0 += padding_y_classical;
 
-	mp->set_context(rect(x0, x0+w, y0, y0+line_height), t->instrument, true, MidiMode::CLASSICAL);
+	mp->set_context(rect(x0, x0+w, y0, y0+line_height), t->instrument, true, MidiMode::Classical);
 	mp->set_size_data(true, line_height / 75);
 	mp->set_min_font_size(min_font_size);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
@@ -108,7 +108,7 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 
 	y0 += padding_y_tab;
 
-	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::TAB);
+	mp->set_context(rect(x0, x0+w, y0, y0+string_dy*n), t->instrument, true, MidiMode::Tab);
 	mp->set_size_data(true, line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);

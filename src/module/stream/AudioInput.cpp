@@ -41,7 +41,7 @@ int AudioInput::read_audio(int port, AudioBuffer &buf) {
 
 	//printf("read %d %d\n", buf.length, stream->buffer.available());
 	if (shared_data.buffer.available() < buf.length)
-		return NOT_ENOUGH_DATA;
+		return Return::NotEnoughData;
 
 	return shared_data.buffer.read(buf);
 }
@@ -57,12 +57,12 @@ string AudioInput::Config::auto_conf(const string &name) const {
 }
 
 AudioInput::AudioInput(Session *_session) :
-		Module(ModuleCategory::STREAM, "AudioInput") {
+		Module(ModuleCategory::Stream, "AudioInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
 	shared_data.num_channels = 2;
 
-	state = State::NO_DEVICE;
+	state = State::NoDevice;
 
 	dev_man = session->device_manager;
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
@@ -78,9 +78,9 @@ AudioInput::AudioInput(Session *_session) :
 }
 
 AudioInput::~AudioInput() {
-	if (state == State::CAPTURING)
+	if (state == State::Capturing)
 		_pause();
-	if (state == State::PAUSED)
+	if (state == State::Paused)
 		_kill_dev();
 }
 
@@ -110,15 +110,15 @@ void AudioInput::set_device(Device *device) {
 
 void AudioInput::update_device() {
 	auto old_state = state;
-	if (state == State::CAPTURING)
+	if (state == State::Capturing)
 		_pause();
-	if (state == State::PAUSED)
+	if (state == State::Paused)
 		_kill_dev();
 
 	cur_device = config.device;
 	shared_data.num_channels = config.device->channels;
 
-	if (old_state == State::CAPTURING)
+	if (old_state == State::Capturing)
 		start();
 
 	//tsunami->log->info(format("input device '%s' chosen", Pa_GetDeviceInfo(pa_device_no)->name));
@@ -130,14 +130,14 @@ void AudioInput::on_config() {
 }
 
 void AudioInput::_kill_dev() {
-	if (state != State::PAUSED)
+	if (state != State::Paused)
 		return;
 	session->debug("input", "kill device");
 
 	delete stream;
 	stream = nullptr;
 
-	state = State::NO_DEVICE;
+	state = State::NoDevice;
 }
 
 void AudioInput::stop() {
@@ -147,17 +147,17 @@ void AudioInput::stop() {
 }
 
 void AudioInput::_pause() {
-	if (state != State::CAPTURING)
+	if (state != State::Capturing)
 		return;
 	session->debug("input", "pause");
 
 	stream->pause();
 
-	state = State::PAUSED;
+	state = State::Paused;
 }
 
 void AudioInput::_create_dev() {
-	if (state != State::NO_DEVICE)
+	if (state != State::NoDevice)
 		return;
 	if (!session->device_manager->audio_api_initialized())
 		return;
@@ -169,44 +169,44 @@ void AudioInput::_create_dev() {
 
 	stream = dev_man->audio_context->create_audio_input_stream(session, cur_device, &shared_data);
 
-	state = State::PAUSED;
+	state = State::Paused;
 }
 
 void AudioInput::_unpause() {
-	if (state != State::PAUSED)
+	if (state != State::Paused)
 		return;
 	session->debug("input", "unpause");
 
 	stream->unpause();
 
-	state = State::CAPTURING;
+	state = State::Capturing;
 }
 
 bool AudioInput::start() {
 	os::require_main_thread("in.start");
 	session->i(_("capture audio start"));
-	if (state == State::NO_DEVICE)
+	if (state == State::NoDevice)
 		_create_dev();
 
 	_unpause();
-	return state == State::CAPTURING;
+	return state == State::Capturing;
 }
 
 
 
 bool AudioInput::is_capturing() {
-	return state == State::CAPTURING;
+	return state == State::Capturing;
 }
 
 base::optional<int64> AudioInput::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::START) {
+	if (cmd == ModuleCommand::Start) {
 		start();
 		return 0;
-	} else if (cmd == ModuleCommand::STOP) {
+	} else if (cmd == ModuleCommand::Stop) {
 		stop();
 		return 0;
-	} else if (cmd == ModuleCommand::PREPARE_START) {
-		if (state == State::NO_DEVICE)
+	} else if (cmd == ModuleCommand::PrepareStart) {
+		if (state == State::NoDevice)
 			_create_dev();
 		return 0;
 	}
@@ -214,7 +214,7 @@ base::optional<int64> AudioInput::command(ModuleCommand cmd, int64 param) {
 }
 
 base::optional<int64> AudioInput::samples_recorded() {
-	if (state == State::NO_DEVICE)
+	if (state == State::NoDevice)
 		return base::None;
 	return stream->estimate_samples_captured();
 }

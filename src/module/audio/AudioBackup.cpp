@@ -34,7 +34,7 @@ string AudioBackup::Config::auto_conf(const string &name) const {
 	return "ignore";
 }
 
-AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::PLUMBING, "AudioBackup") {
+AudioBackup::AudioBackup(Session *_session) : Module(ModuleCategory::Plumbing, "AudioBackup") {
 	session = _session;
 
 	accumulating = true;
@@ -58,7 +58,7 @@ ModuleConfiguration *AudioBackup::get_config() const {
 int AudioBackup::read_audio(int port, AudioBuffer& buf) {
 	auto source = in.source;
 	if (!source)
-		return NO_SOURCE;
+		return Return::NoSource;
 
 	int r = source->read_audio(buf);
 
@@ -99,19 +99,19 @@ void AudioBackup::stop() {
 }
 
 base::optional<int64> AudioBackup::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::START) {
+	if (cmd == ModuleCommand::Start) {
 		start();
 		return 0;
-	} else if (cmd == ModuleCommand::STOP) {
+	} else if (cmd == ModuleCommand::Stop) {
 		stop();
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_START) {
+	} else if (cmd == ModuleCommand::AccumulationStart) {
 		accumulating = true;
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_STOP) {
+	} else if (cmd == ModuleCommand::AccumulationStop) {
 		accumulating = false;
 		return 0;
-	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+	} else if (cmd == ModuleCommand::SetInputChannels) {
 		config.channels = (int)param;
 		changed();
 		return 0;

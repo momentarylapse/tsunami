@@ -23,10 +23,6 @@
 namespace tsunami {
 
 
-const int Module::NOT_ENOUGH_DATA = 0;
-const int Module::END_OF_STREAM = -2;
-const int Module::NO_SOURCE = 0;
-
 string guess_nice_module_name(const string &_class) {
 	if (_class.head(5) == "Audio")
 		return _class.sub(5);
@@ -127,7 +123,7 @@ string Module::config_to_string() const {
 Any Module::config_to_any() const {
 	auto *config = get_config();
 	if (!config)
-		return Any();
+		return {};
 
 	return config->to_any();
 }
@@ -140,10 +136,10 @@ void Module::config_from_string(int _version, const string &param) {
 	if (!config)
 		return;
 
-	if (_version == VERSION_LEGACY) {
+	if (_version == VersionNumber::Legacy) {
 		config->from_string_legacy(param, session);
 	} else {
-		if (_version != VERSION_LATEST and _version != version()) {
+		if (_version != VersionNumber::Latest and _version != version()) {
 			// ... TODO
 			session->e(format("%s: version request:%d current:%d", module_class, _version, version()));
 		}
@@ -160,7 +156,7 @@ void Module::config_from_any(int _version, const Any &param) {
 	if (!config)
 		return;
 
-	if (_version != VERSION_LATEST and _version != version()) {
+	if (_version != VersionNumber::Latest and _version != version()) {
 		// ... TODO
 		session->e(format("%s: version request:%d current:%d", module_class, _version, version()));
 	}
@@ -208,38 +204,38 @@ void Module::changed() {
 xfer<Module> Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_category, module_class);
 	string param = config_to_string();
-	clone->config_from_string(Module::VERSION_LATEST, param);
+	clone->config_from_string(Module::VersionNumber::Latest, param);
 	clone->_config_latest_history = param;
 	return clone;
 }
 
 
 string Module::category_to_str(ModuleCategory cat) {
-	if (cat == ModuleCategory::AUDIO_SOURCE)
+	if (cat == ModuleCategory::AudioSource)
 		return "AudioSource";
-	if (cat == ModuleCategory::AUDIO_EFFECT)
+	if (cat == ModuleCategory::AudioEffect)
 		return "AudioEffect";
-	if (cat == ModuleCategory::SYNTHESIZER)
+	if (cat == ModuleCategory::Synthesizer)
 		return "Synthesizer";
-	if (cat == ModuleCategory::MIDI_SOURCE)
+	if (cat == ModuleCategory::MidiSource)
 		return "MidiSource";
-	if (cat == ModuleCategory::MIDI_EFFECT)
+	if (cat == ModuleCategory::MidiEffect)
 		return "MidiEffect";
-	if (cat == ModuleCategory::BEAT_SOURCE)
+	if (cat == ModuleCategory::BeatSource)
 		return "BeatSource";
-	if (cat == ModuleCategory::AUDIO_VISUALIZER)
+	if (cat == ModuleCategory::AudioVisualizer)
 		return "AudioVisualizer";
-	if (cat == ModuleCategory::PITCH_DETECTOR)
+	if (cat == ModuleCategory::PitchDetector)
 		return "PitchDetector";
-	if (cat == ModuleCategory::STREAM)
+	if (cat == ModuleCategory::Stream)
 		return "Stream";
-	if (cat == ModuleCategory::PLUMBING)
+	if (cat == ModuleCategory::Plumbing)
 		return "Plumbing";
-	if (cat == ModuleCategory::SIGNAL_CHAIN)
+	if (cat == ModuleCategory::SignalChain)
 		return "SignalChain";
-	if (cat == ModuleCategory::TSUNAMI_PLUGIN)
+	if (cat == ModuleCategory::TsunamiPlugin)
 		return "TsunamiPlugin";
-	if (cat == ModuleCategory::OTHER)
+	if (cat == ModuleCategory::Other)
 		return "Other";
 	return "???";
 }
@@ -247,31 +243,31 @@ string Module::category_to_str(ModuleCategory cat) {
 
 ModuleCategory Module::category_from_str(const string &str) {
 	if (str == "AudioSource")
-		return ModuleCategory::AUDIO_SOURCE;
+		return ModuleCategory::AudioSource;
 	if (str == "Plumbing")
-		return ModuleCategory::PLUMBING;
+		return ModuleCategory::Plumbing;
 	if (str == "Stream")
-		return ModuleCategory::STREAM;
+		return ModuleCategory::Stream;
 	if (str == "AudioEffect" or str == "Effect")
-		return ModuleCategory::AUDIO_EFFECT;
+		return ModuleCategory::AudioEffect;
 	if (str == "Synthesizer" or str == "Synth")
-		return ModuleCategory::SYNTHESIZER;
+		return ModuleCategory::Synthesizer;
 	if (str == "MidiEffect")
-		return ModuleCategory::MIDI_EFFECT;
+		return ModuleCategory::MidiEffect;
 	if (str == "MidiSource")
-		return ModuleCategory::MIDI_SOURCE;
+		return ModuleCategory::MidiSource;
 	if (str == "BeatSource")
-		return ModuleCategory::BEAT_SOURCE;
+		return ModuleCategory::BeatSource;
 	if (str == "PitchDetector")
-		return ModuleCategory::PITCH_DETECTOR;
+		return ModuleCategory::PitchDetector;
 	if (str == "AudioVisualizer")
-		return ModuleCategory::AUDIO_VISUALIZER;
+		return ModuleCategory::AudioVisualizer;
 	if (str == "SignalChain")
-		return ModuleCategory::SIGNAL_CHAIN;
+		return ModuleCategory::SignalChain;
 	if (str == "TsunamiPlugin")
-		return ModuleCategory::TSUNAMI_PLUGIN;
+		return ModuleCategory::TsunamiPlugin;
 	if (str == "Other")
-		return ModuleCategory::OTHER;
+		return ModuleCategory::Other;
 	return (ModuleCategory)-1;
 }
 

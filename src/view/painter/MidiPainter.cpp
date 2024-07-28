@@ -54,7 +54,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	allow_shadows = true;
 	force_shadows = false;
 	shift = 0;
-	mode = MidiMode::LINEAR;
+	mode = MidiMode::Linear;
 	mmode = &mode_linear;
 	rr = 5;
 	set_quality(1.0f, true);
@@ -76,25 +76,25 @@ color MidiPainter::pitch_color(int pitch) {
 
 
 float MidiPainter::clef_pos_to_screen(int pos) const {
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.clef_pos_to_screen(pos);
 	return 0;
 }
 
 int MidiPainter::screen_to_clef_pos(float y) const {
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.screen_to_clef_pos(y);
 	return 0;
 }
 
 float MidiPainter::string_to_screen(int string_no) const {
-	if (mode == MidiMode::TAB)
+	if (mode == MidiMode::Tab)
 		return mode_tab.string_to_screen(string_no);
 	return 0;
 }
 
 int MidiPainter::screen_to_string(float y) const {
-	if (mode == MidiMode::TAB)
+	if (mode == MidiMode::Tab)
 		return mode_tab.screen_to_string(y);
 	return 0;
 }
@@ -102,25 +102,25 @@ int MidiPainter::screen_to_string(float y) const {
 // this is the "center" of the note!
 // it reaches below and above this y
 float MidiPainter::pitch2y(int pitch) const {
-	if (mode == MidiMode::LINEAR)
+	if (mode == MidiMode::Linear)
 		return mode_linear.pitch2y(pitch);
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.pitch2y(pitch);
 	return 0;
 }
 
 int MidiPainter::y2pitch(float y, NoteModifier modifier) const {
-	if (mode == MidiMode::LINEAR)
+	if (mode == MidiMode::Linear)
 		return mode_linear.y2pitch(y);
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.y2pitch(y, modifier);
 	return 0;
 }
 
 int MidiPainter::y2clef(float y, NoteModifier &mod) const {
-	if (mode == MidiMode::LINEAR)
+	if (mode == MidiMode::Linear)
 		return mode_linear.y2clef(y, mod);
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.y2clef(y, mod);
 	return 0;
 }
@@ -250,7 +250,7 @@ void MidiPainter::draw_rhythm(Painter *c, const MidiNoteBuffer &midi, const Rang
 	c->set_font_size(multiplet_font_size);
 
 
-	bool neck_offset = (mode == MidiMode::TAB);
+	bool neck_offset = (mode == MidiMode::Tab);
 
 	auto bars = song->bars.get_bars(range);
 	for (auto *b: bars) {
@@ -309,7 +309,7 @@ string note_flag_text(const MidiNote *n, bool allow_dead) {
 void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState __state, float x, float y, float dir) {
 	if (n->flags == 0)
 		return;
-	string t = note_flag_text(n, mode != MidiMode::TAB);
+	string t = note_flag_text(n, mode != MidiMode::Tab);
 	if (t.num > 0)
 		SymbolRenderer::draw(c, {x, y + dir * (rr + flags_font_size*1.33f) - flags_font_size / 2}, flags_font_size, t, true, 0);
 	if (n->is(NOTE_FLAG_STACCATO))
@@ -409,11 +409,11 @@ void MidiPainter::set_context(const rect& _area, const Instrument& i, bool _is_p
 
 	mode = _mode;
 	mmode = &mode_linear;
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		mmode = &mode_classical;
-	else if (mode == MidiMode::TAB)
+	else if (mode == MidiMode::Tab)
 		mmode = &mode_tab;
-	else if (mode == MidiMode::LINEAR)
+	else if (mode == MidiMode::Linear)
 		mmode = &mode_linear;
 	mmode->reset();
 	mmode->direct_size_mode = false;
@@ -487,9 +487,9 @@ float MidiPainter::note_r() const {
 }
 
 float MidiPainter::get_clef_dy() const {
-	if (mode == MidiMode::CLASSICAL)
+	if (mode == MidiMode::Classical)
 		return mode_classical.clef_dy;
-	if (mode == MidiMode::TAB)
+	if (mode == MidiMode::Tab)
 		return mode_tab.string_dy;
 	return 1;
 }

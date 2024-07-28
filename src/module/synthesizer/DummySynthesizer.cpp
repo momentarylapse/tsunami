@@ -18,7 +18,7 @@ public:
 	DummyPitchRenderer(Synthesizer *synth, int pitch) : PitchRenderer(synth, pitch) {
 		volume = 0;
 		phi = 0;
-		env = ((DummySynthesizer*)synth)->env[pitch];
+		env = reinterpret_cast<DummySynthesizer*>(synth)->env[pitch];
 	}
 	bool _cdecl render(AudioBuffer &buf) override {
 		for (int i=0; i<buf.length; i++){
@@ -81,34 +81,34 @@ void DummySynthesizer::on_config() {
 		}
 
 		// bass drum
-		_set_drum(DrumPitch::BASS, 130, 1.5f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::BASS_ACCOUSTIC, 130, 1.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::Bass, 130, 1.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::BassAccoustic, 130, 1.5f, 0.005f, 0.1f);
 
 		// snare
-		_set_drum(DrumPitch::SNARE, 200, 1.2f, 0.005f, 0.2f);
-		_set_drum(DrumPitch::SNARE_ELECTRONIC, 200, 1.2f, 0.005f, 0.2f);
+		_set_drum(DrumPitch::Snare, 200, 1.2f, 0.005f, 0.2f);
+		_set_drum(DrumPitch::SnareElectronic, 200, 1.2f, 0.005f, 0.2f);
 
 		// toms
-		_set_drum(DrumPitch::TOM_FLOOR_LOW, 60, 0.8f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::TOM_FLOOR_HI, 100, 0.8f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::TOM_LOW, 200, 0.8f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::TOM_LOW_MID, 300, 0.6f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::TOM_HI_MID, 400, 0.5f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::TOM_HI, 600, 0.3f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomFloorLow, 60, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomFloorHi, 100, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomLow, 200, 0.8f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomLowMid, 300, 0.6f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomHiMid, 400, 0.5f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::TomHi, 600, 0.3f, 0.005f, 0.1f);
 
 		// hihat
-		_set_drum(DrumPitch::HIHAT_CLOSED, 1000, 0.2f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::HIHAT_PEDAL, 1000, 0.2f, 0.005f, 0.1f);
-		_set_drum(DrumPitch::HIHAT_OPEN, 600, 0.15f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::HihatClosed, 1000, 0.2f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::HihatPedal, 1000, 0.2f, 0.005f, 0.1f);
+		_set_drum(DrumPitch::HihatOpen, 600, 0.15f, 0.005f, 0.4f);
 
 		// cymbals
-		_set_drum(DrumPitch::CRASH_1, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::CRASH_2, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::RIDE_1, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::RIDE_2, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::CHINESE, 600, 0.23f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::BELL_RIDE, 600, 0.2f, 0.005f, 0.4f);
-		_set_drum(DrumPitch::SPLASH, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Crash1, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Crash2, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Ride1, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Ride2, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Chinese, 600, 0.23f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::BellRide, 600, 0.2f, 0.005f, 0.4f);
+		_set_drum(DrumPitch::Splash, 600, 0.2f, 0.005f, 0.4f);
 
 		/*DrumPitch::SIDE_STICK = 37,
 		DrumPitch::CLAP = 39,

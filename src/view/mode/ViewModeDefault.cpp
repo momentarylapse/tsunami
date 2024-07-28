@@ -97,7 +97,7 @@ public:
 		}
 	}
 	void on_clean_up() override {
-		view->selection_mode = SelectionMode::NONE;
+		view->selection_mode = SelectionMode::None;
 		//view->hide_selection = false;
 	}
 };
@@ -204,11 +204,11 @@ void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer, const ve
 
 	view->hover().y0 = view->cur_vlayer()->area.center().y;
 	view->hover().y1 = m.y;
-	view->selection_mode = SelectionMode::TRACK_RECT;
+	view->selection_mode = SelectionMode::TrackRect;
 	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
 
-	view->set_selection(view->mode->get_selection(range, SelectionMode::TRACK_RECT));
-	start_selection_rect(SelectionMode::TRACK_RECT, true);
+	view->set_selection(view->mode->get_selection(range, SelectionMode::TrackRect));
+	start_selection_rect(SelectionMode::TrackRect, true);
 }
 
 void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m) {
@@ -222,7 +222,7 @@ void ViewModeDefault::left_click_handle_void(AudioViewLayer *vlayer, const vec2 
 	view->exclusively_select_layer(vlayer);
 	view->select_under_cursor();
 
-	start_selection_rect(SelectionMode::TRACK_RECT);
+	start_selection_rect(SelectionMode::TrackRect);
 }
 
 void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer, const vec2 &m) {
@@ -242,7 +242,7 @@ void ViewModeDefault::left_click_handle_void_xor(AudioViewLayer *vlayer, const v
 	view->toggle_select_layer_with_content_in_cursor(vlayer);
 
 	// diff selection rectangle
-	start_selection_rect(SelectionMode::TRACK_RECT);
+	start_selection_rect(SelectionMode::TrackRect);
 }
 
 void ViewModeDefault::left_click_handle_object_xor(AudioViewLayer *vlayer, const vec2 &m) {

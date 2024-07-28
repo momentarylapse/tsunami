@@ -31,10 +31,10 @@ hui::Panel *create_dummy_synth_panel() {
 }
 
 hui::Panel *create_synth_panel(Track *track, Session *session, hui::Panel *parent) {
-	auto *p = new ModulePanel(track->synth.get(), parent, ConfigPanelMode::FIXED_HEIGHT | ConfigPanelMode::PROFILES | ConfigPanelMode::REPLACE);
+	auto *p = new ModulePanel(track->synth.get(), parent, ConfigPanelMode::FixedHeight | ConfigPanelMode::Profiles | ConfigPanelMode::Replace);
 	//p->set_func_edit([track](const string &param){ track->edit_synthesizer(param); });
 	p->set_func_replace([parent, track, session] {
-		ModuleSelectorDialog::choose(parent, session, ModuleCategory::SYNTHESIZER, track->synth->module_class).then([track, session] (const string &name) {
+		ModuleSelectorDialog::choose(parent, session, ModuleCategory::Synthesizer, track->synth->module_class).then([track, session] (const string &name) {
 			track->set_synthesizer(CreateSynthesizer(session, name));
 		});
 	});

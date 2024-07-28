@@ -146,7 +146,7 @@ int MidiPainterModeLinear::y2pitch(float y) const {
 }
 
 int MidiPainterModeLinear::y2clef(float y, NoteModifier &mod) const {
-	mod = NoteModifier::UNKNOWN;//modifier;
+	mod = NoteModifier::Unknown;//modifier;
 
 	int pitch = y2pitch(y);
 	return mp->clef->pitch_to_position(pitch, mp->midi_scale, mod);

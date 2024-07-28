@@ -129,14 +129,14 @@ void SelectionMarker::on_draw(Painter* p) {
 	auto &sel = view->sel;
 
 	if (!view->hide_selection) {
-		if ((view->selection_mode == SelectionMode::TIME) or (view->selection_mode == SelectionMode::TRACK_RECT)) {
+		if ((view->selection_mode == SelectionMode::Time) or (view->selection_mode == SelectionMode::TrackRect)) {
 			// drawn as background...
 
 			/*c->setColor(colors.selection_internal);
 			for (AudioViewLayer *l: vlayer)
 				if (sel.has(l->layer))
 					c->draw_rect(rect(sxx1, sxx2, l->area.y1, l->area.y2));*/
-		} else if (view->selection_mode == SelectionMode::RECT) {
+		} else if (view->selection_mode == SelectionMode::Rect) {
 			view->cam.range2screen_clip(sel.range(), view->clip, x1, x2);
 			p->set_color(theme.selection_internal);
 			p->set_fill(false);

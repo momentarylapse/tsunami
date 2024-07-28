@@ -113,7 +113,7 @@ color type_color(const string &t) {
 string channel_title(PerfChannelInfo &c) {
 	if (c.name == "module") {
 		auto *m = reinterpret_cast<Module*>(c.p);
-		if (m->module_category == ModuleCategory::SIGNAL_CHAIN) {
+		if (m->module_category == ModuleCategory::SignalChain) {
 			auto *chain = reinterpret_cast<SignalChain*>(c.p);
 			return chain->name;
 		}

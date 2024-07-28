@@ -98,71 +98,71 @@ string pitch_name(int pitch) {
 }
 
 string drum_pitch_name(int pitch) {
-	if (pitch == DrumPitch::BASS_ACCOUSTIC)
+	if (pitch == DrumPitch::BassAccoustic)
 		return "bass      (akk)";
-	if (pitch == DrumPitch::BASS)
+	if (pitch == DrumPitch::Bass)
 		return "bass";
-	if (pitch == DrumPitch::SIDE_STICK)
+	if (pitch == DrumPitch::SideStick)
 		return "side stick";
-	if (pitch == DrumPitch::SNARE)
+	if (pitch == DrumPitch::Snare)
 		return "snare";
-	if (pitch == DrumPitch::CLAP)
+	if (pitch == DrumPitch::Clap)
 		return "clap";
-	if (pitch == DrumPitch::SNARE_ELECTRONIC)
+	if (pitch == DrumPitch::SnareElectronic)
 		return "snare     (electronic)";
-	if (pitch == DrumPitch::TOM_FLOOR_LOW)
+	if (pitch == DrumPitch::TomFloorLow)
 		return "tom - floor low";
-	if (pitch == DrumPitch::HIHAT_CLOSED)
+	if (pitch == DrumPitch::HihatClosed)
 		return "hihat - closed";
-	if (pitch == DrumPitch::TOM_FLOOR_HI)
+	if (pitch == DrumPitch::TomFloorHi)
 		return "tom - floor hi";
-	if (pitch == DrumPitch::HIHAT_PEDAL)
+	if (pitch == DrumPitch::HihatPedal)
 		return "hihat - pedal";
-	if (pitch == DrumPitch::TOM_LOW)
+	if (pitch == DrumPitch::TomLow)
 		return "tom - low";
-	if (pitch == DrumPitch::HIHAT_OPEN)
+	if (pitch == DrumPitch::HihatOpen)
 		return "hihat - open";
-	if (pitch == DrumPitch::TOM_LOW_MID)
+	if (pitch == DrumPitch::TomLowMid)
 		return "tom - low mid";
-	if (pitch == DrumPitch::TOM_HI_MID)
+	if (pitch == DrumPitch::TomHiMid)
 		return "tom - hi mid";
-	if (pitch == DrumPitch::CRASH_1)
+	if (pitch == DrumPitch::Crash1)
 		return "crash 1";
-	if (pitch == DrumPitch::TOM_HI)
+	if (pitch == DrumPitch::TomHi)
 		return "tom - hi";
-	if (pitch == DrumPitch::RIDE_1)
+	if (pitch == DrumPitch::Ride1)
 		return "ride 1";
-	if (pitch == DrumPitch::CHINESE)
+	if (pitch == DrumPitch::Chinese)
 		return "chinese";
-	if (pitch == DrumPitch::BELL_RIDE)
+	if (pitch == DrumPitch::BellRide)
 		return "bell ride";
-	if (pitch == DrumPitch::TAMBOURINE)
+	if (pitch == DrumPitch::Tambourine)
 		return "tambourine";
-	if (pitch == DrumPitch::SPLASH)
+	if (pitch == DrumPitch::Splash)
 		return "splash";
-	if (pitch == DrumPitch::COWBELL)
+	if (pitch == DrumPitch::Cowbell)
 		return "cowbell";
-	if (pitch == DrumPitch::CRASH_2)
+	if (pitch == DrumPitch::Crash2)
 		return "crash 2";
-	if (pitch == DrumPitch::VIBRASLASH)
+	if (pitch == DrumPitch::Vibraslash)
 		return "vibraslash?";
-	if (pitch == DrumPitch::RIDE_2)
+	if (pitch == DrumPitch::Ride2)
 		return "ride 2";
-	if (pitch == DrumPitch::BONGO_HI)
+	if (pitch == DrumPitch::BongoHi)
 		return "bongo - hi";
-	if (pitch == DrumPitch::BONGO_LOW)
+	if (pitch == DrumPitch::BongoLow)
 		return "bongo - low";
 	return pitch_name(pitch);
 }
 
 string modifier_symbol(NoteModifier mod) {
-	if (mod == NoteModifier::NONE)
+	if (mod == NoteModifier::None)
 		return "";
-	if (mod == NoteModifier::SHARP)
+	if (mod == NoteModifier::Sharp)
 		return u8"\u266f";
-	if (mod == NoteModifier::FLAT)
+	if (mod == NoteModifier::Flat)
 		return u8"\u266d";
-	if (mod == NoteModifier::NATURAL)
+	if (mod == NoteModifier::Natural)
 		return u8"\u266e";
 	return "?";
 }
@@ -176,22 +176,22 @@ int modifier_apply(int pitch, NoteModifier mod, NoteModifier scale_mod) {
 }
 
 int modifier_shift(NoteModifier mod) {
-	if (mod == NoteModifier::SHARP)
+	if (mod == NoteModifier::Sharp)
 		return 1;
-	if (mod == NoteModifier::FLAT)
+	if (mod == NoteModifier::Flat)
 		return -1;
 	return 0;
 }
 
 NoteModifier combine_note_modifiers(NoteModifier mod, NoteModifier scale_mod) {
-	if (mod == NoteModifier::NATURAL)
-		return NoteModifier::NONE;
+	if (mod == NoteModifier::Natural)
+		return NoteModifier::None;
 	int shift = modifier_shift(mod) + modifier_shift(scale_mod);
 	if (shift > 0)
-		return NoteModifier::SHARP;
+		return NoteModifier::Sharp;
 	if (shift < 0)
-		return NoteModifier::FLAT;
-	return NoteModifier::NONE;
+		return NoteModifier::Flat;
+	return NoteModifier::None;
 }
 
 
@@ -475,58 +475,58 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 
 
 string chord_type_name(ChordType type) {
-	if (type == ChordType::MINOR)
+	if (type == ChordType::Minor)
 		return _("Minor");
-	if (type == ChordType::MAJOR)
+	if (type == ChordType::Major)
 		return _("Major");
-	if (type == ChordType::DIMINISHED)
+	if (type == ChordType::Diminished)
 		return _("Diminished");
-	if (type == ChordType::AUGMENTED)
+	if (type == ChordType::Augmented)
 		return _("Augmented");
-	if (type == ChordType::MINOR_SEVENTH)
+	if (type == ChordType::MinorSeventh)
 		return _("Minor seventh");
-	if (type == ChordType::MAJOR_SEVENTH)
+	if (type == ChordType::MajorSeventh)
 		return _("Major seventh");
-	if (type == ChordType::MINOR_MAJOR_SEVENTH)
+	if (type == ChordType::MinorMajorSeventh)
 		return _("Minor major seventh");
-	if (type == ChordType::DIMINISHED_SEVENTH)
+	if (type == ChordType::DiminishedSeventh)
 		return _("Diminished seventh");
-	if (type == ChordType::HALF_DIMINISHED_SEVENTH)
+	if (type == ChordType::HalfDiminishedSeventh)
 		return _("Half diminished seventh");
-	if (type == ChordType::DOMINANT_SEVENTH)
+	if (type == ChordType::DominantSeventh)
 		return _("Dominant seventh");
-	if (type == ChordType::AUGMENTED_SEVENTH)
+	if (type == ChordType::AugmentedSeventh)
 		return _("Augmented seventh");
-	if (type == ChordType::AUGMENTED_MAJOR_SEVENTH)
+	if (type == ChordType::AugmentedMajorSeventh)
 		return _("Augmented major seventh");
 	return "???";
 }
 
 Array<int> chord_notes(ChordType type, int inversion, int pitch) {
 	Array<int> r;
-	if (type == ChordType::MINOR) {
+	if (type == ChordType::Minor) {
 		r = {pitch, pitch+3, pitch+7};
-	} else if (type == ChordType::MAJOR) {
+	} else if (type == ChordType::Major) {
 		r = {pitch, pitch+4, pitch+7};
-	} else if (type == ChordType::DIMINISHED) {
+	} else if (type == ChordType::Diminished) {
 		r = {pitch, pitch+3, pitch+6};
-	} else if (type == ChordType::AUGMENTED) {
+	} else if (type == ChordType::Augmented) {
 		r = {pitch, pitch+4, pitch+8};
-	} else if (type == ChordType::DIMINISHED_SEVENTH) {
+	} else if (type == ChordType::DiminishedSeventh) {
 		r = {pitch, pitch+3, pitch+6, pitch+9};
-	} else if (type == ChordType::HALF_DIMINISHED_SEVENTH) {
+	} else if (type == ChordType::HalfDiminishedSeventh) {
 		r = {pitch, pitch+3, pitch+6, pitch+10};
-	} else if (type == ChordType::MINOR_SEVENTH) {
+	} else if (type == ChordType::MinorSeventh) {
 		r = {pitch, pitch+3, pitch+7, pitch+10};
-	} else if (type == ChordType::MINOR_MAJOR_SEVENTH) {
+	} else if (type == ChordType::MinorMajorSeventh) {
 		r = {pitch, pitch+3, pitch+7, pitch+11};
-	} else if (type == ChordType::DOMINANT_SEVENTH) {
+	} else if (type == ChordType::DominantSeventh) {
 		r = {pitch, pitch+4, pitch+7, pitch+10};
-	} else if (type == ChordType::MAJOR_SEVENTH) {
+	} else if (type == ChordType::MajorSeventh) {
 		r = {pitch, pitch+4, pitch+7, pitch+11};
-	} else if (type == ChordType::AUGMENTED_SEVENTH) {
+	} else if (type == ChordType::AugmentedSeventh) {
 		r = {pitch, pitch+4, pitch+8, pitch+10};
-	} else if (type == ChordType::AUGMENTED_MAJOR_SEVENTH) {
+	} else if (type == ChordType::AugmentedMajorSeventh) {
 		r = {pitch, pitch+4, pitch+8, pitch+11};
 	} else {
 		return r;

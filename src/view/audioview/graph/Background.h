@@ -17,7 +17,7 @@ class AudioViewLayer;
 
 class Background : public ::scenegraph::NodeFree {
 public:
-	Background(AudioView *view);
+	explicit Background(AudioView *view);
 
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_right_button_down(const vec2 &m) override;

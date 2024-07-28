@@ -15,7 +15,7 @@
 namespace tsunami {
 
 TsunamiPlugin::TsunamiPlugin() :
-	Module(ModuleCategory::TSUNAMI_PLUGIN, "")
+	Module(ModuleCategory::TsunamiPlugin, "")
 {
 }
 
@@ -35,7 +35,7 @@ void TsunamiPlugin::stop_request() {
 }
 
 TsunamiPlugin *CreateTsunamiPlugin(Session *session, const string &name) {
-	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleCategory::TSUNAMI_PLUGIN, name);
+	return (TsunamiPlugin*)ModuleFactory::create(session, ModuleCategory::TsunamiPlugin, name);
 }
 
 }

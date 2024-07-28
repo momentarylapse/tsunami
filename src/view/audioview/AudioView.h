@@ -71,23 +71,23 @@ enum class MidiMode;
 
 
 enum class SelectionSnapMode {
-	NONE,
-	BAR,
-	PART,
+	None,
+	Bar,
+	Part,
 };
 
 enum class SelectionMode {
-	NONE,
-	TIME,
-	RECT,
-	TRACK_RECT,
-	FAKE,
+	None,
+	Time,
+	Rect,
+	TrackRect,
+	Fake,
 };
 
 class AudioView : public MainViewNode {
 public:
-	AudioView(Session *session);
-	virtual ~AudioView();
+	explicit AudioView(Session *session);
+	~AudioView() override;
 
 	void* main_view_data() const override;
 	string main_view_description() const override;

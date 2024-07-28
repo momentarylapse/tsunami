@@ -31,7 +31,7 @@ class MainViewNode;
 class MainView : public obs::Node<VirtualBase> {
 public:
 	MainView(Session *session, const string &id);
-	~MainView();
+	~MainView() override;
 
 	obs::xsource<MainViewNode*> out_view_changed{this, "view-changed"};
 

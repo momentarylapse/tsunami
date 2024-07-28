@@ -26,7 +26,7 @@ BufferPainter::BufferPainter(AudioView *_view) {
 	db = view->peak_database.get();
 	area = rect(0,0,0,0);
 	x0 = x1 = 0;
-	mode = AudioViewMode::PEAKS;
+	mode = AudioViewMode::Peaks;
 }
 
 
@@ -141,9 +141,9 @@ inline void draw_peak_buffer_sel(Painter *c, int di, double view_pos_rel, double
 }
 
 void BufferPainter::draw_buffer(Painter *c, AudioBuffer &b, int offset) {
-	if (mode == AudioViewMode::PEAKS)
+	if (mode == AudioViewMode::Peaks)
 		draw_peaks(c, b, offset);
-	else if (mode == AudioViewMode::SPECTRUM)
+	else if (mode == AudioViewMode::Spectrum)
 		draw_spectrum(c, b, offset);
 }
 
@@ -174,7 +174,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 	int pm = PeakData::PEAK_MAGIC_LEVEL2 * b.channels;
 	int l = view->prefered_buffer_layer * 2 * b.channels;
 	if (l >= 0) {
-		auto &p = db->acquire(b, AudioViewMode::PEAKS);
+		auto &p = db->acquire(b, AudioViewMode::Peaks);
 		double bzf = view->buffer_zoom_factor;
 
 		// no peaks yet? -> show dummy
@@ -233,7 +233,7 @@ void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
 	float x1, x2;
 	view->cam.range2screen(Range(offset, b.length), x1, x2);
 
-	auto &p = db->acquire(b, AudioViewMode::SPECTRUM);
+	auto &p = db->acquire(b, AudioViewMode::Spectrum);
 	if (!p.has_spectrum()) {
 		// no spectrum yet? -> show dummy
 		c->set_color(color::interpolate(col1, Red, 0.3f));

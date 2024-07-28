@@ -17,7 +17,7 @@ class AudioViewLayer;
 class LayerHeader : public ::scenegraph::NodeRel {
 public:
 	AudioViewLayer *vlayer;
-	LayerHeader(AudioViewLayer *l);
+	explicit LayerHeader(AudioViewLayer *l);
 	void on_draw(Painter *c) override;
 
 	HoverData get_hover_data(const vec2 &m) override;

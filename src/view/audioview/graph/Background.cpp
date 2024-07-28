@@ -33,7 +33,7 @@ bool Background::on_left_button_down(const vec2 &m) {
 		view->set_cursor_pos(pos);
 		view->hover().range = Range(pos, 0);
 
-		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::TIME, false));
+		view->mdp_prepare(CreateMouseDelaySelect(view, SelectionMode::Time, false));
 	}
 	return true;
 }

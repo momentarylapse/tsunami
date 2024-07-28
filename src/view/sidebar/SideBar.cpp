@@ -86,8 +86,8 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 }
 
 SideBar::~SideBar() {
-	if (visible and (active_console >= 0))
-		consoles[active_console]->on_leave();
+	if (visible and ((int)active_console >= 0))
+		consoles[(int)active_console]->on_leave();
 }
 
 void SideBar::add_console(SideBarConsole *c) {
@@ -123,24 +123,24 @@ void SideBar::_hide() {
 	out_changed.notify();
 }
 
-void SideBar::choose(int console) {
-	if (active_console >= 0) {
+void SideBar::choose(Index console) {
+	if ((int)active_console >= 0) {
 		if (visible)
-			consoles[active_console]->on_leave();
-		consoles[active_console]->hide();
+			consoles[(int)active_console]->on_leave();
+		consoles[(int)active_console]->hide();
 	}
 
-	active_console = console;
+	active_console = (int)console;
 
-	consoles[active_console]->show();
+	consoles[(int)active_console]->show();
 	if (visible)
-		consoles[active_console]->on_enter();
-	set_string("title", consoles[active_console]->title);
+		consoles[(int)active_console]->on_enter();
+	set_string("title", consoles[(int)active_console]->title);
 
 	out_changed.notify();
 }
 
-void SideBar::open(int console) {
+void SideBar::open(Index console) {
 	choose(console);
 
 	if (!visible)
@@ -148,14 +148,14 @@ void SideBar::open(int console) {
 	out_changed.notify();
 }
 
-bool SideBar::is_active(int console) {
-	return (active_console == console) and visible;
+bool SideBar::is_active(Index console) const {
+	return (active_console == (int)console) and visible;
 }
 
 base::future<bool> SideBar::test_allow_close() {
 	if (!visible or active_console < 0)
 		return base::success<bool>(true);
-	return consoles[active_console]->test_allow_close();
+	return consoles[(int)active_console]->test_allow_close();
 }
 
 

@@ -90,11 +90,11 @@ private:
 	void update_device();
 
 	enum class State {
-		UNPREPARED_NO_DEVICE_NO_DATA,
-		UNPREPARED_NO_DEVICE,
-		UNPREPARED_NO_DATA,
-		PAUSED,
-		PLAYING,
+		UnpreparedNoDeviceNoData,
+		UnpreparedNoDevice,
+		UnpreparedNoData,
+		Paused,
+		Playing,
 	} state;
 	void _set_state(State s);
 

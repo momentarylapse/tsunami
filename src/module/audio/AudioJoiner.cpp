@@ -12,13 +12,13 @@
 namespace tsunami {
 
 AudioJoiner::AudioJoiner() :
-	Module(ModuleCategory::PLUMBING, "AudioJoiner")
+	Module(ModuleCategory::Plumbing, "AudioJoiner")
 {
 }
 
 int AudioJoiner::read_audio(int port, AudioBuffer& buf) {
 	bool first = true;
-	int result = NO_SOURCE;
+	int result = Return::NoSource;
 	for (auto _in: port_in) {
 		if (!_in->source)
 			continue;

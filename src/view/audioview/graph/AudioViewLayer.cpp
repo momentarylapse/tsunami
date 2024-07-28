@@ -445,7 +445,7 @@ color AudioViewLayer::background_color() const {
 }
 
 color AudioViewLayer::background_selection_color() const {
-	if (view->selection_mode == SelectionMode::RECT)
+	if (view->selection_mode == SelectionMode::Rect)
 		return background_color(); // complex selection rect as overlay...
 	return (view->sel.has(layer)) ? theme.background_track_selection : theme.background_track;
 }

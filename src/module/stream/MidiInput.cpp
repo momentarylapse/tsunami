@@ -34,7 +34,7 @@ int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 	} else {
 		int samples = min(midi.samples, events.samples);
 		if (samples < midi.samples)
-			return NOT_ENOUGH_DATA;
+			return Return::NotEnoughData;
 		for (int i=events.num-1; i>=0; i--){
 			if (events[i].pos < samples){
 				//msg_write("add " + format("%.0f  %f", events[i].pitch, events[i].volume));
@@ -64,10 +64,10 @@ string MidiInput::Config::auto_conf(const string &name) const {
 	return "";
 }
 
-MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::STREAM, "MidiInput") {
+MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::Stream, "MidiInput") {
 	session = _session;
 	_sample_rate = session->sample_rate();
-	state = State::NO_DEVICE;
+	state = State::NoDevice;
 
 	device_manager = session->device_manager;
 	cur_device = nullptr;
@@ -96,21 +96,21 @@ MidiInput::~MidiInput() {
 }
 
 void MidiInput::_create_dev() {
-	if (state != State::NO_DEVICE)
+	if (state != State::NoDevice)
 		return;
 	stream = device_manager->midi_context->create_midi_input_stream(session, cur_device, &shared_data);
 	if (stream->error)
 		return;
 
-	state = State::PAUSED;
+	state = State::Paused;
 }
 
 void MidiInput::_kill_dev() {
-	if (state == State::NO_DEVICE)
+	if (state == State::NoDevice)
 		return;
 	delete stream;
 	stream = nullptr;
-	state = State::NO_DEVICE;
+	state = State::NoDevice;
 }
 
 bool MidiInput::unconnect() {
@@ -129,21 +129,21 @@ Device *MidiInput::get_device() {
 }
 
 void MidiInput::update_device() {
-	if (state != State::NO_DEVICE)
+	if (state != State::NoDevice)
 		unconnect();
 
 	cur_device = config.device;
 
-	if (state == State::NO_DEVICE)
+	if (state == State::NoDevice)
 		_create_dev();
 
 	stream->update_device(cur_device);
 }
 
 bool MidiInput::start() {
-	if (state == State::NO_DEVICE)
+	if (state == State::NoDevice)
 		_create_dev();
-	if (state != State::PAUSED)
+	if (state != State::Paused)
 		return false;
 	session->i(_("capture midi start"));
 
@@ -156,12 +156,12 @@ bool MidiInput::start() {
 
 	timer->reset();
 
-	state = State::CAPTURING;
+	state = State::Capturing;
 	return true;
 }
 
 void MidiInput::stop() {
-	if (state != State::CAPTURING)
+	if (state != State::Capturing)
 		return;
 	session->i(_("capture midi stop"));
 
@@ -169,7 +169,7 @@ void MidiInput::stop() {
 		return;
 
 	//midi.sanify(Range(0, midi.samples));
-	state = State::PAUSED;
+	state = State::Paused;
 }
 
 // TODO: allow multiple streams/ports
@@ -192,7 +192,7 @@ int MidiInput::do_capturing() {
 }
 
 bool MidiInput::is_capturing() const {
-	return state == State::CAPTURING;
+	return state == State::Capturing;
 }
 
 
@@ -204,13 +204,13 @@ void MidiInput::reset_sync() {
 }
 
 base::optional<int64> MidiInput::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::START){
+	if (cmd == ModuleCommand::Start){
 		start();
 		return 0;
-	} else if (cmd == ModuleCommand::STOP){
+	} else if (cmd == ModuleCommand::Stop){
 		stop();
 		return 0;
-	} else if (cmd == ModuleCommand::SUCK){
+	} else if (cmd == ModuleCommand::Suck){
 		return (int64)do_capturing();
 	}
 	return base::None;

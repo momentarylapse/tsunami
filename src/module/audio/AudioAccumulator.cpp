@@ -35,7 +35,7 @@ string AudioAccumulator::Config::auto_conf(const string &name) const {
 int AudioAccumulator::read_audio(int port, AudioBuffer& buf) {
 	auto source = in.source;
 	if (!source)
-		return NO_SOURCE;
+		return Return::NoSource;
 
 	int r = source->read_audio(buf);
 
@@ -56,7 +56,7 @@ int AudioAccumulator::read_audio(int port, AudioBuffer& buf) {
 }
 
 AudioAccumulator::AudioAccumulator() :
-	Module(ModuleCategory::PLUMBING, "AudioAccumulator")
+	Module(ModuleCategory::Plumbing, "AudioAccumulator")
 {
 	auto _class = session->plugin_manager->get_class("AudioAccumulatorConfig");
 	if (_class->elements.num == 0) {
@@ -91,22 +91,22 @@ void AudioAccumulator::on_config() {
 }
 
 base::optional<int64> AudioAccumulator::command(ModuleCommand cmd, int64 param) {
-	if (cmd == ModuleCommand::ACCUMULATION_START) {
+	if (cmd == ModuleCommand::AccumulationStart) {
 		_accumulate(true);
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_STOP) {
+	} else if (cmd == ModuleCommand::AccumulationStop) {
 		_accumulate(false);
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_CLEAR) {
+	} else if (cmd == ModuleCommand::AccumulationClear) {
 		std::lock_guard<std::mutex> lock(mtx_buf);
 		samples_skipped += buffer.length;
 		buffer.clear();
 		//buf.set_channels(2);
 		return 0;
-	} else if (cmd == ModuleCommand::ACCUMULATION_GET_SIZE) {
+	} else if (cmd == ModuleCommand::AccumulationGetSize) {
 		std::lock_guard<std::mutex> lock(mtx_buf);
 		return buffer.length;
-	} else if (cmd == ModuleCommand::SET_INPUT_CHANNELS) {
+	} else if (cmd == ModuleCommand::SetInputChannels) {
 		set_channels((int)param);
 		return 0;
 	}

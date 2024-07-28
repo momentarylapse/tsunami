@@ -29,7 +29,7 @@ namespace os {
 namespace tsunami {
 
 void AudioOutput::Config::reset() {
-	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_OUTPUT);
+	device = _module->session->device_manager->choose_device(DeviceType::AudioOutput);
 	volume = 1;
 }
 

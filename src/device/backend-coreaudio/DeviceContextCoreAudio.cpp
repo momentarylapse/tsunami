@@ -78,7 +78,7 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 		UInt32 mBufferSizeFrames;
 		AudioStreamBasicDescription     mFormat;
 
-		AudioObjectPropertyScope theScope = (type == DeviceType::AUDIO_INPUT) ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
+		AudioObjectPropertyScope theScope = (type == DeviceType::AudioInput) ? kAudioDevicePropertyScopeInput : kAudioDevicePropertyScopeOutput;
 		AudioObjectPropertyAddress theAddress1 = {
 			kAudioDevicePropertySafetyOffset,
 			theScope,
@@ -158,9 +158,9 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &devids[0]);
 
 	// update
-	check_device(default_devid, DeviceType::AUDIO_OUTPUT, true);
+	check_device(default_devid, DeviceType::AudioOutput, true);
 	for (auto id: devids)
-		check_device(id, DeviceType::AUDIO_OUTPUT, id == default_devid);
+		check_device(id, DeviceType::AudioOutput, id == default_devid);
 
 // input
 	// default
@@ -183,9 +183,9 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 	AudioObjectGetPropertyData(kAudioObjectSystemObject, &theAddress0, 0, nullptr, &propsize, &devids[0]);
 
 	// update
-	check_device(default_devid, DeviceType::AUDIO_INPUT, true);
+	check_device(default_devid, DeviceType::AudioInput, true);
 	for (auto id: devids)
-		check_device(id, DeviceType::AUDIO_INPUT, id == default_devid);
+		check_device(id, DeviceType::AudioInput, id == default_devid);
 
 }
 

@@ -20,7 +20,7 @@
 namespace tsunami {
 
 FormatDescriptorSoundFont2::FormatDescriptorSoundFont2() :
-	FormatDescriptor("SoundFont2", "sf2", Flag::AUDIO | Flag::TAGS | Flag::SAMPLES | Flag::READ)
+	FormatDescriptor("SoundFont2", "sf2", Flag::Audio | Flag::Tags | Flag::Samples | Flag::Read)
 {
 }
 

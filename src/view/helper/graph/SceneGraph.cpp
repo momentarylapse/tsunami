@@ -14,8 +14,8 @@
 namespace scenegraph {
 
 SceneGraph::SceneGraph() {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	m = {-1, -1};
 	mdp = new MouseDelayPlanner(this);
 	set_perf_name("graph");
@@ -241,8 +241,8 @@ void SceneGraph::integrate(hui::Panel *_panel, const string &id, std::function<v
 	panel = _panel;
 	if (fill) {
 		for (auto c: weak(children)) {
-			c->align.horizontal = Node::AlignData::Mode::FILL;
-			c->align.vertical = Node::AlignData::Mode::FILL;
+			c->align.horizontal = Node::AlignData::Mode::Fill;
+			c->align.vertical = Node::AlignData::Mode::Fill;
 		}
 	}
 

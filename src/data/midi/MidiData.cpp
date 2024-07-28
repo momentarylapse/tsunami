@@ -18,11 +18,11 @@ namespace tsunami {
 const float MIDDLE_A_DEFAULT_FREQ = 440.0f;
 
 float pitch_to_freq(float pitch) {
-	return MIDDLE_A_DEFAULT_FREQ * pow(2, (pitch - (float)MIDDLE_A) / 12.0f);
+	return MIDDLE_A_DEFAULT_FREQ * pow(2, (pitch - (float)MiddleA) / 12.0f);
 }
 
 float freq_to_pitch(float freq) {
-	return log2(freq / MIDDLE_A_DEFAULT_FREQ) * 12.0f + (float)MIDDLE_A;
+	return log2(freq / MIDDLE_A_DEFAULT_FREQ) * 12.0f + (float)MiddleA;
 }
 
 
@@ -411,25 +411,25 @@ MidiEventBuffer midi_notes_to_events(const MidiNoteBuffer &notes) {
 	MidiEventBuffer r;
 	for (MidiNote *n: weak(notes)) {
 		Range rr = n->range;
-		if (n->is(NOTE_FLAG_DEAD))
+		if (n->is(NoteFlag::Dead))
 			rr = Range(rr.offset, min(rr.length/4, 2200)); //DEFAULT_SAMPLE_RATE/20)); // FIXME use the current sample rate?
-		else if (n->is(NOTE_FLAG_STACCATO))
+		else if (n->is(NoteFlag::Staccato))
 			rr = Range(rr.offset, rr.length/2);
         const int l = rr.length;
         const int lx = min(l/4, 10000);
-        if (n->is(NOTE_FLAG_TRILL)) {
+        if (n->is(NoteFlag::Trill)) {
             r.add(MidiEvent(n));
             r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
             r.add(MidiEvent(rr.offset + lx, n->pitch+1, n->volume));
             r.add(MidiEvent(rr.offset + lx*2, n->pitch+1, 0));
             r.add(MidiEvent(rr.offset + lx*2, n->pitch, n->volume));
             r.add(MidiEvent(rr.end()-1, n->pitch, 0));
-        } else if (n->is(NOTE_FLAG_BEND_HALF)) {
+        } else if (n->is(NoteFlag::BendHalf)) {
             r.add(MidiEvent(n));
             r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
             r.add(MidiEvent(rr.offset + lx, n->pitch+1, n->volume));
             r.add(MidiEvent(rr.end()-1, n->pitch+1, 0));
-        } else if (n->is(NOTE_FLAG_BEND_FULL)) {
+        } else if (n->is(NoteFlag::BendFull)) {
             r.add(MidiEvent(n));
             r.add(MidiEvent(rr.offset + lx, n->pitch, 0));
             r.add(MidiEvent(rr.offset + lx, n->pitch+2, n->volume));

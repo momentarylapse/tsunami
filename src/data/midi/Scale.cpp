@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-const Scale Scale::C_MAJOR = Scale(Scale::Type::MAJOR, 0);
+const Scale Scale::C_MAJOR = Scale(Scale::Type::Major, 0);
 
 static const NoteModifier scale_major_modifiers[12][7] = {
 	{NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None, NoteModifier::None}, // C
@@ -30,19 +30,19 @@ static const NoteModifier scale_major_modifiers[12][7] = {
 };
 
 inline int scale_to_major(const Scale &s) {
-	if (s.type == Scale::Type::MAJOR)
+	if (s.type == Scale::Type::Major)
 		return s.root;
-	if (s.type == Scale::Type::LOCRIAN)
+	if (s.type == Scale::Type::Locrian)
 		return (s.root + 1) % 12;
-	if (s.type == Scale::Type::MINOR)
+	if (s.type == Scale::Type::Minor)
 		return (s.root + 3) % 12;
-	if (s.type == Scale::Type::MIXOLYDIAN)
+	if (s.type == Scale::Type::Mixolydian)
 		return (s.root + 5) % 12;
-	if (s.type == Scale::Type::LYDIAN)
+	if (s.type == Scale::Type::Lydian)
 		return (s.root + 7) % 12;
-	if (s.type == Scale::Type::PHRYGIAN)
+	if (s.type == Scale::Type::Phrygian)
 		return (s.root + 8) % 12;
-	if (s.type == Scale::Type::DORIAN)
+	if (s.type == Scale::Type::Dorian)
 		return (s.root + 10) % 12;
 	return s.root;
 }
@@ -64,37 +64,37 @@ Scale::Scale(Type _type, int _root) {
 
 // can be parsed
 string Scale::get_type_name_canonical(Type type) {
-	if (type == Type::MAJOR)
+	if (type == Type::Major)
 		return "major";
-	if (type == Type::DORIAN)
+	if (type == Type::Dorian)
 		return "dorian";
-	if (type == Type::PHRYGIAN)
+	if (type == Type::Phrygian)
 		return "phrygian";
-	if (type == Type::LYDIAN)
+	if (type == Type::Lydian)
 		return "lydian";
-	if (type == Type::MIXOLYDIAN)
+	if (type == Type::Mixolydian)
 		return "mixolydian";
-	if (type == Type::MINOR)
+	if (type == Type::Minor)
 		return "minor";
-	if (type == Type::LOCRIAN)
+	if (type == Type::Locrian)
 		return "locrian";
 	return "???";
 }
 
 string Scale::get_type_name(Type type) {
-	if (type == Type::MAJOR)
+	if (type == Type::Major)
 		return _("Major");
-	if (type == Type::DORIAN)
+	if (type == Type::Dorian)
 		return _("Dorian");
-	if (type == Type::PHRYGIAN)
+	if (type == Type::Phrygian)
 		return _("Phrygian");
-	if (type == Type::LYDIAN)
+	if (type == Type::Lydian)
 		return _("Lydian");
-	if (type == Type::MIXOLYDIAN)
+	if (type == Type::Mixolydian)
 		return _("Mixolydian");
-	if (type == Type::MINOR)
+	if (type == Type::Minor)
 		return _("Minor");
-	if (type == Type::LOCRIAN)
+	if (type == Type::Locrian)
 		return _("Locrian");
 	return "???";
 }
@@ -116,8 +116,8 @@ Scale Scale::parse(const string &text) {
 	if (ss.num != 2)
 		return Scale::C_MAJOR;
 	int root = max(parse_rel_pitch(ss[0]), 0);
-	Type type = Type::MAJOR;
-	for (int i=0; i<(int)Scale::Type::NUM_TYPES; i++)
+	Type type = Type::Major;
+	for (int i=0; i<(int)Scale::Type::Count; i++)
 		if (ss[1] == Scale::get_type_name_canonical((Scale::Type)i))
 			type = (Scale::Type)i;
 	return Scale(type, root);

@@ -21,7 +21,7 @@
 namespace tsunami {
 
 FormatDescriptorWave::FormatDescriptorWave() :
-	FormatDescriptor("Wave", "wav,wave", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::READ | Flag::WRITE)
+	FormatDescriptor("Wave", "wav,wave", Flag::Audio | Flag::SingleTrack | Flag::Read | Flag::Write)
 {
 }
 

@@ -48,11 +48,11 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m
 		_curve = cur_track()->add_curve("", t);
 	}
 
-	if (hover().type == HoverData::Type::CURVE_POINT_NONE) {
+	if (hover().type == HoverData::Type::CurvePointNone) {
 		int pos = view->get_mouse_pos(m);
 		float value = screen2value(m.y);
 		cur_track()->curve_add_point(_curve, pos, value);
-	} else if (hover().type == HoverData::Type::CURVE_POINT) {
+	} else if (hover().type == HoverData::Type::CurvePoint) {
 		view->mdp_prepare([this] (const vec2& m) {
 			int pos = view->get_mouse_pos(m);
 			float value = clamp(screen2value(m.y), _curve->min, _curve->max);
@@ -64,7 +64,7 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m
 void ViewModeCurve::on_key_down(int k) {
 	ViewModeDefault::on_key_down(k);
 
-	if (_curve and (view->cur_selection.type == HoverData::Type::CURVE_POINT))
+	if (_curve and (view->cur_selection.type == HoverData::Type::CurvePoint))
 		if (k == hui::KEY_DELETE){
 			cur_track()->curve_delete_point(_curve, view->cur_selection.index);
 			view->cur_selection.clear();
@@ -101,10 +101,10 @@ void ViewModeCurve::draw_track_data(Painter* c, AudioViewTrack* t) {
 		// points
 		foreachi(auto &p, _curve->points, i) {
 			float r = 3;
-			if ((hover().type == HoverData::Type::CURVE_POINT) and (i == hover().index)) {
+			if ((hover().type == HoverData::Type::CurvePoint) and (i == hover().index)) {
 				c->set_color(theme.selection_boundary_hover);
 				r = 5;
-			} else if ((view->cur_selection.type == HoverData::Type::CURVE_POINT) and (i == view->cur_selection.index)) {
+			} else if ((view->cur_selection.type == HoverData::Type::CurvePoint) and (i == view->cur_selection.index)) {
 				// TODO.... selected...
 				c->set_color(theme.selection_boundary);
 			} else {
@@ -123,7 +123,7 @@ void ViewModeCurve::draw_post(Painter* c) {
 
 HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 	auto s = vlayer->Node::get_hover_data(m);//ViewModeDefault::get_hover_data(vlayer, mx, my);
-	s.type = HoverData::Type::CURVE_POINT_NONE;
+	s.type = HoverData::Type::CurvePointNone;
 
 	// curve points
 	if (_curve) {
@@ -131,7 +131,7 @@ HoverData ViewModeCurve::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
 			float x = cam->sample2screen(p.pos);
 			float y = value2screen(p.value);
 			if ((fabs(m.x - x) < 10) and (fabs(m.y - y) < 10)) {
-				s.type = HoverData::Type::CURVE_POINT;
+				s.type = HoverData::Type::CurvePoint;
 				s.index = i;
 				return s;
 			}

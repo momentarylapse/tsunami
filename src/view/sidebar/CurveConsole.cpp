@@ -33,8 +33,8 @@ CurveConsole::CurveConsole(Session *session, SideBar *bar) :
 	popup_menu = hui::create_resource_menu("popup-menu-curve", this);
 
 	event("curve-delete", [this]{ on_delete(); });
-	event("curve-linear", [this]{ on_type(CurveType::LINEAR); });
-	event("curve-exponential", [this]{ on_type(CurveType::EXPONENTIAL); });
+	event("curve-linear", [this]{ on_type(CurveType::Linear); });
+	event("curve-exponential", [this]{ on_type(CurveType::Exponential); });
 	event_x(id_list, "hui:select", [this]{ on_list_select(); });
 	event_x(id_list, "hui:change", [this]{ on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [this]{ on_list_right_click(); });
@@ -141,8 +141,8 @@ void CurveConsole::on_list_right_click() {
 	popup_menu->enable("curve-linear", curve());
 	popup_menu->enable("curve-exponential", curve());
 	if (auto c = curve()) {
-		popup_menu->check("curve-linear", c->type == CurveType::LINEAR);
-		popup_menu->check("curve-exponential", c->type == CurveType::EXPONENTIAL);
+		popup_menu->check("curve-linear", c->type == CurveType::Linear);
+		popup_menu->check("curve-exponential", c->type == CurveType::Exponential);
 	}
 	popup_menu->open_popup(this);
 }

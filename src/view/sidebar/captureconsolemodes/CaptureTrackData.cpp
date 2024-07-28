@@ -184,7 +184,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 
 	if (type() == SignalType::Audio) {
 		if (!device)
-			device = chain->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
+			device = chain->session->device_manager->choose_device(DeviceType::AudioInput);
 
 		// create modules
 		input = chain->addx<AudioOutput>(ModuleCategory::Stream, "AudioInput").get();
@@ -218,7 +218,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 
 	} else if (t->type == SignalType::Midi) {
 		if (!device)
-			device = chain->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+			device = chain->session->device_manager->choose_device(DeviceType::MidiInput);
 
 		// create modules
 		input = (MidiInput*)chain->addx<MidiInput>(ModuleCategory::Stream, "MidiInput").get();

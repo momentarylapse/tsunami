@@ -29,16 +29,16 @@ AudioEditorConsole::AudioEditorConsole(Session *session, SideBar *bar) :
 	});
 
 	event("mode-select", [this] {
-		on_edit_mode((int)ViewModeEditAudio::EditMode::SELECT);
+		on_edit_mode((int)ViewModeEditAudio::EditMode::Select);
 	});
 	event("mode-smoothen", [this] {
-		on_edit_mode((int)ViewModeEditAudio::EditMode::SMOOTHEN);
+		on_edit_mode((int)ViewModeEditAudio::EditMode::Smoothen);
 	});
 	event("mode-clone", [this] {
-		on_edit_mode((int)ViewModeEditAudio::EditMode::CLONE);
+		on_edit_mode((int)ViewModeEditAudio::EditMode::Clone);
 	});
 	event("mode-rubber", [this] {
-		on_edit_mode((int)ViewModeEditAudio::EditMode::RUBBER);
+		on_edit_mode((int)ViewModeEditAudio::EditMode::Rubber);
 	});
 	event("stretch-apply", [this] {
 		view->mode_edit_audio->apply_stretch();
@@ -83,8 +83,8 @@ void AudioEditorConsole::on_view_cur_layer_change() {
 
 void AudioEditorConsole::on_edit_mode(int m) {
 	auto mode = (ViewModeEditAudio::EditMode)m;
-	expand("revealer-clone", mode == ViewModeEditAudio::EditMode::CLONE);
-	expand("revealer-stretch", mode == ViewModeEditAudio::EditMode::RUBBER);
+	expand("revealer-clone", mode == ViewModeEditAudio::EditMode::Clone);
+	expand("revealer-stretch", mode == ViewModeEditAudio::EditMode::Rubber);
 	view->mode_edit_audio->set_edit_mode(mode);
 }
 
@@ -123,10 +123,10 @@ void AudioEditorConsole::update() {
 		check("mode-spectrum", view->cur_vtrack()->audio_mode == AudioViewMode::Spectrum);
 	}
 
-	check("mode-select", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::SELECT);
-	check("mode-smoothen", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::SMOOTHEN);
-	check("mode-clone", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::CLONE);
-	check("mode-rubber", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::RUBBER);
+	check("mode-select", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::Select);
+	check("mode-smoothen", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::Smoothen);
+	check("mode-clone", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::Clone);
+	check("mode-rubber", view->mode_edit_audio->edit_mode == ViewModeEditAudio::EditMode::Rubber);
 }
 
 }

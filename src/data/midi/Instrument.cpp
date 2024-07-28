@@ -14,7 +14,7 @@
 namespace tsunami {
 
 Instrument::Instrument() {
-	type = Type::NONE;
+	type = Type::None;
 }
 
 Instrument::Instrument(Type _type) {
@@ -23,99 +23,99 @@ Instrument::Instrument(Type _type) {
 }
 
 Array<int> Instrument::default_tuning() const {
-	if ((type == Type::GUITAR) or (type == Type::ELECTRIC_GUITAR))
+	if ((type == Type::Guitar) or (type == Type::ElectricGuitar))
 		return {40,45,50,55,59,64};
-	if (type == Type::ELECTRIC_BASS)
+	if (type == Type::ElectricBass)
 		return {28,33,38,43};
-	if (type == Type::DOUBLE_BASS)
+	if (type == Type::DoubleBass)
 		return {28,33,38,43};
-	if (type == Type::CELLO)
+	if (type == Type::Cello)
 		return {36,43,50,57};
-	if (type == Type::VIOLIN)
+	if (type == Type::Violin)
 		return {55,62,69,76};
-	if (type == Type::LUTE)
+	if (type == Type::Lute)
 		return {36,38,40,45,50,55,59,64};
 	return {};
 }
 
 string Instrument::name() const {
-	if (type == Type::NONE)
+	if (type == Type::None)
 		return _("  - none -");
-	if (type == Type::PIANO)
+	if (type == Type::Piano)
 		return _("Piano");
-	if (type == Type::ORGAN)
+	if (type == Type::Organ)
 		return _("Organ");
-	if (type == Type::HAPSICHORD)
+	if (type == Type::Harpsichord)
 		return _("Harpsichord");
-	if (type == Type::KEYBOARD)
+	if (type == Type::Keyboard)
 		return _("Keyboard");
-	if (type == Type::GUITAR)
+	if (type == Type::Guitar)
 		return _("Guitar");
-	if (type == Type::ELECTRIC_GUITAR)
+	if (type == Type::ElectricGuitar)
 		return _("Electric Guitar");
-	if (type == Type::ELECTRIC_BASS)
+	if (type == Type::ElectricBass)
 		return _("Electric Bass");
-	if (type == Type::DRUMS)
+	if (type == Type::Drums)
 		return _("Drums");
-	if (type == Type::VOCALS)
+	if (type == Type::Vocals)
 		return _("Vocals");
-	if (type == Type::VIOLIN)
+	if (type == Type::Violin)
 		return _("Violin");
-	if (type == Type::CELLO)
+	if (type == Type::Cello)
 		return _("Cello");
-	if (type == Type::DOUBLE_BASS)
+	if (type == Type::DoubleBass)
 		return _("Double Bass");
-	if (type == Type::FLUTE)
+	if (type == Type::Flute)
 		return _("Flute");
-	if (type == Type::TRUMPET)
+	if (type == Type::Trumpet)
 		return _("Trumpet");
-	if (type == Type::TROMBONE)
+	if (type == Type::Trombone)
 		return _("Trombone");
-	if (type == Type::TUBA)
+	if (type == Type::Tuba)
 		return _("Tuba");
-	if (type == Type::HORN)
+	if (type == Type::Horn)
 		return _("Horn");
-	if (type == Type::SAXOPHONE)
+	if (type == Type::Saxophone)
 		return _("Saxophone");
-	if (type == Type::CLARINET)
+	if (type == Type::Clarinet)
 		return _("Clarinet");
-	if (type == Type::LUTE)
+	if (type == Type::Lute)
 		return _("Lute");
 	return "???";
 }
 
 int Instrument::midi_no() const {
-	if (type == Type::PIANO)
+	if (type == Type::Piano)
 		return 1;
-	if (type == Type::HAPSICHORD)
+	if (type == Type::Harpsichord)
 		return 7;
-	if (type == Type::ORGAN)
+	if (type == Type::Organ)
 		return 20;
-	if (type == Type::GUITAR)
+	if (type == Type::Guitar)
 		return 25;
-	if (type == Type::ELECTRIC_GUITAR)
+	if (type == Type::ElectricGuitar)
 		return 30;
-	if (type == Type::ELECTRIC_BASS)
+	if (type == Type::ElectricBass)
 		return 34;
-	if (type == Type::VIOLIN)
+	if (type == Type::Violin)
 		return 41;
-	if (type == Type::CELLO)
+	if (type == Type::Cello)
 		return 43;
-	if (type == Type::DOUBLE_BASS)
+	if (type == Type::DoubleBass)
 		return 44;
-	if (type == Type::TRUMPET)
+	if (type == Type::Trumpet)
 		return 57;
-	if (type == Type::TROMBONE)
+	if (type == Type::Trombone)
 		return 58;
-	if (type == Type::TUBA)
+	if (type == Type::Tuba)
 		return 59;
-	if (type == Type::HORN)
+	if (type == Type::Horn)
 		return 61;
-	if (type == Type::SAXOPHONE)
+	if (type == Type::Saxophone)
 		return 67;
-	if (type == Type::CLARINET)
+	if (type == Type::Clarinet)
 		return 72;
-	if (type == Type::FLUTE)
+	if (type == Type::Flute)
 		return 74;
 	return 1;
 }
@@ -132,57 +132,57 @@ bool Instrument::has_default_tuning() const {
 
 void Instrument::set_midi_no(int no) {
 	if ((no >= 1) and (no <= 6))
-		type = Type::PIANO;
+		type = Type::Piano;
 	else if ((no >= 7) and (no <= 8))
-		type = Type::HAPSICHORD;
+		type = Type::Harpsichord;
 	else if ((no >= 17) and (no <= 24))
-		type = Type::ORGAN;
+		type = Type::Organ;
 	else if ((no >= 25) and (no <= 26))
-		type = Type::GUITAR;
+		type = Type::Guitar;
 	else if ((no >= 27) and (no <= 32))
-		type = Type::ELECTRIC_GUITAR;
+		type = Type::ElectricGuitar;
 	else if ((no >= 33) and (no <= 40))
-		type = Type::ELECTRIC_BASS;
+		type = Type::ElectricBass;
 	else if (no == 41)
-		type = Type::VIOLIN;
+		type = Type::Violin;
 	else if (no == 43)
-		type = Type::CELLO;
+		type = Type::Cello;
 	else if (no == 44)
-		type = Type::DOUBLE_BASS;
+		type = Type::DoubleBass;
 	else if (no == 57)
-		type = Type::TRUMPET;
+		type = Type::Trumpet;
 	else if (no == 58)
-		type = Type::TROMBONE;
+		type = Type::Trombone;
 	else if (no == 59)
-		type = Type::TUBA;
+		type = Type::Tuba;
 	else if ((no == 61) or (no == 70))
-		type = Type::HORN;
+		type = Type::Horn;
 	else if ((no >= 65) and (no <= 68))
-		type = Type::SAXOPHONE;
+		type = Type::Saxophone;
 	else if (no == 72)
-		type = Type::CLARINET;
+		type = Type::Clarinet;
 	else
-		type = Type::NONE;
+		type = Type::None;
 	string_pitch = default_tuning();
 }
 
 Array<Instrument> Instrument::enumerate() {
 	Array<Instrument> instruments;
-	for (int i=0; i<(int)Instrument::Type::NUM_TYPES; i++)
+	for (int i=0; i<(int)Instrument::Type::Count; i++)
 		instruments.add(Instrument((Instrument::Type)i));
 	return instruments;
 }
 
 const Clef& Instrument::get_clef() const {
-	if (type == Type::DRUMS)
-		return Clef::_DRUMS;
-	if ((type == Type::ELECTRIC_GUITAR) or (type == Type::GUITAR) or (type == Type::LUTE))
-		return Clef::_TREBLE_8;
-	if (type == Type::CELLO)
-		return Clef::_BASS;
-	if ((type == Type::ELECTRIC_BASS) or (type == Type::DOUBLE_BASS))
-		return Clef::_BASS_8;
-	return Clef::_TREBLE;
+	if (type == Type::Drums)
+		return Clef::Drums;
+	if ((type == Type::ElectricGuitar) or (type == Type::Guitar) or (type == Type::Lute))
+		return Clef::Treble8;
+	if (type == Type::Cello)
+		return Clef::Bass;
+	if ((type == Type::ElectricBass) or (type == Type::DoubleBass))
+		return Clef::Bass8;
+	return Clef::Treble;
 }
 
 bool Instrument::has_strings() const {

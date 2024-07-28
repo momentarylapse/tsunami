@@ -23,7 +23,7 @@ namespace tsunami {
 const int BEAT_PARTITION = 12;
 
 FormatDescriptorGuitarPro::FormatDescriptorGuitarPro() :
-	FormatDescriptor("GuitarPro", "gp3,gp4,gp5", Flag::MIDI | Flag::READ | Flag::WRITE | Flag::MULTITRACK)
+	FormatDescriptor("GuitarPro", "gp3,gp4,gp5", Flag::Midi | Flag::Read | Flag::Write | Flag::Multitrack)
 {
 }
 
@@ -104,7 +104,7 @@ void FormatGuitarPro::save_song(StorageOperationData *_od)
 	for (Track *t : weak(song->tracks))
 		if (t->type == SignalType::Midi){
 			GpTrack tt;
-			tt.is_drum = (t->instrument.type == Instrument::Type::DRUMS);
+			tt.is_drum = (t->instrument.type == Instrument::Type::Drums);
 			tt.midi_instrument = t->instrument.midi_no();
 			tt.tuning = t->instrument.string_pitch;
 			if (tt.tuning.num == 0)
@@ -494,7 +494,7 @@ void FormatGuitarPro::read_track()
 	int port = f->read_int();
 	int channel = f->read_int();
 	[[maybe_unused]] int channel_fx = f->read_int();
-	Instrument instrument = Instrument(Instrument::Type::DRUMS);
+	Instrument instrument = Instrument(Instrument::Type::Drums);
 	if (channel != 10)
 		instrument.set_midi_no(channels[(port-1) * 16 + (channel-1)].instrument);
 

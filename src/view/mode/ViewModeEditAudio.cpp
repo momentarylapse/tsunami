@@ -84,7 +84,7 @@ ViewModeEditAudio::ViewModeEditAudio(AudioView *view) :
 	ViewModeDefault(view)
 {
 	mode_name = "audio";
-	edit_mode = EditMode::SELECT;
+	edit_mode = EditMode::Select;
 	
 	edit_radius = 50;
 }
@@ -102,7 +102,7 @@ void ViewModeEditAudio::on_key_down(int k) {
 		edit_radius *= 1.1f;
 	if (k == hui::KEY_S)
 		edit_radius = max(edit_radius / 1.1f, 5.0f);
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		if (k == hui::KEY_X) {
 			if (rubber.selected >= 0) {
 				rubber.points.erase(rubber.selected);
@@ -142,21 +142,21 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 	float y2 = view->cur_vlayer()->area.y2;
 	float x1, x2;
 	
-	if (edit_mode == EditMode::CLONE) {
+	if (edit_mode == EditMode::Clone) {
 		// input
 		view->cam.range2screen(range_source(), x1, x2);
 		p->set_color(color(0.2f, 0, 1, 0));
 		p->draw_rect(rect(x1, x2, y1, y2));
 	}
 	
-	if ((edit_mode == EditMode::CLONE) or (edit_mode == EditMode::SMOOTHEN)) {
+	if ((edit_mode == EditMode::Clone) or (edit_mode == EditMode::Smoothen)) {
 		// output
 		view->cam.range2screen(range_target(), x1, x2);
 		p->set_color(color(0.2f, 1, 0, 0));
 		p->draw_rect(rect(x1, x2, y1, y2));
 	}
 
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		foreachi (auto &q, rubber.points, i) {
 			// source
 			color c = theme.red.with_alpha(0.7f);
@@ -220,7 +220,7 @@ void ViewModeEditAudio::on_mouse_move(const vec2& m) {
 	if (!cur_vlayer()->is_cur_hover())
 		return;
 
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		foreachi(auto &q, rubber.points, i) {
 			float sx = view->cam.sample2screen(q.source);
 			float tx = view->cam.sample2screen(q.target);
@@ -246,7 +246,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer, const vec
 		return;
 	}
 	
-	if (edit_mode == EditMode::CLONE) {
+	if (edit_mode == EditMode::Clone) {
 		AudioBuffer source;
 		source.resize(range_source().length);
 		vlayer->layer->read_buffers_fixed(source, range_source());
@@ -265,7 +265,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer, const vec
 				out.c[c][i] = a * source.c[c][i] + (1-a) * out.c[c][i];
 			}
 		vlayer->layer->edit_buffers_finish(a);
-	} else if (edit_mode == EditMode::RUBBER) {
+	} else if (edit_mode == EditMode::Rubber) {
 		int smx = view->cam.screen2sample(m.x);
 
 		rubber.selected = rubber.hover;
@@ -324,7 +324,7 @@ void ViewModeEditAudio::apply_stretch() {
 		bt.resize(rt.length);
 
 
-		BufferInterpolator::interpolate(bs, bt, BufferInterpolator::Method::CUBIC);
+		BufferInterpolator::interpolate(bs, bt, BufferInterpolator::Method::Cubic);
 
 		if (flag_pitch_compensate)
 			BufferPitchShift::pitch_shift(bt, (float)rt.length / (float)rs.length);
@@ -338,7 +338,7 @@ void ViewModeEditAudio::apply_stretch() {
 }
 
 string ViewModeEditAudio::get_tip() {
-	if (edit_mode == EditMode::RUBBER) {
+	if (edit_mode == EditMode::Rubber) {
 		if (view->sel.range().is_empty())
 			return "select range for stretching";
 		return "EXPERIMENTAL    click in selection to add point    drag to move point    delete point [X]    clear [Shift+X]    apply [Return]    track [Alt+↑,↓]";

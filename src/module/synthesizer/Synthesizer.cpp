@@ -77,7 +77,7 @@ Synthesizer::Synthesizer() :
 {
 	sample_rate = DEFAULT_SAMPLE_RATE;
 	keep_notes = 0;
-	instrument = Instrument(Instrument::Type::PIANO);
+	instrument = Instrument(Instrument::Type::Piano);
 	source_run_out = false;
 	auto_generate_stereo = false;
 	render_by_ref = true;
@@ -103,7 +103,7 @@ void Synthesizer::set_sample_rate(int _sample_rate) {
 }
 
 void Synthesizer::update_delta_phi() {
-	for (int p=0; p<MAX_PITCH; p++)
+	for (int p=0; p<MaxPitch; p++)
 		delta_phi[p] = temperament.freq[p] * 2.0f * pi / sample_rate;
 }
 

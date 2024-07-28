@@ -107,13 +107,13 @@ SongSelection SongSelection::filter(const Array<const TrackLayer*> &_layers) con
 SongSelection SongSelection::filter(int mask) const {
 	auto s = *this;
 
-	if ((mask & Mask::SAMPLES) == 0)
+	if ((mask & Mask::Samples) == 0)
 		s._samples.clear();
-	if ((mask & Mask::MIDI_NOTES) == 0)
+	if ((mask & Mask::MidiNotes) == 0)
 		s._notes.clear();
-	if ((mask & Mask::BARS) == 0)
+	if ((mask & Mask::Bars) == 0)
 		s._bars.clear();
-	if ((mask & Mask::MARKERS) == 0)
+	if ((mask & Mask::Markers) == 0)
 		s._markers.clear();
 
 	return s;

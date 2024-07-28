@@ -12,8 +12,8 @@
 namespace tsunami {
 
 ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("scrollpad");
 	scrollbar_h = new ScrollBarHorizontal();
 	scrollbar_v = new ScrollBar();

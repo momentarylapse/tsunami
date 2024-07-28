@@ -102,7 +102,7 @@ base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flag
 	Format *f = d->create();
 	auto od = StorageOperationData(session, f, filename);
 	od.song = song;
-	od.only_load_metadata = (flags & Flags::ONLY_METADATA);
+	od.only_load_metadata = (flags & Flags::OnlyMetadata);
 	if (!f->get_parameters(&od, true)) {
 		delete f;
 		return base::failed<void>();
@@ -136,12 +136,12 @@ base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flag
 }
 
 base::future<void> Storage::load(Song *song, const Path &filename) {
-	return load_ex(song, filename, Flags::NONE);
+	return load_ex(song, filename, Flags::None);
 }
 
 base::future<void> Storage::load_track(TrackLayer *layer, const Path &filename, int offset) {
 	current_directory = filename.parent();
-	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::Audio);
 	if (!d)
 		return base::failed<void>();
 
@@ -178,7 +178,7 @@ base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 	base::promise<AudioBuffer> promise;
 
 	current_directory = filename.parent();
-	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO);
+	auto *d = get_format(filename.extension(), FormatDescriptor::Flag::Audio);
 	if (!d)
 		return base::failed<AudioBuffer>();
 
@@ -273,7 +273,7 @@ base::future<void> Storage::_export(Song *song, const Path &filename) {
 }
 
 base::future<void> Storage::save_via_renderer(AudioOutPort &r, const Path &filename, int num_samples, const Array<Tag> &tags) {
-	auto d = get_format(filename.extension(), FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE);
+	auto d = get_format(filename.extension(), FormatDescriptor::Flag::Audio | FormatDescriptor::Flag::Write);
 	if (!d)
 		return base::failed<void>();
 
@@ -338,7 +338,7 @@ Storage::Future Storage::ask_by_flags(hui::Window *win, const string &title, int
 	Array<string> opts = {"filter=" + filter, "showfilter=" + filter_show};
 	opts.append(opt);
 
-	if (flags & FormatDescriptor::Flag::WRITE) {
+	if (flags & FormatDescriptor::Flag::Write) {
 		opts.add("defaultextension=nami");
 		return hui::file_dialog_save(win, title, current_directory, opts);
 	} else {
@@ -347,19 +347,19 @@ Storage::Future Storage::ask_by_flags(hui::Window *win, const string &title, int
 }
 
 Storage::Future Storage::ask_open(hui::Window *win, const Array<string> &opt) {
-	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::READ, opt);
+	return ask_by_flags(win, _("Open file"), FormatDescriptor::Flag::Read, opt);
 }
 
 Storage::Future Storage::ask_save(hui::Window *win, const Array<string> &opt) {
-	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::WRITE, opt);
+	return ask_by_flags(win, _("Save file"), FormatDescriptor::Flag::Write, opt);
 }
 
 Storage::Future Storage::ask_open_import(hui::Window *win, const Array<string> &opt) {
-	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::READ, opt);
+	return ask_by_flags(win, _("Import file"), FormatDescriptor::Flag::SingleTrack | FormatDescriptor::Flag::Read, opt);
 }
 
 Storage::Future Storage::ask_save_render_export(hui::Window *win, const Array<string> &opt) {
-	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SINGLE_TRACK | FormatDescriptor::Flag::AUDIO | FormatDescriptor::Flag::WRITE, opt);
+	return ask_by_flags(win, _("Export file"), FormatDescriptor::Flag::SingleTrack | FormatDescriptor::Flag::Audio | FormatDescriptor::Flag::Write, opt);
 }
 
 

@@ -142,7 +142,7 @@ public:
 				//float w = p->get_str_width(tt);
 				//p->draw_str((p->width - w) / 2, 8, tt);
 			}
-			draw_str_constrained(p, {p->width/2.0f, 8}, p->width, tt, TextAlign::CENTER);
+			draw_str_constrained(p, {p->width/2.0f, 8}, p->width, tt, TextAlign::Center);
 		}
 
 		if (vtrack->track->type == SignalType::Group) {
@@ -340,8 +340,8 @@ MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
 	set_spacing(2);
 	from_resource("mixing-console");
 
-	peak_meter = new PeakMeterDisplay(this, "output-peaks", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::PEAKS);
-	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::SPECTRUM);
+	peak_meter = new PeakMeterDisplay(this, "output-peaks", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::Peaks);
+	spectrum_meter = new PeakMeterDisplay(this, "output-spectrum", session->playback->peak_meter.get(), PeakMeterDisplay::Mode::Spectrum);
 	//set_float("output-volume", device_manager->get_output_volume());
 	set_float("output-volume", session->playback->output_stream->get_volume());
 	

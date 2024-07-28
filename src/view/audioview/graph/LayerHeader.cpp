@@ -99,7 +99,7 @@ public:
 
 LayerHeader::LayerHeader(AudioViewLayer *l) : scenegraph::NodeRel({0, 0}, theme.LAYER_HANDLE_WIDTH, theme.TRACK_HANDLE_HEIGHT) {
 	z = 70;
-	align.horizontal = AlignData::Mode::RIGHT;
+	align.horizontal = AlignData::Mode::Right;
 	set_perf_name("header");
 	vlayer = l;
 	float x0 = 5;

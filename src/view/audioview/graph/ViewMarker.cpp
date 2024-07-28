@@ -22,7 +22,7 @@ HoverData ViewMarker::get_hover_data(const vec2 &m) {
 	//h.vlayer = this;
 	h.marker = marker;
 	//h.vtrack = view->get_track(layer->track);
-	h.type = HoverData::Type::MARKER;
+	h.type = HoverData::Type::Marker;
 
 /*			if (marker_areas[m].inside(mx, my) or marker_label_areas[m].inside(mx, my)) {
 				s.marker = m;

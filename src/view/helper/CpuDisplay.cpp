@@ -59,8 +59,8 @@ CpuDisplay::CpuDisplay(Session *_session) :
 	align.h = 30;
 	align.dx = -20;
 	align.dy = -20;
-	align.horizontal = AlignData::Mode::RIGHT;
-	align.vertical = AlignData::Mode::BOTTOM;
+	align.horizontal = AlignData::Mode::Right;
+	align.vertical = AlignData::Mode::Bottom;
 	align.dz = 100;
 	clip = true;
 	hidden = true;

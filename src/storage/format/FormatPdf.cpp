@@ -27,7 +27,7 @@ static const float PAGE_WIDTH_A4 = 595.276f; // pts
 static const float PAGE_HEIGHT_A4 = 841.89f;
 
 FormatDescriptorPdf::FormatDescriptorPdf() :
-	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::MIDI | Flag::MULTITRACK | Flag::WRITE) {}
+	FormatDescriptor(_("Pdf sheet"), "pdf", Flag::Midi | Flag::Multitrack | Flag::Write) {}
 
 
 bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {

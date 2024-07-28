@@ -20,8 +20,8 @@ float max_abs(const Array<complex> &z);
 namespace tsunami {
 
 enum class WindowFunction {
-	RECTANGLE,
-	HANN
+	Rectangle,
+	Hann
 };
 
 void apply_window_function(Array<float> &data, WindowFunction wf);

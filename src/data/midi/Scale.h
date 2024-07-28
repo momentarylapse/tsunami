@@ -17,15 +17,15 @@ class Scale {
 public:
 
 	enum class Type {
-		MAJOR,
-		DORIAN,
-		PHRYGIAN,
-		LYDIAN,
-		MIXOLYDIAN,
-		MINOR,
-		LOCRIAN,
-		NUM_TYPES,
-		CUSTOM = -1
+		Major,
+		Dorian,
+		Phrygian,
+		Lydian,
+		Mixolydian,
+		Minor,
+		Locrian,
+		Count,
+		Custom = -1
 	};
 	Type type;
 	int root;

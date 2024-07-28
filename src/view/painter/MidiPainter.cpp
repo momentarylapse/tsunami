@@ -291,17 +291,17 @@ void MidiPainter::set_synthesizer(Synthesizer *s) {
 }
 
 string note_flag_text(const MidiNote *n, bool allow_dead) {
-    if (n->is(NOTE_FLAG_DEAD) and allow_dead)
+    if (n->is(NoteFlag::Dead) and allow_dead)
         return "x";
-    if (n->is(NOTE_FLAG_TRILL))
+    if (n->is(NoteFlag::Trill))
         return "tr";
-    if (n->is(NOTE_FLAG_BEND_HALF))
+    if (n->is(NoteFlag::BendHalf))
         return u8"\u27cb +1";
-    if (n->is(NOTE_FLAG_BEND_FULL))
+    if (n->is(NoteFlag::BendFull))
         return u8"\u27cb +2";
-    if (n->is(NOTE_FLAG_HAMMER_ON))
+    if (n->is(NoteFlag::HammerOn))
         return "h";
-    if (n->is(NOTE_FLAG_PULL_OFF))
+    if (n->is(NoteFlag::PullOff))
         return "p";
     return "";
 }
@@ -312,9 +312,9 @@ void MidiPainter::draw_note_flags(Painter *c, const MidiNote *n, MidiNoteState _
 	string t = note_flag_text(n, mode != MidiMode::Tab);
 	if (t.num > 0)
 		SymbolRenderer::draw(c, {x, y + dir * (rr + flags_font_size*1.33f) - flags_font_size / 2}, flags_font_size, t, true, 0);
-	if (n->is(NOTE_FLAG_STACCATO))
+	if (n->is(NoteFlag::Staccato))
 		c->draw_circle({x, y + dir * rr*2}, rr * 0.3f);
-	if (n->is(NOTE_FLAG_TENUTO)) {
+	if (n->is(NoteFlag::Tenuto)) {
 		c->set_line_width(rr*0.4f);
 		c->draw_line({x - rr*1.5f, y + dir * rr*2}, {x + rr*1.5f, y + dir * rr*2});
 	}

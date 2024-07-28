@@ -21,7 +21,7 @@ class Song;
 class TrackLayer;
 class Synthesizer;
 class AudioEffect;
-class CrossFadeOld;
+class CrossFadeLegacy;
 class TrackMarker;
 class Temperament;
 class Curve;
@@ -111,7 +111,7 @@ public:
 
 	shared_array<TrackMarker> _markers_old;
 
-	Array<CrossFadeOld> _fades_old;
+	Array<CrossFadeLegacy> _fades_legacy;
 	bool has_version_selection() const;
 
 	Song *song;

@@ -16,15 +16,15 @@ namespace tsunami {
 // => WE (ScrollBar) own the offset!
 
 ScrollBar::ScrollBar() {
-	align.vertical = AlignData::Mode::FILL;
-	align.horizontal = AlignData::Mode::LEFT;
+	align.vertical = AlignData::Mode::Fill;
+	align.horizontal = AlignData::Mode::Left;
 	align.w = theme.SCROLLBAR_WIDTH;
 	align.dz = 120;
 	set_perf_name("scrollbar");
 }
 ScrollBarHorizontal::ScrollBarHorizontal() : ScrollBar() {
-	align.vertical = AlignData::Mode::BOTTOM;
-	align.horizontal = AlignData::Mode::FILL;
+	align.vertical = AlignData::Mode::Bottom;
+	align.horizontal = AlignData::Mode::Fill;
 	align.h = theme.SCROLLBAR_WIDTH;
 	horizontal = true;
 }

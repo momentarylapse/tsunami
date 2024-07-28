@@ -27,7 +27,7 @@ class Node : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Node();
 	Node(float w, float h);
-	virtual ~Node();
+	~Node() override;
 
 	virtual bool allow_handle_click_when_gaining_focus() const { return true; }
 
@@ -65,12 +65,12 @@ public:
 	Node *parent;
 	struct AlignData {
 		enum class Mode{
-			NONE,
-			LEFT,
-			RIGHT,
-			TOP,
-			BOTTOM,
-			FILL
+			None,
+			Left,
+			Right,
+			Top,
+			Bottom,
+			Fill
 		};
 		Mode horizontal, vertical;
 		float dx, dy, dz;

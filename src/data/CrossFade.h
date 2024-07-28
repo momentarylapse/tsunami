@@ -17,8 +17,8 @@ class CrossFade {
 public:
 
 	enum Mode {
-		INWARD,
-		OUTWARD
+		Inward,
+		Outward
 	};
 
 	int position;
@@ -30,7 +30,7 @@ public:
 	bool operator!=(const CrossFade &o) const;
 };
 
-class CrossFadeOld {
+class CrossFadeLegacy {
 public:
 	int position;
 	int target;

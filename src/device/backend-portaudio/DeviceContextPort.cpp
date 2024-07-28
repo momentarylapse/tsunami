@@ -51,13 +51,13 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	const PaDeviceInfo* dev = Pa_GetDeviceInfo(index);
 	if (!dev)
 		return;
-	int channels = (type == DeviceType::AUDIO_OUTPUT) ? dev->maxOutputChannels : dev->maxInputChannels;
+	int channels = (type == DeviceType::AudioOutput) ? dev->maxOutputChannels : dev->maxInputChannels;
 	if (channels > 0) {
 		Device *d = dm->get_device_create(type, string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name);
 		d->name = string(Pa_GetHostApiInfo(dev->hostApi)->name) + "/" + dev->name;
 		d->channels = channels;
 		d->index_in_lib = index;
-		if (type == DeviceType::AUDIO_OUTPUT)
+		if (type == DeviceType::AudioOutput)
 			d->default_by_lib = (index == Pa_GetDefaultOutputDevice());
 		else
 			d->default_by_lib = (index == Pa_GetDefaultInputDevice());
@@ -75,13 +75,13 @@ void DeviceContextPort::update_device(DeviceManager* device_manager, bool seriou
 		d->present = false;
 
 	// make sure, the default is first...
-	_portaudio_add_dev(device_manager, DeviceType::AUDIO_OUTPUT, Pa_GetDefaultOutputDevice());
-	_portaudio_add_dev(device_manager, DeviceType::AUDIO_INPUT, Pa_GetDefaultInputDevice());
+	_portaudio_add_dev(device_manager, DeviceType::AudioOutput, Pa_GetDefaultOutputDevice());
+	_portaudio_add_dev(device_manager, DeviceType::AudioInput, Pa_GetDefaultInputDevice());
 
 	int count = Pa_GetDeviceCount();
 	for (int i=0; i<count; i++) {
-		_portaudio_add_dev(device_manager, DeviceType::AUDIO_OUTPUT, i);
-		_portaudio_add_dev(device_manager, DeviceType::AUDIO_INPUT, i);
+		_portaudio_add_dev(device_manager, DeviceType::AudioOutput, i);
+		_portaudio_add_dev(device_manager, DeviceType::AudioInput, i);
 	}
 }
 bool DeviceContextPort::_test_error(PaError err, Session *session, const string &msg) {

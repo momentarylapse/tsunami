@@ -32,9 +32,9 @@ public:
 	virtual ~Storage();
 
 	enum Flags {
-		NONE = 0,
-		ONLY_METADATA = 1,
-		FORCE = 2
+		None = 0,
+		OnlyMetadata = 1,
+		Force = 2
 	};
 
 	base::future<void> load(Song *song, const Path &filename);

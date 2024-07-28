@@ -116,7 +116,7 @@ extern bool module_config_debug;
 hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	string chain_file;
 	string plugin_file;
-	auto flags = Storage::Flags::NONE;
+	auto flags = Storage::Flags::None;
 
 	CommandLineParser p;
 	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
@@ -127,7 +127,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		module_config_debug = true;
 	});
 	p.option("--force", "", [&flags] {
-		flags = flags | Storage::Flags::FORCE;
+		flags = flags | Storage::Flags::Force;
 	});
 	p.option("--plugin", "FILE", "add a plugin to run", [&plugin_file] (const string &a) {
 		plugin_file = a;
@@ -185,7 +185,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		//session->log->allow_console_output = false;
 		Song* song = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song;
-		flags = flags | Storage::Flags::ONLY_METADATA;
+		flags = flags | Storage::Flags::OnlyMetadata;
 		for (string &filename: a) {
 			base::await(session->storage->load_ex(song, filename, flags).then([song] {
 				show_song(song);
@@ -200,7 +200,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;
-		flags = flags | Storage::Flags::ONLY_METADATA;
+		flags = flags | Storage::Flags::OnlyMetadata;
 		base::await(session->storage->load_ex(song1, a[0], flags).then([=] {
 			base::await(session->storage->load_ex(song2, a[1], flags).then([=] {
 				auto r = diff_song(song1, song2);
@@ -220,7 +220,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		future.then([=] {
 			session->storage->_export(song, a[1]);
 		}).on_fail([=] {
-			if (flags & Storage::Flags::FORCE)
+			if (flags & Storage::Flags::Force)
 				session->storage->_export(song, a[1]);
 		});
 		base::await(future);

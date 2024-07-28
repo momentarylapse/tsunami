@@ -14,7 +14,7 @@
 namespace tsunami {
 
 FormatDescriptorM4a::FormatDescriptorM4a() :
-	FormatDescriptor("Apple lossless audio", "m4a", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
+	FormatDescriptor("Apple lossless audio", "m4a", Flag::Audio | Flag::SingleTrack | Flag::Tags | Flag::Read)
 {
 }
 

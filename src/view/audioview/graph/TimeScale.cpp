@@ -21,7 +21,7 @@ public:
 	AudioView *view;
 	PlaybackRange(TimeScale *time_scale) : scenegraph::NodeRel({0, 0}, 0, 0) {
 		view = time_scale->view;
-		align.horizontal = AlignData::Mode::FILL;
+		align.horizontal = AlignData::Mode::Fill;
 	}
 	void update_geometry(const rect &target_area) override {
 		area = target_area;
@@ -125,7 +125,7 @@ public:
 
 
 TimeScale::TimeScale(AudioView *_view) : scenegraph::NodeRel({0, 0}, 100, theme.TIME_SCALE_HEIGHT) {
-	align.horizontal = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
 	align.dz = 120;
 	view = _view;
 	set_perf_name("time");

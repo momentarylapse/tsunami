@@ -74,13 +74,13 @@ void interpolate_channel_fourier(const Array<float> &in, Array<float> &out) {
 }
 
 void interpolate_channel(const Array<float> &in, Array<float> &out, Method method) {
-	if (method == Method::LINEAR) {
+	if (method == Method::Linear) {
 		interpolate_channel_linear(in, out);
-	} else if (method == Method::CUBIC) {
+	} else if (method == Method::Cubic) {
 		interpolate_channel_cubic(in, out);
-	} else if (method == Method::SINC) {
+	} else if (method == Method::Sinc) {
 		// TODO...
-	} else if (method == Method::FOURIER) {
+	} else if (method == Method::Fourier) {
 		interpolate_channel_fourier(in, out);
 	}
 }

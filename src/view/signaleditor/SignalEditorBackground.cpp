@@ -14,8 +14,8 @@ namespace tsunami {
 const float MODULE_GRID = 23;
 
 SignalEditorBackground::SignalEditorBackground(SignalEditorTab *t) {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	tab = t;
 	set_perf_name("background");
 }

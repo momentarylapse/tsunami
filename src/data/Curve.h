@@ -41,14 +41,14 @@ public:
 };
 
 enum class CurveType {
-	LINEAR,
-	EXPONENTIAL,
+	Linear,
+	Exponential,
 };
 
 class Curve : public Sharable<obs::Node<VirtualBase>> {
 public:
 	Curve();
-	virtual ~Curve();
+	~Curve() override;
 
 	string name;
 	CurveTarget target;

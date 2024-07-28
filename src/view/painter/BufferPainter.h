@@ -26,7 +26,7 @@ enum class AudioViewMode;
 
 class BufferPainter {
 public:
-	BufferPainter(AudioView *view);
+	explicit BufferPainter(AudioView *view);
 
 
 	void draw_buffer(Painter *c, AudioBuffer &b, int offset);

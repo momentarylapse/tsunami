@@ -14,18 +14,18 @@
 namespace tsunami {
 
 enum class TemperamentType {
-	CUSTOM,
-	EQUAL_12,
-	MEANTONE_QUARTER_COMMA,
-	MEANTONE_THIRD_COMMA,
-	PYTHAGOREAN,
-	FIVE_LIMIT_DIATONIC_MAJOR,
-	NUM
+	Custom,
+	Equal12,
+	MeantoneQuarterComma,
+	MeantoneThirdComma,
+	Pythagorean,
+	FiveLimitDiatonicMajor,
+	Count
 };
 
 class Temperament {
 public:
-	float freq[MAX_PITCH];
+	float freq[MaxPitch];
 
 	bool operator==(const Temperament &t) const;
 	bool is_default() const;

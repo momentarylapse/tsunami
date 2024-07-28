@@ -30,7 +30,7 @@ const int CHUNK_SAMPLES = 1 << 16;
 class FormatDescriptor {
 public:
 	FormatDescriptor(const string &description, const string &extensions, int _flags);
-	virtual ~FormatDescriptor(){}
+	virtual ~FormatDescriptor() = default;
 	bool can_handle(const string &extension);
 	bool test_compatibility(Song *s);
 
@@ -41,15 +41,15 @@ public:
 	int flags;
 
 	enum Flag {
-		SINGLE_TRACK = 1<<0,
-		TAGS = 1<<1,
-		FX = 1<<2,
-		MULTITRACK = 1<<3,
-		SAMPLES = 1<<4,
-		AUDIO = 1<<5,
-		MIDI = 1<<6,
-		READ = 1<<7,
-		WRITE = 1<<8,
+		SingleTrack = 1<<0,
+		Tags = 1<<1,
+		Fx = 1<<2,
+		Multitrack = 1<<3,
+		Samples = 1<<4,
+		Audio = 1<<5,
+		Midi = 1<<6,
+		Read = 1<<7,
+		Write = 1<<8,
 	};
 };
 

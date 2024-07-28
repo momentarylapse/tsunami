@@ -32,7 +32,7 @@ public:
 	void on_update(const vec2 &m) override {
 		tab->graph()->hover = tab->graph()->get_hover_data(m);
 		target = nullptr;
-		if (tab->graph()->hover.type == HoverData::Type::PORT_IN or tab->graph()->hover.type == HoverData::Type::PORT_OUT) {
+		if (tab->graph()->hover.type == HoverData::Type::ModulePortIn or tab->graph()->hover.type == HoverData::Type::ModulePortOut) {
 			auto pp = static_cast<SignalEditorModulePort*>(tab->graph()->hover.node);
 			if ((pp->module != port->module) and (pp->is_out != port->is_out) and (pp->type == port->type))
 				target = pp;
@@ -102,7 +102,7 @@ HoverData SignalEditorModulePort::get_hover_data(const vec2 &m) {
 	auto h = HoverData();
 	h.node = this;
 	h.index = index;
-	h.type = is_out ? HoverData::Type::PORT_OUT : HoverData::Type::PORT_IN;
+	h.type = is_out ? HoverData::Type::ModulePortOut : HoverData::Type::ModulePortIn;
 	return h;
 }
 

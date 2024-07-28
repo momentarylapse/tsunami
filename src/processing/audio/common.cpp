@@ -41,7 +41,7 @@ float max_abs(const Array<complex> &z) {
 namespace tsunami {
 
 void apply_window_function(Array<float> &data, WindowFunction wf) {
-	if (wf == WindowFunction::HANN) {
+	if (wf == WindowFunction::Hann) {
 		for (int k=0; k<data.num; k++) {
 			float s = sin((float)k * pi / (data.num - 1));
 			data[k] *= s*s * 2;

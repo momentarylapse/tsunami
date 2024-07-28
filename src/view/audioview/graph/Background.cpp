@@ -20,8 +20,8 @@ scenegraph::MouseDelayAction* CreateMouseDelaySelect(AudioView *v, SelectionMode
 
 Background::Background(AudioView *_view) : scenegraph::NodeFree() {
 	view = _view;
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("background");
 }
 

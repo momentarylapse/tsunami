@@ -31,8 +31,8 @@ class TabBarButton : public scenegraph::Node {
 public:
 	TabBarButton(MainView *_main_view, MainViewNode* _view) {
 		align.w = 200;
-		align.horizontal = AlignData::Mode::LEFT;
-		align.vertical = AlignData::Mode::FILL;
+		align.horizontal = AlignData::Mode::Left;
+		align.vertical = AlignData::Mode::Fill;
 		set_perf_name("button");
 		main_view = _main_view;
 		view = _view;
@@ -70,8 +70,8 @@ class TabBar : public scenegraph::HBox {
 public:
 	TabBar(MainView *_main_view) {
 		align.h = TAB_BAR_HEIGHT;
-		align.horizontal = AlignData::Mode::FILL;
-		align.vertical = AlignData::Mode::TOP;
+		align.horizontal = AlignData::Mode::Fill;
+		align.vertical = AlignData::Mode::Top;
 		set_perf_name("tabbar");
 		main_view = _main_view;
 	}
@@ -84,8 +84,8 @@ public:
 		children.clear();
 		auto dummy = new Node;
 		dummy->align.w = 80;
-		dummy->align.horizontal = AlignData::Mode::LEFT;
-		dummy->align.vertical = AlignData::Mode::FILL;
+		dummy->align.horizontal = AlignData::Mode::Left;
+		dummy->align.vertical = AlignData::Mode::Fill;
 		add_child(dummy);
 		for (auto v: weak(main_view->views))
 			add_child(new TabBarButton(main_view, v));
@@ -137,18 +137,18 @@ MainView::MainView(Session *_session, const string &_id) {
 	scene_graph->add_child(new ToolTipOverlay);
 
 	// TODO move "OnScreenDisplay"?
-	peak_meter_display = new PeakMeterDisplay(session->playback->peak_meter.get(), PeakMeterDisplay::Mode::BOTH);
+	peak_meter_display = new PeakMeterDisplay(session->playback->peak_meter.get(), PeakMeterDisplay::Mode::Both);
 	peak_meter_display->align.dx = 90;
 	peak_meter_display->align.dy = -20;
-	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
-	peak_meter_display->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
+	peak_meter_display->align.horizontal = scenegraph::Node::AlignData::Mode::Left;
+	peak_meter_display->align.vertical = scenegraph::Node::AlignData::Mode::Bottom;
 	peak_meter_display->align.dz = 100;
 	peak_meter_display->hidden = true;
 	scene_graph->add_child(peak_meter_display);
 
 	output_volume_dial = new Dial(_("output"), 0, 100);
-	output_volume_dial->align.horizontal = scenegraph::Node::AlignData::Mode::LEFT;
-	output_volume_dial->align.vertical = scenegraph::Node::AlignData::Mode::BOTTOM;
+	output_volume_dial->align.horizontal = scenegraph::Node::AlignData::Mode::Left;
+	output_volume_dial->align.vertical = scenegraph::Node::AlignData::Mode::Bottom;
 	output_volume_dial->align.dx = 230;
 	output_volume_dial->align.dy = 0;
 	output_volume_dial->align.dz = 100;

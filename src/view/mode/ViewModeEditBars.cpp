@@ -140,7 +140,7 @@ void ViewModeEditBars::on_key_down(int k) {
 	} else if (edit_mode == EditMode::AddAndSplit) {
 		if (k == hui::KEY_DELETE) {
 			auto h = view->hover();
-			if (h.type != HoverData::Type::BAR_GAP)
+			if (h.type != HoverData::Type::BarGap)
 				return;
 			int index = h.index;
 			if (index < 1)
@@ -227,7 +227,7 @@ void ViewModeEditBars::draw_post(Painter *p) {
 		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f});
 	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
-		if (h.type == HoverData::Type::BAR_GAP) {
+		if (h.type == HoverData::Type::BarGap) {
 		} else if (cur_vlayer()->is_cur_hover() and (h.pos > 0)) {
 			p->set_line_width(2);
 			p->set_color(theme.green);
@@ -286,7 +286,7 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer, const vec2
 			ViewModeDefault::left_click_handle_void(vlayer, m);
 	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
-		if (h.type == HoverData::Type::BAR_GAP) {
+		if (h.type == HoverData::Type::BarGap) {
 			if (h.index > 0)
 				view->mdp_prepare(new MouseDelayBarGapDnD(view, h.index));
 		} else {

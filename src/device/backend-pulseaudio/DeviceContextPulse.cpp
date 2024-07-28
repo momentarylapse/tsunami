@@ -169,7 +169,7 @@ void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serio
 		d->present = false;
 
 	// system default
-	auto *def = device_manager->get_device_create(DeviceType::AUDIO_OUTPUT, "");
+	auto *def = device_manager->get_device_create(DeviceType::AudioOutput, "");
 	def->channels = 2;
 	def->default_by_lib = true;
 	def->present = true;
@@ -182,7 +182,7 @@ void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serio
 	wait_op(session, op);
 
 	// system default
-	def = device_manager->get_device_create(DeviceType::AUDIO_INPUT, "");
+	def = device_manager->get_device_create(DeviceType::AudioInput, "");
 	def->channels = 2;
 	def->default_by_lib = true;
 	def->present = true;
@@ -248,7 +248,7 @@ void DeviceContextPulse::sink_info_callback(pa_context *c, const pa_sink_info *i
 	//printf("output  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	Device d;
-	d.type = DeviceType::AUDIO_OUTPUT;
+	d.type = DeviceType::AudioOutput;
 	d.internal_name = i->name;
 	d.index_in_lib = (int)i->index;
 	d.name = i->description;
@@ -267,7 +267,7 @@ void DeviceContextPulse::source_info_callback(pa_context *c, const pa_source_inf
 	//printf("input  %s ||  %s   %d   %d\n", i->name, i->description, i->index, i->channel_map.channels);
 
 	Device d;
-	d.type = DeviceType::AUDIO_INPUT;
+	d.type = DeviceType::AudioInput;
 	d.internal_name = i->name;
 	d.index_in_lib = (int)i->index;
 	d.name = i->description;

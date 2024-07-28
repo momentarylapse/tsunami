@@ -29,7 +29,7 @@ static void dbo(const string &s) {
 // https://www.recordingblogs.com/wiki/midi-meta-messages
 
 FormatDescriptorMidi::FormatDescriptorMidi() :
-	FormatDescriptor("Midi", "mid,midi", Flag::MIDI | Flag::MULTITRACK | Flag::READ | Flag::WRITE)
+	FormatDescriptor("Midi", "mid,midi", Flag::Midi | Flag::Multitrack | Flag::Read | Flag::Write)
 {
 }
 

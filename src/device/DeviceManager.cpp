@@ -109,7 +109,7 @@ DeviceManager::DeviceManager(Session *_session) {
 	audio_api = ApiType::DUMMY;
 	midi_api = ApiType::DUMMY;
 
-	dummy_device = new Device(DeviceType::NONE, "dummy");
+	dummy_device = new Device(DeviceType::None, "dummy");
 
 	output_volume = 0;
 	hui_rep_id = -1;
@@ -230,9 +230,9 @@ void DeviceManager::init() {
 		hui::config.migrate("Output.Devices[" + d.name + "]", "Devices.Output[" + d.name + "]");
 		hui::config.migrate("Input.Devices[" + d.name + "]", "Devices.Input[" + d.name + "]");
 		hui::config.migrate("MidiInput.Devices[" + d.name + "]", "Devices.MidiInput[" + d.name + "]");
-		migrate_dev_config("Devices.Output[" + d.name + "]", DeviceType::AUDIO_OUTPUT);
-		migrate_dev_config("Devices.Input[" + d.name + "]", DeviceType::AUDIO_INPUT);
-		migrate_dev_config("Devices.MidiInput[" + d.name + "]", DeviceType::MIDI_INPUT);
+		migrate_dev_config("Devices.Output[" + d.name + "]", DeviceType::AudioOutput);
+		migrate_dev_config("Devices.Input[" + d.name + "]", DeviceType::AudioInput);
+		migrate_dev_config("Devices.MidiInput[" + d.name + "]", DeviceType::MidiInput);
 	}
 	hui::config.migrate("Output.Volume", "Devices.OutputVolume");
 
@@ -248,9 +248,9 @@ void DeviceManager::init() {
 
 
 
-	output_devices = parse_devs(hui::config.get("Devices.Output[" + audio_api_name + "]"), DeviceType::AUDIO_OUTPUT);
-	input_devices = parse_devs(hui::config.get("Devices.Input[" + audio_api_name + "]"), DeviceType::AUDIO_INPUT);
-	midi_input_devices = parse_devs(hui::config.get("Devices.MidiInput[" + midi_api_name + "]"), DeviceType::MIDI_INPUT);
+	output_devices = parse_devs(hui::config.get("Devices.Output[" + audio_api_name + "]"), DeviceType::AudioOutput);
+	input_devices = parse_devs(hui::config.get("Devices.Input[" + audio_api_name + "]"), DeviceType::AudioInput);
+	midi_input_devices = parse_devs(hui::config.get("Devices.MidiInput[" + midi_api_name + "]"), DeviceType::MidiInput);
 
 	output_volume = 1;
 	//output_volume = hui::Config.get_float("Devices.OutputVolume", 1.0f);
@@ -342,11 +342,11 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 }
 
 Array<Device*> &DeviceManager::device_list(DeviceType type) {
-	if (type == DeviceType::AUDIO_OUTPUT)
+	if (type == DeviceType::AudioOutput)
 		return output_devices;
-	if (type == DeviceType::AUDIO_INPUT)
+	if (type == DeviceType::AudioInput)
 		return input_devices;
-	if (type == DeviceType::MIDI_INPUT)
+	if (type == DeviceType::MidiInput)
 		return midi_input_devices;
 	return empty_device_list;
 }

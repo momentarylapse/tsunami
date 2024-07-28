@@ -24,7 +24,7 @@ public:
 
 	void _set_drum(int no, float freq, float volume, float attack, float release);
 
-	EnvelopeADSR env[MAX_PITCH];
+	EnvelopeADSR env[MaxPitch];
 };
 
 }

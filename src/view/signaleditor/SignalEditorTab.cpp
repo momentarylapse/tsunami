@@ -36,8 +36,8 @@ public:
 	SignalChain *chain;
 	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, -32}, 45, 45) {
 		align.dz = 30;
-		align.horizontal = AlignData::Mode::RIGHT;
-		align.vertical = AlignData::Mode::BOTTOM;
+		align.horizontal = AlignData::Mode::Right;
+		align.vertical = AlignData::Mode::Bottom;
 		set_perf_name("button");
 		tab = t;
 		chain = tab->chain;
@@ -80,8 +80,8 @@ public:
 	SignalChain *chain;
 	SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, 32}, 45, 45) {
 		align.dz = 30;
-		align.horizontal = AlignData::Mode::RIGHT;
-		align.vertical = AlignData::Mode::TOP;
+		align.horizontal = AlignData::Mode::Right;
+		align.vertical = AlignData::Mode::Top;
 		set_perf_name("button");
 		tab = t;
 		chain = tab->chain;

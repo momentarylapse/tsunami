@@ -28,8 +28,8 @@ public:
 	void on_close();
 
 	enum class Mode {
-		TEXT,
-		KEY
+		Text,
+		Key
 	} mode;
 
 	TrackLayer *layer;

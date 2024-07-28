@@ -324,13 +324,13 @@ void TrackRenderer::render_audio_versioned(AudioBuffer &buf) {
 
 			// fade
 			if (r.overlaps(cur)) {
-				if (f.mode == f.INWARD)
+				if (f.mode == f.Inward)
 					add_fade_in(l, r, buf, cur);
 				else
 					add_fade_out(l, r, buf, cur);
 			}
 			
-			prev_active = (f.mode == f.INWARD);
+			prev_active = (f.mode == f.Inward);
 			prev_end = f.range().end();
 		}
 		

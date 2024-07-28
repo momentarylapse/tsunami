@@ -15,11 +15,11 @@ namespace tsunami {
 
 class RingBuffer {
 public:
-	RingBuffer(int size);
+	explicit RingBuffer(int size);
 	~RingBuffer();
 
-	void _cdecl __init__(int size);
-	void _cdecl __delete__();
+	void __init__(int size);
+	void __delete__();
 
 	// internal
 	void _move_read_pos(int delta);
@@ -32,10 +32,10 @@ public:
 	int write(const AudioBuffer &b);
 
 	enum class PeekMode {
-		FORWARD_REF,
-		FORWARD_COPY_WRAP,
-		BACKWARD_REF,
-		BACKWARD_COPY_WRAP,
+		ForwardRef,
+		ForwardCopyWrap,
+		BackwardRef,
+		BackwardCopyWrap,
 	};
 
 	void read_ref(AudioBuffer &b, int size);

@@ -32,7 +32,7 @@ enum class ChordType;
 
 class ViewModeEditMidi : public ViewModeDefault {
 public:
-	ViewModeEditMidi(AudioView *view);
+	explicit ViewModeEditMidi(AudioView *view);
 
 	void on_start() override;
 	void on_end() override;
@@ -82,18 +82,18 @@ public:
 	MidiMode mode_wanted;
 
 	enum class CreationMode {
-		SELECT,
-		NOTE,
-		INTERVAL,
-		CHORD
+		Select,
+		Note,
+		Interval,
+		Chord
 	};
 	void set_creation_mode(CreationMode mode);
 	CreationMode creation_mode;
 
 	enum class InputMode {
-		DEFAULT,
-		NOTE_LENGTH,
-		BEAT_PARTITION
+		Default,
+		NoteLength,
+		BeatPartition
 	};
 	void set_input_mode(InputMode mode);
 	InputMode input_mode;

@@ -17,7 +17,7 @@ HoverData::HoverData() {
 }
 
 bool HoverData::allow_auto_scroll() const {
-	return (type == Type::SAMPLE) or (type == Type::PLAYBACK_CURSOR) or (type == Type::MIDI_PITCH) or (type == Type::CLEF_POSITION);
+	return (type == Type::Sample) or (type == Type::PlaybackCursor) or (type == Type::MidiPitch) or (type == Type::ClefPosition);
 }
 
 Track *HoverData::track() const {
@@ -39,7 +39,7 @@ TrackLayer *HoverData::layer() const {
 }
 
 void HoverData::clear() {
-	type = Type::NONE;
+	type = Type::None;
 	node = nullptr;
 	vlayer = nullptr;
 	sample = nullptr;

@@ -205,7 +205,7 @@ void Session::set_mode(const string &_mode) {
 		} else if (mode == EditMode::DefaultTrackSynth) {
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::TrackConsole);
-			win->side_bar->track_console->set_mode(TrackConsole::Mode::SYNTH);
+			win->side_bar->track_console->set_mode(TrackConsole::Mode::Synth);
 		} else if (mode == EditMode::DefaultSong) {
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::SongConsole);

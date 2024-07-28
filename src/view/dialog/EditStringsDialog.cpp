@@ -50,10 +50,10 @@ void EditStringsDialog::update() {
 			event("add_" + id, [this] { on_add(); });
 
 			// reverse order list... nicer gui
-			for (int p=MAX_PITCH-1; p>=0; p--)
+			for (int p=MaxPitch-1; p>=0; p--)
 				set_string(id, pitch_name(p));
 		}
-		set_int(id, MAX_PITCH - 1 - t);
+		set_int(id, MaxPitch - 1 - t);
 	}
 
 	gui_num_strings = strings.num;
@@ -67,7 +67,7 @@ void EditStringsDialog::on_ok() {
 void EditStringsDialog::on_edit() {
 	string id = hui::get_event()->id;
 	int n = id.sub(6)._int();
-	int p = MAX_PITCH - 1 - get_int(id);
+	int p = MaxPitch - 1 - get_int(id);
 	strings[n] = p;
 }
 

@@ -38,8 +38,8 @@ private:
 	float min_slider_lin, max_slider_lin;
 	float min_slider_db, max_slider_db;
 	enum Mode {
-		PERCENT,
-		DB
+		Percent,
+		Db
 	};
 	Mode mode;
 	void set_mode(Mode m);
@@ -49,9 +49,9 @@ private:
 	float get_slider() const;
 
 
-	static constexpr float DB_MIN = -1000000;
-	static constexpr float DB_MAX = 12;
-	static constexpr float TAN_SCALE = 13.0f;
+	static constexpr float DbMin = -1000000;
+	static constexpr float DbMax = 12;
+	static constexpr float TanScale = 13.0f;
 
 	float db2slider(float db) const;
 	float slider2db(float val) const;

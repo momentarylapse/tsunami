@@ -49,7 +49,7 @@ NewTrackDialog::NewTrackDialog(hui::Window *_parent, Session *s, SignalType init
 	session = s;
 	on_type(initial_type);
 	check("channels:mono", true);
-	instrument = Instrument(Instrument::Type::PIANO);
+	instrument = Instrument(Instrument::Type::Piano);
 
 	instrument_list = base::sorted(Instrument::enumerate(), [] (const Instrument &a, const Instrument &b) { return a.name() <= b.name(); });
 	for (auto &i: instrument_list) {

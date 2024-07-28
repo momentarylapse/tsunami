@@ -13,16 +13,16 @@
 namespace tsunami {
 
 static string list_id(DeviceType type) {
-	if (type == DeviceType::AUDIO_OUTPUT)
+	if (type == DeviceType::AudioOutput)
 		return "output-list";
-	if (type == DeviceType::AUDIO_INPUT)
+	if (type == DeviceType::AudioInput)
 		return "input-list";
-	if (type == DeviceType::MIDI_INPUT)
+	if (type == DeviceType::MidiInput)
 		return "midi-input-list";
 	return "?";
 }
 
-static const Array<DeviceType> LIST_TYPE = {DeviceType::AUDIO_OUTPUT, DeviceType::AUDIO_INPUT, DeviceType::MIDI_INPUT};
+static const Array<DeviceType> LIST_TYPE = {DeviceType::AudioOutput, DeviceType::AudioInput, DeviceType::MidiInput};
 
 DeviceConsole::DeviceConsole(Session *session, BottomBar *bar) :
 	BottomBar::Console(_("Devices"), "device-console", session, bar)
@@ -97,7 +97,7 @@ string DeviceConsole::to_format(const Device *d) {
 		infos.add("missing");
 	if (!d->visible)
 		infos.add("ignored");
-	if (d->type == DeviceType::AUDIO_OUTPUT or d->type == DeviceType::AUDIO_INPUT)
+	if (d->type == DeviceType::AudioOutput or d->type == DeviceType::AudioInput)
 		infos.add(format("%d channels", d->channels));
 	string info = pre + implode(infos, ", ") + post;
 	return format("%s\\%s\\%s\n<small>    %s</small>", index, status_icon, name, info);

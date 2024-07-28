@@ -36,14 +36,14 @@ void sort_nodes_down(Array<Node*> &nodes) {
 
 
 Node::Node() : Node(0, 0) {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 }
 
 Node::Node(float w, float h) {
 	//msg_write("new Node " + p2s(this));
-	align.horizontal = AlignData::Mode::NONE;
-	align.vertical = AlignData::Mode::NONE;
+	align.horizontal = AlignData::Mode::None;
+	align.vertical = AlignData::Mode::None;
 	align.dx = 0;
 	align.dy = 0;
 	align.w = w;
@@ -120,24 +120,24 @@ string Node::get_tip() const {
 }
 
 void Node::update_geometry(const rect &target_area) {
-	if (align.horizontal == AlignData::Mode::FILL) {
+	if (align.horizontal == AlignData::Mode::Fill) {
 		area.x1 = target_area.x1;
 		area.x2 = target_area.x2;
-	} else if (align.horizontal == AlignData::Mode::LEFT) {
+	} else if (align.horizontal == AlignData::Mode::Left) {
 		area.x1 = target_area.x1 + align.dx;
 		area.x2 = area.x1 + align.w;
-	} else if (align.horizontal == AlignData::Mode::RIGHT) {
+	} else if (align.horizontal == AlignData::Mode::Right) {
 		area.x2 = target_area.x2 + align.dx;
 		area.x1 = area.x2 - align.w;
 	}
 
-	if (align.vertical == AlignData::Mode::FILL) {
+	if (align.vertical == AlignData::Mode::Fill) {
 		area.y1 = target_area.y1;
 		area.y2 = target_area.y2;
-	} else if (align.vertical == AlignData::Mode::TOP) {
+	} else if (align.vertical == AlignData::Mode::Top) {
 		area.y1 = target_area.y1 + align.dy;
 		area.y2 = area.y1 + align.h;
-	} else if (align.vertical == AlignData::Mode::BOTTOM) {
+	} else if (align.vertical == AlignData::Mode::Bottom) {
 		area.y2 = target_area.y2 + align.dy;
 		area.y1 = area.y2 - align.h;
 	}
@@ -231,17 +231,17 @@ NodeFree::NodeFree() : Node(0, 0) {
 }
 
 NodeRel::NodeRel(const vec2 &d, float w, float h) : Node(w, h) {
-	align.horizontal = AlignData::Mode::LEFT;
+	align.horizontal = AlignData::Mode::Left;
 	align.dx = d.x;
-	align.vertical = AlignData::Mode::TOP;
+	align.vertical = AlignData::Mode::Top;
 	align.dy = d.y;
 }
 
 
 
 HBox::HBox() {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("hbox");
 }
 
@@ -255,7 +255,7 @@ void HBox::update_geometry_recursive(const rect &target_area) {
 	for (auto *c: weak(children)) {
 		if (c->hidden)
 			continue;
-		if (c->align.horizontal == AlignData::Mode::FILL)
+		if (c->align.horizontal == AlignData::Mode::Fill)
 			n_expand ++;
 		else
 			w_min += c->align.w;
@@ -263,7 +263,7 @@ void HBox::update_geometry_recursive(const rect &target_area) {
 	float offset = 0;
 	for (auto *c: weak(children)) {
 		float w = c->align.w;
-		if (c->align.horizontal == AlignData::Mode::FILL)
+		if (c->align.horizontal == AlignData::Mode::Fill)
 			w = (w_avail - w_min) / n_expand;
 		if (c->hidden)
 			w = 0;
@@ -273,8 +273,8 @@ void HBox::update_geometry_recursive(const rect &target_area) {
 }
 
 VBox::VBox() {
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("vbox");
 }
 
@@ -288,7 +288,7 @@ void VBox::update_geometry_recursive(const rect &target_area) {
 	for (auto *c: weak(children)) {
 		if (c->hidden)
 			continue;
-		if (c->align.vertical == AlignData::Mode::FILL)
+		if (c->align.vertical == AlignData::Mode::Fill)
 			n_expand ++;
 		else
 			h_min += c->align.h;
@@ -296,7 +296,7 @@ void VBox::update_geometry_recursive(const rect &target_area) {
 	float offset = 0;
 	for (auto *c: weak(children)) {
 		float h = c->align.h;
-		if (c->align.vertical == AlignData::Mode::FILL)
+		if (c->align.vertical == AlignData::Mode::Fill)
 			h = (h_avail - h_min) / n_expand;
 		if (c->hidden)
 			h = 0;

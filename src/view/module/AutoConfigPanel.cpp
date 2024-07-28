@@ -283,7 +283,7 @@ public:
 		p->set_tooltip(id_mode, _("mode: frequency/pitch"));
 		p->set_target(id_grid);
 		p->add_combo_box("!width=150,expandx", 0, 0, id);
-		for (int j=0; j<MAX_PITCH; j++)
+		for (int j=0; j<MaxPitch; j++)
 			p->add_string(id, pitch_name(j));
 		p->add_spin_button("!range=0:10000:0.1,expandx", 1, 0, id_freq);
 		p->add_label("Hz", 2, 0, id_hz);
@@ -521,14 +521,14 @@ public:
 		session = _session;
 		value = nullptr;
 		panel = nullptr;
-		type = DeviceType::AUDIO_OUTPUT;
+		type = DeviceType::AudioOutput;
 	}
 	void parse(const string &s) override {
-		type = DeviceType::AUDIO_OUTPUT;
+		type = DeviceType::AudioOutput;
 		if (s == "audio:input")
-			type = DeviceType::AUDIO_INPUT;
+			type = DeviceType::AudioInput;
 		if (s == "midi:input")
-			type = DeviceType::MIDI_INPUT;
+			type = DeviceType::MidiInput;
 	}
 	void update_list() {
 		list = session->device_manager->good_device_list(type);

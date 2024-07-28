@@ -15,11 +15,11 @@ class Any;
 namespace tsunami {
 
 enum class DeviceType {
-	AUDIO_OUTPUT,
-	AUDIO_INPUT,
-	MIDI_OUTPUT,
-	MIDI_INPUT,
-	NONE = -1
+	AudioOutput,
+	AudioInput,
+	MidiOutput,
+	MidiInput,
+	None = -1
 };
 
 class Device {

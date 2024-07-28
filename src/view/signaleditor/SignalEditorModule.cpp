@@ -174,7 +174,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 	} else {
 		p->set_color(theme.text_soft1);
 	}
-	draw_str_constrained(p, area.center() - vec2(0, p->font_size/2), area.width() - 12, title, TextAlign::CENTER);
+	draw_str_constrained(p, area.center() - vec2(0, p->font_size/2), area.width() - 12, title, TextAlign::Center);
 	p->set_font("", theme.FONT_SIZE, false, false);
 
 }

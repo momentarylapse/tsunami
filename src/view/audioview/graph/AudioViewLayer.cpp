@@ -65,7 +65,7 @@ public:
 	AudioViewLayer *vlayer;
 	LayerScrollBar(AudioViewLayer *l) {
 		vlayer = l;
-		align.horizontal = AlignData::Mode::RIGHT;
+		align.horizontal = AlignData::Mode::Right;
 		hidden = true;
 	}
 	HoverData get_hover_data(const vec2 &m) override {
@@ -77,7 +77,7 @@ public:
 
 
 AudioViewLayer::AudioViewLayer(AudioView *_view, TrackLayer *_layer) : scenegraph::NodeFree() {
-	align.horizontal = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
 	view = _view;
 	layer = _layer;
 	solo = false;
@@ -299,7 +299,7 @@ void AudioViewLayer::draw_markers(Painter *c, const Array<TrackMarker*> &markers
 void AudioViewLayer::draw_marker_group(Painter *c, const Array<TrackMarker*> &markers, HoverData &hover) {
 	Range group_range = Range::to(markers[0]->range.start(), markers.back()->range.end());
 	foreachi(auto *m, markers, i)
-		draw_marker(c, m, (hover.type == HoverData::Type::MARKER) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
+		draw_marker(c, m, (hover.type == HoverData::Type::Marker) and (hover.marker == m), group_range, i == 0, i == markers.num-1);
 }
 
 float marker_alpha_factor(float w, float w_group, bool border) {
@@ -423,7 +423,7 @@ void AudioViewLayer::draw_fades(Painter *c) {
 		c->draw_line({x1, area.y1}, {x1, area.y2});
 		c->draw_line({x2, area.y1}, {x2, area.y2});
 
-		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.INWARD, 50);
+		draw_flare(c, x1, x2, area.y1, area.y2, f.mode == f.Inward, 50);
 	}
 	c->set_line_width(1);
 }
@@ -431,7 +431,7 @@ void AudioViewLayer::draw_fades(Painter *c) {
 
 void AudioViewLayer::set_edit_pitch_min_max(float _min, float _max) {
 	float diff = _max - _min;
-	edit_pitch_min = clamp(_min, 0.0f, MAX_PITCH - diff);
+	edit_pitch_min = clamp(_min, 0.0f, MaxPitch - diff);
 	edit_pitch_max = edit_pitch_min + diff;
 	request_redraw();
 }
@@ -536,8 +536,8 @@ bool AudioViewLayer::on_left_button_down(const vec2 &m) {
 bool AudioViewLayer::allow_handle_click_when_gaining_focus() const {
 	if (view->mode == view->mode_edit)
 		if (view->mode_edit->mode == view->mode_edit_midi)
-			if (view->hover().type == HoverData::Type::MIDI_PITCH)
-				if (view->mode_edit_midi->creation_mode != ViewModeEditMidi::CreationMode::SELECT)
+			if (view->hover().type == HoverData::Type::MidiPitch)
+				if (view->mode_edit_midi->creation_mode != ViewModeEditMidi::CreationMode::Select)
 					return true;
 	if (view->mode == view->mode_curve)
 		if (this == view->cur_vlayer())
@@ -595,7 +595,7 @@ bool AudioViewLayer::on_right_button_down(const vec2 &m) {
 		view->open_popup(view->menu_bar.get());
 	} else if (h.marker) {
 		view->open_popup(view->menu_marker.get());
-	} else if (h.type == HoverData::Type::BAR_GAP) {
+	} else if (h.type == HoverData::Type::BarGap) {
 		view->open_popup(view->menu_bar_gap.get());
 	} else if (hover_buffer(h) >= 0) {
 		view->open_popup(view->menu_buffer.get());
@@ -620,7 +620,7 @@ string AudioViewLayer::get_tip() const {
 		else
 			return _("bar ") + h.bar->format_beats() + format(u8" \u2669=%.1f", h.bar->bpm(view->song->sample_rate));
 	}
-	if (h.type == HoverData::Type::BAR_GAP)
+	if (h.type == HoverData::Type::BarGap)
 		return _("bar gap");
 	if (h.note)
 		return _("note ") + pitch_name(h.note->pitch) + format(" %.0f%%", h.note->volume * 100);
@@ -635,7 +635,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	auto s = view->hover_time(m);
 	s.vlayer = this;
 	s.node = this;
-	s.type = HoverData::Type::LAYER;
+	s.type = HoverData::Type::Layer;
 
 	// markers
 	for (int i=0; i<min(layer->markers.num, marker_areas.num); i++) {
@@ -643,7 +643,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 		if (marker_areas.contains(mm) and marker_label_areas.contains(mm))
 			if (marker_areas[mm].inside(m) or marker_label_areas[mm].inside(m)) {
 				s.marker = mm;
-				s.type = HoverData::Type::MARKER;
+				s.type = HoverData::Type::Marker;
 				return s;
 			}
 	}
@@ -653,7 +653,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 		int offset = view->mouse_over_sample(ss);
 		if (offset >= 0) {
 			s.sample = ss;
-			s.type = HoverData::Type::SAMPLE;
+			s.type = HoverData::Type::Sample;
 			return s;
 		}
 	}
@@ -670,7 +670,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 				//b.range.
 				s.bar = b;
 				s.index = b->index;
-				s.type = HoverData::Type::BAR;
+				s.type = HoverData::Type::Bar;
 				return s;
 			}
 		}
@@ -682,7 +682,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 				float x = view->cam.sample2screen(offset);
 				if (fabs(x - m.x) < view->SNAPPING_DIST) {
 					s.index = i;
-					s.type = HoverData::Type::BAR_GAP;
+					s.type = HoverData::Type::BarGap;
 					s.pos = offset;
 					return s;
 				}

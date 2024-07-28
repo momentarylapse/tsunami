@@ -153,9 +153,9 @@ void SelectionMarker::on_draw(Painter* p) {
 
 
 	// bar gap selection
-	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
+	if (view->cur_selection.type == HoverData::Type::BarGap)
 		draw_bar_gap_selector(p, view->cur_selection.index, theme.text_soft1);
-	if (hover.type == HoverData::Type::BAR_GAP)
+	if (hover.type == HoverData::Type::BarGap)
 		draw_bar_gap_selector(p, view->hover().index, theme.hover);
 }
 

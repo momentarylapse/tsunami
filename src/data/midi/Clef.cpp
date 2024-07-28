@@ -12,20 +12,18 @@
 
 namespace tsunami {
 
-const Clef Clef::_TREBLE(Clef::Type::TREBLE, u8"\U0001d11e", 5*7-5);
-const Clef Clef::_TREBLE_8(Clef::Type::TREBLE_8, u8"\U0001d120", 4*7-5);
-const Clef Clef::_BASS(Clef::Type::BASS, u8"\U0001d122", 3*7-3);
-const Clef Clef::_BASS_8(Clef::Type::BASS_8, u8"\U0001d124", 2*7-3);
-const Clef Clef::_DRUMS(Clef::Type::DRUMS, u8"\U0001d125", 0);
+const Clef Clef::Treble(ClefType::Treble, u8"\U0001d11e", 5*7-5);
+const Clef Clef::Treble8(ClefType::Treble8, u8"\U0001d120", 4*7-5);
+const Clef Clef::Bass(ClefType::Bass, u8"\U0001d122", 3*7-3);
+const Clef Clef::Bass8(ClefType::Bass8, u8"\U0001d124", 2*7-3);
+const Clef Clef::Drums(ClefType::Drums, u8"\U0001d125", 0);
 
-struct DrumClefPosition
-{
+struct DrumClefPosition {
 	int pitch, clef_pos;
 	NoteModifier modifier;
 };
-const int NUM_DRUM_CLEF_POSITIONS = 19;
-const DrumClefPosition DrumClefPositions[NUM_DRUM_CLEF_POSITIONS] =
-{
+static constexpr int NumDrumClefPositions = 19;
+const DrumClefPosition DrumClefPositions[NumDrumClefPositions] = {
 	// drums
 	{DrumPitch::Bass, 1, NoteModifier::None}, // "F"
 	{DrumPitch::BassAccoustic, 1, NoteModifier::None},
@@ -62,19 +60,17 @@ const DrumClefPosition DrumClefPositions[NUM_DRUM_CLEF_POSITIONS] =
 */
 
 
-Clef::Clef(int _type, const string &_symbol, int _offset)
-{
+Clef::Clef(ClefType _type, const string &_symbol, int _offset) {
 	type = _type;
 	symbol = _symbol;
 	offset = _offset;
 }
 
 // TODO account for scale!
-int Clef::pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) const
-{
-	if (type == Type::DRUMS){
-		for (int i=0; i<NUM_DRUM_CLEF_POSITIONS; i++)
-			if (pitch == DrumClefPositions[i].pitch){
+int Clef::pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) const {
+	if (type == ClefType::Drums) {
+		for (int i=0; i<NumDrumClefPositions; i++)
+			if (pitch == DrumClefPositions[i].pitch) {
 				modifier = DrumClefPositions[i].modifier;
 				return DrumClefPositions[i].clef_pos;
 			}
@@ -92,10 +88,9 @@ int Clef::pitch_to_position(int pitch, const Scale &s, NoteModifier &modifier) c
 	return pp[rel] + 7 * octave - offset;
 }
 
-int Clef::position_to_pitch(int pos, const Scale &s, NoteModifier mod) const
-{
-	if (type == Type::DRUMS){
-		for (int i=0; i<NUM_DRUM_CLEF_POSITIONS; i++)
+int Clef::position_to_pitch(int pos, const Scale &s, NoteModifier mod) const {
+	if (type == ClefType::Drums){
+		for (int i=0; i<NumDrumClefPositions; i++)
 			if ((pos == DrumClefPositions[i].clef_pos) and (mod == DrumClefPositions[i].modifier))
 				return DrumClefPositions[i].pitch;
 		return 70;//DrumPitch::BASS;
@@ -103,8 +98,7 @@ int Clef::position_to_pitch(int pos, const Scale &s, NoteModifier mod) const
 	return s.transform_out(position_to_uniclef(pos), mod);
 }
 
-int Clef::position_to_uniclef(int pos) const
-{
+int Clef::position_to_uniclef(int pos) const {
 	return pos + offset;
 }
 

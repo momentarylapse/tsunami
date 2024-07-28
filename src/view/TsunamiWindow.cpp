@@ -1081,7 +1081,7 @@ void TsunamiWindow::on_quick_export() {
 }
 
 int pref_bar_index(AudioView *view) {
-	if (view->cur_selection.type == HoverData::Type::BAR_GAP)
+	if (view->cur_selection.type == HoverData::Type::BarGap)
 		return view->cur_selection.index;
 	/*if (view->cur_selection.bar)
 		return view->cur_selection.index + 1;*/

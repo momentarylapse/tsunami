@@ -19,7 +19,7 @@
 namespace tsunami {
 
 FormatDescriptorRaw::FormatDescriptorRaw() :
-	FormatDescriptor("Raw audio data", "raw", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::READ | Flag::WRITE) {}
+	FormatDescriptor("Raw audio data", "raw", Flag::Audio | Flag::SingleTrack | Flag::Read | Flag::Write) {}
 
 
 bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {

@@ -20,7 +20,7 @@ class TrackLayer;
 
 class ViewModeScaleMarker : public ViewModeDefault {
 public:
-	ViewModeScaleMarker(AudioView *view);
+	explicit ViewModeScaleMarker(AudioView *view);
 
 	void on_start() override;
 

@@ -67,7 +67,7 @@ public:
 			view->hover().y0 = view->mdp()->y0;
 		view->hover().y1 = m.y;
 		view->selection_mode = mode;
-		view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
+		view->hover().type = view->cur_selection.type = HoverData::Type::Time; // ignore BAR_GAP!
 		//view->hide_selection = (mode == SelectionMode::RECT);
 		view->set_selection(view->mode->get_selection(range, mode));
 	}
@@ -205,7 +205,7 @@ void ViewModeDefault::left_click_handle_void_or(AudioViewLayer *vlayer, const ve
 	view->hover().y0 = view->cur_vlayer()->area.center().y;
 	view->hover().y1 = m.y;
 	view->selection_mode = SelectionMode::TrackRect;
-	view->hover().type = view->cur_selection.type = HoverData::Type::TIME; // ignore BAR_GAP!
+	view->hover().type = view->cur_selection.type = HoverData::Type::Time; // ignore BAR_GAP!
 
 	view->set_selection(view->mode->get_selection(range, SelectionMode::TrackRect));
 	start_selection_rect(SelectionMode::TrackRect, true);
@@ -234,7 +234,7 @@ void ViewModeDefault::left_click_handle_object(AudioViewLayer *vlayer, const vec
 
 	// start drag'n'drop?
 	//if ((hover->type == Selection::Type::SAMPLE) or (hover->type == Selection::Type::MARKER) or (hover->type == Selection::Type::MIDI_NOTE)){
-	view->mdp_prepare(CreateMouseDelayObjectsDnD(vlayer, view->sel.filter(SongSelection::Mask::MARKERS | SongSelection::Mask::SAMPLES | SongSelection::Mask::MIDI_NOTES)));
+	view->mdp_prepare(CreateMouseDelayObjectsDnD(vlayer, view->sel.filter(SongSelection::Mask::Markers | SongSelection::Mask::Samples | SongSelection::Mask::MidiNotes)));
 		//}
 }
 

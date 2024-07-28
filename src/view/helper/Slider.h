@@ -19,12 +19,12 @@ public:
 	using Callback = std::function<void(float)>;
 
 	Slider(hui::Panel *_panel, const string &_id_slider, const string &_id_edit);
-	~Slider();
+	~Slider() override;
 
 	obs::xsource<float> out_value{this, "value"};
 
 	void __init_ext__(hui::Panel *_panel, const string &_id_slider, const string &_id_edit, Callable<void()> *_func);
-	void __delete__();
+	void __delete__() override;
 
 	void set(float value);
 	float get();

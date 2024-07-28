@@ -55,7 +55,7 @@ void MidiInput::feed(const MidiEventBuffer &midi) {
 
 void MidiInput::Config::reset() {
 	free_flow = true;
-	device = _module->session->device_manager->choose_device(DeviceType::MIDI_INPUT);
+	device = _module->session->device_manager->choose_device(DeviceType::MidiInput);
 }
 
 string MidiInput::Config::auto_conf(const string &name) const {

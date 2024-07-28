@@ -37,8 +37,8 @@ shared<Song> create_layer_example_data(bool with_fades) {
 	auto *l1 = t->layers[0].get();
 	auto *l2 = t->add_layer();
 	if (with_fades) {
-		l1->fades = {{5, CrossFade::OUTWARD, 2}, {10, CrossFade::INWARD, 2}, {15, CrossFade::OUTWARD, 2}, {20, CrossFade::INWARD, 2}};
-		l2->fades = {{0, CrossFade::OUTWARD, 2}, {5, CrossFade::INWARD, 2}, {10, CrossFade::OUTWARD, 2}, {15, CrossFade::INWARD, 2}, {20, CrossFade::OUTWARD, 2}, {25, CrossFade::INWARD, 2}};
+		l1->fades = {{5, CrossFade::Outward, 2}, {10, CrossFade::Inward, 2}, {15, CrossFade::Outward, 2}, {20, CrossFade::Inward, 2}};
+		l2->fades = {{0, CrossFade::Outward, 2}, {5, CrossFade::Inward, 2}, {10, CrossFade::Outward, 2}, {15, CrossFade::Inward, 2}, {20, CrossFade::Outward, 2}, {25, CrossFade::Inward, 2}};
 	}
 	return s;
 }

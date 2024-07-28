@@ -17,7 +17,7 @@ struct CaptureTrackData;
 
 class ViewModeCapture : public ViewModeDefault {
 public:
-	ViewModeCapture(AudioView *view);
+	explicit ViewModeCapture(AudioView *view);
 
 	void on_start() override;
 	void on_end() override;

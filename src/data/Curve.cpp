@@ -104,7 +104,7 @@ Array<CurveTarget> CurveTarget::enumerate_type(char *pp, const kaba::Class *t, c
 Curve::Curve() {
 	min = 0;
 	max = 1;
-	type = CurveType::LINEAR;
+	type = CurveType::Linear;
 	temp_value = 0;
 }
 
@@ -120,9 +120,9 @@ float Curve::get(int pos) {
 		if (pos < points[i].pos) {
 			float dv = points[i].value - points[i-1].value;
 			float dp = (float)(points[i].pos - points[i-1].pos);
-			if (type == CurveType::LINEAR)
+			if (type == CurveType::Linear)
 				return points[i-1].value + dv * (pos - points[i-1].pos) / dp;
-			if (type == CurveType::EXPONENTIAL)
+			if (type == CurveType::Exponential)
 				return points[i-1].value * exp(log(abs(points[i].value / points[i-1].value)) * (pos - points[i-1].pos) / dp);
 		}
 	return points.back().value;

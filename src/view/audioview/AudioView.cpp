@@ -109,7 +109,7 @@ public:
 		// hints from current mode (full line at bottom)
 		string tip = view->mode->get_tip();
 		if (tip.num > 0)
-			draw_boxed_str(p, {view->song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::CENTER);
+			draw_boxed_str(p, {view->song_area().center().x, area.y2 - 50}, tip, theme.text_soft1, theme.background_track_selected, TextAlign::Center);
 
 		//static int frame = 0;
 		//c->draw_str(100, 100, i2s(frame++));
@@ -1337,7 +1337,7 @@ void AudioView::playback_click() {
 	if (is_playback_active()) {
 		if (playback_range().is_inside(hover().pos)) {
 			set_playback_pos(hover().pos);
-			hover().type = HoverData::Type::PLAYBACK_CURSOR;
+			hover().type = HoverData::Type::PlaybackCursor;
 			force_redraw();
 		} else {
 			stop();
@@ -1524,7 +1524,7 @@ HoverData AudioView::hover_time(const vec2 &m) {
 	s.pos_snap = get_mouse_pos_snap(m);
 	s.range = Range(s.pos, 0);
 	s.y0 = s.y1 = m.y;
-	s.type = HoverData::Type::TIME;
+	s.type = HoverData::Type::Time;
 	return s;
 }
 

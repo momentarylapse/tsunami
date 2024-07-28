@@ -16,7 +16,7 @@ class TrackLayer;
 
 class ViewModeEditAudio : public ViewModeDefault {
 public:
-	ViewModeEditAudio(AudioView *view);
+	explicit ViewModeEditAudio(AudioView *view);
 
 	void on_start() override;
 	void on_end() override;
@@ -28,11 +28,11 @@ public:
 
 
 	enum class EditMode {
-		SELECT,
-		REMOVE_CLICKS,
-		SMOOTHEN,
-		CLONE,
-		RUBBER,
+		Select,
+		RemoveClicks,
+		Smoothen,
+		Clone,
+		Rubber,
 	};
 	void set_edit_mode(EditMode mode);
 	EditMode edit_mode;

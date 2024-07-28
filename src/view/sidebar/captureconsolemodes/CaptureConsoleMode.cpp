@@ -107,8 +107,8 @@ Device* CaptureConsoleMode::get_source(SignalType type, int i) {
 string shorten(const string &s, int max_length);
 
 void CaptureConsoleMode::update_device_list() {
-	sources_audio = session->device_manager->good_device_list(DeviceType::AUDIO_INPUT);
-	sources_midi = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
+	sources_audio = session->device_manager->good_device_list(DeviceType::AudioInput);
+	sources_midi = session->device_manager->good_device_list(DeviceType::MidiInput);
 
 	for (auto &c: items()) {
 		auto sources = sources_audio;

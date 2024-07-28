@@ -67,7 +67,7 @@ void TestInterpolator::test_fourier() {
 
 void TestInterpolator::test_operator() {
 	BufferInterpolator::Operator op;
-	op.method = BufferInterpolator::Method::LINEAR;
+	op.method = BufferInterpolator::Method::Linear;
 	op.reset(2.0f);
 
 	AudioBuffer buf(1024*8, 2);
@@ -77,7 +77,7 @@ void TestInterpolator::test_operator() {
 
 void TestInterpolator::test_pitch_operator() {
 	BufferPitchShift::Operator op;
-	op.reset(2.0f, BufferInterpolator::Method::LINEAR, 1.0f);
+	op.reset(2.0f, BufferInterpolator::Method::Linear, 1.0f);
 
 	AudioBuffer buf(1024*8, 2);
 	assert_equal(op.process(buf).length, 14336);

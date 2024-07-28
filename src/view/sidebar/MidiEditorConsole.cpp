@@ -36,17 +36,17 @@ namespace tsunami {
 
 
 enum class NoteBaseLength {
-	WHOLE,
-	HALF,
-	QUARTER,
-	EIGTH,
-	SIXTEENTH
+	Whole,
+	Half,
+	Quarter,
+	Eigth,
+	Sixteenth
 };
 
 enum class NoteLengthModifier {
-	NONE,
-	DOTTED,
-	TRIPLET
+	None,
+	Dotted,
+	Triplet
 };
 
 
@@ -62,19 +62,19 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	layer = nullptr;
 	enable("track_name", false);
 
-	event("length-whole", [this] { on_base_length(NoteBaseLength::WHOLE); });
-	event("length-half", [this] { on_base_length(NoteBaseLength::HALF); });
-	event("length-quarter", [this] { on_base_length(NoteBaseLength::QUARTER); });
-	event("length-eighth", [this] { on_base_length(NoteBaseLength::EIGTH); });
-	event("length-sixteenth", [this] { on_base_length(NoteBaseLength::SIXTEENTH); });
+	event("length-whole", [this] { on_base_length(NoteBaseLength::Whole); });
+	event("length-half", [this] { on_base_length(NoteBaseLength::Half); });
+	event("length-quarter", [this] { on_base_length(NoteBaseLength::Quarter); });
+	event("length-eighth", [this] { on_base_length(NoteBaseLength::Eigth); });
+	event("length-sixteenth", [this] { on_base_length(NoteBaseLength::Sixteenth); });
 	event("length-dotted", [this] { on_length_dotted(); });
 	event("length-triplet", [this] { on_length_triplet(); });
 	event("length-custom", [this] { on_length_custom(); });
 
-	event("mode-select", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::SELECT); });
-	event("mode-note", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::NOTE); });
-	event("mode-interval", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::INTERVAL); });
-	event("mode-chord", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::CHORD); });
+	event("mode-select", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::Select); });
+	event("mode-note", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::Note); });
+	event("mode-interval", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::Interval); });
+	event("mode-chord", [this] { mode->set_creation_mode(ViewModeEditMidi::CreationMode::Chord); });
 
 	event("mode-classical", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::Classical); });
 	event("mode-tab", [this] { view->cur_vtrack()->set_midi_mode(MidiMode::Tab); });
@@ -115,12 +115,12 @@ MidiEditorConsole::MidiEditorConsole(Session *session, SideBar *bar) :
 	event("action-source", [this] { on_apply_source(); });
 	event("action-effect", [this] { on_apply_effect(); });
 	event("flag-none", [this] { on_apply_flags(0); });
-	event("flag-trill", [this] { on_apply_flags(NOTE_FLAG_TRILL); });
-	event("flag-staccato", [this] { on_apply_flags(NOTE_FLAG_STACCATO); });
-	event("flag-tenuto", [this] { on_apply_flags(NOTE_FLAG_TENUTO); });
-	event("flag-dead", [this] { on_apply_flags(NOTE_FLAG_DEAD); });
-	event("flag-bend-half", [this] { on_apply_flags(NOTE_FLAG_BEND_HALF); });
-	event("flag-bend-full", [this] { on_apply_flags(NOTE_FLAG_BEND_FULL); });
+	event("flag-trill", [this] { on_apply_flags(NoteFlag::Trill); });
+	event("flag-staccato", [this] { on_apply_flags(NoteFlag::Staccato); });
+	event("flag-tenuto", [this] { on_apply_flags(NoteFlag::Tenuto); });
+	event("flag-dead", [this] { on_apply_flags(NoteFlag::Dead); });
+	event("flag-bend-half", [this] { on_apply_flags(NoteFlag::BendHalf); });
+	event("flag-bend-full", [this] { on_apply_flags(NoteFlag::BendFull); });
 	event("add_key_change", [this] { on_add_key_change(); });
 	event("edit-song", [session] {
 		session->set_mode(EditMode::DefaultSong);
@@ -221,17 +221,17 @@ void MidiEditorConsole::update() {
 	//if (get_track_index_save(view->song, view->cur_track) >= 0)
 		allow = (layer->type == SignalType::Midi);
 
-	check("mode-select", mode->creation_mode == ViewModeEditMidi::CreationMode::SELECT);
-	check("mode-note", mode->creation_mode == ViewModeEditMidi::CreationMode::NOTE);
-	check("mode-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::INTERVAL);
-	check("mode-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::CHORD);
+	check("mode-select", mode->creation_mode == ViewModeEditMidi::CreationMode::Select);
+	check("mode-note", mode->creation_mode == ViewModeEditMidi::CreationMode::Note);
+	check("mode-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::Interval);
+	check("mode-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::Chord);
 
 	check("mode-classical", view->cur_vlayer()->midi_mode() == MidiMode::Classical);
 	check("mode-tab", view->cur_vlayer()->midi_mode() == MidiMode::Tab);
 	check("mode-linear", view->cur_vlayer()->midi_mode() == MidiMode::Linear);
 
-	expand("revealer-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::INTERVAL);
-	expand("revealer-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::CHORD);
+	expand("revealer-interval", mode->creation_mode == ViewModeEditMidi::CreationMode::Interval);
+	expand("revealer-chord", mode->creation_mode == ViewModeEditMidi::CreationMode::Chord);
 
 	check("chord-major", mode->chord_type == ChordType::Major);
 	check("chord-minor", mode->chord_type == ChordType::Minor);
@@ -298,7 +298,7 @@ void MidiEditorConsole::update() {
 
 
 
-	if (layer->track->instrument.type == Instrument::Type::DRUMS) {
+	if (layer->track->instrument.type == Instrument::Type::Drums) {
 		// select a nicer pitch range in linear mode for drums
 //		view->get_layer(layer->track)->setPitchMinMax(34, 34 + 30);//PITCH_SHOW_COUNT);
 		// TODO
@@ -306,7 +306,7 @@ void MidiEditorConsole::update() {
 }
 
 void MidiEditorConsole::update_input_device_list() {
-	input_sources = session->device_manager->good_device_list(DeviceType::MIDI_INPUT);
+	input_sources = session->device_manager->good_device_list(DeviceType::MidiInput);
 
 	reset("input");
 	for (auto *d: input_sources)
@@ -327,15 +327,15 @@ void simplify_fraction(int &a, int &b) {
 
 void MidiEditorConsole::on_base_length(NoteBaseLength l) {
 	int partition = 1, length = 1;
-	if (l == NoteBaseLength::WHOLE)
+	if (l == NoteBaseLength::Whole)
 		length = 4;
-	if (l == NoteBaseLength::HALF)
+	if (l == NoteBaseLength::Half)
 		length = 2;
-	if (l == NoteBaseLength::QUARTER)
+	if (l == NoteBaseLength::Quarter)
 		length = 1;
-	if (l == NoteBaseLength::EIGTH)
+	if (l == NoteBaseLength::Eigth)
 		partition = 2;
-	if (l == NoteBaseLength::SIXTEENTH)
+	if (l == NoteBaseLength::Sixteenth)
 		partition = 4;
 
 	if (is_checked("length-dotted")) {
@@ -353,16 +353,16 @@ void MidiEditorConsole::on_base_length(NoteBaseLength l) {
 
 NoteBaseLength MidiEditorConsole::get_base_length() {
 	if (is_checked("length-whole"))
-		return NoteBaseLength::WHOLE;
+		return NoteBaseLength::Whole;
 	if (is_checked("length-half"))
-		return NoteBaseLength::HALF;
+		return NoteBaseLength::Half;
 	if (is_checked("length-quarter"))
-		return NoteBaseLength::QUARTER;
+		return NoteBaseLength::Quarter;
 	if (is_checked("length-eighth"))
-		return NoteBaseLength::EIGTH;
+		return NoteBaseLength::Eigth;
 	if (is_checked("length-sixteenth"))
-		return NoteBaseLength::SIXTEENTH;
-	return NoteBaseLength::QUARTER; // ...
+		return NoteBaseLength::Sixteenth;
+	return NoteBaseLength::Quarter; // ...
 }
 
 void MidiEditorConsole::on_length_dotted() {
@@ -411,13 +411,13 @@ void MidiEditorConsole::on_settings_change() {
 void MidiEditorConsole::on_creation_mode() {
 	int n = get_int("midi_edit_mode");
 	if (n == 0) {
-		mode->set_creation_mode(ViewModeEditMidi::CreationMode::SELECT);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::Select);
 	} else if (n == 1) {
-		mode->set_creation_mode(ViewModeEditMidi::CreationMode::NOTE);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::Note);
 	} else if (n == 2) {
-		mode->set_creation_mode(ViewModeEditMidi::CreationMode::INTERVAL);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::Interval);
 	} else if (n == 3) {
-		mode->set_creation_mode(ViewModeEditMidi::CreationMode::CHORD);
+		mode->set_creation_mode(ViewModeEditMidi::CreationMode::Chord);
 	}
 }
 

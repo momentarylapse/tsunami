@@ -68,13 +68,13 @@ void SampleScaleDialog::on_factor() {
 }
 
 void SampleScaleDialog::on_ok() {
-	auto method = BufferInterpolator::Method::LINEAR;
+	auto method = BufferInterpolator::Method::Linear;
 	if (get_int("method") == 1)
-		method = BufferInterpolator::Method::CUBIC;
+		method = BufferInterpolator::Method::Cubic;
 	else if (get_int("method") == 2)
-		method = BufferInterpolator::Method::SINC;
+		method = BufferInterpolator::Method::Sinc;
 	else if (get_int("method") == 3)
-		method = BufferInterpolator::Method::FOURIER;
+		method = BufferInterpolator::Method::Fourier;
 
 	auto *buf = new AudioBuffer;
 	buf->resize(new_size);

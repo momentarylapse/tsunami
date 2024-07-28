@@ -16,25 +16,26 @@ namespace tsunami {
 class Scale;
 enum class NoteModifier;
 
+enum class ClefType {
+	Treble,
+	Treble8,
+	Bass,
+	Bass8,
+	Drums,
+	Count
+};
+
 class Clef {
 public:
-	Clef(int type, const string &symbol, int offset);
-	enum Type{
-		TREBLE,
-		TREBLE_8,
-		BASS,
-		BASS_8,
-		DRUMS,
-		NUM
-	};
+	Clef(ClefType type, const string &symbol, int offset);
 
-	static const Clef _TREBLE;
-	static const Clef _TREBLE_8;
-	static const Clef _BASS;
-	static const Clef _BASS_8;
-	static const Clef _DRUMS;
+	static const Clef Treble;
+	static const Clef Treble8;
+	static const Clef Bass;
+	static const Clef Bass8;
+	static const Clef Drums;
 
-	int type;
+	ClefType type;
 	int offset;
 	string symbol;
 

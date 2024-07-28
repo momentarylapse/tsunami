@@ -16,7 +16,7 @@ class TrackLayer;
 
 class ViewModeEditBars : public ViewModeDefault {
 public:
-	ViewModeEditBars(AudioView *view);
+	explicit ViewModeEditBars(AudioView *view);
 
 	void on_start() override;
 	void on_end() override;

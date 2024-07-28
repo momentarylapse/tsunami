@@ -47,7 +47,7 @@ static void registry_event_global(void *data, uint32_t id,
 	if (is_sink) {
 	//	printf("object: id:%u type:%s/%d\n", id, type, version);
 		Device d;
-		d.type = DeviceType::AUDIO_OUTPUT;
+		d.type = DeviceType::AudioOutput;
 		d.index_in_lib = (int)id;
 		d.channels = 2;
 		d.present = true;
@@ -104,7 +104,7 @@ bool DeviceContextPipewire::init(Session* session) {
 	{
 		// default output device
 		Device d;
-		d.type = DeviceType::AUDIO_OUTPUT;
+		d.type = DeviceType::AudioOutput;
 		d.channels = 2;
 		d.default_by_lib = true;
 		d.present = true;

@@ -42,7 +42,7 @@ StorageOperationData *cur_op(FileChunkBasic *c);
 
 
 FormatDescriptorNami::FormatDescriptorNami() :
-	FormatDescriptor("Tsunami", "nami", Flag::AUDIO | Flag::MIDI | Flag::FX | Flag::MULTITRACK | Flag::TAGS | Flag::SAMPLES | Flag::READ | Flag::WRITE) {}
+	FormatDescriptor("Tsunami", "nami", Flag::Audio | Flag::Midi | Flag::Fx | Flag::Multitrack | Flag::Tags | Flag::Samples | Flag::Read | Flag::Write) {}
 
 
 class FileChunkTag : public FileChunk<Song,Tag> {
@@ -806,12 +806,12 @@ public:
 	FileChunkSynthesizerTuning() : FileChunk<Synthesizer,Temperament>("tuning") {}
 	void create() override { me = &parent->temperament; }
 	void read(Stream *f) override {
-		for (int i=0; i<MAX_PITCH; i++)
+		for (int i=0; i<MaxPitch; i++)
 			me->freq[i] = f->read_float();
 		parent->update_delta_phi();
 	}
 	void write(Stream *f) override {
-		for (int i=0; i<MAX_PITCH; i++)
+		for (int i=0; i<MaxPitch; i++)
 			f->write_float(me->freq[i]);
 	}
 };
@@ -952,19 +952,19 @@ public:
 };
 
 // deprecated
-class FileChunkFadeOld: public FileChunk<Track,CrossFadeOld> {
+class FileChunkFadeOld: public FileChunk<Track,CrossFadeLegacy> {
 public:
-	FileChunkFadeOld() : FileChunk<Track,CrossFadeOld>("fade") {}
+	FileChunkFadeOld() : FileChunk<Track,CrossFadeLegacy>("fade") {}
 	void create() override {
 	}
 	void read(Stream *f) override {
-		CrossFadeOld ff;
+		CrossFadeLegacy ff;
 		ff.position = f->read_int();
 		ff.target = f->read_int();
 		ff.samples = f->read_int();
 		f->read_int();
 		f->read_int();
-		parent->_fades_old.add(ff);
+		parent->_fades_legacy.add(ff);
 	}
 	void write(Stream *f) override {
 		f->write_int(me->position);
@@ -1205,11 +1205,11 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 	for (Track *t: weak(a->tracks)) {
 		t->layers[0]->markers.append(t->_markers_old);
 		
-		if (t->_fades_old.num > 0) {
+		if (t->_fades_legacy.num > 0) {
 			int previous = 0;
-			for (auto &f: t->_fades_old) {
-				t->layers[previous]->fades.add({f.position, CrossFade::OUTWARD, f.samples});
-				t->layers[f.target]->fades.add({f.position, CrossFade::INWARD, f.samples});
+			for (auto &f: t->_fades_legacy) {
+				t->layers[previous]->fades.add({f.position, CrossFade::Outward, f.samples});
+				t->layers[f.target]->fades.add({f.position, CrossFade::Inward, f.samples});
 				previous = f.target;
 			}
 		}
@@ -1218,14 +1218,14 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 		bool semi_old_version = false;
 		for (auto *l: weak(t->layers)) {
 			if (l->fades.num > 0) {
-				if (l->fades[0].mode == CrossFade::INWARD) {
+				if (l->fades[0].mode == CrossFade::Inward) {
 					od->info("adding missing fade-in");
-					l->fades.insert({a->range().start(), CrossFade::OUTWARD, l->fades[0].samples}, 0);
+					l->fades.insert({a->range().start(), CrossFade::Outward, l->fades[0].samples}, 0);
 					semi_old_version = true;
 				}
-				if (l->fades.back().mode == CrossFade::OUTWARD) {
+				if (l->fades.back().mode == CrossFade::Outward) {
 					od->info("adding missing fade-out");
-					l->fades.add({a->range().end(), CrossFade::INWARD, l->fades.back().samples});
+					l->fades.add({a->range().end(), CrossFade::Inward, l->fades.back().samples});
 					semi_old_version = true;
 				}
 			}
@@ -1234,8 +1234,8 @@ void FormatNami::make_consistent(StorageOperationData *od) {
 			for (auto *l: weak(t->layers)) {
 				if (l != t->layers[0] and l->fades.num == 0) {
 					od->info("disabling non-first version without fades");
-					l->fades.add({a->range().start(), CrossFade::OUTWARD, 2000});
-					l->fades.add({a->range().end(), CrossFade::INWARD, 2000});
+					l->fades.add({a->range().start(), CrossFade::Outward, 2000});
+					l->fades.add({a->range().end(), CrossFade::Inward, 2000});
 				}
 			}
 	}

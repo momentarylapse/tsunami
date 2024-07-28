@@ -116,11 +116,11 @@ void MidiPainterModeLinear::draw_pitch_grid(Painter *c) {
 		auto *c = mp->synth->get_config();
 		p = (Array<SampleRef*> *)&c[1];
 	}
-	bool is_drum = (mp->instrument->type == Instrument::Type::DRUMS);
+	bool is_drum = (mp->instrument->type == Instrument::Type::Drums);
 	float dy = ((pitch2y(0) - pitch2y(1)) - c->font_size) / 2;
 	for (int i=pitch_min; i<pitch_max; i++) {
 		c->set_color(cc);
-		if (((hover->type == HoverData::Type::MIDI_PITCH) and (i == hover->index))) // or ((hover->type == HoverData::Type::MIDI_NOTE) and (i == hover->pitch)))
+		if (((hover->type == HoverData::Type::MidiPitch) and (i == hover->index))) // or ((hover->type == HoverData::Type::MIDI_NOTE) and (i == hover->pitch)))
 			c->set_color(local_theme.text);
 
 		string name = pitch_name(i);

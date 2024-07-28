@@ -47,7 +47,7 @@ int AudioInput::read_audio(int port, AudioBuffer &buf) {
 }
 
 void AudioInput::Config::reset() {
-	device = _module->session->device_manager->choose_device(DeviceType::AUDIO_INPUT);
+	device = _module->session->device_manager->choose_device(DeviceType::AudioInput);
 }
 
 string AudioInput::Config::auto_conf(const string &name) const {

@@ -16,7 +16,7 @@ class Curve;
 
 class ViewModeCurve : public ViewModeDefault {
 public:
-	ViewModeCurve(AudioView *view);
+	explicit ViewModeCurve(AudioView *view);
 
 	void on_start() override;
 

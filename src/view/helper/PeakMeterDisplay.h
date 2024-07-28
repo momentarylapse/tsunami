@@ -24,12 +24,12 @@ class PeakMeterDisplay : public scenegraph::Node {
 public:
 
 	enum class Mode{
-		PEAKS,
-		SPECTRUM,
-		BOTH
+		Peaks,
+		Spectrum,
+		Both
 	};
-	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
-	PeakMeterDisplay(PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::BOTH);
+	PeakMeterDisplay(hui::Panel *panel, const string &id, PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::Both);
+	PeakMeterDisplay(PeakMeter *source, Mode constraint = PeakMeterDisplay::Mode::Both);
 	~PeakMeterDisplay() override;
 
 	void set_source(PeakMeter *source);

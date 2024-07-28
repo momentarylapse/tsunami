@@ -13,8 +13,8 @@
 
 namespace tsunami {
 
-const int MidiNote::UNDEFINED_STRING = -1;
-const int MidiNote::UNDEFINED_CLEF = -123;
+const int MidiNote::UndefinedString = -1;
+const int MidiNote::UndefinedClef = -123;
 
 
 MidiNote::MidiNote() : MidiNote(Range::NONE, 0, 0) {
@@ -25,7 +25,7 @@ MidiNote::MidiNote(const Range &_range, float _pitch, float _volume) {
 	pitch = _pitch;
 	volume = _volume;
 	flags = 0;
-	stringno = UNDEFINED_STRING;
+	stringno = UndefinedString;
 	reset_clef();
 }
 
@@ -41,12 +41,12 @@ MidiNote *MidiNote::copy(int offset) const {
 }
 
 void MidiNote::reset_clef() {
-	clef_position = UNDEFINED_CLEF;
+	clef_position = UndefinedClef;
 	modifier = NoteModifier::Unknown;
 }
 
 void MidiNote::update_clef_pos(const Clef &clef, const Instrument &instrument, const Scale& scale) const {
-	if ((clef_position <= UNDEFINED_CLEF) or (modifier == NoteModifier::Unknown)) {
+	if ((clef_position <= UndefinedClef) or (modifier == NoteModifier::Unknown)) {
 		clef_position = clef.pitch_to_position(pitch, scale, modifier);
 	}
 }

@@ -19,8 +19,8 @@ class LogInfoBox : public scenegraph::NodeFree {
 public:
 	LogInfoBox(Session *_session) : scenegraph::NodeFree() {
 		session = _session;
-		align.horizontal = AlignData::Mode::FILL;
-		align.vertical = AlignData::Mode::BOTTOM;
+		align.horizontal = AlignData::Mode::Fill;
+		align.vertical = AlignData::Mode::Bottom;
 		align.dy = -200;
 		align.h = 120;
 		align.dz = 1000;
@@ -116,8 +116,8 @@ public:
 
 LogNotifier::LogNotifier(Session *_session) : scenegraph::NodeFree() {
 	session = _session;
-	align.horizontal = AlignData::Mode::FILL;
-	align.vertical = AlignData::Mode::FILL;
+	align.horizontal = AlignData::Mode::Fill;
+	align.vertical = AlignData::Mode::Fill;
 	align.dz = 1000;
 	set_perf_name("notifier");
 
@@ -148,7 +148,7 @@ void LogNotifier::draw_status(Painter *c, Message &m) {
 	color c1 = theme.high_contrast_a.with_alpha(a);
 	color c2 = theme.high_contrast_b.with_alpha(a);
 	c->set_font_size(theme.FONT_SIZE * 1.3f * m.size * a);
-	draw_boxed_str(c, area.center(), m.text, c1, c2, TextAlign::CENTER);
+	draw_boxed_str(c, area.center(), m.text, c1, c2, TextAlign::Center);
 	c->set_font_size(theme.FONT_SIZE);
 }
 

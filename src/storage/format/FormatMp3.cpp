@@ -20,7 +20,7 @@
 namespace tsunami {
 
 FormatDescriptorMp3::FormatDescriptorMp3() :
-	FormatDescriptor("Mp3", "mp3", Flag::AUDIO | Flag::SINGLE_TRACK | Flag::TAGS | Flag::READ)
+	FormatDescriptor("Mp3", "mp3", Flag::Audio | Flag::SingleTrack | Flag::Tags | Flag::Read)
 {
 }
 

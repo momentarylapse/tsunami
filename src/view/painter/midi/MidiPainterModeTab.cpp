@@ -70,7 +70,7 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.8f;
 
-	if (n->is(NOTE_FLAG_DEAD)) {
+	if (n->is(NoteFlag::Dead)) {
 		c->set_color(col);
 		SymbolRenderer::draw(c, {x, y - font_size/2}, font_size, "x", true, 0);
 		return;

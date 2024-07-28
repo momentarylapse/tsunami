@@ -34,7 +34,7 @@ bool ActionTrackLayerActivateVersion::is_active_at(int pos) {
 		if (f.range().is_inside(pos)) {
 			return true;
 		} else if (f.range().end() < pos) {
-			active = (f.mode == CrossFade::INWARD);
+			active = (f.mode == CrossFade::Inward);
 		}
 	}
 	return active;
@@ -76,14 +76,14 @@ void ActionTrackLayerActivateVersion::build(Data *d) {
 	del_fades_in_range(rr, d);
 	if (activate) {
 		if (!active_before)
-			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::INWARD, SAMPLES), d);
+			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::Inward, SAMPLES), d);
 		if (!active_after)
-			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::OUTWARD, SAMPLES), d);
+			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::Outward, SAMPLES), d);
 	} else {
 		if (active_before)
-			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::OUTWARD, SAMPLES), d);
+			add_sub_action(new ActionTrackFadeAdd(layer, range.start(), CrossFade::Outward, SAMPLES), d);
 		if (active_after)
-			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::INWARD, SAMPLES), d);
+			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::Inward, SAMPLES), d);
 	}
 }
 

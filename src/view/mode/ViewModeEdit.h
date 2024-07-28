@@ -15,8 +15,8 @@ namespace tsunami {
 
 class ViewModeEdit : public ViewModeDefault {
 public:
-	ViewModeEdit(AudioView *view);
-	virtual ~ViewModeEdit();
+	explicit ViewModeEdit(AudioView *view);
+	~ViewModeEdit() override;
 
 	ViewMode *mode;
 	void set_mode(ViewMode *m);

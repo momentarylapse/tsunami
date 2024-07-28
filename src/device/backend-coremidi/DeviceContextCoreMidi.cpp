@@ -52,7 +52,7 @@ void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool se
 		MIDIObjectGetIntegerProperty(d, kMIDIPropertyUniqueID, &value);
 		//msg_write(value);
 
-		Device* dev = device_manager->get_device_create(DeviceType::MIDI_INPUT, name);
+		Device* dev = device_manager->get_device_create(DeviceType::MidiInput, name);
 		dev->name = display_name;
 		dev->index_in_lib = (int)d;
 		dev->present = true;
@@ -61,7 +61,7 @@ void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool se
 	}
 
 	// default
-	auto *def = device_manager->get_device_create(DeviceType::MIDI_INPUT, "");
+	auto *def = device_manager->get_device_create(DeviceType::MidiInput, "");
 	def->default_by_lib = true;
 	def->present = true;
 	device_manager->set_device_config(def);

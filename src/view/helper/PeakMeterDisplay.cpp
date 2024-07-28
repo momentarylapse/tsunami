@@ -21,8 +21,8 @@ const int PeakMeterDisplay::CHANNEL_SIZE_RECOMMENDED = 8;
 PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	align.w = 120;
 	align.h = good_size(2);
-	align.horizontal = AlignData::Mode::LEFT;
-	align.vertical = AlignData::Mode::TOP;
+	align.horizontal = AlignData::Mode::Left;
+	align.vertical = AlignData::Mode::Top;
 	set_perf_name("peak");
 	panel = nullptr;
 	source = nullptr;
@@ -32,9 +32,9 @@ PeakMeterDisplay::PeakMeterDisplay(PeakMeter *_source, Mode constraint) {
 	channels.resize(2);
 
 	mode_constraint = constraint;
-	mode = Mode::PEAKS;
-	if (mode_constraint == Mode::SPECTRUM)
-		mode = Mode::SPECTRUM;
+	mode = Mode::Peaks;
+	if (mode_constraint == Mode::Spectrum)
+		mode = Mode::Spectrum;
 
 	set_source(_source);
 	enable(true);
@@ -103,13 +103,13 @@ void PeakMeterDisplay::set_visible(bool vis) {
 void PeakMeterDisplay::connect() {
 	source->out_changed >> create_sink([this] { on_update(); });
 	source->out_state_changed >> create_sink([this] { on_update(); });
-	if (mode == Mode::SPECTRUM)
+	if (mode == Mode::Spectrum)
 		source->request_spectrum();
 }
 
 void PeakMeterDisplay::unconnect() {
 	source->unsubscribe(this);
-	if (mode == Mode::SPECTRUM)
+	if (mode == Mode::Spectrum)
 		source->unrequest_spectrum();
 }
 
@@ -169,7 +169,7 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 
 	color bg = (parent ? theme.background_overlay : theme.background);
 
-	if (mode == Mode::PEAKS) {
+	if (mode == Mode::Peaks) {
 
 		float bb = SPACE_BETWEEN_CHANNELS;
 		if (w > h) {
@@ -197,14 +197,14 @@ void PeakMeterDisplay::on_draw(Painter *c) {
 }
 
 bool PeakMeterDisplay::on_left_button_down(const vec2 &m) {
-	if (mode_constraint != Mode::BOTH)
+	if (mode_constraint != Mode::Both)
 		return true;
-	if (mode == Mode::SPECTRUM) {
+	if (mode == Mode::Spectrum) {
 		if (source)
 			source->unrequest_spectrum();
-		mode = Mode::PEAKS;
+		mode = Mode::Peaks;
 	} else {
-		mode = Mode::SPECTRUM;
+		mode = Mode::Spectrum;
 		if (source)
 			source->request_spectrum();
 	}

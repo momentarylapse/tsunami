@@ -34,7 +34,7 @@ MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, Hov
 		s = MidiNoteState::SELECTED;
 	if (as_reference)
 		return MidiNoteState::REFERENCE | s;
-	if ((hover->type == HoverData::Type::MIDI_NOTE) and (n == hover->note))
+	if ((hover->type == HoverData::Type::MidiNote) and (n == hover->note))
 		return MidiNoteState::HOVER | s;
 	return s;
 }

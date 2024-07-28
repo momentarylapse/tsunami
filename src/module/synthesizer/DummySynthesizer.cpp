@@ -72,8 +72,8 @@ void DummySynthesizer::_set_drum(int no, float freq, float volume, float attack,
 
 
 void DummySynthesizer::on_config() {
-	if (instrument.type == Instrument::Type::DRUMS) {
-		for (int i=0; i<MAX_PITCH; i++) {
+	if (instrument.type == Instrument::Type::Drums) {
+		for (int i=0; i<MaxPitch; i++) {
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 			env[i].set(0.005f, 0.05f, 0.00001f, 0.05f, sample_rate);
 			env[i].set2(0, 0.45f);
@@ -118,7 +118,7 @@ void DummySynthesizer::on_config() {
 		DrumPitch::BONGO_HI = 60,
 		DrumPitch::BONGO_LOW = 61,*/
 	} else {
-		for (int i=0; i<MAX_PITCH; i++) {
+		for (int i=0; i<MaxPitch; i++) {
 			//state.pitch[i].env.set(0.01, 0.005f, 0.7f, 0.02f, sample_rate);
 			env[i].set(0.005f, 0.01f, 0.5f, 0.02f, sample_rate);
 			env[i].set2(0, 0.45f);

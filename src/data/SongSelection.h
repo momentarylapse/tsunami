@@ -33,11 +33,11 @@ public:
 	static SongSelection from_range(Song *s, const Range &r);
 
 	enum Mask {
-		SAMPLES = 1,
-		MARKERS = 2,
-		MIDI_NOTES = 4,
-		BARS = 8,
-		ALL = -1
+		Samples = 1,
+		Markers = 2,
+		MidiNotes = 4,
+		Bars = 8,
+		All = -1
 	};
 	SongSelection filter(int mask) const;
 	SongSelection filter(const Array<const TrackLayer*> &layers) const;

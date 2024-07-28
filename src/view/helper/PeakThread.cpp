@@ -69,7 +69,7 @@ void prepare_spectrum(PeakDataRequest *r, float sample_rate) {
 	const float DB_RANGE = 50;
 	const float DB_BOOST = 10;
 
-	auto pspectrum = Spectrogram::log_spectrogram(r->buffer, sample_rate, PeakData::SPECTRUM_CHUNK, PeakData::SPECTRUM_MIN_FREQ, PeakData::SPECTRUM_MAX_FREQ, PeakData::SPECTRUM_N, WindowFunction::HANN);
+	auto pspectrum = Spectrogram::log_spectrogram(r->buffer, sample_rate, PeakData::SPECTRUM_CHUNK, PeakData::SPECTRUM_MIN_FREQ, PeakData::SPECTRUM_MAX_FREQ, PeakData::SPECTRUM_N, WindowFunction::Hann);
 	//auto pspectrum = Spectrogram::spectrogram(b, SPECTRUM_CHUNK, SPECTRUM_N, WindowFunction::HANN);
 	bytes qspectrum = Spectrogram::quantize(Spectrogram::to_db(pspectrum, DB_RANGE, DB_BOOST));
 

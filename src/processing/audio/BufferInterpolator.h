@@ -18,10 +18,10 @@ class AudioBuffer;
 namespace BufferInterpolator {
 
 enum class Method {
-	LINEAR,
-	CUBIC,
-	SINC,
-	FOURIER,
+	Linear,
+	Cubic,
+	Sinc,
+	Fourier,
 };
 
 double cubic_inter(double A, double B, double C, double D, float t);
@@ -34,7 +34,7 @@ void interpolate_channel(const Array<float> &in, Array<float> &out, Method metho
 void interpolate(const AudioBuffer &in, AudioBuffer &out, Method method);
 
 struct Operator {
-	Method method = Method::LINEAR;
+	Method method = Method::Linear;
 	float factor = 1.0f;
 	int64 consumed = 0;
 	int64 produced = 0;

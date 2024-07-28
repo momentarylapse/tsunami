@@ -16,8 +16,8 @@ namespace tsunami {
 
 BottomBarExpandButton::BottomBarExpandButton(Session *_session) : Node(50, 50) {
 	align.dz = 200;
-	align.horizontal = AlignData::Mode::LEFT;
-	align.vertical = AlignData::Mode::BOTTOM;
+	align.horizontal = AlignData::Mode::Left;
+	align.vertical = AlignData::Mode::Bottom;
 	set_perf_name("button");
 	session = _session;
 }

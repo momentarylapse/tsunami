@@ -107,7 +107,7 @@ protected:
 	void _handle_event(const MidiEvent &e);
 
 	Temperament temperament;
-	float delta_phi[MAX_PITCH];
+	float delta_phi[MaxPitch];
 };
 
 Synthesizer* CreateSynthesizer(Session *session, const string &name);

@@ -53,7 +53,7 @@ TrackConsole::TrackConsole(Session *session, SideBar *bar) :
 	editing = false;
 	from_resource("track_dialog");
 	set_decimals(1);
-	set_mode(Mode::FX);
+	set_mode(Mode::Fx);
 
 	instrument_list = base::sorted(Instrument::enumerate(), [] (const Instrument &a, const Instrument &b) { return a.name() <= b.name(); });
 	for (auto &i: instrument_list)
@@ -78,9 +78,9 @@ void TrackConsole::set_mode(Mode mode) {
 	} else if (mode == Mode::SYNTH) {
 		expand("g-synth", true);
 	}*/
-	expand("g-fx", mode == Mode::FX);
-	expand("g-midi-fx", mode == Mode::MIDI_FX);
-	expand("g-synth", mode == Mode::SYNTH);
+	expand("g-fx", mode == Mode::Fx);
+	expand("g-midi-fx", mode == Mode::MidiFx);
+	expand("g-synth", mode == Mode::Synth);
 }
 
 void TrackConsole::on_enter() {

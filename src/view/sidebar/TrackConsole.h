@@ -49,9 +49,9 @@ public:
 	Array<Instrument> instrument_list;
 
 	enum class Mode {
-		FX,
-		MIDI_FX,
-		SYNTH
+		Fx,
+		MidiFx,
+		Synth
 	};
 	void set_mode(Mode m);
 };

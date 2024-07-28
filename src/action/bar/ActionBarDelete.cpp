@@ -39,7 +39,7 @@ void ActionBarDelete::build(Data *d) {
 	add_sub_action(new ActionBar__Delete(index), d);
 
 	if (affect_data) {
-		SongSelection sel = SongSelection::from_range(s, r).filter(SongSelection::Mask::SAMPLES);
+		SongSelection sel = SongSelection::from_range(s, r).filter(SongSelection::Mask::Samples);
 
 		for (auto t: weak(s->tracks)) {
 			

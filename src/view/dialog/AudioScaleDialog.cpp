@@ -19,7 +19,7 @@ AudioScaleDialog::AudioScaleDialog(hui::Window *parent, int _original_size):
 	original_size = _original_size;
 	data.pitch_scale = 1.0f;
 	data.new_size = original_size;
-	data.method = BufferInterpolator::Method::LINEAR;
+	data.method = BufferInterpolator::Method::Linear;
 
 	set_int("samples-original", original_size);
 	check("pitch-mode:natural", true);
@@ -88,13 +88,13 @@ void AudioScaleDialog::on_pitch_shift_semitones() {
 }
 
 void AudioScaleDialog::on_ok() {
-	data.method = BufferInterpolator::Method::LINEAR;
+	data.method = BufferInterpolator::Method::Linear;
 	if (get_int("method") == 1)
-		data.method = BufferInterpolator::Method::CUBIC;
+		data.method = BufferInterpolator::Method::Cubic;
 	else if (get_int("method") == 2)
-		data.method = BufferInterpolator::Method::SINC;
+		data.method = BufferInterpolator::Method::Sinc;
 	else if (get_int("method") == 3)
-		data.method = BufferInterpolator::Method::FOURIER;
+		data.method = BufferInterpolator::Method::Fourier;
 	_promise(data);
 	request_destroy();
 }

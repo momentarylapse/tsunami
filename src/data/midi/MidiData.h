@@ -17,9 +17,9 @@
 
 namespace tsunami {
 
-const int MAX_PITCH = 128;
-const int MIDDLE_C = 60;
-const int MIDDLE_A = 69;
+const int MaxPitch = 128;
+const int MiddleC = 60;
+const int MiddleA = 69;
 
 class MidiEffect;
 class Instrument;
@@ -103,35 +103,37 @@ string pitch_name(int pitch);
 string drum_pitch_name(int pitch);
 
 
-enum DrumPitch {
-	BassAccoustic = 35,
-	Bass = 36,
-	SideStick = 37,
-	Snare = 38,
-	Clap = 39,
-	SnareElectronic = 40,
-	TomFloorLow = 41,
-	HihatClosed = 42,
-	TomFloorHi = 43,
-	HihatPedal = 44,
-	TomLow = 45,
-	HihatOpen = 46,
-	TomLowMid = 47,
-	TomHiMid = 48,
-	Crash1 = 49,
-	TomHi = 50,
-	Ride1 = 51,
-	Chinese = 52,
-	BellRide = 53,
-	Tambourine = 54,
-	Splash = 55,
-	Cowbell = 56,
-	Crash2 = 57,
-	Vibraslash = 58,
-	Ride2 = 59,
-	BongoHi = 60,
-	BongoLow = 61,
-};
+namespace DrumPitch {
+	enum {
+		BassAccoustic = 35,
+		Bass = 36,
+		SideStick = 37,
+		Snare = 38,
+		Clap = 39,
+		SnareElectronic = 40,
+		TomFloorLow = 41,
+		HihatClosed = 42,
+		TomFloorHi = 43,
+		HihatPedal = 44,
+		TomLow = 45,
+		HihatOpen = 46,
+		TomLowMid = 47,
+		TomHiMid = 48,
+		Crash1 = 49,
+		TomHi = 50,
+		Ride1 = 51,
+		Chinese = 52,
+		BellRide = 53,
+		Tambourine = 54,
+		Splash = 55,
+		Cowbell = 56,
+		Crash2 = 57,
+		Vibraslash = 58,
+		Ride2 = 59,
+		BongoHi = 60,
+		BongoLow = 61,
+	};
+}
 
 enum class ChordType {
 	Minor,

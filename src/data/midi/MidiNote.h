@@ -19,17 +19,19 @@ class Clef;
 class Instrument;
 enum class NoteModifier;
 
-enum {
-	NOTE_FLAG_TRILL = 1<<0,
-	NOTE_FLAG_LEGATO = 1<<1,
-	NOTE_FLAG_STACCATO = 1<<2,
-	NOTE_FLAG_TENUTO = 1<<3,
-	NOTE_FLAG_HAMMER_ON = 1<<4,
-	NOTE_FLAG_PULL_OFF = 1<<5,
-	NOTE_FLAG_DEAD = 1<<6,
-	NOTE_FLAG_BEND_HALF = 1<<7,
-	NOTE_FLAG_BEND_FULL = 1<<8,
-};
+namespace NoteFlag {
+	enum {
+		Trill = 1<<0,
+		Legato = 1<<1,
+		Staccato = 1<<2,
+		Tenuto = 1<<3,
+		HammerOn = 1<<4,
+		PullOff = 1<<5,
+		Dead = 1<<6,
+		BendHalf = 1<<7,
+		BendFull = 1<<8,
+	};
+}
 
 
 class MidiNote : public Sharable<base::Empty> {
@@ -55,8 +57,8 @@ public:
 	void update_clef_pos(const Clef &clef, const Instrument &instrument, const Scale &s) const;
 
 
-	static const int UNDEFINED_CLEF;
-	static const int UNDEFINED_STRING;
+	static const int UndefinedClef;
+	static const int UndefinedString;
 };
 
 }

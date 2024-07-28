@@ -47,7 +47,7 @@ void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool seriou
 	}
 
 	// default
-	auto *def = device_manager->get_device_create(DeviceType::MIDI_INPUT, "");
+	auto *def = device_manager->get_device_create(DeviceType::MidiInput, "");
 	def->default_by_lib = true;
 	def->present = true;
 
@@ -65,7 +65,7 @@ void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool seriou
 				continue;
 			if ((snd_seq_port_info_get_capability(pinfo) & SND_SEQ_PORT_CAP_SUBS_READ) == 0)
 				continue;
-			Device *d = device_manager->get_device_create(DeviceType::MIDI_INPUT, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
+			Device *d = device_manager->get_device_create(DeviceType::MidiInput, format("%s/%s", snd_seq_client_info_get_name(cinfo), snd_seq_port_info_get_name(pinfo)));
 			d->name = d->internal_name;
 			d->client = snd_seq_client_info_get_client(cinfo);
 			d->port = snd_seq_port_info_get_port(pinfo);

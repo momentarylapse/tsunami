@@ -41,7 +41,7 @@
 namespace tsunami {
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.115.0";
+const string AppVersion = "0.7.116.0";
 const string AppNickname = "absolute 2er0";
 
 Tsunami *Tsunami::instance = nullptr;

@@ -201,22 +201,26 @@ void migrate_dev_config(const string& key, DeviceType type) {
 }
 
 static string suggest_default_audio_api() {
-#ifdef OS_MAC
+#if HAS_LIB_COREAUDIO
 	return "coreaudio";
-#endif
-#ifdef OS_LINUX
+#elif HAS_LIB_PULSEAUDIO
 	return "pulseaudio";
+#elif HAS_LIB_PIPEWIRE
+	return "pipewire";
 #endif
+
 	return "portaudio";
 }
 
 static string suggest_default_midi_api() {
-#ifdef OS_MAC
+#if HAS_LIB_COREMIDI
 	return "coremidi";
 #endif
-#ifdef OS_LINUX
+
+#if HAS_LIB_ALSA
 	return "alsa";
 #endif
+
 	return "";
 }
 

@@ -5,7 +5,7 @@
 Install libraries (the developer version):
 * **required**: gtk4, zlib, fftw3
 * **recommended**: pulseaudio, alsa, ogg, vorbis, flac, opengl, unwind, dl
-* **optional**: portaudio (mostly in case, pulseaudio is not available)
+* **optional**: portaudio or pipewire (mostly in case, pulseaudio is not available)
 
 ### Arch / Manjaro
 
@@ -19,7 +19,7 @@ sudo pacman -S gtk4 libogg libvorbis flac fftw libpulse alsa-lib libunwind
 sudo dnf install libogg-devel libvorbis-devel flac-devel fftw3-devel pulseaudio-libs-devel alsa-lib-devel libunwind-devel
 ```
 
-### Ubuntu
+### Debian / Ubuntu
 
 ```
 sudo apt-get install git make g++
@@ -65,9 +65,7 @@ cd <REPOSITORY-ROOT>  # important to run the program from here!
 
 # Windows
 
-There is experimental support for Visual Studio 2022.
-
-*Note:* _so far, only BASIC functionality is working (not much more than audio playback and recording)! All plugins (audio fx, synthesizers etc.) depend on the "kaba" JIT compiler, which is currently not working on windows_
+There is **experimental** support for Visual Studio 2022.
 
 ## Preparation: installing gtk4
 
@@ -89,9 +87,7 @@ Since `CMakePresets.json` and `.vs/launch.vs.json` are provided, you should be a
 
 # MacOS
 
-Also experimental support, using `homebrew`, `gtk4` and `portaudio`!
-
-*Note:* _so far, only BASIC functionality is working (not much more than audio playback and recording)! All plugins (audio fx, synthesizers etc.) depend on the "kaba" JIT compiler, which is currently not working on MacOS_
+Also **experimental** support, using `homebrew`, `gtk4` and `coreaudio` or `portaudio`!
 
 ## Preparation: installing libraries
 

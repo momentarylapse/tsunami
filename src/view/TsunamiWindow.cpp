@@ -319,12 +319,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	view->out_selection_changed >> in_update;
 	view->out_cur_layer_changed >> in_update;
 	view->out_cur_sample_changed >> in_update;
-	session->playback->signal_chain->out_changed >> create_sink([this] {
-		on_update();
-	});
-	session->playback->signal_chain->out_state_changed >> create_sink([this] {
-		on_update();
-	});
+	session->playback->signal_chain->out_changed >> in_update;
+	session->playback->signal_chain->out_state_changed >> in_update;
 	song->action_manager->out_changed >> in_update;
 	song->action_manager->out_undo_action >> create_sink([this] {
 		session->status(_("undo: ") + hui::get_language_s(song->action_manager->get_current_action()));
@@ -731,13 +727,11 @@ void TsunamiWindow::on_play_loop() {
 }
 
 void TsunamiWindow::on_play() {
-	if (session->in_mode(EditMode::Capture))
-		return;
-
-	view->play();
+	main_view->active_view->mvn_play();
 }
 
 void TsunamiWindow::on_play_toggle() {
+	main_view->active_view->mvn_play_toggle();
 	if (session->in_mode(EditMode::Capture))
 		return;
 
@@ -749,17 +743,11 @@ void TsunamiWindow::on_play_toggle() {
 }
 
 void TsunamiWindow::on_pause() {
-	if (session->in_mode(EditMode::Capture))
-		return;
-	view->pause(true);
+	main_view->active_view->mvn_pause();
 }
 
 void TsunamiWindow::on_stop() {
-	if (session->in_mode(EditMode::Capture)) {
-		session->set_mode(EditMode::Default);
-	} else {
-		view->stop();
-	}
+	main_view->active_view->mvn_stop();
 }
 
 void TsunamiWindow::on_insert_sample() {
@@ -884,11 +872,11 @@ void TsunamiWindow::update_menu() {
 	enable("sample-delete", view->sel.num_samples() > 0);
 	enable("sample-properties", view->cur_sample());
 	// sound
-	enable("play", !session->in_mode(EditMode::Capture));
-	enable("stop", view->is_playback_active() or session->in_mode(EditMode::Capture));
-	enable("pause", view->is_playback_active() and !view->is_paused());
+	enable("play", main_view->active_view->mvn_can_play());
+	enable("stop", main_view->active_view->mvn_can_stop());
+	enable("pause", main_view->active_view->mvn_can_pause());
 	check("play-loop", view->looping());
-	enable("record", !session->in_mode(EditMode::Capture));
+	enable("record", main_view->active_view->mvn_can_record());
 	// view
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::Index::MixingConsole));
 	check("show_signal_chain", bottom_bar->is_active(BottomBar::Index::SignalChainConsole));

@@ -89,9 +89,19 @@ public:
 	explicit AudioView(Session *session);
 	~AudioView() override;
 
-	void* main_view_data() const override;
-	string main_view_description() const override;
-	void on_enter_main_view() override;
+	void* mvn_data() const override;
+	string mvn_description() const override;
+	void mvn_on_enter() override;
+
+	void mvn_play() override;
+	void mvn_play_toggle() override;
+	void mvn_stop() override;
+	void mvn_pause() override;
+	bool mvn_is_playing() override;
+	bool mvn_can_play() override;
+	bool mvn_can_stop() override;
+	bool mvn_can_pause() override;
+	bool mvn_can_record() override;
 
 	void check_consistency();
 	void force_redraw();

@@ -315,16 +315,72 @@ AudioView::~AudioView() {
 	metronome_overlay_vlayer->layer = nullptr;
 }
 
-void* AudioView::main_view_data() const {
+void* AudioView::mvn_data() const {
 	return song;
 }
 
-string AudioView::main_view_description() const {
+string AudioView::mvn_description() const {
 	return "song: " + song->filename.basename();
 }
 
-void AudioView::on_enter_main_view() {
+void AudioView::mvn_on_enter() {
 	session->set_mode(EditMode::Default);
+}
+
+void AudioView::mvn_play() {
+	//session->playback->play();
+	if (session->in_mode(EditMode::Capture))
+		return;
+
+	play();
+}
+
+void AudioView::mvn_play_toggle() {
+	if (session->in_mode(EditMode::Capture))
+		return;
+
+	if (is_playback_active()) {
+		pause(!is_paused());
+	} else {
+		play();
+	}
+}
+
+void AudioView::mvn_stop() {
+	//session->playback->stop();
+
+	if (session->in_mode(EditMode::Capture)) {
+		session->set_mode(EditMode::Default);
+	} else {
+		stop();
+	}
+}
+
+void AudioView::mvn_pause() {
+	//session->playback->pause();
+	if (session->in_mode(EditMode::Capture))
+		return;
+	pause(true);
+}
+
+bool AudioView::mvn_is_playing() {
+	return session->playback->is_active();
+}
+
+bool AudioView::mvn_can_play() {
+	return !session->in_mode(EditMode::Capture);
+}
+
+bool AudioView::mvn_can_stop() {
+	return is_playback_active() or session->in_mode(EditMode::Capture);
+}
+
+bool AudioView::mvn_can_pause() {
+	return is_playback_active() and !is_paused();
+}
+
+bool AudioView::mvn_can_record() {
+	return !session->in_mode(EditMode::Capture);
 }
 
 void AudioView::set_antialiasing(bool set) {

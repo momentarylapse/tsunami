@@ -28,8 +28,8 @@ class ScrollBar;
 // TODO rename to SignalEditor
 class SignalEditorTab : public MainViewNode {
 public:
-	SignalEditorTab(SignalChain *_chain);
-	~SignalEditorTab();
+	explicit SignalEditorTab(SignalChain *_chain);
+	~SignalEditorTab() override;
 
 	obs::xsource<Module*> out_module_selected{this, "module-selected"};
 	obs::source out_popup_chain{this, "popup-chain"};
@@ -49,9 +49,18 @@ public:
 	void select_module(Module *m, bool add=false);
 	void update_module_positions();
 
-	void* main_view_data() const override;
-	string main_view_description() const override;
-	void on_enter_main_view() override;
+	void* mvn_data() const override;
+	string mvn_description() const override;
+	void mvn_on_enter() override;
+
+	void mvn_play() override;
+	void mvn_play_toggle() override;
+	void mvn_stop() override;
+	void mvn_pause() override;
+	bool mvn_is_playing() override;
+	bool mvn_can_play() override;
+	bool mvn_can_pause() override;
+	bool mvn_can_stop() override;
 
 	static color signal_color_base(SignalType type);
 	static color signal_color(SignalType type, bool hover);

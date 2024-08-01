@@ -19,6 +19,7 @@
 #include "../helper/Drawing.h"
 #include "../sidebar/SideBar.h"
 #include "../MouseDelayPlanner.h"
+#include "../TsunamiWindow.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
@@ -123,7 +124,7 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) {
 	background = new SignalEditorBackground(this);
 	add_child(background);
 	pad->connect_scrollable(background);
-	add_child(new SignalEditorPlayButton(this));
+	//add_child(new SignalEditorPlayButton(this));
 
 	/*
 	event("signal_chain_add_audio_source", [this] { on_add(ModuleCategory::AUDIO_SOURCE); });
@@ -165,16 +166,51 @@ SignalEditorTab::~SignalEditorTab() {
 	chain->unsubscribe(this);
 }
 
-void* SignalEditorTab::main_view_data() const {
+void* SignalEditorTab::mvn_data() const {
 	return chain;
 }
 
-string SignalEditorTab::main_view_description() const {
+string SignalEditorTab::mvn_description() const {
 	return "chain: " + chain->name;
 }
 
-void SignalEditorTab::on_enter_main_view() {
+void SignalEditorTab::mvn_on_enter() {
 	session->side_bar()->open(SideBar::Index::SignalChainConsole);
+}
+
+void SignalEditorTab::mvn_play() {
+	chain->start();
+}
+
+void SignalEditorTab::mvn_play_toggle() {
+	if (chain->is_active())
+		chain->stop();
+	else
+		chain->start();
+}
+
+void SignalEditorTab::mvn_stop() {
+	chain->stop_hard();
+}
+
+void SignalEditorTab::mvn_pause() {
+	chain->stop();
+}
+
+bool SignalEditorTab::mvn_is_playing() {
+	return chain->is_active();
+}
+
+bool SignalEditorTab::mvn_can_play() {
+	return true;
+}
+
+bool SignalEditorTab::mvn_can_pause() {
+	return chain->is_active();
+}
+
+bool SignalEditorTab::mvn_can_stop() {
+	return chain->is_active() or chain->is_prepared();
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {
@@ -240,6 +276,8 @@ void SignalEditorTab::on_chain_update() {
 	if (graph())
 		graph()->hover = HoverData();
 
+	// TODO event routing...
+	session->win->update_menu();
 
 	update_module_positions();
 }

@@ -56,7 +56,7 @@ public:
 		} else {
 			p->set_font("", theme.FONT_SIZE_SMALL, false, false);
 		}
-		p->draw_str({area.x1 + 8, area.center().y - theme.FONT_SIZE_SMALL * 0.5f}, view->main_view_description());
+		p->draw_str({area.x1 + 8, area.center().y - theme.FONT_SIZE_SMALL * 0.5f}, view->mvn_description());
 	}
 	bool on_left_button_down(const vec2& m) override {
 		main_view->activate_view(view);
@@ -218,14 +218,14 @@ void MainView::activate_view(MainViewNode* view) {
 	tab_bar->rebuild();
 	if (view != active_view) {
 		active_view = view;
-		view->on_enter_main_view();
+		view->mvn_on_enter();
 		out_view_changed(view);
 	}
 }
 
 void MainView::open_for(VirtualBase* p) {
 	for (auto v: weak(views))
-		if (v->main_view_data() == p) {
+		if (v->mvn_data() == p) {
 			activate_view(v);
 			return;
 		}

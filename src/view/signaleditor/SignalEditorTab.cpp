@@ -17,13 +17,13 @@
 #include "../helper/graph/Node.h"
 #include "../helper/graph/ToolTipOverlay.h"
 #include "../helper/Drawing.h"
+#include "../sidebar/SideBar.h"
 #include "../MouseDelayPlanner.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
 #include "../../data/base.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 #include "../../storage/Storage.h"
 #include "../../plugins/PluginManager.h"
 
@@ -174,7 +174,7 @@ string SignalEditorTab::main_view_description() const {
 }
 
 void SignalEditorTab::on_enter_main_view() {
-	session->set_mode(EditMode::SignalChain);
+	session->side_bar()->open(SideBar::Index::SignalChainConsole);
 }
 
 color SignalEditorTab::signal_color_base(SignalType type) {

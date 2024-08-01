@@ -8,7 +8,6 @@
 #include "../module/ModulePanel.h"
 #include "../TsunamiWindow.h"
 #include "../../Session.h"
-#include "../../EditModes.h"
 #include "../../plugins/PluginManager.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
@@ -106,7 +105,7 @@ void SignalChainPanel::set_module(Module *m) {
 												  ConfigPanelMode::Replace);
 		embed(module_panel, "grid-module", 0, 0);
 	} else {
-		session->set_mode(EditMode::SignalChain);
+		//session->set_mode(EditMode::SignalChain);
 	}
 }
 

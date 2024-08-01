@@ -30,6 +30,7 @@
 #include "view/bottombar/BottomBar.h"
 #include "view/bottombar/MixingConsole.h"
 #include "view/TsunamiWindow.h"
+#include "view/mainview/MainView.h"
 
 namespace tsunami {
 
@@ -55,7 +56,6 @@ const string EditMode::Capture = "capture";
 const string EditMode::ScaleBars = "scale-bars";
 const string EditMode::ScaleMarker = "scale-marker";
 const string EditMode::Curves = "curves";
-const string EditMode::SignalChain = "signal-chain";
 
 
 Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
@@ -177,60 +177,73 @@ void Session::set_mode(const string &_mode) {
 	hui::run_later(0.1f, [this, mode = _mode] {
 		debug("mode", ">> " + mode);
 		if (mode == EditMode::Default) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->_hide();
 		} else if (mode == EditMode::Capture) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_capture);
 		} else if (mode == EditMode::EditTrack) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_edit);
 		} else if (mode == EditMode::ScaleBars) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_edit_bars);
 			view->mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::Rubber);
 		} else if (mode == EditMode::ScaleMarker) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_scale_marker);
 		} else if (mode == EditMode::Curves) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_curve);
 		} else if (mode == EditMode::DefaultTrack) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::TrackConsole);
 		} else if (mode == EditMode::DefaultTrackFx) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::EffectsConsole);
 			//win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
 		} else if (mode == EditMode::DefaultTrackMidiFx) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::EffectsConsole);
 			//win->side_bar->open(SideBar::TRACK_CONSOLE);
 			//win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
 		} else if (mode == EditMode::DefaultTrackSynth) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::TrackConsole);
 			win->side_bar->track_console->set_mode(TrackConsole::Mode::Synth);
 		} else if (mode == EditMode::DefaultSong) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::SongConsole);
 		} else if (mode == EditMode::DefaultSamples) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::SampleConsole);
 		} else if (mode == EditMode::DefaultMixing) {
-			view->set_mode(view->mode_default);
+			//view->set_mode(view->mode_default);
 			win->bottom_bar->open(BottomBar::Index::MixingConsole);
 		} else if (mode == EditMode::DefaultFx) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->bottom_bar->open(BottomBar::Index::MixingConsole);
 			win->bottom_bar->mixing_console->show_fx(view->cur_track());
 		} else if (mode == EditMode::DefaultMidiFx) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->bottom_bar->open(BottomBar::Index::MixingConsole);
 			win->bottom_bar->mixing_console->show_fx(view->cur_track());
 		} else if (mode == EditMode::DefaultSampleRef) {
+			main_view->activate_view(view);
 			view->set_mode(view->mode_default);
 			win->side_bar->open(SideBar::Index::SamplerefConsole);
 		} else if (mode == EditMode::XSignalEditor) {
 			//view->set_mode(view->mode_default);
 			win->bottom_bar->open(BottomBar::Index::SignalChainConsole);
-		} else if (mode == EditMode::SignalChain) {
-			win->side_bar->open(SideBar::Index::SignalChainConsole);
 		} else {
 			e("unknown mode: " + mode);
 			return;
@@ -240,8 +253,16 @@ void Session::set_mode(const string &_mode) {
 	});
 }
 
-bool Session::in_mode(const string &m) {
+bool Session::in_mode(const string &m) const {
 	return mode == m;
+}
+
+SideBar* Session::side_bar() {
+	return win->side_bar.get();
+}
+
+BottomBar* Session::bottom_bar() {
+	return win->bottom_bar.get();
 }
 
 void Session::add_signal_chain(xfer<SignalChain> chain) {

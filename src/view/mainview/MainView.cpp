@@ -59,7 +59,7 @@ public:
 		p->draw_str({area.x1 + 8, area.center().y - theme.FONT_SIZE_SMALL * 0.5f}, view->main_view_description());
 	}
 	bool on_left_button_down(const vec2& m) override {
-		main_view->_activate_view(view);
+		main_view->activate_view(view);
 		return true;
 	}
 	MainView *main_view;
@@ -189,7 +189,7 @@ void MainView::_add_view(shared<MainViewNode> view) {
 	views.add(view);
 	_update_box();
 
-	_activate_view(view.get());
+	activate_view(view.get());
 
 	view->out_delete_me >> create_sink([this, _view = view.get()] {
 		_remove_view(_view);
@@ -201,17 +201,17 @@ void MainView::_remove_view(MainViewNode* view) {
 		if (views[i].get() == view) {
 			// switch to another panel before deleting - keep active_view valid
 			if (i >= 1)
-				_activate_view(views[0].get());
+				activate_view(views[0].get());
 			views.erase(i);
 			break;
 		}
 
 	_update_box();
 
-	_activate_view(active_view);
+	activate_view(active_view);
 }
 
-void MainView::_activate_view(MainViewNode* view) {
+void MainView::activate_view(MainViewNode* view) {
 	for (auto v: weak(views))
 		v->set_hidden(v != view);
 	tab_bar->set_hidden(views.num < 2);
@@ -226,7 +226,7 @@ void MainView::_activate_view(MainViewNode* view) {
 void MainView::open_for(VirtualBase* p) {
 	for (auto v: weak(views))
 		if (v->main_view_data() == p) {
-			_activate_view(v);
+			activate_view(v);
 			return;
 		}
 

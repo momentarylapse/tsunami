@@ -32,6 +32,8 @@ class SessionManager;
 class PerformanceMonitor;
 class SignalChain;
 class Playback;
+class SideBar;
+class BottomBar;
 struct SessionPersistenceData;
 
 
@@ -62,6 +64,8 @@ public:
 	owned<Playback> playback;
 	AudioView *view;
 	MainView *main_view;
+	SideBar* side_bar();
+	BottomBar* bottom_bar();
 	owned<Storage> storage;
 	bool auto_delete;
 	SessionPersistenceData* persistence_data = nullptr;
@@ -83,7 +87,7 @@ public:
 	int sample_rate();
 
 	void set_mode(const string &mode);
-	bool in_mode(const string &mode);
+	bool in_mode(const string &mode) const;
 	string mode;
 
 	// global

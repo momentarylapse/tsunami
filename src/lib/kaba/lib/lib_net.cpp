@@ -75,10 +75,10 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("set_target", TypeVoid, net_p(&Socket::set_target), Flags::MUTABLE);
 			func_add_param("target", TypeNetAddress);
 		class_add_func("get_sender", TypeNetAddress, net_p(&Socket::get_sender), Flags::MUTABLE);
-		class_add_func("read", TypeString, net_p(&Socket::read), Flags::MUTABLE);
+		class_add_func("read", TypeBytes, net_p(&Socket::read), Flags::MUTABLE);
 			func_add_param("size", TypeInt32);
 		class_add_func("write", TypeBool, net_p(&Socket::write), Flags::MUTABLE);
-			func_add_param("buf", TypeString);
+			func_add_param("buf", TypeBytes);
 		class_add_func("can_read", TypeBool, net_p(&Socket::can_read));
 		class_add_func("can_write", TypeBool, net_p(&Socket::can_write));
 		class_add_func("is_connected", TypeBool, net_p(&Socket::is_connected));

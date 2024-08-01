@@ -57,7 +57,7 @@ class VulkanTexture : vulkan::Texture {
 		new(this) vulkan::Texture(w, h, format);
 	}
 	void __delete__() {
-		this->~Texture();
+		this->~VulkanTexture();
 	}
 };
 
@@ -102,14 +102,14 @@ public:
 		new(this) vulkan::FrameBuffer(rp, attachments);
 	}
 	void __delete__() {
-		this->~FrameBuffer();
+		this->~VulkanFrameBuffer();
 	}
 };
 
 class VulkanCommandBuffer : public vulkan::CommandBuffer {
 public:
 	void __delete__() {
-		this->~CommandBuffer();
+		this->~VulkanCommandBuffer();
 	}
 };
 
@@ -122,7 +122,7 @@ public:
 		new(this) vulkan::UniformBuffer(size, count);
 	}
 	void __delete__() {
-		this->~UniformBuffer();
+		this->~VulkanUniformBuffer();
 	}
 };
 
@@ -132,21 +132,21 @@ public:
 		new(this) DescriptorPool(s, max_sets);
 	}
 	void __delete__() {
-		this->~DescriptorPool();
+		this->~VulkanDescriptorPool();
 	}
 };
 
 class VulkanDescriptorSet : public vulkan::DescriptorSet {
 public:
 	void __delete__() {
-		this->~DescriptorSet();
+		this->~VulkanDescriptorSet();
 	}
 };
 
 class VulkanInstance : public vulkan::Instance {
 public:
 	void __delete__() {
-		this->~Instance();
+		this->~VulkanInstance();
 	}
 };
 
@@ -156,7 +156,7 @@ public:
 		new(this) vulkan::VertexBuffer(format);
 	}
 	void __delete__() {
-		this->~VertexBuffer();
+		this->~VulkanVertexBuffer();
 	}
 };
 
@@ -166,7 +166,7 @@ public:
 		new(this) vulkan::GraphicsPipeline(shader, render_pass, subpass, topology, format);
 	}
 	void __delete__() {
-		this->~GraphicsPipeline();
+		this->~VulkanGraphicsPipeline();
 	}
 };
 
@@ -190,7 +190,7 @@ public:
 		new(this) vulkan::RenderPass(formats, options);
 	}
 	void __delete__() {
-		this->~RenderPass();
+		this->~VulkanRenderPass();
 	}
 };
 
@@ -200,7 +200,7 @@ public:
 		new(this) vulkan::SwapChain(window, device);
 	}
 	void __delete__() {
-		this->~SwapChain();
+		this->~VulkanSwapChain();
 	}
 	base::optional<int> acquire_image_x(vulkan::Semaphore *sem) {
 		int index;
@@ -216,7 +216,7 @@ public:
 		new(this) vulkan::Fence(device);
 	}
 	void __delete__() {
-		this->~Fence();
+		this->~VulkanFence();
 	}
 };
 
@@ -226,7 +226,7 @@ public:
 		new(this) vulkan::Semaphore(device);
 	}
 	void __delete__() {
-		this->~Semaphore();
+		this->~VulkanSemaphore();
 	}
 };
 
@@ -237,7 +237,7 @@ public:
 		new(this) vulkan::Shader();
 	}
 	void __delete__() {
-		this->~Shader();
+		this->~VulkanShader();
 	}
 };
 

@@ -93,11 +93,11 @@ public:
 	string mvn_description() const override;
 	void mvn_on_enter() override;
 
-	void mvn_play() override;
-	void mvn_play_toggle() override;
-	void mvn_stop() override;
-	void mvn_pause() override;
-	bool mvn_is_playing() override;
+	void play() override;
+	void stop() override;
+	void pause() override;
+	bool is_playback_active() override;
+	bool is_paused() override;
 	bool mvn_can_play() override;
 	bool mvn_can_stop() override;
 	bool mvn_can_pause() override;
@@ -234,9 +234,6 @@ public:
 	Song *song;
 
 	void set_playback_loop(bool loop);
-	void play();
-	void stop();
-	void pause(bool pause);
 	void prepare_playback(const Range &range, bool allow_loop);
 	bool is_playback_active() const;
 	void playback_click();

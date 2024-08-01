@@ -17,12 +17,11 @@ public:
 	virtual string mvn_description() const = 0;
 	virtual void mvn_on_enter() {}
 
-	// TODO clean up this stupid interface!
-	virtual void mvn_play() {}
-	virtual void mvn_play_toggle() {}
-	virtual void mvn_stop() {}
-	virtual void mvn_pause() {}
-	virtual bool mvn_is_playing() { return false; }
+	virtual void play() {}
+	virtual void stop() {}
+	virtual void pause() {}
+	virtual bool is_playback_active() { return false; } // playing or paused
+	virtual bool is_paused() { return false; }
 	virtual bool mvn_can_play() { return false; }
 	virtual bool mvn_can_stop() { return false; }
 	virtual bool mvn_can_pause() { return false; }

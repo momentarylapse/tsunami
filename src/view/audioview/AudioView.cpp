@@ -327,44 +327,32 @@ void AudioView::mvn_on_enter() {
 	session->set_mode(EditMode::Default);
 }
 
-void AudioView::mvn_play() {
-	//session->playback->play();
+void AudioView::play() {
 	if (session->in_mode(EditMode::Capture))
 		return;
-
-	play();
+	session->playback->play();
 }
 
-void AudioView::mvn_play_toggle() {
-	if (session->in_mode(EditMode::Capture))
-		return;
-
-	if (is_playback_active()) {
-		pause(!is_paused());
-	} else {
-		play();
-	}
-}
-
-void AudioView::mvn_stop() {
-	//session->playback->stop();
-
+void AudioView::stop() {
 	if (session->in_mode(EditMode::Capture)) {
 		session->set_mode(EditMode::Default);
 	} else {
-		stop();
+		session->playback->stop();
 	}
 }
 
-void AudioView::mvn_pause() {
-	//session->playback->pause();
+void AudioView::pause() {
 	if (session->in_mode(EditMode::Capture))
 		return;
-	pause(true);
+	session->playback->pause(true);
 }
 
-bool AudioView::mvn_is_playing() {
+bool AudioView::is_playback_active() {
 	return session->playback->is_active();
+}
+
+bool AudioView::is_paused() {
+	return session->playback->is_paused();
 }
 
 bool AudioView::mvn_can_play() {
@@ -1353,15 +1341,7 @@ void AudioView::enable(bool _enabled) {
 void AudioView::set_playback_loop(bool loop) {
 	session->playback->set_loop(loop);
 }
-void AudioView::play() {
-	session->playback->play();
-}
-void AudioView::stop() {
-	session->playback->stop();
-}
-void AudioView::pause(bool pause) {
-	session->playback->pause(pause);
-}
+
 void AudioView::prepare_playback(const Range &range, bool allow_loop) {
 	session->playback->prepare(range, allow_loop);
 }

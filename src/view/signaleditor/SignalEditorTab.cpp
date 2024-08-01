@@ -178,27 +178,24 @@ void SignalEditorTab::mvn_on_enter() {
 	session->side_bar()->open(SideBar::Index::SignalChainConsole);
 }
 
-void SignalEditorTab::mvn_play() {
+void SignalEditorTab::play() {
 	chain->start();
 }
 
-void SignalEditorTab::mvn_play_toggle() {
-	if (chain->is_active())
-		chain->stop();
-	else
-		chain->start();
-}
-
-void SignalEditorTab::mvn_stop() {
+void SignalEditorTab::stop() {
 	chain->stop_hard();
 }
 
-void SignalEditorTab::mvn_pause() {
+void SignalEditorTab::pause() {
 	chain->stop();
 }
 
-bool SignalEditorTab::mvn_is_playing() {
-	return chain->is_active();
+bool SignalEditorTab::is_playback_active() {
+	return chain->is_active() or chain->is_prepared();
+}
+
+bool SignalEditorTab::is_paused() {
+	return chain->is_prepared() and !chain->is_active();
 }
 
 bool SignalEditorTab::mvn_can_play() {

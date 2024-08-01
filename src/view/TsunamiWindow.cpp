@@ -727,27 +727,22 @@ void TsunamiWindow::on_play_loop() {
 }
 
 void TsunamiWindow::on_play() {
-	main_view->active_view->mvn_play();
+	main_view->active_view->play();
 }
 
 void TsunamiWindow::on_play_toggle() {
-	main_view->active_view->mvn_play_toggle();
-	if (session->in_mode(EditMode::Capture))
-		return;
-
-	if (view->is_playback_active()) {
-		view->pause(!view->is_paused());
-	} else {
-		view->play();
-	}
+	if (main_view->active_view->is_paused() or !main_view->active_view->is_playback_active())
+		main_view->active_view->play();
+	else
+		main_view->active_view->pause();
 }
 
 void TsunamiWindow::on_pause() {
-	main_view->active_view->mvn_pause();
+	main_view->active_view->pause();
 }
 
 void TsunamiWindow::on_stop() {
-	main_view->active_view->mvn_stop();
+	main_view->active_view->stop();
 }
 
 void TsunamiWindow::on_insert_sample() {

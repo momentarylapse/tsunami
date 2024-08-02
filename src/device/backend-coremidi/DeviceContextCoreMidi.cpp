@@ -15,16 +15,23 @@ namespace tsunami {
 
 DeviceContextCoreMidi* DeviceContextCoreMidi::instance;
 
+void on_coremidi_notify(const MIDINotification *message, void* refCon) {
+	auto ctx = reinterpret_cast<DeviceContextCoreMidi*>(refCon);
+	//msg_write(format("notify   %d", (int)message->messageID));
+	if (message->messageID == kMIDIMsgObjectAdded or message->messageID == kMIDIMsgObjectRemoved)
+		ctx->out_request_update();
+}
+
 DeviceContextCoreMidi::DeviceContextCoreMidi(Session* session) : DeviceContext(session) {
 	instance = this;
 
 	CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, "tsunami", kCFStringEncodingMacRoman);
-	MIDIClientCreate(name, nullptr, nullptr, (MIDIClientRef*)&client);
+	MIDIClientCreate(name, &on_coremidi_notify, this, (MIDIClientRef*)&client);
+	//MIDIClientCreateWithBlock(name, )
 	CFRelease(name);
 }
 
-DeviceContextCoreMidi::~DeviceContextCoreMidi() {
-}
+DeviceContextCoreMidi::~DeviceContextCoreMidi() = default;
 
 bool DeviceContextCoreMidi::init(Session* session) {
 	return true;
@@ -52,12 +59,13 @@ void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool se
 		MIDIObjectGetIntegerProperty(d, kMIDIPropertyUniqueID, &value);
 		//msg_write(value);
 
-		Device* dev = device_manager->get_device_create(DeviceType::MidiInput, name);
-		dev->name = display_name;
-		dev->index_in_lib = (int)d;
-		dev->present = true;
-		//out_device_found(dev);
-		device_manager->set_device_config(dev);
+		Device dev;
+		dev.type = DeviceType::MidiInput;
+		dev.internal_name = name;
+		dev.name = display_name;
+		dev.index_in_lib = (int)d;
+		dev.present = true;
+		out_device_found(dev);
 	}
 
 	// default

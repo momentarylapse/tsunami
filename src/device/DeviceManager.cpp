@@ -184,13 +184,13 @@ void DeviceManager::update_devices(bool initial_discovery) {
 
 	for (auto d: all_devices()) {
 		if (d->present and !present_old.contains(d)) {
-			out_found_device(d);
+			out_device_plugged_in(d);
 			if (!initial_discovery)
-				session->status(_("device found: ") + d->get_name());
+				session->status(_("device plugged in: ") + d->get_name());
 		} else if (!d->present and present_old.contains(d)) {
-			out_lost_device(d);
+			out_device_plugged_out(d);
 			if (!initial_discovery)
-				session->status(_("device lost: ") + d->get_name());
+				session->status(_("device plugged out: ") + d->get_name());
 		}
 	}
 
@@ -279,26 +279,27 @@ void DeviceManager::init() {
 	output_volume = 1;
 	//output_volume = hui::Config.get_float("Devices.OutputVolume", 1.0f);
 
+	auto init_context = [this](DeviceContext* ctx) {
+		ctx->out_request_update >> create_sink([this] {
+			update_devices(false);
+		});
+		ctx->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
+			//msg_write("DEVICE FOUND..." + dd.internal_name);
+			Device *d = get_device_create(dd.type, dd.internal_name);
+			*d = dd;
+			d->present = true;
+			set_device_config(d);
+		});
+		ctx->fully_initialized = ctx->init(session);
+	};
+
 	// audio
-
 	audio_context = create_backend_context(session, audio_api);
-	audio_context->out_request_update >> create_sink([this] {
-		update_devices(false);
-	});
-	audio_context->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
-		//msg_write("DEVICE FOUND..." + dd.internal_name);
-		Device *d = get_device_create(dd.type, dd.internal_name);
-		*d = dd;
-		d->present = true;
-		set_device_config(d);
-	});
-
-	audio_context->fully_initialized = audio_context->init(session);
-
+	init_context(audio_context);
 
 	// midi
 	midi_context = create_backend_context(session, midi_api);
-	midi_context->fully_initialized = midi_context->init(session);
+	init_context(midi_context);
 
 	update_devices(true);
 

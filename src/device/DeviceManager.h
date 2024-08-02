@@ -33,8 +33,8 @@ public:
 	obs::xsource<Device*> out_add_device{this, "add-device"};
 	obs::xsource<Device*> out_remove_device{this, "remove-device"};
 	// device present?
-	obs::xsource<Device*> out_found_device{this, "found-device"};
-	obs::xsource<Device*> out_lost_device{this, "lost-device"};
+	obs::xsource<Device*> out_device_plugged_in{this, "device-plugged-in"};
+	obs::xsource<Device*> out_device_plugged_out{this, "device-plugged-out"};
 
 	explicit DeviceManager(Session *session);
 	~DeviceManager() override;

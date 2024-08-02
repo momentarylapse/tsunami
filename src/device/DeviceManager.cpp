@@ -20,13 +20,13 @@
 namespace tsunami {
 
 Array<DeviceManager::ApiDescription> DeviceManager::api_descriptions = {
-	{"alsa", DeviceManager::ApiType::ALSA, 2, HAS_LIB_ALSA},
-	{"pulseaudio", DeviceManager::ApiType::PULSE, 1, HAS_LIB_PULSEAUDIO},
-	{"portaudio", DeviceManager::ApiType::PORTAUDIO, 1, HAS_LIB_PORTAUDIO},
-	{"pipewire", DeviceManager::ApiType::PIPEWIRE, 1, HAS_LIB_PIPEWIRE},
-	{"coreaudio", DeviceManager::ApiType::COREAUDIO, 1, HAS_LIB_COREAUDIO},
-	{"coremidi", DeviceManager::ApiType::COREMIDI, 2, HAS_LIB_COREMIDI},
-	{"dummy", DeviceManager::ApiType::DUMMY, 3, true}
+	{"alsa", DeviceManager::ApiType::Alsa, 2, HAS_LIB_ALSA},
+	{"pulseaudio", DeviceManager::ApiType::Pulseaudio, 1, HAS_LIB_PULSEAUDIO},
+	{"portaudio", DeviceManager::ApiType::Portaudio, 1, HAS_LIB_PORTAUDIO},
+	{"pipewire", DeviceManager::ApiType::Pipewire, 1, HAS_LIB_PIPEWIRE},
+	{"coreaudio", DeviceManager::ApiType::Coreaudio, 1, HAS_LIB_COREAUDIO},
+	{"coremidi", DeviceManager::ApiType::Coremidi, 2, HAS_LIB_COREMIDI},
+	{"dummy", DeviceManager::ApiType::Dummy, 3, true}
 };
 
 
@@ -67,27 +67,27 @@ Any devs2any(const Array<Device*>& devices) {
 
 DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType api) {
 #if HAS_LIB_COREAUDIO
-	if (api == DeviceManager::ApiType::COREAUDIO)
+	if (api == DeviceManager::ApiType::Coreaudio)
 		return new DeviceContextCoreAudio(session);
 #endif
 #if HAS_LIB_PULSEAUDIO
-	if (api == DeviceManager::ApiType::PULSE)
+	if (api == DeviceManager::ApiType::Pulseaudio)
 		return new DeviceContextPulse(session);
 #endif
 #if HAS_LIB_PORTAUDIO
-	if (api == DeviceManager::ApiType::PORTAUDIO)
+	if (api == DeviceManager::ApiType::Portaudio)
 		return new DeviceContextPort(session);
 #endif
 #if HAS_LIB_COREMIDI
-	if (api == DeviceManager::ApiType::COREMIDI)
+	if (api == DeviceManager::ApiType::Coremidi)
 		return new DeviceContextCoreMidi(session);
 #endif
 #if HAS_LIB_PIPEWIRE
-	if (api == DeviceManager::ApiType::PIPEWIRE)
+	if (api == DeviceManager::ApiType::Pipewire)
 		return new DeviceContextPipewire(session);
 #endif
 #if HAS_LIB_ALSA
-	if (api == DeviceManager::ApiType::ALSA)
+	if (api == DeviceManager::ApiType::Alsa)
 		return new DeviceContextAlsa(session);
 #endif
 
@@ -106,8 +106,8 @@ DeviceManager::DeviceManager(Session *_session) {
 
 	session = _session;
 
-	audio_api = ApiType::DUMMY;
-	midi_api = ApiType::DUMMY;
+	audio_api = ApiType::Dummy;
+	midi_api = ApiType::Dummy;
 
 	dummy_device = new Device(DeviceType::None, "dummy");
 
@@ -169,19 +169,34 @@ void DeviceManager::write_config() {
 
 
 // don't poll pulse too much... it will send notifications anyways
-void DeviceManager::update_devices(bool serious) {
-	audio_context->update_device(this, serious);
+void DeviceManager::update_devices(bool initial_discovery) {
+	base::set<Device*> present_old;
+	for (auto d: all_devices()) {
+		if (d->present)
+			present_old.add(d);
+		d->present = false;
+	}
+
+	audio_context->update_device(this, initial_discovery);
 	if (midi_context)
-		midi_context->update_device(this, serious);
+		midi_context->update_device(this, initial_discovery);
+
+
+	for (auto d: all_devices()) {
+		if (d->present and !present_old.contains(d))
+			out_found_device(d);
+		else if (!d->present and present_old.contains(d))
+			out_lost_device(d);
+	}
 
 	write_config();
-	out_changed.notify();
+	out_changed();
 }
 
 
 static DeviceManager::ApiType select_api(const string &preferred_name, int mode) {
-	DeviceManager::ApiType best = DeviceManager::ApiType::DUMMY;
-	for (int i=(int)DeviceManager::ApiType::NUM_APIS-1; i>=0; i--) {
+	DeviceManager::ApiType best = DeviceManager::ApiType::Dummy;
+	for (int i=(int)DeviceManager::ApiType::Count-1; i>=0; i--) {
 		auto &a = DeviceManager::api_descriptions[i];
 		if (!a.available or ((a.mode & mode) == 0))
 			continue;
@@ -263,10 +278,10 @@ void DeviceManager::init() {
 
 	audio_context = create_backend_context(session, audio_api);
 	audio_context->out_request_update >> create_sink([this] {
-		update_devices(true);
+		update_devices(false);
 	});
 	audio_context->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
-		//msg_write("DEVICE FOUND..." + dd.name);
+		//msg_write("DEVICE FOUND..." + dd.internal_name);
 		Device *d = get_device_create(dd.type, dd.internal_name);
 		*d = dd;
 		d->present = true;
@@ -286,7 +301,7 @@ void DeviceManager::init() {
 #if HAS_LIB_ALSA
 	// only updating alsa makes sense...
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
-	if (midi_api == ApiType::ALSA)
+	if (midi_api == ApiType::Alsa)
 		hui_rep_id = hui::run_repeated(2.0f, [this] {
 			DeviceContextAlsa::instance->update_device(this, true);
 		});
@@ -323,7 +338,7 @@ float DeviceManager::get_output_volume() {
 void DeviceManager::set_output_volume(float _volume) {
 	output_volume = _volume;
 	write_config();
-	out_changed.notify();
+	out_changed();
 }
 
 Device* DeviceManager::get_device(DeviceType type, const string &internal_name) {
@@ -343,6 +358,13 @@ Device* DeviceManager::get_device_create(DeviceType type, const string &internal
 	devices.add(d);
 	out_add_device.notify(d);
 	return d;
+}
+
+Array<Device*> DeviceManager::all_devices() const {
+	auto all = output_devices;
+	all.append(input_devices);
+	all.append(midi_input_devices);
+	return all;
 }
 
 Array<Device*> &DeviceManager::device_list(DeviceType type) {
@@ -388,7 +410,7 @@ void DeviceManager::set_device_config(Device *d) {
 		getDeviceList(d.type).add(d);
 	}*/
 	write_config();
-	out_changed.notify();
+	out_changed();
 }
 
 void DeviceManager::make_device_top_priority(Device *d) {
@@ -400,7 +422,7 @@ void DeviceManager::make_device_top_priority(Device *d) {
 			break;
 		}
 	write_config();
-	out_changed.notify();
+	out_changed();
 }
 
 void DeviceManager::move_device_priority(Device *d, int new_prio) {
@@ -411,7 +433,7 @@ void DeviceManager::move_device_priority(Device *d, int new_prio) {
 			break;
 		}
 	write_config();
-	out_changed.notify();
+	out_changed();
 }
 
 }

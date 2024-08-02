@@ -29,11 +29,15 @@ public:
 	friend class AudioInput;
 	friend class MidiInput;
 
+	// general database entries
 	obs::xsource<Device*> out_add_device{this, "add-device"};
 	obs::xsource<Device*> out_remove_device{this, "remove-device"};
+	// device present?
+	obs::xsource<Device*> out_found_device{this, "found-device"};
+	obs::xsource<Device*> out_lost_device{this, "lost-device"};
 
-	DeviceManager(Session *session);
-	virtual ~DeviceManager();
+	explicit DeviceManager(Session *session);
+	~DeviceManager() override;
 
 	Session *session;
 
@@ -41,14 +45,14 @@ public:
 	void kill_library();
 
 	enum class ApiType {
-		DUMMY,
-		ALSA,
-		PULSE,
-		PORTAUDIO,
-		PIPEWIRE,
-		COREAUDIO,
-		COREMIDI,
-		NUM_APIS
+		Dummy,
+		Alsa,
+		Pulseaudio,
+		Portaudio,
+		Pipewire,
+		Coreaudio,
+		Coremidi,
+		Count
 	};
 	ApiType audio_api;
 	ApiType midi_api;
@@ -67,6 +71,7 @@ public:
 
 	Device *get_device(DeviceType type, const string &internal_name);
 	Device *get_device_create(DeviceType type, const string &internal_name);
+	Array<Device*> all_devices() const;
 	Array<Device*> &device_list(DeviceType type);
 	Array<Device*> good_device_list(DeviceType type);
 
@@ -82,7 +87,7 @@ public:
 
 	float output_volume;
 
-	void update_devices(bool serious);
+	void update_devices(bool initial_discovery);
 	Array<Device*> empty_device_list;
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;

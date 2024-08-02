@@ -163,7 +163,7 @@ bool LogNotifier::progress(float dt) {
 
 void LogNotifier::set_status(const string& text, float size) {
 	status.text = text;
-	status.ttl = 0.8f;
+	status.ttl = 0.2f + (float)text.num * 0.1f;
 	status.size = size;
 	request_redraw();
 }

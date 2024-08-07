@@ -14,6 +14,8 @@
 #include "../stuff/SessionManager.h"
 #include "../lib/hui/Controls/ControlMenuButton.h"
 #include "../lib/base/iter.h"
+#include "mainview/MainView.h"
+#include "mainview/MainViewNode.h"
 
 namespace tsunami {
 
@@ -94,8 +96,8 @@ HeaderBar::HeaderBar(TsunamiWindow* _win) {
 }
 
 void HeaderBar::update() {
-	bool editing = win->session->in_mode(EditMode::EditTrack);
-	bool recording = win->session->in_mode(EditMode::Capture);
+	bool editing = win->main_view->active_view->is_editing();
+	bool recording = win->main_view->active_view->is_recording();
 	win->hide_control("undo-redo-box", !win->side_bar->visible or recording);
 	win->hide_control("copy-paste-box", !editing);
 

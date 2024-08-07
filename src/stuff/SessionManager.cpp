@@ -453,7 +453,7 @@ bool SessionManager::try_restore_session(Session *session, const Path &filename)
 	if (!p)
 		return false;
 	load_into_session(p, session);
-	session->i(_("session automatically restored: ") + str(p->session_filename));
+	session->i(_("session restored: ") + str(p->session_filename));
 	return true;
 }
 

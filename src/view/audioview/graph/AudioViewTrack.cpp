@@ -67,17 +67,17 @@ void AudioViewTrack::on_track_change() {
 bool AudioView::editing_track(Track *t) {
 	if (cur_track() != t)
 		return false;
-	if (session->in_mode(EditMode::DefaultTrack))
+	if (in_mode(EditMode::DefaultTrack))
 		return true;
-	if (session->in_mode(EditMode::DefaultTrackFx))
+	if (in_mode(EditMode::DefaultTrackFx))
 		return true;
-	if (session->in_mode(EditMode::DefaultMidiFx))
+	if (in_mode(EditMode::DefaultMidiFx))
 		return true;
-	if (session->in_mode(EditMode::Curves))
+	if (in_mode(EditMode::Curves))
 		return true;
-	if (session->in_mode(EditMode::EditTrack))
+	if (in_mode(EditMode::EditTrack))
 		return true;
-	if (session->in_mode(EditMode::Capture))
+	if (in_mode(EditMode::Capture))
 		return true;
 	return false;
 }

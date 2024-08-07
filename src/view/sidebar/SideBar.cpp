@@ -24,6 +24,7 @@
 #include "../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
+#include "../mainview/MainView.h"
 
 namespace tsunami {
 
@@ -98,9 +99,13 @@ void SideBar::add_console(SideBarConsole *c) {
 
 void SideBar::on_close() {
 	test_allow_close().then([this] (bool allow) {
-		if (allow)
-			session->set_mode(EditMode::Default);
-			//_hide();
+		if (allow) {
+			// TODO ... just fix this!
+			if (session->main_view->active_view == session->view)
+				session->set_mode(EditMode::Default);
+			else
+				_hide();
+		}
 	});
 }
 

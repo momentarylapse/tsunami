@@ -235,11 +235,6 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 		});
 	});
-	p.cmd("session", "SESSION ...", "restore a saved session", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
-			session_manager->load_session(a[0]);
-		});
-	});
 #ifndef NDEBUG
 	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
 		UnitTest::print_all_names();

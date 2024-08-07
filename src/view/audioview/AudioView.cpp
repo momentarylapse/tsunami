@@ -14,7 +14,6 @@
 #include "../MouseDelayPlanner.h"
 #include "../helper/graph/SceneGraph.h"
 #include "../helper/graph/ScrollBar.h"
-#include "../helper/Dial.h"
 #include "../helper/Drawing.h"
 #include "../helper/PeakThread.h"
 #include "../helper/PeakDatabase.h"
@@ -30,7 +29,7 @@
 #include "../painter/BufferPainter.h"
 #include "../painter/GridPainter.h"
 #include "../sidebar/SideBar.h"
-#include "../bottombar/BottomBar.h"
+#include "../sidebar/TrackConsole.h"
 #include "../mainview/MainView.h"
 #include "../TsunamiWindow.h"
 #include "../../data/base.h"
@@ -41,9 +40,7 @@
 #include "../../data/Sample.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/SampleRef.h"
-#include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
-#include "../../module/SignalChain.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../Session.h"
@@ -152,7 +149,6 @@ AudioView::AudioView(Session *_session) :
 	mode_curve = new ViewModeCurve(this);
 	mode_capture = new ViewModeCapture(this);
 	all_modes = {mode_default, mode_edit_audio, mode_edit_midi, mode_edit_bars, mode_edit_dummy, mode_edit, mode_scale_marker, mode_curve, mode_capture};
-	set_mode(mode_default);
 
 	/*scene_graph->set_callback_set_current([this] {
 		if (!selecting_or())
@@ -298,9 +294,6 @@ AudioView::AudioView(Session *_session) :
 		update_menu();
 	}, song->MESSAGE_ANY);*/
 	enable(true);
-
-	//ForceRedraw();
-	update_menu();
 }
 
 AudioView::~AudioView() {
@@ -324,25 +317,26 @@ string AudioView::mvn_description() const {
 }
 
 void AudioView::mvn_on_enter() {
-	session->set_mode(EditMode::Default);
+	// restore side bar state
+	set_mode(current_mode_name);
 }
 
 void AudioView::play() {
-	if (session->in_mode(EditMode::Capture))
+	if (mode == mode_capture)
 		return;
 	session->playback->play();
 }
 
 void AudioView::stop() {
-	if (session->in_mode(EditMode::Capture)) {
-		session->set_mode(EditMode::Default);
+	if (mode == mode_capture) {
+		set_mode(EditMode::Default);
 	} else {
 		session->playback->stop();
 	}
 }
 
 void AudioView::pause() {
-	if (session->in_mode(EditMode::Capture))
+	if (mode == mode_capture)
 		return;
 	session->playback->pause(true);
 }
@@ -356,11 +350,11 @@ bool AudioView::is_paused() {
 }
 
 bool AudioView::mvn_can_play() {
-	return !session->in_mode(EditMode::Capture);
+	return mode != mode_capture;
 }
 
 bool AudioView::mvn_can_stop() {
-	return is_playback_active() or session->in_mode(EditMode::Capture);
+	return is_playback_active() or (mode == mode_capture);
 }
 
 bool AudioView::mvn_can_pause() {
@@ -368,7 +362,20 @@ bool AudioView::mvn_can_pause() {
 }
 
 bool AudioView::mvn_can_record() {
-	return !session->in_mode(EditMode::Capture);
+	return (mode != mode_capture);
+}
+bool AudioView::mvn_can_edit() {
+	return true;
+}
+bool AudioView::is_editing() {
+	return mode == mode_edit;
+}
+bool AudioView::mvn_show_undo() {
+	return true;
+};
+
+bool AudioView::is_recording() {
+	return mode == mode_capture;
 }
 
 void AudioView::set_antialiasing(bool set) {
@@ -386,7 +393,7 @@ void AudioView::set_high_details(bool set) {
 	out_settings_changed.notify();
 }
 
-void AudioView::set_mode(ViewMode *m) {
+void AudioView::_set_mode(ViewMode *m) {
 	if (m == mode)
 		return;
 	if (mode) {
@@ -400,6 +407,65 @@ void AudioView::set_mode(ViewMode *m) {
 	}
 	thm.set_dirty();
 	force_redraw();
+}
+
+void AudioView::set_mode(const string& m) {
+	current_mode_name = m;
+
+	if (m == EditMode::Default) {
+		_set_mode(mode_default);
+		win->side_bar->_hide();
+	} else if (m == EditMode::Capture) {
+		_set_mode(mode_capture);
+		mode->set_side_bar(SideBar::Index::CaptureConsole);
+	} else if (m == EditMode::EditTrack) {
+		_set_mode(mode_edit);
+		//mode->set_side_bar(SideBar::Index::T);
+	} else if (m == EditMode::ScaleBars) {
+		_set_mode(mode_edit_bars);
+		mode_edit_bars->set_edit_mode(ViewModeEditBars::EditMode::Rubber);
+	} else if (m == EditMode::ScaleMarker) {
+		_set_mode(mode_scale_marker);
+	} else if (m == EditMode::Curves) {
+		_set_mode(mode_curve);
+		mode->set_side_bar(SideBar::Index::CurveConsole);
+	} else if (m == EditMode::DefaultTrack) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::TrackConsole);
+	} else if (m == EditMode::DefaultTrackFx) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::EffectsConsole);
+		//win->side_bar->track_console->set_mode(TrackConsole::Mode::FX);
+	} else if (m == EditMode::DefaultTrackMidiFx) {
+		win->side_bar->open(SideBar::Index::EffectsConsole);
+		//win->side_bar->open(SideBar::TRACK_CONSOLE);
+		//win->side_bar->track_console->set_mode(TrackConsole::Mode::MIDI_FX);
+	} else if (m == EditMode::DefaultTrackSynth) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::TrackConsole);
+		win->side_bar->track_console->set_mode(TrackConsole::Mode::Synth);
+	} else if (m == EditMode::DefaultSong) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::SongConsole);
+	} else if (m == EditMode::DefaultSamples) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::SampleConsole);
+	} else if (m == EditMode::DefaultFx) {
+		_set_mode(mode_default);
+		//win->bottom_bar->open(BottomBar::Index::MixingConsole);
+		//win->bottom_bar->mixing_console->show_fx(cur_track());
+	} else if (m == EditMode::DefaultMidiFx) {
+		_set_mode(mode_default);
+		//win->bottom_bar->open(BottomBar::Index::MixingConsole);
+		//win->bottom_bar->mixing_console->show_fx(cur_track());
+	} else if (m == EditMode::DefaultSampleRef) {
+		_set_mode(mode_default);
+		win->side_bar->open(SideBar::Index::SamplerefConsole);
+	}
+}
+
+bool AudioView::in_mode(const string& m) {
+	return current_mode_name == m;
 }
 
 int AudioView::mouse_over_sample(SampleRef *s) {

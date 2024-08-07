@@ -446,7 +446,7 @@ void ViewModeDefault::draw_selected_layer_highlight(Painter *p, const rect &area
 }
 
 void ViewModeDefault::draw_post(Painter *p) {
-	if (session->mode.match("default/track*"))
+	if (view->current_mode_name.match("default/track*"))
 		draw_selected_layer_highlight(p, view->cur_vtrack()->area);
 }
 

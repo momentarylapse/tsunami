@@ -102,6 +102,10 @@ public:
 	bool mvn_can_stop() override;
 	bool mvn_can_pause() override;
 	bool mvn_can_record() override;
+	bool mvn_can_edit() override;
+	bool is_editing() override;
+	bool is_recording() override;
+	bool mvn_show_undo() override;
 
 	void check_consistency();
 	void force_redraw();
@@ -215,7 +219,10 @@ public:
 	MidiMode midi_view_mode;
 
 	ViewMode *mode;
-	void set_mode(ViewMode *m);
+	void _set_mode(ViewMode *m);
+	void set_mode(const string& m);
+	bool in_mode(const string& m);
+	string current_mode_name;
 
 	owned_array<ViewMode> all_modes;
 	ViewModeDefault *mode_default;

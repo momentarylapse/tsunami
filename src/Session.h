@@ -87,8 +87,6 @@ public:
 	int sample_rate();
 
 	void set_mode(const string &mode);
-	bool in_mode(const string &mode) const;
-	string mode;
 
 	// global
 	Log *log;

@@ -453,9 +453,9 @@ color AudioViewLayer::background_selection_color() const {
 bool AudioView::editing_layer(AudioViewLayer *l) {
 	if (cur_vlayer() != l)
 		return false;
-	if (session->in_mode(EditMode::EditTrack))
+	if (in_mode(EditMode::EditTrack))
 		return true;
-	if (session->in_mode(EditMode::Capture))
+	if (in_mode(EditMode::Capture))
 		return true;
 	return false;
 }

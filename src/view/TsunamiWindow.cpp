@@ -357,6 +357,8 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 		}
 	});
 
+	view->set_mode(EditMode::Default);
+	view->update_menu();
 	update_menu();
 }
 
@@ -494,6 +496,7 @@ void TsunamiWindow::on_buffer_compress() {
 }
 
 void TsunamiWindow::on_mode_edit_checked() {
+	// TODO main_view->active->edit()...
 	if (view->mode == view->mode_edit)
 		session->set_mode(EditMode::Default);
 	else
@@ -753,6 +756,7 @@ void TsunamiWindow::on_insert_sample() {
 extern bool _capture_console_force_complex_;
 
 void TsunamiWindow::on_record(bool complex) {
+	// TODO main_view->active...
 	_capture_console_force_complex_ = complex;
 	session->set_mode(EditMode::Capture);
 }
@@ -876,7 +880,7 @@ void TsunamiWindow::update_menu() {
 	check("show-mixing-console", bottom_bar->is_active(BottomBar::Index::MixingConsole));
 	check("show_signal_chain", bottom_bar->is_active(BottomBar::Index::SignalChainConsole));
 	check("show-plugin-console", bottom_bar->is_active(BottomBar::Index::PluginConsole));
-	check("sample_manager", session->in_mode(EditMode::DefaultSamples));
+	check("sample_manager", view->in_mode(EditMode::DefaultSamples));
 
 	string title = title_filename(song->filename) + " - " + AppName;
 	if (!song->action_manager->is_save())

@@ -17,7 +17,6 @@
 #include "../MouseDelayPlanner.h"
 #include "../ColorScheme.h"
 #include "../../module/stream/AudioOutput.h"
-#include "../../stuff/PerformanceMonitor.h"
 #include "../../data/Song.h"
 #include "../../module/SignalChain.h"
 #include "../../Playback.h"
@@ -189,7 +188,8 @@ void MainView::_add_view(shared<MainViewNode> view) {
 	views.add(view);
 	_update_box();
 
-	activate_view(view.get());
+	if (views.num == 1)
+		activate_view(view.get());
 
 	view->out_delete_me >> create_sink([this, _view = view.get()] {
 		_remove_view(_view);
@@ -232,8 +232,10 @@ void MainView::open_for(VirtualBase* p) {
 
 	if (auto song = dynamic_cast<Song*>(p)) {
 		_add_view(new AudioView(song->session));
+		activate_view(weak(views).back());
 	} else if (auto chain = dynamic_cast<SignalChain*>(p)) {
 		_add_view(new SignalEditorTab(chain));
+		activate_view(weak(views).back());
 	}
 }
 

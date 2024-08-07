@@ -27,6 +27,8 @@
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../Playback.h"
+#include "../view/mainview/MainView.h"
+#include "../view/signaleditor/SignalEditorTab.h"
 
 namespace tsunami {
 
@@ -235,6 +237,51 @@ void SessionManager::save_session(Session *s) {
 		save_session(s, suggest_internal_session_path(s));
 }
 
+xml::Element audio_view_to_xml(AudioView* view) {
+	auto ev = xml::Element("view");
+	ev.witha("type", "audioview");
+	auto es = xml::Element("selection")
+			.witha("start", i2s(view->sel.range().start()))
+			.witha("end", i2s(view->sel.range().end()));
+	ev.add(es);
+	auto ec = xml::Element("viewport")
+			.witha("start", i2s(view->cam.range().start()))
+			.witha("end", i2s(view->cam.range().end()));
+	ev.add(ec);
+	auto ets = xml::Element("tracks");
+	for (auto&& [i,t]: enumerate(weak(view->song->tracks))) {
+		auto et = xml::Element("track").witha("index", i2s(i));
+		auto vt = view->get_track(t);
+		if (vt->solo)
+			et.witha("solo", "true");
+		if (t->type == SignalType::Audio)
+			et.witha("audio_mode", audio_mode_str(vt->audio_mode));
+		else if (t->type == SignalType::Midi)
+			et.witha("midi_mode", midi_mode_str(vt->midi_mode_wanted));
+		ets.add(et);
+	}
+	ev.add(ets);
+	return ev;
+}
+
+xml::Element signal_editor_to_xml(SignalEditorTab* s, int uid) {
+	auto ev = xml::Element("view");
+	ev.witha("type", "signalchain");
+	ev.witha("uid", str(uid));
+	return ev;
+}
+
+xml::Element main_view_node_to_xml(MainViewNode* v, Session* s) {
+	if (v == s->view)
+		return audio_view_to_xml(s->view);
+
+	for (auto [uid, c]: enumerate(weak(s->all_signal_chains)))
+		if (v->mvn_data() == c)
+			return signal_editor_to_xml(reinterpret_cast<SignalEditorTab*>(v), uid);
+
+	return xml::Element("view").witha("type", "unknown");
+}
+
 void SessionManager::save_session(Session *s, const Path &filename) {
 	os::fs::create_directory(directory());
 
@@ -256,36 +303,18 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 	if (s->song->filename)
 		e.add(xml::Element("file").witha("path", s->song->filename.absolute().str()));
 
-	// view
-	auto ev = xml::Element("view");
-	auto es = xml::Element("selection")
-			.witha("start", i2s(s->view->sel.range().start()))
-			.witha("end", i2s(s->view->sel.range().end()));
-	ev.add(es);
-	auto ec = xml::Element("viewport")
-			.witha("start", i2s(s->view->cam.range().start()))
-			.witha("end", i2s(s->view->cam.range().end()));
-	ev.add(ec);
-	auto ets = xml::Element("tracks");
-	for (auto&& [i,t]: enumerate(weak(s->song->tracks))) {
-		auto et = xml::Element("track").witha("index", i2s(i));
-		auto vt = s->view->get_track(t);
-		if (vt->solo)
-			et.witha("solo", "true");
-		if (t->type == SignalType::Audio)
-			et.witha("audio_mode", audio_mode_str(vt->audio_mode));
-		else if (t->type == SignalType::Midi)
-			et.witha("midi_mode", midi_mode_str(vt->midi_mode_wanted));
-		ets.add(et);
-	}
-	e.add(ets);
-	e.add(ev);
+	// mainview
+	auto mview = xml::Element("mainview");
+	mview.witha("active", str(weak(s->main_view->views).find(s->main_view->active_view)));
+	for (auto v: weak(s->main_view->views))
+		mview.add(main_view_node_to_xml(v, s));
+	e.add(mview);
 
 	// signal chains
 	auto echains = xml::Element("signalchains");
-	for (auto c: weak(s->all_signal_chains))
+	for (auto [uid, c]: enumerate(weak(s->all_signal_chains)))
 		if (c->explicitly_save_for_session)
-			echains.add(signal_chain_to_xml(c));
+			echains.add(signal_chain_to_xml(c).witha("uid", i2s(uid)));
 	e.add(echains);
 
 	// plugins
@@ -309,18 +338,37 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 }
 
 
-/*bool SessionManager::session_exists(const string& name) const {
-	for (const auto& l: enumerate_all_sessions())
-		if (l.is_persistent() and l.name == session_name(name))
-			return true;
-	return false;
-}*/
-
 Session *SessionManager::load_session(const Path &filename, Session *session_caller) {
 	auto *session = get_empty_session(session_caller);
 	if (auto p = find_for_filename_x(filename))
 		load_into_session(p, session);
 	return session;
+}
+
+void audio_view_tracks_from_xml(AudioView* view, xml::Element* ets) {
+	for (auto& e: ets->elements) {
+		int index = e.value("index", "-1")._int();
+		if (index >= 0 and index < view->song->tracks.num) {
+			auto t = view->song->tracks[index].get();
+			auto vt = view->get_track(t);
+			vt->set_solo(e.value("solo", "false")._bool());
+			if (auto mm = parse_midi_mode(e.value("midi_mode")))
+				vt->set_midi_mode(*mm);
+			if (auto am = parse_audio_mode(e.value("audio_mode")))
+				vt->set_audio_mode(*am);
+		}
+	}
+}
+
+void audio_view_from_xml(AudioView* view, xml::Element* ev) {
+	auto es = ev->find("selection");
+	view->sel = SongSelection::from_range(view->song, Range::to(es->value("start")._int(), es->value("end")._int()));
+	view->update_selection();
+	auto ec = ev->find("viewport");
+	view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
+
+	if (auto ets = ev->find("tracks"))
+		audio_view_tracks_from_xml(view, ets);
 }
 
 void SessionManager::load_into_session(SessionPersistenceData *p, Session *session) {
@@ -342,34 +390,21 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 	if (!song_filename.is_empty())
 		session->storage->load(session->song.get(), song_filename);
 
-	if (auto ev = e.find("view")) {
-		auto es = ev->find("selection");
-		session->view->sel = SongSelection::from_range(session->song.get(), Range::to(es->value("start")._int(), es->value("end")._int()));
-		session->view->update_selection();
-		auto ec = ev->find("viewport");
-		session->view->cam.set_range(Range::to(ec->value("start")._int(), ec->value("end")._int()));
-	}
+	// deprecated
+	if (auto ev = e.find("view"))
+		audio_view_from_xml(session->view, ev);
+	if (auto ets = e.find("tracks"))
+		audio_view_tracks_from_xml(session->view, ets);
 
-	if (auto ets = e.find("tracks")) {
-		for (auto& e: ets->elements) {
-			int index = e.value("index", "-1")._int();
-			if (index >= 0 and index < session->song->tracks.num) {
-				auto t = session->song->tracks[index].get();
-				auto vt = session->view->get_track(t);
-				vt->set_solo(e.value("solo", "false")._bool());
-				if (auto mm = parse_midi_mode(e.value("midi_mode")))
-					vt->set_midi_mode(*mm);
-				if (auto am = parse_audio_mode(e.value("audio_mode")))
-					vt->set_audio_mode(*am);
-			}
-		}
-	}
+	base::map<int, SignalChain*> chain_by_uid;
 
 	// signal chains
 	if (auto echains = e.find("signalchains")) {
 		for (auto &ec: echains->elements) {
 			auto chain = signal_chain_from_xml(session, ec);
 			session->add_signal_chain(chain);
+			if (ec.value("uid") != "")
+				chain_by_uid.set(ec.value("uid")._int(), chain);
 		}
 	}
 
@@ -385,6 +420,24 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 				p->config_from_string(version, config);
 				p->out_changed.notify();
 			}
+		}
+	}
+
+	// main view
+	if (auto emv = e.find("mainview")) {
+		for (auto &ep: emv->elements) {
+			if (ep.value("type") == "audioview") {
+				audio_view_from_xml(session->view, &ep);
+			} else if (ep.value("type") == "signalchain") {
+				int uid = ep.value("uid")._int();
+				if (chain_by_uid.contains(uid))
+					session->main_view->_add_view(new SignalEditorTab(chain_by_uid[uid]));
+			}
+		}
+		if (emv->value("active", "") != "") {
+			const int n = emv->value("active")._int();
+			if (n >= 0 and n < session->main_view->views.num)
+				session->main_view->activate_view(weak(session->main_view->views)[n]);
 		}
 	}
 

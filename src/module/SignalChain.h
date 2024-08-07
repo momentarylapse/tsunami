@@ -33,7 +33,7 @@ class SignalChain : public Module {
 	friend class SuckerThread;
 public:
 	SignalChain(Session *session, const string &name);
-	virtual ~SignalChain();
+	~SignalChain() override;
 
 	void _cdecl __init__(Session *session, const string &name);
 	void _cdecl __delete__() override;

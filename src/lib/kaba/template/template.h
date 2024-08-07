@@ -24,7 +24,7 @@ class TemplateManager;
 
 
 
-class TemplateClassInstantiator {
+class TemplateClassInstantiator : public Sharable<base::Empty> {
 public:
 	TemplateClassInstantiator();
 	virtual ~TemplateClassInstantiator() = default;
@@ -37,9 +37,9 @@ public:
 	static Function* add_func_header(Class* t, const string& name, const Class* return_type, const Array<const Class*>& param_types, const Array<string>& param_names, Function* cf = nullptr, Flags flags = Flags::NONE, const shared_array<Node>& def_params = {});
 };
 
-class TemplateClassInstanceManager : public Sharable<base::Empty> {
+class TemplateClassInstanceManager {
 public:
-	TemplateClassInstanceManager(const Class *template_class, const Array<string>& params_names, TemplateClassInstantiator* instantiator);
+	TemplateClassInstanceManager(const Class *template_class, const Array<string>& params_names, shared<TemplateClassInstantiator> instantiator);
 
 	const Class* request_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id);
 	const Class* create_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id);
@@ -54,7 +54,7 @@ public:
 	const Class *template_class;
 	Array<string> param_names;
 	Array<ClassInstance> instances;
-	owned<TemplateClassInstantiator> instantiator;
+	shared<TemplateClassInstantiator> instantiator;
 };
 
 class TemplateManager {
@@ -116,7 +116,7 @@ private:
 	};
 	Array<FunctionTemplate> function_templates;
 
-	shared_array<TemplateClassInstanceManager> class_managers;
+	owned_array<TemplateClassInstanceManager> class_managers;
 
 	FunctionTemplate &get_function_template(SyntaxTree *tree, Function *f0, int token_id);
 	TemplateClassInstanceManager &get_class_manager(SyntaxTree *tree, const Class *c0, int token_id);

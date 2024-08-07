@@ -56,7 +56,7 @@ struct Scope {
 // data structures (uncompiled)
 class SyntaxTree {
 public:
-	SyntaxTree(Module *module);
+	explicit SyntaxTree(Module *module);
 	~SyntaxTree();
 
 	void default_import();

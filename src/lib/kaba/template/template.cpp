@@ -23,7 +23,12 @@ TemplateManager::TemplateManager(Context *c) {
 
 void TemplateManager::copy_from(TemplateManager *t) {
 	function_templates = t->function_templates;
-	class_managers = t->class_managers;
+	for (auto mm: weak(t->class_managers)) {
+		auto m = new TemplateClassInstanceManager(mm->template_class, mm->param_names, mm->instantiator);
+		m->instances = mm->instances;
+		class_managers.add(m);
+	}
+	//class_managers = t->class_managers;
 }
 
 
@@ -306,18 +311,16 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypeDictBase;
 extern const Class *TypeCallableBase;
 
-string class_name_might_need_parantheses(const Class *t);
 
+TemplateClassInstantiator::TemplateClassInstantiator() = default;
 
-TemplateClassInstantiator::TemplateClassInstantiator() {
-}
 const Class* TemplateClassInstantiator::create_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
 	auto c = declare_new_instance(tree, params, array_size, token_id);
 	add_function_headers(c);
 	return c;
 }
 
-TemplateClassInstanceManager::TemplateClassInstanceManager(const Class* template_class, const Array<string>& param_names, TemplateClassInstantiator* instantiator) {
+TemplateClassInstanceManager::TemplateClassInstanceManager(const Class* template_class, const Array<string>& param_names, shared<TemplateClassInstantiator> instantiator) {
 	this->template_class = template_class;
 	this->param_names = param_names;
 	this->instantiator = instantiator;

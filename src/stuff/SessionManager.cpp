@@ -67,7 +67,7 @@ Path associated_song_filename(const Path& filename) {
 		return s.sub_ref(0, -16);
 	//if (s.tail(8) == ".session")
 	//	return s.sub_ref(0, -8);
-	return filename;
+	return "";
 }
 
 bool SessionManager::can_find_associated_session_file(const Path& filename) {
@@ -455,12 +455,16 @@ Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 			continue;
 	//	if (find_for_filename(f))
 	//		continue;
-		if (can_find_associated_session_file(f))
+		if (can_find_associated_session_file(f)) {
 			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, f});
-		else if (f.extension() == "session")
-			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, associated_song_filename(f)});
-		else
+		} else if (f.extension() == "session") {
+			auto file = associated_song_filename(f);
+			if (file.is_empty())
+				file = f;
+			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, file});
+		} else {
 			sessions.add({SessionLabel::Recent, f});
+		}
 	}
 	return sessions;
 }

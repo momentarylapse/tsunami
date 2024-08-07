@@ -208,8 +208,8 @@ void MidiEventBuffer::clear() {
 	samples = 0;
 }
 
-MidiEventBuffer MidiEventBuffer::get_events(const Range &r) const {
-	MidiEventBuffer a;
+Array<MidiEvent> MidiEventBuffer::get_events(const Range &r) const {
+	Array<MidiEvent> a;
 	for (int i=0;i<num;i++)
 		if (r.is_inside((*this)[i].pos))
 			a.add((*this)[i]);

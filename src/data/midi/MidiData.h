@@ -42,7 +42,7 @@ public:
 	MidiEventBuffer();
 	void _cdecl __init__();
 	void clear();
-	MidiEventBuffer get_events(const Range &r) const;
+	Array<MidiEvent> get_events(const Range &r) const;
 	int read(MidiEventBuffer &data, const Range &r) const;
 	MidiNoteBuffer get_notes(const Range &r) const;
 	int get_next_event(int pos) const;

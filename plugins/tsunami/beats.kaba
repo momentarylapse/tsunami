@@ -27,14 +27,14 @@ struct Bar as shared
 
 struct Beat
 	var range: Range
-	var bar_index: int
+	var bar_index = 0
 	var bar_no = 0
 	var beat_no = 0
-	var level: int
+	var level = 0
 
 	func __init__()
-	func __init__(_offset: int, _level: int)
-		range = Range(_offset, 0)
+	func __init__(_range: Range, _level: int)
+		range = _range
 		level = _level
 
 struct BarCollection extends shared![Bar][]

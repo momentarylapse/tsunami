@@ -32,7 +32,7 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 		} else {
 			auto _beats = b->get_beats(pos_bar, include_sub_beats, sub_beat_partition);
 			for (Beat &bb: _beats)
-				if (r.is_inside(bb.range.offset))
+				if (r.overlaps(bb.range))
 					beats.add(bb);
 			pos_bar += b->length;
 			bar_no ++;

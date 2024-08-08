@@ -50,7 +50,7 @@ class MetronomeSource extends BeatSource
 					level = 0
 				else
 					level = 1
-			beats.add(Beat(offset_sub_beat, level))
+			beats.add(Beat(Range(offset_sub_beat, 0), level))
 			
 			if next_sub_beat == 0
 				next_beat ++

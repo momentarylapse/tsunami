@@ -29,7 +29,8 @@ int BeatMidifier::read(MidiEventBuffer &midi) {
 	int r = in.source->read_beats(beats, midi.samples);
 
 	for (Beat &b: beats)
-		midi.add_metronome_click(b.range.offset, b.level, volume);
+		if (b.range.offset >= 0)
+			midi.add_metronome_click(b.range.offset, b.level, volume);
 
 	return r;
 }

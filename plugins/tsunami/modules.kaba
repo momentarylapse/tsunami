@@ -102,6 +102,9 @@ class Module extends Object as shared
 		var type: SignalType
 		var name: string
 		#func extern __init__()
+		func extern mut _init_audio(m: Module&, name: string)
+		func extern mut _init_midi(m: Module&, name: string)
+		func extern mut _init_beats(m: Module&, name: string)
 		func extern mut connect(source: InPort)
 		func mut __rshift__(source: InPort)
 			connect(source)
@@ -113,6 +116,9 @@ class Module extends Object as shared
 		var type: SignalType
 		var name: string
 		var source: Module.OutPort*
+		func extern mut _init_audio(m: Module&, name: string)
+		func extern mut _init_midi(m: Module&, name: string)
+		func extern mut _init_beats(m: Module&, name: string)
 		func extern mut disconnect()
 		
 	class Config

@@ -159,6 +159,30 @@ void generic__delete__(T *me) {
 	me->T::~T();
 }
 
+void AudioInPort__init(AudioInPort* p, Module* m, const string& name) {
+	new(p) AudioInPort(m, name);
+}
+
+void MidiInPort__init(MidiInPort* p, Module* m, const string& name) {
+	new(p) MidiInPort(m, name);
+}
+
+void BeatsInPort__init(BeatsInPort* p, Module* m, const string& name) {
+	new(p) BeatsInPort(m, name);
+}
+
+void AudioOutPort__init(AudioOutPort* p, Module* m, const string& name) {
+	new(p) AudioOutPort(m, name);
+}
+
+void MidiOutPort__init(MidiOutPort* p, Module* m, const string& name) {
+	new(p) MidiOutPort(m, name);
+}
+
+void BeatsOutPort__init(BeatsOutPort* p, Module* m, const string& name) {
+	new(p) BeatsOutPort(m, name);
+}
+
 
 void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
@@ -467,6 +491,9 @@ void PluginManager::link_app_data() {
 	ext->declare_class_size("Module.OutPort", sizeof(OutPort));
 	ext->declare_class_element("Module.OutPort.name", &OutPort::name);
 	ext->declare_class_element("Module.OutPort.type", &OutPort::type);
+	ext->link_class_func("Module.OutPort._init_audio", &AudioOutPort__init);
+	ext->link_class_func("Module.OutPort._init_midi", &MidiOutPort__init);
+	ext->link_class_func("Module.OutPort._init_beats", &BeatsOutPort__init);
 	ext->link_class_func("Module.OutPort.connect", &OutPort::connect);
 	ext->link_class_func("Module.OutPort.read_audio", &OutPort::read_audio);
 	ext->link_class_func("Module.OutPort.read_midi", &OutPort::read_midi);
@@ -475,6 +502,9 @@ void PluginManager::link_app_data() {
 	ext->declare_class_size("Module.InPort", sizeof(InPort));
 	ext->declare_class_element("Module.InPort.name", &InPort::name);
 	ext->declare_class_element("Module.InPort.type", &InPort::type);
+	ext->link_class_func("Module.InPort._init_audio", &AudioInPort__init);
+	ext->link_class_func("Module.InPort._init_midi", &MidiInPort__init);
+	ext->link_class_func("Module.InPort._init_beats", &BeatsInPort__init);
 	ext->link_class_func("Module.InPort.disconnect", &InPort::disconnect);
 
 	{

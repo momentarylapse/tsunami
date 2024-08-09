@@ -1,0 +1,242 @@
+use tsunami.*
+use helper.draw.*
+use hui
+
+struct Node
+	pos: vec2
+	pitch = 64
+	volume = 1.0
+	source = false
+
+struct Cable
+	source, target: int
+	speed = 1.0
+
+class Config extends Module.Config
+	var nodes: Node[]
+	var cables: Cable[]
+	
+	func override reset()
+		nodes = []
+		cables = []
+		
+		nodes = [([2,2], 64, 1, true), ([5,2], 65, 1, false), ([4,4], 67, 1, false)]
+		cables = [[0,1,1], [1,2,1], [2,0,1]]
+
+	func mut delete_node(index: int)
+		cables = cables |> filter(c => c.source != index and c.target != index)
+		for c in cables
+			if c.source > index
+				c.source --
+			if c.target > index
+				c.target --
+		nodes.remove(index)
+
+struct Signal
+	cable: int
+	offset: float
+
+class GraphSequencerSource extends MidiSource
+	var in_beats: Module.InPort
+
+	var config: Config
+	var active = false
+	var signals: Signal[]
+	
+	func override __init__()
+		super.__init__()
+		in_beats._init_beats(&self, "in")
+	
+	func override on_config()
+		#subbeat_length = DEFAULT_SAMPLE_RATE * 60 / config.bpm / config.subbeats
+
+	func override reset_state()
+		active = false
+		signals = []
+		
+	func mut activate(node_index: int, out buf: MidiEventBuffer)
+		buf.add(MidiEvent(0, config.nodes[node_index].pitch, config.nodes[node_index].volume))
+		buf.add(MidiEvent(500, config.nodes[node_index].pitch, 0.0))
+		for i=>c in config.cables
+			if c.source == node_index
+				signals.add([i, 0.0])
+	
+	
+	func cable_length(c: Cable) -> float
+		return len(config.nodes[c.target].pos - config.nodes[c.source].pos) / c.speed
+	
+	func mut iterate(dt: float, out buf: MidiEventBuffer)
+		var aa: int[]
+		for mut s in signals
+			s.offset += dt / cable_length(config.cables[s.cable])
+			if s.offset > 1
+				aa.add(config.cables[s.cable].target)
+		for a in aa
+			activate(a, buf)
+		signals = signals |> filter(s => s.offset < 1.0)
+		# TODO loop
+		
+	func override read(out midi: MidiEventBuffer) -> int
+		var beats: Beat[]
+		for s in in_beats.source
+			let rr = s.read_beats(beats, midi.samples)
+		
+		var buf: MidiEventBuffer
+		
+		if not active
+			active = true
+			for i=>n in config.nodes
+				if n.source
+					activate(i, buf)
+		
+		for b in beats
+			if b.level >= 2
+				continue
+			let r = b.range and Range(0, midi.samples)
+			iterate(float(r.length) / b.range.length, buf)
+				
+		for e in buf
+			if e.pos >= 0 and e.pos < midi.samples
+				midi.add(e)
+			
+		return midi.samples
+	
+	func override create_panel() -> xfer[ConfigPanel]
+		return new GraphSequencerPanel(self)
+
+
+class GraphSequencerPanel extends ConfigPanel
+	var override c: GraphSequencerSource&
+	var width = 0
+	var height = 0
+	var id_runner = -1
+	
+	var scale = 40.0
+	
+	struct Hover
+		enum Type
+			NODE
+			CABLE
+		type: Type
+		index: int
+		
+	var hover: Hover?
+	var selected: Hover?
+	var moving = false
+	
+	func override __init__(_h: Module)
+		from_source("
+Grid ? '' vertical
+	DrawingArea drawing '' grabfocus expandx expandy")
+	
+		event_x("drawing", "hui:draw", on_draw)
+		event_x("drawing", "hui:left-button-down", on_left_button_down)
+		event_x("drawing", "hui:left-button-up", on_left_button_up)
+		event_x("drawing", "hui:right-button-down", on_right_button_down)
+		event_x("drawing", "hui:mouse-move", on_mouse_move)
+		event_x("drawing", "hui:mouse-leave", on_mouse_leave)
+		event_x("drawing", "hui:key-down", on_key_down)
+		
+		id_runner = hui.run_repeated(0.02, trigger_redraw)
+	
+	func override __delete__()
+		hui.cancel_runner(id_runner)
+	
+	func project(p: vec2) -> vec2
+		return p * scale
+	
+	func unproject(p: vec2) -> vec2
+		return p / scale
+	
+	func get_hover(m: vec2) -> Hover?
+		for i=>n in c.config.nodes
+			if len(m - project(n.pos)) < 15
+				return [Hover.Type.NODE, i]
+		return nil
+	
+	func mut on_left_button_down()
+		for h in hover
+			for s in selected
+				if s.type == Hover.Type.NODE
+					if h.type == Hover.Type.NODE
+						c.config.cables.add([s.index, h.index, 1])
+			else
+				selected = hover
+				moving = true
+		else
+			for s in selected
+				if s.type == Hover.Type.NODE
+					let m = unproject(hui.get_event().mouse)
+					c.config.nodes.add([m, 64, 1.0, false])
+					c.config.cables.add([s.index, len(c.config.nodes) - 1, 1])
+				
+			else
+				let m = unproject(hui.get_event().mouse)
+				c.config.nodes.add([m, 64, 1.0, false])
+		redraw("drawing")
+	
+	func mut on_left_button_up()
+		moving = false
+		redraw("drawing")
+	
+	func mut on_right_button_down()
+		redraw("drawing")
+
+	func mut on_mouse_move()
+		if moving
+			for s in selected
+				if s.type == Hover.Type.NODE
+					c.config.nodes[s.index].pos = unproject(hui.get_event().mouse)
+		else
+			hover = get_hover(hui.get_event().mouse)
+		redraw("drawing")
+
+	func mut on_mouse_leave()
+		redraw("drawing")
+
+	func mut on_key_down()
+		let k = hui.get_event().key
+		if k in [hui.KEY_BACKSPACE, hui.KEY_DELETE]
+			for s in selected
+				if s.type == Hover.Type.NODE
+					c.config.delete_node(s.index)
+			hover = nil
+			selected = nil
+		if k == hui.KEY_ESCAPE
+			selected = nil
+		redraw("drawing")
+	
+	func mut on_draw(p: hui.Painter)
+		width = p.width
+		height = p.height
+		
+		p.set_color(theme.background)
+		p.draw_rect([0,width, 0,height])
+		
+		for i=>n in c.config.nodes
+			var col = theme.text_soft2
+			for s in selected
+				if s.type == Hover.Type.NODE and s.index == i
+					col = theme.selection
+			for h in hover
+				if h.type == Hover.Type.NODE and h.index == i
+					col = theme.hoverify(col)
+			p.set_color(col)
+			p.draw_circle(project(n.pos), 8)
+		for cb in c.config.cables
+			p.set_color(theme.text_soft2)
+			p.draw_line(project(c.config.nodes[cb.source].pos), project(c.config.nodes[cb.target].pos))
+			#draw_arrow(p, project(c.config.nodes[cb.source].pos), project(c.config.nodes[cb.target].pos))
+		for s in c.signals
+			p.set_color(color.RED)
+			let p1 = c.config.nodes[c.config.cables[s.cable].source].pos
+			let p2 = c.config.nodes[c.config.cables[s.cable].target].pos
+			p.draw_circle(project(p1 + (p2 - p1) * s.offset), 4)
+			
+	
+	func mut trigger_redraw()
+		redraw("drawing")
+
+
+
+

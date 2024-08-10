@@ -971,7 +971,11 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::VEC2_DIVIDE_ASSIGN:
 			for (int i=0;i<2;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
-			break;
+		break;
+	case InlineID::VEC2_NEGATIVE:
+		for (int i=0;i<2;i++)
+			cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt32, 0x80000000));
+		break;
 // complex
 		case InlineID::COMPLEX_MULTIPLY:{
 			auto t1 = add_temp(TypeFloat32);

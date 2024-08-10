@@ -122,7 +122,21 @@ class GraphSequencerPanel extends ConfigPanel
 		
 	var hover: Hover?
 	var selected: Hover?
+	
+	enum Mode
+		NONE
+		MOVE
+		ADD
+		LINK
+		PITCH
+	var mode = GraphSequencerPanel.Mode.NONE
 	var moving = false
+	
+	func node(_h: Hover?) -> Node*
+		for h in _h
+			if h.type == Hover.Type.NODE
+				return &c.config.nodes[h.index]
+		return nil
 	
 	func override __init__(_h: Module)
 		from_source("
@@ -155,24 +169,34 @@ Grid ? '' vertical
 		return nil
 	
 	func mut on_left_button_down()
-		for h in hover
-			for s in selected
-				if s.type == Hover.Type.NODE
-					if h.type == Hover.Type.NODE
-						c.config.cables.add([s.index, h.index, 1])
-			else
+		if mode == Mode.ADD
+			for h in hover
 				selected = hover
-				moving = true
-		else
-			for s in selected
-				if s.type == Hover.Type.NODE
+			else
+				for s in selected
+					if s.type == Hover.Type.NODE
+						let m = unproject(hui.get_event().mouse)
+						c.config.nodes.add([m, 64, 1.0, false])
+						c.config.cables.add([s.index, len(c.config.nodes) - 1, 1])
+					
+				else
 					let m = unproject(hui.get_event().mouse)
 					c.config.nodes.add([m, 64, 1.0, false])
-					c.config.cables.add([s.index, len(c.config.nodes) - 1, 1])
-				
-			else
-				let m = unproject(hui.get_event().mouse)
-				c.config.nodes.add([m, 64, 1.0, false])
+		else if mode == Mode.LINK
+			for h in hover
+				for s in selected
+					if s.type == Hover.Type.NODE
+						if h.type == Hover.Type.NODE and h.index != s.index
+							c.config.cables.add([s.index, h.index, 1])
+				else
+					selected = hover
+		else if mode == Mode.PITCH
+			selected = hover
+		else
+			selected = hover
+			for h in hover
+				if h.type == Hover.Type.NODE
+					moving = true
 		redraw("drawing")
 	
 	func mut on_left_button_up()
@@ -184,9 +208,8 @@ Grid ? '' vertical
 
 	func mut on_mouse_move()
 		if moving
-			for s in selected
-				if s.type == Hover.Type.NODE
-					c.config.nodes[s.index].pos = unproject(hui.get_event().mouse)
+			for n in node(selected)
+				n.pos = unproject(hui.get_event().mouse)
 		else
 			hover = get_hover(hui.get_event().mouse)
 		redraw("drawing")
@@ -202,8 +225,22 @@ Grid ? '' vertical
 					c.config.delete_node(s.index)
 			hover = nil
 			selected = nil
+		if k == hui.KEY_PLUS
+			mode = Mode.ADD
+		if k == hui.KEY_L
+			mode = Mode.LINK
+		if k == hui.KEY_P
+			mode = Mode.PITCH
 		if k == hui.KEY_ESCAPE
-			selected = nil
+			mode = Mode.NONE
+			
+		if mode == Mode.PITCH
+			if k >= hui.KEY_0 and k <= hui.KEY_9
+				for n in node(selected)
+					if n.pitch >= 10
+						n.pitch = k - hui.KEY_0
+					else
+						n.pitch = n.pitch * 10 + k - hui.KEY_0
 		redraw("drawing")
 	
 	func mut on_draw(p: hui.Painter)
@@ -213,25 +250,39 @@ Grid ? '' vertical
 		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
+		let R = 0.25 * scale
+		
 		for i=>n in c.config.nodes
 			var col = theme.text_soft2
-			for s in selected
-				if s.type == Hover.Type.NODE and s.index == i
-					col = theme.selection
-			for h in hover
-				if h.type == Hover.Type.NODE and h.index == i
-					col = theme.hoverify(col)
+			if &n == node(selected)
+				col = theme.selection
+			if &n == node(hover)
+				col = theme.hoverify(col)
 			p.set_color(col)
-			p.draw_circle(project(n.pos), 8)
+			p.draw_circle(project(n.pos), R)
+			if mode == Mode.PITCH
+				p.draw_str(project(n.pos) + [2,5], str(n.pitch))
 		for cb in c.config.cables
 			p.set_color(theme.text_soft2)
-			p.draw_line(project(c.config.nodes[cb.source].pos), project(c.config.nodes[cb.target].pos))
-			#draw_arrow(p, project(c.config.nodes[cb.source].pos), project(c.config.nodes[cb.target].pos))
+		#	p.draw_line(project(c.config.nodes[cb.source].pos), project(c.config.nodes[cb.target].pos))
+			let a = project(c.config.nodes[cb.source].pos)
+			let b = project(c.config.nodes[cb.target].pos)
+			draw_arrow(p, a, b + (a-b).normalized() * (R * 0.8), 14)
 		for s in c.signals
 			p.set_color(color.RED)
 			let p1 = c.config.nodes[c.config.cables[s.cable].source].pos
 			let p2 = c.config.nodes[c.config.cables[s.cable].target].pos
 			p.draw_circle(project(p1 + (p2 - p1) * s.offset), 4)
+		
+		if mode == Mode.ADD
+			p.set_color(theme.text_soft1)
+			p.draw_str([2,2], "+")
+		if mode == Mode.LINK
+			p.set_color(theme.text_soft1)
+			p.draw_str([2,2], "L")
+		if mode == Mode.PITCH
+			p.set_color(theme.text_soft1)
+			p.draw_str([2,2], "P")
 			
 	
 	func mut trigger_redraw()

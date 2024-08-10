@@ -225,8 +225,8 @@ Grid ? ''
 		let v = vec2(50, 0)
 		draw_spline(p, p0, v, p1, v)
 		let m = spline_pos(p0, v, p1, v, 0.5)
-		let dm = spline_vel(p0, v, p1, v, 0.5).normalized()
-		draw_arrow(p, m + dm * 6, m - dm * 6)
+		let dm = - spline_vel(p0, v, p1, v, 0.5).normalized()
+		draw_arrow_head(p, m + dm * 8, dm * 16)
 	
 	func t2x(t: float) -> float
 		return width*0.7 * sqrt(t)

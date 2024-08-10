@@ -29,4 +29,5 @@ void draw_framed_box(Painter *p, const rect &r, const color &bg, const color &fr
 float draw_str_constrained(Painter *p, const vec2 &pos, float w_max, const string &str, TextAlign align=TextAlign::Left);
 void draw_str_centered(Painter* c, const vec2& pos, const string& str);
 void draw_cursor_hover(Painter *c, const string &msg, const vec2 &m, const rect &area);
-void draw_arrow(Painter *p, const vec2 &a, const vec2 &b);
+void draw_arrow_head(Painter *p, const vec2 &tip, const vec2 &d);
+void draw_arrow(Painter *p, const vec2 &a, const vec2 &b, float head_size);

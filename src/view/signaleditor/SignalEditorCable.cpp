@@ -13,6 +13,7 @@
 #include "../../module/SignalChain.h"
 #include "../../data/base.h"
 #include "../../lib/math/interpolation.h"
+#include "../helper/Drawing.h"
 
 namespace tsunami {
 
@@ -63,7 +64,9 @@ void SignalEditorCable::on_draw(Painter *p) {
 	p->draw_circle(p1, 10);
 	p->draw_circle(inter.get(0.5f), arrow_len * 1.3f);
 	p->set_color(base_color);
-	SignalEditorTab::draw_arrow(p, inter.get(0.5f), inter.getTang(0.5f), arrow_len);
+	const vec2 m = inter.get(0.5f);
+	const vec2 dir = inter.getTang(0.5f).normalized() * arrow_len * 2;
+	draw_arrow_head(p, m + dir / 2, dir);
 }
 
 bool SignalEditorCable::has_hover(const vec2 &m) const {

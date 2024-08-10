@@ -3,6 +3,7 @@
 #include "../sidebar/SideBar.h"
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewLayer.h"
+#include "../helper/Drawing.h"
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
 #include "../../action/Action.h"
@@ -11,7 +12,6 @@
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 
-void draw_arrow(Painter *p, const vec2 &a, const vec2 &b);
 
 namespace tsunami {
 
@@ -223,8 +223,8 @@ void ViewModeEditBars::draw_post(Painter *p) {
 		p->set_line_width(2);
 		p->draw_line({x1, (y1+y2)/2}, {x3, (y1+y2)/2});
 		p->set_color(theme.green.with_alpha(0.8f));
-		draw_arrow(p, {x2, y1 + (y2-y1)*0.2f}, {x3, y1 + (y2-y1)*0.2f});
-		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f});
+		draw_arrow(p, {x2, y1 + (y2-y1)*0.2f}, {x3, y1 + (y2-y1)*0.2f}, 18);
+		draw_arrow(p, {x2, y2 - (y2-y1)*0.2f}, {x3, y2 - (y2-y1)*0.2f}, 18);
 	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BarGap) {

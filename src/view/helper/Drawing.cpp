@@ -99,15 +99,24 @@ void draw_cursor_hover(Painter *c, const string &msg, const vec2 &m, const rect 
 	//c->set_font("", -1, false, false);
 }
 
-void draw_arrow(Painter *p, const vec2 &a, const vec2 &b) {
+
+void draw_arrow_head(Painter *p, const vec2 &tip, const vec2 &d) {
+	vec2 e = vec2(d.y,-d.x);
+	Array<vec2> pp;
+	pp.add(tip);
+	pp.add(tip - d + e / 4);
+	pp.add(tip - d * 0.9f);
+	pp.add(tip - d - e / 4);
+	p->draw_polygon(pp);
+}
+
+void draw_arrow(Painter *p, const vec2 &a, const vec2 &b, float head_size) {
 	float l = (b-a).length();
 	if (l < 0.0001f)
 		return;
 	vec2 dir = (b-a) / l;
-	vec2 e = vec2(dir.y, -dir.x);
-	float r = min(l, 18.0f);
 	p->draw_line(a, b);
-	p->draw_polygon({b, b - r * (dir + e*0.4f), b - r * (dir - e*0.4f)});
+	draw_arrow_head(p, b, dir * head_size);
 }
 
 

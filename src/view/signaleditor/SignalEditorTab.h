@@ -64,7 +64,6 @@ public:
 
 	static color signal_color_base(SignalType type);
 	static color signal_color(SignalType type, bool hover);
-	static void draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length);
 
 	bool on_key_down(int k) override;
 	void on_chain_update();

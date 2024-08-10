@@ -182,8 +182,8 @@ void ViewModeEditAudio::draw_post(Painter *p) {
 
 			p->set_line_width(2);
 			p->set_color(theme.text);
-			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.25f), vec2(x2, y1 + (y2-y1)*0.25f));
-			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.75f), vec2(x2, y1 + (y2-y1)*0.75f));
+			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.25f), vec2(x2, y1 + (y2-y1)*0.25f), 18);
+			draw_arrow(p, vec2(x1, y1 + (y2-y1)*0.75f), vec2(x2, y1 + (y2-y1)*0.75f), 18);
 			p->set_line_width(1);
 		}
 	}

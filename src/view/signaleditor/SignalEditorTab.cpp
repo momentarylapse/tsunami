@@ -230,17 +230,6 @@ color SignalEditorTab::signal_color(SignalType type, bool hover) {
 	return c;
 }
 
-void SignalEditorTab::draw_arrow(Painter *p, const vec2 &m, const vec2 &_d, float length) {
-	vec2 d = _d / _d.length();
-	vec2 e = vec2(d.y,-d.x);
-	Array<vec2> pp;
-	pp.add(m + d * length);
-	pp.add(m - d * length + e * length / 2);
-	pp.add(m - d * length * 0.8f);
-	pp.add(m - d * length - e * length / 2);
-	p->draw_polygon(pp);
-}
-
 void SignalEditorTab::on_chain_update() {
 	// delete old modules
 	Array<SignalEditorModule*> to_del;

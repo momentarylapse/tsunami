@@ -188,9 +188,12 @@ enum {
 	NUM_KEYS,
 
 	KEY_ANY,
-	KEY_CONTROL = 256,
-	KEY_SHIFT = 512,
-	KEY_ALT = 1024
+	KEY_CONTROL = 1<<8,
+	KEY_SHIFT = 1<<9,
+	KEY_ALT = 1<<10,
+	KEY_META = 1<<11,
+	KEY_SUPER = 1<<12,
+	KEY_HYPER = 1<<13
 };
 
 namespace EventID {

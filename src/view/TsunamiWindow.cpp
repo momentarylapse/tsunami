@@ -83,41 +83,46 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_size(width, height);
 	set_maximized(maximized);
 
+	int mod = hui::KEY_CONTROL;
+#ifdef OS_MAC
+	mod = hui::KEY_META; // mac "command" key
+#endif
+
 	event("new", [this] { on_new(); });
-	set_key_code("new", hui::KEY_N + hui::KEY_CONTROL);
+	set_key_code("new", hui::KEY_N + mod);
 	event("open", [this] { on_open(); });
-	set_key_code("open", hui::KEY_O + hui::KEY_CONTROL);
+	set_key_code("open", hui::KEY_O + mod);
 	event("save", [this] { on_save(); });
-	set_key_code("save", hui::KEY_S + hui::KEY_CONTROL);
+	set_key_code("save", hui::KEY_S + mod);
 	event("save_as", [this] { on_save_as(); });
-	set_key_code("save_as", hui::KEY_S + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	set_key_code("save_as", hui::KEY_S + mod + hui::KEY_SHIFT);
 	event("save-session", [this] { on_save_session(); });
 	event("copy", [this] { on_copy(); });
-	set_key_code("copy", hui::KEY_C + hui::KEY_CONTROL);
+	set_key_code("copy", hui::KEY_C + mod);
 	event("paste", [this] { on_paste(); });
-	set_key_code("paste", hui::KEY_V + hui::KEY_CONTROL);
+	set_key_code("paste", hui::KEY_V + mod);
 	event("paste-as-samples", [this] { on_paste_as_samples(); });
 	event("paste-insert-time", [this] { on_paste_insert_time(); });
-	set_key_code("paste-insert-time", hui::KEY_V + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	set_key_code("paste-insert-time", hui::KEY_V + mod + hui::KEY_SHIFT);
 	event("paste-aligned-to-beats", [this] { on_paste_aligned_to_beats(); });
-	set_key_code("paste-aligned-to-beats", hui::KEY_B + hui::KEY_CONTROL);
+	set_key_code("paste-aligned-to-beats", hui::KEY_B + mod);
 	event("delete", [this] { on_delete(); });
 	set_key_code("delete", hui::KEY_DELETE);
 	event("delete-shift", [this] { on_delete_shift(); });
 	set_key_code("delete-shift", hui::KEY_SHIFT + hui::KEY_DELETE);
 	event("export", [this] { on_export(); });
-	set_key_code("export", hui::KEY_CONTROL + hui::KEY_E);
+	set_key_code("export", mod + hui::KEY_E);
 	event("export-selection", [this] { on_export_selection(); });
-	set_key_code("export-selection", hui::KEY_E + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	set_key_code("export-selection", hui::KEY_E + mod + hui::KEY_SHIFT);
 	event("quick-export", [this] { on_quick_export(); });
-	set_key_code("quick-export", hui::KEY_X + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	set_key_code("quick-export", hui::KEY_X + mod + hui::KEY_SHIFT);
 	event("undo", [this] { on_undo(); });
-	set_key_code("undo", hui::KEY_Z + hui::KEY_CONTROL);
+	set_key_code("undo", hui::KEY_Z + mod);
 	event("redo", [this] { on_redo(); });
-	set_key_code("redo", hui::KEY_Y + hui::KEY_CONTROL);
+	set_key_code("redo", hui::KEY_Y + mod);
 	event("track_render", [this] { on_track_render(); });
 	event("track-add-new", [this] { on_add_new_track(SignalType::Audio); });
-	set_key_code("track-add-new", hui::KEY_N + hui::KEY_CONTROL + hui::KEY_SHIFT);
+	set_key_code("track-add-new", hui::KEY_N + mod + hui::KEY_SHIFT);
 	event("track-add-beats", [this] { on_add_new_track(SignalType::Beats); });
 	event("track-delete", [this] { on_track_delete(); });
 	event("track-create-group", [this] { on_track_group(); });
@@ -129,7 +134,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("track-edit-curves", [this] { session->set_mode(EditMode::Curves); });
 	event("track-edit-fx", [this] { on_track_edit_fx(); });
 	event("track-add-marker", [this] { on_track_add_marker(); });
-	set_key_code("track-add-marker", hui::KEY_CONTROL + hui::KEY_J);
+	set_key_code("track-add-marker", mod + hui::KEY_J);
 	add_action_checkable("track-convert-mono");
 	event("track-convert-mono", [this] { on_track_convert_mono(); });
 	add_action_checkable("track-convert-stereo");
@@ -173,7 +178,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	event("layer-add", [this] { on_add_layer(); });
 	event("layer-delete", [this] { on_delete_layer(); });
-	set_key_code("layer-delete", hui::KEY_CONTROL + hui::KEY_DELETE);
+	set_key_code("layer-delete", mod + hui::KEY_DELETE);
 	event("layer-make-track", [this] { on_layer_make_track(); });
 	event("layer-merge", [this] { on_layer_merge(); });
 	event("layer-mark-dominant", [this] { on_layer_mark_selection_dominant(); });
@@ -191,10 +196,10 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("song-edit-samples", [this] { on_sample_manager(); });
 	add_action_checkable("show-mixing-console");
 	event("show-mixing-console", [this] { on_mixing_console(); });
-	set_key_code("show-mixing-console", hui::KEY_CONTROL + hui::KEY_M);
+	set_key_code("show-mixing-console", mod + hui::KEY_M);
 	add_action_checkable("show-plugin-console");
 	event("show-plugin-console", [this] { on_plugin_console(); });
-	set_key_code("show-plugin-console", hui::KEY_CONTROL + hui::KEY_P);
+	set_key_code("show-plugin-console", mod + hui::KEY_P);
 	event("show-devices", [this] { on_settings(); });
 	add_action_checkable("show-signal-chain");
 	event("show-signal-chain", [this] { session->set_mode(EditMode::XSignalEditor); });
@@ -203,7 +208,7 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("show-session-console", [this] { bottom_bar->open(BottomBar::Index::SessionConsole); });
 	event("sample_from_selection", [this] { on_sample_from_selection(); });
 	event("sample-insert", [this] { on_insert_sample(); });
-	set_key_code("sample-insert", hui::KEY_I + hui::KEY_CONTROL);
+	set_key_code("sample-insert", hui::KEY_I + mod);
 	event("sample-delete", [this] { on_remove_sample(); });
 	event("marker-delete", [this] { on_delete_marker(); });
 	event("marker-edit", [this] { on_edit_marker(); });
@@ -220,12 +225,12 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	set_key_code("play-toggle", hui::KEY_SPACE);
 	add_action_checkable("play-loop");
 	event("play-loop", [this] { on_play_loop(); });
-	set_key_code("play-loop", hui::KEY_CONTROL + hui::KEY_L);
+	set_key_code("play-loop", mod + hui::KEY_L);
 	event("pause", [this] { on_pause(); });
 	event("stop", [this] { on_stop(); });
-	set_key_code("stop", hui::KEY_CONTROL + hui::KEY_T);
+	set_key_code("stop", mod + hui::KEY_T);
 	event("record", [this] { on_record(false); });
-	set_key_code("record", hui::KEY_CONTROL + hui::KEY_R);
+	set_key_code("record", mod + hui::KEY_R);
 	event("record-simple", [this] { on_record(false); });
 	event("record-complex", [this] { on_record(true); });
 	event("playback-range-lock", [this] { view->set_playback_range_locked(!view->playback_range_locked); });
@@ -234,9 +239,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	event("help", [this] { on_help(); });
 	set_key_code("run_plugin", hui::KEY_SHIFT + hui::KEY_RETURN);
 	event("exit", [this] { on_exit(); });
-	set_key_code("exit", hui::KEY_CONTROL + hui::KEY_Q);
+	set_key_code("exit", mod + hui::KEY_Q);
 	event("select_all", [this] { on_select_all(); });
-	set_key_code("select_all", hui::KEY_CONTROL + hui::KEY_A);
+	set_key_code("select_all", mod + hui::KEY_A);
 	event("select_nothing", [this] { on_select_none(); });
 	event("select_expand", [this] { on_select_expand(); });
 	set_key_code("select_expand", hui::KEY_TAB + hui::KEY_SHIFT);
@@ -257,10 +262,17 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 
 	set_key_code("cam-move-right", hui::KEY_PAGE_DOWN);
 	set_key_code("cam-move-left", hui::KEY_PAGE_UP);
+#ifdef OS_MAC
+	set_key_code("cursor-jump-start", hui::KEY_META + hui::KEY_LEFT);
+	set_key_code("cursor-jump-end", hui::KEY_META + hui::KEY_RIGHT);
+	set_key_code("cursor-expand-start", hui::KEY_META + hui::KEY_SHIFT + hui::KEY_LEFT);
+	set_key_code("cursor-expand-end", hui::KEY_META + hui::KEY_SHIFT + hui::KEY_RIGHT);
+#else
 	set_key_code("cursor-jump-start", hui::KEY_HOME);
 	set_key_code("cursor-jump-end", hui::KEY_END);
 	set_key_code("cursor-expand-start", hui::KEY_HOME + hui::KEY_SHIFT);
 	set_key_code("cursor-expand-end", hui::KEY_END + hui::KEY_SHIFT);
+#endif
 	set_key_code("cursor-move-left", hui::KEY_LEFT);
 	set_key_code("cursor-move-right", hui::KEY_RIGHT);
 	set_key_code("cursor-expand-left", hui::KEY_LEFT + hui::KEY_SHIFT);

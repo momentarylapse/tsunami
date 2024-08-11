@@ -149,7 +149,7 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 #if GTK_CHECK_VERSION(4,0,0)
 		gtk_widget_insert_action_group(window, "win", G_ACTION_GROUP(action_group));
 
-		shortcut_controller = gtk_shortcut_controller_new ();
+		shortcut_controller = gtk_shortcut_controller_new();
 		gtk_shortcut_controller_set_scope(GTK_SHORTCUT_CONTROLLER(shortcut_controller), GTK_SHORTCUT_SCOPE_GLOBAL);
 		gtk_widget_add_controller(window, shortcut_controller);
 
@@ -584,6 +584,18 @@ void Window::set_menu(xfer<Menu> _menu) {
 	basic_layout->set_menu(_menu);
 }
 
+int key_to_gtk(int key_code, GdkModifierType* mod) {
+
+	int _mod = (((key_code & KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) |
+				(((key_code & KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) |
+				(((key_code & KEY_ALT)>0) ? GDK_ALT_MASK : 0) |
+				(((key_code & KEY_META)>0) ? GDK_META_MASK : 0) |
+				(((key_code & KEY_SUPER)>0) ? GDK_SUPER_MASK : 0) |
+				(((key_code & KEY_HYPER)>0) ? GDK_HYPER_MASK : 0);
+	*mod = (GdkModifierType)_mod;
+	return HuiKeyID[key_code & 255];
+}
+
 void Window::set_key_code(const string &id, int key_code, const string &image) {
 	// make sure, each id has only 1 code
 	//   (multiple ids may have the same code)
@@ -597,9 +609,10 @@ void Window::set_key_code(const string &id, int key_code, const string &image) {
 #if GTK_CHECK_VERSION(4,0,0)
 	_try_add_action_(id, false);
 
-	int mod = (((key_code&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((key_code&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((key_code&KEY_ALT)>0) ? GDK_ALT_MASK : 0);
+	GdkModifierType mod;
+	int gtk_key = key_to_gtk(key_code, &mod);
 	gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(shortcut_controller),
-		gtk_shortcut_new(gtk_keyval_trigger_new(HuiKeyID[key_code & 255], (GdkModifierType)mod), gtk_named_action_new(get_gtk_action_name(id, this).c_str())));
+		gtk_shortcut_new(gtk_keyval_trigger_new(gtk_key, mod), gtk_named_action_new(get_gtk_action_name(id, this).c_str())));
 #endif
 }
 

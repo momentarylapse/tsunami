@@ -291,6 +291,10 @@ int _get_hui_key_id_2(guint keyval, guint keycode, int mod) {
 		key_code += KEY_CONTROL;
 	if ((mod & GDK_SHIFT_MASK) > 0)
 		key_code += KEY_SHIFT;
+	if ((mod & GDK_META_MASK) > 0)
+		key_code += KEY_META;
+	if ((mod & GDK_HYPER_MASK) > 0)
+		key_code += KEY_HYPER;
 #if GTK_CHECK_VERSION(4,0,0)
 	if ((mod & GDK_ALT_MASK) > 0)
 		key_code += KEY_ALT;

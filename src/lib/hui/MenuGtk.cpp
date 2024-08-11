@@ -17,14 +17,16 @@ namespace hui
 #if !GTK_CHECK_VERSION(4,0,0)
 GtkAccelGroup *accel_group = nullptr;
 
+int key_to_gtk(int key_code, GdkModifierType* mod);
+
 void try_add_accel(GtkWidget *item, const string &id, Panel *panel) {
 	if (!panel->win)
 		return;
 	for (auto &c: panel->win->get_event_key_codes())
 		if ((id == c.id) and (c.key_code >= 0)) {
-			int k = c.key_code;
-			int mod = (((k&KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) | (((k&KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) | (((k&KEY_ALT)>0) ? GDK_META_MASK : 0);
-			gtk_widget_add_accelerator(item, "activate", accel_group, HuiKeyID[k & 255], (GdkModifierType)mod, GTK_ACCEL_VISIBLE);
+			GdkModifierType mod;
+			int gtk_key = key_to_gtk(c.key_code, &mod);
+			gtk_widget_add_accelerator(item, "activate", accel_group, gtk_key, mod, GTK_ACCEL_VISIBLE);
 		}
 }
 #endif

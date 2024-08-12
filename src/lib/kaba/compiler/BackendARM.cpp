@@ -540,7 +540,7 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 
 [[maybe_unused]]
 static bool arm_type_uses_int_register(const Class *t) {
-	return (t == TypeInt32) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == TypeInt32) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeUInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
@@ -571,7 +571,7 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> float_param;
 	for (SerialNodeParam &p: params) {
-		if ((p.type == TypeInt32) /*or (p.type == TypeInt64)*/ or (p.type == TypeInt8) or (p.type == TypeBool) or p.type->is_some_pointer()) {
+		if ((p.type == TypeInt32) /*or (p.type == TypeInt64)*/ or (p.type == TypeInt8) or (p.type == TypeUInt8) or (p.type == TypeBool) or p.type->is_some_pointer()) {
 			if (reg_param.num < max_reg_params) {
 				reg_param.add(p);
 			} else {
@@ -723,7 +723,7 @@ void BackendARM::add_function_intro_params(Function *f) {
 	Array<Variable*> stack_param;
 	Array<Variable*> float_param;
 	for (Variable *p: param) {
-		if ((p->type == TypeInt32) or (p->type == TypeInt8) or (p->type == TypeBool) or p->type->is_some_pointer()) {
+		if ((p->type == TypeInt32) or (p->type == TypeInt8) or (p->type == TypeUInt8) or (p->type == TypeBool) or p->type->is_some_pointer()) {
 			if (reg_param.num < 4) {
 				reg_param.add(p);
 			} else {

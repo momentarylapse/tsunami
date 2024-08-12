@@ -17,8 +17,12 @@
 #include "../syntax/Inline.h"
 #include <cstdint>
 
-template<> inline string str(const uint8_t& c) {
+template<> inline string str(const uint8& c) {
 	return format("0x%02x", (unsigned int)c);
+}
+
+template<> inline string str(const int8& c) {
+	return str((int)c);
 }
 
 namespace kaba {

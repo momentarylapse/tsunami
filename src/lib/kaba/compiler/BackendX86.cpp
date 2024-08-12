@@ -219,7 +219,7 @@ void BackendX86::correct_implement_commands() {
 				implement_mov_chunk(p1, p2, size);
 			//}
 		} else if (c.inst == Asm::InstID::MOVSX or c.inst == Asm::InstID::MOVZX) {
-			// only  (char <-> int)  or  (int <-> int64)
+			// only  (i8 <-> i32)  or  (i32 <-> i64)
 			auto inst = c.inst;
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
@@ -238,8 +238,8 @@ void BackendX86::correct_implement_commands() {
 				insert_cmd(inst, param_vreg(p1.type, reg, preg), p2);
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg));
 			} else {
-				// char <- int
-				// int <- int64
+				// i8 <- i32
+				// i32 <- i64
 				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, p2.type->size);
 				insert_cmd(Asm::InstID::MOV, param_vreg(p2.type, reg), p2);
 				auto preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);

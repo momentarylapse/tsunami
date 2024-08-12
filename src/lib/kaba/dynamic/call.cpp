@@ -146,8 +146,8 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	for (int i=0; i<param.num; i++) {
 		if (ptype[i] == TypeInt32 or ptype[i]->is_enum())
 			temp[nrreg ++] = *(int*)param[i];
-		else if (ptype[i] == TypeInt8 or ptype[i] == TypeBool)
-			temp[nrreg ++] = *(char*)param[i];
+		else if (ptype[i] == TypeInt8 or ptype[i] == TypeUInt8 or ptype[i] == TypeBool)
+			temp[nrreg ++] = *(int8*)param[i];
 		else if (ptype[i] == TypeInt64 or ptype[i]->is_some_pointer())
 			temp[nrreg ++] = *(int64*)param[i];
 		else if (ptype[i] == TypeFloat32)
@@ -232,8 +232,8 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 		*(int*)ret = (int)temp[N*2+2];
 	} else if (return_type == TypeInt64 or return_type->is_some_pointer()) {
 		*(int64*)ret = temp[N*2+2];
-	} else if (return_type == TypeInt8 or return_type == TypeBool) {
-		*(char*)ret = (char)temp[N*2+2];
+	} else if (return_type == TypeInt8 or return_type == TypeUInt8 or return_type == TypeBool) {
+		*(int8*)ret = (int8)temp[N*2+2];
 	} else if (return_type->_return_in_float_registers()) {
 		//msg_error("ret in float");
 		for (int i=0; i<return_type->size/4; i++)

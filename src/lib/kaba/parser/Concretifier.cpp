@@ -2006,7 +2006,7 @@ shared<Node> SyntaxTree::make_fake_constructor(const Class *t, const Class *para
 }
 
 shared_array<Node> Concretifier::turn_class_into_constructor(const Class *t, const shared_array<Node> &params, int token_id) {
-	if (((t == TypeInt32) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeInt8)) and (params.num == 1))
+	if (((t == TypeInt32) or (t == TypeFloat32) or (t == TypeInt64) or (t == TypeFloat64) or (t == TypeBool) or (t == TypeInt8) or (t == TypeUInt8)) and (params.num == 1))
 		return {tree->make_fake_constructor(t, params[0]->type, token_id)};
 
 	// constructor

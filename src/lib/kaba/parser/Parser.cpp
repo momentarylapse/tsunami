@@ -87,7 +87,7 @@ void Parser::parse_buffer(const string &buffer, bool just_analyse) {
 const Class *Parser::get_constant_type(const string &str) {
 	// character '...'
 	if ((str[0] == '\'') and (str.back() == '\''))
-		return TypeInt8;
+		return TypeUInt8;
 
 	// string "..."
 	if ((str[0] == '"') and (str.back() == '"'))
@@ -118,7 +118,7 @@ const Class *Parser::get_constant_type(const string &str) {
 	if (type == TypeInt32) {
 		if (hex) {
 			if (str.num == 4)
-				type = TypeInt8;
+				type = TypeUInt8;
 			if (str.num > 10)
 				type = TypeInt64;
 		} else {
@@ -132,7 +132,7 @@ const Class *Parser::get_constant_type(const string &str) {
 void Parser::get_constant_value(const string &str, Value &value) {
 	value.init(get_constant_type(str));
 // literal
-	if (value.type == TypeInt8) {
+	if (value.type == TypeUInt8) {
 		if (str[0] == '\'') // 'bla'
 			value.as_int() = str.unescape()[1];
 		else // 0x12

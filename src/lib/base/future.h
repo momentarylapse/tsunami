@@ -9,6 +9,7 @@
 #define SRC_LIB_BASE_FUTURE_H_
 
 #include <functional>
+#include "base.h"
 #include "pointer.h"
 
 namespace base {
@@ -35,6 +36,14 @@ struct xparam<int> {
 template<>
 struct xparam<int64> {
 	using t = int64;
+};
+template<>
+struct xparam<int8> {
+	using t = int8;
+};
+template<>
+struct xparam<uint8> {
+	using t = uint8;
 };
 template<>
 struct xparam<float> {

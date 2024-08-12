@@ -147,6 +147,7 @@ extern const Class *TypePointer;
 extern const Class *TypeReference;
 extern const Class *TypeBool;
 extern const Class *TypeInt8;
+extern const Class *TypeUInt8;
 extern const Class *TypeInt16;
 extern const Class *TypeInt32;
 extern const Class *TypeInt64;

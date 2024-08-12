@@ -64,13 +64,15 @@
 	#define _cdecl
 #endif*/
 
-typedef int int32;
-typedef long long int64;
+using int32 = int;
+using int64 = long long;
+using int8 = signed char;
+using uint8 = unsigned char;
 
 #if defined(CPU_AMD64) || defined(CPU_ARM64)
-typedef int64 int_p;
+using int_p = int64;
 #else
-typedef int32 int_p;
+using int_p = int32;
 #endif
 
 // did cpu detection work correctly?

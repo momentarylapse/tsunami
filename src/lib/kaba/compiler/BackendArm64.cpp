@@ -44,7 +44,7 @@ void BackendArm64::add_function_intro_params(Function *f) {
 	Array<Variable*> stack_param;
 	Array<Variable*> float_param;
 	for (Variable *p: param) {
-		if ((p->type == TypeInt32) or (p->type == TypeInt64) or (p->type == TypeInt8) or (p->type == TypeBool) or p->type->is_enum() or p->type->is_some_pointer()) {
+		if ((p->type == TypeInt32) or (p->type == TypeInt64) or (p->type == TypeInt8) or (p->type == TypeUInt8) or (p->type == TypeBool) or p->type->is_enum() or p->type->is_some_pointer()) {
 			if (reg_param.num < 8) {
 				reg_param.add(p);
 			} else {
@@ -597,14 +597,22 @@ void BackendArm64::correct_implement_commands() {
 				cond = Asm::ArmCond::NotEqual;
 			} else if (inst == Asm::InstID::SETNZ) { // !=
 				cond = Asm::ArmCond::Equal;
-			} else if (inst == Asm::InstID::SETNLE or inst == Asm::InstID::SETNBE) { // >
+			} else if (inst == Asm::InstID::SETNLE) { // > signed
 				cond = Asm::ArmCond::LessEqual;
-			} else if (inst == Asm::InstID::SETNL or inst == Asm::InstID::SETNB) { // >=
+			} else if (inst == Asm::InstID::SETNL) { // >= signed
 				cond = Asm::ArmCond::LessThan;
-			} else if (inst == Asm::InstID::SETL or inst == Asm::InstID::SETB) { // <
+			} else if (inst == Asm::InstID::SETL) { // < signed
 				cond = Asm::ArmCond::GreaterEqual;
-			} else if (inst == Asm::InstID::SETLE or inst == Asm::InstID::SETBE) { // <=
+			} else if (inst == Asm::InstID::SETLE) { // <= signed
 				cond = Asm::ArmCond::GreaterThan;
+			} else if (inst == Asm::InstID::SETNBE) { // > unsigned
+				cond = Asm::ArmCond::UnsignedLowerSame; // ok
+			} else if (inst == Asm::InstID::SETNB) { // >= unsigned
+				cond = Asm::ArmCond::CarryClear;
+			} else if (inst == Asm::InstID::SETB) { // < unsigned
+				cond = Asm::ArmCond::CarrySet;
+			} else if (inst == Asm::InstID::SETBE) { // <= unsigned
+				cond = Asm::ArmCond::UnsignedHigher;
 			}
 			insert_cmd(Asm::InstID::CSET, param_vreg_auto(TypeInt32, reg), param_imm(TypeInt32, (int)cond));
 			insert_cmd(Asm::InstID::AND, param_vreg_auto(TypeInt32, reg), param_vreg_auto(TypeInt32, reg), param_imm(TypeInt32, 1));
@@ -727,7 +735,7 @@ BackendArm64::CallData BackendArm64::fc_begin(const Array<SerialNodeParam> &_par
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> float_param;
 	for (SerialNodeParam &p: params) {
-		if ((p.type == TypeInt32) or (p.type == TypeInt64) or (p.type == TypeInt8) or (p.type == TypeBool) or p.type->is_enum() or p.type->is_some_pointer()) {
+		if ((p.type == TypeInt32) or (p.type == TypeInt64) or (p.type == TypeInt8) or (p.type == TypeUInt8) or (p.type == TypeBool) or p.type->is_enum() or p.type->is_some_pointer()) {
 			if (reg_param.num < max_reg_params) {
 				reg_param.add(p);
 			} else {

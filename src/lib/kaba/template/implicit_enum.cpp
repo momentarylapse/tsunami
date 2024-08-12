@@ -30,7 +30,7 @@ void AutoImplementer::_implement_functions_for_enum(const Class *t) {
 Class* TemplateClassInstantiatorEnum::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
 	auto c = const_cast<Class*>(params[0]);
 	c->from_template = TypeEnumT;
-	c->flags = Flags::FORCE_CALL_BY_VALUE; // FORCE_CALL_BY_VALUE
+	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
 	kaba::add_class(c);
 	return c;
 }

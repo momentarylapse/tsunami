@@ -43,6 +43,7 @@ const Class *TypeObject;
 const Class *TypeObjectP;
 const Class *TypeBool;
 const Class *TypeInt8;
+const Class *TypeUInt8;
 const Class *TypeInt16;
 const Class *TypeInt32;
 const Class *TypeInt64;

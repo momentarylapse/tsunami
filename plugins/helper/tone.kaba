@@ -19,7 +19,7 @@ func pitch_from_octave_and_rel(rel: int, octave: int) -> int
 func pitch_to_rel(pitch: int) -> int
 	return pitch % 12
 
-func char_to_rel_pitch(c: i8) -> int
+func char_to_rel_pitch(c: u8) -> int
 	if c == 'c'
 		return 0
 	if c == 'd'

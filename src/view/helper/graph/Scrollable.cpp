@@ -6,8 +6,16 @@
  */
 
 #include "Scrollable.h"
+
+#include <image/Painter.h>
+
 #include "ScrollBar.h"
+#include "../../../stuff/PerformanceMonitor.h"
 #include "../../../lib/hui/Event.h"
+
+namespace scenegraph {
+void sort_nodes_up(Array<Node*> &nodes);
+}
 
 namespace tsunami {
 
@@ -40,17 +48,25 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 
 
 // coord -> screen
-vec2 ScrollPad::project(const vec2 &p) {
-	return p - view_pos;
+vec2 ScrollPad::project(const vec2 &p) const {
+	return (p - view_pos) * scale;
+}
+
+rect ScrollPad::project(const rect &r) const {
+	return rect((r.x1 - view_pos.x) * scale, (r.x2 - view_pos.x) * scale, (r.y1 - view_pos.y) * scale, (r.y2 - view_pos.y) * scale);
 }
 
 // screen -> coord
-vec2 ScrollPad::unproject(const vec2 &p) {
-	return p + view_pos;
+vec2 ScrollPad::unproject(const vec2 &p) const {
+	return p / scale + view_pos;
+}
+
+rect ScrollPad::unproject(const rect &r) const {
+	return rect(r.x1 / scale + view_pos.x, r.x2 / scale + view_pos.x, r.y1 / scale + view_pos.y, r.y2 / scale + view_pos.y);
 }
 
 bool ScrollPad::on_mouse_wheel(const vec2 &d) {
-	move_view(d * 50);
+	move_view(d * 50 / scale);
 	return true;
 }
 
@@ -63,11 +79,15 @@ bool ScrollPad::on_key_down(int key) {
 		move_view({-10, 0});
 	if (key == hui::KEY_RIGHT)
 		move_view({10, 0});
+	if (key == hui::KEY_PLUS)
+		scale *= 1.1f;
+	if (key == hui::KEY_MINUS)
+		scale /= 1.1f;
 	return false;
 }
 
 void ScrollPad::move_view(const vec2 &d) {
-	view_pos += d;
+	view_pos += d / scale;
 	_update_scrolling();
 	request_redraw();
 }
@@ -85,19 +105,46 @@ void ScrollPad::_update_scrolling() {
 
 void ScrollPad::update_geometry_recursive(const rect &target_area) {
 	Node::update_geometry_recursive(target_area);
-	for (auto c: collect_children(false))
+	/*for (auto c: collect_children(false))
 		if (c != scrollbar_h and c != scrollbar_v and c != hbox and c != vbox) {
-			c->area.x1 -= view_pos.x;
-			c->area.x2 -= view_pos.x;
-			c->area.y1 -= view_pos.y;
-			c->area.y2 -= view_pos.y;
-		}
+			//c->area = project(c->area);
+		}*/
 }
 
 void ScrollPad::set_content(const rect &r) {
 	content_area = r;
 	_update_scrolling();
 	request_redraw();
+}
+
+void ScrollPad::draw_recursive(Painter *p) {
+	if (hidden)
+		return;
+	PerformanceMonitor::start_busy(perf_channel);
+
+	rect clip_before = p->clip();
+	if (clip)
+		p->set_clip(area);
+
+	on_draw(p);
+
+	float m[4] = {scale, 0, 0, scale};
+	p->set_transform(m, -view_pos*scale);
+
+	auto nodes = weak(children);
+	sort_nodes_up(nodes);
+	for (auto *c: nodes)
+		if (!c->hidden and c != vbox)
+			c->draw_recursive(p);
+
+	float m_id[4] = {1, 0, 0, 1};
+	p->set_transform(m_id, vec2::ZERO);
+
+	vbox->draw_recursive(p);
+
+	if (clip)
+		p->set_clip(clip_before);
+	PerformanceMonitor::end_busy(perf_channel);
 }
 
 }

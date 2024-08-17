@@ -45,7 +45,7 @@ public:
 
 	virtual bool has_hover(const vec2 &m) const;
 
-	void draw_recursive(Painter *p);
+	virtual void draw_recursive(Painter *p);
 	virtual void on_draw(Painter *p) {}
 	virtual tsunami::HoverData get_hover_data(const vec2 &m);
 	void add_child(Node *child);

@@ -42,10 +42,13 @@ public:
 	scenegraph::VBox *vbox;
 
 	vec2 view_pos = vec2::ZERO;
+	float scale = 1.0f;
 	rect content_area = rect::EMPTY;
 	void set_content(const rect &r);
 
 	ScrollPad();
+
+	void draw_recursive(Painter *p) override;
 
 	bool on_mouse_wheel(const vec2 &d) override;
 	bool on_key_down(int key) override;
@@ -53,8 +56,10 @@ public:
 
 	void move_view(const vec2 &d);
 
-	vec2 project(const vec2 &p);
-	vec2 unproject(const vec2 &p);
+	vec2 project(const vec2 &p) const;
+	vec2 unproject(const vec2 &p) const;
+	rect project(const rect &r) const;
+	rect unproject(const rect &r) const;
 
 	void _update_scrolling();
 

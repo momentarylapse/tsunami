@@ -430,7 +430,15 @@ void BackendArm64::correct_implement_commands() {
 			}
 		} else if (c.inst == Asm::InstID::MOVSX) {
 			int vreg = _to_register(c.p[1]);
-			insert_cmd(Asm::InstID::MOVSX, param_vreg_auto(TypeInt64, vreg), param_vreg_auto(TypeInt32, vreg));
+			if (c.p[0].type == TypeInt32 and c.p[1].type == TypeInt64) {
+				// nothing to do
+			} else if (c.p[0].type == TypeInt64 and c.p[1].type == TypeInt32) {
+				insert_cmd(Asm::InstID::SXTW, param_vreg_auto(TypeInt64, vreg), param_vreg_auto(TypeInt32, vreg));
+			} else if (c.p[0].type == TypeInt32 and c.p[1].type == TypeInt8) {
+				insert_cmd(Asm::InstID::SXTB, param_vreg_auto(TypeInt32, vreg), param_vreg_auto(TypeInt8, vreg));
+			} else {
+				do_error(format("movsx for %s <- %s", c.p[0].type->long_name(), c.p[1].type->long_name()));
+			}
 			_from_register(vreg, c.p[0]);
 			vreg_free(vreg);
 		} else if (c.inst == Asm::InstID::MOVZX) {

@@ -93,7 +93,7 @@ void SIAddPackageNet(Context *c) {
 			func_add_param("port", TypeInt32);
 
 	add_class(TypeBinaryBuffer);
-		class_add_element("data", TypeString, net_p(&BinaryBuffer::data));
+		class_add_element("data", TypeBytes, net_p(&BinaryBuffer::data));
 		class_add_func(Identifier::Func::INIT, TypeVoid, net_p(&BinaryBuffer::__init__), Flags::MUTABLE);
 		class_add_func(Identifier::Func::DELETE, TypeVoid, net_p(&BinaryBuffer::__delete__), Flags::MUTABLE);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(int&))&BinaryBuffer::operator>>), Flags::MUTABLE);
@@ -103,7 +103,7 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool&))&BinaryBuffer::operator>>), Flags::MUTABLE);
 			func_add_param("b", TypeBool, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(char&))&BinaryBuffer::operator>>), Flags::MUTABLE);
-			func_add_param("c", TypeInt8, Flags::OUT);
+			func_add_param("c", TypeUInt8, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(string&))&BinaryBuffer::operator>>), Flags::MUTABLE);
 			func_add_param("s", TypeString, Flags::OUT);
 		class_add_func("__rshift__", TypeVoid, net_p((void(BinaryBuffer::*)(vec3&))&BinaryBuffer::operator>>), Flags::MUTABLE);
@@ -121,7 +121,7 @@ void SIAddPackageNet(Context *c) {
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(bool))&BinaryBuffer::operator<<), Flags::MUTABLE);
 			func_add_param("b", TypeBool);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(char))&BinaryBuffer::operator<<), Flags::MUTABLE);
-			func_add_param("c", TypeInt8);
+			func_add_param("c", TypeUInt8);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const string &))&BinaryBuffer::operator<<), Flags::MUTABLE);
 			func_add_param("s", TypeString);
 		class_add_func("__lshift__", TypeVoid, net_p((void(BinaryBuffer::*)(const vec3 &))&BinaryBuffer::operator<<), Flags::MUTABLE);

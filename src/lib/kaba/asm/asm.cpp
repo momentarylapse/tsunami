@@ -370,6 +370,8 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 	{InstID::ORS, "ors"},
 	{InstID::MOVS, "movs"},
 	{InstID::MVNS, "movns"},
+	{InstID::SXTW, "sxtw"},
+	{InstID::SXTB, "sxtb"},
 
 	{InstID::LDR,		"ldr"},
 	{InstID::LDUR,		"ldur"},

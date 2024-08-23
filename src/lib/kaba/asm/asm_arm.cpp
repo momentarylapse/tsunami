@@ -191,8 +191,9 @@ void arm64_init() {
 	add_inst_arm(InstID::MOV,  0x91000000, 0xfffffc00, AP_REG_0P5, AP_REG_5P5); // 64bit
 	add_inst_arm(InstID::MOV,  0xaa0003e0, 0xffe0ffe0, AP_REG_0P5, AP_REG_16P5); // 64bit - mostly for disassembly
 
-	// "sxtw"
-	add_inst_arm(InstID::MOVSX, 0x93407c00, 0xfffffc00, AP_REG_0P5, AP_WREG_5P5);
+	// "movsx"
+	add_inst_arm(InstID::SXTW, 0x93407c00, 0xfffffc00, AP_REG_0P5, AP_WREG_5P5);
+	add_inst_arm(InstID::SXTB, 0x13001c00, 0xfffffc00, AP_WREG_0P5, AP_WREG_5P5);
 
 	add_inst_arm(InstID::SUB,  0xd1000000, 0xff800000, AP_REG_0P5, AP_REG_5P5, AP_IMM12_10SH); // 64bit
 	add_inst_arm(InstID::SUB,  0x51000000, 0xffe00000, AP_WREG_0P5, AP_WREG_5P5, AP_IMM12_10); // 32bit

@@ -294,6 +294,8 @@ enum class InstID {
 	ORS,
 	MOVS,
 	MVNS,
+	SXTW,
+	SXTB,
 
 	LDR,
 	LDUR,

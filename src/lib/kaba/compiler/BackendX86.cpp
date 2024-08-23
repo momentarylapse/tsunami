@@ -223,20 +223,21 @@ void BackendX86::correct_implement_commands() {
 			auto inst = c.inst;
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-//			msg_write("MOVSX " + p1.type->name + " << "+ p2.type->name);
 			if (p1.type == TypeInt64 and p2.type == TypeInt32) {
-				// int64 <- int
+				// i64 <- i32
 				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, p2.type->size);
 				insert_cmd(Asm::InstID::MOV, param_vreg(p2.type, reg), p2);
 				auto preg_x = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(Asm::InstID::MOVSXD, param_vreg(p1.type, reg, preg_x), param_vreg(p2.type, reg));
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg_x));
-			} else if (p1.type == TypeInt32 and p2.type == TypeInt8) {
-				// int <- char
+			} else if (p1.type == TypeInt32 and (p2.type == TypeInt8 or p2.type == TypeUInt8)) {
+				// i32 <- i8/u8
 				int reg = find_unused_reg(cmd.cmd.num, cmd.cmd.num, max(p1.type->size, p2.type->size));
 				auto preg = reg_resize(cmd.virtual_reg[reg].reg, p1.type->size);
 				insert_cmd(inst, param_vreg(p1.type, reg, preg), p2);
 				insert_cmd(Asm::InstID::MOV, p1, param_vreg(p1.type, reg, preg));
+				if (p2.type == TypeUInt8)
+					insert_cmd(Asm::InstID::AND, p1, param_imm(TypeInt32, 0x000000ff));
 			} else {
 				// i8 <- i32
 				// i32 <- i64

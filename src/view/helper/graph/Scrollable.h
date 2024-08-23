@@ -43,6 +43,8 @@ public:
 
 	vec2 view_pos = vec2::ZERO;
 	float scale = 1.0f;
+	float scale_min = 1.0f;
+	float scale_max = 1.0f;
 	rect content_area = rect::EMPTY;
 	void set_content(const rect &r);
 
@@ -55,13 +57,14 @@ public:
 	void update_geometry_recursive(const rect &target_area) override;
 
 	void move_view(const vec2 &d);
+	void zoom(float factor);
 
 	vec2 project(const vec2 &p) const;
 	vec2 unproject(const vec2 &p) const;
 	rect project(const rect &r) const;
 	rect unproject(const rect &r) const;
 
-	void _update_scrolling();
+	void _update_scrollbars();
 
 	template<class T>
 	void connect_scrollable(Scrollable<T> *s) {

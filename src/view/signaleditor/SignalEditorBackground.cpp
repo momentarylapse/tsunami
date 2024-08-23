@@ -28,27 +28,28 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	p->draw_rect(area);
 	p->set_line_width(0.7f);
 
-	const rect ua = pad->unproject(area);
+	const color col1 = color::interpolate(theme.background, theme.grid, 0.5f);
+	const color col2 = color::interpolate(theme.background, theme.grid, 0.2f);
 
 	float D = MODULE_GRID;
-	int i0 = floor(ua.x1 / D);
-	int i1 = ceil(ua.x2 / D);
+	int i0 = floor(area.x1 / D);
+	int i1 = ceil(area.x2 / D);
 	for (int i=i0; i<=i1; i++) {
-		float x = pad->project(vec2(i * D, 0)).x;
+		float x = i * D;
 		if ((i % 5) == 0)
-			p->set_color(color::interpolate(theme.background, theme.grid, 0.5f));
+			p->set_color(col1);
 		else
-			p->set_color(color::interpolate(theme.background, theme.grid, 0.2f));
+			p->set_color(col2);
 		p->draw_line({x, area.y1}, {x, area.y2});
 	}
-	int j0 = floor(ua.y1 / D);
-	int j1 = ceil(ua.y2 / D);
+	int j0 = floor(area.y1 / D);
+	int j1 = ceil(area.y2 / D);
 	for (int j=j0; j<=j1; j++) {
-		float y = pad->project(vec2(0, j * D)).y;
+		float y = j * D;
 		if ((j % 5) == 0)
-			p->set_color(color::interpolate(theme.background, theme.grid, 0.5f));
+			p->set_color(col1);
 		else
-			p->set_color(color::interpolate(theme.background, theme.grid, 0.2f));
+			p->set_color(col2);
 		p->draw_line({area.x1, y}, {area.x2, y});
 	}
 

@@ -65,6 +65,23 @@ Node::~Node() {
 			graph()->hover = {};
 }
 
+
+bool Node::on_left_button_down(const vec2 &m) {
+	for (auto c: weak(children))
+		if (c->on_left_button_down(m))
+			return true;
+	return false;
+}
+bool Node::on_left_button_up(const vec2 &m) { return false; }
+bool Node::on_left_double_click(const vec2 &m) { return false; }
+bool Node::on_right_button_down(const vec2 &m) { return false; }
+bool Node::on_right_button_up(const vec2 &m) { return false; }
+bool Node::on_mouse_move(const vec2 &m) { return false; }
+bool Node::on_mouse_wheel(const vec2 &d) { return false; }
+bool Node::on_gesture(const string &id, const vec2 &m, const vec2 &param) { return false; }
+bool Node::on_key_down(int key) { return false; }
+bool Node::on_key_up(int key) { return false; }
+
 bool Node::has_hover(const vec2 &m) const {
 	if (hidden)
 		return false;
@@ -129,6 +146,9 @@ void Node::update_geometry(const rect &target_area) {
 	} else if (align.horizontal == AlignData::Mode::Right) {
 		area.x2 = target_area.x2 + align.dx;
 		area.x1 = area.x2 - align.w;
+	} else if (align.horizontal == AlignData::Mode::Absolute) {
+		area.x1 = align.dx;
+		area.x2 = area.x1 + align.w;
 	}
 
 	if (align.vertical == AlignData::Mode::Fill) {
@@ -140,6 +160,9 @@ void Node::update_geometry(const rect &target_area) {
 	} else if (align.vertical == AlignData::Mode::Bottom) {
 		area.y2 = target_area.y2 + align.dy;
 		area.y1 = area.y2 - align.h;
+	} else if (align.vertical == AlignData::Mode::Absolute) {
+		area.y1 = align.dy;
+		area.y2 = area.y1 + align.h;
 	}
 }
 

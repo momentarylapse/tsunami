@@ -32,16 +32,16 @@ public:
 	virtual bool allow_handle_click_when_gaining_focus() const { return true; }
 
 	// return: block upwards propagation
-	virtual bool on_left_button_down(const vec2 &m) { return false; }
-	virtual bool on_left_button_up(const vec2 &m) { return false; }
-	virtual bool on_left_double_click(const vec2 &m) { return false; }
-	virtual bool on_right_button_down(const vec2 &m) { return false; }
-	virtual bool on_right_button_up(const vec2 &m) { return false; }
-	virtual bool on_mouse_move(const vec2 &m) { return false; }
-	virtual bool on_mouse_wheel(const vec2 &d) { return false; }
-	virtual bool on_gesture(const string &id, const vec2 &m, const vec2 &param) { return false; }
-	virtual bool on_key_down(int key) { return false; }
-	virtual bool on_key_up(int key) { return false; }
+	virtual bool on_left_button_down(const vec2 &m);
+	virtual bool on_left_button_up(const vec2 &m);
+	virtual bool on_left_double_click(const vec2 &m);
+	virtual bool on_right_button_down(const vec2 &m);
+	virtual bool on_right_button_up(const vec2 &m);
+	virtual bool on_mouse_move(const vec2 &m);
+	virtual bool on_mouse_wheel(const vec2 &d);
+	virtual bool on_gesture(const string &id, const vec2 &m, const vec2 &param);
+	virtual bool on_key_down(int key);
+	virtual bool on_key_up(int key);
 
 	virtual bool has_hover(const vec2 &m) const;
 
@@ -51,7 +51,9 @@ public:
 	void add_child(Node *child);
 	void delete_child(Node *child);
 
+	// this or a decendent has hover?
 	bool is_cur_hover() const;
+	// top-most hover?
 	bool is_cur_hover_non_recursive() const;
 
 	virtual string get_tip() const;
@@ -70,7 +72,8 @@ public:
 			Right,
 			Top,
 			Bottom,
-			Fill
+			Fill,
+			Absolute
 		};
 		Mode horizontal, vertical;
 		float dx, dy, dz;

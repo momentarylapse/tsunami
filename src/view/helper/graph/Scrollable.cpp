@@ -43,7 +43,7 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	vbox->add_child(scrollbar_h);
 	hbox->add_child(scrollbar_v);
 	add_child(vbox);
-	_update_scrolling();
+	_update_scrollbars();
 }
 
 
@@ -66,8 +66,13 @@ rect ScrollPad::unproject(const rect &r) const {
 }
 
 bool ScrollPad::on_mouse_wheel(const vec2 &d) {
-	move_view(d * 50 / scale);
+	move_view(d * 50);
 	return true;
+}
+
+void ScrollPad::zoom(float factor) {
+	scale = clamp(scale * factor, scale_min, scale_max);
+	out_changed();
 }
 
 bool ScrollPad::on_key_down(int key) {
@@ -80,19 +85,21 @@ bool ScrollPad::on_key_down(int key) {
 	if (key == hui::KEY_RIGHT)
 		move_view({10, 0});
 	if (key == hui::KEY_PLUS)
-		scale *= 1.1f;
+		zoom(1.1f);
 	if (key == hui::KEY_MINUS)
-		scale /= 1.1f;
+		zoom(1.0f / 1.1f);
+
 	return false;
 }
 
 void ScrollPad::move_view(const vec2 &d) {
 	view_pos += d / scale;
-	_update_scrolling();
+	_update_scrollbars();
+	out_changed();
 	request_redraw();
 }
 
-void ScrollPad::_update_scrolling() {
+void ScrollPad::_update_scrollbars() {
 	scrollbar_h->set_view(view_pos.x, view_pos.x + area.width());
 	scrollbar_h->set_content(content_area.x1, content_area.x2);
 
@@ -104,16 +111,21 @@ void ScrollPad::_update_scrolling() {
 }
 
 void ScrollPad::update_geometry_recursive(const rect &target_area) {
-	Node::update_geometry_recursive(target_area);
-	/*for (auto c: collect_children(false))
-		if (c != scrollbar_h and c != scrollbar_v and c != hbox and c != vbox) {
-			//c->area = project(c->area);
-		}*/
+	update_geometry(target_area);
+	if (parent)
+		z = parent->z + align.dz;
+
+	for (auto *c: weak(children))
+		if (c != scrollbar_h and c != scrollbar_v)
+			c->update_geometry_recursive(unproject(area));
+
+	scrollbar_h->update_geometry_recursive(area);
+	scrollbar_v->update_geometry_recursive(area);
 }
 
 void ScrollPad::set_content(const rect &r) {
 	content_area = r;
-	_update_scrolling();
+	_update_scrollbars();
 	request_redraw();
 }
 

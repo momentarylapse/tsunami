@@ -122,10 +122,11 @@ SignalEditorTab::SignalEditorTab(SignalChain *_chain) {
 	view = session->view;
 
 	pad = new ScrollPad();
-	pad->align.dz = 5;
+	pad->scale_min = 0.2f;
+	pad->scale_max = 2.0f;
 	add_child(pad);
 	background = new SignalEditorBackground(this);
-	add_child(background);
+	pad->add_child(background);
 	pad->connect_scrollable(background);
 	//add_child(new SignalEditorPlayButton(this));
 
@@ -351,14 +352,13 @@ void SignalEditorTab::select_module(Module *m, bool add) {
 
 void SignalEditorTab::update_module_positions() {
 	// temporarily set a 1:1 coord system
-	pad->Node::update_geometry_recursive(pad->area);
+	//pad->Node::update_geometry_recursive(pad->area);
 	rect r = rect::EMPTY;
 	if (modules.num > 0)
 		r = modules[0]->area;
 
 	for (auto *m: modules) {
-		m->align.dx = m->module->module_x;
-		m->align.dy = m->module->module_y;
+		m->update_pos();
 		r = r || m->area;
 	}
 	pad->set_content(r);

@@ -26,6 +26,8 @@ public:
 	bool on_left_button_down(const vec2 &m) override;
 	bool on_right_button_down(const vec2 &m) override;
 	string get_tip() const override;
+
+	void update_pos();
 };
 
 }

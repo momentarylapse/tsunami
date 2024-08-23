@@ -143,12 +143,14 @@ public:
 
 SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegraph::NodeRel({m->module_x, m->module_y}, MODULE_WIDTH, MODULE_HEIGHT) {
 	align.dz = 2;
+	align.horizontal = AlignData::Mode::None;
+	align.vertical = AlignData::Mode::None;
 	tab = t;
 	module = m;
 	set_perf_name("se:module");
-	for(const auto& [i,p]: enumerate(m->port_in))
+	for (const auto& [i,p]: enumerate(m->port_in))
 		in.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_in_x(module, i), module_port_in_y(module, i), false));
-	for(const auto& [i,p]: enumerate(m->port_out))
+	for (const auto& [i,p]: enumerate(m->port_out))
 		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module, i), module_port_out_y(module, i), true));
 	for (auto p: in + out)
 		add_child(p);
@@ -200,5 +202,10 @@ bool SignalEditorModule::on_right_button_down(const vec2 &m) {
 string SignalEditorModule::get_tip() const {
 	return "module: " + module->module_class + "\ncategory: " + Module::category_to_str(module->module_category);
 }
+
+void SignalEditorModule::update_pos() {
+	area = {module->module_x, module->module_x + MODULE_WIDTH, module->module_y, module->module_y + MODULE_HEIGHT};
+}
+
 
 }

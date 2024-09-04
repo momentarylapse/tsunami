@@ -47,7 +47,7 @@ Class *TemplateManager::add_class_template(SyntaxTree *tree, const string &name,
 		msg_write("ADD CLASS TEMPLATE " + name);
 	//msg_write("add class template  " + c->long_name());
 	Class *c = new Class(nullptr, name, 0, 1, tree);
-	flags_set(c->flags, Flags::TEMPLATE);
+	flags_set(c->flags, Flags::Template);
 	auto m = new TemplateClassInstanceManager(c, param_names, instantiator);
 	class_managers.add(m);
 	return c;
@@ -58,7 +58,7 @@ void TemplateManager::clear_from_module(Module *m) {
 
 
 void show_node_details(shared<Node> n) {
-	if (n->kind == NodeKind::BLOCK) {
+	if (n->kind == NodeKind::Block) {
 		msg_write("block " + p2s(n.get()) + "  ->  " + p2s(n->as_block()->function));
 		msg_right();
 		for (auto v: n->as_block()->vars)
@@ -66,7 +66,7 @@ void show_node_details(shared<Node> n) {
 	}
 	for (auto p: weak(n->params))
 		show_node_details(p);
-	if (n->kind == NodeKind::BLOCK) {
+	if (n->kind == NodeKind::Block) {
 		msg_left();
 	}
 }
@@ -80,10 +80,10 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	//msg_error("FULL COPY");
 	auto f = f0->create_dummy_clone(f0->name_space);
 	f->block = cp_node(f0->block.get())->as_block();
-	flags_clear(f->flags, Flags::NEEDS_OVERRIDE);
+	flags_clear(f->flags, Flags::NeedsOverride);
 
 	auto convert = [f,tree](shared<Node> n) {
-		if (n->kind != NodeKind::BLOCK)
+		if (n->kind != NodeKind::Block)
 			return n;
 		auto b = n->as_block();
 		//msg_write("block " + p2s(b));
@@ -137,17 +137,17 @@ Class* TemplateManager::declare_new_class(SyntaxTree *tree, const Class *c0, con
 }
 
 void TemplateManager::match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f) {
-	if (p->kind == NodeKind::ABSTRACT_TOKEN) {
+	if (p->kind == NodeKind::AbstractToken) {
 		// direct
 		string token = p->as_token();
 		f(token, t);
-	} else if (p->kind == NodeKind::ABSTRACT_TYPE_LIST) {
+	} else if (p->kind == NodeKind::AbstractTypeList) {
 		if (t->is_list())
 			match_parameter_type(p->params[0], t->get_array_element(), f);
-	} else if (p->kind == NodeKind::ABSTRACT_TYPE_STAR) {
+	} else if (p->kind == NodeKind::AbstractTypeStar) {
 		if (t->is_pointer_raw())
 			match_parameter_type(p->params[0], t->param[0], f);
-	} else if (p->kind == NodeKind::ABSTRACT_TYPE_REFERENCE) {
+	} else if (p->kind == NodeKind::AbstractTypeReference) {
 		if (t->is_reference())
 			match_parameter_type(p->params[0], t->param[0], f);
 	} /*else if (p->kind == NodeKind::ABSTRACT_TYPE_SHARED) {
@@ -228,7 +228,7 @@ TemplateClassInstanceManager& TemplateManager::get_class_manager(SyntaxTree *tre
 shared<Node> TemplateManager::node_replace(SyntaxTree *tree, shared<Node> n, const Array<string> &names, const Array<const Class*> &params) {
 	//return parser->concretify_as_type(n, block, ns);
 	return tree->transform_node(n, [tree, &names, &params](shared<Node> nn) {
-		if (nn->kind == NodeKind::ABSTRACT_TOKEN) {
+		if (nn->kind == NodeKind::AbstractToken) {
 			string token = nn->as_token();
 			for (int i=0; i<names.num; i++)
 				if (token == names[i])
@@ -383,7 +383,7 @@ Function* TemplateClassInstantiator::add_func_header(Class *t, const string &nam
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
-		f->block->add_var(param_names[i], p, Flags::NONE);
+		f->block->add_var(param_names[i], p, Flags::None);
 		f->num_params ++;
 	}
 	f->default_parameters = def_params;

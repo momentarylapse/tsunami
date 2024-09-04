@@ -56,13 +56,13 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 	} else if (c == kaba::TypeString) {
 		return Any(*(const string*)v);
 	} else if (c->is_array()) {
-		Any r = Any::EmptyArray;
+		Any r = Any::EmptyList;
 		auto tel = c->get_array_element();
 		for (int i=0; i<c->array_length; i++)
 			r.add(var_to_any(tel, &v[i * tel->size]));
 		return r;
 	} else if (c->is_list()) {
-		Any r = Any::EmptyArray;
+		Any r = Any::EmptyList;
 		auto a = (DynamicArray*)v;
 		auto tel = c->get_array_element();
 		for (int i=0; i<a->num; i++)
@@ -79,16 +79,16 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		return Any();
 	} else if (c->is_product() or c == kaba::TypeComplex or c == kaba::TypeVec2 or c == kaba::TypeVec3 or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
 		// rect ...nope
-		Any r = Any::EmptyArray;
+		Any r = Any::EmptyList;
 		for (auto &e: c->elements)
 			if (!e.hidden())
 				r.add(var_to_any(e.type, &v[e.offset]));
 		return r;
 	} else {
-		Any r = Any::EmptyMap;
+		Any r = Any::EmptyDict;
 		for (auto &e: c->elements)
 			if (!e.hidden())
-				r.map_set(e.name, var_to_any(e.type, &v[e.offset]));
+				r.dict_set(e.name, var_to_any(e.type, &v[e.offset]));
 		return r;
 	}
 	return Any();
@@ -191,16 +191,16 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 	} else if (type == kaba::TypeString) {
 		*(string*)v = a.str();
 	} else if (type->is_array()) {
-		if (!a.is_array())
+		if (!a.is_list())
 			throw Exception("array expected");
-		auto &array = a.as_array();
+		auto &array = a.as_list();
 		auto tel = type->get_array_element();
 		for (int i=0; i<min(type->array_length, array.num); i++)
 			var_from_any(tel, &v[i * tel->size], array[i], session);
 	} else if (type->is_list()) {
-		if (!a.is_array())
+		if (!a.is_list())
 			throw Exception("array expected");
-		auto &array = a.as_array();
+		auto &array = a.as_list();
 		auto *aa = (DynamicArray*)v;
 		auto tel = type->get_array_element();
 		aa->simple_resize(array.num); // todo...
@@ -222,11 +222,11 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		}
 	} else {
 		auto e = get_unique_elements(type);
-		if (a.is_array()) {
-			auto &aa = a.as_array();
+		if (a.is_list()) {
+			auto &aa = a.as_list();
 			for (int i=0; i<min(e.num, aa.num); i++)
 				var_from_any(e[i].type, &v[e[i].offset], aa[i], session);
-		} else if (a.is_map()) {
+		} else if (a.is_dict()) {
 			for (auto &el: e)
 				if (a.has(el.name))
 					var_from_any(el.type, &v[el.offset], a[el.name], session);

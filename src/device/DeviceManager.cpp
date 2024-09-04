@@ -51,14 +51,14 @@ Array<Device*> str2devs(const string &s, DeviceType type) {
 
 Array<Device*> parse_devs(const Any& a, DeviceType type) {
 	Array<Device*> devices;
-	if (a.is_array())
-		for (const auto& aa: a.as_array())
+	if (a.is_list())
+		for (const auto& aa: a.as_list())
 			devices.add(new Device(type, aa));
 	return devices;
 }
 
 Any devs2any(const Array<Device*>& devices) {
-	Any a = Any::EmptyArray;
+	Any a = Any::EmptyList;
 	for (auto d: devices)
 		a.add(d->to_config());
 	return a;

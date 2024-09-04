@@ -319,7 +319,7 @@ Function *get_entry_point(SyntaxTree *tree) {
 		return f;
 	auto rmain = tree->global_scope.find("main", -1);
 	if (rmain.num > 0)
-		if (rmain[0]->kind == NodeKind::FUNCTION)
+		if (rmain[0]->kind == NodeKind::Function)
 			return rmain[0]->as_func();
 	tree->do_error("no entry point 'func main()' found");
 	return nullptr;
@@ -335,7 +335,7 @@ void Compiler::compile_os_entry_point() {
 }
 
 shared<Node> check_const_used(shared<Node> n, Module *me) {
-	if (n->kind == NodeKind::CONSTANT) {
+	if (n->kind == NodeKind::Constant) {
 		n->as_const()->used = true;
 		/*if (n->as_const()->owner != me->syntax)
 			msg_error("evil const " + n->as_const()->name);*/
@@ -430,7 +430,7 @@ void Compiler::map_constants_to_opcode() {
 void Compiler::map_address_constants_to_opcode() {
 	for (auto f: module->functions()) {
 		tree->transform_block(f->block.get(), [this] (shared<Node> n) {
-			if (n->kind == NodeKind::ADDRESS) {
+			if (n->kind == NodeKind::Address) {
 				//msg_write(format("ADDRESS   %x", n->link_no));
 				memcpy(&module->opcode[module->opcode_size], &n->link_no, config.target.pointer_size);
 				n->link_no = config.code_origin + module->opcode_size;
@@ -787,7 +787,7 @@ void Compiler::_compile() {
 }
 
 bool is_func(shared<Node> n) {
-	return (n->kind == NodeKind::CALL_FUNCTION or n->kind == NodeKind::CALL_VIRTUAL or n->kind == NodeKind::FUNCTION);
+	return (n->kind == NodeKind::CallFunction or n->kind == NodeKind::CallVirtual or n->kind == NodeKind::Function);
 }
 
 int check_needed(SyntaxTree *tree, Function *f) {
@@ -803,7 +803,7 @@ int check_needed(SyntaxTree *tree, Function *f) {
 	if (f->virtual_index >= 0)
 		ref_count ++;
 	// well, for now, only allow these functions:
-	if (f->name != Identifier::Func::ASSIGN and f->name != Identifier::Func::DELETE and f->name != Identifier::Func::INIT)
+	if (f->name != Identifier::func::Assign and f->name != Identifier::func::Delete and f->name != Identifier::func::Init)
 		ref_count ++;
 
 	return ref_count;

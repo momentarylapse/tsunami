@@ -67,7 +67,7 @@ SerialNodeParam CommandList::_add_temp(const Class *t) {
 	v.force_stack = (t->size > config.target.pointer_size) or t->is_list() or t->is_array() or (t->elements.num > 0);
 	temp_var.add(v);
 	return SerialNodeParam {
-		.kind = NodeKind::VAR_TEMP,
+		.kind = NodeKind::VarTemp,
 		.p = temp_var.num - 1,
 		.type = t,
 		.shift = 0
@@ -79,10 +79,10 @@ SerialNodeParam CommandList::_add_temp(const Class *t) {
 void CommandList::set_cmd_param(int index, int param_index, const SerialNodeParam &p) {
 	SerialNode &c = cmd[index];
 	c.p[param_index] = p;
-	if ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::DEREF_REGISTER))
+	if ((p.kind == NodeKind::Register) or (p.kind == NodeKind::DereferenceRegister))
 		if (p.vreg >= 0)
 			use_virtual_reg(p.vreg, index, index);
-	if ((p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::DEREF_VAR_TEMP)) {
+	if ((p.kind == NodeKind::VarTemp) or (p.kind == NodeKind::DereferenceVarTemp)) {
 		int v = (int)(int_p)p.p;
 		temp_var[v].use(index, index);
 		if ((c.inst == Asm::InstID::LEA) and (param_index == 1)) {
@@ -182,7 +182,7 @@ void CommandList::remove_cmd(int index) {
 void CommandList::remove_temp_var(int v) {
 	for (SerialNode &c: cmd) {
 		for (int i=0; i<SERIAL_NODE_NUM_PARAMS; i++)
-			if ((c.p[i].kind == NodeKind::VAR_TEMP) or (c.p[i].kind == NodeKind::DEREF_VAR_TEMP))
+			if ((c.p[i].kind == NodeKind::VarTemp) or (c.p[i].kind == NodeKind::DereferenceVarTemp))
 				if (c.p[i].p > v)
 					c.p[i].p --;
 	}
@@ -190,14 +190,14 @@ void CommandList::remove_temp_var(int v) {
 }
 
 void CommandList::move_param(SerialNodeParam &p, int from, int to) {
-	if ((p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::DEREF_VAR_TEMP)) {
+	if ((p.kind == NodeKind::VarTemp) or (p.kind == NodeKind::DereferenceVarTemp)) {
 		// move_param temp
 		int v = (int)p.p;
 		if (temp_var[v].last < max(from, to))
 			temp_var[v].last = max(from, to);
 		if (temp_var[v].first > min(from, to))
 			temp_var[v].first = min(from, to);
-	} else if ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::DEREF_REGISTER)) {
+	} else if ((p.kind == NodeKind::Register) or (p.kind == NodeKind::DereferenceRegister)) {
 		// move_param reg
 		auto r = Asm::reg_root[p.p];
 		bool found = false;
@@ -221,7 +221,7 @@ int CommandList::add_label(int l) {
 	SerialNodeParam p = p_none;
 	if (l < 0)
 		ser->do_error("trying to add non existing label");
-	p.kind = NodeKind::LABEL;
+	p.kind = NodeKind::Label;
 	p.p = l;
 	add_cmd(Asm::InstID::LABEL, p);
 	return l;

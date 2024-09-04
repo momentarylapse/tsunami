@@ -23,7 +23,7 @@ static shared<Node> sa_num(shared<Node> node) {
 }*/
 
 void AutoImplementer::implement_list_constructor(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	auto te = t->get_array_element();
 	auto ff = t->get_member_func("__mem_init__", TypeVoid, {TypeInt32});
@@ -33,7 +33,7 @@ void AutoImplementer::implement_list_constructor(Function *f, const Class *t) {
 }
 
 void AutoImplementer::implement_list_destructor(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	if (auto f_clear = t->get_member_func("clear", TypeVoid, {}))
 		f->block->add(add_node_member_call(f_clear, self));
@@ -46,7 +46,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 		return;
 	auto t_el = t->get_array_element();
 	auto n_other = add_node_local(f->__get_var("other"));
-	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
+	auto n_self = add_node_local(f->__get_var(Identifier::Self));
 
 	if (auto f_resize = t->get_member_func("resize", TypeVoid, {TypeInt32})) {
 		// self.resize(other.num)
@@ -74,7 +74,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 
 		b->add(add_assign(f, "", add_node_local(v_el)->deref(), n_other_el));
 
-		auto n_for = add_node_statement(StatementID::FOR_CONTAINER);
+		auto n_for = add_node_statement(StatementID::ForContainer);
 		// [VAR, INDEX, ARRAY, BLOCK]
 		n_for->set_param(0, add_node_local(v_el));
 		n_for->set_param(1, add_node_local(v_i));
@@ -87,7 +87,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 	auto te = t->get_array_element();
 
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 // delete...
 	if (auto f_del = te->get_destructor()) {
@@ -101,7 +101,7 @@ void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 		auto cmd_delete = add_node_member_call(f_del, add_node_local(var_el)->deref());
 		b->add(cmd_delete);
 
-		auto cmd_for = add_node_statement(StatementID::FOR_CONTAINER);
+		auto cmd_for = add_node_statement(StatementID::ForContainer);
 		cmd_for->set_param(0, add_node_local(var_el));
 		cmd_for->set_param(1, add_node_local(var_i));
 		cmd_for->set_param(2, self);
@@ -128,7 +128,7 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 
 	auto num = add_node_local(f->__get_var("num"));
 
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	auto self_num = sa_num(self);
 
@@ -136,7 +136,7 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 
 	{
 		// num_old = self.num
-		f->block->add(add_node_operator_by_inline(InlineID::INT32_ASSIGN, num_old, self_num));
+		f->block->add(add_node_operator_by_inline(InlineID::Int32Assign, num_old, self_num));
 	}
 
 // delete...
@@ -151,7 +151,7 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 		b->add(cmd_delete);
 
 		//  [VAR, START, STOP, STEP, BLOCK]
-		auto cmd_for = add_node_statement(StatementID::FOR_RANGE);
+		auto cmd_for = add_node_statement(StatementID::ForRange);
 		cmd_for->set_param(0, add_node_local(var));
 		cmd_for->set_param(1, num);
 		cmd_for->set_param(2, self_num);
@@ -182,7 +182,7 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 		b->add(cmd_init);
 
 		//  [VAR, START, STOP, STEP, BLOCK]
-		auto cmd_for = add_node_statement(StatementID::FOR_RANGE);
+		auto cmd_for = add_node_statement(StatementID::ForRange);
 		cmd_for->set_param(0, add_node_local(var));
 		cmd_for->set_param(1, num_old);
 		cmd_for->set_param(2, self_num);
@@ -201,7 +201,7 @@ void AutoImplementer::implement_list_remove(Function *f, const Class *t) {
 		return;
 	auto te = t->get_array_element();
 	auto index = add_node_local(f->__get_var("index"));
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	// delete...
 	if (auto f_del = te->get_destructor()) {
@@ -231,11 +231,11 @@ void AutoImplementer::implement_list_add(Function *f, const Class *t) {
 	Block *b = f->block.get();
 	auto item = add_node_local(b->get_var("x"));
 
-	auto self = add_node_local(b->get_var(Identifier::SELF));
+	auto self = add_node_local(b->get_var(Identifier::Self));
 
 	{
 		// resize(self.num + 1)
-		auto cmd_add = add_node_operator_by_inline(InlineID::INT32_ADD, sa_num(self), const_int(1));
+		auto cmd_add = add_node_operator_by_inline(InlineID::Int32Add, sa_num(self), const_int(1));
 		auto cmd_resize = add_node_member_call(t->get_member_func("resize", TypeVoid, {TypeInt32}), self);
 		cmd_resize->set_param(1, cmd_add);
 		b->add(cmd_resize);
@@ -243,7 +243,7 @@ void AutoImplementer::implement_list_add(Function *f, const Class *t) {
 
 	{
 		// el := self.data[self.num - 1]
-		auto cmd_sub = add_node_operator_by_inline(InlineID::INT32_SUBTRACT, sa_num(self), const_int(1));
+		auto cmd_sub = add_node_operator_by_inline(InlineID::Int32Subtract, sa_num(self), const_int(1));
 		auto cmd_el = add_node_dyn_array(self, cmd_sub);
 
 		b->add(add_assign(f, "", format("no operator %s = %s for elements found", te->long_name(), te->long_name()), cmd_el, item));
@@ -255,12 +255,12 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		return;
 	auto te = t->get_array_element();
 	auto other = add_node_local(f->__get_var("other"));
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	{
 		// if self.num != other.num
 		//     return false
-		auto n_eq = add_node_operator_by_inline(InlineID::INT32_NOT_EQUAL,  sa_num(self), sa_num(other));
+		auto n_eq = add_node_operator_by_inline(InlineID::Int32NotEqual,  sa_num(self), sa_num(other));
 		f->block->add(node_if(n_eq, node_return(node_false())));
 	}
 
@@ -276,21 +276,21 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		// other[i]
 		auto n_other_el = add_node_dyn_array(other, add_node_local(v_i));
 
-		auto n_if = add_node_statement(StatementID::IF);
+		auto n_if = add_node_statement(StatementID::If);
 		n_if->set_num_params(2);
 		n_if->set_param(1, node_return(node_false()));
 		b->add(n_if);
 
-		if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, add_node_local(v_el)->deref(), n_other_el)) {
+		if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, add_node_local(v_el)->deref(), n_other_el)) {
 			n_if->set_param(0, n_neq);
-		} else if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, add_node_local(v_el)->deref(), n_other_el)) {
-			n_if->set_param(0, add_node_operator_by_inline(InlineID::BOOL_NOT, n_eq, nullptr));
+		} else if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, add_node_local(v_el)->deref(), n_other_el)) {
+			n_if->set_param(0, add_node_operator_by_inline(InlineID::BoolNot, n_eq, nullptr));
 		} else {
 			do_error_implicit(f, format("neither operator %s != %s nor == found", te->long_name(), te->long_name()));
 		}
 
 
-		auto n_for = add_node_statement(StatementID::FOR_CONTAINER);
+		auto n_for = add_node_statement(StatementID::ForContainer);
 		// [VAR, INDEX, ARRAY, BLOCK]
 		n_for->set_param(0, add_node_local(v_el));
 		n_for->set_param(1, add_node_local(v_i));
@@ -309,12 +309,12 @@ void AutoImplementer::implement_list_give(Function *f, const Class *t) {
 	auto t_el = t->get_array_element();
 	auto t_xfer = tree->request_implicit_class_xfer(t_el->param[0], -1);
 	auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 	auto temp = add_node_local(f->block->add_var("temp", t_xfer_list));
 
 	{
 		// memcpy(temp, self)
-		f->block->add(add_node_operator_by_inline(InlineID::CHUNK_ASSIGN, temp, self));
+		f->block->add(add_node_operator_by_inline(InlineID::ChunkAssign, temp, self));
 	}
 
 	{
@@ -338,11 +338,11 @@ void AutoImplementer::_implement_functions_for_list(const Class *t) {
 	if (t->param[0]->is_pointer_owned() or t->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0]->param[0], -1);
 		auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
-		implement_list_give(prepare_auto_impl(t, t->get_member_func(Identifier::Func::OWNED_GIVE, t_xfer_list, {})), t);
-		implement_list_assign(prepare_auto_impl(t, t->get_member_func(Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list})), t);
+		implement_list_give(prepare_auto_impl(t, t->get_member_func(Identifier::func::OwnedGive, t_xfer_list, {})), t);
+		implement_list_assign(prepare_auto_impl(t, t->get_member_func(Identifier::func::Assign, TypeVoid, {t_xfer_list})), t);
 	}
 	implement_list_assign(prepare_auto_impl(t, t->get_assign()), t);
-	implement_list_equal(prepare_auto_impl(t, t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t})), t);
+	implement_list_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::Equal, TypeBool, {t})), t);
 }
 
 
@@ -356,31 +356,31 @@ void TemplateClassInstantiatorList::add_function_headers(Class* c) {
 	if (!class_can_default_construct(c->param[0]))
 		c->owner->do_error(format("can not create a dynamic array from type '%s', missing default constructor", c->param[0]->long_name()), c->token_id);
 
-	add_func_header(c, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(c, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(c, "clear", TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(c, "resize", TypeVoid, {TypeInt32}, {"num"}, nullptr, Flags::MUTABLE);
+	add_func_header(c, Identifier::func::Init, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+	add_func_header(c, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+	add_func_header(c, "clear", TypeVoid, {}, {}, nullptr, Flags::Mutable);
+	add_func_header(c, "resize", TypeVoid, {TypeInt32}, {"num"}, nullptr, Flags::Mutable);
 	if (c->param[0]->is_pointer_owned() or c->param[0]->is_pointer_owned_not_null()) {
 		auto t_xfer = c->owner->request_implicit_class_xfer(c->param[0]->param[0], -1);
 		auto t_xfer_list = c->owner->request_implicit_class_list(t_xfer, -1);
-		add_func_header(c, "add", TypeVoid, {t_xfer}, {"x"}, nullptr, Flags::MUTABLE);
-		add_func_header(c, Identifier::Func::OWNED_GIVE, t_xfer_list, {}, {}, nullptr, Flags::MUTABLE);
+		add_func_header(c, "add", TypeVoid, {t_xfer}, {"x"}, nullptr, Flags::Mutable);
+		add_func_header(c, Identifier::func::OwnedGive, t_xfer_list, {}, {}, nullptr, Flags::Mutable);
 		//add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"});
-		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {t_xfer_list}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Assign, TypeVoid, {t_xfer_list}, {"other"}, nullptr, Flags::Mutable);
 	} else if (c->param[0]->is_pointer_xfer_not_null()) {
 		//	add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
-		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Assign, TypeVoid, {c}, {"other"}, nullptr, Flags::Mutable);
 	} else if (c->param[0]->is_reference()) {
 		add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"});
-		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Assign, TypeVoid, {c}, {"other"}, nullptr, Flags::Mutable);
 	} else {
-		add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, "add", TypeVoid, {c->param[0]}, {"x"}, nullptr, Flags::Mutable);
 		if (class_can_assign(c->param[0]))
-			add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+			add_func_header(c, Identifier::func::Assign, TypeVoid, {c}, {"other"}, nullptr, Flags::Mutable);
 	}
-	add_func_header(c, "remove", TypeVoid, {TypeInt32}, {"index"}, nullptr, Flags::MUTABLE);
+	add_func_header(c, "remove", TypeVoid, {TypeInt32}, {"index"}, nullptr, Flags::Mutable);
 	if (class_can_equal(c->param[0]))
-		add_func_header(c, Identifier::Func::EQUAL, TypeBool, {c}, {"other"}, nullptr, Flags::PURE);
+		add_func_header(c, Identifier::func::Equal, TypeBool, {c}, {"other"}, nullptr, Flags::Pure);
 }
 
 }

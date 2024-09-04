@@ -271,8 +271,8 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 
 
 	// try user code
-	auto f_str = type->get_member_func(Identifier::Func::STR, TypeString, {});
-	auto f_repr = type->get_member_func(Identifier::Func::REPR, TypeString, {});
+	auto f_str = type->get_member_func(Identifier::func::Str, TypeString, {});
+	auto f_repr = type->get_member_func(Identifier::func::Repr, TypeString, {});
 	auto f = f_str;
 	if ((as_repr and f_repr) or !f_str)
 		f = f_repr;
@@ -320,14 +320,14 @@ Any _cdecl dynify(const void *var, const Class *type) {
 	if (type == TypeAny)
 		return *(Any*)var;
 	if (type->is_array()) {
-		Any a = Any::EmptyArray;
+		Any a = Any::EmptyList;
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<type->array_length; i++)
 			a.add(dynify((char*)var + t_el->size * i, t_el));
 		return a;
 	}
 	if (type->is_list()) {
-		Any a = Any::EmptyArray;
+		Any a = Any::EmptyList;
 		auto *ar = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<ar->num; i++)
@@ -335,12 +335,12 @@ Any _cdecl dynify(const void *var, const Class *type) {
 		return a;
 	}
 	if (type->is_dict()) {
-		Any a = Any::EmptyMap;
+		Any a = Any::EmptyDict;
 		auto *da = reinterpret_cast<const DynamicArray*>(var);
 		auto *t_el = type->get_array_element();
 		for (int i=0; i<da->num; i++) {
 			string key = *(string*)(((char*)da->data) + i * da->element_size);
-			a.map_set(key, dynify(((char*)da->data) + i * da->element_size + sizeof(string), t_el));
+			a.dict_set(key, dynify(((char*)da->data) + i * da->element_size + sizeof(string), t_el));
 		}
 		return a;
 	}
@@ -349,7 +349,7 @@ Any _cdecl dynify(const void *var, const Class *type) {
 	Any a;
 	for (auto &e: type->elements) {
 		if (!e.hidden())
-			a.map_set(e.name, dynify((char*)var + e.offset, e.type));
+			a.dict_set(e.name, dynify((char*)var + e.offset, e.type));
 	}
 	return a;
 }

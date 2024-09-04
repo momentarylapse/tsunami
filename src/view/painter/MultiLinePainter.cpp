@@ -232,7 +232,7 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _av
 			continue;
 
 		Any at;
-		for (Any &a: conf.as_array())
+		for (Any &a: conf.as_list())
 			if (a["index"]._int() == ti)
 				at = a;
 		bool allow_classical = at.has("classical");

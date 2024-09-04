@@ -69,9 +69,9 @@ int element_offset(M C::* p) {
 	//return *(int*)(void*)&p;
 }
 
-void add_package(Context *c, const string &name, Flags = Flags::NONE);
-const Class *add_type(const string &name, int size, Flags = Flags::NONE, const Class *_namespace = nullptr);
-const Class *add_type_simple(const string &name, int size, int alignment, Flags flags = Flags::NONE, const Class *name_space = nullptr);
+void add_package(Context *c, const string &name, Flags = Flags::None);
+const Class *add_type(const string &name, int size, Flags = Flags::None, const Class *_namespace = nullptr);
+const Class *add_type_simple(const string &name, int size, int alignment, Flags flags = Flags::None, const Class *name_space = nullptr);
 const Class *add_type_p_raw(const Class *sub_type);
 const Class *add_type_p_owned(const Class *sub_type);
 const Class *add_type_p_shared(const Class *sub_type);
@@ -91,24 +91,24 @@ void capture_implicit_type(const Class *t, const string &name);
 const Class *add_class_template(const string &name, const Array<string>& params, TemplateClassInstantiator* instantiator);
 
 
-Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag = Flags::NONE);
+Function *add_func_x(const string &name, const Class *return_type, void *func, Flags flag = Flags::None);
 // version: regular function
 template<class T>
-Function *add_func(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
+Function *add_func(const string &name, const Class *return_type, T func, Flags flag = Flags::None) {
 	return add_func_x(name, return_type, (void*)func, flag);
 }
 
 void func_set_inline(InlineID index);
-void func_add_param(const string &name, const Class *type, Flags flags = Flags::NONE);
-void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags = Flags::NONE);
+void func_add_param(const string &name, const Class *type, Flags flags = Flags::None);
+void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags = Flags::None);
 template<class T>
-void func_add_param_def(const string &name, const Class *type, T p, Flags flags = Flags::NONE) {
+void func_add_param_def(const string &name, const Class *type, T p, Flags flags = Flags::None) {
 	func_add_param_def_x(name, type, &p, flags);
 }
 Class *add_class(const Class *root_type);
-void class_add_element_x(const string &name, const Class *type, int offset, Flags flag = Flags::MUTABLE);
+void class_add_element_x(const string &name, const Class *type, int offset, Flags flag = Flags::Mutable);
 template<class T>
-void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::MUTABLE) {
+void class_add_element(const string &name, const Class *type, T p, Flags flag = Flags::Mutable) {
 	// allows &Class::element
 	if constexpr (std::is_integral<T>::value)
 		class_add_element_x(name, type, p, flag);
@@ -120,22 +120,22 @@ void class_add_element(const string &name, const Class *type, T p, Flags flag = 
 
 
 
-Function* class_add_func_x(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
+Function* class_add_func_x(const string &name, const Class *return_type, void *func, Flags = Flags::None);
 // version: null
-Function* class_add_func(const string &name, const Class *return_type, std::nullptr_t func, Flags flag = Flags::NONE);
+Function* class_add_func(const string &name, const Class *return_type, std::nullptr_t func, Flags flag = Flags::None);
 // version: regular function
 template <typename R, typename ...Args>
-Function* class_add_func(const string &name, const Class *return_type, R (*func)(Args...), Flags flag = Flags::NONE) {
+Function* class_add_func(const string &name, const Class *return_type, R (*func)(Args...), Flags flag = Flags::None) {
 	return class_add_func_x(name, return_type, (void*)func, flag);
 }
 // version: member function
 template <typename T, typename R, typename ...Args>
-Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...), Flags flag = Flags::NONE) {
+Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...), Flags flag = Flags::None) {
 	return class_add_func_x(name, return_type, mf(func), flag);
 }
 // version: const member function
 template <typename T, typename R, typename ...Args>
-Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...) const, Flags flag = Flags::NONE) {
+Function* class_add_func(const string &name, const Class *return_type, R (T::*func)(Args...) const, Flags flag = Flags::None) {
 	return class_add_func_x(name, return_type, mf(func), flag);
 }
 
@@ -143,9 +143,9 @@ Function* class_add_func(const string &name, const Class *return_type, R (T::*fu
 
 
 
-Function* class_add_func_virtual_x(const string &name, const Class *return_type, void *func, Flags = Flags::NONE);
+Function* class_add_func_virtual_x(const string &name, const Class *return_type, void *func, Flags = Flags::None);
 template<class T>
-Function* class_add_func_virtual(const string &name, const Class *return_type, T func, Flags flag = Flags::NONE) {
+Function* class_add_func_virtual(const string &name, const Class *return_type, T func, Flags flag = Flags::None) {
 	return class_add_func_virtual_x(name, return_type, mf(func), flag);
 }
 

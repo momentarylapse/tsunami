@@ -30,33 +30,33 @@ void AutoImplementer::_implement_functions_for_enum(const Class *t) {
 Class* TemplateClassInstantiatorEnum::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
 	auto c = const_cast<Class*>(params[0]);
 	c->from_template = TypeEnumT;
-	flags_set(c->flags, Flags::FORCE_CALL_BY_VALUE);
+	flags_set(c->flags, Flags::ForceCallByValue);
 	kaba::add_class(c);
 	return c;
 }
 void TemplateClassInstantiatorEnum::add_function_headers(Class* t) {
 	cur_package = t->owner->module;
 
-	class_add_func("from_int", t, &kaba_int_passthrough, Flags::STATIC | Flags::PURE);
-		func_set_inline(InlineID::PASSTHROUGH);
+	class_add_func("from_int", t, &kaba_int_passthrough, Flags::Static | Flags::Pure);
+		func_set_inline(InlineID::Passthrough);
 		func_add_param("i", TypeInt32);
 	//class_add_func(Identifier::Func::STR, TypeString, &i2s, Flags::PURE);
-	class_add_func("__i32__", TypeInt32, &kaba_int_passthrough, Flags::PURE);
-		func_set_inline(InlineID::PASSTHROUGH);
-	if (!flags_has(t->flags, Flags::NOAUTO)) {
-		class_add_func("parse", t, &enum_parse, Flags::STATIC | Flags::PURE);
+	class_add_func("__i32__", TypeInt32, &kaba_int_passthrough, Flags::Pure);
+		func_set_inline(InlineID::Passthrough);
+	if (!flags_has(t->flags, Flags::Noauto)) {
+		class_add_func("parse", t, &enum_parse, Flags::Static | Flags::Pure);
 			func_add_param("label", TypeString);
 			func_add_param("type", TypeClassRef);
-		class_add_func("all", TypeDynamicArray, &enum_all, Flags::STATIC | Flags::PURE);
+		class_add_func("all", TypeDynamicArray, &enum_all, Flags::Static | Flags::Pure);
 			func_add_param("type", TypeClassRef);
 	}
-	add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::INT32_ASSIGN);
-	add_operator(OperatorID::ADD, t, t, t, InlineID::INT32_ADD, &op_int_add);
-	add_operator(OperatorID::ADDS, TypeVoid, t, t, InlineID::INT32_ADD_ASSIGN);
-	add_operator(OperatorID::EQUAL, TypeBool, t, t, InlineID::INT32_EQUAL, &op_int_eq);
-	add_operator(OperatorID::NOT_EQUAL, TypeBool, t, t, InlineID::INT32_NOT_EQUAL, &op_int_neq);
-	add_operator(OperatorID::BIT_AND, t, t, t, InlineID::INT32_AND);
-	add_operator(OperatorID::BIT_OR, t, t, t, InlineID::INT32_OR);
+	add_operator(OperatorID::Assign, TypeVoid, t, t, InlineID::Int32Assign);
+	add_operator(OperatorID::Add, t, t, t, InlineID::Int32Add, &op_int_add);
+	add_operator(OperatorID::AddAssign, TypeVoid, t, t, InlineID::Int32AddAssign);
+	add_operator(OperatorID::Equal, TypeBool, t, t, InlineID::Int32Equal, &op_int_eq);
+	add_operator(OperatorID::NotEqual, TypeBool, t, t, InlineID::Int32NotEqual, &op_int_neq);
+	add_operator(OperatorID::BitAnd, t, t, t, InlineID::Int32BitAnd);
+	add_operator(OperatorID::BitOr, t, t, t, InlineID::Int32BitOr);
 
 	for (auto f: weak(t->functions)) {
 		if (f->name == "parse") {

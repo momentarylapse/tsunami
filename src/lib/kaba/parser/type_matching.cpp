@@ -259,7 +259,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			auto t_xfer = tree->request_implicit_class_xfer(wanted->param[0], -1);
 			cd.penalty = 10;
 			cd.cast = TypeCastId::MAKE_SHARED;
-			cd.f = wanted->get_func(Identifier::Func::SHARED_CREATE, wanted, {t_xfer});
+			cd.f = wanted->get_func(Identifier::func::SharedCreate, wanted, {t_xfer});
 			return true;
 		}
 	}
@@ -272,7 +272,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
-	if (node->kind == NodeKind::ARRAY_BUILDER and given == TypeUnknown) {
+	if (node->kind == NodeKind::ArrayBuilder and given == TypeUnknown) {
 		if (wanted->is_list()) {
 			auto t = wanted->get_array_element();
 			CastingDataSingle cast;
@@ -297,7 +297,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			}
 		}
 	}
-	if ((node->kind == NodeKind::TUPLE) and (given == TypeUnknown)) {
+	if ((node->kind == NodeKind::Tuple) and (given == TypeUnknown)) {
 		for (auto *f: wanted->get_constructors()) {
 			if (type_match_tuple_as_contructor(node, f, cd.penalty)) {
 				cd.cast = TypeCastId::TUPLE_AS_CONSTRUCTOR;
@@ -318,7 +318,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
-	if (node->kind == NodeKind::DICT_BUILDER and given == TypeUnknown) {
+	if (node->kind == NodeKind::DictBuilder and given == TypeUnknown) {
 		if (wanted->is_dict()) {
 			auto t = wanted->get_array_element();
 			CastingDataSingle cast;
@@ -334,7 +334,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 	}
 	if (wanted->is_callable() and (given == TypeUnknown)) {
-		if (node->kind == NodeKind::FUNCTION) {
+		if (node->kind == NodeKind::Function) {
 			auto ft = make_effective_class_callable(node);
 			if (type_match_up(ft, wanted)) {
 				cd.cast = TypeCastId::FUNCTION_AS_CALLABLE;
@@ -353,7 +353,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 
 	// single parameter auto-constructor?
 	for (auto *f: wanted->get_constructors())
-		if (f->num_params == 2 and flags_has(f->flags, Flags::AUTO_CAST)) {
+		if (f->num_params == 2 and flags_has(f->flags, Flags::AutoCast)) {
 			CastingDataSingle c;
 			if (type_match_with_cast(node, false, f->literal_param_type[1], c)) {
 				cd.cast = TypeCastId::AUTO_CONSTRUCTOR;
@@ -444,7 +444,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, 
 	}
 	if ((cast.cast == TypeCastId::MAKE_SHARED) or (cast.cast == TypeCastId::MAKE_OWNED)) {
 		if (!cast.f)
-			do_error(format("internal: make shared... %s.%s() missing...", wanted->name, Identifier::Func::SHARED_CREATE), node);
+			do_error(format("internal: make shared... %s.%s() missing...", wanted->name, Identifier::func::SharedCreate), node);
 		auto nn = add_node_call(cast.f, node->token_id);
 		nn->set_param(0, node);
 		return nn;

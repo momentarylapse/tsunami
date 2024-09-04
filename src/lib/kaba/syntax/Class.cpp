@@ -43,7 +43,7 @@ bool type_match_up(const Class *given, const Class *wanted);
 
 
 Class::Class(const Class* _from_template, const string &_name, int64 _size, int _alignment, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
-	flags = Flags::FULLY_PARSED;
+	flags = Flags::FullyParsed;
 	name = _name;
 	owner = _owner;
 	size = _size;
@@ -70,15 +70,15 @@ Class::~Class() {
 }
 
 bool Class::force_call_by_value() const {
-	return flags_has(flags, Flags::FORCE_CALL_BY_VALUE);
+	return flags_has(flags, Flags::ForceCallByValue);
 }
 
 bool Class::fully_parsed() const {
-	return flags_has(flags, Flags::FULLY_PARSED);
+	return flags_has(flags, Flags::FullyParsed);
 }
 
 bool Class::_return_in_float_registers() const {
-	return flags_has(flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+	return flags_has(flags, Flags::ReturnInFloatRegisters);
 }
 
 bool reachable_from(const Class *ns, const Class *observer_ns) {
@@ -399,28 +399,28 @@ Function *Class::get_same_func(const string &_name, Function *ff) const {
 }
 
 Function *Class::get_default_constructor() const {
-	return get_func(Identifier::Func::INIT, TypeVoid, {nullptr});
+	return get_func(Identifier::func::Init, TypeVoid, {nullptr});
 }
 
 Array<Function*> Class::get_constructors() const {
 	Array<Function*> c;
 	for (auto *f: weak(functions))
-		if ((f->name == Identifier::Func::INIT) and (f->literal_return_type == TypeVoid))
+		if ((f->name == Identifier::func::Init) and (f->literal_return_type == TypeVoid))
 			c.add(f);
 	return c;
 }
 
 Function *Class::get_destructor() const {
-	return get_func(Identifier::Func::DELETE, TypeVoid, {nullptr});
+	return get_func(Identifier::func::Delete, TypeVoid, {nullptr});
 }
 
 Function *Class::get_assign() const {
-	return get_func(Identifier::Func::ASSIGN, TypeVoid, {nullptr, this});
+	return get_func(Identifier::func::Assign, TypeVoid, {nullptr, this});
 }
 
 Function *Class::get_get(const Class *index) const {
 	for (auto *cf: weak(functions)) {
-		if (cf->name != Identifier::Func::GET)
+		if (cf->name != Identifier::func::Get)
 			continue;
 		if (cf->is_static())
 			continue;
@@ -435,7 +435,7 @@ Function *Class::get_get(const Class *index) const {
 
 Function *Class::get_call() const {
 	for (auto *cf: weak(functions)) {
-		if (cf->name == Identifier::Func::CALL)
+		if (cf->name == Identifier::func::Call)
 			return cf;
 	}
 	return nullptr;
@@ -562,7 +562,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			if (config.verbose)
 				msg_write("VVVVV +");
 			f->virtual_index = s->module->context->external->process_class_offset(cname(owner->base_class), f->name, max(vtable.num, 2));
-			if ((f->name == Identifier::Func::DELETE) and (config.target.abi == Abi::AMD64_WINDOWS or config.target.abi == Abi::X86_WINDOWS))
+			if ((f->name == Identifier::func::Delete) and (config.target.abi == Abi::AMD64_WINDOWS or config.target.abi == Abi::X86_WINDOWS))
 				f->virtual_index = 1;
 		}
 
@@ -579,7 +579,7 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 		if (!override and orig) {
 			msg_write(f->signature());
 			msg_write(orig->signature());
-			s->do_error(format("function %s is already defined, use '%s'", f->signature(), Identifier::OVERRIDE), f->token_id);
+			s->do_error(format("function %s is already defined, use '%s'", f->signature(), Identifier::Override), f->token_id);
 		}
 		if (override) {
 			if (config.verbose)
@@ -588,18 +588,18 @@ void Class::add_function(SyntaxTree *s, Function *f, bool as_virtual, bool overr
 			//f->flags = orig->flags;
 			// don't copy __INIT_FILL_ALL_PARAMS etc...
 			// better copy one-by-one for now
-			if (flags_has(orig->flags, Flags::MUTABLE))
-				flags_set(f->flags, Flags::MUTABLE);
+			if (flags_has(orig->flags, Flags::Mutable))
+				flags_set(f->flags, Flags::Mutable);
 			else
-				flags_clear(f->flags, Flags::MUTABLE);
-			if (flags_has(orig->flags, Flags::REF))
-				flags_set(f->flags, Flags::REF);
+				flags_clear(f->flags, Flags::Mutable);
+			if (flags_has(orig->flags, Flags::Ref))
+				flags_set(f->flags, Flags::Ref);
 
-			if (auto self = f->__get_var(Identifier::SELF)) {
-				if (flags_has(f->flags, Flags::MUTABLE))
-					flags_set(self->flags, Flags::MUTABLE);
+			if (auto self = f->__get_var(Identifier::Self)) {
+				if (flags_has(f->flags, Flags::Mutable))
+					flags_set(self->flags, Flags::Mutable);
 				else
-					flags_clear(self->flags, Flags::MUTABLE);
+					flags_clear(self->flags, Flags::Mutable);
 			}
 			functions[orig_index] = f;
 		} else {
@@ -638,16 +638,16 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 
 	// inheritance of functions
 	for (auto *f: weak(parent->functions)) {
-		if (f->name == Identifier::Func::ASSIGN)
+		if (f->name == Identifier::func::Assign)
 			continue;
 		Function *ff = f;
-		if (f->name == Identifier::Func::INIT) {
+		if (f->name == Identifier::func::Init) {
 			if (!(derive_flags & DeriveFlags::KEEP_CONSTRUCTORS))
 				continue;
 			ff = f->create_dummy_clone(this);
-		} else if (f->name == Identifier::Func::DELETE) {
+		} else if (f->name == Identifier::func::Delete) {
 			ff = f->create_dummy_clone(this);
-		} else if (f->name == Identifier::Func::SUBARRAY) {
+		} else if (f->name == Identifier::func::Subarray) {
 			ff = f->create_dummy_clone(this);
 			ff->_label = f->_label;
 			ff->address = f->address;

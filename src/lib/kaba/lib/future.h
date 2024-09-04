@@ -58,8 +58,8 @@ inline void lib_create_future(const Class *tt, const Class *pp, const Class *t_c
 	t->param = {pp};
 
 	add_class(t);
-		//class_add_func(Identifier::Func::INIT, TypeVoid, &KabaFuture<T>::__init__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaFuture<T>::__delete__, Flags::MUTABLE);
+		//class_add_func(Identifier::func::INIT, TypeVoid, &KabaFuture<T>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Delete, TypeVoid, &KabaFuture<T>::__delete__, Flags::Mutable);
 		class_add_func("then", TypeVoid, &KabaFuture<T>::kaba_then);
 			func_add_param("cb", t_cb);
 		class_add_func("then_or_fail", TypeVoid, &KabaFuture<T>::kaba_then_or_fail);
@@ -76,8 +76,8 @@ inline void lib_create_future<void>(const Class *tt, const Class *pp, const Clas
 	t->param = {pp};
 
 	add_class(t);
-		//class_add_func(Identifier::Func::INIT, TypeVoid, &KabaVoidFuture::__init__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &KabaVoidFuture::__delete__, Flags::MUTABLE);
+		//class_add_func(Identifier::func::INIT, TypeVoid, &KabaVoidFuture::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Delete, TypeVoid, &KabaVoidFuture::__delete__, Flags::Mutable);
 		class_add_func("then", TypeVoid, &KabaVoidFuture::kaba_then);
 			func_add_param("cb", t_cb);
 		class_add_func("then_or_fail", TypeVoid, &KabaVoidFuture::kaba_then_or_fail);

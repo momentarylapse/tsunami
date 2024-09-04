@@ -53,7 +53,7 @@ void Interpreter::run_function(Function *f, Serializer *ser) {
 
 	for (auto &c: ser->cmd.cmd)
 		for (int k=0; k<3; k++)
-			if (c.p[k].kind == NodeKind::VAR_TEMP) {
+			if (c.p[k].kind == NodeKind::VarTemp) {
 				int n = c.p[k].p;
 				if (n >= frame.temps.num)
 					frame.temps.resize(n + 1);
@@ -69,19 +69,19 @@ void Interpreter::run_function(Function *f, Serializer *ser) {
 
 int Interpreter::run_command(int index, SerialNode &n, Serializer *ser, Frame &frame) {
 	auto get_param = [&] (int i) {
-		if (n.p[i].kind == NodeKind::NONE) {
+		if (n.p[i].kind == NodeKind::None) {
 			return (void*)nullptr;
-		} else if (n.p[i].kind == NodeKind::IMMEDIATE) {
+		} else if (n.p[i].kind == NodeKind::Immediate) {
 			return (void*)&n.p[i].p;
-		} else if (n.p[i].kind == NodeKind::CONSTANT_BY_ADDRESS) {
+		} else if (n.p[i].kind == NodeKind::ConstantByAddress) {
 			return (void*)(int_p)n.p[i].p;
-		} else if (n.p[i].kind == NodeKind::CONSTANT) {
+		} else if (n.p[i].kind == NodeKind::Constant) {
 			return ((Constant*)n.p[i].p)->p();
-		} else if (n.p[i].kind == NodeKind::VAR_LOCAL) {
+		} else if (n.p[i].kind == NodeKind::VarLocal) {
 			return (void*)&frame.stack[frame.offset + ((Variable*)(int_p)n.p[i].p)->_offset];
-		} else if (n.p[i].kind == NodeKind::LOCAL_MEMORY) {
+		} else if (n.p[i].kind == NodeKind::LocalMemory) {
 			return (void*)&frame.stack[frame.offset + n.p[i].p];
-		} else if (n.p[i].kind == NodeKind::VAR_TEMP) {
+		} else if (n.p[i].kind == NodeKind::VarTemp) {
 			int nn = n.p[i].p;
 			return (void*)&frame.temps[nn][0];
 		} else {

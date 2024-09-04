@@ -84,7 +84,7 @@ void BackendArm64::add_function_intro_params(Function *f) {
 
 	if (f->effective_return_type->uses_return_by_memory()) {
 		for (Variable *v: weak(f->var))
-			if (v->name == Identifier::RETURN_VAR) {
+			if (v->name == Identifier::ReturnVar) {
 				int reg = cmd.add_virtual_reg(Asm::r_reg(8));
 				_from_register(reg, param_local(v->type, v->_offset));
 				cmd.set_virtual_reg(reg, cmd.cmd.num - 1, cmd.cmd.num - 1);
@@ -167,7 +167,7 @@ void BackendArm64::_immediate_to_register_64(int64 val, int r) {
 
 SerialNodeParam BackendArm64::param_vreg_auto(const Class *type, int vreg) {
 	auto preg = reg_resize(cmd.virtual_reg[vreg].reg, max((int)type->size, 4));
-	return {NodeKind::REGISTER, (int)preg, vreg, type, 0};
+	return {NodeKind::Register, (int)preg, vreg, type, 0};
 }
 
 void BackendArm64::_local_to_register(int offset, int size, int vreg) {
@@ -212,19 +212,19 @@ int BackendArm64::_to_register(const SerialNodeParam &p, int force_register) {
 		vreg_free(reg2);
 	};
 
-	if (p.kind == NodeKind::CONSTANT) {
+	if (p.kind == NodeKind::Constant) {
 		auto cc = (Constant*)p.p;
 		_immediate_to_register(*((int64*)((char*)cc->p() + p.shift)), size, reg);
-	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
+	} else if (p.kind == NodeKind::ConstantByAddress) {
 		_immediate_to_register(*((int64*)((char*)p.p + p.shift)), size, reg);
-	} else if (p.kind == NodeKind::IMMEDIATE) {
+	} else if (p.kind == NodeKind::Immediate) {
 		if (p.shift != 0)
 			do_error("immediate + offset");
 		_immediate_to_register(p.p, size, reg);
-	} else if (p.kind == NodeKind::VAR_LOCAL) {
+	} else if (p.kind == NodeKind::VarLocal) {
 		auto var2 = (Variable*)p.p;
 		_local_to_register(var2->_offset + p.shift, size, reg);
-	} else if (p.kind == NodeKind::DEREF_LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::DerefereceLocalMemory) {
 		int reg2 = vreg_alloc(8);
 		_local_to_register(p.p, 8, reg2);
 		if (p.shift != 0)
@@ -234,17 +234,17 @@ int BackendArm64::_to_register(const SerialNodeParam &p, int force_register) {
 		else
 			insert_cmd(Asm::InstID::LDR, param_vreg_auto(p.type, reg), param_deref_vreg(p.type, reg2));
 		vreg_free(reg2);
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		_local_to_register(p.p + p.shift, size, reg);
-	} else if (p.kind == NodeKind::GLOBAL_LOOKUP) {
+	} else if (p.kind == NodeKind::GlobalLookup) {
 		// TODO really use global ref
 		if (p.shift != 0)
 			do_error("global lookup + offset");
 		_immediate_to_register((int64)(int_p)global_refs[p.p].p, size, reg);
-	} else if (p.kind == NodeKind::VAR_GLOBAL) {
+	} else if (p.kind == NodeKind::VarGlobal) {
 		auto var = (Variable*)p.p;
 		global_mem((int_p)var->memory + p.shift);
-	} else if (p.kind == NodeKind::MEMORY) {
+	} else if (p.kind == NodeKind::Memory) {
 		global_mem(p.p + p.shift);
 	} else {
 		do_error("evil read source..." + kind2str(p.kind));
@@ -271,13 +271,13 @@ int BackendArm64::_reference_to_register_64(const SerialNodeParam &p, int force_
 			insert_cmd(Asm::InstID::ADD, param_vreg_auto(TypeInt64, reg), param_vreg_auto(TypeInt64, reg), param_imm(TypeInt64, offset & 0xfff000));
 	};
 
-	if (p.kind == NodeKind::VAR_LOCAL) {
+	if (p.kind == NodeKind::VarLocal) {
 		// TODO: simplify for offset=0
 		auto var = (Variable*)p.p;
 		local_mem(var->_offset);
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		local_mem(p.p);
-	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
+	} else if (p.kind == NodeKind::ConstantByAddress) {
 		_immediate_to_register_64((int_p)((char*)p.p + p.shift), reg);
 	} else {
 		do_error("lea source not handled: " + kind2str(p.kind));
@@ -316,17 +316,17 @@ void BackendArm64::_from_register(int reg, const SerialNodeParam &p) {
 		vreg_free(reg2);
 	};
 
-	if (p.kind == NodeKind::VAR_LOCAL) {
+	if (p.kind == NodeKind::VarLocal) {
 		auto var = (Variable*)p.p;
 		local_mem(var->_offset + p.shift);
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		local_mem(p.p + p.shift);
-	} else if (p.kind == NodeKind::VAR_GLOBAL) {
+	} else if (p.kind == NodeKind::VarGlobal) {
 		auto var = (Variable*)p.p;
 		global_mem((int_p)var->memory + p.shift);
-	} else if (p.kind == NodeKind::MEMORY) {
+	} else if (p.kind == NodeKind::Memory) {
 		global_mem(p.p + p.shift);
-	} else if (p.kind == NodeKind::DEREF_LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::DerefereceLocalMemory) {
 		int reg2 = vreg_alloc(8);
 		_local_to_register(p.p, 8, reg2);
 		if (p.shift != 0)
@@ -357,10 +357,10 @@ int BackendArm64::_to_register_float(const SerialNodeParam &p, int force_registe
 }
 
 void BackendArm64::_from_register_float(int sreg, const SerialNodeParam &p) {
-	if (p.kind == NodeKind::VAR_LOCAL) {
+	if (p.kind == NodeKind::VarLocal) {
 		auto var = (Variable*)p.p;
 		insert_cmd(Asm::InstID::STR, param_vreg_auto(TypeFloat32, sreg), param_local(TypeFloat32, var->_offset + p.shift));
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		insert_cmd(Asm::InstID::STR, param_vreg_auto(TypeFloat32, sreg), param_local(TypeFloat32, p.p + p.shift));
 	} else {
 		int reg = vreg_alloc(4);
@@ -371,22 +371,22 @@ void BackendArm64::_from_register_float(int sreg, const SerialNodeParam &p) {
 }
 
 bool is_8b_aligned(const SerialNodeParam& p) {
-	if (p.kind == NodeKind::REGISTER)
+	if (p.kind == NodeKind::Register)
 		return true;
-	if (p.kind == NodeKind::CONSTANT) {
+	if (p.kind == NodeKind::Constant) {
 		auto cc = (Constant*)p.p;
 		return (((int_p)cc->p() + p.shift) & 0x07) == 0;
-	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
+	} else if (p.kind == NodeKind::ConstantByAddress) {
 		return (((int_p)p.p + p.shift) & 0x07) == 0;
-	} else if (p.kind == NodeKind::VAR_LOCAL) {
+	} else if (p.kind == NodeKind::VarLocal) {
 		auto var = (Variable*)p.p;
 		return ((var->_offset + p.shift) & 0x07) == 0;
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		return ((p.p + p.shift) & 0x07) == 0;
-	} else if (p.kind == NodeKind::VAR_GLOBAL) {
+	} else if (p.kind == NodeKind::VarGlobal) {
 		auto var = (Variable*)p.p;
 		return (((int_p)var->memory + p.shift) & 0x07) == 0;
-	} else if (p.kind == NodeKind::DEREF_LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::DerefereceLocalMemory) {
 		return true; // I guess, we could enforce this with alignment rules... somehow
 	}
 	return false;
@@ -464,7 +464,7 @@ void BackendArm64::correct_implement_commands() {
 			int vreg1 = vreg_alloc(size);
 			int vreg2 = vreg_alloc(size);
 
-			if (p2.kind == NodeKind::NONE) {
+			if (p2.kind == NodeKind::None) {
 				// a += b
 				_to_register(p0, vreg1);
 				_to_register(p1, vreg2);
@@ -489,7 +489,7 @@ void BackendArm64::correct_implement_commands() {
 			int vreg3 = vreg_alloc(size);
 			int vreg4 = vreg_alloc(size);
 
-			if (p2.kind == NodeKind::NONE) {
+			if (p2.kind == NodeKind::None) {
 				// a %= b
 				_to_register(p0, vreg1);
 				_to_register(p1, vreg2);
@@ -515,7 +515,7 @@ void BackendArm64::correct_implement_commands() {
 			int sreg1 = vreg_alloc(4, Asm::RegID::S0);
 			int sreg2 = vreg_alloc(4, Asm::RegID::S1);
 
-			if (p2.kind == NodeKind::NONE) {
+			if (p2.kind == NodeKind::None) {
 				// a += b
 				_to_register_float(p0, sreg1);
 				_to_register_float(p1, sreg2);
@@ -680,7 +680,7 @@ void BackendArm64::correct_implement_commands() {
 
 void BackendArm64::implement_return(const SerialNodeParam &p) {
 	Array<int> allocated_vgres;
-	if (p.kind != NodeKind::NONE) {
+	if (p.kind != NodeKind::None) {
 		if (cur_func->effective_return_type->uses_return_by_memory()) {
 			do_error("return by memory not implemented yet!");
 		} else if (cur_func->effective_return_type->_return_in_float_registers()) {
@@ -896,7 +896,7 @@ void BackendArm64::assemble() {
 
 	list->insert_location_label(cur_func->_label);
 
-	if (!flags_has(cur_func->flags, Flags::NOFRAME))
+	if (!flags_has(cur_func->flags, Flags::Noframe))
 		add_function_intro_frame(stack_max_size);
 
 	//	do_error("new ARM assemble() not yet implemented");

@@ -12,7 +12,7 @@ class XXX extends TsunamiPlugin
 		
 
 		print("make")
-		for p in session.song.secret_data["presets"].as_array()
+		for p in session.song.secret_data["presets"]!.as_list()!
 			import_preset(p)
 		
 		stop()
@@ -41,20 +41,20 @@ class XXX extends TsunamiPlugin
 			
 			
 
-		for z in p["zones"].as_array()
+		for z in p["zones"]!.as_list()!
 			if not z.has("instrument")
 				continue
 				
 			#if z.has("vel")
 			#print("P {{z}}")
 				
-			var ii = session.song.secret_data["instruments"][int(z["instrument"])]
-			for zz in ii["zones"].as_array()
+			var ii = session.song.secret_data["instruments"]![int(z["instrument"]!)]!
+			for zz in ii["zones"]!.as_list()!
 				if not zz.has("sample")
 					continue
 				if not zz.has("keys")
 					continue
-				var index = int(zz["sample"])
+				var index = int(zz["sample"]!)
 				var offset = 0
 				for k in 0:index
 					offset += len(*session.song.samples[k].buf)
@@ -64,8 +64,8 @@ class XXX extends TsunamiPlugin
 				
 				var az: any
 				az["sample"] = "sample:{{s.uid|08x}}"
-				az["pitch_min"] = int(zz["keys"][0])
-				az["pitch_max"] = int(zz["keys"][1])
+				az["pitch_min"] = int(zz["keys"]![0]!)
+				az["pitch_max"] = int(zz["keys"]![1]!)
 				
 				az["vel_min"] = 0.0
 				az["vel_max"] = 1.0
@@ -85,27 +85,27 @@ class XXX extends TsunamiPlugin
 				import_from_zone(az, zz, offset) # from instrument zone
 				print("    loop  {{az["start_loop"]}}:{{az["end_loop"]}}")
 	
-				a["zones"].add(az)
+				a["zones"]!.add(az)
 		#print(a)
 		synth.config_from_any(1, a)
 
 func import_from_zone(out o: any, i: any, offset: int)
 	if i.has("keys")
-		o["pitch_min"] = int(i["keys"][0])
-		o["pitch_max"] = int(i["keys"][1])
+		o["pitch_min"] = int(i["keys"]![0]!)
+		o["pitch_max"] = int(i["keys"]![1]!)
 				
 	if i.has("vel")
-		o["vel_min"] = int(i["vel"][0]) / 127.0
-		o["vel_max"] = int(i["vel"][1]) / 127.0
+		o["vel_min"] = int(i["vel"]![0]!) / 127.0
+		o["vel_max"] = int(i["vel"]![1]!) / 127.0
 			
 	if i.has("root-key")
-		o["pitch_original"] = int(i["root-key"])
+		o["pitch_original"] = int(i["root-key"]!)
 	if i.has("start-loop")
-		o["start_loop"] = int(i["start-loop"]) - offset
+		o["start_loop"] = int(i["start-loop"]!) - offset
 	if i.has("end-loop")
-		o["end_loop"] = int(i["end-loop"]) - offset
+		o["end_loop"] = int(i["end-loop"]!) - offset
 	for k in ["attack", "sustain", "release"]
 		if i.has(k)
-			o[k] = float(i[k])
+			o[k] = float(i[k]!)
 
 		

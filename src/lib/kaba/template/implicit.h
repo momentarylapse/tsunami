@@ -27,7 +27,7 @@ public:
 
 	void _add_missing_function_headers_for_regular(Class *t);
 
-	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::NONE, const shared_array<Node> &def_params = {});
+	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::None, const shared_array<Node> &def_params = {});
 
 	void implement_add_virtual_table(shared<Node> self, Function *f, const Class *t);
 	void implement_add_child_constructors(shared<Node> self, Function *f, const Class *t, bool allow_elements_from_parent);

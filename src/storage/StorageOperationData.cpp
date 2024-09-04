@@ -42,7 +42,7 @@ StorageOperationData::StorageOperationData(Session *_session, Format *_format, c
 	try {
 		auto x = Any::parse("{" + Storage::options_in + "}");
 		for (string &k: x.keys())
-			parameters.map_set(k, x[k]);
+			parameters.dict_set(k, x[k]);
 	} catch (Exception &e) {
 		session->e(::format("options '%s':  %s", Storage::options_in, e.message()));
 	}

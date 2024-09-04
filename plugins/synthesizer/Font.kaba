@@ -153,13 +153,13 @@ class FontPanel extends ConfigPanel
 
 		reset("instruments")
 		let instruments = font_list.instruments(c.session, sc.name)
-		var match = false
+		var matching = false
 		for i=>ins in instruments
 			add_string("instruments", ins)
 			if ins == sc.instrument
 				set_int("instruments", i)
-				match = true
-		if not match
+				matching = true
+		if not matching
 			set_int("instruments", 0)
 		
 		

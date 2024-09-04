@@ -31,13 +31,13 @@ Backend::~Backend() {
 SerialNodeParam Backend::param_vreg(const Class *type, int vreg, Asm::RegID preg) {
 	if (preg == Asm::RegID::INVALID)
 		preg = cmd.virtual_reg[vreg].reg;
-	return {NodeKind::REGISTER, (int)preg, vreg, type, 0};
+	return {NodeKind::Register, (int)preg, vreg, type, 0};
 }
 
 SerialNodeParam Backend::param_deref_vreg(const Class *type, int vreg, Asm::RegID preg) {
 	if (preg == Asm::RegID::INVALID)
 		preg = cmd.virtual_reg[vreg].reg;
-	return {NodeKind::DEREF_REGISTER, (int)preg, vreg, type, 0};
+	return {NodeKind::DereferenceRegister, (int)preg, vreg, type, 0};
 }
 
 

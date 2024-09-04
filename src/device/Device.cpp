@@ -73,7 +73,7 @@ bool Device::is_default() const {
 }
 
 Any Device::to_config() const {
-	Any a = Any::EmptyMap;
+	Any a = Any::EmptyDict;
 	a["name"] = name;
 	a["internal"] = internal_name;
 	a["channels"] = channels;

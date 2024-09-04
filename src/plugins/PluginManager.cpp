@@ -257,8 +257,8 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Bar.index", &Bar::index);
 	ext->declare_class_element("Bar.index_text", &Bar::index_text);
 	ext->declare_class_element("Bar.offset", &Bar::offset);
-	ext->declare_class_element("Bar." + kaba::Identifier::SHARED_COUNT, &Bar::_pointer_ref_counter);
-	ext->link_class_func("Bar." + kaba::Identifier::Func::INIT, &Bar::__init__);
+	ext->declare_class_element("Bar." + kaba::Identifier::SharedCount, &Bar::_pointer_ref_counter);
+	ext->link_class_func("Bar." + kaba::Identifier::func::Init, &Bar::__init__);
 	ext->link_class_func("Bar.range", &Bar::range);
 	ext->link_class_func("Bar.bpm", &Bar::bpm);
 
@@ -282,7 +282,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Session.view", &Session::view);
 	ext->declare_class_element("Session.song", &Session::song);
 	ext->declare_class_element("Session.playback", &Session::playback);
-	ext->declare_class_element("Session." + kaba::Identifier::SHARED_COUNT, &Session::_pointer_ref_counter);
+	ext->declare_class_element("Session." + kaba::Identifier::SharedCount, &Session::_pointer_ref_counter);
 	ext->link_class_func("Session.sample_rate", &Session::sample_rate);
 	ext->link_class_func("Session.i", &Session::i);
 	ext->link_class_func("Session.w", &Session::w);
@@ -305,7 +305,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_element("Module.out_read_end_of_stream", &Module::out_read_end_of_stream);
 		ext->declare_class_element("Module.out_play_end_of_stream", &Module::out_play_end_of_stream);
 		ext->declare_class_element("Module.out_tick", &Module::out_tick);
-		ext->declare_class_element("Module." + kaba::Identifier::SHARED_COUNT, &Module::_pointer_ref_counter);
+		ext->declare_class_element("Module." + kaba::Identifier::SharedCount, &Module::_pointer_ref_counter);
 		ext->link_class_func("Module.__init__", &Module::__init__);
 		ext->link_virtual("Module.__delete__", &Module::__delete__, &module);
 		ext->link_virtual("Module.create_panel", &Module::create_panel, &module);
@@ -441,7 +441,7 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("AudioBuffer.add", &AudioBuffer::add);
 	ext->link_class_func("AudioBuffer.set", &AudioBuffer::set);
 	ext->link_class_func("AudioBuffer.set_as_ref", &AudioBuffer::set_as_ref);
-	ext->link_class_func("AudioBuffer." + kaba::Identifier::Func::SUBARRAY, &AudioBuffer::ref);
+	ext->link_class_func("AudioBuffer." + kaba::Identifier::func::Subarray, &AudioBuffer::ref);
 	ext->link_class_func("AudioBuffer.get_spectrum", &ExtendedAudioBuffer::get_spectrum);
 
 
@@ -467,7 +467,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Sample.uid", &Sample::uid);
 	ext->declare_class_element("Sample.ref_count", &Sample::ref_count);
 	ext->declare_class_element("Sample.tags", &Sample::tags);
-	ext->declare_class_element("Sample." + kaba::Identifier::SHARED_COUNT, &Sample::_pointer_ref_counter);
+	ext->declare_class_element("Sample." + kaba::Identifier::SharedCount, &Sample::_pointer_ref_counter);
 	ext->link_class_func("Sample.__init__", &Sample::__init__);
 	ext->link_class_func("Sample.create_ref", &Sample::create_ref);
 	ext->link_class_func("Sample.get_value", &Sample::get_value);
@@ -481,7 +481,7 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("SampleRef.buf", &SampleRef::buf);
 		ext->link_class_func("SampleRef.midi", &SampleRef::midi);
 		ext->declare_class_element("SampleRef.origin", &SampleRef::origin);
-		ext->declare_class_element("SampleRef." + kaba::Identifier::SHARED_COUNT, &SampleRef::_pointer_ref_counter);
+		ext->declare_class_element("SampleRef." + kaba::Identifier::SharedCount, &SampleRef::_pointer_ref_counter);
 		ext->link_class_func("SampleRef.__init__", &SampleRef::__init__);
 		ext->link_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
 	}
@@ -627,7 +627,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("MidiNote.clef_position", &MidiNote::clef_position);
 	ext->declare_class_element("MidiNote.modifier", &MidiNote::modifier);
 	ext->declare_class_element("MidiNote.flags", &MidiNote::flags);
-	ext->declare_class_element("MidiNote." + kaba::Identifier::SHARED_COUNT, &MidiNote::_pointer_ref_counter);
+	ext->declare_class_element("MidiNote." + kaba::Identifier::SharedCount, &MidiNote::_pointer_ref_counter);
 	ext->link_class_func("MidiNote.copy", &MidiNote::copy);
 	ext->link_class_func("MidiNote.is", &MidiNote::is);
 	ext->link_class_func("MidiNote.set", &MidiNote::set);
@@ -675,7 +675,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("TrackMarker.text", &TrackMarker::text);
 	ext->declare_class_element("TrackMarker.range", &TrackMarker::range);
 	ext->declare_class_element("TrackMarker.fx", &TrackMarker::fx);
-	ext->declare_class_element("TrackMarker." + kaba::Identifier::SHARED_COUNT, &TrackMarker::_pointer_ref_counter);
+	ext->declare_class_element("TrackMarker." + kaba::Identifier::SharedCount, &TrackMarker::_pointer_ref_counter);
 
 	ext->declare_class_size("TrackLayer", sizeof(TrackLayer));
 	ext->declare_class_element("TrackLayer.type", &TrackLayer::type);
@@ -684,7 +684,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("TrackLayer.samples", &TrackLayer::samples);
 	ext->declare_class_element("TrackLayer.markers", &TrackLayer::markers);
 	ext->declare_class_element("TrackLayer.track", &TrackLayer::track);
-	ext->declare_class_element("TrackLayer." + kaba::Identifier::SHARED_COUNT, &TrackLayer::_pointer_ref_counter);
+	ext->declare_class_element("TrackLayer." + kaba::Identifier::SharedCount, &TrackLayer::_pointer_ref_counter);
 	ext->link_class_func("TrackLayer.get_buffers", &TrackLayer::get_buffers);
 	ext->link_class_func("TrackLayer.read_buffers", &TrackLayer::read_buffers);
 	ext->link_class_func("TrackLayer.edit_buffers", &TrackLayer::edit_buffers);
@@ -711,7 +711,7 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("Track.synth", &Track::synth);
 	ext->declare_class_element("Track.instrument", &Track::instrument);
 	ext->declare_class_element("Track.root", &Track::song);
-	ext->declare_class_element("Track." + kaba::Identifier::SHARED_COUNT, &Track::_pointer_ref_counter);
+	ext->declare_class_element("Track." + kaba::Identifier::SharedCount, &Track::_pointer_ref_counter);
 	ext->link_class_func("Track.nice_name", &Track::nice_name);
 	ext->link_class_func("Track.set_name", &Track::set_name);
 	ext->link_class_func("Track.set_muted", &Track::set_muted);
@@ -735,7 +735,7 @@ void PluginManager::link_app_data() {
 	//	ext->declare_class_element("Song.layers", &Song::layers);
 		ext->declare_class_element("Song.bars", &Song::bars);
 		ext->declare_class_element("Song.secret_data", &Song::secret_data);
-		ext->declare_class_element("Song." + kaba::Identifier::SHARED_COUNT, &Song::_pointer_ref_counter);
+		ext->declare_class_element("Song." + kaba::Identifier::SharedCount, &Song::_pointer_ref_counter);
 		ext->link_class_func("Song.__init__", &Song::__init__);
 		ext->link_virtual("Song.__delete__", &Song::__delete__, &af);
 		ext->link_class_func("Song.add_track", &Song::add_track);
@@ -878,7 +878,7 @@ void PluginManager::link_app_data() {
 
 	ext->declare_class_size("SceneGraph.Node", sizeof(scenegraph::Node));
 	ext->declare_class_element("SceneGraph.Node.area", &scenegraph::Node::area);
-	ext->declare_class_element("SceneGraph.Node." + kaba::Identifier::SHARED_COUNT, &scenegraph::Node::_pointer_ref_counter);
+	ext->declare_class_element("SceneGraph.Node." + kaba::Identifier::SharedCount, &scenegraph::Node::_pointer_ref_counter);
 
 	ext->declare_class_size("AudioView.Layer", sizeof(AudioViewLayer));
 	ext->declare_class_element("AudioView.Layer.layer", &AudioViewLayer::layer);

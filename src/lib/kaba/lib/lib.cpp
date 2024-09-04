@@ -127,7 +127,7 @@ void flags_clear(Flags &flags, Flags t) {
 }
 
 Flags flags_mix(const Array<Flags> &f) {
-	Flags r = Flags::NONE;
+	Flags r = Flags::None;
 	for (Flags ff: f)
 		r = Flags(int(r) | int(ff));
 	return r;
@@ -141,7 +141,7 @@ void add_package(Context *c, const string &name, Flags flags) {
 			return;
 		}
 	auto s = c->create_empty_module(name);
-	s->used_by_default = flags_has(flags, Flags::AUTO_IMPORT);
+	s->used_by_default = flags_has(flags, Flags::AutoImport);
 	s->tree->base_class->name = name;
 	c->packages.add(s);
 	cur_package = s.get();
@@ -196,7 +196,7 @@ const Class *add_type_p_raw(const Class *sub_type) {
 	//string name = format("%s[%s]", Identifier::RAW_POINTER, sub_type->name);
 	string name = sub_type->name + "*";
 	Class *t = new Class(TypeRawT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
-	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	flags_set(t->flags, Flags::ForceCallByValue);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(cur_package->tree.get(), t, TypeRawT, {sub_type});
 	return t;
@@ -205,14 +205,14 @@ const Class *add_type_p_raw(const Class *sub_type) {
 const Class *add_type_ref(const Class *sub_type) {
 	string name = sub_type->name + "&";
 	Class *t = new Class(TypeReferenceT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
-	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	flags_set(t->flags, Flags::ForceCallByValue);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(cur_package->tree.get(), t, TypeReferenceT, {sub_type});
 	return t;
 }
 
 const Class *add_type_p_owned(const Class *sub_type) {
-	string name = format("%s[%s]", Identifier::OWNED, sub_type->name);
+	string name = format("%s[%s]", Identifier::Owned, sub_type->name);
 	Class *t = new Class(TypeOwnedT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(cur_package->tree.get(), t, TypeOwnedT, {sub_type});
@@ -220,7 +220,7 @@ const Class *add_type_p_owned(const Class *sub_type) {
 }
 
 const Class *add_type_p_shared(const Class *sub_type) {
-	string name = format("%s[%s]", Identifier::SHARED, sub_type->name);
+	string name = format("%s[%s]", Identifier::Shared, sub_type->name);
 	Class *t = new Class(TypeSharedT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(
@@ -230,7 +230,7 @@ const Class *add_type_p_shared(const Class *sub_type) {
 }
 
 const Class *add_type_p_shared_not_null(const Class *sub_type) {
-	string name = format("%s![%s]", Identifier::SHARED, sub_type->name);
+	string name = format("%s![%s]", Identifier::Shared, sub_type->name);
 	Class *t = new Class(TypeSharedNotNullT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(
@@ -240,9 +240,9 @@ const Class *add_type_p_shared_not_null(const Class *sub_type) {
 }
 
 const Class *add_type_p_xfer(const Class *sub_type) {
-	string name = format("%s[%s]", Identifier::XFER, sub_type->name);
+	string name = format("%s[%s]", Identifier::Xfer, sub_type->name);
 	Class *t = new Class(TypeXferT, name, config.target.pointer_size, config.target.pointer_size, cur_package->tree.get(), nullptr, {sub_type});
-	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	flags_set(t->flags, Flags::ForceCallByValue);
 	__add_class__(t, sub_type->name_space);
 	cur_package->context->template_manager->add_explicit_class_instance(
 			cur_package->tree.get(),
@@ -292,7 +292,7 @@ void capture_implicit_type(const Class *_t, const string &name) {
 // enum
 const Class *add_type_enum(const string &name, const Class *_namespace) {
 	Class *t = new Class(TypeEnumT, name, sizeof(int), sizeof(int), cur_package->tree.get());
-	flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE);
+	flags_set(t->flags, Flags::ForceCallByValue);
 	__add_class__(t, _namespace);
 	return t;
 }
@@ -369,16 +369,16 @@ const Class *add_type_func(const Class *ret_type, const Array<const Class*> &par
 	add_class(ff);
 	if (ret_type == TypeVoid) {
 		if (params.num == 0) {
-			class_add_func(Identifier::Func::INIT, TypeVoid, &KabaCallable<void()>::__init__);
+			class_add_func(Identifier::func::Init, TypeVoid, &KabaCallable<void()>::__init__);
 				func_add_param("fp", TypePointer);
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void()>::operator());
 		} else if (params.num == 1 and ptr_param(params[0])) {
-			class_add_func(Identifier::Func::INIT, TypeVoid, &KabaCallable<void(void*)>::__init__);
+			class_add_func(Identifier::func::Init, TypeVoid, &KabaCallable<void(void*)>::__init__);
 				func_add_param("fp", TypePointer);
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*)>::operator());
 				func_add_param("a", params[0]);
 		} else if (params.num == 2 and ptr_param(params[0]) and ptr_param(params[1])) {
-			class_add_func(Identifier::Func::INIT, TypeVoid, &KabaCallable<void(void*,void*)>::__init__);
+			class_add_func(Identifier::func::Init, TypeVoid, &KabaCallable<void(void*,void*)>::__init__);
 				func_add_param("fp", TypePointer);
 			class_add_func_virtual("call", TypeVoid, &KabaCallable<void(void*,void*)>::operator());
 				func_add_param("a", params[0]);
@@ -417,15 +417,15 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 		p = nullptr;
 	}
 
-	Flags flags = Flags::MUTABLE;
-	if (!(o->abstract->flags & OperatorFlags::LEFT_IS_MODIFIABLE))
-		flags = Flags::PURE;
+	Flags flags = Flags::Mutable;
+	if (!(o->abstract->flags & OperatorFlags::LeftIsModifiable))
+		flags = Flags::Pure;
 
 	//if (!c->uses_call_by_reference())
-	if ((o->abstract->flags & OperatorFlags::LEFT_IS_MODIFIABLE) and !c->uses_call_by_reference())
-		flags_set(flags, Flags::STATIC);
+	if ((o->abstract->flags & OperatorFlags::LeftIsModifiable) and !c->uses_call_by_reference())
+		flags_set(flags, Flags::Static);
 
-	if (!flags_has(flags, Flags::STATIC)) {
+	if (!flags_has(flags, Flags::Static)) {
 		add_class(c);
 		o->f = class_add_func_x(o->abstract->function_name, return_type, func, flags);
 		if (p)
@@ -438,7 +438,7 @@ void add_operator_x(OperatorID primitive_op, const Class *return_type, const Cla
 			func_add_param("b", p);
 	}
 	func_set_inline(inline_index);
-	if (inline_index != InlineID::NONE and cur_package->filename.extension() == "")
+	if (inline_index != InlineID::None and cur_package->filename.extension() == "")
 		cur_package->context->global_operators.add(o);
 	else
 		delete o;
@@ -474,7 +474,7 @@ void class_derive_from(const Class *parent, DeriveFlags flags) {
 
 void _class_add_member_func(const Class *ccc, Function *f, Flags flag) {
 	Class *c = const_cast<Class*>(ccc);
-	if (flags_has(flag, Flags::OVERRIDE)) {
+	if (flags_has(flag, Flags::Override)) {
 		for (auto&& [i, ff]: enumerate(weak(c->functions)))
 			if (ff->name == f->name) {
 				//msg_write("OVERRIDE");
@@ -636,7 +636,7 @@ void add_const(const string &name, const Class *type, const void *value) {
 
 void add_ext_var(const string &name, const Class *type, void *var) {
 	auto *v = new Variable(name, type);
-	flags_set(v->flags, Flags::EXTERN); // prevent initialization when importing
+	flags_set(v->flags, Flags::Extern); // prevent initialization when importing
 	cur_package->tree->base_class->static_variables.add(v);
 	if (config.allow_std_lib)
 		v->memory = var;

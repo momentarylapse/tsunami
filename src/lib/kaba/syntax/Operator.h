@@ -25,55 +25,55 @@ class Class;
 //--------------------------------------------------------------------------------------------------
 // operators
 enum class OperatorID {
-	NONE = -1,
-	ASSIGN,        //  =
-	ADD,           //  +
-	SUBTRACT,      //  -
-	MULTIPLY,      //  *
-	DIVIDE,        //  /
-	NEGATIVE,      //  -
-	ADDS,          // +=
-	SUBTRACTS,     // -=
-	MULTIPLYS,     // *=
-	DIVIDES,       // /=
-	EQUAL,         // ==
-	NOT_EQUAL,     // !=
-	NEGATE,        //  not
-	SMALLER,       //  <
-	GREATER,       //  >
-	SMALLER_EQUAL, // <=
-	GREATER_EQUAL, // >=
-	AND,           // and
-	OR,            // or
-	MODULO,        //  %
-	BIT_AND,       //  &
-	BIT_OR,        //  |
-	SHIFT_LEFT,    // <<
-	SHIFT_RIGHT,   // >>
-	INCREASE,      // ++
-	DECREASE,      // --
-	IS,            // is
-	IN,            // in
-	EXTENDS,       // extends
-	EXPONENT,      // ^
-	COMMA,         // ,
-	DEREFERENCE,   // *
-	REFERENCE,     // &
-	ARRAY,         // [...]
-	FUNCTION_PIPE, // |>
-	AS,            // as
-	MAPS_TO,       // =>
-	REF_ASSIGN,    // :=
-	_COUNT_
+	None = -1,
+	Assign,        //  =
+	Add,           //  +
+	Subtract,      //  -
+	Multiply,      //  *
+	Divide,        //  /
+	Negative,      //  -
+	AddAssign,     // +=
+	SubtractAssign,// -=
+	MultiplyAssign,// *=
+	DivideAssign,  // /=
+	Equal,         // ==
+	NotEqual,      // !=
+	Negate,        //  not
+	Smaller,       //  <
+	Greater,       //  >
+	SmallerEqual,  // <=
+	GreaterEqual,  // >=
+	And,           // and
+	Or,            // or
+	Modulo,        //  %
+	BitAnd,        //  &
+	BitOr,         //  |
+	ShiftLeft,     // <<
+	ShiftRight,    // >>
+	Increase,      // ++
+	Decrease,      // --
+	Is,            // is
+	In,            // in
+	Extends,       // extends
+	Exponent,      // ^
+	Comma,         // ,
+	Dereference,   // *
+	Reference,     // &
+	Index,         // [...]
+	PipeRight,     // |>
+	As,            // as
+	MapsTo,        // =>
+	RefAssign,     // :=
+	_Count_
 };
 
 enum class OperatorFlags {
-	NONE = 0,
-	UNARY_LEFT = 1,
-	UNARY_RIGHT = 2,
-	BINARY = 3,
-	LEFT_IS_MODIFIABLE = 4,
-	ORDER_INVERTED = 8 // (param, instance) instead of (instance, param)
+	None = 0,
+	UnaryLeft = 1,
+	UnaryRight = 2,
+	Binary = 3,
+	LeftIsModifiable = 4,
+	OrderInverted = 8 // (param, instance) instead of (instance, param)
 };
 
 OperatorFlags operator|(OperatorFlags a, OperatorFlags b);
@@ -85,7 +85,7 @@ public:
 	OperatorID id;
 	unsigned char level; // order of operators ("Punkt vor Strich")
 	string function_name;
-	OperatorFlags flags = OperatorFlags::NONE;
+	OperatorFlags flags = OperatorFlags::None;
 
 	bool is_binary() const;
 };

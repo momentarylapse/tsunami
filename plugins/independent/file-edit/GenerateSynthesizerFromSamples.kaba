@@ -5,7 +5,7 @@ use hui
 
 func get_instruments(p: any, i: any) -> int
 	var ins = 0
-	for z in p["zones"].as_array()
+	for z in p["zones"]!.as_list()!
 		if z.has("instrument")
 			ins ++
 			#keys += int(z["keys"][1]) - int(z["keys"][0]) + 1
@@ -13,10 +13,10 @@ func get_instruments(p: any, i: any) -> int
 
 func get_samples(p: any, i: any) -> int
 	var samples = 0
-	for z in p["zones"].as_array()
+	for z in p["zones"]!.as_list()!
 		if z.has("instrument")
-			var ii = i[int(z["instrument"])]
-			for zz in ii["zones"].as_array()
+			var ii = i[int(z["instrument"]!)]!
+			for zz in ii["zones"]!.as_list()!
 				if zz.has("sample")
 					samples ++
 	return samples
@@ -36,8 +36,8 @@ Grid ? ''
 		Button ok 'Ok' default")
 		#for i in plug.song.secret_data["instruments"].as_array()
 		#	dlg.add_string("instrument", "{{i["name"]}}\\{{get_keys(i)}}\\{{get_samples(i)}}")
-		var ii = plug.session.song.secret_data["instruments"]
-		for p in plug.session.song.secret_data["presets"].as_array()
+		var ii = plug.session.song.secret_data["instruments"]!
+		for p in plug.session.song.secret_data["presets"]!.as_list()!
 			add_string("presets", "{{p["name"]}}\\{{get_instruments(p, ii)}}\\{{get_samples(p, ii)}}")
 		selected = 0
 		set_int("presets", selected)
@@ -85,24 +85,24 @@ class XXX extends TsunamiPlugin
 		
 
 		print("make")
-		var p = session.song.secret_data["presets"][pre]
-		for z in p["zones"].as_array()
+		var p = session.song.secret_data["presets"]![pre]!
+		for z in p["zones"]!.as_list()!
 			if z.has("instrument")
-				var ii = session.song.secret_data["instruments"][int(z["instrument"])]
-				for zz in ii["zones"].as_array()
+				var ii = session.song.secret_data["instruments"]![int(z["instrument"]!)]!
+				for zz in ii["zones"]!.as_list()!
 					if not zz.has("sample")
 						continue
 					if not zz.has("keys")
 						continue
-					var k0 = int(zz["keys"][0])
-					var k1 = int(zz["keys"][1]) + 1
-					var s = session.song.samples[int(zz["sample"])]
+					var k0 = int(zz["keys"]![0]!)
+					var k1 = int(zz["keys"]![1]!) + 1
+					var s = session.song.samples[int(zz["sample"]!)]
 					if zz.has("root-key")
-						s.set_value("pitch", str(zz["root-key"]))
+						s.set_value("pitch", str(zz["root-key"]!))
 					if zz.has("start-loop")
-						s.set_value("start-loop", str(zz["start-loop"]))
+						s.set_value("start-loop", str(zz["start-loop"]!))
 					if zz.has("end-loop")
-						s.set_value("end-loop", str(zz["end-loop"]))
+						s.set_value("end-loop", str(zz["end-loop"]!))
 					if s.get_value("pitch") == ""
 						continue
 					var root = int(s.get_value("pitch"))

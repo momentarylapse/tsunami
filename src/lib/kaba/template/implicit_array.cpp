@@ -15,7 +15,7 @@ namespace kaba {
 void AutoImplementer::implement_array_constructor(Function *f, const Class *t) {
 	if (!f)
 		return;
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	auto te = t->get_array_element();
 	if (auto *f_el_init = te->get_default_constructor()) {
@@ -33,7 +33,7 @@ void AutoImplementer::implement_array_destructor(Function *f, const Class *t) {
 	if (!f)
 		return;
 	auto te = t->get_array_element();
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	if (auto *f_el_del = te->get_destructor()) {
 		for (int i=0; i<t->array_length; i++) {
@@ -51,7 +51,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 		return;
 
 	auto n_other = add_node_local(f->__get_var("other"));
-	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
+	auto n_self = add_node_local(f->__get_var(Identifier::Self));
 
 	// for i=>el in self
 	//    el = other[i]
@@ -66,7 +66,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 
 	b->add(add_assign(f, "", add_node_local(v_el)->deref(), n_other_el));
 
-	auto n_for = add_node_statement(StatementID::FOR_CONTAINER);
+	auto n_for = add_node_statement(StatementID::ForContainer);
 	// [VAR, INDEX, ARRAY, BLOCK]
 	n_for->set_param(0, add_node_local(v_el));
 	n_for->set_param(1, add_node_local(v_i));
@@ -91,13 +91,13 @@ void TemplateClassInstantiatorArray::add_function_headers(Class* c) {
 		c->owner->do_error(format("can not create an array from type '%s', missing default constructor", c->param[0]->long_name()), c->token_id);
 
 	if (c->param[0]->needs_constructor() and class_can_default_construct(c->param[0]))
-		add_func_header(c, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Init, TypeVoid, {}, {}, nullptr, Flags::Mutable);
 	if (c->param[0]->needs_destructor() and class_can_destruct(c->param[0]))
-		add_func_header(c, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable);
 	if (class_can_assign(c->param[0]))
-		add_func_header(c, Identifier::Func::ASSIGN, TypeVoid, {c}, {"other"}, nullptr, Flags::MUTABLE);
+		add_func_header(c, Identifier::func::Assign, TypeVoid, {c}, {"other"}, nullptr, Flags::Mutable);
 	if (class_can_equal(c->param[0]) and false) // TODO
-		add_func_header(c, Identifier::Func::EQUAL, TypeBool, {c}, {"other"}, nullptr, Flags::PURE);
+		add_func_header(c, Identifier::func::Equal, TypeBool, {c}, {"other"}, nullptr, Flags::Pure);
 }
 
 

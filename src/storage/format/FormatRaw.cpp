@@ -25,18 +25,18 @@ FormatDescriptorRaw::FormatDescriptorRaw() :
 bool FormatRaw::get_parameters(StorageOperationData *od, bool save) {
 	// optional defaults
 	if (!od->parameters.has("offset"))
-		od->parameters.map_set("offset", 0);
+		od->parameters.dict_set("offset", 0);
 	if (!od->parameters.has("samplerate"))
-		od->parameters.map_set("samplerate", od->session->sample_rate());
+		od->parameters.dict_set("samplerate", od->session->sample_rate());
 	
 	if (od->parameters.has("format") and od->parameters.has("channels"))
 		return true;
 
 	// mandatory defaults
 	if (!od->parameters.has("format"))
-		od->parameters.map_set("format", "f32");
+		od->parameters.dict_set("format", "f32");
 	if (!od->parameters.has("channels"))
-		od->parameters.map_set("channels", 1);
+		od->parameters.dict_set("channels", 1);
 
 	shared<RawConfigDialog> dlg = new RawConfigDialog(od, od->win);
 	hui::fly_and_wait(dlg.to<hui::Window>());

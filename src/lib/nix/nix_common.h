@@ -19,7 +19,7 @@
 #endif
 #if defined(OS_LINUX) || defined(OS_MAC)
 	#define GL_GLEXT_PROTOTYPES
-	#include <GL/glx.h>
+	//#include <GL/glx.h>
 	#include <GL/gl.h>
 	#include <GL/glext.h>
 #endif

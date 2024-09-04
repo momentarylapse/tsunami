@@ -33,26 +33,26 @@ FormatDescriptorPdf::FormatDescriptorPdf() :
 bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	// optional defaults
 	if (!od->parameters.has("horizontal-scale"))
-		od->parameters.map_set("horizontal-scale", 1.0f);
+		od->parameters.dict_set("horizontal-scale", 1.0f);
 	if (!od->parameters.has("border"))
-		od->parameters.map_set("border", 25);
+		od->parameters.dict_set("border", 25);
 	if (!od->parameters.has("line-height"))
-		od->parameters.map_set("line-height", 20);
+		od->parameters.dict_set("line-height", 20);
 	if (!od->parameters.has("line-space"))
-		od->parameters.map_set("line-space", 1.2f * 20);
+		od->parameters.dict_set("line-space", 1.2f * 20);
 	if (!od->parameters.has("track-space"))
-		od->parameters.map_set("track-space", 0.4f * 20);
+		od->parameters.dict_set("track-space", 0.4f * 20);
 	if (!od->parameters.has("allow-shadows"))
-		od->parameters.map_set("allow-shadows", true);
+		od->parameters.dict_set("allow-shadows", true);
 	if (!od->parameters.has("min-font-size"))
-		od->parameters.map_set("min-font-size", 6.0f);
+		od->parameters.dict_set("min-font-size", 6.0f);
 
 	if (od->parameters.has("tracks"))
 		return true;
 
 	// mandatory defaults
 	if (!od->parameters.has("tracks"))
-		od->parameters.map_set("tracks", {});
+		od->parameters.dict_set("tracks", {});
 
 	shared<PdfConfigDialog> dlg = new PdfConfigDialog(od, od->win);
 	hui::fly_and_wait(dlg.to<hui::Window>());

@@ -12,7 +12,7 @@
 namespace kaba {
 
 
-const SerialNodeParam p_none = {NodeKind::NONE, -1, 0, nullptr, 0};
+const SerialNodeParam p_none = {NodeKind::None, -1, 0, nullptr, 0};
 
 
 bool SerialNodeParam::operator == (const SerialNodeParam &param) const {
@@ -78,32 +78,32 @@ string guess_local_mem(int offset, Serializer *ser) {
 
 string SerialNodeParam::str(Serializer *ser) const {
 	string str;
-	if (kind != NodeKind::NONE) {
+	if (kind != NodeKind::None) {
 		string n = p2s((void*)p);
-		if ((kind == NodeKind::REGISTER) or (kind == NodeKind::DEREF_REGISTER))
+		if ((kind == NodeKind::Register) or (kind == NodeKind::DereferenceRegister))
 			n = Asm::get_reg_name(as_reg());
-		else if ((kind == NodeKind::VAR_TEMP) or (kind == NodeKind::DEREF_VAR_TEMP))
+		else if ((kind == NodeKind::VarTemp) or (kind == NodeKind::DereferenceVarTemp))
 			n = "#" + i2s(p);
-		else if (kind == NodeKind::LABEL)
+		else if (kind == NodeKind::Label)
 			return ser->list->label[p].name;
-		else if (kind == NodeKind::LOCAL_MEMORY)
+		else if (kind == NodeKind::LocalMemory)
 			n = guess_local_mem(p + shift, ser);
-		else if (kind == NodeKind::MEMORY)
+		else if (kind == NodeKind::Memory)
 			n = "0x" + i2h(p + shift, config.target.pointer_size);
-		else if (kind == NodeKind::IMMEDIATE)
+		else if (kind == NodeKind::Immediate)
 			n = guess_constant(p + shift, ser);
-		else if (kind == NodeKind::VAR_LOCAL)
+		else if (kind == NodeKind::VarLocal)
 			n = ((Variable*)p)->name;
-		else if (kind == NodeKind::VAR_GLOBAL)
+		else if (kind == NodeKind::VarGlobal)
 			n = ((Variable*)p)->name;
-		else if (kind == NodeKind::CONSTANT)
+		else if (kind == NodeKind::Constant)
 			n = ((Constant*)p)->str();
-		else if (kind == NodeKind::CONSTANT_BY_ADDRESS) {
+		else if (kind == NodeKind::ConstantByAddress) {
 			if (config.fully_linear_output)
 				n = "@" + p2s((void*)(int_p)p);
 			else
 				n = var_repr((void*)(int_p)(p + shift), type) + " @" + p2s((void*)(int_p)p);
-		} else if (kind == NodeKind::FUNCTION)
+		} else if (kind == NodeKind::Function)
 			n = ((Function*)p)->signature(TypeVoid);
 		str = "(" + type_name_safe(type) + ") <" + kind2str(kind) + "> " + n;
 		if (shift > 0)
@@ -149,16 +149,16 @@ string SerialNode::str(Serializer *ser) const {
 	if (cond != Asm::ArmCond::Always)
 		t += _cond_str(cond) + ":";
 	t += format("%-6s %s", Asm::get_instruction_name(inst), p[0].str(ser));
-	if (p[1].kind != NodeKind::NONE)
+	if (p[1].kind != NodeKind::None)
 		t += ",  " + p[1].str(ser);
-	if (p[2].kind != NodeKind::NONE)
+	if (p[2].kind != NodeKind::None)
 		t += ",  " + p[2].str(ser);
 	return t;
 }
 
 
 SerialNodeParam deref_temp(const SerialNodeParam &param, const Class *type) {
-	return {NodeKind::DEREF_VAR_TEMP, param.p, -1, type, 0};
+	return {NodeKind::DereferenceVarTemp, param.p, -1, type, 0};
 }
 
 SerialNodeParam param_shift(const SerialNodeParam &param, int shift, const Class *t) {
@@ -171,7 +171,7 @@ SerialNodeParam param_shift(const SerialNodeParam &param, int shift, const Class
 SerialNodeParam param_global(const Class *type, void *v) {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = NodeKind::MEMORY;
+	p.kind = NodeKind::Memory;
 	p.p = (int_p)v;
 	p.shift = 0;
 	return p;
@@ -180,7 +180,7 @@ SerialNodeParam param_global(const Class *type, void *v) {
 SerialNodeParam param_local(const Class *type, int offset) {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = NodeKind::LOCAL_MEMORY;
+	p.kind = NodeKind::LocalMemory;
 	p.p = offset;
 	p.shift = 0;
 	return p;
@@ -189,14 +189,14 @@ SerialNodeParam param_local(const Class *type, int offset) {
 SerialNodeParam param_imm(const Class *type, int64 c) {
 	SerialNodeParam p;
 	p.type = type;
-	p.kind = NodeKind::IMMEDIATE;
+	p.kind = NodeKind::Immediate;
 	p.p = c;
 	p.shift = 0;
 	return p;
 }
 
 SerialNodeParam param_label(const Class *type, int m) {
-	return {NodeKind::LABEL, m, -1, type, 0};
+	return {NodeKind::Label, m, -1, type, 0};
 }
 
 SerialNodeParam param_label32(int m) {
@@ -204,23 +204,23 @@ SerialNodeParam param_label32(int m) {
 }
 
 SerialNodeParam param_deref_label(const Class *type, int m) {
-	return {NodeKind::DEREF_LABEL, m, -1, type, 0};
+	return {NodeKind::DereferenceLabel, m, -1, type, 0};
 }
 
 SerialNodeParam param_preg(const Class *type, Asm::RegID reg) {
-	return {NodeKind::REGISTER, (int)reg, -1, type, 0};
+	return {NodeKind::Register, (int)reg, -1, type, 0};
 }
 
 SerialNodeParam param_deref_preg(const Class *type, Asm::RegID reg) {
-	return {NodeKind::DEREF_REGISTER, (int)reg, -1, type, 0};
+	return {NodeKind::DereferenceRegister, (int)reg, -1, type, 0};
 }
 
 SerialNodeParam param_lookup(const Class *type, int ref) {
-	return {NodeKind::GLOBAL_LOOKUP, ref, -1, /*type*/TypePointer, 0};
+	return {NodeKind::GlobalLookup, ref, -1, /*type*/TypePointer, 0};
 }
 
 SerialNodeParam param_deref_lookup(const Class *type, int ref) {
-	return {NodeKind::DEREF_GLOBAL_LOOKUP, ref, -1, /*type*/TypePointer, 0};
+	return {NodeKind::DereferenceGlobalLookup, ref, -1, /*type*/TypePointer, 0};
 }
 
 

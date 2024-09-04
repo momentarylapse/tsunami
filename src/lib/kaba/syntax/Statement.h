@@ -19,28 +19,30 @@ namespace kaba {
 
 // statements
 enum class StatementID {
-	RETURN,
-	IF,
-	IF_UNWRAP,
-	WHILE,
-	FOR_CONTAINER,
-	FOR_RANGE,
-	FOR_DIGEST,
-	BREAK,
-	CONTINUE,
-	NEW,
-	DELETE,
-	ASM,
-	RAISE,
-	TRY,
-	EXCEPT,
-	PASS,
-	LET,
-	VAR,
-	LAMBDA,
-	FUNC,
-	RAW_FUNCTION_POINTER,
-	TRUST_ME
+	Return,
+	If,
+	IfUnwrap,
+	While,
+	ForContainer,
+	ForRange,
+	ForDigest,
+	Break,
+	Continue,
+	New,
+	Delete,
+	Asm,
+	Raise,
+	RaiseLocal,
+	Try,
+	Except,
+	Pass,
+	Let,
+	Var,
+	Lambda,
+	Func,
+	RawFunctionPointer,
+	TrustMe,
+	Match
 };
 
 class Statement {
@@ -57,16 +59,16 @@ int add_statement(const string &name, StatementID id, int num_params = 0);
 
 // special functions
 enum class SpecialFunctionID {
-	SIZEOF,
-	TYPEOF,
-	STR,
-	REPR,
-	LEN,
-	SORT,
-	FILTER,
-	DYN,
-	WEAK,
-	GIVE
+	Sizeof,
+	Typeof,
+	Str,
+	Repr,
+	Len,
+	Sort,
+	Filter,
+	Dyn,
+	Weak,
+	Give
 };
 
 class SpecialFunction {

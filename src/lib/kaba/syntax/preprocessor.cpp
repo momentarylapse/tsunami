@@ -17,13 +17,13 @@ void db_out(const string &s) {
 Array<void*> prepare_const_func_params(shared<Node> c, bool allow_placeholder) {
 	Array<void*> p;
 	for (int i=0;i<c->params.num;i++) {
-		if (c->params[i]->kind == NodeKind::DEREFERENCE and c->params[i]->params[0]->kind == NodeKind::CONSTANT) {
+		if (c->params[i]->kind == NodeKind::Dereference and c->params[i]->params[0]->kind == NodeKind::Constant) {
 			db_out("pp: " + c->params[i]->params[0]->str(tree->base_class));
 			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
-		} else if (c->params[i]->kind == NodeKind::CONSTANT) {
+		} else if (c->params[i]->kind == NodeKind::Constant) {
 			db_out("p: " + c->params[i]->str(tree->base_class));
 			p.add(c->params[i]->as_const()->p());
-		} else if (c->params[i]->kind == NodeKind::PLACEHOLDER and allow_placeholder) {
+		} else if (c->params[i]->kind == NodeKind::Placeholder and allow_placeholder) {
 			p.add(nullptr);
 		} else {
 			return {};
@@ -66,7 +66,7 @@ shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 
 bool all_params_are_const(shared<Node> n) {
 	for (int i=0; i<n->params.num; i++)
-		if (n->params[i]->kind != NodeKind::CONSTANT)
+		if (n->params[i]->kind != NodeKind::Constant)
 			return false;
 	return true;
 }
@@ -158,18 +158,18 @@ shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Functio
 
 // BEFORE transforming to call-by-reference!
 shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
-	if (c->kind == NodeKind::OPERATOR) {
+	if (c->kind == NodeKind::Operator) {
 		return eval_function_call(this, c, c->as_op()->f);
-	} else if (c->kind == NodeKind::CONSTRUCTOR_AS_FUNCTION) {
+	} else if (c->kind == NodeKind::ConstructorAsFunction) {
 		return eval_constructor_function(this, c, c->as_func());
-	} else if (c->kind == NodeKind::CALL_FUNCTION) {
+	} else if (c->kind == NodeKind::CallFunction) {
 		return eval_function_call(this, c, c->as_func());
 	}
 	return conv_eval_const_func_nofunc(c);
 }
 
 shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
-	if (c->kind == NodeKind::DYNAMIC_ARRAY) {
+	if (c->kind == NodeKind::DynamicArray) {
 		if (all_params_are_const(c)) {
 			auto cr = add_node_const(add_constant(c->type));
 			DynamicArray *da = &c->params[0]->as_const()->as_array();
@@ -177,7 +177,7 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 			rec_assign(cr->as_const()->p(), (char*)da->data + index * da->element_size, c->type);
 			return cr;
 		}
-	} else if (c->kind == NodeKind::ARRAY) {
+	} else if (c->kind == NodeKind::Array) {
 		// hmmm, not existing, I guess....
 		if (all_params_are_const(c)) {
 			auto cr = add_node_const(add_constant(c->type));
@@ -185,7 +185,7 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 			rec_assign(cr->as_const()->p(), (char*)c->params[0]->as_const()->p() + index * c->type->size, c->type);
 			return cr;
 		}
-	} else if (c->kind == NodeKind::ARRAY_BUILDER) {
+	} else if (c->kind == NodeKind::ArrayBuilder) {
 		if (all_params_are_const(c)) {
 			auto c_array = add_node_const(add_constant(c->type));
 			DynamicArray &da = c_array->as_const()->as_array();
@@ -204,16 +204,16 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 
 // may not use AddConstant()!!!
 shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
-	if (c->kind == NodeKind::CALL_INLINE) {
+	if (c->kind == NodeKind::CallInline) {
 		auto *f = c->as_func();
 		//if (!f->is_pure or !f->address_preprocess)
 		//	return c;
-		if ((f->inline_no != InlineID::INT64_ADD_INT32) and (f->inline_no != InlineID::INT32_ADD))
+		if ((f->inline_no != InlineID::Int64AddInt32) and (f->inline_no != InlineID::Int32Add))
 			return c;
-		if (c->params[1]->kind != NodeKind::CONSTANT)
+		if (c->params[1]->kind != NodeKind::Constant)
 			return c;
 		Array<void*> p;
-		if ((c->params[0]->kind == NodeKind::ADDRESS) or (c->params[0]->kind == NodeKind::LOCAL_ADDRESS)) {
+		if ((c->params[0]->kind == NodeKind::Address) or (c->params[0]->kind == NodeKind::LocalAddress)) {
 			p.add((void*)&c->params[0]->link_no);
 		} else {
 			return c;
@@ -229,21 +229,21 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 		r->type = c->type;
 		return r;
 
-	} else if (c->kind == NodeKind::REFERENCE) {
+	} else if (c->kind == NodeKind::Reference) {
 		auto p0 = c->params[0];
-		if (p0->kind == NodeKind::VAR_GLOBAL) {
-			return new Node(NodeKind::ADDRESS, (int_p)p0->as_global_p(), c->type);
-		} else if (p0->kind == NodeKind::VAR_LOCAL) {
-			return new Node(NodeKind::LOCAL_ADDRESS, (int_p)p0->as_local()->_offset, c->type);
-		} else if (p0->kind == NodeKind::CONSTANT) {
-			return new Node(NodeKind::ADDRESS, (int_p)p0->as_const_p(), c->type);
+		if (p0->kind == NodeKind::VarGlobal) {
+			return new Node(NodeKind::Address, (int_p)p0->as_global_p(), c->type);
+		} else if (p0->kind == NodeKind::VarLocal) {
+			return new Node(NodeKind::LocalAddress, (int_p)p0->as_local()->_offset, c->type);
+		} else if (p0->kind == NodeKind::Constant) {
+			return new Node(NodeKind::Address, (int_p)p0->as_const_p(), c->type);
 		}
-	} else if (c->kind == NodeKind::DEREFERENCE) {
+	} else if (c->kind == NodeKind::Dereference) {
 		auto p0 = c->params[0];
-		if (p0->kind == NodeKind::ADDRESS) {
-			return new Node(NodeKind::MEMORY, p0->link_no, c->type);
-		} else if (p0->kind == NodeKind::LOCAL_ADDRESS) {
-			return new Node(NodeKind::LOCAL_MEMORY, p0->link_no, c->type);
+		if (p0->kind == NodeKind::Address) {
+			return new Node(NodeKind::Memory, p0->link_no, c->type);
+		} else if (p0->kind == NodeKind::LocalAddress) {
+			return new Node(NodeKind::LocalMemory, p0->link_no, c->type);
 		}
 	}
 	return c;

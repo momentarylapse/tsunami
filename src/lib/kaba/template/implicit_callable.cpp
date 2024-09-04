@@ -40,7 +40,7 @@ Array<const Class*> suggest_callable_bind_param_types(const Class *fp) {
 
 
 void AutoImplementer::implement_callable_constructor(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	implement_add_virtual_table(self, f, t);
 
@@ -62,17 +62,17 @@ void AutoImplementer::implement_callable_constructor(Function *f, const Class *t
 
 
 void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	//db_add_print_label(this, f->block, "== callable.call ==");
 
 	// contains a Function* pointer, extract its raw pointer
-	auto raw = add_node_statement(StatementID::RAW_FUNCTION_POINTER);
+	auto raw = add_node_statement(StatementID::RawFunctionPointer);
 	raw->type = TypeFunctionCodeRef;
 	raw->set_param(0, get_callable_fp(t, self));
 
 	// call its raw pointer
-	auto call = new Node(NodeKind::CALL_RAW_POINTER, 0, f->literal_return_type);
+	auto call = new Node(NodeKind::CallRawPointer, 0, f->literal_return_type);
 	call->set_num_params(1 + get_callable_param_types(t).num);
 	call->set_param(0, raw);
 	for (int i=1; i<f->num_params; i++) // skip "self"
@@ -81,7 +81,7 @@ void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
 	if (f->literal_return_type == TypeVoid) {
 		f->block->add(call);
 	} else {
-		auto ret = add_node_statement(StatementID::RETURN);
+		auto ret = add_node_statement(StatementID::Return);
 		ret->set_num_params(1);
 		ret->set_param(0, call);
 		f->block->add(ret);
@@ -91,7 +91,7 @@ void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
 
 
 void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	//db_add_print_label(this, f->block, "== bind.call ==");
 
@@ -131,7 +131,7 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 	if (f->literal_return_type == TypeVoid) {
 		f->block->add(call);
 	} else {
-		auto ret = add_node_statement(StatementID::RETURN);
+		auto ret = add_node_statement(StatementID::Return);
 		ret->set_num_params(1);
 		ret->set_param(0, call);
 		f->block->add(ret);
@@ -184,11 +184,11 @@ void TemplateClassInstantiatorCallableFP::add_function_headers(Class* c) {
 	c->functions.clear(); // don't inherit call() with specific types!
 	c->param = params;
 
-	add_func_header(c, Identifier::Func::INIT, TypeVoid, {TypePointer}, {"p"}, nullptr, Flags::MUTABLE);
-	add_func_header(c, Identifier::Func::CALL,
+	add_func_header(c, Identifier::func::Init, TypeVoid, {TypePointer}, {"p"}, nullptr, Flags::Mutable);
+	add_func_header(c, Identifier::func::Call,
 			get_callable_return_type(c),
 			get_callable_param_types(c),
-			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::None)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
 Class* TemplateClassInstantiatorCallableBind::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
@@ -237,12 +237,12 @@ void TemplateClassInstantiatorCallableBind::add_function_headers(Class* c) {
 
 	auto types = get_callable_capture_types(c);
 	types.insert(TypePointer, 0);
-	add_func_header(c, Identifier::Func::INIT, TypeVoid, types,
-			{"p", "a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::MUTABLE);
-	add_func_header(c, Identifier::Func::CALL,
+	add_func_header(c, Identifier::func::Init, TypeVoid, types,
+			{"p", "a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::Mutable);
+	add_func_header(c, Identifier::func::Call,
 			get_callable_return_type(c),
 			suggest_callable_bind_param_types(c),
-			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::NONE)->virtual_index = TypeCallableBase->get_call()->virtual_index;
+			{"a", "b", "c", "d", "e", "f", "g", "h"}, nullptr, Flags::None)->virtual_index = TypeCallableBase->get_call()->virtual_index;
 }
 
 }

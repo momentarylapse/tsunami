@@ -26,6 +26,9 @@ struct LoopData {
 	int label_continue, label_break;
 	int level, index;
 };
+struct TryData {
+	int label_except, label_after;
+};
 
 
 class Serializer {
@@ -41,7 +44,8 @@ public:
 	int cur_func_index;
 	bool call_used;
 
-	Array<LoopData> loop;
+	Array<LoopData> loop_stack;
+	Array<TryData> try_stack;
 
 	int stack_offset, stack_max_size, max_push_size;
 
@@ -102,6 +106,8 @@ public:
 	void add_function_outro(Function *f);
 	SerialNodeParam serialize_statement(Node *com, Block *block, int index);
 	void serialize_inline_function(Node *com, const Array<SerialNodeParam> &params, const SerialNodeParam &ret);
+
+	void serialize_assign(const SerialNodeParam& p1, const SerialNodeParam& p2, Block *block, int token_id);
 
 
 	void fix_return_by_ref();

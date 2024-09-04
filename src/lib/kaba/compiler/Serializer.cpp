@@ -5,6 +5,7 @@
 #include "../../os/msg.h"
 #include "../../base/algo.h"
 #include "../../base/iter.h"
+#include "../template/implicit.h"
 
 
 namespace kaba {
@@ -55,7 +56,7 @@ SerialNodeParam Serializer::add_temp(const Class *t, bool add_constructor) {
 			inserted_temp.add({r, cur_block_level});
 
 		if (add_constructor)
-			add_cmd_constructor(r, NodeKind::VAR_TEMP);
+			add_cmd_constructor(r, NodeKind::VarTemp);
 	}
 	return r;
 }
@@ -73,13 +74,13 @@ const Class *get_subtype(const Class *t) {
 SerialNodeParam Serializer::param_vreg(const Class *type, int vreg, Asm::RegID preg) {
 	if (preg == Asm::RegID::INVALID)
 		preg = cmd.virtual_reg[vreg].reg;
-	return {NodeKind::REGISTER, (int)preg, vreg, type, 0};
+	return {NodeKind::Register, (int)preg, vreg, type, 0};
 }
 
 SerialNodeParam Serializer::param_deref_vreg(const Class *type, int vreg, Asm::RegID preg) {
 	if (preg == Asm::RegID::INVALID)
 		preg = cmd.virtual_reg[vreg].reg;
-	return {NodeKind::DEREF_REGISTER, (int)preg, vreg, type, 0};
+	return {NodeKind::DereferenceRegister, (int)preg, vreg, type, 0};
 }
 
 
@@ -122,17 +123,26 @@ SerialNodeParam Serializer::add_reference(const SerialNodeParam &param, const Cl
 		type = syntax_tree->type_ref(param.type, -1);
 	ret.type = type;
 	ret.shift = 0;
-	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {
-		ret.kind = NodeKind::IMMEDIATE;
+	if (param.kind == NodeKind::ConstantByAddress) {
+		ret.kind = NodeKind::Immediate;
 		ret.p = (int_p)((char*)param.p + param.shift);
-	} else if ((param.kind == NodeKind::IMMEDIATE) or (param.kind == NodeKind::MEMORY)) {
-		ret.kind = NodeKind::IMMEDIATE;
+	} else if (param.kind == NodeKind::Constant) {
+		ret.kind = NodeKind::Immediate;
+		ret.p = (int_p)reinterpret_cast<Constant*>((void*)(int_p)param.p)->address_runtime + param.shift;
+	} else if ((param.kind == NodeKind::Immediate) or (param.kind == NodeKind::Memory)) {
+		ret.kind = NodeKind::Immediate;
 		if (param.shift > 0)
 			msg_error("Serializer: immediade/mem + shift?!?!?");
 		ret.p = param.p;
-	} else if (param.kind == NodeKind::DEREF_VAR_TEMP) {
+	} else if (param.kind == NodeKind::DereferenceVarTemp) {
 		ret = param;
-		ret.kind = NodeKind::VAR_TEMP; // FIXME why was it param.kind ?!?!?
+		ret.kind = NodeKind::VarTemp; // FIXME why was it param.kind ?!?!?
+		ret.type = type;
+	/*} else if (param.kind == NodeKind::VAR_TEMP) {
+		cmd.temp_var[param.p].referenced = true;
+		sdkjfhkjh
+		ret = param;
+		ret.kind = NodeKind::VAR_TEMP; // FIXME why was it param.kind ?!?!?*/
 	} else {
 		ret = add_temp(type);
 		cmd.add_cmd(Asm::InstID::LEA, ret, param);
@@ -170,19 +180,19 @@ SerialNodeParam Serializer::add_dereference(const SerialNodeParam &param, const 
 	temp.kind = KindDerefVarTemp;
 	add_cmd(Asm::inst_mov, ret, temp);*/
 
-	if (param.kind == NodeKind::VAR_TEMP) {
+	if (param.kind == NodeKind::VarTemp) {
 		return deref_temp(param, type);
-	} else if (param.kind == NodeKind::REGISTER) {
+	} else if (param.kind == NodeKind::Register) {
 		msg_write("???  register???");
 		ret = param;
-		ret.kind = NodeKind::DEREF_REGISTER;
+		ret.kind = NodeKind::DereferenceRegister;
 		ret.type = type;// ? type : get_subtype(param.type);
 		ret.shift = 0;
 	} else {
 		if (config.target.is_arm()) {
-			if (param.kind == NodeKind::LOCAL_ADDRESS) {
+			if (param.kind == NodeKind::LocalAddress) {
 				ret = param;
-				ret.kind = NodeKind::DEREF_LOCAL_MEMORY;
+				ret.kind = NodeKind::DerefereceLocalMemory;
 			} else {
 //				do_error("arm deref...");
 				SerialNodeParam temp = add_temp(param.type);
@@ -201,8 +211,8 @@ SerialNodeParam Serializer::add_dereference(const SerialNodeParam &param, const 
 
 
 bool node_is_assign_mem(Node *n) {
-	if (n->kind == NodeKind::CALL_INLINE) {
-		return (n->as_func()->inline_no == InlineID::CHUNK_ASSIGN);
+	if (n->kind == NodeKind::CallInline) {
+		return (n->as_func()->inline_no == InlineID::ChunkAssign);
 	}
 	// nope...
 	/*if (n->kind == NodeKind::FUNCTION_CALL) {
@@ -226,36 +236,36 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 			.shift = 0
 	};
 
-	if (com->kind == NodeKind::MEMORY) {
+	if (com->kind == NodeKind::Memory) {
 		p.p = com->link_no;
 		return p;
-	} else if (com->kind == NodeKind::ADDRESS) {
+	} else if (com->kind == NodeKind::Address) {
 		//p.p = com->link_no;
 		if (config.fully_linear_output)
 			p.p = com->link_no; // by map_address_constants_to_opcode()
 		else
 			p.p = (int_p)&com->link_no;
-		p.kind = NodeKind::CONSTANT_BY_ADDRESS;
+		p.kind = NodeKind::ConstantByAddress;
 		return p;
-	} else if (com->kind == NodeKind::VAR_GLOBAL) {
+	} else if (com->kind == NodeKind::VarGlobal) {
 		p.p = com->link_no;
 		/*p.p = (int_p)com->as_global_p();
 		if (!p.p)
 			script->do_error_link("variable is not linkable: " + com->as_global()->name);
 		p.kind = NodeKind::MEMORY;*/
 		return p;
-	} else if (com->kind == NodeKind::VAR_LOCAL) {
+	} else if (com->kind == NodeKind::VarLocal) {
 		p.p = com->link_no;
 		//p.p = com->as_local()->_offset;
 		//p.kind = NodeKind::LOCAL_MEMORY;
 		return p;
-	} else if (com->kind == NodeKind::LOCAL_MEMORY) {
+	} else if (com->kind == NodeKind::LocalMemory) {
 		p.p = com->link_no;
 		return p;
-	} else if (com->kind == NodeKind::LOCAL_ADDRESS) {
+	} else if (com->kind == NodeKind::LocalAddress) {
 		SerialNodeParam param = param_local(TypePointer, com->link_no);
 		return add_reference(param, com->type);
-	} else if (com->kind == NodeKind::CONSTANT) {
+	} else if (com->kind == NodeKind::Constant) {
 		p.p = com->link_no;
 		/*p.p = (int_p)com->as_const()->address; // FIXME ....need a cleaner approach for compiling os...
 		if (config.compile_os)
@@ -268,10 +278,10 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 			p.p = fp->_label;
 		}*/
 		return p;
-	} else if (com->kind == NodeKind::REFERENCE) {
+	} else if (com->kind == NodeKind::Reference) {
 		auto param = serialize_node(com->params[0].get(), block, index);
 		return add_reference(param, com->type);
-	} else if (com->kind == NodeKind::DEREFERENCE) {
+	} else if (com->kind == NodeKind::Dereference) {
 		auto param = serialize_node(com->params[0].get(), block, index);
 		/*if ((param.kind == KindVarLocal) or (param.kind == KindVarGlobal)){
 			p.type = param.type->sub_type;
@@ -280,7 +290,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 			p.p = param.p;
 		}*/
 		return add_dereference(param, com->type);
-	} else if (com->kind == NodeKind::VAR_TEMP) {
+	} else if (com->kind == NodeKind::VarTemp) {
 		// only used by <new> operator
 		p.p = com->link_no;
 		return p;
@@ -289,10 +299,10 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 	/*----- complex nodes --------*/
 
-	if (com->kind == NodeKind::STATEMENT) {
+	if (com->kind == NodeKind::Statement) {
 		// for/while can't pre-serialize params, because they need a label to this point
 		return serialize_statement(com, block, index);
-	} else if (com->kind == NodeKind::BLOCK) {
+	} else if (com->kind == NodeKind::Block) {
 		return serialize_block(com->as_block());
 	}
 
@@ -304,8 +314,8 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	if (node_is_assign_mem(com) /*and (config.abi == Abi::AMD64_GNU)*/) {
 		auto dst = com->params[0].get();
 		auto src = com->params[1].get();
-		if (src->kind == NodeKind::CALL_FUNCTION or src->kind == NodeKind::CALL_INLINE) {
-			if (dst->kind == NodeKind::VAR_LOCAL or dst->kind == NodeKind::VAR_GLOBAL or dst->kind == NodeKind::LOCAL_ADDRESS) {
+		if (src->kind == NodeKind::CallFunction or src->kind == NodeKind::CallInline) {
+			if (dst->kind == NodeKind::VarLocal or dst->kind == NodeKind::VarGlobal or dst->kind == NodeKind::LocalAddress) {
 				override_ret = dst;
 				com = src;
 
@@ -320,7 +330,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	if (override_ret) {
 		ret = serialize_node(override_ret, block, index);
 	} else {
-		bool create_constructor_for_return = ((com->kind != NodeKind::STATEMENT) and (com->kind != NodeKind::CALL_FUNCTION) and (com->kind != NodeKind::CALL_VIRTUAL));
+		bool create_constructor_for_return = ((com->kind != NodeKind::Statement) and (com->kind != NodeKind::CallFunction) and (com->kind != NodeKind::CallVirtual));
 		ret = add_temp(com->type, create_constructor_for_return);
 	}
 
@@ -334,16 +344,16 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 	};
 
 
-	if (com->kind == NodeKind::CALL_FUNCTION) {
+	if (com->kind == NodeKind::CallFunction) {
 		const auto params = serialize_params(com);
 		add_function_call(com->as_func(), params, ret);
-	} else if (com->kind == NodeKind::CALL_VIRTUAL) {
+	} else if (com->kind == NodeKind::CallVirtual) {
 		const auto params = serialize_params(com);
 		add_member_function_call(com->as_func(), params, ret);
-	} else if (com->kind == NodeKind::CALL_INLINE) {
+	} else if (com->kind == NodeKind::CallInline) {
 		const auto params = serialize_params(com);
 		serialize_inline_function(com, params, ret);
-	} else if (com->kind == NodeKind::CALL_RAW_POINTER) {
+	} else if (com->kind == NodeKind::CallRawPointer) {
 		const auto params = serialize_params(com);
 		add_pointer_call(params[0], params.sub_ref(1), ret);
 	} else {
@@ -371,7 +381,7 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 		ret = serialize_node(block->params[i].get(), block, i);
 
 		// keep return temp vars alive longer...
-		if (i == block->params.num - 1 and ret.kind == NodeKind::VAR_TEMP) {
+		if (i == block->params.num - 1 and ret.kind == NodeKind::VarTemp) {
 			for (int k=0; k<inserted_temp.num; k++)
 				if (inserted_temp[k].param.p == ret.p)
 					inserted_temp[k].block_level = cur_block_level - 1;
@@ -382,9 +392,9 @@ SerialNodeParam Serializer::serialize_block(Block *block) {
 
 		// end of loop?
 		// DEPRECATING...
-		if (loop.num > 0)
-			if ((loop.back().level == block->level) and (loop.back().index == i - 1))
-				loop.pop();
+		if (loop_stack.num > 0)
+			if ((loop_stack.back().level == block->level) and (loop_stack.back().index == i - 1))
+				loop_stack.pop();
 	}
 
 	insert_destructors_block(block);
@@ -399,7 +409,7 @@ void Serializer::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 	call_used = true;
 	[[maybe_unused]] int push_size = function_call_push_params(f, params, ret);
 
-	SerialNodeParam fp = {NodeKind::FUNCTION, (int_p)f, -1, TypeFunctionRef, 0};
+	SerialNodeParam fp = {NodeKind::Function, (int_p)f, -1, TypeFunctionRef, 0};
 	cmd.add_cmd(Asm::InstID::CALL, ret, fp); // the actual call
 }
 
@@ -444,10 +454,29 @@ void Serializer::add_function_outro(Function *f) {
 		cmd.add_cmd(Asm::InstID::RET);
 }
 
+
+void Serializer::serialize_assign(const SerialNodeParam& p1, const SerialNodeParam& p2, Block *block, int token_id) {
+	if (p1.type == TypeVoid)
+		return;
+	if (p1.type->can_memcpy()) {
+		cmd.add_cmd(Asm::InstID::MOV, p1, p2);
+	} else {
+		if (auto f = p1.type->get_assign()) {
+			auto type_ref = syntax_tree->request_implicit_class_reference(p1.type, token_id);
+			auto r1 = add_reference(p1, type_ref);
+			auto r2 = add_reference(p2, type_ref);
+			auto call = add_node_call(f, token_id);
+			add_function_call(f, {r1, r2}, p_none);
+		} else {
+			do_error(format("can not copy type '%s' out of if", p1.type->long_name()));
+		}
+	}
+}
+
 SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int index) {
 	auto statement = com->as_statement();
 	switch (statement->id) {
-		case StatementID::IF:
+		case StatementID::If:
 			if (com->params.num == 2) { // if
 				int label_after_true = list->create_label("_IF_AFTER_" + i2s(num_labels ++));
 				auto cond = serialize_node(com->params[0].get(), block, index);
@@ -458,8 +487,6 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 				cmd.add_label(label_after_true);
 			} else { // if/else
 				auto ret = add_temp(com->type, true);
-				if (com->type->needs_constructor())
-					module->do_error("currently only trivial types allowed in valued `if/else`", com->token_id);
 
 				int label_after_true = list->create_label("_IF_AFTER_TRUE_" + i2s(num_labels ++));
 				int label_after_false = list->create_label("_IF_AFTER_FALSE_" + i2s(num_labels ++));
@@ -467,20 +494,20 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 				// cmp;  jz m1;  -block-  jmp m2;  m1;  -block-  m2;
 				cmd.add_cmd(Asm::InstID::CMP, cond, param_imm(TypeBool, 0x0));
 				cmd.add_cmd(Asm::InstID::JZ, param_label32(label_after_true)); // jz ...
-				auto ret_true = serialize_node(com->params[1].get(), block, index);
+				const auto ret_true = serialize_node(com->params[1].get(), block, index);
 				if (com->type != TypeVoid)
-					cmd.add_cmd(Asm::InstID::MOV, ret, ret_true);
+					serialize_assign(ret, ret_true, block, com->token_id);
 				cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after_false));
 				cmd.add_label(label_after_true);
 				auto ret_false = serialize_node(com->params[2].get(), block, index);
 				if (com->type != TypeVoid)
-					cmd.add_cmd(Asm::InstID::MOV, ret, ret_false);
+					serialize_assign(ret, ret_false, block, com->token_id);
 				cmd.add_label(label_after_false);
 
 				return ret;
 			}
 			break;
-		case StatementID::WHILE:{
+		case StatementID::While:{
 			int label_before_while = list->create_label("_WHILE_BEFORE_" + i2s(num_labels ++));
 			int label_after_while = list->create_label("_WHILE_AFTER_" + i2s(num_labels ++));
 			cmd.add_label(label_before_while);
@@ -492,14 +519,14 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 
 			// body of loop
 			LoopData l = {label_before_while, label_after_while, block->level, index};
-			loop.add(l);
+			loop_stack.add(l);
 			serialize_node(com->params[1].get(), block, index);
-			loop.pop();
+			loop_stack.pop();
 
 			cmd.add_cmd(Asm::InstID::JMP, param_label32(label_before_while));
 			cmd.add_label(label_after_while);
 			}break;
-		case StatementID::FOR_DIGEST:{
+		case StatementID::ForDigest:{
 			int label_before_for = list->create_label("_FOR_BEFORE_" + i2s(num_labels ++));
 			int label_after_for = list->create_label("_FOR_AFTER_" + i2s(num_labels ++));
 			int label_continue = list->create_label("_FOR_CONTINUE_" + i2s(num_labels ++));
@@ -513,9 +540,9 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 
 			// body of loop
 			LoopData l = {label_continue, label_after_for, block->level, index};
-			loop.add(l);
+			loop_stack.add(l);
 			serialize_node(com->params[2].get(), block, index);
-			loop.pop();
+			loop_stack.pop();
 
 			// "i++"
 			cmd.add_label(label_continue);
@@ -524,16 +551,18 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			cmd.add_cmd(Asm::InstID::JMP, param_label32(label_before_for));
 			cmd.add_label(label_after_for);
 			}break;
-		case StatementID::BREAK:
-			cmd.add_cmd(Asm::InstID::JMP, param_label32(loop.back().label_break));
+		case StatementID::Break:
+			// FIXME: destructors
+			cmd.add_cmd(Asm::InstID::JMP, param_label32(loop_stack.back().label_break));
 			break;
-		case StatementID::CONTINUE:
-			cmd.add_cmd(Asm::InstID::JMP, param_label32(loop.back().label_continue));
+		case StatementID::Continue:
+			// FIXME: destructors
+			cmd.add_cmd(Asm::InstID::JMP, param_label32(loop_stack.back().label_continue));
 			break;
-		case StatementID::RETURN:
+		case StatementID::Return:
 			if (com->params.num > 0) {
 				auto p = serialize_node(com->params[0].get(), block, index);
-				if (p.kind == NodeKind::DEREF_VAR_TEMP and !cur_func->literal_return_type->uses_return_by_memory()) {
+				if (p.kind == NodeKind::DereferenceVarTemp and !cur_func->literal_return_type->uses_return_by_memory()) {
 					auto t = add_temp(p.type);
 					cmd.add_cmd(Asm::InstID::MOV, t, p);
 					p = t;
@@ -546,7 +575,7 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			}
 
 			break;
-		case StatementID::NEW:{
+		case StatementID::New:{
 			auto ret = add_temp(com->type, false);
 
 			// malloc()
@@ -556,12 +585,12 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 
 			// __init__()
 			auto sub = com->params[0]->shallow_copy();
-			Node *c_ret = new Node(NodeKind::VAR_TEMP, ret.p, ret.type);
+			Node *c_ret = new Node(NodeKind::VarTemp, ret.p, ret.type);
 			sub->set_instance(c_ret);
 			serialize_node(sub.get(), block, index);
 			//delete sub;
 			return ret;}
-		case StatementID::DELETE:{
+		case StatementID::Delete:{
 			// __delete__()
 			auto operand = serialize_node(com->params[0].get(), block, index);
 			add_cmd_destructor(operand, false);
@@ -570,33 +599,44 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			auto f = syntax_tree->required_func_global("@free");
 			add_function_call(f, {operand}, p_none);
 			break;}
-		case StatementID::RAISE:{
+		case StatementID::Raise:{
 			auto e = com->params[0]->as_const_p();
-			auto f = syntax_tree->required_func_global(block->is_in_try() ? Identifier::RAISE : "@die");
+			auto f = syntax_tree->required_func_global(block->is_in_try() ? Identifier::Raise : "@die");
 			add_function_call(f, {param_global(TypePointer, e)}, p_none);
 			break;}
-		case StatementID::TRY:{
-			int label_finish = list->create_label("_TRY_AFTER_" + i2s(num_labels ++));
+		case StatementID::RaiseLocal:{
+			// FIXME destructors!
+			cmd.add_cmd(Asm::InstID::JMP, param_label32(try_stack.back().label_except));
+			break;}
+		case StatementID::Try:{
+			int label_except = list->create_label("_TRY_EXCEPT_" + i2s(num_labels ++));
+			int label_after = list->create_label("_TRY_AFTER_" + i2s(num_labels ++));
 
 			// try
+			try_stack.add({label_except, label_after});
 			serialize_node(com->params[0].get(), block, index);
-			cmd.add_cmd(Asm::InstID::JMP, param_label32(label_finish));
+			try_stack.pop();
+			cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after));
 
 			// except
 			for (int i=2; i<com->params.num; i+=2) {
+				if (i == com->params.num-1)
+					cmd.add_label(label_except);
 				serialize_node(com->params[i].get(), block, index);
 				if (i < com->params.num-1)
-					cmd.add_cmd(Asm::InstID::JMP, param_label32(label_finish));
+					cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after));
 			}
 
-			cmd.add_label(label_finish);
+			if (com->params.num == 1)
+				cmd.add_label(label_except);
+			cmd.add_label(label_after);
 			}break;
-		case StatementID::ASM:
+		case StatementID::Asm:
 			cmd.add_cmd(Asm::InstID::ASM, param_imm(TypeInt32, com->params[0]->as_const()->as_int()));
 			break;
-		case StatementID::PASS:
+		case StatementID::Pass:
 			break;
-		case StatementID::RAW_FUNCTION_POINTER: {
+		case StatementID::RawFunctionPointer: {
 			auto ret = add_temp(com->type, false);
 			// only from callable can reach here!
 			if (config.fully_linear_output)
@@ -615,16 +655,16 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 void Serializer::serialize_inline_function(Node *com, const Array<SerialNodeParam> &param, const SerialNodeParam &ret) {
 	auto index = com->as_func()->inline_no;
 	switch (index) {
-		case InlineID::INT32_TO_FLOAT32:
+		case InlineID::Int32ToFloat32:
 			cmd.add_cmd(Asm::InstID::CVTSI2SS, ret, param[0]);
 			break;
-		case InlineID::FLOAT32_TO_INT32:
+		case InlineID::FloatToInt32:
 			cmd.add_cmd(Asm::InstID::CVTTSS2SI, ret, param[0]);
 			break;
-		case InlineID::FLOAT32_TO_FLOAT64:
+		case InlineID::Float32ToFloat64:
 			cmd.add_cmd(Asm::InstID::CVTSS2SD, ret, param[0]);
 			break;
-		case InlineID::FLOAT64_TO_FLOAT32:
+		case InlineID::Float64ToFloat32:
 			cmd.add_cmd(Asm::InstID::CVTSD2SS, ret, param[0]);
 			break;
 /*
@@ -636,45 +676,45 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::CVTSD2SS, p_xmm0, param[0]);
 			cmd.add_cmd(Asm::InstID::MOVSS, ret, p_xmm0);
 			break;*/
-		case InlineID::POINTER_TO_BOOL:
+		case InlineID::PointerToBool:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param_imm(TypePointer, 0));
 			cmd.add_cmd(Asm::InstID::SETNZ, ret);
 			break;
-		case InlineID::INT32_TO_UINT8:
-		case InlineID::UINT8_TO_INT32:
+		case InlineID::Int32ToUint8:
+		case InlineID::Uint8ToInt32:
 			cmd.add_cmd(Asm::InstID::MOVZX, ret, param[0]);
 			break;
-		case InlineID::INT32_TO_INT8:
-		case InlineID::INT8_TO_INT32:
+		case InlineID::Int32ToInt8:
+		case InlineID::Int8ToInt32:
 			cmd.add_cmd(Asm::InstID::MOVSX, ret, param[0]);
 			break;
-		case InlineID::RECT_SET:
-		case InlineID::VECTOR_SET:
-		case InlineID::COMPLEX_SET:
-		case InlineID::COLOR_SET:
+		case InlineID::RectSet:
+		case InlineID::VectorSet:
+		case InlineID::ComplexSet:
+		case InlineID::ColorSet:
 			for (int i=0; i<ret.type->size/4; i++)
 				cmd.add_cmd(Asm::InstID::MOV, param_shift(ret, i*4, TypeFloat32), param[i]);
 			break;
-		case InlineID::INT32_ASSIGN:
-		case InlineID::INT64_ASSIGN:
-		case InlineID::FLOAT32_ASSIGN:
-		case InlineID::FLOAT64_ASSIGN:
-		case InlineID::POINTER_ASSIGN:
+		case InlineID::Int32Assign:
+		case InlineID::Int64Assign:
+		case InlineID::Float32Assign:
+		case InlineID::Float64Assign:
+		case InlineID::PointerAssign:
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
-		case InlineID::SHARED_POINTER_INIT:
+		case InlineID::SharedPointerInit:
 			// FIXME does this work for 64bit?!?
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param_imm(TypeInt32, 0));
 			break;
-		case InlineID::INT8_ASSIGN:
-		case InlineID::BOOL_ASSIGN:
+		case InlineID::Int8Assign:
+		case InlineID::BoolAssign:
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
 // chunk...
-		case InlineID::CHUNK_ASSIGN:
+		case InlineID::ChunkAssign:
 			cmd.add_cmd(Asm::InstID::MOV, param[0], param[1]);
 			break;
-		case InlineID::CHUNK_EQUAL:
+		case InlineID::ChunkEqual:
 			if (param[0].type->size > config.target.pointer_size) {
 				// chunk cmp
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
@@ -690,7 +730,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				cmd.add_cmd(Asm::InstID::SETZ, ret);
 			}
 			break;
-		case InlineID::CHUNK_NOT_EQUAL:
+		case InlineID::ChunkNotEqual:
 			if (param[0].type->size > config.target.pointer_size) {
 				// chunk cmp
 				int label_after_cmp = list->create_label("_CMP_AFTER_" + i2s(num_labels ++));
@@ -706,295 +746,295 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				cmd.add_cmd(Asm::InstID::SETNZ, ret);
 			}
 			break;
-		case InlineID::PASSTHROUGH:
+		case InlineID::Passthrough:
 			cmd.add_cmd(Asm::InstID::MOV, ret, param[0]);
 			break;
 // int
-		case InlineID::INT32_ADD_ASSIGN:
-		case InlineID::INT64_ADD_ASSIGN:
+		case InlineID::Int32AddAssign:
+		case InlineID::Int64AddAssign:
 			cmd.add_cmd(Asm::InstID::ADD, param[0], param[1]);
 			break;
-		case InlineID::INT32_SUBTRACT_ASSIGN:
-		case InlineID::INT64_SUBTRACT_ASSIGN:
+		case InlineID::Int32SubtractAssign:
+		case InlineID::Int64SubtractAssign:
 			cmd.add_cmd(Asm::InstID::SUB, param[0], param[1]);
 			break;
-		case InlineID::INT32_MULTIPLY_ASSIGN:
-		case InlineID::INT64_MULTIPLY_ASSIGN:
+		case InlineID::Int32MultiplyAssign:
+		case InlineID::Int64MultiplyAssign:
 			cmd.add_cmd(Asm::InstID::IMUL, param[0], param[1]);
 			break;
-		case InlineID::INT32_DIVIDE_ASSIGN:
-		case InlineID::INT64_DIVIDE_ASSIGN:
+		case InlineID::Int32DivideAssign:
+		case InlineID::Int64DivideAssign:
 			cmd.add_cmd(Asm::InstID::IDIV, param[0], param[1]);
 			break;
-		case InlineID::INT32_ADD:
-		case InlineID::INT64_ADD:
+		case InlineID::Int32Add:
+		case InlineID::Int64Add:
 			cmd.add_cmd(Asm::InstID::ADD, ret, param[0], param[1]);
 			break;
-		case InlineID::INT64_ADD_INT32:{
+		case InlineID::Int64AddInt32:{
 			auto t = add_temp(TypeInt64, false);
 			cmd.add_cmd(Asm::InstID::MOVSX, t, param[1]);
 			cmd.add_cmd(Asm::InstID::ADD, ret, param[0], t);
 			}break;
-		case InlineID::INT32_SUBTRACT:
-		case InlineID::INT64_SUBTRACT:
+		case InlineID::Int32Subtract:
+		case InlineID::Int64Subtract:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_MULTIPLY:
-		case InlineID::INT64_MULTIPLY:
+		case InlineID::Int32Multiply:
+		case InlineID::Int64Multiply:
 			cmd.add_cmd(Asm::InstID::IMUL, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_DIVIDE:
-		case InlineID::INT64_DIVIDE:
+		case InlineID::Int32Divide:
+		case InlineID::Int64Divide:
 			cmd.add_cmd(Asm::InstID::IDIV, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_MODULO:
-		case InlineID::INT64_MODULO:
+		case InlineID::Int32Modulo:
+		case InlineID::Int64Modulo:
 			cmd.add_cmd(Asm::InstID::MODULO, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_EQUAL:
-		case InlineID::INT64_EQUAL:
-		case InlineID::POINTER_EQUAL:
+		case InlineID::Int32Equal:
+		case InlineID::Int64Equal:
+		case InlineID::PointerEqual:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETZ, ret);
 			break;
-		case InlineID::INT32_NOT_EQUAL:
-		case InlineID::INT64_NOT_EQUAL:
-		case InlineID::POINTER_NOT_EQUAL:
+		case InlineID::Int32NotEqual:
+		case InlineID::Int64NotEqual:
+		case InlineID::PointerNotEqual:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNZ, ret);
 			break;
-		case InlineID::INT32_GREATER:
-		case InlineID::INT64_GREATER:
+		case InlineID::Int32Greater:
+		case InlineID::Int64Greater:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNLE, ret);
 			break;
-		case InlineID::INT32_GREATER_EQUAL:
-		case InlineID::INT64_GREATER_EQUAL:
+		case InlineID::Int32GreaterEqual:
+		case InlineID::Int64GreaterEqual:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNL, ret);
 			break;
-		case InlineID::INT32_SMALLER:
-		case InlineID::INT64_SMALLER:
+		case InlineID::Int32Smaller:
+		case InlineID::Int64Smaller:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETL, ret);
 			break;
-		case InlineID::INT32_SMALLER_EQUAL:
-		case InlineID::INT64_SMALLER_EQUAL:
+		case InlineID::Int32SmallerEqual:
+		case InlineID::Int64SmallerEqual:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETLE, ret);
 			break;
-		case InlineID::INT32_AND:
-		case InlineID::INT64_AND:
+		case InlineID::Int32BitAnd:
+		case InlineID::Int64BitAnd:
 			cmd.add_cmd(Asm::InstID::AND, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_OR:
-		case InlineID::INT64_OR:
+		case InlineID::Int32BitOr:
+		case InlineID::Int64BitOr:
 			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_SHIFT_RIGHT:
-		case InlineID::INT64_SHIFT_RIGHT:
+		case InlineID::Int32ShiftRight:
+		case InlineID::Int64ShiftRight:
 			cmd.add_cmd(Asm::InstID::SHR, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_SHIFT_LEFT:
-		case InlineID::INT64_SHIFT_LEFT:
+		case InlineID::Int32ShiftLeft:
+		case InlineID::Int64ShiftLeft:
 			cmd.add_cmd(Asm::InstID::SHL, ret, param[0], param[1]);
 			break;
-		case InlineID::INT32_NEGATIVE:
-		case InlineID::INT64_NEGATIVE:
+		case InlineID::Int32Negative:
+		case InlineID::Int64Negative:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param_imm(TypeInt32, 0x0), param[0]);
 			break;
-		case InlineID::INT32_INCREASE:
+		case InlineID::Int32Increase:
 			cmd.add_cmd(Asm::InstID::ADD, param[0], param_imm(TypeInt32, 0x1));
 			break;
-		case InlineID::INT64_INCREASE:
+		case InlineID::Int64Increase:
 			cmd.add_cmd(Asm::InstID::ADD, param[0], param_imm(TypeInt64, 0x1));
 			break;
-		case InlineID::INT32_DECREASE:
+		case InlineID::Int32Decrease:
 			cmd.add_cmd(Asm::InstID::SUB, param[0], param_imm(TypeInt32, 0x1));
 			break;
-		case InlineID::INT64_DECREASE:
+		case InlineID::Int64Decrease:
 			cmd.add_cmd(Asm::InstID::SUB, param[0], param_imm(TypeInt64, 0x1));
 			break;
-		case InlineID::INT64_TO_INT32:
-		case InlineID::INT32_TO_INT64:
+		case InlineID::Int64ToInt32:
+		case InlineID::Int32ToInt64:
 			cmd.add_cmd(Asm::InstID::MOVSX, ret, param[0]);
 			break;
 // float
-		case InlineID::FLOAT32_ADD_ASSIGN:
-		case InlineID::FLOAT64_ADD_ASSIGN:
+		case InlineID::Float32AddAssign:
+		case InlineID::Float64AddAssign:
 			cmd.add_cmd(Asm::InstID::FADD, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_SUBTRACT_ASSIGN:
-		case InlineID::FLOAT64_SUBTRACT_ASSIGN:
+		case InlineID::Float32SubtractAssign:
+		case InlineID::Float64SubtractAssign:
 			cmd.add_cmd(Asm::InstID::FSUB, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_MULTIPLY_ASSIGN:
-		case InlineID::FLOAT64_MULTIPLY_ASSIGN:
+		case InlineID::Float32MultiplyAssign:
+		case InlineID::Float64MultiplyAssign:
 			cmd.add_cmd(Asm::InstID::FMUL, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_DIVIDE_ASSIGN:
-		case InlineID::FLOAT64_DIVIDE_ASSIGN:
+		case InlineID::Float32DivideAssign:
+		case InlineID::Float64DivideAssign:
 			cmd.add_cmd(Asm::InstID::FDIV, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_ADD:
-		case InlineID::FLOAT64_ADD:
+		case InlineID::Float32Add:
+		case InlineID::Float64Add:
 			cmd.add_cmd(Asm::InstID::FADD, ret, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_SUBTARCT:
-		case InlineID::FLOAT64_SUBTRACT:
+		case InlineID::Float32Subtarct:
+		case InlineID::Float64Subtract:
 			cmd.add_cmd(Asm::InstID::FSUB, ret, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_MULTIPLY:
-		case InlineID::FLOAT64_MULTIPLY:
+		case InlineID::Float32Multiply:
+		case InlineID::Float64Multiply:
 			cmd.add_cmd(Asm::InstID::FMUL, ret, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_DIVIDE:
-		case InlineID::FLOAT64_DIVIDE:
+		case InlineID::Float32Divide:
+		case InlineID::Float64Divide:
 			cmd.add_cmd(Asm::InstID::FDIV, ret, param[0], param[1]);
 			break;
-		case InlineID::FLOAT32_EQUAL:
-		case InlineID::FLOAT64_EQUAL:
+		case InlineID::Float32Equal:
+		case InlineID::Float64Equal:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETZ, ret);
 			break;
-		case InlineID::FLOAT32_NOT_EQUAL:
-		case InlineID::FLOAT64_NOT_EQUAL:
+		case InlineID::Float32NotEqual:
+		case InlineID::Float64NotEqual:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNZ, ret);
 			break;
-		case InlineID::FLOAT32_SMALLER:
-		case InlineID::FLOAT64_SMALLER:
+		case InlineID::Float32Smaller:
+		case InlineID::Float64Smaller:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETB, ret);
 			break;
-		case InlineID::FLOAT32_SMALLER_EQUAL:
-		case InlineID::FLOAT64_SMALLER_EQUAL:
+		case InlineID::Float32SmallerEqual:
+		case InlineID::Float64SmallerEqual:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETBE, ret);
 			break;
-		case InlineID::FLOAT32_GREATER:
-		case InlineID::FLOAT64_GREATER:
+		case InlineID::Float32Greater:
+		case InlineID::Float64Greater:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNBE, ret);
 			break;
-		case InlineID::FLOAT32_GREATER_EQUAL:
-		case InlineID::FLOAT64_GREATER_EQUAL:
+		case InlineID::Float32GreaterEqual:
+		case InlineID::Float64GreaterEqual:
 			cmd.add_cmd(Asm::InstID::UCOMISS, param[0], param[1]);
 			cmd.add_cmd(Asm::InstID::SETNB, ret);
 			break;
 
-		case InlineID::FLOAT32_NEGATIVE:
+		case InlineID::Float32Negative:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt32, 0x80000000));
 			break;
 // bool/char
-		case InlineID::INT8_EQUAL:
-		case InlineID::INT8_NOT_EQUAL:
-		case InlineID::BOOL_EQUAL:
-		case InlineID::BOOL_NOT_EQUAL:
-		case InlineID::INT8_GREATER:
-		case InlineID::INT8_GREATER_EQUAL:
-		case InlineID::INT8_SMALLER:
-		case InlineID::INT8_SMALLER_EQUAL:
-		case InlineID::UINT8_GREATER:
-		case InlineID::UINT8_GREATER_EQUAL:
-		case InlineID::UINT8_SMALLER:
-		case InlineID::UINT8_SMALLER_EQUAL:
+		case InlineID::Int8Equal:
+		case InlineID::Int8NotEqual:
+		case InlineID::BoolEqual:
+		case InlineID::BoolNotEqual:
+		case InlineID::Int8Greater:
+		case InlineID::Int8GreaterEqual:
+		case InlineID::Int8Smaller:
+		case InlineID::Int8SmallerEqual:
+		case InlineID::Uint8Greater:
+		case InlineID::Uint8GreaterEqual:
+		case InlineID::Uint8Smaller:
+		case InlineID::Uint8SmallerEqual:
 			cmd.add_cmd(Asm::InstID::CMP, param[0], param[1]);
-			if ((index == InlineID::INT8_EQUAL) or (index == InlineID::BOOL_EQUAL))
+			if ((index == InlineID::Int8Equal) or (index == InlineID::BoolEqual))
 				cmd.add_cmd(Asm::InstID::SETZ, ret);
-			else if ((index == InlineID::INT8_NOT_EQUAL) or (index == InlineID::BOOL_NOT_EQUAL))
+			else if ((index == InlineID::Int8NotEqual) or (index == InlineID::BoolNotEqual))
 				cmd.add_cmd(Asm::InstID::SETNZ, ret);
-			else if (index == InlineID::INT8_GREATER)
+			else if (index == InlineID::Int8Greater)
 				cmd.add_cmd(Asm::InstID::SETNLE, ret);
-			else if (index == InlineID::INT8_GREATER_EQUAL)
+			else if (index == InlineID::Int8GreaterEqual)
 				cmd.add_cmd(Asm::InstID::SETNL, ret);
-			else if (index == InlineID::INT8_SMALLER)
+			else if (index == InlineID::Int8Smaller)
 				cmd.add_cmd(Asm::InstID::SETL, ret);
-			else if (index == InlineID::INT8_SMALLER_EQUAL)
+			else if (index == InlineID::Int8SmallerEqual)
 				cmd.add_cmd(Asm::InstID::SETLE, ret);
-			else if (index == InlineID::UINT8_GREATER)
+			else if (index == InlineID::Uint8Greater)
 				cmd.add_cmd(Asm::InstID::SETNBE, ret);
-			else if (index == InlineID::UINT8_GREATER_EQUAL)
+			else if (index == InlineID::Uint8GreaterEqual)
 				cmd.add_cmd(Asm::InstID::SETNB, ret);
-			else if (index == InlineID::UINT8_SMALLER)
+			else if (index == InlineID::Uint8Smaller)
 				cmd.add_cmd(Asm::InstID::SETB, ret);
-			else if (index == InlineID::UINT8_SMALLER_EQUAL)
+			else if (index == InlineID::Uint8SmallerEqual)
 				cmd.add_cmd(Asm::InstID::SETBE, ret);
 			// "above/below" -> unsigned, "greater/less" -> signed
 			break;
-		case InlineID::BOOL_AND:
+		case InlineID::BoolAnd:
 			cmd.add_cmd(Asm::InstID::AND, ret, param[0], param[1]);
 			break;
-		case InlineID::BOOL_OR:
+		case InlineID::BoolOr:
 			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
 			break;
-		case InlineID::INT8_ADD_ASSIGN:
+		case InlineID::Int8AddAssign:
 			cmd.add_cmd(Asm::InstID::ADD, param[0], param[1]);
 			break;
-		case InlineID::INT8_SUBTRACT_ASSIGN:
+		case InlineID::Int8SubtractAssign:
 			cmd.add_cmd(Asm::InstID::SUB, param[0], param[1]);
 			break;
-		case InlineID::INT8_ADD:
+		case InlineID::Int8Add:
 			cmd.add_cmd(Asm::InstID::ADD, ret, param[0], param[1]);
 			break;
-		case InlineID::INT8_SUBTRACT:
+		case InlineID::Int8Subtract:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param[0], param[1]);
 			break;
-		case InlineID::INT8_AND:
+		case InlineID::Int8BitAnd:
 			cmd.add_cmd(Asm::InstID::AND, ret, param[0], param[1]);
 			break;
-		case InlineID::INT8_OR:
+		case InlineID::Int8BitOr:
 			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
 			break;
-		case InlineID::BOOL_NOT:
+		case InlineID::BoolNot:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeBool, 0x1));
 			break;
-		case InlineID::INT8_NEGATIVE:
+		case InlineID::Int8Negative:
 			cmd.add_cmd(Asm::InstID::SUB, ret, param[0], param_imm(TypeInt8, 0x0));
 			break;
 // vec2
-		case InlineID::VEC2_ADD_ASSIGN:
+		case InlineID::Vec2AddAssign:
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(param[0], 0, TypeFloat32), param_shift(param[1], 0, TypeFloat32));
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(param[0], 4, TypeFloat32), param_shift(param[1], 4, TypeFloat32));
 			break;
-		case InlineID::VEC2_SUBTARCT_ASSIGN:
+		case InlineID::Vec2SubtarctAssign:
 			cmd.add_cmd(Asm::InstID::FSUB, param_shift(param[0], 0, TypeFloat32), param_shift(param[1], 0, TypeFloat32));
 			cmd.add_cmd(Asm::InstID::FSUB, param_shift(param[0], 4, TypeFloat32), param_shift(param[1], 4, TypeFloat32));
 			break;
-		case InlineID::VEC2_ADD:
+		case InlineID::Vec2Add:
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, 0, TypeFloat32), param_shift(param[0], 0, TypeFloat32), param_shift(param[1], 0, TypeFloat32));
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, 4, TypeFloat32), param_shift(param[0], 4, TypeFloat32), param_shift(param[1], 4, TypeFloat32));
 			break;
-		case InlineID::VEC2_SUBTRACT:
+		case InlineID::Vec2Subtract:
 			cmd.add_cmd(Asm::InstID::FSUB, param_shift(ret, 0, TypeFloat32), param_shift(param[0], 0, TypeFloat32), param_shift(param[1], 0, TypeFloat32));
 			cmd.add_cmd(Asm::InstID::FSUB, param_shift(ret, 4, TypeFloat32), param_shift(param[0], 4, TypeFloat32), param_shift(param[1], 4, TypeFloat32));
 			break;
-		case InlineID::VEC2_MULTIPLY_SV:
+		case InlineID::Vec2MultiplySV:
 			cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, 0, TypeFloat32), param[0], param_shift(param[1], 0, TypeFloat32));
 			cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, 4, TypeFloat32), param[0], param_shift(param[1], 4, TypeFloat32));
 			break;
-		case InlineID::VEC2_MULTIPLY_VS:
+		case InlineID::Vec2MultiplyVS:
 			cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, 0, TypeFloat32), param_shift(param[0], 0, TypeFloat32), param[1]);
 			cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, 4, TypeFloat32), param_shift(param[0], 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC2_DIVIDE_VS:
+		case InlineID::Vec2DivideVs:
 			cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, 0 * 4, TypeFloat32), param_shift(param[0], 0 * 4, TypeFloat32), param[1]);
 			cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, 1 * 4, TypeFloat32), param_shift(param[0], 1 * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC2_MULTIPLY_ASSIGN:
+		case InlineID::Vec2MultiplyAssign:
 			for (int i=0;i<2;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC2_DIVIDE_ASSIGN:
+		case InlineID::Vec2DivideAssign:
 			for (int i=0;i<2;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 		break;
-	case InlineID::VEC2_NEGATIVE:
+	case InlineID::Vec2Negative:
 		for (int i=0;i<2;i++)
 			cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt32, 0x80000000));
 		break;
 // complex
-		case InlineID::COMPLEX_MULTIPLY:{
+		case InlineID::ComplexMultiply:{
 			auto t1 = add_temp(TypeFloat32);
 			auto t2 = add_temp(TypeFloat32);
 			// t1 = a.x * b.x
@@ -1011,39 +1051,39 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, 4, TypeFloat32), t1, t2);
 			}break;
 // vector
-		case InlineID::VEC3_ADD_ASSIGN:
+		case InlineID::Vec3AddAssign:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FADD, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VEC3_MULTIPLY_ASSIGN:
+		case InlineID::Vec3MultiplyAssign:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC3_DIVIDE_ASSIGN:
+		case InlineID::Vec3DivideAssign:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC3_SUBTARCT_ASSIGN:
+		case InlineID::Vec3SubtarctAssign:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FSUB, param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VEC3_ADD:
+		case InlineID::Vec3Add:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FADD, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VEC3_SUBTRACT:
+		case InlineID::Vec3Subtract:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FSUB, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VEC3_MULTIPLY_VF:
+		case InlineID::Vec3MultiplyVF:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC3_MULTIPLY_FV:
+		case InlineID::Vec3MultiplyFV:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FMUL, param_shift(ret, i * 4, TypeFloat32), param[0], param_shift(param[1], i * 4, TypeFloat32));
 			break;
-		case InlineID::VEC3_MULTIPLY_VV:{
+		case InlineID::Vec3MultiplyVV:{
 			cmd.add_cmd(Asm::InstID::FMUL, ret, param_shift(param[0], 0 * 4, TypeFloat32), param_shift(param[1], 0 * 4, TypeFloat32));
 			auto t = add_temp(TypeFloat32);
 			for (int i=1;i<3;i++) {
@@ -1051,11 +1091,11 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 				cmd.add_cmd(Asm::InstID::FADD, ret, t);
 			}
 			}break;
-		case InlineID::VEC3_DIVIDE_VF:
+		case InlineID::Vec3DivideVF:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::FDIV, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param[1]);
 			break;
-		case InlineID::VEC3_NEGATIVE:
+		case InlineID::Vec3Negative:
 			for (int i=0;i<3;i++)
 				cmd.add_cmd(Asm::InstID::XOR, param_shift(ret, i * 4, TypeFloat32), param_shift(param[0], i * 4, TypeFloat32), param_imm(TypeInt32, 0x80000000));
 			break;
@@ -1158,7 +1198,7 @@ void Serializer::fix_return_by_ref() {
 //    -1: -return-/new   -> don't destruct
 void Serializer::add_cmd_constructor(const SerialNodeParam &param, NodeKind modus) {
 	const Class *class_type = param.type;
-	if (modus == NodeKind::NONE)
+	if (modus == NodeKind::None)
 		class_type = class_type->param[0];
 	Function *f = class_type->get_default_constructor();
 	if (!f) {
@@ -1168,7 +1208,7 @@ void Serializer::add_cmd_constructor(const SerialNodeParam &param, NodeKind modu
 	}
 
 	SerialNodeParam instance = param;
-	if (modus == NodeKind::NONE) {
+	if (modus == NodeKind::None) {
 	} else {
 		instance = add_reference(param);
 	}
@@ -1196,7 +1236,7 @@ void Serializer::insert_constructors_block(Block *b) {
 	for (auto *v: b->vars) {
 		if (!v->explicitly_constructed) {
 			SerialNodeParam param = param_local(v->type, v->_offset);
-			add_cmd_constructor(param, (v->name == Identifier::RETURN_VAR) ? NodeKind::NONE : NodeKind::VAR_LOCAL);
+			add_cmd_constructor(param, (v->name == Identifier::ReturnVar) ? NodeKind::None : NodeKind::VarLocal);
 		}
 	}
 }
@@ -1223,9 +1263,9 @@ int Serializer::temp_in_cmd(int c, int v) {
 		return 0;
 	int r = 0;
 	for (int i=0; i<SERIAL_NODE_NUM_PARAMS; i++)
-		if ((cmd.cmd[c].p[i].kind == NodeKind::VAR_TEMP) or (cmd.cmd[c].p[i].kind == NodeKind::DEREF_VAR_TEMP))
+		if ((cmd.cmd[c].p[i].kind == NodeKind::VarTemp) or (cmd.cmd[c].p[i].kind == NodeKind::DereferenceVarTemp))
 			if (cmd.cmd[c].p[i].p == v)
-				r += (1<<i) + ((cmd.cmd[c].p[i].kind == NodeKind::DEREF_VAR_TEMP) ? (8<<i) : 0);
+				r += (1<<i) + ((cmd.cmd[c].p[i].kind == NodeKind::DereferenceVarTemp) ? (8<<i) : 0);
 	return r;
 }
 
@@ -1248,7 +1288,7 @@ void Serializer::scan_temp_var_usage() {
 }
 
 inline bool param_is_simple(SerialNodeParam &p) {
-	return ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::NONE));
+	return ((p.kind == NodeKind::Register) or (p.kind == NodeKind::VarTemp) or (p.kind == NodeKind::None));
 }
 
 inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNodeParam &p2) {
@@ -1258,11 +1298,11 @@ inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNod
 		return false;
 	bool r1, w1, r2, w2;
 	Asm::get_instruction_param_flags(inst, r1, w1, r2, w2);
-	if ((w1) and (p1.kind == NodeKind::IMMEDIATE))
+	if ((w1) and (p1.kind == NodeKind::Immediate))
 		return false;
-	if ((w2) and (p2.kind == NodeKind::IMMEDIATE))
+	if ((w2) and (p2.kind == NodeKind::Immediate))
 		return false;
-	if ((p1.kind == NodeKind::IMMEDIATE) or (p2.kind == NodeKind::IMMEDIATE))
+	if ((p1.kind == NodeKind::Immediate) or (p2.kind == NodeKind::Immediate))
 		if (!Asm::get_instruction_allow_const(inst))
 			return false;
 	return true;
@@ -1296,7 +1336,7 @@ bool Serializer::param_untouched_in_interval(SerialNodeParam &p, int first, int 
 			return false;
 	
 	// registers may be more subtle..
-	if ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::DEREF_REGISTER)) {
+	if ((p.kind == NodeKind::Register) or (p.kind == NodeKind::DereferenceRegister)) {
 		for (int i=first;i<=last;i++) {
 			
 			// call violates all!
@@ -1309,10 +1349,10 @@ bool Serializer::param_untouched_in_interval(SerialNodeParam &p, int first, int 
 					return false;
 
 			// registers used? (may be part of the same meta-register)
-			if ((cmd.cmd[i].p[0].kind == NodeKind::REGISTER) or (cmd.cmd[i].p[0].kind == NodeKind::DEREF_REGISTER))
+			if ((cmd.cmd[i].p[0].kind == NodeKind::Register) or (cmd.cmd[i].p[0].kind == NodeKind::DereferenceRegister))
 				if (Asm::reg_root[cmd.cmd[i].p[0].p] == Asm::reg_root[p.p])
 					return false;
-			if ((cmd.cmd[i].p[1].kind == NodeKind::REGISTER) or (cmd.cmd[i].p[1].kind == NodeKind::DEREF_REGISTER))
+			if ((cmd.cmd[i].p[1].kind == NodeKind::Register) or (cmd.cmd[i].p[1].kind == NodeKind::DereferenceRegister))
 				if (Asm::reg_root[cmd.cmd[i].p[1].p] == Asm::reg_root[p.p])
 					return false;
 		}
@@ -1374,7 +1414,7 @@ void Serializer::simplify_fpu_stack() {
 			continue;
 		// moved into fstore'able?
 		auto kind = cmd.cmd[v.last].p[0].kind;
-		if ((kind != NodeKind::LOCAL_MEMORY) and (kind != NodeKind::MEMORY) and (kind != NodeKind::VAR_TEMP) and (kind != NodeKind::DEREF_VAR_TEMP) and (kind != NodeKind::DEREF_REGISTER))
+		if ((kind != NodeKind::LocalMemory) and (kind != NodeKind::Memory) and (kind != NodeKind::VarTemp) and (kind != NodeKind::DereferenceVarTemp) and (kind != NodeKind::DereferenceRegister))
 		    continue;
 
 		// check, if mov target is used in between
@@ -1598,7 +1638,7 @@ void Serializer::add_stack_var(TempVar &v, SerialNodeParam &p) {
 
 	v.mapped = true;
 
-	p.kind = NodeKind::LOCAL_MEMORY;
+	p.kind = NodeKind::LocalMemory;
 	p.p = v.stack_offset;
 	p.type = v.type;
 	p.shift = 0;
@@ -1633,7 +1673,7 @@ void Serializer::serialize_function(Function *f) {
 	// outro (if last command != return)
 	bool need_outro = true;
 	if (f->block->params.num > 0)
-		if ((f->block->params.back()->kind == NodeKind::STATEMENT) and (f->block->params.back()->as_statement()->id == StatementID::RETURN))
+		if ((f->block->params.back()->kind == NodeKind::Statement) and (f->block->params.back()->as_statement()->id == StatementID::Return))
 			need_outro = false;
 	if (need_outro)
 		add_function_outro(f);
@@ -1683,15 +1723,15 @@ void Serializer::try_merge_temp_vars() {
 	return;
 	for (int i=0;i<cmd.cmd.num;i++)
 		if (cmd.cmd[i].inst == Asm::InstID::MOV)
-			if ((cmd.cmd[i].p[0].kind == NodeKind::VAR_TEMP) and (cmd.cmd[i].p[1].kind == NodeKind::VAR_TEMP)) {
+			if ((cmd.cmd[i].p[0].kind == NodeKind::VarTemp) and (cmd.cmd[i].p[1].kind == NodeKind::VarTemp)) {
 				int v1 = cmd.cmd[i].p[0].p;
 				int v2 = cmd.cmd[i].p[1].p;
 				if ((cmd.temp_var[v1].first == i) and (cmd.temp_var[v2].last == i)) {
 					// swap v1 -> v2
 					for (int j=i+1;j<=cmd.temp_var[v1].last;j++) {
-						if (((cmd.cmd[j].p[0].kind == NodeKind::VAR_TEMP) or (cmd.cmd[j].p[0].kind == NodeKind::DEREF_VAR_TEMP)) and (cmd.cmd[j].p[0].p == v1))
+						if (((cmd.cmd[j].p[0].kind == NodeKind::VarTemp) or (cmd.cmd[j].p[0].kind == NodeKind::DereferenceVarTemp)) and (cmd.cmd[j].p[0].p == v1))
 							cmd.cmd[j].p[0].p = v2;
-						if (((cmd.cmd[j].p[1].kind == NodeKind::VAR_TEMP) or (cmd.cmd[j].p[1].kind == NodeKind::DEREF_VAR_TEMP)) and (cmd.cmd[j].p[1].p == v1))
+						if (((cmd.cmd[j].p[1].kind == NodeKind::VarTemp) or (cmd.cmd[j].p[1].kind == NodeKind::DereferenceVarTemp)) and (cmd.cmd[j].p[1].p == v1))
 							cmd.cmd[j].p[1].p = v2;
 					}
 					cmd.temp_var[v2].last = cmd.temp_var[v1].last;
@@ -1704,7 +1744,7 @@ void Serializer::try_merge_temp_vars() {
 void Serializer::simplify_float_store() {
 	for (int i=0;i<cmd.cmd.num - 1;i++) {
 		if ((cmd.cmd[i].inst == Asm::InstID::FSTP) and (cmd.cmd[i+1].inst == Asm::InstID::MOV)) {
-			if (cmd.cmd[i].p[0].kind == NodeKind::VAR_TEMP) {
+			if (cmd.cmd[i].p[0].kind == NodeKind::VarTemp) {
 				int v = cmd.cmd[i].p[0].p;
 				if ((cmd.temp_var[v].first == i) and (cmd.temp_var[v].last == i+1)) {
 					cmd.cmd[i].p[0] = cmd.cmd[i+1].p[0];

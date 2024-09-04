@@ -90,22 +90,22 @@ void PdfConfigDialog::update_params() {
 		if (t->type != SignalType::Midi)
 			continue;
 		Any at;
-		at.map_set("index", i);
+		at.dict_set("index", i);
 		if (is_checked(format("classical-%d", i)))
-			at.map_set("classical", true);
+			at.dict_set("classical", true);
 		if (is_checked(format("tab-%d", i)))
-			at.map_set("tab", true);
+			at.dict_set("tab", true);
 		ats.add(at);
 	}
-	od->parameters.map_set("tracks", ats);
-	od->parameters.map_set("line-height", get_float("line-height"));
-	od->parameters.map_set("line-space", get_float("line-space") * get_float("line-height"));
-	od->parameters.map_set("track-space", get_float("track-space") * get_float("line-height"));
-	//od->parameters.map_set("border", get_float("border"));
-	od->parameters.map_set("horizontal-scale", get_float("horizontal-scale") / 100);
-	od->parameters.map_set("allow-shadows", is_checked("allow-shadows"));
+	od->parameters.dict_set("tracks", ats);
+	od->parameters.dict_set("line-height", get_float("line-height"));
+	od->parameters.dict_set("line-space", get_float("line-space") * get_float("line-height"));
+	od->parameters.dict_set("track-space", get_float("track-space") * get_float("line-height"));
+	//od->parameters.dict_set("border", get_float("border"));
+	od->parameters.dict_set("horizontal-scale", get_float("horizontal-scale") / 100);
+	od->parameters.dict_set("allow-shadows", is_checked("allow-shadows"));
 
-	od->parameters.map_set("theme", get_int("theme"));
+	od->parameters.dict_set("theme", get_int("theme"));
 
 	redraw("area");
 }

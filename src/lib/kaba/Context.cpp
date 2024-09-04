@@ -158,14 +158,14 @@ void Context::execute_single_command(const string &cmd) {
 // analyse syntax
 
 	// create a main() function
-	Function *func = tree->add_function("--command-func--", TypeVoid, tree->base_class, Flags::STATIC);
+	Function *func = tree->add_function("--command-func--", TypeVoid, tree->base_class, Flags::Static);
 	func->_var_size = 0; // set to -1...
 
 	parser->Exp.reset_walker();
 
 	// parse
 	func->block->type = TypeUnknown;
-	parser->parse_abstract_complete_command(func->block.get());
+	parser->parse_abstract_complete_command_into_block(func->block.get());
 	if (config.verbose) {
 		msg_write("ABSTRACT SINGLE:");
 		func->block->show();
@@ -186,8 +186,9 @@ void Context::execute_single_command(const string &cmd) {
 		cmd->set_param(0, n_str);
 		func->block->params[0] = cmd;
 	}
-	for (auto *c: tree->owned_classes)
-		parser->auto_implementer.implement_functions(c);
+	//for (auto *c: tree->owned_classes)
+	for (int i=0; i<tree->owned_classes.num; i++) // array might change...
+		parser->auto_implementer.implement_functions(tree->owned_classes[i]);
 	//ps->show("aaaa");
 
 

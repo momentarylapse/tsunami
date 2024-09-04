@@ -15,7 +15,7 @@ namespace kaba {
 void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 	if (t->is_struct()) {
 		// force to have:
-		if (!flags_has(t->flags, Flags::NOAUTO)) {
+		if (!flags_has(t->flags, Flags::Noauto)) {
 			if (t->parent) {
 				if (has_user_constructors(t)) {
 					// don't inherit constructors!
@@ -27,18 +27,18 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			}
 			if (t->get_constructors().num == 0) {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
+					add_func_header(t, Identifier::func::Init, TypeVoid, {}, {}, t->get_default_constructor(), Flags::Mutable);
 				if (class_can_fully_construct(t))
 					add_full_constructor(t);
 			}
 			if (needs_new(t->get_destructor()))
-				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor(), Flags::MUTABLE);
+				add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, t->get_destructor(), Flags::Mutable);
 			if (needs_new(t->get_assign()))
-				add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"}, t->get_assign(), Flags::MUTABLE);
+				add_func_header(t, Identifier::func::Assign, TypeVoid, {t}, {"other"}, t->get_assign(), Flags::Mutable);
 
 		}
 		if (t->get_assign() and t->can_memcpy()) {
-			t->get_assign()->inline_no = InlineID::CHUNK_ASSIGN;
+			t->get_assign()->inline_no = InlineID::ChunkAssign;
 		}
 
 	} else {
@@ -49,7 +49,7 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			if (has_user_constructors(t)) {
 			} else {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
+					add_func_header(t, Identifier::func::Init, TypeVoid, {}, {}, t->get_default_constructor(), Flags::Mutable);
 				/*if (!flags_has(t->flags, Flags::NOAUTO))
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
@@ -66,13 +66,13 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 			}
 			if (t->get_constructors().num == 0) {
 				if (t->needs_constructor())
-					add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, t->get_default_constructor(), Flags::MUTABLE);
+					add_func_header(t, Identifier::func::Init, TypeVoid, {}, {}, t->get_default_constructor(), Flags::Mutable);
 				/*if (!flags_has(t->flags, Flags::NOAUTO))
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
 			}
 			if (needs_new(t->get_destructor()))
-				add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, t->get_destructor(), Flags::MUTABLE);
+				add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, t->get_destructor(), Flags::Mutable);
 		}
 
 		/*if (!flags_has(t->flags, Flags::NOAUTO) and needs_new(t->get_assign())) {
@@ -94,7 +94,7 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 void AutoImplementer::implement_add_virtual_table(shared<Node> self, Function *f, const Class *t) {
 	if (t->vtable.num > 0) {
 		auto *c = tree->add_constant_pointer(TypePointer, t->_vtable_location_target_);
-		f->block->add(add_node_operator_by_inline(InlineID::POINTER_ASSIGN,
+		f->block->add(add_node_operator_by_inline(InlineID::PointerAssign,
 				self->change_type(TypePointer),
 				add_node_const(c)));
 	}
@@ -122,10 +122,10 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 		f->block->add(add_assign(f, "auto init", n_self->shift(e.offset, e.type), add_node_const(init.value.get())));
 	}
 
-	if (flags_has(t->flags, Flags::SHARED)) {
+	if (flags_has(t->flags, Flags::Shared)) {
 		for (auto &e: t->elements)
-			if (e.name == Identifier::SHARED_COUNT and e.type == TypeInt32) {
-				f->block->add(add_node_operator_by_inline(InlineID::INT32_ASSIGN,
+			if (e.name == Identifier::SharedCount and e.type == TypeInt32) {
+				f->block->add(add_node_operator_by_inline(InlineID::Int32Assign,
 						n_self->shift(e.offset, e.type),
 						add_node_const(tree->add_constant_int(0))));
 			}
@@ -135,9 +135,9 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 void AutoImplementer::implement_regular_constructor(Function *f, const Class *t, bool allow_parent_constructor) {
 	if (!f)
 		return;
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
-	if (flags_has(f->flags, Flags::__INIT_FILL_ALL_PARAMS)) {
+	if (flags_has(f->flags, Flags::__InitFillAllParams)) {
 		// init
 		implement_add_child_constructors(self, f, t, true);
 
@@ -151,7 +151,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 
 		// parent constructor
 		if (t->parent and allow_parent_constructor) {
-			Function *f_same = t->parent->get_same_func(Identifier::Func::INIT, f);
+			Function *f_same = t->parent->get_same_func(Identifier::func::Init, f);
 			Function *f_def = t->parent->get_default_constructor();
 			if (f_same) {
 				// first, try same signature
@@ -180,7 +180,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 void AutoImplementer::implement_regular_destructor(Function *f, const Class *t) {
 	if (!f)
 		return;
-	auto self = add_node_local(f->__get_var(Identifier::SELF));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
 
 	// call child destructors
 	int i0 = t->parent ? t->parent->elements.num : 0;
@@ -212,7 +212,7 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 		return;
 
 	auto n_other = add_node_local(f->__get_var("other"));
-	auto n_self = add_node_local(f->__get_var(Identifier::SELF));
+	auto n_self = add_node_local(f->__get_var(Identifier::Self));
 
 
 	// parent assignment

@@ -30,28 +30,28 @@ void SIAddPackageThread(Context *c) {
 	const Class *TypeScheduler = add_type("Scheduler", sizeof(ThreadedWork));
 
 	add_class(TypeThread);
-		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&Thread::__init__), Flags::MUTABLE);
-		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, thread_p(&Thread::__delete__), Flags::MUTABLE);
-		class_add_func("run", TypeVoid, thread_p(&Thread::run), Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, thread_p(&Thread::__init__), Flags::Mutable);
+		class_add_func_virtual(Identifier::func::Delete, TypeVoid, thread_p(&Thread::__delete__), Flags::Mutable);
+		class_add_func("run", TypeVoid, thread_p(&Thread::run), Flags::Mutable);
 		class_add_func_virtual("on_run", TypeVoid, thread_p(&Thread::on_run));
 		class_add_func("is_done", TypeBool, thread_p(&Thread::is_done));
-		class_add_func("kill", TypeVoid, thread_p(&Thread::kill), Flags::MUTABLE);
-		class_add_func("join", TypeVoid, thread_p(&Thread::join), Flags::MUTABLE);
-		class_add_func("self", TypeThreadP,thread_p(&Thread::get_self), Flags::STATIC);
+		class_add_func("kill", TypeVoid, thread_p(&Thread::kill), Flags::Mutable);
+		class_add_func("join", TypeVoid, thread_p(&Thread::join), Flags::Mutable);
+		class_add_func("self", TypeThreadP,thread_p(&Thread::get_self), Flags::Static);
 #ifdef KABA_EXPORT_THREADS
 		class_set_vtable(Thread);
 #endif
 
 	add_class(TypeMutex);
-		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&Mutex::__init__), Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, thread_p(&Mutex::__delete__), Flags::MUTABLE);
-		class_add_func("lock", TypeVoid, thread_p(&Mutex::lock), Flags::MUTABLE);
-		class_add_func("unlock", TypeVoid, thread_p(&Mutex::unlock), Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, thread_p(&Mutex::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, thread_p(&Mutex::__delete__), Flags::Mutable);
+		class_add_func("lock", TypeVoid, thread_p(&Mutex::lock), Flags::Mutable);
+		class_add_func("unlock", TypeVoid, thread_p(&Mutex::unlock), Flags::Mutable);
 
 	add_class(TypeScheduler);
-		class_add_func(Identifier::Func::INIT, TypeVoid, thread_p(&ThreadedWork::__init__), Flags::MUTABLE);
-		class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, thread_p(&ThreadedWork::__delete__), Flags::MUTABLE);
-		class_add_func("run", TypeBool, thread_p(&ThreadedWork::run), Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, thread_p(&ThreadedWork::__init__), Flags::Mutable);
+		class_add_func_virtual(Identifier::func::Delete, TypeVoid, thread_p(&ThreadedWork::__delete__), Flags::Mutable);
+		class_add_func("run", TypeBool, thread_p(&ThreadedWork::run), Flags::Mutable);
 			func_add_param("total_size", TypeInt32);
 			func_add_param("partition_size", TypeInt32);
 		class_add_func_virtual("on_step", TypeVoid, thread_p(&ThreadedWork::on_step));
@@ -65,8 +65,8 @@ void SIAddPackageThread(Context *c) {
 #endif
 
 
-	add_func("get_num_cores", TypeInt32, thread_p(&Thread::get_num_cores), Flags::STATIC);
-	add_func("exit", TypeVoid, thread_p(&Thread::exit), Flags::STATIC);
+	add_func("get_num_cores", TypeInt32, thread_p(&Thread::get_num_cores), Flags::Static);
+	add_func("exit", TypeVoid, thread_p(&Thread::exit), Flags::Static);
 }
 
 };

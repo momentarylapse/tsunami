@@ -20,8 +20,8 @@ void AutoImplementerFutureCore::add_missing_function_headers(Class *t) {
 	msg_write(t->param[0]->long_name());
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
-	add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE);
+	add_func_header(t, Identifier::func::Init, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+	add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable);
 	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"});
 	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f"});
 	//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
@@ -31,7 +31,7 @@ void AutoImplementerFutureCore::complete_type(Class *t) {
 	add_missing_function_headers(t);
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
-	t->elements.add(ClassElement(Identifier::SHARED_COUNT, TypeInt32, 0));
+	t->elements.add(ClassElement(Identifier::SharedCount, TypeInt32, 0));
 	t->elements.add(ClassElement("cb_success", t_callback, 4));
 	t->elements.add(ClassElement("cb_fail", t_callback_fail, 4 + config.target.pointer_size));
 	t->elements.add(ClassElement("state", TypeInt32, 4 + config.target.pointer_size * 2));
@@ -46,9 +46,9 @@ void AutoImplementerFuture::add_missing_function_headers(Class *t) {
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, TypeVoid, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, TypeVoid, -1);
 	//add_func_header(t, Identifier::Func::INIT, TypeVoid, {}, {});
-	add_func_header(t, Identifier::Func::DELETE, TypeVoid, {}, {}, nullptr, Flags::MUTABLE | Flags::EXTERN);
-	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"}, nullptr, Flags::EXTERN);
-	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f", "f_fail"}, nullptr, Flags::EXTERN);
+	add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable | Flags::Extern);
+	add_func_header(t, "then", TypeVoid, {t_callback}, {"f"}, nullptr, Flags::Extern);
+	add_func_header(t, "then_or_fail", TypeVoid, {t_callback, t_callback_fail}, {"f", "f_fail"}, nullptr, Flags::Extern);
 	//add_func_header(t, Identifier::Func::ASSIGN, TypeVoid, {t}, {"other"});
 }
 
@@ -78,7 +78,7 @@ void AutoImplementerFuture::complete_type(Class *t) {
 
 
 Class* TemplateClassInstantiatorFuture::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
-	return create_raw_class(tree, format("%s[%s]", Identifier::FUTURE, params[0]->name), TypeFutureT, sizeof(base::future<void>), config.target.pointer_size, 0, nullptr, params, token_id);
+	return create_raw_class(tree, format("%s[%s]", Identifier::Future, params[0]->name), TypeFutureT, sizeof(base::future<void>), config.target.pointer_size, 0, nullptr, params, token_id);
 }
 void TemplateClassInstantiatorFuture::add_function_headers(Class* c) {
 	AutoImplementerFuture ai(nullptr, c->owner);

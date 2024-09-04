@@ -15,7 +15,7 @@
 namespace kaba {
 
 Block::Block(Function *f, Block *_parent, const Class *t) :
-	Node(NodeKind::BLOCK, (int_p)this, t)
+	Node(NodeKind::Block, (int_p)this, t)
 {
 	level = 0;
 	function = f;
@@ -37,7 +37,7 @@ void Block::set(int index, shared<Node> c) {
 }
 
 bool Block::is_trust_me() const {
-	if (flags_has(flags, Flags::TRUST_ME))
+	if (flags_has(flags, Flags::TrustMe))
 		return true;
 	if (parent)
 		return parent->is_trust_me();
@@ -45,7 +45,7 @@ bool Block::is_trust_me() const {
 }
 
 bool Block::is_in_try() const {
-	if (flags_has(flags, Flags::TRY))
+	if (flags_has(flags, Flags::Try))
 		return true;
 	if (parent)
 		return parent->is_in_try();

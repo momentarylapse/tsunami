@@ -34,71 +34,71 @@ extern const Class* TypeVoid;
 
 
 enum class NodeKind {
-	NONE = -1,
-	UNKNOWN,
-	PLACEHOLDER,
+	None = -1,
+	Unknown,
+	Placeholder,
 	// data
-	VAR_LOCAL,
-	VAR_GLOBAL,
-	FUNCTION,           // = just the name
-	CONSTANT,
+	VarLocal,
+	VarGlobal,
+	Function,            // = just the name
+	Constant,
 	// execution
-	CALL_FUNCTION,      // = real function call
-	CALL_VIRTUAL,       // = virtual function call
-	CALL_INLINE,        // = function defined inside the compiler...
-	CALL_RAW_POINTER,   // = function call via a raw pointer
-	STATEMENT,          // = if/while/break/...
-	CALL_SPECIAL_FUNCTION, // = len(), sorted() etc
-	SPECIAL_FUNCTION_NAME, // = len, sorted etc
-	BLOCK,              // = block of commands {...}
-	OPERATOR,
+	CallFunction,        // = real function call
+	CallVirtual,         // = virtual function call
+	CallInline,          // = function defined inside the compiler...
+	CallRawPointer,      // = function call via a raw pointer
+	Statement,           // = if/while/break/...
+	CallSpecialFunction, // = len(), sorted() etc
+	SpecialFunctionName, // = len, sorted etc
+	Block,               // = block of commands {...}
+	Operator,
 	// data altering
-	ADDRESS_SHIFT,      // = . "struct"
-	ARRAY,              // = []
-	POINTER_AS_ARRAY,   // = []
-	DYNAMIC_ARRAY,      // = []
-	REFERENCE,          // = &
-	DEREFERENCE,        // = *
-	DEREF_ADDRESS_SHIFT,// = ->
-	DEFINITELY,         // = x!
-	CONSTANT_BY_ADDRESS,
-	ADDRESS,            // &global (for pre processing address shifts)
-	MEMORY,             // global (but LinkNr = address)
-	LOCAL_ADDRESS,      // &local (for pre processing address shifts)
-	LOCAL_MEMORY,       // local (but LinkNr = address)
+	AddressShift,        // = struct.element
+	Array,               // = []
+	PointerAsArray,      // = []
+	DynamicArray,        // = []
+	Reference,           // = &
+	Dereference,         // = *
+	DereferenceAddressShift,// = ->
+	Definitely,          // = x!
+	ConstantByAddress,
+	Address,             // &global (for pre processing address shifts)
+	Memory,              // global (but LinkNr = address)
+	LocalAddress,        // &local (for pre processing address shifts)
+	LocalMemory,         // local (but LinkNr = address)
 	// special
-	CLASS,
-	ARRAY_BUILDER,      // = [X,Y,...]
-	ARRAY_BUILDER_FOR,
-	ARRAY_BUILDER_FOR_IF,
-	DICT_BUILDER,       // = {"x":y, ...}
-	TUPLE,              // = (X,Y,...)
-	TUPLE_EXTRACTION,   // (X,Y,...) = ...
-	CONSTRUCTOR_AS_FUNCTION,
-	SLICE,              // = A:B or A:B:C
+	Class,
+	ArrayBuilder,        // = [X,Y,...]
+	ArrayBuilderFor,
+	ArrayBuilderForIf,
+	DictBuilder,         // = {"x":y, ...}
+	Tuple,               // = (X,Y,...)
+	TupleExtraction,     // (X,Y,...) = ...
+	ConstructorAsFunction,
+	Slice,               // = A:B or A:B:C
 	// abstract syntax tree
-	ABSTRACT_TOKEN,
-	ABSTRACT_OPERATOR,
-	ABSTRACT_ELEMENT,
-	ABSTRACT_CALL,
-	ABSTRACT_TYPE_REFERENCE,// X&
-	ABSTRACT_TYPE_STAR,    // X*
-	ABSTRACT_TYPE_LIST,    // X[]
-	ABSTRACT_TYPE_DICT,    // X{}
-	ABSTRACT_TYPE_OPTIONAL,// X?
-	ABSTRACT_TYPE_CALLABLE,// X->Y
-	ABSTRACT_VAR,          // var x ...
+	AbstractToken,
+	AbstractOperator,
+	AbstractElement,
+	AbstractCall,
+	AbstractTypeReference,// X&
+	AbstractTypeStar,    // X*
+	AbstractTypeList,    // X[]
+	AbstractTypeDict,    // X{}
+	AbstractTypeOptional,// X?
+	AbstractTypeCallable,// X->Y
+	AbstractVar,         // var x ...
 	// compilation
-	VAR_TEMP,
-	DEREF_VAR_TEMP,
-	DEREF_LOCAL_MEMORY,
-	REGISTER,
-	DEREF_REGISTER,
-	LABEL,
-	DEREF_LABEL,
-	IMMEDIATE,
-	GLOBAL_LOOKUP,       // ARM
-	DEREF_GLOBAL_LOOKUP, // ARM
+	VarTemp,
+	DereferenceVarTemp,
+	DerefereceLocalMemory,
+	Register,
+	DereferenceRegister,
+	Label,
+	DereferenceLabel,
+	Immediate,
+	GlobalLookup,        // ARM
+	DereferenceGlobalLookup, // ARM
 };
 
 // single operand/command
@@ -115,7 +115,7 @@ public:
 	Flags flags;
 	bool is_mutable() const;
 
-	Node(NodeKind kind, int64 link_no, const Class *type, Flags flags = Flags::MUTABLE, int token_id = -1);
+	Node(NodeKind kind, int64 link_no, const Class *type, Flags flags = Flags::Mutable, int token_id = -1);
 	/*Node(const Class *c);
 	Node(const Block *b);
 	Node(const Constant *c);*/

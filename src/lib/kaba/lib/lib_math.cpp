@@ -239,33 +239,33 @@ public:
 #pragma GCC optimize("0")
 
 
-
 class KabaAny : public Any {
 public:
-	Any _cdecl _map_get(const string &key)
-	//{ return map_get(key); }
-	{ KABA_EXCEPTION_WRAPPER(return map_get(key)); return Any(); }
-	void _cdecl _map_set(const string &key, Any &a)
-	{ KABA_EXCEPTION_WRAPPER(map_set(key, a)); }
-	Any _cdecl _array_get(int i)
-	{ KABA_EXCEPTION_WRAPPER(return array_get(i)); return Any(); }
-	void _cdecl _array_set(int i, Any &a)
-	{ KABA_EXCEPTION_WRAPPER(array_set(i, a)); }
-	void _cdecl _array_add(Any &a)
-	{ KABA_EXCEPTION_WRAPPER(add(a)); }
-	Array<Any> _as_array() {
-		if (type != TYPE_ARRAY)
-			kaba_raise_exception(new KabaException("not an array"));
-		Array<Any> r;
-		r.set_ref(as_array());
-		return r;
+	const Class* _get_class() {
+		if (type == Any::Type::Int)
+			return TypeInt32;
+		if (type == Any::Type::Float)
+			return TypeFloat32;
+		if (type == Any::Type::Bool)
+			return TypeBool;
+		if (type == Any::Type::String)
+			return TypeString;
+		if (type == Any::Type::List)
+			return TypeAnyList;
+		if (type == Any::Type::Dict)
+			return TypeAnyDict;
+		return TypeVoid;
 	}
-	Array<int> _as_map() { // FAKE TYPE!!!
-		if (type != TYPE_MAP)
-			kaba_raise_exception(new KabaException("not a map"));
-		Array<int> r;
-		r.set_ref((Array<int>&)as_map());
-		return r;
+
+	Array<Any>* _as_list() {
+		if (type != Type::List)
+			return nullptr;
+		return &as_list();
+	}
+	Array<int>* _as_dict() { // FAKE TYPE!!!
+		if (type != Type::Dict)
+			return nullptr;
+		return (Array<int>*)&as_dict();
 	}
 	
 	static void unwrap(Any &aa, void *var, const Class *type) {
@@ -279,22 +279,22 @@ public:
 			*(string*)var = aa.as_string();
 		} else if (type->is_pointer_raw()) {
 			*(const void**)var = aa.as_pointer();
-		} else if (type->is_list() and (aa.type == TYPE_ARRAY)) {
+		} else if (type->is_list() and (aa.type == Type::List)) {
 			auto *t_el = type->get_array_element();
 			auto *a = (DynamicArray*)var;
-			auto &b = aa.as_array();
+			auto &b = aa.as_list();
 			int n = b.num;
 			array_resize(var, type, n);
 			for (int i=0; i<n; i++)
 				unwrap(aa[i], (char*)a->data + i * t_el->size, t_el);
-		} else if (type->is_array() and (aa.type == TYPE_ARRAY)) {
+		} else if (type->is_array() and (aa.type == Type::List)) {
 			auto *t_el = type->get_array_element();
-			auto &b = aa.as_array();
+			auto &b = aa.as_list();
 			int n = min(type->array_length, b.num);
 			for (int i=0; i<n; i++)
 				unwrap(b[i], (char*)var + i*t_el->size, t_el);
-		} else if (aa.type == TYPE_MAP) {
-			[[maybe_unused]] auto &map = aa.as_map();
+		} else if (aa.type == Type::Dict) {
+			[[maybe_unused]] auto &map = aa.as_dict();
 			auto keys = aa.keys();
 			for (auto &e: type->elements)
 				for (string &k: keys)
@@ -367,7 +367,7 @@ public:
 };
 
 void SIAddPackageMath(Context *c) {
-	add_package(c, "math", Flags::AUTO_IMPORT);
+	add_package(c, "math", Flags::AutoImport);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));
@@ -402,20 +402,23 @@ void SIAddPackageMath(Context *c) {
 
 	const_cast<Class*>(TypeVec3)->alignment = 4; // would be updated too late, otherwise...
 	auto TypeVec3Optional = add_type_optional(TypeVec3);
+
+	auto TypeAnyRef = add_type_ref(TypeAny);
+	auto TypeAnyRefOptional = add_type_optional(TypeAnyRef);
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
-		flags_set(((Class*)TypeFloat32)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-		flags_set(((Class*)TypeFloat64)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+		flags_set(((Class*)TypeFloat32)->flags, Flags::ReturnInFloatRegisters);
+		flags_set(((Class*)TypeFloat64)->flags, Flags::ReturnInFloatRegisters);
 		if (config.target.abi == Abi::AMD64_GNU or config.target.abi == Abi::ARM64_GNU) {
 			// not on windows!
-			flags_set(((Class*)TypeComplex)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypeVec2)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypeQuaternion)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypeVec3)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypeColor)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypePlane)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
-			flags_set(((Class*)TypeRect)->flags, Flags::RETURN_IN_FLOAT_REGISTERS);
+			flags_set(((Class*)TypeComplex)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypeVec2)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypeQuaternion)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypeVec3)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypeColor)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypePlane)->flags, Flags::ReturnInFloatRegisters);
+			flags_set(((Class*)TypeRect)->flags, Flags::ReturnInFloatRegisters);
 		}
 	}
 
@@ -427,140 +430,140 @@ void SIAddPackageMath(Context *c) {
 
 	lib_create_optional<vec3>(TypeVec3Optional);
 
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray3, TypeFloatArray3, InlineID::CHUNK_ASSIGN, &FloatN<3>::__assign__);
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray4, TypeFloatArray4, InlineID::CHUNK_ASSIGN, &FloatN<4>::__assign__);
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray9, TypeFloatArray9, InlineID::CHUNK_ASSIGN, &FloatN<9>::__assign__);
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray3x3, TypeFloatArray3x3, InlineID::CHUNK_ASSIGN, &FloatN<9>::__assign__);
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray16, TypeFloatArray16, InlineID::CHUNK_ASSIGN, &FloatN<16>::__assign__);
-	add_operator(OperatorID::ASSIGN, TypeVoid, TypeFloatArray4x4, TypeFloatArray4x4, InlineID::CHUNK_ASSIGN, &FloatN<16>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray3, TypeFloatArray3, InlineID::ChunkAssign, &FloatN<3>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray4, TypeFloatArray4, InlineID::ChunkAssign, &FloatN<4>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray9, TypeFloatArray9, InlineID::ChunkAssign, &FloatN<9>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray3x3, TypeFloatArray3x3, InlineID::ChunkAssign, &FloatN<9>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray16, TypeFloatArray16, InlineID::ChunkAssign, &FloatN<16>::__assign__);
+	add_operator(OperatorID::Assign, TypeVoid, TypeFloatArray4x4, TypeFloatArray4x4, InlineID::ChunkAssign, &FloatN<16>::__assign__);
 
 
 	add_class(TypeComplex);
 		class_add_element("x", TypeFloat32, &complex::x);
 		class_add_element("y", TypeFloat32, &complex::y);
-		class_add_func("abs", TypeFloat32, &complex::abs, Flags::PURE);
-		class_add_func("abs_sqr", TypeFloat32, &complex::abs_sqr, Flags::PURE);
-		class_add_func("bar", TypeComplex, &complex::bar, Flags::PURE);
-		class_add_func(Identifier::Func::STR, TypeString, &complex::str, Flags::PURE);
+		class_add_func("abs", TypeFloat32, &complex::abs, Flags::Pure);
+		class_add_func("abs_sqr", TypeFloat32, &complex::abs_sqr, Flags::Pure);
+		class_add_func("bar", TypeComplex, &complex::bar, Flags::Pure);
+		class_add_func(Identifier::func::Str, TypeString, &complex::str, Flags::Pure);
 		class_add_const("I", TypeComplex, &complex::I);
-		class_add_func("_create", TypeComplex, &KabaVector<complex>::set2, Flags::STATIC | Flags::PURE);
-			func_set_inline(InlineID::COMPLEX_SET);
+		class_add_func("_create", TypeComplex, &KabaVector<complex>::set2, Flags::Static | Flags::Pure);
+			func_set_inline(InlineID::ComplexSet);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaVector<complex>::init2, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaVector<complex>::init2, Flags::Mutable);
 			func_add_param("x", TypeFloat32);
-			func_add_param("y", TypeFloat32);	
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplex, TypeComplex, InlineID::CHUNK_ASSIGN, &KabaVector<complex>::assign);
-		add_operator(OperatorID::ADD, TypeComplex, TypeComplex, TypeComplex, InlineID::VEC2_ADD, &complex::operator+);
-		add_operator(OperatorID::SUBTRACT, TypeComplex, TypeComplex, TypeComplex, InlineID::VEC2_SUBTRACT, (decltype(&complex::operator+)) &complex::operator-);
-		add_operator(OperatorID::MULTIPLY, TypeComplex, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY, (decltype(&complex::operator+)) &complex::operator*);
-		add_operator(OperatorID::MULTIPLY, TypeComplex, TypeFloat32, TypeComplex, InlineID::VEC2_MULTIPLY_SV);
-		add_operator(OperatorID::MULTIPLY, TypeComplex, TypeComplex, TypeFloat32, InlineID::VEC2_MULTIPLY_VS);
-		add_operator(OperatorID::DIVIDE, TypeComplex, TypeComplex, TypeComplex, InlineID::NONE /*InlineID::COMPLEX_DIVIDE*/, (decltype(&complex::operator+)) &complex::operator/);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeComplex, TypeComplex, InlineID::VEC2_ADD_ASSIGN, &complex::operator+=);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplex, TypeComplex, InlineID::VEC2_SUBTARCT_ASSIGN, &complex::operator-=);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_MULTIPLY_ASSIGN, (decltype(&complex::operator+=)) &complex::operator*=);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplex, TypeComplex, InlineID::COMPLEX_DIVIDE_ASSIGN, (decltype(&complex::operator+=)) &complex::operator/=);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeComplex, TypeComplex, InlineID::CHUNK_EQUAL, &complex::operator==);
-		add_operator(OperatorID::NEGATIVE, TypeComplex, nullptr, TypeComplex, InlineID::VEC2_NEGATIVE, &KabaVector<complex>::negate);
+			func_add_param("y", TypeFloat32);
+		add_operator(OperatorID::Assign, TypeVoid, TypeComplex, TypeComplex, InlineID::ChunkAssign, &KabaVector<complex>::assign);
+		add_operator(OperatorID::Add, TypeComplex, TypeComplex, TypeComplex, InlineID::Vec2Add, &complex::operator+);
+		add_operator(OperatorID::Subtract, TypeComplex, TypeComplex, TypeComplex, InlineID::Vec2Subtract, (decltype(&complex::operator+)) &complex::operator-);
+		add_operator(OperatorID::Multiply, TypeComplex, TypeComplex, TypeComplex, InlineID::ComplexMultiply, (decltype(&complex::operator+)) &complex::operator*);
+		add_operator(OperatorID::Multiply, TypeComplex, TypeFloat32, TypeComplex, InlineID::Vec2MultiplySV);
+		add_operator(OperatorID::Multiply, TypeComplex, TypeComplex, TypeFloat32, InlineID::Vec2MultiplyVS);
+		add_operator(OperatorID::Divide, TypeComplex, TypeComplex, TypeComplex, InlineID::None /*InlineID::COMPLEX_DIVIDE*/, (decltype(&complex::operator+)) &complex::operator/);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeComplex, TypeComplex, InlineID::Vec2AddAssign, &complex::operator+=);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeComplex, TypeComplex, InlineID::Vec2SubtarctAssign, &complex::operator-=);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeComplex, TypeComplex, InlineID::ComplexMultiplyAssign, (decltype(&complex::operator+=)) &complex::operator*=);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeComplex, TypeComplex, InlineID::ComplexDivideAssign, (decltype(&complex::operator+=)) &complex::operator/=);
+		add_operator(OperatorID::Equal, TypeBool, TypeComplex, TypeComplex, InlineID::ChunkEqual, &complex::operator==);
+		add_operator(OperatorID::Negative, TypeComplex, nullptr, TypeComplex, InlineID::Vec2Negative, &KabaVector<complex>::negate);
 
 	add_class(TypeComplexList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<complex>::__init__, Flags::MUTABLE);
-		add_operator(OperatorID::ADD, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::add_values);
-		add_operator(OperatorID::SUBTRACT, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::sub_values);
-		add_operator(OperatorID::MULTIPLY, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::mul_values);
-		add_operator(OperatorID::DIVIDE, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::div_values);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::iadd_values);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::isub_values);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::imul_values);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplexList, InlineID::NONE, &VectorList<complex>::idiv_values);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::iadd_values_scalar);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::isub_values_scalar);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::imul_values_scalar);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::idiv_values_scalar);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &VectorList<complex>::imul_values_scalar_f);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeComplexList, TypeFloat32, InlineID::NONE, &VectorList<complex>::idiv_values_scalar_f);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeComplexList, TypeComplex, InlineID::NONE, &VectorList<complex>::assign_values_scalar);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<complex>::__init__, Flags::Mutable);
+		add_operator(OperatorID::Add, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::add_values);
+		add_operator(OperatorID::Subtract, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::sub_values);
+		add_operator(OperatorID::Multiply, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::mul_values);
+		add_operator(OperatorID::Divide, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::div_values);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::iadd_values);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::isub_values);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::imul_values);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::idiv_values);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeComplexList, TypeComplex, InlineID::None, &VectorList<complex>::iadd_values_scalar);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeComplexList, TypeComplex, InlineID::None, &VectorList<complex>::isub_values_scalar);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeComplexList, TypeComplex, InlineID::None, &VectorList<complex>::imul_values_scalar);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeComplexList, TypeComplex, InlineID::None, &VectorList<complex>::idiv_values_scalar);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeComplexList, TypeFloat32, InlineID::None, &VectorList<complex>::imul_values_scalar_f);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeComplexList, TypeFloat32, InlineID::None, &VectorList<complex>::idiv_values_scalar_f);
+		add_operator(OperatorID::Assign, TypeVoid, TypeComplexList, TypeComplex, InlineID::None, &VectorList<complex>::assign_values_scalar);
 
 
 	add_class(TypeVec2);
 		class_add_element("x", TypeFloat32, &vec2::x);
 		class_add_element("y", TypeFloat32, &vec2::y);
 		//class_add_element("_e", TypeFloatArray2, 0);
-		class_add_func(Identifier::Func::LENGTH, TypeFloat32, type_p(&vec2::length), Flags::PURE);
-		class_add_func("length", TypeFloat32, type_p(&vec2::length), Flags::PURE);
+		class_add_func(Identifier::func::Length, TypeFloat32, type_p(&vec2::length), Flags::Pure);
+		class_add_func("length", TypeFloat32, type_p(&vec2::length), Flags::Pure);
 		//class_add_func("length_sqr", TypeFloat32, type_p(&vec2::length_sqr), Flags::PURE);
 		//class_add_func("length_fuzzy", TypeFloat32, type_p(&vec2::length_fuzzy), Flags::PURE);
-		class_add_func("normalized", TypeVec2, &vec2::normalized, Flags::PURE);
-		class_add_func(Identifier::Func::STR, TypeString, &vec2::str, Flags::PURE);
-		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::STATIC | Flags::PURE);
+		class_add_func("normalized", TypeVec2, &vec2::normalized, Flags::Pure);
+		class_add_func(Identifier::func::Str, TypeString, &vec2::str, Flags::Pure);
+		class_add_func("dot", TypeFloat32, &vec2::dot, Flags::Static | Flags::Pure);
 			func_add_param("v1", TypeVec2);
 			func_add_param("v2", TypeVec2);
-		class_add_func("_create", TypeVec2, &KabaVector<vec2>::set2, Flags::STATIC | Flags::PURE);
-			func_set_inline(InlineID::COMPLEX_SET);
+		class_add_func("_create", TypeVec2, &KabaVector<vec2>::set2, Flags::Static | Flags::Pure);
+			func_set_inline(InlineID::ComplexSet);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 		// ignored, but useful for docu
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaVector<vec2>::init2, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaVector<vec2>::init2, Flags::Mutable);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 		class_add_const("0", TypeVec2, &vec2::ZERO);
 		class_add_const("O", TypeVec2, &vec2::ZERO);
 		class_add_const("EX", TypeVec2, &vec2::EX);
 		class_add_const("EY", TypeVec2, &vec2::EY);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVec2, TypeVec2, InlineID::CHUNK_ASSIGN, &KabaVector<vec2>::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeVec2, TypeVec2, InlineID::CHUNK_EQUAL, &vec2::operator==);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeVec2, TypeVec2, InlineID::CHUNK_NOT_EQUAL, &vec2::operator!=);
-		add_operator(OperatorID::ADD, TypeVec2, TypeVec2, TypeVec2, InlineID::VEC2_ADD, &vec2::operator+);
-		add_operator(OperatorID::SUBTRACT, TypeVec2, TypeVec2, TypeVec2, InlineID::VEC2_SUBTRACT, (decltype(&vec2::operator+)) &vec2::operator-);
+		add_operator(OperatorID::Assign, TypeVoid, TypeVec2, TypeVec2, InlineID::ChunkAssign, &KabaVector<vec2>::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeVec2, TypeVec2, InlineID::ChunkEqual, &vec2::operator==);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeVec2, TypeVec2, InlineID::ChunkNotEqual, &vec2::operator!=);
+		add_operator(OperatorID::Add, TypeVec2, TypeVec2, TypeVec2, InlineID::Vec2Add, &vec2::operator+);
+		add_operator(OperatorID::Subtract, TypeVec2, TypeVec2, TypeVec2, InlineID::Vec2Subtract, (decltype(&vec2::operator+)) &vec2::operator-);
 //		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVec2, TypeVec2, InlineID::COMPLEX_MULTIPLY_VV, &KabaVector<vec2>::mul_vv);
-		add_operator(OperatorID::MULTIPLY, TypeVec2, TypeVec2, TypeFloat32, InlineID::VEC2_MULTIPLY_VS, &KabaVector<vec2>::mul_vf);
-		add_operator(OperatorID::MULTIPLY, TypeVec2, TypeFloat32, TypeVec2, InlineID::VEC2_MULTIPLY_SV, &KabaVector<vec2>::mul_fv);
-		add_operator(OperatorID::DIVIDE, TypeVec2, TypeVec2, TypeFloat32, InlineID::VEC2_DIVIDE_VS, &KabaVector<vec2>::div_f);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeVec2, TypeVec2, InlineID::VEC2_ADD_ASSIGN, &vec2::operator+=);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec2, TypeVec2, InlineID::VEC2_SUBTARCT_ASSIGN, &vec2::operator-=);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec2, TypeFloat32, InlineID::VEC2_MULTIPLY_ASSIGN, &vec2::operator*=);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec2, TypeFloat32, InlineID::VEC2_DIVIDE_ASSIGN, &vec2::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVec2, nullptr, TypeVec2, InlineID::VEC2_NEGATIVE, &KabaVector<vec2>::negate);
+		add_operator(OperatorID::Multiply, TypeVec2, TypeVec2, TypeFloat32, InlineID::Vec2MultiplyVS, &KabaVector<vec2>::mul_vf);
+		add_operator(OperatorID::Multiply, TypeVec2, TypeFloat32, TypeVec2, InlineID::Vec2MultiplySV, &KabaVector<vec2>::mul_fv);
+		add_operator(OperatorID::Divide, TypeVec2, TypeVec2, TypeFloat32, InlineID::Vec2DivideVs, &KabaVector<vec2>::div_f);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeVec2, TypeVec2, InlineID::Vec2AddAssign, &vec2::operator+=);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeVec2, TypeVec2, InlineID::Vec2SubtarctAssign, &vec2::operator-=);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeVec2, TypeFloat32, InlineID::Vec2MultiplyAssign, &vec2::operator*=);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeVec2, TypeFloat32, InlineID::Vec2DivideAssign, &vec2::operator/=);
+		add_operator(OperatorID::Negative, TypeVec2, nullptr, TypeVec2, InlineID::Vec2Negative, &KabaVector<vec2>::negate);
 
 	add_class(TypeVec2List);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<vec2>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<vec2>::__init__, Flags::Mutable);
 
-	
+
 	add_class(TypeVec3);
 		class_add_element("x", TypeFloat32, &vec3::x);
 		class_add_element("y", TypeFloat32, &vec3::y);
 		class_add_element("z", TypeFloat32, &vec3::z);
 		class_add_element("_e", TypeFloatArray3, &vec3::x);
 		class_add_element("_xy", TypeVec2, &vec3::x);
-		class_add_func(Identifier::Func::LENGTH, TypeFloat32, type_p(&vec3::length), Flags::PURE);
-		class_add_func("length", TypeFloat32, type_p(&vec3::length), Flags::PURE);
-		class_add_func("length_sqr", TypeFloat32, type_p(&vec3::length_sqr), Flags::PURE);
-		class_add_func("length_fuzzy", TypeFloat32, type_p(&vec3::length_fuzzy), Flags::PURE);
-		class_add_func("normalized", TypeVec3, &vec3::normalized, Flags::PURE);
-		class_add_func("dir2ang", TypeVec3, &vec3::dir2ang, Flags::PURE);
-		class_add_func("dir2ang2", TypeVec3, &vec3::dir2ang2, Flags::PURE);
+		class_add_func(Identifier::func::Length, TypeFloat32, type_p(&vec3::length), Flags::Pure);
+		class_add_func("length", TypeFloat32, type_p(&vec3::length), Flags::Pure);
+		class_add_func("length_sqr", TypeFloat32, type_p(&vec3::length_sqr), Flags::Pure);
+		class_add_func("length_fuzzy", TypeFloat32, type_p(&vec3::length_fuzzy), Flags::Pure);
+		class_add_func("normalized", TypeVec3, &vec3::normalized, Flags::Pure);
+		class_add_func("dir2ang", TypeVec3, &vec3::dir2ang, Flags::Pure);
+		class_add_func("dir2ang2", TypeVec3, &vec3::dir2ang2, Flags::Pure);
 			func_add_param("up", TypeVec3);
-		class_add_func("ang2dir", TypeVec3, &vec3::ang2dir, Flags::PURE);
+		class_add_func("ang2dir", TypeVec3, &vec3::ang2dir, Flags::Pure);
 //		class_add_func("rotate", TypeVector, &vector::rotate, Flags::PURE);
 //			func_add_param("ang", TypeVector);
 //		class_add_func("__div__", TypeVector, vector::untransform), Flags::PURE);
 //			func_add_param("m", TypeMatrix);
-		class_add_func("ortho", TypeVec3, &vec3::ortho, Flags::PURE);
-		class_add_func(Identifier::Func::STR, TypeString, &vec3::str, Flags::PURE);
-		class_add_func("dot", TypeFloat32, &vec3::dot, Flags::STATIC | Flags::PURE);
+		class_add_func("ortho", TypeVec3, &vec3::ortho, Flags::Pure);
+		class_add_func(Identifier::func::Str, TypeString, &vec3::str, Flags::Pure);
+		class_add_func("dot", TypeFloat32, &vec3::dot, Flags::Static | Flags::Pure);
 			func_add_param("v1", TypeVec3);
 			func_add_param("v2", TypeVec3);
-		class_add_func("cross", TypeVec3, &vec3::cross, Flags::STATIC | Flags::PURE);
+		class_add_func("cross", TypeVec3, &vec3::cross, Flags::Static | Flags::Pure);
 			func_add_param("v1", TypeVec3);
 			func_add_param("v2", TypeVec3);
-		class_add_func("_create", TypeVec3, &KabaVector<vec3>::set3, Flags::STATIC | Flags::PURE);
-			func_set_inline(InlineID::VECTOR_SET);
+		class_add_func("_create", TypeVec3, &KabaVector<vec3>::set3, Flags::Static | Flags::Pure);
+			func_set_inline(InlineID::VectorSet);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
 		// ignored, but useful for docu
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaVector<vec3>::init3, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaVector<vec3>::init3, Flags::Mutable);
 			func_add_param("x", TypeFloat32);
 			func_add_param("y", TypeFloat32);
 			func_add_param("z", TypeFloat32);
@@ -576,64 +579,64 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("EX", TypeVec3, &vec3::EX);
 		class_add_const("EY", TypeVec3, &vec3::EY);
 		class_add_const("EZ", TypeVec3, &vec3::EZ);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeVec3, TypeVec3, InlineID::CHUNK_ASSIGN, &KabaVector<vec3>::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeVec3, TypeVec3, InlineID::CHUNK_EQUAL, &vec3::operator==);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeVec3, TypeVec3, InlineID::CHUNK_NOT_EQUAL, &vec3::operator!=);
-		add_operator(OperatorID::ADD, TypeVec3, TypeVec3, TypeVec3, InlineID::VEC3_ADD, &vec3::operator+);
-		add_operator(OperatorID::SUBTRACT, TypeVec3, TypeVec3, TypeVec3, InlineID::VEC3_SUBTRACT, (decltype(&vec3::operator+)) &vec3::operator-);
-		add_operator(OperatorID::MULTIPLY, TypeFloat32, TypeVec3, TypeVec3, InlineID::VEC3_MULTIPLY_VV, &KabaVector<vec3>::mul_vv);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeVec3, TypeFloat32, InlineID::VEC3_MULTIPLY_VF, &KabaVector<vec3>::mul_vf);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeFloat32, TypeVec3, InlineID::VEC3_MULTIPLY_FV, &KabaVector<vec3>::mul_fv);
-		add_operator(OperatorID::DIVIDE, TypeVec3, TypeVec3, TypeFloat32, InlineID::VEC3_DIVIDE_VF, &KabaVector<vec3>::div_f);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeVec3, TypeVec3, InlineID::VEC3_ADD_ASSIGN, &vec3::operator+=);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVec3, TypeVec3, InlineID::VEC3_SUBTARCT_ASSIGN, &vec3::operator-=);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVec3, TypeFloat32, InlineID::VEC3_MULTIPLY_ASSIGN, &vec3::operator*=);
-		add_operator(OperatorID::DIVIDES, TypeVoid, TypeVec3, TypeFloat32, InlineID::VEC3_DIVIDE_ASSIGN, &vec3::operator/=);
-		add_operator(OperatorID::NEGATIVE, TypeVec3, nullptr, TypeVec3, InlineID::VEC3_NEGATIVE, &KabaVector<vec3>::negate);
-	
-	add_class(TypeVec3List);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<vec3>::__init__, Flags::MUTABLE);
+		add_operator(OperatorID::Assign, TypeVoid, TypeVec3, TypeVec3, InlineID::ChunkAssign, &KabaVector<vec3>::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeVec3, TypeVec3, InlineID::ChunkEqual, &vec3::operator==);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeVec3, TypeVec3, InlineID::ChunkNotEqual, &vec3::operator!=);
+		add_operator(OperatorID::Add, TypeVec3, TypeVec3, TypeVec3, InlineID::Vec3Add, &vec3::operator+);
+		add_operator(OperatorID::Subtract, TypeVec3, TypeVec3, TypeVec3, InlineID::Vec3Subtract, (decltype(&vec3::operator+)) &vec3::operator-);
+		add_operator(OperatorID::Multiply, TypeFloat32, TypeVec3, TypeVec3, InlineID::Vec3MultiplyVV, &KabaVector<vec3>::mul_vv);
+		add_operator(OperatorID::Multiply, TypeVec3, TypeVec3, TypeFloat32, InlineID::Vec3MultiplyVF, &KabaVector<vec3>::mul_vf);
+		add_operator(OperatorID::Multiply, TypeVec3, TypeFloat32, TypeVec3, InlineID::Vec3MultiplyFV, &KabaVector<vec3>::mul_fv);
+		add_operator(OperatorID::Divide, TypeVec3, TypeVec3, TypeFloat32, InlineID::Vec3DivideVF, &KabaVector<vec3>::div_f);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeVec3, TypeVec3, InlineID::Vec3AddAssign, &vec3::operator+=);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeVec3, TypeVec3, InlineID::Vec3SubtarctAssign, &vec3::operator-=);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeVec3, TypeFloat32, InlineID::Vec3MultiplyAssign, &vec3::operator*=);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeVec3, TypeFloat32, InlineID::Vec3DivideAssign, &vec3::operator/=);
+		add_operator(OperatorID::Negative, TypeVec3, nullptr, TypeVec3, InlineID::Vec3Negative, &KabaVector<vec3>::negate);
 
-	
+	add_class(TypeVec3List);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<vec3>::__init__, Flags::Mutable);
+
+
 	add_class(TypeQuaternion);
 		class_add_element("x", TypeFloat32, &quaternion::x);
 		class_add_element("y", TypeFloat32, &quaternion::y);
 		class_add_element("z", TypeFloat32, &quaternion::z);
 		class_add_element("w", TypeFloat32, &quaternion::w);
-		class_add_func("bar", TypeQuaternion, &quaternion::bar, Flags::PURE);
-		class_add_func("normalize", TypeVoid, &quaternion::normalize, Flags::MUTABLE);
-		class_add_func("angles", TypeVec3, &quaternion::get_angles, Flags::PURE);
-		class_add_func(Identifier::Func::STR, TypeString, &quaternion::str, Flags::PURE);
-		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
+		class_add_func("bar", TypeQuaternion, &quaternion::bar, Flags::Pure);
+		class_add_func("normalize", TypeVoid, &quaternion::normalize, Flags::Mutable);
+		class_add_func("angles", TypeVec3, &quaternion::get_angles, Flags::Pure);
+		class_add_func(Identifier::func::Str, TypeString, &quaternion::str, Flags::Pure);
+		class_add_func(Identifier::func::Init, TypeVoid, nullptr, Flags::Mutable);
 			func_add_param("ang", TypeVec3);
-		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, nullptr, Flags::Mutable);
 			func_add_param("axis", TypeVec3);
 			func_add_param("angle", TypeFloat32);
-		class_add_func(Identifier::Func::INIT, TypeVoid, nullptr, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, nullptr, Flags::Mutable);
 			func_add_param("m", TypeMat4);
-		class_add_func("_rotation_v", TypeQuaternion, &quaternion::rotation_v, Flags::STATIC | Flags::PURE);
+		class_add_func("_rotation_v", TypeQuaternion, &quaternion::rotation_v, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeVec3);
-		class_add_func("_rotation_a", TypeQuaternion, &quaternion::rotation_a, Flags::STATIC | Flags::PURE);
+		class_add_func("_rotation_a", TypeQuaternion, &quaternion::rotation_a, Flags::Static | Flags::Pure);
 			func_add_param("axis", TypeVec3);
 			func_add_param("angle", TypeFloat32);
-		class_add_func("_rotation_m", TypeQuaternion, &quaternion::rotation_m, Flags::STATIC | Flags::PURE);
+		class_add_func("_rotation_m", TypeQuaternion, &quaternion::rotation_m, Flags::Static | Flags::Pure);
 			func_add_param("m", TypeMat4);
-		class_add_func("interpolate", TypeQuaternion, (quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, Flags::STATIC | Flags::PURE);
+		class_add_func("interpolate", TypeQuaternion, (quaternion(*)(const quaternion&, const quaternion&, float))&quaternion::interpolate, Flags::Static | Flags::Pure);
 			func_add_param("q0", TypeQuaternion);
 			func_add_param("q1", TypeQuaternion);
 			func_add_param("t", TypeFloat32);
-		class_add_func("drag", TypeQuaternion, &quaternion::drag, Flags::STATIC | Flags::PURE);
+		class_add_func("drag", TypeQuaternion, &quaternion::drag, Flags::Static | Flags::Pure);
 			func_add_param("up", TypeVec3);
 			func_add_param("dang", TypeVec3);
 			func_add_param("reset_z", TypeBool);
 		class_add_const("ID", TypeQuaternion, &quaternion::ID);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::CHUNK_ASSIGN);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeQuaternion, TypeQuaternion, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeQuaternion, TypeQuaternion, InlineID::CHUNK_NOT_EQUAL);
-		add_operator(OperatorID::MULTIPLY, TypeQuaternion, TypeQuaternion, TypeQuaternion, InlineID::NONE, &quaternion::mul);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeQuaternion, TypeVec3, InlineID::NONE, &KabaQuaternion::mulv);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::NONE, &quaternion::imul);
-	
+		add_operator(OperatorID::Assign, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::ChunkAssign);
+		add_operator(OperatorID::Equal, TypeBool, TypeQuaternion, TypeQuaternion, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeQuaternion, TypeQuaternion, InlineID::ChunkNotEqual);
+		add_operator(OperatorID::Multiply, TypeQuaternion, TypeQuaternion, TypeQuaternion, InlineID::None, &quaternion::mul);
+		add_operator(OperatorID::Multiply, TypeVec3, TypeQuaternion, TypeVec3, InlineID::None, &KabaQuaternion::mulv);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeQuaternion, TypeQuaternion, InlineID::None, &quaternion::imul);
+
 	add_class(TypeRect);
 		class_add_element("x1", TypeFloat32, &rect::x1);
 		class_add_element("x2", TypeFloat32, &rect::x2);
@@ -642,67 +645,67 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("ID", TypeRect, &rect::ID);
 		class_add_const("ID_SYM", TypeRect, &rect::ID_SYM);
 		class_add_const("EMPTY", TypeRect, &rect::EMPTY);
-		class_add_func("width", TypeFloat32, &rect::width, Flags::PURE);
-		class_add_func("height", TypeFloat32, &rect::height, Flags::PURE);
-		class_add_func("area", TypeFloat32, &rect::area, Flags::PURE);
-		class_add_func("center", TypeVec2, &rect::center, Flags::PURE);
-		class_add_func("size", TypeVec2, &rect::size, Flags::PURE);
-		class_add_func("inside", TypeBool, &rect::inside, Flags::PURE);
+		class_add_func("width", TypeFloat32, &rect::width, Flags::Pure);
+		class_add_func("height", TypeFloat32, &rect::height, Flags::Pure);
+		class_add_func("area", TypeFloat32, &rect::area, Flags::Pure);
+		class_add_func("center", TypeVec2, &rect::center, Flags::Pure);
+		class_add_func("size", TypeVec2, &rect::size, Flags::Pure);
+		class_add_func("inside", TypeBool, &rect::inside, Flags::Pure);
 			func_add_param("p", TypeVec2);
-		class_add_func(Identifier::Func::STR, TypeString, &rect::str, Flags::PURE);
-		class_add_func("_create", TypeRect, &KabaRect::set, Flags::STATIC | Flags::PURE);
-			func_set_inline(InlineID::RECT_SET);
+		class_add_func(Identifier::func::Str, TypeString, &rect::str, Flags::Pure);
+		class_add_func("_create", TypeRect, &KabaRect::set, Flags::Static | Flags::Pure);
+			func_set_inline(InlineID::RectSet);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
 			func_add_param("y1", TypeFloat32);
 			func_add_param("y2", TypeFloat32);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaRect::init, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaRect::init, Flags::Mutable);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
 			func_add_param("y1", TypeFloat32);
 			func_add_param("y2", TypeFloat32);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeRect, TypeRect, InlineID::CHUNK_ASSIGN, &KabaRect::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeRect, TypeRect, InlineID::CHUNK_EQUAL, &rect::operator==);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeRect, TypeRect, InlineID::CHUNK_NOT_EQUAL, &rect::operator!=);
-	
+		add_operator(OperatorID::Assign, TypeVoid, TypeRect, TypeRect, InlineID::ChunkAssign, &KabaRect::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeRect, TypeRect, InlineID::ChunkEqual, &rect::operator==);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeRect, TypeRect, InlineID::ChunkNotEqual, &rect::operator!=);
+
 	add_class(TypeColor);
 		class_add_element("r", TypeFloat32, &color::r);
 		class_add_element("g", TypeFloat32, &color::g);
 		class_add_element("b", TypeFloat32, &color::b);
 		class_add_element("a", TypeFloat32, &color::a);
-		class_add_func(Identifier::Func::STR, TypeString, &color::str, Flags::PURE);
-		class_add_func("hex", TypeString, &color::hex, Flags::PURE);
-		class_add_func("with_alpha", TypeColor, &color::with_alpha, Flags::PURE);
+		class_add_func(Identifier::func::Str, TypeString, &color::str, Flags::Pure);
+		class_add_func("hex", TypeString, &color::hex, Flags::Pure);
+		class_add_func("with_alpha", TypeColor, &color::with_alpha, Flags::Pure);
 			func_add_param("a", TypeFloat32);
-		class_add_func("hsb", TypeColor, &color::hsb, Flags::STATIC | Flags::PURE);
+		class_add_func("hsb", TypeColor, &color::hsb, Flags::Static | Flags::Pure);
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
 			func_add_param("b", TypeFloat32);
 			func_add_param("a", TypeFloat32);
-		class_add_func("interpolate", TypeColor, &color::interpolate, Flags::STATIC | Flags::PURE);
+		class_add_func("interpolate", TypeColor, &color::interpolate, Flags::Static | Flags::Pure);
 			func_add_param("c1", TypeColor);
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
-		class_add_func("_create", TypeColor, &KabaColor::set, Flags::STATIC | Flags::PURE);
-			func_set_inline(InlineID::COLOR_SET);
+		class_add_func("_create", TypeColor, &KabaColor::set, Flags::Static | Flags::Pure);
+			func_set_inline(InlineID::ColorSet);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
 			func_add_param("a", TypeFloat32);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaColor::init, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaColor::init, Flags::Mutable);
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
 			func_add_param("a", TypeFloat32);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeColor, TypeColor, InlineID::CHUNK_ASSIGN, &KabaColor::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeColor, TypeColor, InlineID::CHUNK_NOT_EQUAL);
-		add_operator(OperatorID::ADD, TypeColor, TypeColor, TypeColor, InlineID::NONE, &color::operator+);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeColor, TypeColor, InlineID::NONE, &color::operator+=);
-		add_operator(OperatorID::SUBTRACT, TypeColor, TypeColor, TypeColor, InlineID::NONE, &color::operator-);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeColor, TypeColor, InlineID::NONE, &color::operator-=);
-		add_operator(OperatorID::MULTIPLY, TypeColor, TypeColor, TypeFloat32, InlineID::NONE, &KabaColor::mul_f);
-		add_operator(OperatorID::MULTIPLY, TypeColor, TypeColor, TypeColor, InlineID::NONE, &KabaColor::mul_c);
+		add_operator(OperatorID::Assign, TypeVoid, TypeColor, TypeColor, InlineID::ChunkAssign, &KabaColor::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeColor, TypeColor, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeColor, TypeColor, InlineID::ChunkNotEqual);
+		add_operator(OperatorID::Add, TypeColor, TypeColor, TypeColor, InlineID::None, &color::operator+);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeColor, TypeColor, InlineID::None, &color::operator+=);
+		add_operator(OperatorID::Subtract, TypeColor, TypeColor, TypeColor, InlineID::None, &color::operator-);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeColor, TypeColor, InlineID::None, &color::operator-=);
+		add_operator(OperatorID::Multiply, TypeColor, TypeColor, TypeFloat32, InlineID::None, &KabaColor::mul_f);
+		add_operator(OperatorID::Multiply, TypeColor, TypeColor, TypeColor, InlineID::None, &KabaColor::mul_c);
 		// color
 		class_add_const("WHITE",  TypeColor, &White);
 		class_add_const("BLACK",  TypeColor, &Black);
@@ -715,7 +718,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("PURPLE", TypeColor, &Purple);
 
 	add_class(TypeColorList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<color>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<color>::__init__, Flags::Mutable);
 
 	add_class(TypePlane);
 		class_add_element("_a", TypeFloat32, 0);
@@ -723,46 +726,46 @@ void SIAddPackageMath(Context *c) {
 		class_add_element("_c", TypeFloat32, 8);
 		class_add_element("d", TypeFloat32, &plane::d);
 		class_add_element("n", TypeVec3, &plane::n);
-		class_add_func("intersect_line", TypeBool, &plane::intersect_line, Flags::PURE);
+		class_add_func("intersect_line", TypeBool, &plane::intersect_line, Flags::Pure);
 			func_add_param("l1", TypeVec3);
 			func_add_param("l2", TypeVec3);
 			func_add_param("inter", TypeVec3);
-		class_add_func("inverse", TypePlane, &plane::inverse, Flags::PURE);
-		class_add_func("distance", TypeFloat32, &plane::distance, Flags::PURE);
+		class_add_func("inverse", TypePlane, &plane::inverse, Flags::Pure);
+		class_add_func("distance", TypeFloat32, &plane::distance, Flags::Pure);
 			func_add_param("p", TypeVec3);
-		class_add_func(Identifier::Func::STR, TypeString, &plane::str, Flags::PURE);
-		class_add_func("transform", TypePlane, &plane::transform, Flags::PURE);
+		class_add_func(Identifier::func::Str, TypeString, &plane::str, Flags::Pure);
+		class_add_func("transform", TypePlane, &plane::transform, Flags::Pure);
 			func_add_param("m", TypeMat4);
-		class_add_func("from_points", TypePlane, &plane::from_points, Flags::STATIC | Flags::PURE);
+		class_add_func("from_points", TypePlane, &plane::from_points, Flags::Static | Flags::Pure);
 			func_add_param("a", TypeVec3);
 			func_add_param("b", TypeVec3);
 			func_add_param("c", TypeVec3);
-		class_add_func("from_point_normal", TypePlane, &plane::from_point_normal, Flags::STATIC | Flags::PURE);
+		class_add_func("from_point_normal", TypePlane, &plane::from_point_normal, Flags::Static | Flags::Pure);
 			func_add_param("p", TypeVec3);
 			func_add_param("n", TypeVec3);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypePlane, TypePlane, InlineID::CHUNK_ASSIGN);
-		add_operator(OperatorID::EQUAL, TypeBool, TypePlane, TypePlane, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypePlane, TypePlane, InlineID::CHUNK_NOT_EQUAL);
-	
+		add_operator(OperatorID::Assign, TypeVoid, TypePlane, TypePlane, InlineID::ChunkAssign);
+		add_operator(OperatorID::Equal, TypeBool, TypePlane, TypePlane, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypePlane, TypePlane, InlineID::ChunkNotEqual);
+
 	add_class(TypePlaneList);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<plane>::__init__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<plane>::__init__, Flags::Mutable);
 
 
 	add_class(TypeRay);
 		class_add_element("u", TypeVec3, &Ray::u);
 		class_add_element("v", TypeVec3, &Ray::v);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaRay::init);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &KabaRay::init_ex);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaRay::init);
+		class_add_func(Identifier::func::Init, TypeVoid, &KabaRay::init_ex);
 			func_add_param("a", TypeVec3);
 			func_add_param("b", TypeVec3);
-		class_add_func("dot", TypeFloat32, &Ray::dot, Flags::STATIC | Flags::PURE);
+		class_add_func("dot", TypeFloat32, &Ray::dot, Flags::Static | Flags::Pure);
 			func_add_param("r1", TypeRay);
 			func_add_param("r2", TypeRay);
-		class_add_func("intersect_plane", TypeVec3Optional, &Ray::intersect_plane, Flags::PURE);
+		class_add_func("intersect_plane", TypeVec3Optional, &Ray::intersect_plane, Flags::Pure);
 			func_add_param("pl", TypePlane);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeRay, TypeRay, InlineID::CHUNK_ASSIGN);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeRay, TypeRay, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeRay, TypeRay, InlineID::CHUNK_NOT_EQUAL);
+		add_operator(OperatorID::Assign, TypeVoid, TypeRay, TypeRay, InlineID::ChunkAssign);
+		add_operator(OperatorID::Equal, TypeBool, TypeRay, TypeRay, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeRay, TypeRay, InlineID::ChunkNotEqual);
 
 
 	add_class(TypeMat4);
@@ -785,49 +788,49 @@ void SIAddPackageMath(Context *c) {
 		class_add_element("e", TypeFloatArray4x4, 0);
 		class_add_element("_e", TypeFloatArray16, 0);
 		class_add_const("ID", TypeMat4, &mat4::ID);
-		class_add_func(Identifier::Func::STR, TypeString, &mat4::str, Flags::PURE);
-		class_add_func("transform", TypeVec3, &mat4::transform, Flags::PURE);
+		class_add_func(Identifier::func::Str, TypeString, &mat4::str, Flags::Pure);
+		class_add_func("transform", TypeVec3, &mat4::transform, Flags::Pure);
 			func_add_param("v", TypeVec3);
-		class_add_func("transform_normal", TypeVec3, &mat4::transform_normal, Flags::PURE);
+		class_add_func("transform_normal", TypeVec3, &mat4::transform_normal, Flags::Pure);
 			func_add_param("v", TypeVec3);
-		class_add_func("untransform", TypeVec3, &mat4::untransform, Flags::PURE);
+		class_add_func("untransform", TypeVec3, &mat4::untransform, Flags::Pure);
 			func_add_param("v", TypeVec3);
-		class_add_func("project", TypeVec3, &mat4::project, Flags::PURE);
+		class_add_func("project", TypeVec3, &mat4::project, Flags::Pure);
 			func_add_param("v", TypeVec3);
-		class_add_func("unproject", TypeVec3, &mat4::unproject, Flags::PURE);
+		class_add_func("unproject", TypeVec3, &mat4::unproject, Flags::Pure);
 			func_add_param("v", TypeVec3);
-		class_add_func("inverse", TypeMat4, &mat4::inverse, Flags::PURE);
-		class_add_func("transpose", TypeMat4, &mat4::transpose, Flags::PURE);
-		class_add_func("translation", TypeMat4, &mat4::translation, Flags::STATIC | Flags::PURE);
+		class_add_func("inverse", TypeMat4, &mat4::inverse, Flags::Pure);
+		class_add_func("transpose", TypeMat4, &mat4::transpose, Flags::Pure);
+		class_add_func("translation", TypeMat4, &mat4::translation, Flags::Static | Flags::Pure);
 			func_add_param("trans", TypeVec3);
-		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_v, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_v, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeVec3);
-		class_add_func("rotation_x", TypeMat4, &mat4::rotation_x, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation_x", TypeMat4, &mat4::rotation_x, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_y", TypeMat4, &mat4::rotation_y, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation_y", TypeMat4, &mat4::rotation_y, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation_z", TypeMat4, &mat4::rotation_z, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation_z", TypeMat4, &mat4::rotation_z, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeFloat32);
-		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_q, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation", TypeMat4, &KabaMatrix<mat4>::rotation_q, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_f, Flags::STATIC | Flags::PURE);
+		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_f, Flags::Static | Flags::Pure);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
-		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_v, Flags::STATIC | Flags::PURE);
+		class_add_func("scale", TypeMat4, &KabaMatrix<mat4>::scale_v, Flags::Static | Flags::Pure);
 			func_add_param("s", TypeVec3);
-		class_add_func("perspective", TypeMat4, &mat4::perspective, Flags::STATIC | Flags::PURE);
+		class_add_func("perspective", TypeMat4, &mat4::perspective, Flags::Static | Flags::Pure);
 			func_add_param("fovy", TypeFloat32);
 			func_add_param("aspect", TypeFloat32);
 			func_add_param("z_near", TypeFloat32);
 			func_add_param("z_far", TypeFloat32);
 			func_add_param("z_sym", TypeBool);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat4, TypeMat4, InlineID::CHUNK_ASSIGN, &KabaVector<mat4>::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeMat4, TypeMat4, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeMat4, TypeMat4, InlineID::CHUNK_NOT_EQUAL);
-		add_operator(OperatorID::MULTIPLY, TypeMat4, TypeMat4, TypeMat4, InlineID::NONE, &KabaMatrix<mat4>::mul);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeMat4, TypeVec3, InlineID::NONE, &KabaMatrix<mat4>::mul_v<vec3>);
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeMat4, TypeMat4, InlineID::NONE, &KabaMatrix<mat4>::imul);
+		add_operator(OperatorID::Assign, TypeVoid, TypeMat4, TypeMat4, InlineID::ChunkAssign, &KabaVector<mat4>::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeMat4, TypeMat4, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeMat4, TypeMat4, InlineID::ChunkNotEqual);
+		add_operator(OperatorID::Multiply, TypeMat4, TypeMat4, TypeMat4, InlineID::None, &KabaMatrix<mat4>::mul);
+		add_operator(OperatorID::Multiply, TypeVec3, TypeMat4, TypeVec3, InlineID::None, &KabaMatrix<mat4>::mul_v<vec3>);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeMat4, TypeMat4, InlineID::None, &KabaMatrix<mat4>::imul);
 
 	add_class(TypeMat3);
 		class_add_element("_11", TypeFloat32, 0);
@@ -843,389 +846,393 @@ void SIAddPackageMath(Context *c) {
 		class_add_element("_e", TypeFloatArray9, 0);
 		class_add_const("ID", TypeMat3, &mat3::ID);
 		class_add_const("0", TypeMat3, &mat3::ZERO);
-		class_add_func(Identifier::Func::STR, TypeString, &mat3::str, Flags::PURE);
-		class_add_func("inverse", TypeMat3, &mat3::inverse, Flags::PURE);
-		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_v, Flags::STATIC | Flags::PURE);
+		class_add_func(Identifier::func::Str, TypeString, &mat3::str, Flags::Pure);
+		class_add_func("inverse", TypeMat3, &mat3::inverse, Flags::Pure);
+		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_v, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeVec3);
-		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_q, Flags::STATIC | Flags::PURE);
+		class_add_func("rotation", TypeMat3, &KabaMatrix<mat3>::rotation_q, Flags::Static | Flags::Pure);
 			func_add_param("ang", TypeQuaternion);
-		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_f, Flags::STATIC | Flags::PURE);
+		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_f, Flags::Static | Flags::Pure);
 			func_add_param("s_x", TypeFloat32);
 			func_add_param("s_y", TypeFloat32);
 			func_add_param("s_z", TypeFloat32);
-		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_v, Flags::STATIC | Flags::PURE);
+		class_add_func("scale", TypeMat3, &KabaMatrix<mat3>::scale_v, Flags::Static | Flags::Pure);
 			func_add_param("s", TypeVec3);
-		add_operator(OperatorID::ASSIGN, TypeVoid, TypeMat3, TypeMat3, InlineID::CHUNK_ASSIGN, &KabaVector<mat3>::assign);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeMat3, TypeMat3, InlineID::CHUNK_EQUAL);
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeMat3, TypeMat3, InlineID::CHUNK_NOT_EQUAL);
-		add_operator(OperatorID::MULTIPLY, TypeMat3, TypeMat3, TypeMat3, InlineID::NONE, &KabaMatrix<mat3>::mul);
-		add_operator(OperatorID::MULTIPLY, TypeVec3, TypeMat3, TypeVec3, InlineID::NONE, &KabaMatrix<mat3>::mul_v<vec3>);
-	
+		add_operator(OperatorID::Assign, TypeVoid, TypeMat3, TypeMat3, InlineID::ChunkAssign, &KabaVector<mat3>::assign);
+		add_operator(OperatorID::Equal, TypeBool, TypeMat3, TypeMat3, InlineID::ChunkEqual);
+		add_operator(OperatorID::NotEqual, TypeBool, TypeMat3, TypeMat3, InlineID::ChunkNotEqual);
+		add_operator(OperatorID::Multiply, TypeMat3, TypeMat3, TypeMat3, InlineID::None, &KabaMatrix<mat3>::mul);
+		add_operator(OperatorID::Multiply, TypeVec3, TypeMat3, TypeVec3, InlineID::None, &KabaMatrix<mat3>::mul_v<vec3>);
+
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);
 		class_add_element("data", TypeIntList, 4);
-		class_add_func(Identifier::Func::INIT, TypeVoid, algebra_p(&vli::__init__), Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, algebra_p(&vli::__delete__), Flags::MUTABLE);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, algebra_p(&vli::set_vli), Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&vli::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, algebra_p(&vli::__delete__), Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_vli), Flags::Mutable);
 			func_add_param("v", TypeVli);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, algebra_p(&vli::set_str), Flags::MUTABLE);
+		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_str), Flags::Mutable);
 			func_add_param("s", TypeString);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, algebra_p(&vli::set_int), Flags::MUTABLE);
+		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_int), Flags::Mutable);
 			func_add_param("i", TypeInt32);
-		class_add_func(Identifier::Func::STR, TypeString, algebra_p(&vli::to_string), Flags::PURE);
-		class_add_func("compare", TypeInt32, algebra_p(&vli::compare), Flags::PURE);
+		class_add_func(Identifier::func::Str, TypeString, algebra_p(&vli::to_string), Flags::Pure);
+		class_add_func("compare", TypeInt32, algebra_p(&vli::compare), Flags::Pure);
 			func_add_param("v", TypeVli);
-		class_add_func("idiv", TypeVoid, algebra_p(&vli::idiv), Flags::MUTABLE);
+		class_add_func("idiv", TypeVoid, algebra_p(&vli::idiv), Flags::Mutable);
 			func_add_param("div", TypeVli);
 			func_add_param("rem", TypeVli);
-		class_add_func("div", TypeVli, algebra_p(&vli::_div), Flags::PURE);
+		class_add_func("div", TypeVli, algebra_p(&vli::_div), Flags::Pure);
 			func_add_param("div", TypeVli);
 			func_add_param("rem", TypeVli);
-		class_add_func("pow", TypeVli, algebra_p(&vli::pow), Flags::PURE);
+		class_add_func("pow", TypeVli, algebra_p(&vli::pow), Flags::Pure);
 			func_add_param("exp", TypeVli);
-		class_add_func("pow_mod", TypeVli, algebra_p(&vli::pow_mod), Flags::PURE);
+		class_add_func("pow_mod", TypeVli, algebra_p(&vli::pow_mod), Flags::Pure);
 			func_add_param("exp", TypeVli);
 			func_add_param("mod", TypeVli);
-		class_add_func("gcd", TypeVli, algebra_p(&vli::gcd), Flags::PURE);
+		class_add_func("gcd", TypeVli, algebra_p(&vli::gcd), Flags::Pure);
 			func_add_param("v", TypeVli);
-		add_operator(OperatorID::EQUAL, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator==));
-		add_operator(OperatorID::NOT_EQUAL, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator!=));
-		add_operator(OperatorID::GREATER, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator<));
-		add_operator(OperatorID::GREATER, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator>));
-		add_operator(OperatorID::SMALLER_EQUAL, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator<=));
-		add_operator(OperatorID::GREATER_EQUAL, TypeBool, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator>=));
-		add_operator(OperatorID::ADD, TypeVli, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator+));
-		add_operator(OperatorID::SUBTRACT, TypeVli, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator-));
-		add_operator(OperatorID::MULTIPLY, TypeVli, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator*));
-		add_operator(OperatorID::ADDS, TypeVoid, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator+=));
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator-=));
-		add_operator(OperatorID::MULTIPLYS, TypeVoid, TypeVli, TypeVli, InlineID::NONE, algebra_p(&vli::operator*=));
-	
+		add_operator(OperatorID::Equal, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator==));
+		add_operator(OperatorID::NotEqual, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator!=));
+		add_operator(OperatorID::Greater, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator<));
+		add_operator(OperatorID::Greater, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator>));
+		add_operator(OperatorID::SmallerEqual, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator<=));
+		add_operator(OperatorID::GreaterEqual, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator>=));
+		add_operator(OperatorID::Add, TypeVli, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator+));
+		add_operator(OperatorID::Subtract, TypeVli, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator-));
+		add_operator(OperatorID::Multiply, TypeVli, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator*));
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator+=));
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator-=));
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator*=));
+
 	add_class(TypeAny);
-		class_add_element("type", TypeClassRef, &Any::_class);
 		class_add_element("data", TypePointer, &Any::data);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &Any::__init__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &Any::__delete__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &Any::set, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &Any::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, &Any::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, &Any::set, Flags::Mutable);
 			func_add_param("a", TypeAny);
-		class_add_func("clear", TypeVoid, &Any::clear, Flags::MUTABLE);
-		class_add_func(Identifier::Func::LENGTH, TypeInt32, &Any::length, Flags::PURE);
-		class_add_func(Identifier::Func::GET, TypeAny, &KabaAny::_map_get, Flags::REF | Flags::RAISES_EXCEPTIONS);
+		class_add_func("type", TypeClassRef, &KabaAny::_get_class);
+		class_add_func("clear", TypeVoid, &Any::clear, Flags::Mutable);
+		class_add_func(Identifier::func::Length, TypeInt32, &Any::length, Flags::Pure);
+		class_add_func(Identifier::func::Get, TypeAnyRefOptional, &KabaAny::dict_get, Flags::Ref);
 			func_add_param("key", TypeString);
-		class_add_func(Identifier::Func::SET, TypeVoid, &KabaAny::_map_set, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+		class_add_func(Identifier::func::Set, TypeVoid, &KabaAny::dict_set, Flags::Mutable);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func(Identifier::Func::GET, TypeAny, &KabaAny::_array_get, Flags::REF | Flags::RAISES_EXCEPTIONS);
+		class_add_func(Identifier::func::Get, TypeAnyRefOptional, &KabaAny::list_get, Flags::Ref);
 			func_add_param("index", TypeInt32);
-		class_add_func(Identifier::Func::SET, TypeVoid, &KabaAny::_array_set, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+		class_add_func(Identifier::func::Set, TypeVoid, &KabaAny::list_set, Flags::Mutable);
 			func_add_param("index", TypeInt32);
 			func_add_param("value", TypeAny);
-		class_add_func("is_empty", TypeBool, &Any::is_empty, Flags::PURE);
-		class_add_func("has", TypeBool, &Any::has, Flags::PURE);
+		class_add_func("is_empty", TypeBool, &Any::is_empty, Flags::Pure);
+		class_add_func("has", TypeBool, &Any::has, Flags::Pure);
 			func_add_param("key", TypeString);
-		class_add_func("add", TypeVoid, &KabaAny::_array_add, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+		class_add_func("add", TypeVoid, &KabaAny::add, Flags::Mutable);
 			func_add_param("a", TypeAny);
-		class_add_func("drop", TypeVoid, &Any::map_drop, Flags::RAISES_EXCEPTIONS | Flags::MUTABLE);
+		class_add_func("drop", TypeVoid, &Any::dict_drop, Flags::RaisesExceptions | Flags::Mutable);
 			func_add_param("key", TypeString);
-		class_add_func("keys", TypeStringList, &Any::keys, Flags::PURE);//, Flags::RAISES_EXCEPTIONS);
-		class_add_func("__bool__", TypeBool, &Any::_bool, Flags::PURE);
-		class_add_func("__i32__", TypeInt32, &Any::_int, Flags::PURE);
-		class_add_func("__f32__", TypeFloat32, &Any::_float, Flags::PURE);
-		class_add_func(Identifier::Func::STR, TypeString, &Any::str, Flags::PURE);
-		class_add_func(Identifier::Func::REPR, TypeString, &Any::repr, Flags::PURE);
-		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RAISES_EXCEPTIONS);
+		class_add_func("keys", TypeStringList, &Any::keys, Flags::Pure);//, Flags::RAISES_EXCEPTIONS);
+		class_add_func("__bool__", TypeBool, &Any::_bool, Flags::Pure);
+		class_add_func("__i32__", TypeInt32, &Any::_int, Flags::Pure);
+		class_add_func("__f32__", TypeFloat32, &Any::_float, Flags::Pure);
+		class_add_func(Identifier::func::Str, TypeString, &Any::str, Flags::Pure);
+		class_add_func(Identifier::func::Repr, TypeString, &Any::repr, Flags::Pure);
+		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RaisesExceptions);
 			func_add_param("var", TypeReference);
 			func_add_param("type", TypeClassRef);
-		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::STATIC | Flags::RAISES_EXCEPTIONS);
+		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::Static | Flags::RaisesExceptions);
 			func_add_param("s", TypeString);
-		add_operator(OperatorID::ADDS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_add);// operator+=);
-		add_operator(OperatorID::SUBTRACTS, TypeVoid, TypeAny, TypeAny, InlineID::NONE, &Any::_sub);// operator-);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &Any::_add);// operator+=);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &Any::_sub);// operator-);
 
-	add_func("@int2any", TypeAny, &int2any, Flags::STATIC);
+
+	lib_create_optional<void*>(TypeAnyRefOptional);
+
+
+	add_func("@int2any", TypeAny, &int2any, Flags::Static);
 		func_add_param("i", TypeInt32);
-	add_func("@float2any", TypeAny, &float2any, Flags::STATIC);
+	add_func("@float2any", TypeAny, &float2any, Flags::Static);
 		func_add_param("i", TypeFloat32);
-	add_func("@bool2any", TypeAny, &bool2any, Flags::STATIC);
+	add_func("@bool2any", TypeAny, &bool2any, Flags::Static);
 		func_add_param("i", TypeBool);
-	add_func("@str2any", TypeAny, &str2any, Flags::STATIC);
+	add_func("@str2any", TypeAny, &str2any, Flags::Static);
 		func_add_param("s", TypeString);
-	add_func("@pointer2any", TypeAny, &pointer2any, Flags::STATIC);
+	add_func("@pointer2any", TypeAny, &pointer2any, Flags::Static);
 		func_add_param("p", TypePointer);
 
 
 	add_class(TypeCrypto);
 		class_add_element("n", TypeVli, 0);
 		class_add_element("k", TypeVli, sizeof(vli));
-		class_add_func(Identifier::Func::INIT, TypeVoid, algebra_p(&Crypto::__init__), Flags::MUTABLE);
-		class_add_func(Identifier::Func::STR, TypeString, algebra_p(&Crypto::str), Flags::PURE);
-		class_add_func("from_str", TypeVoid, algebra_p(&Crypto::from_str), Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&Crypto::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Str, TypeString, algebra_p(&Crypto::str), Flags::Pure);
+		class_add_func("from_str", TypeVoid, algebra_p(&Crypto::from_str), Flags::Mutable);
 			func_add_param("str", TypeString);
-		class_add_func("encrypt", TypeString, algebra_p(&Crypto::Encrypt), Flags::PURE);
+		class_add_func("encrypt", TypeString, algebra_p(&Crypto::Encrypt), Flags::Pure);
 			func_add_param("str", TypeString);
-		class_add_func("decrypt", TypeString, algebra_p(&Crypto::Decrypt), Flags::PURE);
+		class_add_func("decrypt", TypeString, algebra_p(&Crypto::Decrypt), Flags::Pure);
 			func_add_param("str", TypeString);
 			func_add_param("cut", TypeBool);
-		class_add_func("create_keys", TypeVoid, algebra_p(&CryptoCreateKeys), Flags::STATIC);
+		class_add_func("create_keys", TypeVoid, algebra_p(&CryptoCreateKeys), Flags::Static);
 			func_add_param("c1", TypeCrypto);
 			func_add_param("c2", TypeCrypto);
 			func_add_param("type", TypeString);
 			func_add_param("bits", TypeInt32);
 
 	add_class(TypeRandom);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &Random::__init__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &Random::__assign__, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &Random::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, &Random::__assign__, Flags::Mutable);
 			func_add_param("o", TypeRandom);
 		//class_add_element("n", TypeRandom, 0);
-		class_add_func("seed", TypeVoid, &Random::seed, Flags::MUTABLE);
+		class_add_func("seed", TypeVoid, &Random::seed, Flags::Mutable);
 			func_add_param("str", TypeString);
-		class_add_func("int", TypeInt32, &Random::_int, Flags::MUTABLE);
+		class_add_func("int", TypeInt32, &Random::_int, Flags::Mutable);
 			func_add_param("max", TypeInt32);
-		class_add_func("uniform01", TypeFloat32, &Random::uniform01, Flags::MUTABLE);
-		class_add_func("uniform", TypeFloat32, &Random::uniform, Flags::MUTABLE);
+		class_add_func("uniform01", TypeFloat32, &Random::uniform01, Flags::Mutable);
+		class_add_func("uniform", TypeFloat32, &Random::uniform, Flags::Mutable);
 			func_add_param("min", TypeFloat32);
 			func_add_param("max", TypeFloat32);
-		class_add_func("normal", TypeFloat32, &Random::normal, Flags::MUTABLE);
+		class_add_func("normal", TypeFloat32, &Random::normal, Flags::Mutable);
 			func_add_param("mean", TypeFloat32);
 			func_add_param("stddev", TypeFloat32);
-		class_add_func("in_ball", TypeVec3, &Random::in_ball, Flags::MUTABLE);
+		class_add_func("in_ball", TypeVec3, &Random::in_ball, Flags::Mutable);
 			func_add_param("r", TypeFloat32);
-		class_add_func("dir", TypeVec3, &Random::dir, Flags::MUTABLE);
-	
-	
+		class_add_func("dir", TypeVec3, &Random::dir, Flags::Mutable);
+
+
 	add_class(TypeFloatInterpolator);
 		class_add_element("type", TypeInt32, 0);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &Interpolator<float>::__init__, Flags::MUTABLE);
-		class_add_func("clear", TypeVoid, &Interpolator<float>::clear, Flags::MUTABLE);
-		class_add_func("set_type", TypeVoid, &Interpolator<float>::setType, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &Interpolator<float>::__init__, Flags::Mutable);
+		class_add_func("clear", TypeVoid, &Interpolator<float>::clear, Flags::Mutable);
+		class_add_func("set_type", TypeVoid, &Interpolator<float>::setType, Flags::Mutable);
 			func_add_param("type", TypeString);
-		class_add_func("add", TypeVoid, &Interpolator<float>::addv, Flags::MUTABLE);
+		class_add_func("add", TypeVoid, &Interpolator<float>::addv, Flags::Mutable);
 			func_add_param("p", TypeFloat32);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("add2", TypeVoid, &Interpolator<float>::add2v, Flags::MUTABLE);
+		class_add_func("add2", TypeVoid, &Interpolator<float>::add2v, Flags::Mutable);
 			func_add_param("p", TypeFloat32);
 			func_add_param("v", TypeFloat32);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("add3", TypeVoid, &Interpolator<float>::add3v, Flags::MUTABLE);
+		class_add_func("add3", TypeVoid, &Interpolator<float>::add3v, Flags::Mutable);
 			func_add_param("p", TypeFloat32);
 			func_add_param("v", TypeFloat32);
 			func_add_param("w", TypeFloat32);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("jump", TypeVoid, &Interpolator<float>::jumpv, Flags::MUTABLE);
+		class_add_func("jump", TypeVoid, &Interpolator<float>::jumpv, Flags::Mutable);
 			func_add_param("p", TypeFloat32);
 			func_add_param("v", TypeFloat32);
-		class_add_func("normalize", TypeVoid, &Interpolator<float>::normalize, Flags::MUTABLE);
-		class_add_func("get", TypeFloat32, &Interpolator<float>::get, Flags::PURE);
+		class_add_func("normalize", TypeVoid, &Interpolator<float>::normalize, Flags::Mutable);
+		class_add_func("get", TypeFloat32, &Interpolator<float>::get, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeFloat32, &Interpolator<float>::getTang, Flags::PURE);
+		class_add_func("get_tang", TypeFloat32, &Interpolator<float>::getTang, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeFloatList, &Interpolator<float>::getList, Flags::PURE);
+		class_add_func("get_list", TypeFloatList, &Interpolator<float>::getList, Flags::Pure);
 			func_add_param("t", TypeFloatList);
 
-	
+
 	add_class(TypeVectorInterpolator);
 		class_add_element("type", TypeInt32, 0);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &Interpolator<vec3>::__init__, Flags::MUTABLE);
-		class_add_func("clear", TypeVoid, &Interpolator<vec3>::clear, Flags::MUTABLE);
-		class_add_func("set_type", TypeVoid, &Interpolator<vec3>::setType, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &Interpolator<vec3>::__init__, Flags::Mutable);
+		class_add_func("clear", TypeVoid, &Interpolator<vec3>::clear, Flags::Mutable);
+		class_add_func("set_type", TypeVoid, &Interpolator<vec3>::setType, Flags::Mutable);
 			func_add_param("type", TypeString);
-		class_add_func("add", TypeVoid, &Interpolator<vec3>::add, Flags::MUTABLE);
+		class_add_func("add", TypeVoid, &Interpolator<vec3>::add, Flags::Mutable);
 			func_add_param("p", TypeVec3);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("add2", TypeVoid, &Interpolator<vec3>::add2, Flags::MUTABLE);
+		class_add_func("add2", TypeVoid, &Interpolator<vec3>::add2, Flags::Mutable);
 			func_add_param("p", TypeVec3);
 			func_add_param("v", TypeVec3);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("add3", TypeVoid, &Interpolator<vec3>::add3, Flags::MUTABLE);
+		class_add_func("add3", TypeVoid, &Interpolator<vec3>::add3, Flags::Mutable);
 			func_add_param("p", TypeVec3);
 			func_add_param("v", TypeVec3);
 			func_add_param("w", TypeFloat32);
 			func_add_param("dt", TypeFloat32);
-		class_add_func("jump", TypeVoid, &Interpolator<vec3>::jump, Flags::MUTABLE);
+		class_add_func("jump", TypeVoid, &Interpolator<vec3>::jump, Flags::Mutable);
 			func_add_param("p", TypeVec3);
 			func_add_param("v", TypeVec3);
-		class_add_func("normalize", TypeVoid, &Interpolator<vec3>::normalize, Flags::MUTABLE);
-		class_add_func("get", TypeVec3, &Interpolator<vec3>::get, Flags::PURE);
+		class_add_func("normalize", TypeVoid, &Interpolator<vec3>::normalize, Flags::Mutable);
+		class_add_func("get", TypeVec3, &Interpolator<vec3>::get, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeVec3, &Interpolator<vec3>::getTang, Flags::PURE);
+		class_add_func("get_tang", TypeVec3, &Interpolator<vec3>::getTang, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::getList, Flags::PURE);
+		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::getList, Flags::Pure);
 			func_add_param("t", TypeFloatList);
 
 	add_class(TypeFFT);
-		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::STATIC | Flags::PURE);
+		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::Static | Flags::Pure);
 			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeComplexList, Flags::OUT);
+			func_add_param("out", TypeComplexList, Flags::Out);
 			func_add_param("invers", TypeBool);
-		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::STATIC | Flags::PURE);
+		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::Static | Flags::Pure);
 			func_add_param("in", TypeFloatList);
-			func_add_param("out", TypeComplexList, Flags::OUT);
-		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::STATIC | Flags::PURE);
+			func_add_param("out", TypeComplexList, Flags::Out);
+		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::Static | Flags::Pure);
 			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeFloatList, Flags::OUT);
-		class_add_func("c2c_2d", TypeVoid, fft_p(&fft::c2c_2d), Flags::STATIC | Flags::PURE);
+			func_add_param("out", TypeFloatList, Flags::Out);
+		class_add_func("c2c_2d", TypeVoid, fft_p(&fft::c2c_2d), Flags::Static | Flags::Pure);
 			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeComplexList, Flags::OUT);
+			func_add_param("out", TypeComplexList, Flags::Out);
 			func_add_param("n", TypeInt32);
 			func_add_param("invers", TypeBool);
 
 
 	// int
-	add_func("clamp", TypeInt32, &clamp<int>, Flags::STATIC | Flags::PURE);
+	add_func("clamp", TypeInt32, &clamp<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", TypeInt32);
 		func_add_param("min", TypeInt32);
 		func_add_param("max", TypeInt32);
-	add_func("loop", TypeInt32, &loop<int>, Flags::STATIC | Flags::PURE);
+	add_func("loop", TypeInt32, &loop<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", TypeInt32);
 		func_add_param("min", TypeInt32);
 		func_add_param("max", TypeInt32);
-	add_func("abs", TypeInt32, &abs<int>, Flags::STATIC | Flags::PURE);
+	add_func("abs", TypeInt32, &abs<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", TypeInt32);
-	add_func("sign", TypeInt32, &sign<int>, Flags::STATIC | Flags::PURE);
+	add_func("sign", TypeInt32, &sign<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", TypeInt32);
-	add_func("min", TypeInt32, &min<int>, Flags::STATIC | Flags::PURE);
+	add_func("min", TypeInt32, &min<int>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeInt32);
 		func_add_param("b", TypeInt32);
-	add_func("max", TypeInt32, &max<int>, Flags::STATIC | Flags::PURE);
+	add_func("max", TypeInt32, &max<int>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeInt32);
 		func_add_param("b", TypeInt32);
 
 	// float
-	add_func("sin", TypeFloat32, &sinf, Flags::STATIC | Flags::PURE);
+	add_func("sin", TypeFloat32, &sinf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("cos", TypeFloat32, &cosf, Flags::STATIC | Flags::PURE);
+	add_func("cos", TypeFloat32, &cosf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("tan", TypeFloat32, &tanf, Flags::STATIC | Flags::PURE);
+	add_func("tan", TypeFloat32, &tanf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("asin", TypeFloat32, &asinf, Flags::STATIC | Flags::PURE);
+	add_func("asin", TypeFloat32, &asinf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("acos", TypeFloat32, &acosf, Flags::STATIC | Flags::PURE);
+	add_func("acos", TypeFloat32, &acosf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("atan", TypeFloat32, &atanf, Flags::STATIC | Flags::PURE);
+	add_func("atan", TypeFloat32, &atanf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("atan2", TypeFloat32, &atan2f, Flags::STATIC | Flags::PURE);
+	add_func("atan2", TypeFloat32, &atan2f, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
 		func_add_param("y", TypeFloat32);
-	add_func("sqrt", TypeFloat32, &sqrtf, Flags::STATIC | Flags::PURE);
+	add_func("sqrt", TypeFloat32, &sqrtf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, &f_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sqr", TypeFloat32, &f_sqr, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("exp", TypeFloat32, &expf, Flags::STATIC | Flags::PURE);
+	add_func("exp", TypeFloat32, &expf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("log", TypeFloat32, &logf, Flags::STATIC | Flags::PURE);
+	add_func("log", TypeFloat32, &logf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("pow", TypeFloat32, &powf, Flags::STATIC | Flags::PURE);
+	add_func("pow", TypeFloat32, &powf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
 		func_add_param("exp", TypeFloat32);
-	add_func("clamp", TypeFloat32, &clamp<float>, Flags::STATIC | Flags::PURE);
+	add_func("clamp", TypeFloat32, &clamp<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("loop", TypeFloat32, &loop<float>, Flags::STATIC | Flags::PURE);
+	add_func("loop", TypeFloat32, &loop<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", TypeFloat32);
 		func_add_param("min", TypeFloat32);
 		func_add_param("max", TypeFloat32);
-	add_func("abs", TypeFloat32, &abs<float>, Flags::STATIC | Flags::PURE);
+	add_func("abs", TypeFloat32, &abs<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", TypeFloat32);
-	add_func("sign", TypeFloat32, &sign<float>, Flags::STATIC | Flags::PURE);
+	add_func("sign", TypeFloat32, &sign<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", TypeFloat32);
-	add_func("min", TypeFloat32, &min<float>, Flags::STATIC | Flags::PURE);
+	add_func("min", TypeFloat32, &min<float>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
-	add_func("max", TypeFloat32, &max<float>, Flags::STATIC | Flags::PURE);
+	add_func("max", TypeFloat32, &max<float>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
 
 	// complex
-	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::STATIC | Flags::PURE);
+	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::Static | Flags::Pure);
 		func_add_param("z", TypeComplex);
 
 	// int[]
-	add_func("sum", TypeInt32, &XList<int>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeInt32, &XList<int>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("sum_sqr", TypeInt32, &XList<int>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeInt32, &XList<int>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("min", TypeInt32, &XList<int>::min, Flags::STATIC | Flags::PURE);
+	add_func("min", TypeInt32, &XList<int>::min, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("max", TypeInt32, &XList<int>::max, Flags::STATIC | Flags::PURE);
+	add_func("max", TypeInt32, &XList<int>::max, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("argmin", TypeInt32, &XList<int>::argmin, Flags::STATIC | Flags::PURE);
+	add_func("argmin", TypeInt32, &XList<int>::argmin, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("argmax", TypeInt32, &XList<int>::argmax, Flags::STATIC | Flags::PURE);
+	add_func("argmax", TypeInt32, &XList<int>::argmax, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("unique", TypeIntList, &XList<int>::unique, Flags::STATIC | Flags::PURE);
+	add_func("unique", TypeIntList, &XList<int>::unique, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
-	add_func("range", TypeIntList, (void*)&kaba_range<int>, Flags::STATIC | Flags::PURE);
+	add_func("range", TypeIntList, (void*)&kaba_range<int>, Flags::Static | Flags::Pure);
 		func_add_param("start", TypeInt32);
 		func_add_param_def("end", TypeInt32, DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeInt32, 1);
 
 	// float[]
-	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("min", TypeFloat32, &XList<float>::min, Flags::STATIC | Flags::PURE);
+	add_func("min", TypeFloat32, &XList<float>::min, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("max", TypeFloat32, &XList<float>::max, Flags::STATIC | Flags::PURE);
+	add_func("max", TypeFloat32, &XList<float>::max, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("argmin", TypeInt32, &XList<float>::argmin, Flags::STATIC | Flags::PURE);
+	add_func("argmin", TypeInt32, &XList<float>::argmin, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("argmax", TypeInt32, &XList<float>::argmax, Flags::STATIC | Flags::PURE);
+	add_func("argmax", TypeInt32, &XList<float>::argmax, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
-	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::STATIC | Flags::PURE);
+	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::Static | Flags::Pure);
 		func_add_param("start", TypeFloat32);
 		func_add_param_def("end", TypeFloat32, (float)DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeFloat32, 1.0f);
 
 	// float64[]
-	add_func("sum", TypeFloat64, &XList<double>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeFloat64, &XList<double>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
-	add_func("sum_sqr", TypeFloat64, &XList<double>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeFloat64, &XList<double>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
-	add_func("min", TypeFloat64, &XList<double>::min, Flags::STATIC | Flags::PURE);
+	add_func("min", TypeFloat64, &XList<double>::min, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
-	add_func("max", TypeFloat64, &XList<double>::max, Flags::STATIC | Flags::PURE);
+	add_func("max", TypeFloat64, &XList<double>::max, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
-	add_func("argmin", TypeInt32, &XList<double>::argmin, Flags::STATIC | Flags::PURE);
+	add_func("argmin", TypeInt32, &XList<double>::argmin, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
-	add_func("argmax", TypeInt32, &XList<double>::argmax, Flags::STATIC | Flags::PURE);
+	add_func("argmax", TypeInt32, &XList<double>::argmax, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloat64List);
 
 	// vec2[]
-	add_func("sum", TypeVec2, &VectorList<vec2>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeVec2, &VectorList<vec2>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec2List);
-	add_func("sum_sqr", TypeFloat32, &VectorList<vec2>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<vec2>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec2List);
 
 	// vec3[]
-	add_func("sum", TypeVec3, &VectorList<vec3>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeVec3, &VectorList<vec3>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec3List);
-	add_func("sum_sqr", TypeFloat32, &VectorList<vec3>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<vec3>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec3List);
 
 	// complex[]
-	add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeComplexList);
-	add_func("sum_sqr", TypeFloat32, &VectorList<complex>::sum_sqr, Flags::STATIC | Flags::PURE);
+	add_func("sum_sqr", TypeFloat32, &VectorList<complex>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeComplexList);
 
 	// string[]
-	add_func("sum", TypeString, &XList<string>::sum, Flags::STATIC | Flags::PURE);
+	add_func("sum", TypeString, &XList<string>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeStringList);
 
 	// other types
-	add_func("bary_centric", TypeVec2, (void*)&bary_centric, Flags::STATIC | Flags::PURE);
+	add_func("bary_centric", TypeVec2, (void*)&bary_centric, Flags::Static | Flags::Pure);
 		func_add_param("p", TypeVec3);
 		func_add_param("a", TypeVec3);
 		func_add_param("b", TypeVec3);
 		func_add_param("c", TypeVec3);
 
 	// random numbers
-	add_func("rand", TypeInt32, &randi, Flags::STATIC);
+	add_func("rand", TypeInt32, &randi, Flags::Static);
 		func_add_param("max", TypeInt32);
-	add_func("rand", TypeFloat32, &randf, Flags::STATIC);
+	add_func("rand", TypeFloat32, &randf, Flags::Static);
 		func_add_param("max", TypeFloat32);
-	add_func("rand_seed", TypeVoid, &srand, Flags::STATIC);
+	add_func("rand_seed", TypeVoid, &srand, Flags::Static);
 		func_add_param("seed", TypeInt32);
 
 	add_ext_var("_any_allow_simple_output", TypeBool, (void*)&Any::allow_simple_output);
@@ -1237,14 +1244,16 @@ void SIAddPackageMath(Context *c) {
 	// needs to be defined after any
 	TypeAnyList = add_type_list(TypeAny);
 	lib_create_list<Any>(TypeAnyList);
+	auto TypeAnyListP = add_type_p_raw(TypeAnyList);
 
 	TypeAnyDict = add_type_dict(TypeAny);
-	lib_create_dict<Any>(TypeAnyDict);
+	lib_create_dict<Any>(TypeAnyDict, TypeAnyRefOptional);
+	auto TypeAnyDictP = add_type_p_raw(TypeAnyDict);
 
 
 	add_class(TypeAny);
-		class_add_func("as_array", TypeAnyList, &KabaAny::_as_array, Flags::REF | Flags::RAISES_EXCEPTIONS);
-		class_add_func("as_map", TypeAnyDict, &KabaAny::_as_map, Flags::REF | Flags::RAISES_EXCEPTIONS);
+		class_add_func("as_list", TypeAnyListP, &KabaAny::_as_list, Flags::Ref);
+		class_add_func("as_dict", TypeAnyDictP, &KabaAny::_as_dict, Flags::Ref);
 
 
 	add_type_cast(50, TypeInt32, TypeAny, "math.@int2any");

@@ -62,19 +62,19 @@ void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zon
 				if (g.op <= 4)
 					msg_error("WAHHHH");
 				if (g.op == 43) {
-					az.map_set("keys", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
+					az.dict_set("keys", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
 				} else if (g.op == 44) {
-					az.map_set("vel", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
+					az.dict_set("vel", ia2any({g.amount & 0xff, (g.amount >> 8) & 0xff}));
 				} else if (g.op == 46) {
-					az.map_set("keys", ia2any({g.amount, g.amount}));
+					az.dict_set("keys", ia2any({g.amount, g.amount}));
 				} else if (g.op == 47) {
-					az.map_set("vel", ia2any({g.amount, g.amount}));
+					az.dict_set("vel", ia2any({g.amount, g.amount}));
 				} else if (g.op == 53) {
-					az.map_set("sample", g.amount);
+					az.dict_set("sample", g.amount);
 				} else if (g.op == 58) {
-					az.map_set("root-key", g.amount);
+					az.dict_set("root-key", g.amount);
 				} else if (g.op == 41) {
-					az.map_set("instrument", g.amount);
+					az.dict_set("instrument", g.amount);
 				} else if (g.op == 2) {
 					startloop += g.amount;
 				} else if (g.op == 3) {
@@ -92,24 +92,24 @@ void import_zones(Any &ai, const Array<FormatSoundFont2::sfZone> &zones, int zon
 				} else if (g.op == 12) {
 					end += g.amount << 15;
 				} else if (g.op == 34) {
-					az.map_set("attack", abs_timecents_to_sec((short)g.amount));
+					az.dict_set("attack", abs_timecents_to_sec((short)g.amount));
 				} else if (g.op == 38) {
-					az.map_set("release", abs_timecents_to_sec((short)g.amount));
+					az.dict_set("release", abs_timecents_to_sec((short)g.amount));
 				}
 			}
 			if (start > 0)
-				az.map_set("start", start);
+				az.dict_set("start", start);
 			if (end > 0)
-				az.map_set("end", end);
+				az.dict_set("end", end);
 			if (startloop > 0)
-				az.map_set("start-loop", startloop);
+				az.dict_set("start-loop", startloop);
 			if (endloop > 0)
-				az.map_set("end-loop", endloop);
+				az.dict_set("end-loop", endloop);
 			if (!az.is_empty())
 				azs.add(az);
 		}
 	}
-	ai.map_set("zones", azs);
+	ai.dict_set("zones", azs);
 }
 
 void FormatSoundFont2::load_song(StorageOperationData *_od) {
@@ -138,11 +138,11 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	for (auto &p: presets) {
 		msg_write(format("preset: %s", p.name));
 		Any ap;
-		ap.map_set("name", p.name);
+		ap.dict_set("name", p.name);
 		import_zones(ap, preset_zones, p.zone_start, p.zone_end, preset_generators);
 		aps.add(ap);
 	}
-	song->secret_data.map_set("presets", aps);
+	song->secret_data.dict_set("presets", aps);
 
 	instruments.back().zone_end = instrument_zones.num;
 	instrument_zones.back().gen_end = instrument_generators.num;
@@ -150,12 +150,12 @@ void FormatSoundFont2::load_song(StorageOperationData *_od) {
 	for (auto &i: instruments) {
 		msg_write(format("instrument: %s", i.name));
 		Any ai;
-		ai.map_set("name", i.name);
+		ai.dict_set("name", i.name);
 		import_zones(ai, instrument_zones, i.zone_start, i.zone_end, instrument_generators);
 		ais.add(ai);
 	}
 
-	song->secret_data.map_set("instruments", ais);
+	song->secret_data.dict_set("instruments", ais);
 	//msg_write(song->secret_data.str());
 
 	delete f;

@@ -2,80 +2,48 @@
 #include "../base/map.h"
 #include "../os/msg.h"
 
-#if __has_include("../kaba/kaba.h")
-#include "../kaba/kaba.h"
-namespace kaba {
-	extern const Class *TypeAnyList;
-	extern const Class *TypeAnyDict;
-}
-const void *_get_class(int t) {
-	if (t == Any::TYPE_INT)
-		return kaba::TypeInt32;
-	if (t == Any::TYPE_FLOAT)
-		return kaba::TypeFloat32;
-	if (t == Any::TYPE_BOOL)
-		return kaba::TypeBool;
-	if (t == Any::TYPE_STRING)
-		return kaba::TypeString;
-	if (t == Any::TYPE_ARRAY)
-		return kaba::TypeAnyList;
-	if (t == Any::TYPE_MAP)
-		return kaba::TypeAnyDict;
-	return kaba::TypeVoid;
-}
-#else
-	const void *_get_class(int t) {
-		return nullptr;
-	}
-#endif
-
 
 string f2s_clean(float f, int dez);
 
-class AnyMap : public base::map<string, Any> {};
+class AnyDict : public base::map<string, Any> {};
 
-AnyMap _empty_dummy_map_;
+AnyDict _empty_dummy_map_;
 static DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
 
 Any EmptyVar;
 //Any EmptyMap = _empty_dummy_map_;
-Any Any::EmptyArray = *(Array<Any>*)&_empty_dummy_array_;
-Any Any::EmptyMap = Any(_empty_dummy_map_);
+Any Any::EmptyList = *(Array<Any>*)&_empty_dummy_array_;
+Any Any::EmptyDict = Any(_empty_dummy_map_);
 bool Any::allow_simple_output = true;
 
 //#define any_db(m)	msg_write(m)
 #define any_db(m)
 
 
-static string type_name(int t) {
-	if (t == Any::TYPE_NONE)
+static string type_name(Any::Type t) {
+	if (t == Any::Type::None)
 		return "-none-";
-	if (t == Any::TYPE_INT)
+	if (t == Any::Type::Int)
 		return "int";
-	if (t == Any::TYPE_FLOAT)
+	if (t == Any::Type::Float)
 		return "float";
-	if (t == Any::TYPE_BOOL)
+	if (t == Any::Type::Bool)
 		return "bool";
-	if (t == Any::TYPE_STRING)
+	if (t == Any::Type::String)
 		return "string";
-	if (t == Any::TYPE_ARRAY)
-		return "array";
-	if (t == Any::TYPE_MAP)
-		return "map";
-	if (t == Any::TYPE_POINTER)
+	if (t == Any::Type::List)
+		return "list";
+	if (t == Any::Type::Dict)
+		return "dict";
+	if (t == Any::Type::Pointer)
 		return "pointer";
 	return "-unknown type-";
 }
 
 Any::Any() {
-	type = TYPE_NONE;
-	data = NULL;
+	type = Type::None;
+	data = nullptr;
 	parent = nullptr;
-#ifdef _X_USE_KABA_
-	_class = kaba::TypeVoid;
-#else
-	_class = nullptr;
-#endif
 }
 
 void Any::__init__() {
@@ -91,46 +59,46 @@ Any::Any(const Any &a) : Any() {
 }
 
 Any::Any(int i) : Any() {
-	create_type(TYPE_INT);
+	create_type(Type::Int);
 	as_int() = i;
 }
 
 Any::Any(float f) : Any() {
-	create_type(TYPE_FLOAT);
+	create_type(Type::Float);
 	as_float() = f;
 }
 
 Any::Any(bool b) : Any() {
-	create_type(TYPE_BOOL);
+	create_type(Type::Bool);
 	as_bool() = b;
 }
 
 Any::Any(const string &s) : Any() {
-	create_type(TYPE_STRING);
+	create_type(Type::String);
 	as_string() = s;
 }
 
 Any::Any(const char *s) : Any(string(s)) {}
 
 Any::Any(const void *p) : Any() {
-	create_type(TYPE_POINTER);
+	create_type(Type::Pointer);
 	as_pointer() = p;
 }
 
 Any::Any(const Array<Any> &a) : Any() {
-	create_type(TYPE_ARRAY);
-	as_array() = a;
+	create_type(Type::List);
+	as_list() = a;
 }
 
 Any::Any(const Array<int> &a) : Any() {
-	create_type(TYPE_ARRAY);
+	create_type(Type::List);
 	for (int i: a)
-		as_array().add(i);
+		as_list().add(i);
 }
 
-Any::Any(const AnyMap &m) : Any() {
-	create_type(TYPE_MAP);
-	as_map() = m;
+Any::Any(const AnyDict &m) : Any() {
+	create_type(Type::Dict);
+	as_dict() = m;
 }
 
 Any Any::ref() {
@@ -138,12 +106,11 @@ Any Any::ref() {
 	r.parent = this;
 	r.type = type;
 	r.data = data;
-	r._class = _class;
 	any_db(format("ref  %s -> %s:   %s", p2s(this), p2s(parent), str()));
 	return r;
 }
 
-void Any::create_type(int _type) {
+void Any::create_type(Type _type) {
 	if (parent) {
 		any_db(format("parent create  %s -> %s:   %s", p2s(this), p2s(parent), str()));
 		parent->create_type(_type);
@@ -152,7 +119,6 @@ void Any::create_type(int _type) {
 	}
 	clear();
 	type = _type;
-	_class = _get_class(type);
 	if (is_int()) {
 		data = new int;
 	} else if (is_float()) {
@@ -163,10 +129,10 @@ void Any::create_type(int _type) {
 		data = new (void*);
 	} else if (is_string()) {
 		data = new string;
-	} else if (is_array()) {
+	} else if (is_list()) {
 		data = new Array<Any>;
-	} else if (is_map()) {
-		data = new AnyMap;
+	} else if (is_dict()) {
+		data = new AnyDict;
 	} else if (is_empty()) {
 	} else {
 		msg_error("can not create " + type_name(type));
@@ -178,7 +144,6 @@ void Any::sync_to_parent() {
 		any_db(format("sync  %s -> %s:   %s", p2s(this), p2s(parent), str()));
 		parent->data = data;
 		parent->type = type;
-		parent->_class = _class;
 		parent->sync_to_parent();
 	}
 }
@@ -189,7 +154,6 @@ void Any::sync_from_parent() {
 		parent->sync_from_parent();
 		data = parent->data;
 		type = parent->type;
-		_class = parent->_class;
 	}
 }
 
@@ -220,50 +184,49 @@ void Any::clear() {
 			delete &as_bool();
 		else if (is_string())
 			delete &as_string();
-		else if (is_array())
-			delete &as_array();
-		else if (is_map())
-			delete &as_map();
+		else if (is_list())
+			delete &as_list();
+		else if (is_dict())
+			delete &as_dict();
 		else if (is_pointer())
 			delete &as_pointer();
 		else if (!is_empty())
 			msg_error("any.clear(): " + type_name(type));
-		type = TYPE_NONE;
-		_class = _get_class(type);
-		data = NULL;
+		type = Type::None;
+		data = nullptr;
 	}
 }
 
 bool Any::is_empty() const {
-	return type == TYPE_NONE;
+	return type == Type::None;
 }
 
 bool Any::is_int() const {
-	return type == TYPE_INT;
+	return type == Type::Int;
 }
 
 bool Any::is_float() const {
-	return type == TYPE_FLOAT;
+	return type == Type::Float;
 }
 
 bool Any::is_bool() const {
-	return type == TYPE_BOOL;
+	return type == Type::Bool;
 }
 
 bool Any::is_string() const {
-	return type == TYPE_STRING;
+	return type == Type::String;
 }
 
 bool Any::is_pointer() const {
-	return type == TYPE_POINTER;
+	return type == Type::Pointer;
 }
 
-bool Any::is_array() const {
-	return type == TYPE_ARRAY;
+bool Any::is_list() const {
+	return type == Type::List;
 }
 
-bool Any::is_map() const {
-	return type == TYPE_MAP;
+bool Any::is_dict() const {
+	return type == Type::Dict;
 }
 
 bool key_needs_quotes(const string &k) {
@@ -300,17 +263,17 @@ string Any::repr() const {
 		return as_string().repr();
 	} else if (is_pointer()) {
 		return p2s(as_pointer());
-	} else if (is_array()) {
+	} else if (is_list()) {
 		string s = "[";
-		for (Any &p: as_array()) {
+		for (Any &p: as_list()) {
 			if (s.num > 1)
 				s += ", ";
 			s += p.repr();
 		}
 		return s + "]";
-	} else if (is_map()) {
+	} else if (is_dict()) {
 		string s = "{";
-		for (auto&& [k,v]: as_map()) {
+		for (auto&& [k,v]: as_dict()) {
 			if (s.num > 1)
 				s += ", ";
 			s += minimal_key_repr(k) + ": " + v.repr();
@@ -359,7 +322,7 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 	expect_no_end();
 	auto &cur = tokens[pos];
 	if (cur == "[") {
-		a.create_type(Any::TYPE_ARRAY);
+		a.create_type(Any::Type::List);
 		pos ++;
 		while (tokens[pos] != "]") {
 			if (tokens[pos] == ",") {
@@ -367,24 +330,24 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 				pos ++;
 				continue;
 			}
-			a.as_array().resize(a.as_array().num + 1);
-			any_parse_part(a.as_array().back(), tokens, pos);
+			a.as_list().resize(a.as_list().num + 1);
+			any_parse_part(a.as_list().back(), tokens, pos);
 			if (tokens[pos] == "]")
 				break;
 			expect_token(",");
 		}
 		pos ++;
 	} else if (cur == "{") {
-		a.create_type(Any::TYPE_MAP);
+		a.create_type(Any::Type::Dict);
 		pos ++;
 		while (tokens[pos] != "}") {
 			Any key;
 			any_parse_part(key, tokens, pos);
-			if (key.type != Any::TYPE_STRING)
+			if (key.type != Any::Type::String)
 				throw Exception("only strings allowed as dict keys");
 			expect_token(":");
-			a.as_map().set(key.as_string(), Any());
-			any_parse_part(a.as_map()[key.as_string()], tokens, pos);
+			a.as_dict().set(key.as_string(), Any());
+			any_parse_part(a.as_dict()[key.as_string()], tokens, pos);
 			if (tokens[pos] == "}")
 				break;
 			expect_token(",");
@@ -395,24 +358,24 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 		pos ++;
 	} else if (str_is_number(cur)) {
 		if (cur.has_char('.')) {
-			a.create_type(Any::TYPE_FLOAT);
+			a.create_type(Any::Type::Float);
 			a.as_float() = cur._float();
 		} else {
-			a.create_type(Any::TYPE_INT);
+			a.create_type(Any::Type::Int);
 			a.as_int() = cur._int();
 		}
 		pos ++;
 	} else if (cur == "true" or cur == "false") {
-		a.create_type(Any::TYPE_BOOL);
+		a.create_type(Any::Type::Bool);
 		a.as_bool() = cur._bool();
 		pos ++;
 	} else if (cur[0] == '\"' or cur[0] == '\'') {
-		a.create_type(Any::TYPE_STRING);
+		a.create_type(Any::Type::String);
 		a.as_string() = cur.sub(1, -1).unescape();
 		pos ++;
 	} else {
 		// token (string without quotes)
-		a.create_type(Any::TYPE_STRING);
+		a.create_type(Any::Type::String);
 		a.as_string() = cur;
 		pos ++;
 		//throw Exception(format("what is '%s'?", cur));
@@ -481,10 +444,10 @@ void Any::operator = (const Any &a) {
 			as_pointer() = a.as_pointer();
 		} else if (a.is_string()) {
 			as_string() = a.as_string();
-		} else if (a.is_array()) {
-			as_array() = a.as_array();
-		} else if (a.is_map()) {
-			as_map() = a.as_map();
+		} else if (a.is_list()) {
+			as_list() = a.as_list();
+		} else if (a.is_dict()) {
+			as_dict() = a.as_dict();
 		} else if (a.is_empty()) {
 			clear();
 		} else {
@@ -523,9 +486,9 @@ void Any::operator += (const Any &a) {
 		as_float() += a._float();
 	else if (is_string() and a.is_string())
 		as_string() += a.str();
-	else if (is_array() and a.is_array())
+	else if (is_list() and a.is_list())
 		append(a);
-	else if (is_array())
+	else if (is_list())
 		add(a);
 	else
 		throw Exception(format("%s += %s not allowed", type_name(type), type_name(a.type)));
@@ -542,10 +505,10 @@ bool Any::operator == (const Any& a) const {
 		return as_bool() == a.as_bool();
 	if (is_string())
 		return as_string() == a.as_string();
-	if (is_array())
-		return as_array() == a.as_array();
-	if (is_map())
-		return false;//as_map() == a.as_map();
+	if (is_list())
+		return as_list() == a.as_list();
+	if (is_dict())
+		return false;//as_dict() == a.as_dict();
 	return false;
 }
 
@@ -560,17 +523,13 @@ void Any::add(const Any &a) {
 		any_db(format("parent add  %s -> %s:   %s", p2s(this), p2s(parent), str()));
 		return;
 	}
-	if (is_empty())
-		create_type(TYPE_ARRAY);
-	if (is_array()) {
-		if (&a == this) {
-			Any b = a;
-			as_array().add(b);
-		} else {
-			as_array().add(a);
-		}
+	if (!is_list())
+		create_type(Type::List);
+	if (&a == this) {
+		Any b = a;
+		as_list().add(b);
 	} else {
-		throw Exception("only allowed for arrays: " + type_name(type));
+		as_list().add(a);
 	}
 }
 
@@ -581,16 +540,16 @@ void Any::append(const Any &a) {
 		sync_from_parent();
 		return;
 	}
-	if (!a.is_array())
+	if (!a.is_list())
 		throw Exception("parameter not an array: " + type_name(a.type));
 	if (is_empty())
-		create_type(TYPE_ARRAY);
-	if (is_array() and a.is_array()) {
+		create_type(Type::List);
+	if (is_list() and a.is_list()) {
 		if (&a == this) {
 			Any b = a;
-			as_array().append(b.as_array());
+			as_list().append(b.as_list());
 		} else {
-			as_array().append(a.as_array());
+			as_list().append(a.as_list());
 		}
 	} else {
 		throw Exception("not an array: " + type_name(type));
@@ -598,59 +557,59 @@ void Any::append(const Any &a) {
 }
 
 int Any::length() const {
-	if (is_array())
-		return as_array().num;
-	if (is_map())
-		return as_map().num;
+	if (is_list())
+		return as_list().num;
+	if (is_dict())
+		return as_dict().num;
 	if (is_string())
 		return as_string().num;
 	return 0;
 }
 
 Any &Any::operator[] (int index) {
-	if (!is_array())
+	if (!is_list())
 		msg_error("only allowed for arrays: " + type_name(type));
-	return as_array()[index];
+	return as_list()[index];
 }
 
 const Any &Any::operator[] (int index) const {
-	if (!is_array())
+	if (!is_list())
 		msg_error("only allowed for arrays: " + type_name(type));
-	return as_array()[index];
+	return as_list()[index];
 }
 
 Any &Any::back() {
-	if (!is_array())
+	if (!is_list())
 		msg_error("only allowed for arrays: " + type_name(type));
-	return as_array().back();
+	return as_list().back();
 }
 
 const Any &Any::operator[] (const string &key) const {
-	if (!is_map())
+	if (!is_dict())
 		msg_error("only allowed for maps: " + type_name(type));
-	return as_map()[key];
+	return as_dict()[key];
 }
 
 Any &Any::operator[] (const string &key) {
 	if (is_empty())
-		create_type(TYPE_MAP);
-	if (!is_map())
+		create_type(Type::Dict);
+	if (!is_dict())
 		msg_error("only allowed for maps: " + type_name(type));
-	if (!as_map().contains(key))
-		as_map().set(key, Any());
-	return as_map()[key];
+	if (!as_dict().contains(key))
+		as_dict().set(key, Any());
+	return as_dict()[key];
 }
 
 Array<string> Any::keys() const {
-	if (!is_map())
+	if (!is_dict())
 		return {};
-	return as_map().keys();
+	return as_dict().keys();
 }
 
 bool Any::has(const string &key) const {
-	if (!is_map())
+	if (!is_dict())
 		return false;
-	return sa_contains(as_map().keys(), key);
+	return sa_contains(as_dict().keys(), key);
 }
 
 int& Any::as_int() const {
@@ -673,63 +632,64 @@ string& Any::as_string() const {
 	return *(string*)data;
 }
 
-AnyMap& Any::as_map() const {
-	return *(AnyMap*)data;
+AnyDict& Any::as_dict() const {
+	return *(AnyDict*)data;
 }
 
-Array<Any>& Any::as_array() const {
+Array<Any>& Any::as_list() const {
 	return *(Array<Any>*)data;
 }
 
-Any Any::array_get(int i) {
-	if (!is_array())
-		throw Exception("not an array: " + type_name(type));
-	return (*this)[i].ref();
+base::optional<Any*> Any::list_get(int i) {
+	if (!is_list())
+		return base::None;
+	if (i < 0 or i >= as_list().num)
+		return base::None;
+	return &(*this)[i];
 }
 
-void Any::array_set(int i, const Any &value) {
+void Any::list_set(int i, const Any &value) {
+	if (i < 0)
+		return;
 	if (parent) {
-		parent->array_set(i, value);
+		parent->list_set(i, value);
 		sync_from_parent();
 		return;
 	}
-	if (is_empty())
-		create_type(TYPE_ARRAY);
-	if (!is_array())
-		throw Exception("not an array: " + type_name(type));
+	if (!is_list())
+		create_type(Type::List);
+	if (as_list().num <= i)
+		as_list().resize(i + 1);
 	(*this)[i] = value;
 }
 
-Any Any::map_get(const string &key) {
-	if (!is_map())
-		throw Exception("not a map: " + type_name(type));
-	if (!as_map().contains(key))
-		throw Exception("key not found: " + key);
-	return as_map()[key].ref();
+base::optional<Any*> Any::dict_get(const string &key) {
+	if (!is_dict())
+		return base::None;
+	if (!as_dict().contains(key))
+		return base::None;
+	return &as_dict()[key];
 }
 
-void Any::map_set(const string &key, const Any &value) {
+void Any::dict_set(const string &key, const Any &value) {
 	if (parent) {
-		parent->map_set(key, value);
+		parent->dict_set(key, value);
 		sync_from_parent();
 		return;
 	}
-	if (is_empty())
-		create_type(TYPE_MAP);
-	if (!is_map())
-		throw Exception("not a map: " + type_name(type));
-	as_map().set(key, value);
+	if (!is_dict())
+		create_type(Type::Dict);
+	as_dict().set(key, value);
 }
 
-void Any::map_drop(const string &key) {
+void Any::dict_drop(const string &key) {
 	if (parent) {
-		parent->map_drop(key);
+		parent->dict_drop(key);
 		sync_from_parent();
 		return;
 	}
-	if (!is_map())
-		throw Exception("not a map: " + type_name(type));
-	as_map().drop(key);
+	if (is_dict())
+		as_dict().drop(key);
 }
 
 template<> string repr(const Any& a) {

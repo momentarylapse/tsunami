@@ -29,7 +29,7 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	auto_declared = false;
 	_var_size = 0;
 	token_id = -1;
-	inline_no = InlineID::NONE;
+	inline_no = InlineID::None;
 	virtual_index = -1;
 	num_slightly_hidden_vars = 0;
 	address = 0;
@@ -91,10 +91,10 @@ Variable *Function::__get_var(const string &name) const {
 
 Variable *Function::add_param(const string &name, const Class *type, Flags flags) {
 	auto v = block->insert_var(num_params, name, type);
-	if (flags_has(flags, Flags::OUT))
-		flags_set(v->flags, Flags::OUT);
+	if (flags_has(flags, Flags::Out))
+		flags_set(v->flags, Flags::Out);
 	else
-		flags_clear(v->flags, Flags::MUTABLE);
+		flags_clear(v->flags, Flags::Mutable);
 	literal_param_type.add(type);
 	num_params ++;
 	return v;
@@ -113,7 +113,7 @@ string Function::signature(const Class *ns) const {
 	for (int i=first; i<num_params; i++) {
 		if (i > first)
 			r += ", ";
-		if (flags_has(var[i]->flags, Flags::OUT))
+		if (flags_has(var[i]->flags, Flags::Out))
 			r += "out ";
 		r += literal_param_type[i]->cname(ns);
 	}
@@ -126,11 +126,11 @@ string Function::signature(const Class *ns) const {
 void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 	blocks.add(block);
 	for (auto n: weak(block->params)) {
-		if (n->kind == NodeKind::BLOCK)
+		if (n->kind == NodeKind::Block)
 			blocks_add_recursive(blocks, n->as_block());
-		if (n->kind == NodeKind::STATEMENT) {
+		if (n->kind == NodeKind::Statement) {
 			for (auto p: weak(n->params))
-				if (p->kind == NodeKind::BLOCK)
+				if (p->kind == NodeKind::Block)
 					blocks_add_recursive(blocks, p->as_block());
 		}
 	}
@@ -159,11 +159,11 @@ void Function::update_parameters_after_parsing() {
 	// return by memory
 	if (literal_return_type->uses_return_by_memory())
 		//if (!__get_var(Identifier::RETURN_VAR))
-			block->add_var(Identifier::RETURN_VAR, owner()->type_ref(literal_return_type));
+			block->add_var(Identifier::ReturnVar, owner()->type_ref(literal_return_type));
 
 	// class function
 	if (is_member()) {
-		if (!__get_var(Identifier::SELF))
+		if (!__get_var(Identifier::Self))
 			add_self_parameter();
 		/*if (flags_has(flags, Flags::CONST))
 			flags_set(__get_var(Identifier::SELF)->flags, Flags::CONST);
@@ -173,12 +173,12 @@ void Function::update_parameters_after_parsing() {
 }
 
 void Function::add_self_parameter() {
-	auto _flags = Flags::NONE;
-	if (flags_has(flags, Flags::MUTABLE))
-		flags_set(_flags, Flags::OUT | Flags::MUTABLE);
-	if (flags_has(flags, Flags::REF))
-		flags_set(_flags, Flags::REF);
-	block->insert_var(0, Identifier::SELF, name_space, _flags);
+	auto _flags = Flags::None;
+	if (flags_has(flags, Flags::Mutable))
+		flags_set(_flags, Flags::Out | Flags::Mutable);
+	if (flags_has(flags, Flags::Ref))
+		flags_set(_flags, Flags::Ref);
+	block->insert_var(0, Identifier::Self, name_space, _flags);
 	literal_param_type.insert(name_space, 0);
 	abstract_param_types.insert(nullptr, 0);
 	num_params ++;
@@ -190,7 +190,7 @@ void Function::add_self_parameter() {
 // * update_parameters_after_parsing() called
 Function *Function::create_dummy_clone(const Class *_name_space) const {
 	Function *f = new Function(name, literal_return_type, _name_space, flags);
-	flags_set(f->flags, Flags::NEEDS_OVERRIDE);
+	flags_set(f->flags, Flags::NeedsOverride);
 
 	f->num_params = num_params;
 	f->default_parameters = default_parameters;
@@ -217,51 +217,51 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 }
 
 bool Function::is_extern() const {
-	return flags_has(flags, Flags::EXTERN);
+	return flags_has(flags, Flags::Extern);
 }
 
 bool Function::is_pure() const {
-	return flags_has(flags, Flags::PURE);
+	return flags_has(flags, Flags::Pure);
 }
 
 bool Function::is_static() const {
-	return flags_has(flags, Flags::STATIC);
+	return flags_has(flags, Flags::Static);
 }
 
 bool Function::is_member() const {
-	return !flags_has(flags, Flags::STATIC);
+	return !flags_has(flags, Flags::Static);
 }
 
 bool Function::is_mutable() const {
-	return flags_has(flags, Flags::MUTABLE);
+	return flags_has(flags, Flags::Mutable);
 
 	// hmmm, might be better, to use self:
 	if (is_static())
 		return true;
-	return __get_var(Identifier::SELF)->is_mutable();
+	return __get_var(Identifier::Self)->is_mutable();
 }
 
 bool Function::is_selfref() const {
 	if (is_static())
 		return false;
-	return flags_has(flags, Flags::REF);
-	return flags_has(__get_var(Identifier::SELF)->flags, Flags::REF);
+	return flags_has(flags, Flags::Ref);
+	return flags_has(__get_var(Identifier::Self)->flags, Flags::Ref);
 }
 
 bool Function::throws_exceptions() const {
-	return flags_has(flags, Flags::RAISES_EXCEPTIONS);
+	return flags_has(flags, Flags::RaisesExceptions);
 }
 
 bool Function::is_template() const {
-	return flags_has(flags, Flags::TEMPLATE);
+	return flags_has(flags, Flags::Template);
 }
 
 bool Function::is_macro() const {
-	return flags_has(flags, Flags::MACRO);
+	return flags_has(flags, Flags::Macro);
 }
 
 bool Function::needs_overriding() const {
-	return flags_has(flags, Flags::NEEDS_OVERRIDE);
+	return flags_has(flags, Flags::NeedsOverride);
 }
 
 }

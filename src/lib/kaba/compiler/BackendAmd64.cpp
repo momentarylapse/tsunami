@@ -71,7 +71,7 @@ BackendAmd64::~BackendAmd64() {
 
 
 void BackendAmd64::implement_return(const SerialNodeParam &p) {
-	if (p.kind != NodeKind::NONE) {
+	if (p.kind != NodeKind::None) {
 		if (cur_func->effective_return_type->_return_in_float_registers()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
 			//		cmd.add_cmd(Asm::InstID::FLD, t);
@@ -350,7 +350,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	Array<Variable*> param;
 	if (f->effective_return_type->uses_return_by_memory()) {
 		for (Variable *v: weak(f->var))
-			if (v->name == Identifier::RETURN_VAR) {
+			if (v->name == Identifier::ReturnVar) {
 				param.add(v);
 				break;
 			}

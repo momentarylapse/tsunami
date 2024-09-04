@@ -52,7 +52,7 @@ void Configuration::set_str(const string& name, const string& val) {
 }
 
 void Configuration::set_str_array(const string &name, const Array<string> &val) {
-	Any a = Any::EmptyArray;
+	Any a = Any::EmptyList;
 	for (auto &s: val)
 		a.add(Any(s));
 	set(name, a);
@@ -85,13 +85,13 @@ string Configuration::get_str(const string& name, const string& default_val) con
 }
 
 Array<string> Configuration::get_str_array(const string &name, const Array<string> &default_val) const {
-	auto a = get(name, Any::EmptyArray);
+	auto a = get(name, Any::EmptyList);
 	if (a.is_empty())
 		return {};
 	if (a.is_string())
 		return {a.str()};
 	Array<string> r;
-	for (auto &s: a.as_array()) {
+	for (auto &s: a.as_list()) {
 		if (s.is_empty())
 			r.add("");
 		else

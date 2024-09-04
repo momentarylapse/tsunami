@@ -276,28 +276,28 @@ void lib_create_list(const Class *tt, bool allow_str = true) {
 	auto t_element = t->param[0];
 
 	add_class(t);
-		class_add_func(Identifier::Func::INIT, TypeVoid, &XList<T>::__init__, Flags::MUTABLE);
-		class_add_func(Identifier::Func::DELETE, TypeVoid, &XList<T>::clear, Flags::MUTABLE);
-		class_add_func("clear", TypeVoid, &XList<T>::clear, Flags::MUTABLE);
-		class_add_func("add", TypeVoid, &XList<T>::__add, Flags::MUTABLE);
+		class_add_func(Identifier::func::Init, TypeVoid, &XList<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, &XList<T>::clear, Flags::Mutable);
+		class_add_func("clear", TypeVoid, &XList<T>::clear, Flags::Mutable);
+		class_add_func("add", TypeVoid, &XList<T>::__add, Flags::Mutable);
 			func_add_param("x", t_element);
-		class_add_func("insert", TypeVoid, &XList<T>::__insert, Flags::MUTABLE);
+		class_add_func("insert", TypeVoid, &XList<T>::__insert, Flags::Mutable);
 			func_add_param("x", t_element);
 			func_add_param("index", TypeInt32);
 		/*class_add_func(Identifier::Func::CONTAINS, TypeBool, &XList<T>::__contains__);
 			func_add_param("x", t_element);
 		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XList<T>::assign);
 			func_add_param("other", t);*/
-		class_add_func("remove", TypeVoid, &XList<T>::erase, Flags::MUTABLE);
+		class_add_func("remove", TypeVoid, &XList<T>::erase, Flags::Mutable);
 			func_add_param("index", TypeInt32);
-		class_add_func("resize", TypeVoid, &XList<T>::resize, Flags::MUTABLE);
+		class_add_func("resize", TypeVoid, &XList<T>::resize, Flags::Mutable);
 			func_add_param("num", TypeInt32);
 		if (allow_str)
-			class_add_func(Identifier::Func::STR, TypeString, &XList<T>::str, Flags::PURE);
+			class_add_func(Identifier::func::Str, TypeString, &XList<T>::str, Flags::Pure);
 
-		add_operator(OperatorID::ASSIGN, TypeVoid, t, t, InlineID::NONE, &XList<T>::assign);
-		add_operator(OperatorID::IN, TypeBool, t, t_element, InlineID::NONE, &XList<T>::__contains__);
-		add_operator(OperatorID::BIT_OR, t, t, t, InlineID::NONE, &XList<T>::__add__);
+		add_operator(OperatorID::Assign, TypeVoid, t, t, InlineID::None, &XList<T>::assign);
+		add_operator(OperatorID::In, TypeBool, t, t_element, InlineID::None, &XList<T>::__contains__);
+		add_operator(OperatorID::BitOr, t, t, t, InlineID::None, &XList<T>::__add__);
 		//add_operator(OperatorID::BIT_OR_ASSIGN, TypeVoid, t, t, InlineID::NONE, &XList<T>::__adds__);
 }
 

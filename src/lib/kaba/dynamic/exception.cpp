@@ -158,7 +158,7 @@ ExceptionBlockData get_blocks(shared<Module> s, Function *f, void* rip, const Cl
 
 		// are we in a try block?
 		for (auto n: weak(b->parent->params)) {
-			if ((n->kind == NodeKind::STATEMENT) and (n->as_statement()->id == StatementID::TRY)) {
+			if ((n->kind == NodeKind::Statement) and (n->as_statement()->id == StatementID::Try)) {
 				if (n->params[0]->as_block() == b) {
 					dbo("found try block");
 					for (int i=1; i<n->params.num; i+=2) {

@@ -44,18 +44,18 @@ shared<Node> AutoImplementer::const_int(int i) {
 }
 
 shared<Node> AutoImplementer::node_not(shared<kaba::Node> n) {
-	return add_node_operator_by_inline(InlineID::BOOL_NOT, n, nullptr);
+	return add_node_operator_by_inline(InlineID::BoolNot, n, nullptr);
 }
 
 shared<Node> AutoImplementer::node_return(shared<Node> n) {
-	auto ret = add_node_statement(StatementID::RETURN, -1);
+	auto ret = add_node_statement(StatementID::Return, -1);
 	ret->set_num_params(1);
 	ret->set_param(0, n);
 	return ret;
 }
 
 shared<Node> AutoImplementer::node_if(shared<Node> n_test, shared<Node> n_true) {
-	auto cmd_if = add_node_statement(StatementID::IF);
+	auto cmd_if = add_node_statement(StatementID::If);
 	//cmd_if->type = n_true->type;
 	cmd_if->set_num_params(2);
 	cmd_if->set_param(0, n_test);
@@ -64,7 +64,7 @@ shared<Node> AutoImplementer::node_if(shared<Node> n_test, shared<Node> n_true) 
 }
 
 shared<Node> AutoImplementer::node_if_else(shared<Node> n_test, shared<Node> n_true, shared<Node> n_false) {
-	auto cmd_if = add_node_statement(StatementID::IF);
+	auto cmd_if = add_node_statement(StatementID::If);
 	//cmd_if->type = n_true->type;
 	cmd_if->set_num_params(3);
 	cmd_if->set_param(0, n_test);
@@ -77,9 +77,9 @@ shared<Node> AutoImplementer::node_raise_no_value() {
 	auto f_ex = TypeNoValueError->get_default_constructor();
 	auto cmd_call_ex = add_node_call(f_ex, -1);
 	cmd_call_ex->set_num_params(1);
-	cmd_call_ex->set_param(0, new Node(NodeKind::PLACEHOLDER, 0, TypeVoid));
+	cmd_call_ex->set_param(0, new Node(NodeKind::Placeholder, 0, TypeVoid));
 
-	auto cmd_new = add_node_statement(StatementID::NEW);
+	auto cmd_new = add_node_statement(StatementID::New);
 	cmd_new->set_num_params(1);
 	cmd_new->set_param(0, cmd_call_ex);
 	cmd_new->type = TypeExceptionXfer;
@@ -119,15 +119,15 @@ shared<Node> AutoImplementer::db_print_label_node(const string &s, shared<Node> 
 
 	auto ff = tree->required_func_global("print");
 	auto cmd = add_node_call(ff);
-	cmd->set_param(0, parser->con.link_operator_id(OperatorID::ADD, add_node_const(c), parser->con.add_converter_str(node, false)));
+	cmd->set_param(0, parser->con.link_operator_id(OperatorID::Add, add_node_const(c), parser->con.add_converter_str(node, false)));
 	return cmd;
 }
 
 shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
 	if ((a->type->is_reference() and b->type->is_reference())
 				or (a->type->is_pointer_xfer_not_null() and b->type->is_pointer_xfer_not_null()))
-		return add_node_operator_by_inline(InlineID::POINTER_ASSIGN, a, b);
-	if (auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, a, b))
+		return add_node_operator_by_inline(InlineID::PointerAssign, a, b);
+	if (auto n_assign = parser->con.link_operator_id(OperatorID::Assign, a, b))
 		return n_assign;
 	do_error_implicit(f, format("(%s) no operator %s = %s found", ctx, a->type->long_name(), b->type->long_name()));
 	return nullptr;
@@ -137,27 +137,27 @@ shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, const s
 	if ((a->type->is_reference() and b->type->is_reference())
 				or (a->type->is_pointer_xfer_not_null() and b->type->is_pointer_xfer_not_null())
 				or (a->type->is_pointer_alias() and b->type->is_pointer_alias()))
-		return add_node_operator_by_inline(InlineID::POINTER_ASSIGN, a, b);
-	if (auto n_assign = parser->con.link_operator_id(OperatorID::ASSIGN, a, b))
+		return add_node_operator_by_inline(InlineID::PointerAssign, a, b);
+	if (auto n_assign = parser->con.link_operator_id(OperatorID::Assign, a, b))
 		return n_assign;
 	do_error_implicit(f, format("(%s) %s", ctx, msg));
 	return nullptr;
 }
 
 shared<Node> AutoImplementer::add_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
-	if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, a, b))
+	if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, a, b))
 		return n_eq;
-	if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, a, b))
-		return add_node_operator_by_inline(InlineID::BOOL_NOT, n_neq, nullptr);
+	if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, a, b))
+		return add_node_operator_by_inline(InlineID::BoolNot, n_neq, nullptr);
 	do_error_implicit(f, format("neither operator %s == %s nor != found", a->type->long_name(), b->type->long_name()));
 	return nullptr;
 }
 
 shared<Node> AutoImplementer::add_not_equal(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
-	if (auto n_neq = parser->con.link_operator_id(OperatorID::NOT_EQUAL, a, b))
+	if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, a, b))
 		return n_neq;
-	if (auto n_eq = parser->con.link_operator_id(OperatorID::EQUAL, a, b))
-		return add_node_operator_by_inline(InlineID::BOOL_NOT, n_eq, nullptr);
+	if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, a, b))
+		return add_node_operator_by_inline(InlineID::BoolNot, n_eq, nullptr);
 	do_error_implicit(f, format("neither operator %s != %s nor == found", a->type->long_name(), b->type->long_name()));
 	return nullptr;
 }
@@ -180,7 +180,7 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
-		f->block->add_var(param_names[i], p, Flags::NONE);
+		f->block->add_var(param_names[i], p, Flags::None);
 		f->num_params ++;
 	}
 	f->default_parameters = def_params;
@@ -216,15 +216,15 @@ bool has_user_constructors(const Class *t) {
 
 void AutoImplementer::remove_inherited_constructors(Class *t) {
 	for (int i=t->functions.num-1; i>=0; i--)
-		if (t->functions[i]->name == Identifier::Func::INIT and t->functions[i]->needs_overriding())
+		if (t->functions[i]->name == Identifier::func::Init and t->functions[i]->needs_overriding())
 			t->functions.erase(i);
 }
 
 void AutoImplementer::redefine_inherited_constructors(Class *t) {
 	for (auto *pcc: t->parent->get_constructors()) {
-		auto c = t->get_same_func(Identifier::Func::INIT, pcc);
+		auto c = t->get_same_func(Identifier::func::Init, pcc);
 		if (needs_new(c)) {
-			add_func_header(t, Identifier::Func::INIT, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::MUTABLE, pcc->default_parameters);
+			add_func_header(t, Identifier::func::Init, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::Mutable, pcc->default_parameters);
 		}
 	}
 }
@@ -238,8 +238,8 @@ void AutoImplementer::add_full_constructor(Class *t) {
 			types.add(e.type);
 		}
 	}
-	auto f = add_func_header(t, Identifier::Func::INIT, TypeVoid, types, names, nullptr, Flags::MUTABLE);
-	flags_set(f->flags, Flags::__INIT_FILL_ALL_PARAMS);
+	auto f = add_func_header(t, Identifier::func::Init, TypeVoid, types, names, nullptr, Flags::Mutable);
+	flags_set(f->flags, Flags::__InitFillAllParams);
 }
 
 bool class_can_fully_construct(const Class *t) {
@@ -265,7 +265,7 @@ bool class_can_default_construct(const Class *t) {
 		return true;
 	if (t->get_default_constructor())
 		return true;
-	if (t->is_struct() and !flags_has(t->flags, Flags::NOAUTO))
+	if (t->is_struct() and !flags_has(t->flags, Flags::Noauto))
 		return true;
 	if (t->is_array())
 		return class_can_default_construct(t->param[0]);
@@ -277,7 +277,7 @@ bool class_can_destruct(const Class *t) {
 		return true;
 	if (t->get_destructor())
 		return true;
-	if (t->is_struct() and !flags_has(t->flags, Flags::NOAUTO))
+	if (t->is_struct() and !flags_has(t->flags, Flags::Noauto))
 		return true;
 	if (t->is_array())
 		return class_can_destruct(t->param[0]);
@@ -289,7 +289,7 @@ bool class_can_assign(const Class *t) {
 		return true;
 	if (t->get_assign())
 		return true;
-	if (t->is_struct() and !flags_has(t->flags, Flags::NOAUTO))
+	if (t->is_struct() and !flags_has(t->flags, Flags::Noauto))
 		return true;
 	if (t->is_array())
 		return class_can_assign(t->param[0]);
@@ -308,7 +308,7 @@ bool class_can_elements_assign(const Class *t) {
 bool class_can_equal(const Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return true;
-	if (t->get_member_func(Identifier::Func::EQUAL, TypeBool, {t}))
+	if (t->get_member_func(Identifier::func::Equal, TypeBool, {t}))
 		return true;
 	return false;
 }
@@ -327,7 +327,7 @@ Function* AutoImplementer::prepare_auto_impl(const Class *t, Function *f) {
 		return nullptr;
 	if (!f->auto_declared)
 		return nullptr;
-	flags_clear(f->flags, Flags::NEEDS_OVERRIDE); // we're about to implement....
+	flags_clear(f->flags, Flags::NeedsOverride); // we're about to implement....
 	return f;
 }
 

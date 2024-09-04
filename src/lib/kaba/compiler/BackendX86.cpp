@@ -113,31 +113,31 @@ void BackendX86::correct() {
 void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 	for (auto &c: cmd.cmd) {
 		for (auto &p: c.p) {
-			if (p.kind == NodeKind::NONE) {
-			} else if (p.kind == NodeKind::VAR_LOCAL) {
+			if (p.kind == NodeKind::None) {
+			} else if (p.kind == NodeKind::VarLocal) {
 				auto v = (Variable*)p.p;
 				p.p = v->_offset;
-				p.kind = NodeKind::LOCAL_MEMORY;
-			} else if (p.kind == NodeKind::VAR_GLOBAL) {
+				p.kind = NodeKind::LocalMemory;
+			} else if (p.kind == NodeKind::VarGlobal) {
 				auto v = (Variable*)p.p;
 				p.p = (int_p)v->memory;
 				if (!p.p)
 					module->do_error_link("variable is not linkable: " + v->name);
-				p.kind = NodeKind::MEMORY;
-			} else if (p.kind == NodeKind::CONSTANT) {
+				p.kind = NodeKind::Memory;
+			} else if (p.kind == NodeKind::Constant) {
 				auto cc = (Constant*)p.p;
 				if (module->tree->flag_function_pointer_as_code and (p.type == TypeFunctionRef)) {
 					auto *fp = (Function*)(int_p)cc->as_int64();
-					p.kind = NodeKind::LABEL;
+					p.kind = NodeKind::Label;
 					p.p = fp->_label;
 				} else {
 					p.p = (int_p)cc->address_runtime; // FIXME ....need a cleaner approach for compiling os...
 					if (config.fully_linear_output or (p.type == TypeFunctionCodeRef)) // from raw_function_pointer
-						p.kind = NodeKind::MEMORY;
+						p.kind = NodeKind::Memory;
 					else
-						p.kind = NodeKind::CONSTANT_BY_ADDRESS;
+						p.kind = NodeKind::ConstantByAddress;
 				}
-			} else if (p.kind == NodeKind::LABEL) {
+			} else if (p.kind == NodeKind::Label) {
 			} else {
 				//msg_write(p.str(serializer));
 			}
@@ -146,7 +146,7 @@ void BackendX86::correct_parameters_variables_to_memory(CommandList &cmd) {
 }
 
 void BackendX86::implement_return(const SerialNodeParam &p) {
-	if (p.kind != NodeKind::NONE) {
+	if (p.kind != NodeKind::None) {
 		if (cur_func->effective_return_type->_return_in_float_registers()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
 			//		cmd.add_cmd(Asm::InstID::FLD, t);
@@ -250,7 +250,7 @@ void BackendX86::correct_implement_commands() {
 		} else if (c.inst == Asm::InstID::LEA) {
 			auto p0 = c.p[0];
 			auto p1 = c.p[1];
-			if ((p1.kind == NodeKind::LOCAL_MEMORY) or (p1.kind == NodeKind::VAR_TEMP)) {
+			if ((p1.kind == NodeKind::LocalMemory) or (p1.kind == NodeKind::VarTemp)) {
 				insert_lea(p0, p1);
 			} else {
 				do_error("illegal reference to " + p1.str(serializer));
@@ -317,7 +317,7 @@ void BackendX86::correct_implement_commands() {
 			insert_cmd(Asm::InstID::MOV, r, p1);
 			insert_cmd(inst, r, param_vreg(TypeInt8, vecx, Asm::RegID::CL));
 		} else if (x86helper::inst_is_arithmetic(c.inst)) {
-			if (c.p[2].kind == NodeKind::NONE) {
+			if (c.p[2].kind == NodeKind::None) {
 				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
 				continue;
 			}
@@ -386,7 +386,7 @@ void BackendX86::correct_implement_commands() {
 			inst = x86helper::trafo_inst_float(inst, p1.type);
 			auto inst_mov = (p1.type == TypeFloat64) ? Asm::InstID::MOVSD : Asm::InstID::MOVSS;
 
-			if (p3.kind == NodeKind::NONE) {
+			if (p3.kind == NodeKind::None) {
 				// a += b
 				insert_cmd(inst_mov, p_xmm0, p1);
 				insert_cmd(inst, p_xmm0, p2);
@@ -582,20 +582,20 @@ SerialNodeParam BackendX86::insert_reference(const SerialNodeParam &param, const
 		type = module->tree->type_ref(param.type, -1);
 	ret.type = type;
 	ret.shift = 0;
-	if (param.kind == NodeKind::CONSTANT_BY_ADDRESS) {
+	if (param.kind == NodeKind::ConstantByAddress) {
 		return param_imm(type, (int_p)((char*)param.p + param.shift));
 
-	} else if ((param.kind == NodeKind::IMMEDIATE) or (param.kind == NodeKind::MEMORY)) {
+	} else if ((param.kind == NodeKind::Immediate) or (param.kind == NodeKind::Memory)) {
 		if (param.shift > 0)
 			msg_error("Serializer: immediade/mem + shift?!?!?");
 		return param_imm(type, param.p);
 
-	} else if (param.kind == NodeKind::DEREF_VAR_TEMP) {
+	} else if (param.kind == NodeKind::DereferenceVarTemp) {
 		ret = param;
-		ret.kind = NodeKind::VAR_TEMP; // FIXME why was it param.kind ?!?!?
+		ret.kind = NodeKind::VarTemp; // FIXME why was it param.kind ?!?!?
 
 
-	} else if ((param.kind == NodeKind::LOCAL_MEMORY) or (param.kind == NodeKind::VAR_TEMP)) {
+	} else if ((param.kind == NodeKind::LocalMemory) or (param.kind == NodeKind::VarTemp)) {
 		ret = cmd._add_temp(type);
 		insert_lea(ret, param);
 	} else {
@@ -642,7 +642,7 @@ void BackendX86::correct_far_mem_access() {
 	for (int i=0; i<cmd.cmd.num; i++) {
 		auto &c = cmd.cmd[i];
 
-		if (c.p[1].kind == NodeKind::CONSTANT_BY_ADDRESS) {
+		if (c.p[1].kind == NodeKind::ConstantByAddress) {
 			if (!dist_fits_32bit(c.p[1].p + c.p[1].shift, module->opcode)) {
 				auto p1 = c.p[1];
 
@@ -707,7 +707,7 @@ void BackendX86::do_mapping() {
 
 void BackendX86::correct_unallowed_param_combis2(SerialNode &c) {
 	if (c.inst == Asm::InstID::CMP)
-		if ((c.p[1].kind == NodeKind::IMMEDIATE) and (c.p[1].type->size == 8)) {
+		if ((c.p[1].kind == NodeKind::Immediate) and (c.p[1].type->size == 8)) {
 			if ((c.p[1].p & 0xffffffff00000000) != 0)
 				do_error("cmp immediate > 32bit");
 			c.p[1].type = TypeInt32;
@@ -717,7 +717,7 @@ void BackendX86::correct_unallowed_param_combis2(SerialNode &c) {
 
 namespace x86helper {
 inline bool param_is_simple(SerialNodeParam &p) {
-	return ((p.kind == NodeKind::REGISTER) or (p.kind == NodeKind::VAR_TEMP) or (p.kind == NodeKind::NONE));
+	return ((p.kind == NodeKind::Register) or (p.kind == NodeKind::VarTemp) or (p.kind == NodeKind::None));
 }
 
 inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNodeParam &p2) {
@@ -727,22 +727,22 @@ inline bool param_combi_allowed(Asm::InstID inst, SerialNodeParam &p1, SerialNod
 		return false;
 	bool r1, w1, r2, w2;
 	Asm::get_instruction_param_flags(inst, r1, w1, r2, w2);
-	if (w1 and (p1.kind == NodeKind::IMMEDIATE))
+	if (w1 and (p1.kind == NodeKind::Immediate))
 		return false;
-	if (w2 and (p2.kind == NodeKind::IMMEDIATE))
+	if (w2 and (p2.kind == NodeKind::Immediate))
 		return false;
-	if ((p1.kind == NodeKind::IMMEDIATE) or (p2.kind == NodeKind::IMMEDIATE))
+	if ((p1.kind == NodeKind::Immediate) or (p2.kind == NodeKind::Immediate))
 		if (!Asm::get_instruction_allow_const(inst))
 			return false;
 	return true;
 }
 
 inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &stackvar) {
-	if ((p.kind == NodeKind::VAR_TEMP) and (p.p == v)) {
-		p.kind = NodeKind::LOCAL_MEMORY;//stackvar.kind;
+	if ((p.kind == NodeKind::VarTemp) and (p.p == v)) {
+		p.kind = NodeKind::LocalMemory;//stackvar.kind;
 		p.p = stackvar.p;
-	} else if ((p.kind == NodeKind::DEREF_VAR_TEMP) and (p.p == v)) {
-		p.kind = NodeKind::DEREF_LOCAL_MEMORY;
+	} else if ((p.kind == NodeKind::DereferenceVarTemp) and (p.p == v)) {
+		p.kind = NodeKind::DerefereceLocalMemory;
 		p.p = stackvar.p;
 	}
 }
@@ -751,7 +751,7 @@ inline void try_map_param_to_stack(SerialNodeParam &p, int v, SerialNodeParam &s
 void BackendX86::map_referenced_temp_vars_to_stack() {
 	for (SerialNode &c: cmd.cmd)
 		if (c.inst == Asm::InstID::LEA)
-			if (c.p[1].kind == NodeKind::VAR_TEMP) {
+			if (c.p[1].kind == NodeKind::VarTemp) {
 				int v = c.p[1].p;
 //				msg_error("ref b " + i2s(v));
 				cmd.temp_var[v].referenced = true;
@@ -831,7 +831,7 @@ void BackendX86::add_stack_var(TempVar &v, SerialNodeParam &p) {
 
 	v.mapped = true;
 
-	p.kind = NodeKind::LOCAL_MEMORY;
+	p.kind = NodeKind::LocalMemory;
 	p.p = v.stack_offset;
 	p.type = v.type;
 	p.shift = 0;
@@ -850,13 +850,13 @@ void BackendX86::correct_params_indirect_in() {
 			continue;
 
 #if !defined(NDEBUG)
-		if ((c.p[0].kind == NodeKind::CONSTANT_BY_ADDRESS) or (c.p[0].kind == NodeKind::IMMEDIATE))
+		if ((c.p[0].kind == NodeKind::ConstantByAddress) or (c.p[0].kind == NodeKind::Immediate))
 			if (c.inst != Asm::InstID::CMP)
 				do_error("output into const: " + c.str(serializer));
 #endif
 
 		// correct
-		bool mov_first_param = (c.p[1].kind == NodeKind::NONE) or (c.p[0].kind == NodeKind::CONSTANT_BY_ADDRESS) or (c.p[0].kind == NodeKind::IMMEDIATE);
+		bool mov_first_param = (c.p[1].kind == NodeKind::None) or (c.p[0].kind == NodeKind::ConstantByAddress) or (c.p[0].kind == NodeKind::Immediate);
 		int p_index = mov_first_param ? 0 : 1;
 		SerialNodeParam p = c.p[p_index];
 
@@ -885,7 +885,7 @@ void BackendX86::solve_deref_temp_local(int c, int np, bool is_local) {
 	const Class *type_pointer = is_local ? TypePointer : cmd.temp_var[p.p].type;
 	const Class *type_data = p.type;
 
-	p.kind = is_local ? NodeKind::LOCAL_MEMORY : NodeKind::VAR_TEMP;
+	p.kind = is_local ? NodeKind::LocalMemory : NodeKind::VarTemp;
 	p.shift = 0;
 	p.type = type_pointer;
 
@@ -913,13 +913,13 @@ void BackendX86::resolve_deref_temp_and_local() {
 	for (int i=cmd.cmd.num-1;i>=0;i--) {
 		if (cmd.cmd[i].inst >= Asm::InstID::LABEL)
 			continue;
-		bool dl1 = ((cmd.cmd[i].p[0].kind == NodeKind::DEREF_LOCAL_MEMORY) or (cmd.cmd[i].p[0].kind == NodeKind::DEREF_VAR_TEMP));
-		bool dl2 = ((cmd.cmd[i].p[1].kind == NodeKind::DEREF_LOCAL_MEMORY) or (cmd.cmd[i].p[1].kind == NodeKind::DEREF_VAR_TEMP));
+		bool dl1 = ((cmd.cmd[i].p[0].kind == NodeKind::DerefereceLocalMemory) or (cmd.cmd[i].p[0].kind == NodeKind::DereferenceVarTemp));
+		bool dl2 = ((cmd.cmd[i].p[1].kind == NodeKind::DerefereceLocalMemory) or (cmd.cmd[i].p[1].kind == NodeKind::DereferenceVarTemp));
 		if (!(dl1 or dl2))
 			continue;
 
-		bool is_local1 = (cmd.cmd[i].p[0].kind == NodeKind::DEREF_LOCAL_MEMORY);
-		bool is_local2 = (cmd.cmd[i].p[1].kind == NodeKind::DEREF_LOCAL_MEMORY);
+		bool is_local1 = (cmd.cmd[i].p[0].kind == NodeKind::DerefereceLocalMemory);
+		bool is_local2 = (cmd.cmd[i].p[1].kind == NodeKind::DerefereceLocalMemory);
 
 		//msg_write(format("deref temp/local... cmd=%d", i));
 		if (!dl2) {
@@ -960,8 +960,8 @@ void BackendX86::resolve_deref_temp_and_local() {
 			int shift2 = p2.shift;
 			p1.shift = p2.shift = 0;
 
-			p1.kind = is_local1 ? NodeKind::LOCAL_MEMORY : NodeKind::VAR_TEMP;
-			p2.kind = is_local2 ? NodeKind::LOCAL_MEMORY : NodeKind::VAR_TEMP;
+			p1.kind = is_local1 ? NodeKind::LocalMemory : NodeKind::VarTemp;
+			p2.kind = is_local2 ? NodeKind::LocalMemory : NodeKind::VarTemp;
 			p1.type = type_pointer;
 			p2.type = type_pointer;
 			cmd.set_cmd_param(i, 0, p_deref_reg2);
@@ -1022,34 +1022,34 @@ void BackendX86::scan_temp_var_usage() {
 
 
 Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodeParam &p) {
-	if (p.kind == NodeKind::NONE) {
+	if (p.kind == NodeKind::None) {
 		return Asm::param_none;
-	} else if (p.kind == NodeKind::LABEL) {
+	} else if (p.kind == NodeKind::Label) {
 		return Asm::param_label(p.p, p.type->size);
-	} else if (p.kind == NodeKind::DEREF_LABEL) {
+	} else if (p.kind == NodeKind::DereferenceLabel) {
 		return Asm::param_deref_label(p.p, p.type->size);
-	} else if (p.kind == NodeKind::REGISTER) {
+	} else if (p.kind == NodeKind::Register) {
 		if (p.shift > 0)
 			do_error("prepare_param: reg + shift");
 		return Asm::param_reg(p.as_reg());
 		//param_size = p.type->size;
-	} else if (p.kind == NodeKind::DEREF_REGISTER) {
+	} else if (p.kind == NodeKind::DereferenceRegister) {
 		if (p.shift != 0)
 			return Asm::param_deref_reg_shift(p.as_reg(), p.shift, p.type->size);
 		else
 			return Asm::param_deref_reg(p.as_reg(), p.type->size);
-	} else if (p.kind == NodeKind::MEMORY) {
+	} else if (p.kind == NodeKind::Memory) {
 		int size = p.type->size;
 		// compiler self-test
 		if ((size != 1) and (size != 2) and (size != 4) and (size != 8))
 			do_error("prepare_param: evil global of type " + p.type->name);
 		return Asm::param_deref_imm(p.p + p.shift, size);
-	} else if (p.kind == NodeKind::LOCAL_MEMORY) {
+	} else if (p.kind == NodeKind::LocalMemory) {
 		return Asm::param_deref_reg_shift(Asm::RegID::EBP, p.p + p.shift, p.type->size);
 		//if ((param_size != 1) and (param_size != 2) and (param_size != 4) and (param_size != 8))
 		//	param_size = -1; // lea doesn't need size...
 			//s->DoErrorInternal("prepare_param: evil local of type " + p.type->name);
-	} else if (p.kind == NodeKind::CONSTANT_BY_ADDRESS) {
+	} else if (p.kind == NodeKind::ConstantByAddress) {
 		bool imm_allowed = Asm::get_instruction_allow_const(inst);
 		if (imm_allowed and p.type->is_pointer_raw()) {
 			return Asm::param_imm(*(int_p*)(p.p + p.shift), p.type->size);
@@ -1058,7 +1058,7 @@ Asm::InstructionParam BackendX86::prepare_param(Asm::InstID inst, SerialNodePara
 		} else {
 			return Asm::param_deref_imm(p.p + p.shift, p.type->size);
 		}
-	} else if (p.kind == NodeKind::IMMEDIATE) {
+	} else if (p.kind == NodeKind::Immediate) {
 		if (p.shift > 0)
 			do_error("prepare_param: immediate + shift");
 		return Asm::param_imm(p.p, p.type->size);
@@ -1099,7 +1099,7 @@ void BackendX86::assemble() {
 	stack_max_size = mem_align(stack_max_size, config.target.stack_frame_align);
 
 	list->insert_location_label(cur_func->_label);
-	if (!flags_has(cur_func->flags, Flags::NOFRAME))
+	if (!flags_has(cur_func->flags, Flags::Noframe))
 		add_function_intro_frame(stack_max_size); // param intro later...
 
 	for (auto &c: cmd.cmd) {

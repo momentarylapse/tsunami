@@ -13,117 +13,117 @@
 namespace kaba {
 
 string kind2str(NodeKind kind) {
-	if (kind == NodeKind::PLACEHOLDER)
+	if (kind == NodeKind::Placeholder)
 		return "placeholder";
-	if (kind == NodeKind::VAR_LOCAL)
+	if (kind == NodeKind::VarLocal)
 		return "local";
-	if (kind == NodeKind::VAR_GLOBAL)
+	if (kind == NodeKind::VarGlobal)
 		return "global";
-	if (kind == NodeKind::FUNCTION)
+	if (kind == NodeKind::Function)
 		return "function name";
-	if (kind == NodeKind::CONSTANT)
+	if (kind == NodeKind::Constant)
 		return "constant";
-	if (kind == NodeKind::CONSTANT_BY_ADDRESS)
+	if (kind == NodeKind::ConstantByAddress)
 		return "constant by addr";
-	if (kind == NodeKind::CALL_FUNCTION)
+	if (kind == NodeKind::CallFunction)
 		return "call";
-	if (kind == NodeKind::CALL_RAW_POINTER)
+	if (kind == NodeKind::CallRawPointer)
 		return "raw pointer call";
-	if (kind == NodeKind::CALL_INLINE)
+	if (kind == NodeKind::CallInline)
 		return "inline";
-	if (kind == NodeKind::CALL_VIRTUAL)
+	if (kind == NodeKind::CallVirtual)
 		return "virtual call";
-	if (kind == NodeKind::STATEMENT)
+	if (kind == NodeKind::Statement)
 		return "statement";
-	if (kind == NodeKind::CALL_SPECIAL_FUNCTION)
+	if (kind == NodeKind::CallSpecialFunction)
 		return "special function call";
-	if (kind == NodeKind::SPECIAL_FUNCTION_NAME)
+	if (kind == NodeKind::SpecialFunctionName)
 		return "special function name";
-	if (kind == NodeKind::OPERATOR)
+	if (kind == NodeKind::Operator)
 		return "operator";
-	if (kind == NodeKind::ABSTRACT_TOKEN)
+	if (kind == NodeKind::AbstractToken)
 		return "token";
-	if (kind == NodeKind::ABSTRACT_OPERATOR)
+	if (kind == NodeKind::AbstractOperator)
 		return "abstract operator";
-	if (kind == NodeKind::ABSTRACT_ELEMENT)
+	if (kind == NodeKind::AbstractElement)
 		return "abstract element";
-	if (kind == NodeKind::ABSTRACT_CALL)
+	if (kind == NodeKind::AbstractCall)
 		return "abstract call";
-	if (kind == NodeKind::ABSTRACT_TYPE_REFERENCE)
+	if (kind == NodeKind::AbstractTypeReference)
 		return "reference";
-	if (kind == NodeKind::ABSTRACT_TYPE_LIST)
+	if (kind == NodeKind::AbstractTypeList)
 		return "list";
-	if (kind == NodeKind::ABSTRACT_TYPE_DICT)
+	if (kind == NodeKind::AbstractTypeDict)
 		return "dict";
-	if (kind == NodeKind::ABSTRACT_TYPE_OPTIONAL)
+	if (kind == NodeKind::AbstractTypeOptional)
 		return "optional";
-	if (kind == NodeKind::ABSTRACT_TYPE_CALLABLE)
+	if (kind == NodeKind::AbstractTypeCallable)
 		return "callable type";
-	if (kind == NodeKind::ABSTRACT_VAR)
+	if (kind == NodeKind::AbstractVar)
 		return "var";
-	if (kind == NodeKind::BLOCK)
+	if (kind == NodeKind::Block)
 		return "block";
-	if (kind == NodeKind::ADDRESS_SHIFT)
+	if (kind == NodeKind::AddressShift)
 		return "address shift";
-	if (kind == NodeKind::ARRAY)
+	if (kind == NodeKind::Array)
 		return "array element";
-	if (kind == NodeKind::DYNAMIC_ARRAY)
+	if (kind == NodeKind::DynamicArray)
 		return "dynamic array element";
-	if (kind == NodeKind::POINTER_AS_ARRAY)
+	if (kind == NodeKind::PointerAsArray)
 		return "pointer as array element";
-	if (kind == NodeKind::REFERENCE)
+	if (kind == NodeKind::Reference)
 		return "reference operator";
-	if (kind == NodeKind::DEREFERENCE)
+	if (kind == NodeKind::Dereference)
 		return "dereferencing";
-	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
+	if (kind == NodeKind::DereferenceAddressShift)
 		return "deref address shift";
-	if (kind == NodeKind::DEFINITELY)
+	if (kind == NodeKind::Definitely)
 		return "definitely";
-	if (kind == NodeKind::CLASS)
+	if (kind == NodeKind::Class)
 		return "class";
-	if (kind == NodeKind::ARRAY_BUILDER)
+	if (kind == NodeKind::ArrayBuilder)
 		return "array builder";
-	if (kind == NodeKind::ARRAY_BUILDER_FOR)
+	if (kind == NodeKind::ArrayBuilderFor)
 		return "array builder for";
-	if (kind == NodeKind::ARRAY_BUILDER_FOR_IF)
+	if (kind == NodeKind::ArrayBuilderForIf)
 		return "array builder for if";
-	if (kind == NodeKind::DICT_BUILDER)
+	if (kind == NodeKind::DictBuilder)
 		return "dict builder";
-	if (kind == NodeKind::TUPLE)
+	if (kind == NodeKind::Tuple)
 		return "tuple";
-	if (kind == NodeKind::TUPLE_EXTRACTION)
+	if (kind == NodeKind::TupleExtraction)
 		return "tuple extract";
-	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
+	if (kind == NodeKind::ConstructorAsFunction)
 		return "constructor function";
-	if (kind == NodeKind::SLICE)
+	if (kind == NodeKind::Slice)
 		return "slice";
-	if (kind == NodeKind::VAR_TEMP)
+	if (kind == NodeKind::VarTemp)
 		return "temp";
-	if (kind == NodeKind::DEREF_VAR_TEMP)
+	if (kind == NodeKind::DereferenceVarTemp)
 		return "deref temp";
-	if (kind == NodeKind::REGISTER)
+	if (kind == NodeKind::Register)
 		return "register";
-	if (kind == NodeKind::ADDRESS)
+	if (kind == NodeKind::Address)
 		return "address";
-	if (kind == NodeKind::MEMORY)
+	if (kind == NodeKind::Memory)
 		return "memory";
-	if (kind == NodeKind::LOCAL_ADDRESS)
+	if (kind == NodeKind::LocalAddress)
 		return "local address";
-	if (kind == NodeKind::LOCAL_MEMORY)
+	if (kind == NodeKind::LocalMemory)
 		return "local memory";
-	if (kind == NodeKind::DEREF_REGISTER)
+	if (kind == NodeKind::DereferenceRegister)
 		return "deref register";
-	if (kind == NodeKind::LABEL)
+	if (kind == NodeKind::Label)
 		return "label";
-	if (kind == NodeKind::DEREF_LABEL)
+	if (kind == NodeKind::DereferenceLabel)
 		return "deref label";
-	if (kind == NodeKind::GLOBAL_LOOKUP)
+	if (kind == NodeKind::GlobalLookup)
 		return "global lookup";
-	if (kind == NodeKind::DEREF_GLOBAL_LOOKUP)
+	if (kind == NodeKind::DereferenceGlobalLookup)
 		return "deref global lookup";
-	if (kind == NodeKind::IMMEDIATE)
+	if (kind == NodeKind::Immediate)
 		return "immediate";
-	if (kind == NodeKind::DEREF_LOCAL_MEMORY)
+	if (kind == NodeKind::DerefereceLocalMemory)
 		return "deref local";
 	return format("UNKNOWN KIND: %d", (int)kind);
 }
@@ -132,71 +132,71 @@ string kind2str(NodeKind kind) {
 string Node::signature(const Class *ns) const {
 	//string t = (kind == NodeKind::ABSTRACT_TOKEN) ? " " : type->cname(ns) + " ";
 	string t = ": " + type->cname(ns);
-	if (kind == NodeKind::PLACEHOLDER)
+	if (kind == NodeKind::Placeholder)
 		return "";
-	if (kind == NodeKind::VAR_LOCAL)
+	if (kind == NodeKind::VarLocal)
 		return as_local()->name + t;
-	if (kind == NodeKind::VAR_GLOBAL)
+	if (kind == NodeKind::VarGlobal)
 		return as_global()->name + t;
-	if (kind == NodeKind::FUNCTION)
+	if (kind == NodeKind::Function)
 		return as_func()->cname(ns) + t;
-	if (kind == NodeKind::CONSTANT)
+	if (kind == NodeKind::Constant)
 		return as_const()->str() + t;
-	if (kind == NodeKind::CALL_FUNCTION)
+	if (kind == NodeKind::CallFunction)
 		return as_func()->signature(ns) + t;
-	if (kind == NodeKind::CALL_RAW_POINTER)
+	if (kind == NodeKind::CallRawPointer)
 		return "(...)" + t;
-	if (kind == NodeKind::CALL_INLINE)
+	if (kind == NodeKind::CallInline)
 		return as_func()->signature(ns);
-	if (kind == NodeKind::CALL_VIRTUAL)
+	if (kind == NodeKind::CallVirtual)
 		return as_func()->signature(ns);
-	if (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION)
+	if (kind == NodeKind::ConstructorAsFunction)
 		return as_func()->signature(ns);
-	if (kind == NodeKind::SLICE)
+	if (kind == NodeKind::Slice)
 		return t;
-	if (kind == NodeKind::STATEMENT)
+	if (kind == NodeKind::Statement)
 		return as_statement()->name + t;
-	if (kind == NodeKind::CALL_SPECIAL_FUNCTION)
+	if (kind == NodeKind::CallSpecialFunction)
 		return as_special_function()->name + t;
-	if (kind == NodeKind::SPECIAL_FUNCTION_NAME)
+	if (kind == NodeKind::SpecialFunctionName)
 		return as_special_function()->name + t;
-	if (kind == NodeKind::OPERATOR)
+	if (kind == NodeKind::Operator)
 		return as_op()->sig(ns);
-	if (kind == NodeKind::ABSTRACT_TOKEN)
+	if (kind == NodeKind::AbstractToken)
 		return as_token();
-	if (kind == NodeKind::ABSTRACT_OPERATOR)
+	if (kind == NodeKind::AbstractOperator)
 		return as_abstract_op()->name;
-	if (kind == NodeKind::BLOCK)
+	if (kind == NodeKind::Block)
 		return (type == TypeVoid) ? "" : t; //p2s(as_block());
-	if (kind == NodeKind::ADDRESS_SHIFT)
-		return i2s(link_no) + t;
-	if (kind == NodeKind::ARRAY)
+	if (kind == NodeKind::AddressShift)
+		return ::str(link_no) + t;
+	if (kind == NodeKind::Array)
 		return t;
-	if (kind == NodeKind::DYNAMIC_ARRAY)
+	if (kind == NodeKind::DynamicArray)
 		return t;
-	if (kind == NodeKind::POINTER_AS_ARRAY)
+	if (kind == NodeKind::PointerAsArray)
 		return t;
-	if (kind == NodeKind::REFERENCE)
+	if (kind == NodeKind::Reference)
 		return t;
-	if (kind == NodeKind::DEREFERENCE)
+	if (kind == NodeKind::Dereference)
 		return t;
-	if (kind == NodeKind::DEFINITELY)
+	if (kind == NodeKind::Definitely)
 		return t;
-	if (kind == NodeKind::DEREF_ADDRESS_SHIFT)
-		return i2s(link_no) + t;
-	if (kind == NodeKind::CLASS)
+	if (kind == NodeKind::DereferenceAddressShift)
+		return ::str(link_no) + t;
+	if (kind == NodeKind::Class)
 		return as_class()->cname(ns);
-	if (kind == NodeKind::REGISTER)
+	if (kind == NodeKind::Register)
 		return Asm::get_reg_name((Asm::RegID)link_no) + t;
-	if (kind == NodeKind::ADDRESS)
+	if (kind == NodeKind::Address)
 		return i2h(link_no, config.target.pointer_size) + t;
-	if (kind == NodeKind::MEMORY)
+	if (kind == NodeKind::Memory)
 		return i2h(link_no, config.target.pointer_size) + t;
-	if (kind == NodeKind::LOCAL_ADDRESS)
+	if (kind == NodeKind::LocalAddress)
 		return i2h(link_no, config.target.pointer_size) + t;
-	if (kind == NodeKind::LOCAL_MEMORY)
+	if (kind == NodeKind::LocalMemory)
 		return i2h(link_no, config.target.pointer_size) + t;
-	return i2s(link_no) + t;
+	return ::str(link_no) + t;
 }
 
 string Node::str(const Class *ns) const {
@@ -234,27 +234,27 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, Flags _flags, int
 }
 
 Node::~Node() {
-	if (kind == NodeKind::BLOCK)
+	if (kind == NodeKind::Block)
 		as_block()->vars.clear();
 }
 
 bool Node::is_mutable() const {
-	return flags_has(flags, Flags::MUTABLE);
+	return flags_has(flags, Flags::Mutable);
 }
 
 void Node::set_mutable(bool _mutable) {
 	if (_mutable)
-		flags_set(flags, Flags::MUTABLE);
+		flags_set(flags, Flags::Mutable);
 	else
-		flags_clear(flags, Flags::MUTABLE);
+		flags_clear(flags, Flags::Mutable);
 }
 
 bool Node::is_call() const {
-	return (kind == NodeKind::CALL_FUNCTION) or (kind == NodeKind::CALL_VIRTUAL) or (kind == NodeKind::CALL_RAW_POINTER);
+	return (kind == NodeKind::CallFunction) or (kind == NodeKind::CallVirtual) or (kind == NodeKind::CallRawPointer);
 }
 
 bool Node::is_function() const {
-	return (kind == NodeKind::CALL_FUNCTION) or (kind == NodeKind::CALL_VIRTUAL) or (kind == NodeKind::CALL_INLINE) or (kind == NodeKind::CONSTRUCTOR_AS_FUNCTION);
+	return (kind == NodeKind::CallFunction) or (kind == NodeKind::CallVirtual) or (kind == NodeKind::CallInline) or (kind == NodeKind::ConstructorAsFunction);
 }
 
 Block *Node::as_block() const {
@@ -364,7 +364,7 @@ shared<Node> Node::shallow_copy() const {
 }
 
 shared<Node> Node::ref(const Class *t) const {
-	shared<Node> c = new Node(NodeKind::REFERENCE, 0, t, flags, token_id);
+	shared<Node> c = new Node(NodeKind::Reference, 0, t, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -377,21 +377,21 @@ shared<Node> Node::ref(SyntaxTree *tree) const {
 shared<Node> Node::deref(const Class *override_type) const {
 	if (!override_type)
 		override_type = type->param[0];
-	shared<Node> c = new Node(NodeKind::DEREFERENCE, 0, override_type, flags, token_id);
+	shared<Node> c = new Node(NodeKind::Dereference, 0, override_type, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::shift(int64 shift, const Class *type, int token_id) const {
-	shared<Node> c = new Node(NodeKind::ADDRESS_SHIFT, shift, type, flags, token_id >= 0 ? token_id : this->token_id);
+	shared<Node> c = new Node(NodeKind::AddressShift, shift, type, flags, token_id >= 0 ? token_id : this->token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
 }
 
 shared<Node> Node::deref_shift(int64 shift, const Class *type, int token_id) const {
-	shared<Node> c = new Node(NodeKind::DEREF_ADDRESS_SHIFT, shift, type, flags, token_id);
+	shared<Node> c = new Node(NodeKind::DereferenceAddressShift, shift, type, flags, token_id);
 	c->set_num_params(1);
 	c->set_param(0, const_cast<Node*>(this));
 	return c;
@@ -409,7 +409,7 @@ shared<Node> Node::change_type(const Class *type, int token_id) const {
 // recursive
 shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 	shared<Node> cmd;
-	if (c->kind == NodeKind::BLOCK) {
+	if (c->kind == NodeKind::Block) {
 		if (!parent_block)
 			parent_block = c->as_block()->parent;
 		cmd = new Block(c->as_block()->function, parent_block, c->type);
@@ -429,15 +429,15 @@ shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 
 
 shared<Node> add_node_constructor(const Function *f, int token_id) {
-	auto *dummy = new Node(NodeKind::PLACEHOLDER, 0, f->name_space, Flags::MUTABLE);
+	auto *dummy = new Node(NodeKind::Placeholder, 0, f->name_space, Flags::Mutable);
 	auto n = add_node_member_call(f, dummy, token_id); // temp var added later...
-	n->kind = NodeKind::CONSTRUCTOR_AS_FUNCTION;
+	n->kind = NodeKind::ConstructorAsFunction;
 	n->type = f->name_space;
 	return n;
 }
 
 shared<Node> add_node_const(const Constant *c, int token_id) {
-	return new Node(NodeKind::CONSTANT, (int_p)c, c->type.get(), Flags::NONE, token_id);
+	return new Node(NodeKind::Constant, (int_p)c, c->type.get(), Flags::None, token_id);
 }
 
 /*shared<Node> add_node_block(Block *b) {
@@ -446,21 +446,21 @@ shared<Node> add_node_const(const Constant *c, int token_id) {
 
 shared<Node> add_node_statement(StatementID id, int token_id, const Class *type) {
 	auto *s = statement_from_id(id);
-	auto c = new Node(NodeKind::STATEMENT, (int_p)s, type, Flags::NONE, token_id);
+	auto c = new Node(NodeKind::Statement, (int_p)s, type, Flags::None, token_id);
 	c->set_num_params(s->num_params);
 	return c;
 }
 
 shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id, const Class *type) {
 	auto *s = special_function_from_id(id);
-	auto c = new Node(NodeKind::CALL_SPECIAL_FUNCTION, (int_p)s, type, Flags::NONE, token_id);
+	auto c = new Node(NodeKind::CallSpecialFunction, (int_p)s, type, Flags::None, token_id);
 	c->set_num_params(s->max_params);
 	return c;
 }
 
 shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, const Class *type) {
 	auto *s = special_function_from_id(id);
-	auto c = new Node(NodeKind::SPECIAL_FUNCTION_NAME, (int_p)s, type, Flags::NONE, token_id);
+	auto c = new Node(NodeKind::SpecialFunctionName, (int_p)s, type, Flags::None, token_id);
 	return c;
 }
 
@@ -468,9 +468,9 @@ shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, 
 shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params, bool force_non_virtual) {
 	shared<Node> c;
 	if ((f->virtual_index >= 0) and !force_non_virtual) {
-		c = new Node(NodeKind::CALL_VIRTUAL, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
+		c = new Node(NodeKind::CallVirtual, (int_p)f, f->literal_return_type, Flags::None, token_id);
 	} else {
-		c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
+		c = new Node(NodeKind::CallFunction, (int_p)f, f->literal_return_type, Flags::None, token_id);
 	}
 	c->set_num_params(f->num_params);
 	c->set_instance(inst);
@@ -482,24 +482,24 @@ shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, in
 // non-member!
 shared<Node> add_node_call(const Function *f, int token_id) {
 	// FIXME: literal_return_type???
-	shared<Node> c = new Node(NodeKind::CALL_FUNCTION, (int_p)f, f->literal_return_type, Flags::NONE, token_id);
+	shared<Node> c = new Node(NodeKind::CallFunction, (int_p)f, f->literal_return_type, Flags::None, token_id);
 		c->set_num_params(f->num_params);
 	return c;
 }
 
 shared<Node> add_node_func_name(const Function *f, int token_id) {
-	return new Node(NodeKind::FUNCTION, (int_p)f, TypeUnknown, Flags::NONE, token_id);
+	return new Node(NodeKind::Function, (int_p)f, TypeUnknown, Flags::None, token_id);
 }
 
 shared<Node> add_node_class(const Class *c, int token_id) {
-	return new Node(NodeKind::CLASS, (int_p)c, TypeClassRef, Flags::NONE, token_id);
+	return new Node(NodeKind::Class, (int_p)c, TypeClassRef, Flags::None, token_id);
 }
 
 
 shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
 	if (!override_type)
 		override_type = op->return_type;
-	shared<Node> cmd = new Node(NodeKind::OPERATOR, (int_p)op, override_type, Flags::NONE, token_id);
+	shared<Node> cmd = new Node(NodeKind::Operator, (int_p)op, override_type, Flags::None, token_id);
 	if (op->abstract->is_binary()) {
 		cmd->set_num_params(2); // binary
 		cmd->set_param(0, p1);
@@ -513,19 +513,19 @@ shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const 
 
 
 shared<Node> add_node_local(const Variable *v, const Class *type, int token_id) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, type, v->flags, token_id);
+	return new Node(NodeKind::VarLocal, (int_p)v, type, v->flags, token_id);
 }
 
 shared<Node> add_node_local(const Variable *v, int token_id) {
-	return new Node(NodeKind::VAR_LOCAL, (int_p)v, v->type, v->flags, token_id);
+	return new Node(NodeKind::VarLocal, (int_p)v, v->type, v->flags, token_id);
 }
 
 shared<Node> add_node_global(const Variable *v, int token_id) {
-	return new Node(NodeKind::VAR_GLOBAL, (int_p)v, v->type, v->flags, token_id);
+	return new Node(NodeKind::VarGlobal, (int_p)v, v->type, v->flags, token_id);
 }
 
 shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type) {
-	shared<Node> cmd_el = new Node(NodeKind::POINTER_AS_ARRAY, 0, type, p->flags, index->token_id);
+	shared<Node> cmd_el = new Node(NodeKind::PointerAsArray, 0, type, p->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, p);
 	cmd_el->set_param(1, index);
@@ -533,7 +533,7 @@ shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *ty
 }
 
 shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
-	shared<Node> cmd_el = new Node(NodeKind::DYNAMIC_ARRAY, 0, array->type->get_array_element(), array->flags, index->token_id);
+	shared<Node> cmd_el = new Node(NodeKind::DynamicArray, 0, array->type->get_array_element(), array->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, array);
 	cmd_el->set_param(1, index);
@@ -543,7 +543,7 @@ shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
 shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *type) {
 	if (!type)
 		type = array->type->param[0];
-	auto *el = new Node(NodeKind::ARRAY, 0, type, array->flags, index->token_id);
+	auto *el = new Node(NodeKind::Array, 0, type, array->flags, index->token_id);
 	el->set_num_params(2);
 	el->set_param(0, array);
 	el->set_param(1, index);
@@ -551,7 +551,7 @@ shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class 
 }
 
 shared<Node> add_node_slice(shared<Node> start, shared<Node> end) {
-	auto n = new Node(NodeKind::SLICE, 0, TypeUnknown);
+	auto n = new Node(NodeKind::Slice, 0, TypeUnknown);
 	n->set_num_params(2);
 	n->set_param(0, start);
 	n->set_param(1, end);
@@ -598,10 +598,10 @@ bool node_is_member_function_with_instance(shared<Node> n) {
 }
 
 bool is_type_tuple(const shared<Node> n) {
-	if (n->kind != NodeKind::TUPLE)
+	if (n->kind != NodeKind::Tuple)
 		return false;
 	for (auto p: weak(n->params))
-		if (p->kind != NodeKind::CLASS)
+		if (p->kind != NodeKind::Class)
 			return false;
 	return true;
 }

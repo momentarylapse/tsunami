@@ -42,13 +42,13 @@ void RawConfigDialog::on_close() {
 }
 
 void RawConfigDialog::on_ok() {
-	od->parameters.map_set("format", format_code(SampleFormat(get_int("format") + 1)));
+	od->parameters.dict_set("format", format_code(SampleFormat(get_int("format") + 1)));
 	if (is_checked("channels:stereo"))
-		od->parameters.map_set("channels", 2);
+		od->parameters.dict_set("channels", 2);
 	else
-		od->parameters.map_set("channels", 1);
-	od->parameters.map_set("samplerate", get_int("sample_rate"));
-	od->parameters.map_set("offset", get_int("offset"));
+		od->parameters.dict_set("channels", 1);
+	od->parameters.dict_set("samplerate", get_int("sample_rate"));
+	od->parameters.dict_set("offset", get_int("offset"));
 	ok = true;
 	request_destroy();
 }

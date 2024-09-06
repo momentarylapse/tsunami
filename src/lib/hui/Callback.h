@@ -9,7 +9,6 @@
 #define SRC_LIB_HUI_CALLBACK_H_
 
 #include <functional>
-#include "../base/pointer.h"
 
 class Painter;
 

@@ -15,7 +15,6 @@
 #include "common.h"
 
 class Image;
-class Configuration;
 
 namespace hui
 {
@@ -46,8 +45,6 @@ void delete_image(const string &name);
 
 // HUI configuration
 extern string separator;
-
-extern Configuration config;
 
 };
 

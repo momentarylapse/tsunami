@@ -10,8 +10,7 @@
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
-#include "../../lib/os/config.h"
+#include "../../lib/hui/config.h"
 #include <pulse/pulseaudio.h>
 
 namespace tsunami {

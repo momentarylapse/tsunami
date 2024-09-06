@@ -14,11 +14,12 @@
 #include "../Session.h"
 #include "../plugins/PluginManager.h"
 #include "../lib/base/iter.h"
-#include "../lib/os/config.h"
+#include "../lib/hui/config.h"
+#include "../lib/hui/Callback.h"
+#include "../lib/hui/language.h"
 #include "../lib/os/time.h"
 #include "../lib/doc/xml.h"
 #include "../lib/threads/Thread.h"
-#include "../lib/hui/hui.h"
 #include "../stuff/PerformanceMonitor.h"
 
 namespace tsunami {

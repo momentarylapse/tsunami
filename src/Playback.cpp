@@ -12,8 +12,7 @@
 #include "module/audio/PeakMeter.h"
 #include "module/stream/AudioOutput.h"
 #include "view/audioview/AudioView.h"
-#include "lib/hui/hui.h"
-#include "lib/os/config.h"
+#include "lib/hui/config.h"
 
 namespace tsunami {
 

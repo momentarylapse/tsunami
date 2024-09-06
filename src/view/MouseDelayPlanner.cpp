@@ -6,8 +6,8 @@
  */
 
 #include "MouseDelayPlanner.h"
-#include "../lib/hui/hui.h"
-#include "../lib/os/config.h"
+#include "../lib/hui/config.h"
+#include "../lib/hui/Event.h"
 #include "helper/graph/SceneGraph.h"
 #include <cmath>
 

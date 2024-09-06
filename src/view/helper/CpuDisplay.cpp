@@ -15,7 +15,7 @@
 #include "../TsunamiWindow.h"
 #include "../../stuff/PerformanceMonitor.h"
 #include "../../lib/hui/hui.h"
-#include "../../lib/os/config.h"
+#include "../../lib/hui/config.h"
 #include "../../Session.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"

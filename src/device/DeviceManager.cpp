@@ -16,8 +16,9 @@
 #include "Device.h"
 #include "../Session.h"
 #include "../lib/any/any.h"
-#include "../lib/hui/hui.h"
-#include "../lib/os/config.h"
+#include "../lib/hui/Callback.h"
+#include "../lib/hui/language.h"
+#include "../lib/hui/config.h"
 
 namespace tsunami {
 

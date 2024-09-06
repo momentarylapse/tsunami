@@ -59,9 +59,9 @@
 #include "../stuff/BackupManager.h"
 #include "../stuff/SessionManager.h"
 #include "../lib/hui/hui.h"
+#include "../lib/hui/config.h"
 #include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
-#include "../lib/os/config.h"
 #include "../lib/os/msg.h"
 
 namespace tsunami {

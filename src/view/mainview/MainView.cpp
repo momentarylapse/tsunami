@@ -18,7 +18,7 @@
 #include "../ColorScheme.h"
 #include "../../module/stream/AudioOutput.h"
 #include "../../data/Song.h"
-#include "../../lib/os/config.h"
+#include "../../lib/hui/config.h"
 #include "../../module/SignalChain.h"
 #include "../../Playback.h"
 #include "../../Session.h"

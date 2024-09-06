@@ -6,9 +6,8 @@
  */
 
 #include "Log.h"
-#include "../lib/hui/hui.h"
-#include "../lib/threads/Thread.h"
-#include "../lib/os/config.h"
+#include "../lib/hui/Callback.h"
+#include "../lib/hui/config.h"
 #include "../lib/os/msg.h"
 #include "../Session.h"
 

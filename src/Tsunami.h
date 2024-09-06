@@ -9,7 +9,7 @@
 #define TSUNAMI_H_
 
 #include "lib/base/pointer.h"
-#include "lib/hui/hui.h"
+#include "lib/hui/Application.h"
 
 namespace tsunami {
 
@@ -34,7 +34,7 @@ class PerformanceMonitor;
 class Tsunami : public hui::Application {
 public:
 	Tsunami();
-	virtual ~Tsunami();
+	~Tsunami() override;
 
 	hui::AppStatus on_startup_before_gui_init(const Array<string> &arg) override;
 	hui::AppStatus on_startup(const Array<string> &arg) override;

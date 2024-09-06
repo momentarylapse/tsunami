@@ -4,7 +4,7 @@
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
-#include "../../lib/os/config.h"
+#include "../../lib/hui/config.h"
 #include <CoreAudio/CoreAudio.h>
 
 // https://developer.apple.com/library/archive/samplecode/RecordAudioToFile/Listings/DCAudioFileRecorder_cpp.html#//apple_ref/doc/uid/DTS10003986-DCAudioFileRecorder_cpp-DontLinkElementID_4

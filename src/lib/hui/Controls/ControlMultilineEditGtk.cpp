@@ -7,6 +7,7 @@
 
 #include "ControlMultilineEdit.h"
 #include "../Event.h"
+#include "../../os/msg.h"
 
 #ifdef HUI_API_GTK
 

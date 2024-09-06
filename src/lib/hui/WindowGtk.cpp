@@ -6,6 +6,7 @@
 #include "../base/pointer.h"
 #include "../base/iter.h"
 #include "../os/time.h"
+#include "../os/msg.h"
 #ifdef HUI_API_GTK
 
 

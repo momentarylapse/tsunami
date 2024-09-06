@@ -15,6 +15,7 @@
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
 #include "../../stuff/Log.h"
+#include "../../lib/os/config.h"
 #include "../../storage/Storage.h"
 #include "../../Session.h"
 #include "../../Playback.h"

@@ -1,5 +1,6 @@
 #include "hui.h"
 #include "internal.h"
+#include "../os/msg.h"
 
 // character set....
 #ifdef OS_WINDOWS

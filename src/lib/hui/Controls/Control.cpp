@@ -8,7 +8,8 @@
 #include "Control.h"
 
 #include "../hui.h"
-#include "ControlMultilineEdit.h"
+#include "../../os/msg.h"
+#include "../../image/color.h"
 
 namespace hui
 {

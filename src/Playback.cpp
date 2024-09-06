@@ -13,6 +13,7 @@
 #include "module/stream/AudioOutput.h"
 #include "view/audioview/AudioView.h"
 #include "lib/hui/hui.h"
+#include "lib/os/config.h"
 
 namespace tsunami {
 

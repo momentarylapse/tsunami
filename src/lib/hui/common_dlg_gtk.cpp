@@ -2,8 +2,10 @@
 #ifdef HUI_API_GTK
 
 #include "../base/optional.h"
+#include "../image/color.h"
 #include "../os/file.h"
 #include "../os/filesystem.h"
+#include "../os/msg.h"
 
 namespace hui
 {

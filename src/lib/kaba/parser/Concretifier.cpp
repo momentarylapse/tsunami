@@ -967,6 +967,7 @@ shared<Node> Concretifier::concretify_special_function_typeof(shared<Node> node,
 shared<Node> implement_len(shared<Node> node, Concretifier *con, Block *block, const Class *ns, int token_id) {
 	node = con->concretify_node(node, block, ns);
 	node = con->force_concrete_type(node);
+	node = con->deref_if_reference(node);
 
 	// array?
 	if (node->type->is_array())

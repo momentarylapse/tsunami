@@ -11,6 +11,7 @@
 #include "Controls/ToolItemMenuButton.h"
 #include "Controls/ToolItemSeparator.h"
 #include "Controls/ToolItemToggleButton.h"
+#include "../os/msg.h"
 
 namespace hui
 {

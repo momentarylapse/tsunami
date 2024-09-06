@@ -6,6 +6,7 @@
  */
 
 #include "HelpDialog.h"
+#include "../../lib/os/config.h"
 
 namespace tsunami {
 

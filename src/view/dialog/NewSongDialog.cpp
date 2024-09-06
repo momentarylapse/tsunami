@@ -12,6 +12,7 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../action/ActionManager.h"
 #include "../../stuff/SessionManager.h"
+#include "../../lib/os/config.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 

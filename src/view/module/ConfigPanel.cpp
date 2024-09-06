@@ -8,8 +8,8 @@
 #include "ConfigPanel.h"
 #include "ModulePanel.h"
 #include "../helper/Progress.h"
-#include "../../plugins/PluginManager.h"
 #include "../../Session.h"
+#include "../../lib/os/msg.h"
 #include "../../module/Module.h"
 
 namespace tsunami {

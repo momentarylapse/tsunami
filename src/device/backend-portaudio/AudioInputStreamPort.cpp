@@ -9,6 +9,7 @@
 #include "../Device.h"
 #include "../../Session.h"
 #include "../../lib/hui/hui.h"
+#include "../../lib/os/config.h"
 #include <portaudio.h>
 
 namespace tsunami {

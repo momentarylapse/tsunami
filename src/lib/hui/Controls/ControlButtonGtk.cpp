@@ -7,6 +7,7 @@
 
 #include "ControlButton.h"
 #include "../hui.h"
+#include "../../os/msg.h"
 
 #ifdef HUGE
 #undef HUGE

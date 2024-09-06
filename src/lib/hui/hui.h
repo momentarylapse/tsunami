@@ -13,12 +13,9 @@
 #define _HUI_EXISTS_
 
 #include "common.h"
-#if __has_include("../image/image.h")
-	#include "../image/image.h"
-#else
-	typedef int Image;
-	typedef int color;
-#endif
+
+class Image;
+class Configuration;
 
 namespace hui
 {
@@ -50,6 +47,8 @@ void delete_image(const string &name);
 // HUI configuration
 extern string separator;
 
+extern Configuration config;
+
 };
 
 
@@ -69,11 +68,6 @@ extern string separator;
 #include "error.h"
 #include "Clipboard.h"
 
-
-#include "../os/config.h"
-namespace hui {
-extern Configuration config;
-}
 
 
 #endif

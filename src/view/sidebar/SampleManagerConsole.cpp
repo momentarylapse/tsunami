@@ -7,7 +7,6 @@
 
 #include "SampleManagerConsole.h"
 #include "../audioview/AudioView.h"
-#include "../audioview/graph/AudioViewLayer.h"
 #include "../painter/MidiPainter.h"
 #include "../helper/Progress.h"
 #include "../dialog/SampleScaleDialog.h"
@@ -24,6 +23,8 @@
 #include "../../module/midi/MidiEventStreamer.h"
 #include "../../storage/Storage.h"
 #include "../../lib/math/math.h"
+#include "../../lib/image/image.h"
+#include "../../lib/os/msg.h"
 #include "../../Session.h"
 #include <math.h>
 

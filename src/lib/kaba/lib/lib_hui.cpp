@@ -14,6 +14,7 @@
 #else
 	#error("we are re screwed.... no hui or hui_minimal")
 #endif
+#include "../../os/config.h"
 
 
 namespace hui{

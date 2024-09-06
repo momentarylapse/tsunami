@@ -2,6 +2,9 @@
 #ifndef _HUI_INTERNAL_EXISTS_
 #define _HUI_INTERNAL_EXISTS_
 
+class Configuration;
+class Image;
+
 namespace hui
 {
 
@@ -33,6 +36,9 @@ extern Array<HuiImage> _all_images_;
 
 // window lists...
 extern Array<Window*> _all_windows_;
+
+
+extern Configuration config;
 
 };
 

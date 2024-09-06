@@ -10,6 +10,7 @@
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
+#include "../os/msg.h"
 
 
 namespace hui {

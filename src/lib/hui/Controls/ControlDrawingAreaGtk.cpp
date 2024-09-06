@@ -6,13 +6,16 @@
  */
 
 #include "ControlDrawingArea.h"
-#include "../hui.h"
-#include <math.h>
 #include "../internal.h"
+#include "../hui.h"
 #include "../Event.h"
+#include "../../image/color.h"
 #include "../../math/rect.h"
-
+#include "../../os/config.h"
+#include "../../os/msg.h"
+#include <math.h>
 #include <thread>
+
 static std::thread::id main_thread_id = std::this_thread::get_id();
 
 

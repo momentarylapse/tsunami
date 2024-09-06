@@ -7,6 +7,7 @@
 
 #include "ControlGroup.h"
 #include "../Window.h"
+#include "../../os/msg.h"
 
 #ifdef HUI_API_GTK
 

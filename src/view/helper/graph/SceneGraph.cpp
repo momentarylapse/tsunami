@@ -9,6 +9,7 @@
 #include "../../HoverData.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../../lib/hui/hui.h"
+#include "../../../lib/os/config.h"
 
 
 namespace scenegraph {

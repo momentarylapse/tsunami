@@ -7,6 +7,7 @@
 
 #include "ControlHeaderBar.h"
 #include "../hui.h"
+#include "../../os/msg.h"
 
 #ifdef HUI_API_GTK
 

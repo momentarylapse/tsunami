@@ -5,6 +5,7 @@
 #include "../Device.h"
 #include "../../Session.h"
 #include "../../lib/hui/hui.h"
+#include "../../lib/os/config.h"
 
 namespace tsunami {
 

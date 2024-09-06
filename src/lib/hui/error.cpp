@@ -7,6 +7,7 @@
 
 #include "hui.h"
 #include "internal.h"
+#include "../os/msg.h"
 
 #ifdef _X_USE_NET_
 	#include "../net/net.h"

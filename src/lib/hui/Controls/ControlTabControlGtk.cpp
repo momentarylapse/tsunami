@@ -7,6 +7,7 @@
 
 #include "../hui.h"
 #include "ControlTabControl.h"
+#include "../../os/msg.h"
 
 #ifdef HUI_API_GTK
 

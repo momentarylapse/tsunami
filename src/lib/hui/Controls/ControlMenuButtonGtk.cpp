@@ -9,6 +9,7 @@
 #include "ControlMenuButton.h"
 #include "../Menu.h"
 #include "../Resource.h"
+#include "../../os/msg.h"
 
 
 namespace hui

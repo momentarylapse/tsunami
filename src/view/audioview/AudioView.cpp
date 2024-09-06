@@ -40,6 +40,8 @@
 #include "../../data/Sample.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/SampleRef.h"
+#include "../../lib/os/config.h"
+#include "../../lib/os/msg.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../stuff/PerformanceMonitor.h"

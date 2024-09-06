@@ -9,6 +9,7 @@
 #include "../hui.h"
 #include "../../base/iter.h"
 #include "../../base/algo.h"
+#include "../../os/msg.h"
 
 
 #ifdef HUI_API_GTK

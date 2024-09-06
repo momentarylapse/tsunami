@@ -61,6 +61,8 @@
 #include "../lib/hui/hui.h"
 #include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
+#include "../lib/os/config.h"
+#include "../lib/os/msg.h"
 
 namespace tsunami {
 

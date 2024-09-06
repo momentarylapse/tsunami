@@ -11,7 +11,7 @@
 #include "../Storage.h"
 #include "../../module/port/Port.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/os/msg.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"

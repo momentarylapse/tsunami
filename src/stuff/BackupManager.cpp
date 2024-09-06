@@ -9,6 +9,7 @@
 #include "../data/Track.h"
 #include "../Tsunami.h"
 #include "../Session.h"
+#include "../lib/os/config.h"
 #include "../lib/os/date.h"
 #include "../lib/os/file.h"
 #include "../lib/os/filesystem.h"

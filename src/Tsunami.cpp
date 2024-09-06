@@ -8,6 +8,8 @@
 #include "Tsunami.h"
 #include "lib/base/pointer.h"
 #include "lib/os/CommandLineParser.h"
+#include "lib/os/config.h"
+#include "lib/os/msg.h"
 #include "data/base.h"
 #include "data/Song.h"
 #include "module/SignalChain.h"

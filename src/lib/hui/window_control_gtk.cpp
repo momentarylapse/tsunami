@@ -23,6 +23,7 @@
 #include "Controls/ControlTreeView.h"
 #include "hui.h"
 #include "internal.h"
+#include "../os/msg.h"
 #ifdef HUI_API_GTK
 
 #ifndef OS_WINDOWS

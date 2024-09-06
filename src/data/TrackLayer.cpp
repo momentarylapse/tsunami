@@ -34,6 +34,7 @@
 #include "../lib/base/algo.h"
 #include "../lib/hui/hui.h"
 #include "../lib/threads/Mutex.h"
+#include "../lib/os/msg.h"
 
 namespace tsunami {
 

@@ -15,16 +15,7 @@
 #include <functional>
 
 // which api?
-
-/*#ifdef OS_WINDOWS
-	#ifdef HUI_USE_GTK_ON_WINDOWS
-		#define HUI_API_GTK
-	#else
-		#define HUI_API_WIN
-	#endif
-#else*/
-	#define HUI_API_GTK
-//#endif
+#define HUI_API_GTK
 
 
 
@@ -38,10 +29,8 @@
 		#endif
 	#endif
 #endif
-#ifdef HUI_API_GTK
-	#include <gtk/gtk.h>
-	#include <gdk/gdkkeysyms.h>
-#endif
+//#include <gtk/gtk.h>
+//#include <gdk/gdkkeysyms.h>
 #if defined(OS_LINUX) || defined(OS_MAC)
 	#define _cdecl
 #endif
@@ -49,6 +38,7 @@
 
 
 typedef struct _XDisplay Display; // Xorg
+class Image;
 
 namespace hui
 {
@@ -60,6 +50,33 @@ namespace hui
 	extern Display *x_display;
 #endif
 
+
+	extern string Version;
+
+
+
+
+	class Window;
+	class Menu;
+	class EventHandler;
+
+
+
+
+
+
+
+//----------------------------------------------------------------------------------
+// hui itself
+
+
+// images
+//int LoadImage(const string &filename);
+	string set_image(const Image *image, const string &name = "");
+	void delete_image(const string &name);
+
+// HUI configuration
+	extern string separator;
 
 
 

@@ -8,6 +8,8 @@
 #include "../os/msg.h"
 #ifdef HUI_API_GTK
 
+#include <gtk/gtk.h>
+
 #ifdef HUGE
 #undef HUGE
 #endif

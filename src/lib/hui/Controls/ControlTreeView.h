@@ -10,6 +10,8 @@
 
 #include "Control.h"
 
+#include <gtk/gtk.h>
+
 namespace hui {
 
 class ControlTreeView : public Control {

@@ -13,6 +13,8 @@
 #include "../image/color.h"
 #include "../os/msg.h"
 
+#include <gtk/gtk.h>
+
 namespace hui
 {
 

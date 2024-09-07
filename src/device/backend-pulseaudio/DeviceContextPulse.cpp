@@ -10,7 +10,7 @@
 #include "../Device.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Callback.h"
 
 #include <pulse/pulseaudio.h>
 

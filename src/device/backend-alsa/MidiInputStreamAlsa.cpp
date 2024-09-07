@@ -10,7 +10,7 @@
 #include "../Device.h"
 #include "../../data/midi/MidiData.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/language.h"
 #include <alsa/asoundlib.h>
 
 namespace tsunami {

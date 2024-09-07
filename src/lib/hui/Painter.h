@@ -10,6 +10,9 @@
 
 #include "../image/Painter.h"
 
+typedef struct _PangoLayout PangoLayout;
+typedef struct _PangoFontDescription PangoFontDescription;
+
 class vec2;
 class rect;
 class color;

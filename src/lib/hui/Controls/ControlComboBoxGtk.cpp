@@ -9,7 +9,7 @@
 #include "../Event.h"
 #include "../language.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -123,5 +123,3 @@ void ControlComboBox::__reset() {
 }
 
 };
-
-#endif

@@ -9,6 +9,8 @@
 #include "Toolbar.h"
 #include "Window.h"
 
+#include <gtk/gtk.h>
+
 namespace hui
 {
 

@@ -6,8 +6,8 @@
  */
 
 #include "base.h"
-#include "../lib/hui/hui.h"
-#include <math.h>
+#include "../lib/hui/language.h"
+#include <cmath>
 
 
 namespace tsunami {

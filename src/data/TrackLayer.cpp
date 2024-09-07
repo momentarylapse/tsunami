@@ -28,12 +28,8 @@
 #include "../action/track/marker/ActionTrackAddMarker.h"
 #include "../action/track/marker/ActionTrackDeleteMarker.h"
 #include "../action/track/marker/ActionTrackEditMarker.h"
-//#include "../Plugins/PluginManager.h"
-//#include "../Tsunami.h"
 #include "../lib/base/iter.h"
 #include "../lib/base/algo.h"
-#include "../lib/hui/hui.h"
-#include "../lib/threads/Mutex.h"
 #include "../lib/os/msg.h"
 
 namespace tsunami {

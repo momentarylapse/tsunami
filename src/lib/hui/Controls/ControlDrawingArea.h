@@ -11,6 +11,8 @@
 #include "Control.h"
 #include <mutex>
 
+#include <gtk/gtk.h>
+
 class rect;
 
 namespace hui

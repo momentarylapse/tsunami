@@ -9,6 +9,7 @@
 #include "../os/msg.h"
 #ifdef HUI_API_GTK
 
+#include <gtk/gtk.h>
 
 #ifdef OS_WINDOWS
 	#include <gdk/win32/gdkwin32.h>
@@ -589,7 +590,11 @@ int key_to_gtk(int key_code, GdkModifierType* mod) {
 
 	int _mod = (((key_code & KEY_SHIFT)>0) ? GDK_SHIFT_MASK : 0) |
 				(((key_code & KEY_CONTROL)>0) ? GDK_CONTROL_MASK : 0) |
+#if GTK_CHECK_VERSION(4,0,0)
 				(((key_code & KEY_ALT)>0) ? GDK_ALT_MASK : 0) |
+#else
+				(((key_code & KEY_ALT)>0) ? GDK_MOD1_MASK : 0) |
+#endif
 				(((key_code & KEY_META)>0) ? GDK_META_MASK : 0) |
 				(((key_code & KEY_SUPER)>0) ? GDK_SUPER_MASK : 0) |
 				(((key_code & KEY_HYPER)>0) ? GDK_HYPER_MASK : 0);

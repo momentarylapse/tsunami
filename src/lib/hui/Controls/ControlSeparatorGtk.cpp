@@ -6,6 +6,7 @@
  */
 
 #include "ControlSeparator.h"
+#include <gtk/gtk.h>
 
 namespace hui
 {

@@ -11,7 +11,15 @@
 #include "Event.h"
 #include "../base/pointer.h"
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
+
+typedef void* gpointer;
+typedef struct _GVariant GVariant;
+typedef struct _GtkWidget GtkWidget;
+typedef struct _GtkSizeGroup GtkSizeGroup;
+typedef struct _GAction GAction;
+typedef struct _GSimpleAction GSimpleAction;
+typedef struct _GSimpleActionGroup GSimpleActionGroup;
 
 
 //class Painter;
@@ -144,10 +152,8 @@ public:
 	void redraw(const string &id);
 	void redraw_rect(const string &_id, const rect &r);
 	Control *_get_control_(const string &id);
-#ifdef HUI_API_GTK
 	Control *_get_control_by_widget_(GtkWidget *widget);
 	string _get_id_by_widget_(GtkWidget *widget);
-#endif
 	string _get_cur_id_();
 	void _set_cur_id_(const string &id);
 	void set_border_width(int width);
@@ -192,13 +198,13 @@ public:
 	shared_array<Panel> children;
 
 
-#if GTK_CHECK_VERSION(4,0,0)
+//#if GTK_CHECK_VERSION(4,0,0)
 	static void _on_menu_action_(GSimpleAction *simple, GVariant *parameter, gpointer user_data);
 	GSimpleActionGroup *action_group = nullptr;
 	void _try_add_action_(const string &id, bool checkable);
 public:
 	GAction *_get_action(const string &id);
-#endif
+//#endif
 };
 
 };

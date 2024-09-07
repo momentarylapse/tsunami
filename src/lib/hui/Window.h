@@ -12,6 +12,8 @@
 #include "Panel.h"
 #include "../base/future.h"
 
+typedef struct _GtkEventController GtkEventController;
+
 class vec2;
 class rect;
 class Painter;
@@ -160,9 +162,9 @@ public:
 	Array<EventKeyCode> get_event_key_codes() const { return event_key_codes; }
 protected:
 
-#if GTK_CHECK_VERSION(4,0,0)
+//#if GTK_CHECK_VERSION(4,0,0)
 	GtkEventController *shortcut_controller = nullptr;
-#endif
+//#endif
 
 public:
 	base::promise<void> end_run_promise;

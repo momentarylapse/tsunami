@@ -13,6 +13,10 @@ class Path;
 
 namespace hui {
 
+	class Panel;
+	class Menu;
+	class Window;
+
 //----------------------------------------------------------------------------------
 // resource handling
 

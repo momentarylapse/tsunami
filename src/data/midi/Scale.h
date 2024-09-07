@@ -8,6 +8,7 @@
 #ifndef SRC_DATA_MIDI_SCALE_H_
 #define SRC_DATA_MIDI_SCALE_H_
 
+#include "../../lib/base/base.h"
 
 namespace tsunami {
 

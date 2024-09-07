@@ -6,10 +6,10 @@
  */
 
 #include "ControlHeaderBar.h"
-#include "../hui.h"
+#include "../common.h"
 #include "../../os/msg.h"
+#include <gtk/gtk.h>
 
-#ifdef HUI_API_GTK
 
 namespace hui {
 
@@ -55,5 +55,3 @@ void ControlHeaderBar::__set_option(const string &op, const string &value) {
 }
 
 };
-
-#endif

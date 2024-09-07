@@ -8,7 +8,7 @@
 #include "ControlSlider.h"
 #include "../Event.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -100,5 +100,3 @@ void ControlSlider::__set_option(const string &op, const string &value) {
 }
 
 };
-
-#endif

@@ -6,21 +6,20 @@
  */
 
 
-#include "hui.h"
+#include "Clipboard.h"
+#include <gtk/gtk.h>
 
 namespace hui {
 
 namespace clipboard {
 
 void copy(const string &buffer) {
-#ifdef HUI_API_GTK
 #if GTK_CHECK_VERSION(4,0,0)
 	GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default()); //gtk_widget_get_clipboard(widget);
 	gdk_clipboard_set_text(clipboard, buffer.c_str());
 #else
 	GtkClipboard *cb = gtk_clipboard_get_for_display(gdk_display_get_default(),GDK_SELECTION_CLIPBOARD);
 	gtk_clipboard_set_text(cb, (char*)buffer.data, buffer.num);
-#endif
 #endif
 }
 
@@ -39,7 +38,6 @@ void g_ready_callback(GObject* source_object, GAsyncResult* res, gpointer data) 
 
 base::future<string> paste() {
 	clipboard_promise.reset();
-#ifdef HUI_API_GTK
 #if GTK_CHECK_VERSION(4,0,0)
 	GdkClipboard *clipboard = gdk_display_get_clipboard(gdk_display_get_default());
 	// sadly, gdk_clipboard_get_content() + gdk_content_provider_get_value() seems to fail
@@ -54,7 +52,6 @@ base::future<string> paste() {
 		clipboard_promise(buffer);
 		g_free(buffer);
 	}
-#endif
 #endif
 	return clipboard_promise.get_future();
 }

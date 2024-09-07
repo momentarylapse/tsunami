@@ -11,6 +11,8 @@
 #include "Control.h"
 #include "../../image/color.h"
 
+#include <gtk/gtk.h>
+
 namespace hui
 {
 

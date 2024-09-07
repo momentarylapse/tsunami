@@ -1,6 +1,9 @@
 #include "hui.h"
 #include "common.h"
 
+#include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
+
 // TODO: international key names
 
 namespace hui {

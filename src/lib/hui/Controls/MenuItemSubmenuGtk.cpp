@@ -9,7 +9,7 @@
 #include "MenuItemSubmenu.h"
 #include "../language.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -35,6 +35,3 @@ MenuItemSubmenu::~MenuItemSubmenu() {
 }
 
 };
-
-#endif
-

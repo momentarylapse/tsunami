@@ -12,8 +12,11 @@
 #include "../Event.h"
 #include "../../base/pointer.h"
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 #include <functional>
+
+
+typedef struct _GtkWidget GtkWidget;
 
 namespace hui
 {

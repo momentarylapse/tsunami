@@ -16,6 +16,8 @@
 #include "Controls/ToolItemToggleButton.h"
 #include "../os/msg.h"
 
+#include <gtk/gtk.h>
+
 namespace hui
 {
 

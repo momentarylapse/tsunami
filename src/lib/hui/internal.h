@@ -11,16 +11,10 @@ namespace hui
 #ifdef OS_WINDOWS
 	extern void *hui_win_instance;
 #endif
-#ifdef HUI_API_WIN
-	extern unsigned char HuiKeyID[256];
-	extern HFONT hui_win_default_font;
-	extern HICON hui_win_main_icon;
-#else
-	extern int HuiKeyID[256];
-	extern void *invisible_cursor;
-	extern void *get_gtk_image(const string &image, IconSize size);
-	extern void *get_gtk_image_pixbuf(const string &image);
-#endif
+extern int HuiKeyID[256];
+extern void *invisible_cursor;
+extern void *get_gtk_image(const string &image, IconSize size);
+extern void *get_gtk_image_pixbuf(const string &image);
 extern int allow_signal_level;
 
 

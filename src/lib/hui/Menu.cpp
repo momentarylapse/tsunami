@@ -12,6 +12,8 @@
 #include "Controls/MenuItemSubmenu.h"
 #include "Controls/MenuItemToggle.h"
 
+#include <gtk/gtk.h>
+
 namespace hui {
 
 void DBDEL_START(const string &type, const string &id, void *p);

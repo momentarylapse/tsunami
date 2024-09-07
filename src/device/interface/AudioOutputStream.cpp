@@ -5,8 +5,9 @@
 #include "AudioOutputStream.h"
 #include "../DeviceManager.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Callback.h"
 #include "../../lib/hui/config.h"
+#include <cstdio>
 
 namespace tsunami {
 

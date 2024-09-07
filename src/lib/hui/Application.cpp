@@ -7,11 +7,19 @@
 
 #include "Application.h"
 
-#include "hui.h"
+#include "common.h"
+#include "error.h"
+#include "Resource.h"
 #include "internal.h"
+#include "common_dlg.h"
+#include "Event.h"
+#include "language.h"
+#include "main.h"
 #include "../os/config.h"
 #include "../os/filesystem.h"
 #include "../os/msg.h"
+
+#include <gtk/gtk.h>
 
 #ifdef OS_WINDOWS
 #include <windows.h>

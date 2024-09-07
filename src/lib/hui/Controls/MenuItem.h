@@ -10,6 +10,8 @@
 
 #include "Control.h"
 
+typedef struct _GMenuItem GMenuItem;
+
 namespace hui {
 
 class BasicMenuItem : public Control {
@@ -18,9 +20,9 @@ public:
 	virtual ~BasicMenuItem();
 
 	void take_gtk_ownership();
-#if GTK_CHECK_VERSION(4,0,0)
+//#if GTK_CHECK_VERSION(4,0,0)
 	GMenuItem *item = nullptr;
-#endif
+//#endif
 };
 
 class MenuItem : public BasicMenuItem {

@@ -8,8 +8,7 @@
 #include "AudioInputStreamPipewire.h"
 #include "AudioOutputStreamPipewire.h"
 #include "../Device.h"
-#include "../../lib/os/msg.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Callback.h"
 
 #include <pipewire/pipewire.h>
 

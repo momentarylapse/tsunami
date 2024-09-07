@@ -7,7 +7,7 @@
 
 #include "ToolItemSeparator.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -28,5 +28,4 @@ ToolItemSeparator::ToolItemSeparator() :
 
 }
 
-#endif
 

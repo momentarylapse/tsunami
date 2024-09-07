@@ -13,6 +13,8 @@
 #include "../os/path.h"
 #include "common.h"
 
+typedef struct _GtkApplication GtkApplication;
+
 namespace hui {
 
 class Window;

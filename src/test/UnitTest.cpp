@@ -13,7 +13,8 @@
 #include "../lib/os/terminal.h"
 #include "../lib/hui/hui.h"
 #include "../data/audio/AudioBuffer.h"
-#include <math.h>
+#include <cmath>
+#include <cstdio>
 
 #include "TestAudioBuffer.h"
 #include "TestRingBuffer.h"

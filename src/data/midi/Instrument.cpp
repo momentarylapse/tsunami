@@ -8,7 +8,7 @@
 #include "Instrument.h"
 #include "MidiData.h"
 #include "Clef.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/language.h"
 
 
 namespace tsunami {

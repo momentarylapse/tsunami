@@ -9,11 +9,12 @@
 #include "../Event.h"
 #include "../language.h"
 
+#include <gtk/gtk.h>
+
 #ifdef HUGE
 #undef HUGE
 #endif
 
-#ifdef HUI_API_GTK
 
 namespace hui
 {
@@ -80,5 +81,3 @@ void ControlToggleButton::__set_option(const string &op, const string &value) {
 }
 
 };
-
-#endif

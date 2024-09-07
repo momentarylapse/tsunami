@@ -8,8 +8,7 @@
 #include "ControlRadioButton.h"
 #include "../hui.h"
 
-
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui {
 
@@ -78,5 +77,3 @@ bool ControlRadioButton::is_checked() {
 }
 
 };
-
-#endif

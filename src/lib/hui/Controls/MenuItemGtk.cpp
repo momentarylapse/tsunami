@@ -9,7 +9,7 @@
 #include "../internal.h"
 #include "MenuItem.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -64,5 +64,3 @@ void MenuItem::set_image(const string &image) {
 }
 
 };
-
-#endif

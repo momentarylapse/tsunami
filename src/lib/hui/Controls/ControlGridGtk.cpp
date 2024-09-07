@@ -6,7 +6,8 @@
  */
 
 #include "ControlGrid.h"
-#include "../hui.h"
+#include "../Panel.h"
+#include <gtk/gtk.h>
 
 #ifdef HUI_API_GTK
 

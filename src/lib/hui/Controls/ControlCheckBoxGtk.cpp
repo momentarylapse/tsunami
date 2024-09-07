@@ -11,7 +11,7 @@
 #include "../language.h"
 #include "../../os/config.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui {
 
@@ -90,4 +90,3 @@ bool ControlCheckBox::is_checked() {
 
 };
 
-#endif

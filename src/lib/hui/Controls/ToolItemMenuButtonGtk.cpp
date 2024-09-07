@@ -9,7 +9,7 @@
 #include "ToolItemMenuButton.h"
 #include "../hui.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -71,6 +71,4 @@ void ToolItemMenuButton::__set_option(const string &op, const string &value) {
 }
 
 }
-
-#endif
 

@@ -9,7 +9,7 @@
 #include "../Event.h"
 #include "../../image/color.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui {
 	// perform gamma corrections?
@@ -112,5 +112,3 @@ void ControlColorButton::__set_option(const string &op, const string &value) {
 }
 
 };
-
-#endif

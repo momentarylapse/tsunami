@@ -10,7 +10,7 @@
 #include "../Window.h"
 #include "../../os/msg.h"
 
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui {
 
@@ -167,5 +167,3 @@ void ControlExpander::__set_option(const string& op, const string& value) {
 }
 
 };
-
-#endif

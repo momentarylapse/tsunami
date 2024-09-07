@@ -12,7 +12,7 @@
 #include "../base/pointer.h"
 
 
-#include <gtk/gtk.h>
+//#include <gtk/gtk.h>
 
 namespace hui
 {

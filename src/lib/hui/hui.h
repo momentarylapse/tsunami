@@ -13,42 +13,6 @@
 #define _HUI_EXISTS_
 
 #include "common.h"
-
-class Image;
-
-namespace hui
-{
-
-extern string Version;
-
-
-
-
-class Window;
-class Menu;
-class EventHandler;
-
-
-
-
-
-
-
-//----------------------------------------------------------------------------------
-// hui itself
-
-
-// images
-//int LoadImage(const string &filename);
-string set_image(const Image *image, const string &name = "");
-void delete_image(const string &name);
-
-// HUI configuration
-extern string separator;
-
-};
-
-
 #include "Callback.h"
 #include "Application.h"
 #include "main.h"

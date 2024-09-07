@@ -8,7 +8,7 @@
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Callback.h"
 #include "../../lib/hui/config.h"
 #include <portaudio.h>
 

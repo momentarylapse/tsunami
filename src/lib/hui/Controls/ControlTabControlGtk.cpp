@@ -11,6 +11,8 @@
 
 #ifdef HUI_API_GTK
 
+#include <gtk/gtk.h>
+
 namespace hui {
 
 void on_gtk_tab_control_switch(GtkWidget *widget, GtkWidget *page, guint page_num, gpointer data) {

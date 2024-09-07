@@ -5,9 +5,9 @@
  *      Author: michi
  */
 
-#include "../../lib/hui/hui.h"
 #include "Scale.h"
 #include "MidiData.h"
+#include "../../lib/hui/language.h"
 
 
 namespace tsunami {

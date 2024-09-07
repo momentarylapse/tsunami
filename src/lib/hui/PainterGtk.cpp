@@ -16,6 +16,8 @@
 #define HAS_IMAGE
 #endif
 
+#include <gtk/gtk.h>
+
 namespace hui {
 
 bool color_painter_linear = false;

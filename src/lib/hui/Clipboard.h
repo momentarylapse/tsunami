@@ -8,6 +8,9 @@
 #ifndef SRC_LIB_HUI_CLIPBOARD_H_
 #define SRC_LIB_HUI_CLIPBOARD_H_
 
+#include "../base/base.h"
+#include "../base/future.h"
+
 namespace hui {
 
 namespace clipboard {

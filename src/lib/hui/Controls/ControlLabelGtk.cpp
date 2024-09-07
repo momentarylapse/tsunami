@@ -7,8 +7,7 @@
 
 
 #include "ControlLabel.h"
-
-#ifdef HUI_API_GTK
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -93,4 +92,3 @@ void ControlLabel::__set_option(const string &op, const string &value) {
 
 };
 
-#endif

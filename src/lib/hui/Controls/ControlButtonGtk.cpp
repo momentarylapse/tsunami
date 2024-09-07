@@ -6,9 +6,9 @@
  */
 
 #include "ControlButton.h"
-#include "../hui.h"
-#include "../common.h"
+#include "../Window.h"
 #include "../../os/msg.h"
+#include <gtk/gtk.h>
 
 #ifdef HUGE
 #undef HUGE
@@ -36,11 +36,11 @@ ControlButton::ControlButton(const string &title, const string &id, Panel *panel
 	auto parts = split_title(title);
 	this->panel = panel;
 	if (option_has(get_option_from_title(title), "link")) {
-		widget = gtk_link_button_new_with_label(sys_str(parts[0]), sys_str(parts[0]));
+		widget = gtk_link_button_new_with_label(parts[0].c_str(), parts[0].c_str());
 		g_signal_connect(G_OBJECT(widget), "activate-link", G_CALLBACK(&on_gtk_link_button_activate), this);
 		//set_options("padding=2");
 	} else {
-		widget = gtk_button_new_with_label(sys_str(parts[0]));
+		widget = gtk_button_new_with_label(parts[0].c_str());
 		g_signal_connect(G_OBJECT(widget), "clicked", G_CALLBACK(&on_gtk_button_press), this);
 	}
 	take_gtk_ownership();
@@ -57,7 +57,7 @@ string ControlButton::get_string() {
 }
 
 void ControlButton::__set_string(const string &str) {
-	gtk_button_set_label(GTK_BUTTON(widget), sys_str(str));
+	gtk_button_set_label(GTK_BUTTON(widget), str.c_str());
 }
 
 void ControlButton::set_image(const string& str) {

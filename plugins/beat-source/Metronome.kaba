@@ -50,7 +50,7 @@ class MetronomeSource extends BeatSource
 					level = 0
 				else
 					level = 1
-			beats.add(Beat(Range(offset_sub_beat, 0), level))
+			beats.add(Beat(offset_sub_beat, level))
 			
 			if next_sub_beat == 0
 				next_beat ++
@@ -64,6 +64,8 @@ class MetronomeSource extends BeatSource
 		offset_sub_beat -= samples
 		var fraction_sub_beat = 1 - float(offset_sub_beat) / float(samples_sub_beat)
 		fraction_beat = (float(cur_sub_beat()) + fraction_sub_beat) / float(config.sub_beats)
+		
+		# TODO "keep-alive" beat
 		
 		return samples
 	

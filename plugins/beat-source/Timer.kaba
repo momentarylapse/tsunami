@@ -5,7 +5,7 @@ let AUTO_CONFIG_BPM = "range=1:360,sliderrange=10:200,unit=/min"
 class Config extends Module.Config
 	
 	# rhythm
-	var bpm: float
+	var bpm: f32
 	
 	func override reset()
 		bpm = 90
@@ -13,43 +13,33 @@ class Config extends Module.Config
 class MetronomeSource extends BeatSource
 	var config: Config
 	
-	# state/output
-	var next_beat: Range
-
-	#var fraction_beat: float
-	var samples_beat: int
+	var next_beat = 0
+	var samples_per_beat: i32
 	
 
 	func override reset_state()
-
-		next_beat = Range(0,0)
-		#fraction_beat = 1
-		
+		next_beat = 0
 		on_config()
 		
-	func override read(out beats: Beat[], samples: int) -> int
+	func override read(out beats: Beat[], samples: i32) -> i32
 	
-		beats.add(Beat(next_beat, 0))
-		
-		while next_beat.end() < samples
-			next_beat = Range(next_beat.end(), samples_beat)
+		while next_beat < samples
 			beats.add(Beat(next_beat, 0))
+			next_beat += samples_per_beat
 	
-		next_beat.offset -= samples
+		next_beat -= samples
+		
+		beats.add(Beat.create_keep_alive(samples, samples_per_beat - next_beat, samples_per_beat))
 		
 		return samples
 	
-	func override beat_fraction() -> float
-		return 0.0 #fraction_beat
-	
-	func mut set_bpm(bpm: float)
+	func mut set_bpm(bpm: f32)
 		config.bpm = bpm
 		changed()
 	
 	func override on_config()
-		var sample_rate = session.sample_rate()
-		var dt_b = 60.0 / config.bpm
-		samples_beat = dt_b * sample_rate
+		let dt_b = 60.0 / config.bpm
+		samples_per_beat = dt_b * session.sample_rate()
 		
-		next_beat.length = samples_beat
+		# should we correct next_beat?  ...meh, don't bother...
 		

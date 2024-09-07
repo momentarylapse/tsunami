@@ -10,9 +10,12 @@ class ChaosSource extends BeatSource
 		var sample_rate = session.sample_rate()
 	
 		while offset < samples
-			beats.add(Beat(Range(offset,0), rand(3)))
+			beats.add(Beat(offset, rand(3)))
 			offset += rand(sample_rate / 4)
 		offset -= samples
-			
+		
+		# TODO "keep-alive" beat
+		#beats.add(Beat.create_keep_alive(samples, 0, ))
+		
 		return samples
 	

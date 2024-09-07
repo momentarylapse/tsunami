@@ -22,10 +22,12 @@ class obs
 
 
 struct Range
-	var offset, length: int
-	func extern start() -> int
-	func extern end() -> int
-	func inside(pos: int) -> bool
+	var offset, length: i32
+	func extern start() -> i32
+	func extern end() -> i32
+	func inside(pos: i32) -> bool
+		return pos >= offset and pos < offset + length
+	func __contains__(pos: int) -> bool
 		return pos >= offset and pos < offset + length
 	func extern overlaps(o: Range) -> bool
 	func extern covers(o: Range) -> bool
@@ -33,7 +35,7 @@ struct Range
 	func extern __str__() -> string
 	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
-func RangeTo(start: int, end: int) -> Range
+func RangeTo(start: i32, end: i32) -> Range
 	return Range(start, end - start)
 
 

@@ -19,12 +19,22 @@ class Config extends Module.Config
 		subbeats = 4
 		pitches = [[64,[true,false,true]], [66,[false,true]], [67,[]], [69,[]], [71,[]]]
 
+
+# extrapolate overall beat range
+func get_beat_range(r: Range, fraction_start: f32, fraction_end: f32) -> Range
+	var beat_length = 100
+	if fraction_end != fraction_start and len(r) > 0
+		beat_length = len(r) / (fraction_end - fraction_start)
+	return Range(r.offset - beat_length * fraction_start, beat_length)
+
+
 class SequencerSource extends MidiSource
 	var in_beats: Module.InPort
 
 	var config: Config
-	var cur_beat = 0
-	var fraction: float? # output
+	var cur_beat = -1
+	var beat_fraction = 1.0
+	var active_pitches: int[]
 	
 	func override __init__()
 		super.__init__()
@@ -34,35 +44,53 @@ class SequencerSource extends MidiSource
 		#subbeat_length = DEFAULT_SAMPLE_RATE * 60 / config.bpm / config.subbeats
 
 	func override reset_state()
-		cur_beat = 0
-		fraction = nil
+		cur_beat = -1
+		beat_fraction = 1.0
+	
+	func mut tick_end(out buf: MidiEventBuffer, offset: i32)
+		for p in active_pitches
+			buf.add(MidiEvent(offset, p, 0))
+		active_pitches = []
+	
+	func mut tick_start(out buf: MidiEventBuffer, offset: i32, subbeat_index: i32)
+		for p in config.pitches
+			if p.is_active(subbeat_index)
+				buf.add(MidiEvent(offset, p.pitch, 1.0))
+				active_pitches.add(p.pitch)
+	
+	func mut iterate_beat(out buf: MidiEventBuffer, beat: i32, r: Range, fraction_start: f32, fraction_end: f32)
+		let beat_range = get_beat_range(r, fraction_start, fraction_end)
+		for s in 0:config.subbeats
+			let subbeat_index = beat * config.subbeats + s
+			let pos = beat_range.offset + (len(beat_range) * s) / config.subbeats
+			if (pos - 1) in r
+				tick_end(buf, pos - 1)
+			if pos in r
+				tick_start(buf, pos, subbeat_index)
 		
-	func override read(out midi: MidiEventBuffer) -> int
+		if (beat_range.end() - 1) in r
+			tick_end(buf, beat_range.end() - 1)
+			
+		beat_fraction = fraction_end
+		if fraction_end >= 1.0
+			cur_beat = loop(beat + 1, 0, config.beats)
+			beat_fraction = 0.0
+			
+		
+	func override read(out midi: MidiEventBuffer) -> i32
 		var beats: Beat[]
 		for s in in_beats.source
 			let rr = s.read_beats(beats, midi.samples)
 		
-		var buf: MidiEventBuffer
+		var offset = 0
 		for b in beats
-			if b.level >= 2
-				continue
-			let beat_length = b.range.length
-			let subbeat_length = beat_length / config.subbeats
-			
-			for s in 0:config.subbeats
-				let subbeat_index = cur_beat * config.subbeats + s
-				for p in config.pitches
-					if p.is_active(subbeat_index)
-						buf.add(MidiEvent(b.range.offset + s * subbeat_length, p.pitch, 1))
-						buf.add(MidiEvent(b.range.offset + (s+1) * subbeat_length - 1, p.pitch, 0))
-			if b.range.end() < midi.samples
-				cur_beat = loop(cur_beat + 1, 0, config.beats)
-		
-			fraction = (float(cur_beat) + float(midi.samples - b.range.offset) / b.range.length) / config.beats
-				
-		for e in buf
-			if e.pos >= 0 and e.pos < midi.samples
-				midi.add(e)
+			if b.level in [0,1]
+				iterate_beat(midi, cur_beat, RangeTo(offset, b.range.offset), beat_fraction, 1.0)
+				offset = b.range.offset
+			else if b.level < 0
+				# "keep-alive"
+				iterate_beat(midi, cur_beat, RangeTo(offset, b.range.offset), beat_fraction, b.keep_alive_fraction())
+				offset = b.range.offset
 			
 		return midi.samples
 	
@@ -131,12 +159,11 @@ Grid ? '' vertical
 		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
+		let total_fraction = (c.cur_beat + c.beat_fraction) / f32(c.config.beats)
 		let subbeats = c.config.beats*c.config.subbeats
-		var active = -1
-		for f in c.fraction
-			active = int(subbeats * f)
-		let gridx = float(width) / subbeats
-		let gridy = float(height) / len(c.config.pitches)
+		let active = i32(subbeats * total_fraction)
+		let gridx = f32(width) / subbeats
+		let gridy = f32(height) / len(c.config.pitches)
 		let border = gridx * 0.05
 		let beat_border = gridx * 0.07 # additional
 		let wbutton = (width - subbeats * border - (c.config.beats-1)*beat_border) / subbeats
@@ -159,9 +186,9 @@ Grid ? '' vertical
 				if ((i+1) % c.config.subbeats) == 0
 					x0 += beat_border
 		
-		for f in c.fraction
+		if c.cur_beat >= 0
 			p.set_color(color.GREEN)
-			let x = float(width) * f
+			let x = f32(width) * total_fraction
 			p.draw_line([x,0], [x,height])
 	
 	func mut on_edit()

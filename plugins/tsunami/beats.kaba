@@ -7,16 +7,16 @@ use common.*
 #	int[] beats
 
 struct Bar as shared
-	var beats: int[]
-	var divisor: int
-	var total_sub_beats: int
-	var index: int
-	var index_text: int
-	var length: int
-	var offset: int
+	var beats: i32[]
+	var divisor: i32
+	var total_sub_beats: i32
+	var index: i32
+	var index_text: i32
+	var length: i32
+	var offset: i32
 	func __init__()
-	func extern __init__(length: int, beats: int, sub_beats: int)
-	func extern bpm(sample_rate: float) -> float
+	func extern __init__(length: i32, beats: i32, sub_beats: i32)
+	func extern bpm(sample_rate: f32) -> f32
 	func extern range() -> Range
 	enum EditMode
 		IGNORE
@@ -33,12 +33,30 @@ struct Beat
 	var level = 0
 
 	func __init__()
-	func __init__(_range: Range, _level: int)
-		range = _range
+	func __init__(_offset: i32, _level: i32)
+		range = Range(_offset, 0)
 		level = _level
+	
+	# on first sample AFTER chunk!
+	func static create_keep_alive(chunk_size: i32, offset: i32, length: i32) -> Beat
+		var beat = Beat(chunk_size, -1)
+		# hide some data inside :P
+		beat.bar_index = offset
+		beat.bar_no = length
+		return beat
+	
+	func keep_alive_fraction() -> f32
+		return f32(bar_index) / f32(bar_no)
+	
+	func keep_alive_offset() -> i32
+		return bar_index
+	
+	func keep_alive_length() -> i32
+		return bar_no
+		
 
 struct BarCollection extends shared![Bar][]
 	func extern selfref get_bars(r: Range) -> Bar&[]
-	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
-	func extern get_next_beat(pos: int) -> int
-	func extern get_prev_beat(pos: int) -> int
+	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: i32) -> Beat[]
+	func extern get_next_beat(pos: i32) -> i32
+	func extern get_prev_beat(pos: i32) -> i32

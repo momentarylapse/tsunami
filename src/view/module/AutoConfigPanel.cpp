@@ -19,6 +19,7 @@
 #include "../../data/midi/MidiData.h"
 #include "../../lib/base/iter.h"
 #include "../../lib/kaba/kaba.h"
+#include "../../lib/hui/language.h"
 #include "../../lib/os/msg.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"

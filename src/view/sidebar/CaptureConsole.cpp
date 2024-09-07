@@ -21,6 +21,8 @@
 #include "../../Session.h"
 #include "../../Playback.h"
 #include "../../EditModes.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/common_dlg.h"
 
 namespace tsunami {
 

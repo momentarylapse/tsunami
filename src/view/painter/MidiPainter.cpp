@@ -22,6 +22,7 @@
 #include "../../data/Sample.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../module/ModuleConfiguration.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

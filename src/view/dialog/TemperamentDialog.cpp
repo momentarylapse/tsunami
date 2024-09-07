@@ -7,10 +7,12 @@
 
 #include "TemperamentDialog.h"
 #include "../audioview/AudioView.h"
+#include "../ColorScheme.h"
+#include "../../lib/image/Painter.h"
 #include "../../data/Track.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../Tsunami.h"
-#include <math.h>
+#include <cmath>
 
 namespace tsunami {
 

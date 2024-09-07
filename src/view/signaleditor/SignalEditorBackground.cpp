@@ -7,7 +7,9 @@
 
 #include "SignalEditorBackground.h"
 #include "SignalEditorTab.h"
+#include "../ColorScheme.h"
 #include "../audioview/AudioView.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

@@ -12,6 +12,8 @@
 #include "../../data/TrackMarker.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Range.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/image/Painter.h"
 #include "../sidebar/SideBar.h"
 
 namespace tsunami {

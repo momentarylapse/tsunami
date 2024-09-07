@@ -12,12 +12,14 @@
 #include "../audioview/AudioView.h"
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../helper/Drawing.h"
 #include "../helper/graph/SceneGraph.h"
 #include "../../module/Module.h"
 #include "../../module/port/Port.h"
 #include "../../data/base.h"
 #include "../../Session.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

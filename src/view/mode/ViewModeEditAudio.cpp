@@ -6,11 +6,13 @@
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../processing/audio/BufferInterpolator.h"
 #include "../../processing/audio/BufferPitchShift.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

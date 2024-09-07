@@ -10,6 +10,8 @@
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
 #include "../../Session.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/hui.h"
 
 namespace tsunami {
 

@@ -15,6 +15,7 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../lib/base/iter.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

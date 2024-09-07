@@ -10,14 +10,12 @@
 #include "../audioview/graph/AudioViewTrack.h" // AudioViewMode...
 #include "../helper/Drawing.h"
 #include "../helper/PeakDatabase.h"
+#include "../ColorScheme.h"
 #include "../../lib/math/vec2.h"
 #include "../../lib/image/Painter.h"
 #include "../../data/Range.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/complex.h"
-#include "../../lib/fft/fft.h"
-#include "../../processing/audio/Spectrogram.h"
-#include "../../Session.h"
 
 namespace tsunami {
 

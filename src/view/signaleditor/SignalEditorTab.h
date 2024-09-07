@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include "../../lib/base/base.h"
 #include "../../lib/base/set.h"
 #include "../mainview/MainViewNode.h"
 

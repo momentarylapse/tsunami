@@ -9,6 +9,7 @@
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

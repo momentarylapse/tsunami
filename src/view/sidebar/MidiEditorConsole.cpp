@@ -29,6 +29,7 @@
 #include "../../plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

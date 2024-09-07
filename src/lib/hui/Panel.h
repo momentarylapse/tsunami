@@ -36,7 +36,7 @@ class Panel : public Sharable<EventHandler> {
 public:
 	Panel(const string &id, Panel *parent);
 	Panel();
-	virtual ~Panel();
+	~Panel() override;
 	void _ClearPanel_();
 
 	void activate(const string &control_id);
@@ -159,9 +159,6 @@ public:
 protected:
 
 
-#ifdef HUI_API_WIN
-#endif
-#ifdef HUI_API_GTK
 public:
 	struct SizeGroup {
 		GtkSizeGroup *group;
@@ -172,7 +169,6 @@ public:
 //protected:
 	void _insert_control_(shared<Control> c, int x, int y);
 	int desired_width, desired_height;
-#endif
 
 	Control *target_control;
 	shared<Control> root_control;

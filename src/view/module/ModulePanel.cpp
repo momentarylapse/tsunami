@@ -14,6 +14,8 @@
 #include "../../data/Song.h"
 #include "../../Session.h"
 #include "../../lib/hui/Controls/ControlMenuButton.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/Menu.h"
 
 
 #include "../../module/audio/AudioEffect.h"

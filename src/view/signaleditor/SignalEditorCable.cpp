@@ -10,9 +10,11 @@
 #include "SignalEditorModule.h"
 #include "SignalEditorPort.h"
 #include "../audioview/AudioView.h"
+#include "../ColorScheme.h"
 #include "../../module/SignalChain.h"
 #include "../../data/base.h"
 #include "../../lib/math/interpolation.h"
+#include "../../lib/image/Painter.h"
 #include "../helper/Drawing.h"
 
 namespace tsunami {

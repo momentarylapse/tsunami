@@ -12,12 +12,13 @@
 #include "../TsunamiWindow.h"
 #include "../../Session.h"
 #include "../../stuff/Log.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 
 class LogInfoBox : public scenegraph::NodeFree {
 public:
-	LogInfoBox(Session *_session) : scenegraph::NodeFree() {
+	explicit LogInfoBox(Session *_session) : scenegraph::NodeFree() {
 		session = _session;
 		align.horizontal = AlignData::Mode::Fill;
 		align.vertical = AlignData::Mode::Bottom;

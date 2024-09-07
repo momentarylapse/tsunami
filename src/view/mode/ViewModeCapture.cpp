@@ -21,6 +21,7 @@
 #include "../../module/audio/AudioAccumulator.h"
 #include "../../module/midi/MidiAccumulator.h"
 #include "../../Session.h"
+#include "../ColorScheme.h"
 
 
 namespace tsunami {

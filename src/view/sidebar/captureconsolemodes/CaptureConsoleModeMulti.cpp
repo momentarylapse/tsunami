@@ -16,6 +16,7 @@
 #include "../../../module/audio/PeakMeter.h"
 #include "../../../module/SignalChain.h"
 #include "../../../Session.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

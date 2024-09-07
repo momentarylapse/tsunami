@@ -13,6 +13,8 @@
 #include "../../module/SignalChain.h"
 #include "../../storage/Storage.h"
 #include "../../lib/base/sort.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/common_dlg.h"
 
 namespace tsunami {
 

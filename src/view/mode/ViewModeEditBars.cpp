@@ -6,11 +6,13 @@
 #include "../helper/Drawing.h"
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../action/Action.h"
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
+#include "../../lib/image/Painter.h"
 
 
 namespace tsunami {

@@ -140,14 +140,12 @@ public:
 private:
 
 
-#ifdef HUI_API_GTK
 public:
 	GtkWidget *window;
 public:
 	shared<Control> header_bar;
 	void _add_headerbar();
 	ControlBasicWindowLayout *basic_layout = nullptr;
-#endif
 	
 protected:
 	Menu *popup;

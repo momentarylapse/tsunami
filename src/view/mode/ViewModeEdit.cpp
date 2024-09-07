@@ -14,6 +14,7 @@
 #include "../audioview/graph/AudioViewLayer.h"
 #include "../../data/base.h"
 #include "../../data/Track.h"
+#include "../../lib/hui/Event.h"
 
 namespace tsunami {
 

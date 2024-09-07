@@ -11,6 +11,9 @@
 #include "../../data/Song.h"
 #include "../../data/base.h"
 #include "../../lib/base/iter.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/Menu.h"
+#include "../../lib/hui/Resource.h"
 #include "../../Session.h"
 
 namespace tsunami {

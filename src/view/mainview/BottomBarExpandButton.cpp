@@ -10,7 +10,10 @@
 #include "../helper/Drawing.h"
 #include "../bottombar/BottomBar.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../Session.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

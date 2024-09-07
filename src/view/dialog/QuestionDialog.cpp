@@ -7,6 +7,7 @@
 
 #include "QuestionDialog.h"
 #include "../../lib/base/pointer.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

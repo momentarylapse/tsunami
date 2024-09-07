@@ -12,16 +12,8 @@
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
 #include "../helper/FxListEditor.h"
-#include "../dialog/TemperamentDialog.h"
-#include "../dialog/EditStringsDialog.h"
-#include "../dialog/ModuleSelectorDialog.h"
 #include "../../data/Track.h"
-#include "../../data/base.h"
-#include "../../module/synthesizer/Synthesizer.h"
-#include "../../plugins/PluginManager.h"
-#include "../../lib/base/sort.h"
-#include "../../lib/base/iter.h"
-#include "../../Session.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

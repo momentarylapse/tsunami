@@ -8,6 +8,7 @@
 #include "Tsunami.h"
 #include "lib/base/pointer.h"
 #include "lib/hui/config.h"
+#include "lib/hui/language.h"
 #include "lib/os/CommandLineParser.h"
 #include "lib/os/msg.h"
 #include "data/base.h"

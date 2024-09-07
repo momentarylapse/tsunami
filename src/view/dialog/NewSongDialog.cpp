@@ -13,6 +13,7 @@
 #include "../../action/ActionManager.h"
 #include "../../stuff/SessionManager.h"
 #include "../../lib/hui/config.h"
+#include "../../lib/hui/language.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 

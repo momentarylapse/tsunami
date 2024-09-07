@@ -14,6 +14,9 @@
 #include "../../data/Track.h"
 #include "../../data/Curve.h"
 #include "../../Session.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/Resource.h"
+#include "../../lib/hui/Menu.h"
 
 namespace tsunami {
 

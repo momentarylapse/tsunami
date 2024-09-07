@@ -22,6 +22,7 @@
 #include "../../Tsunami.h"
 #include "../../Session.h"
 #include "../../lib/base/sort.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

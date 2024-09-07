@@ -3,6 +3,7 @@
 //
 
 #include "PresetSelectionDialog.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

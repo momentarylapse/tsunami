@@ -15,11 +15,11 @@
 #include "../dialog/ModuleSelectorDialog.h"
 #include "../helper/graph/SceneGraph.h"
 #include "../helper/graph/Node.h"
-#include "../helper/graph/ToolTipOverlay.h"
 #include "../helper/Drawing.h"
 #include "../sidebar/SideBar.h"
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../module/port/Port.h"
 #include "../../module/Module.h"
 #include "../../module/SignalChain.h"
@@ -27,6 +27,9 @@
 #include "../../Session.h"
 #include "../../storage/Storage.h"
 #include "../../plugins/PluginManager.h"
+#include "../../lib/image/Painter.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/common_dlg.h"
 
 
 namespace tsunami {

@@ -15,9 +15,7 @@
 #include "../../../data/base.h"
 #include "../../../Session.h"
 #include "../../../module/SignalChain.h"
-#include "../../../device/Device.h"
-#include "../../../module/audio/AudioChannelSelector.h"
-#include "../../../device/DeviceManager.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

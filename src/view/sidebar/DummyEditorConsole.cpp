@@ -6,6 +6,7 @@
  */
 
 #include "DummyEditorConsole.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

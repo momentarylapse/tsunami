@@ -16,8 +16,9 @@
 #include "../processing/audio/BufferPitchShift.h"
 #include "../Session.h"
 #include "../lib/hui/language.h"
+#include "../lib/hui/Window.h"
 
-#include <stdio.h>
+#include <cstdio>
 
 namespace tsunami {
 

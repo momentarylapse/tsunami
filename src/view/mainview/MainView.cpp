@@ -19,6 +19,8 @@
 #include "../../module/stream/AudioOutput.h"
 #include "../../data/Song.h"
 #include "../../lib/hui/config.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/image/Painter.h"
 #include "../../module/SignalChain.h"
 #include "../../Playback.h"
 #include "../../Session.h"

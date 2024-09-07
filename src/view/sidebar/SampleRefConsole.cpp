@@ -17,6 +17,7 @@
 #include "../../data/Sample.h"
 #include "../../data/SampleRef.h"
 #include "../../Session.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

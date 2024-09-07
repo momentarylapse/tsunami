@@ -30,7 +30,7 @@ enum class SignalType;
 
 class TsunamiWindow : public obs::Node<hui::Window> {
 public:
-	TsunamiWindow(Session *session);
+	explicit TsunamiWindow(Session *session);
 	~TsunamiWindow() override;
 
 	obs::sink in_update;

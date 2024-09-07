@@ -20,6 +20,7 @@
 #include "../../plugins/PluginManager.h"
 #include "../../lib/base/sort.h"
 #include "../../lib/base/iter.h"
+#include "../../lib/hui/language.h"
 #include "../../Session.h"
 
 namespace tsunami {

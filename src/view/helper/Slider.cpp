@@ -6,6 +6,7 @@
  */
 
 #include "Slider.h"
+#include "../../lib/hui/Panel.h"
 #include <cmath>
 
 namespace tsunami {

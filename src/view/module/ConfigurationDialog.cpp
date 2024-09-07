@@ -16,6 +16,7 @@
 #include "../../module/SignalChain.h"
 #include "../../module/audio/AudioEffect.h"
 #include "../../module/audio/SongRenderer.h"
+#include "../../lib/hui/language.h"
 #include "../audioview/AudioView.h"
 
 namespace tsunami {

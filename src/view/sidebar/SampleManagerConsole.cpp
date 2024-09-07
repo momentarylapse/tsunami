@@ -10,6 +10,7 @@
 #include "../painter/MidiPainter.h"
 #include "../helper/Progress.h"
 #include "../dialog/SampleScaleDialog.h"
+#include "../ColorScheme.h"
 #include "../../action/ActionManager.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
@@ -25,8 +26,11 @@
 #include "../../lib/math/math.h"
 #include "../../lib/image/image.h"
 #include "../../lib/os/msg.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/Menu.h"
+#include "../../lib/hui/hui.h"
 #include "../../Session.h"
-#include <math.h>
+#include <cmath>
 
 namespace tsunami {
 

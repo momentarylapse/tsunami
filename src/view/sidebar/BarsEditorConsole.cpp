@@ -1,12 +1,11 @@
 #include "BarsEditorConsole.h"
 #include "../audioview/AudioView.h"
-#include "../audioview/graph/AudioViewTrack.h"
 #include "../mode/ViewModeEditBars.h"
 #include "../TsunamiWindow.h"
 #include "../../module/Module.h"
-#include "../../plugins/PluginManager.h"
 #include "../../Session.h"
 #include "../../EditModes.h"
+#include "../../lib/hui/language.h"
 
 namespace tsunami {
 

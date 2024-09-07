@@ -12,6 +12,7 @@
 #include "../../Session.h"
 #include "../../lib/hui/config.h"
 #include <pulse/pulseaudio.h>
+#include <stdio.h>
 
 namespace tsunami {
 

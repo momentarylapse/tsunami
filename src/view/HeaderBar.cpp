@@ -13,6 +13,7 @@
 #include "../Tsunami.h"
 #include "../stuff/SessionManager.h"
 #include "../lib/hui/Controls/ControlMenuButton.h"
+#include "../lib/hui/Window.h"
 #include "../lib/base/iter.h"
 #include "mainview/MainView.h"
 #include "mainview/MainViewNode.h"

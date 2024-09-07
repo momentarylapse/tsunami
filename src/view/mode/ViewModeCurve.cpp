@@ -11,10 +11,12 @@
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../sidebar/SideBar.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../data/Curve.h"
 #include "../../data/Track.h"
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

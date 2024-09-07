@@ -16,6 +16,7 @@
 #include "../painter/MidiPainter.h"
 #include "../sidebar/SideBar.h"
 #include "../TsunamiWindow.h"
+#include "../ColorScheme.h"
 #include "../../module/SignalChain.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../lib/os/time.h"
@@ -33,6 +34,8 @@
 #include "../../module/stream/MidiInput.h"
 #include "../../module/midi/MidiAccumulator.h"
 #include "../../Session.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/image/Painter.h"
 
 namespace tsunami {
 

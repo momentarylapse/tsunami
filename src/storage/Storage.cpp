@@ -26,6 +26,8 @@
 #include "../lib/base/iter.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/hui/config.h"
+#include "../lib/hui/language.h"
+#include "../lib/hui/common_dlg.h"
 #include "../view/helper/Progress.h"
 #include "../view/TsunamiWindow.h"
 #include "../data/base.h"

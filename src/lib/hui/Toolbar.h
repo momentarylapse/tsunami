@@ -8,17 +8,22 @@
 #ifndef HUITOOLBAR_H_
 #define HUITOOLBAR_H_
 
-#include "hui.h"
+#include "Controls/Control.h"
 #include "../base/pointer.h"
+
+
+#include <gtk/gtk.h>
 
 namespace hui
 {
 
+class Menu;
 class Window;
+class Resource;
 
 class Toolbar : public Sharable<base::Empty> {
 public:
-	Toolbar(Window *win, bool vertical = false);
+	explicit Toolbar(Window *win, bool vertical = false);
 	virtual ~Toolbar();
 	Window *win;
 	shared_array<Control> items;
@@ -26,12 +31,7 @@ public:
 	bool enabled;
 	bool text_enabled;
 	bool large_icons;
-#ifdef HUI_API_WIN
-	HWND hWnd;
-#endif
-#ifdef HUI_API_GTK
 	GtkWidget *widget;
-#endif
 
 	void _cdecl enable(bool enabled);
 	void _cdecl configure(bool text_enabled, bool large_icons);

@@ -8,7 +8,6 @@
 #ifndef SRC_VIEW_TRACKHEIGHTMANAGER_H_
 #define SRC_VIEW_TRACKHEIGHTMANAGER_H_
 
-#include "../../lib/hui/hui.h"
 #include "../../lib/math/rect.h"
 #include "../../lib/os/time.h"
 

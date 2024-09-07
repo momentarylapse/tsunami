@@ -10,6 +10,7 @@
 #include "../../stuff/Log.h"
 #include "../../data/Song.h"
 #include "LogConsole.h"
+#include "../../lib/hui/hui.h"
 
 namespace tsunami {
 

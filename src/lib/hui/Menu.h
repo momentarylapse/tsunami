@@ -9,8 +9,10 @@
 #ifndef _HUI_MENU_EXISTS_
 #define _HUI_MENU_EXISTS_
 
-#include "common.h"
+//#include "common.h"
 #include "../base/pointer.h"
+#include "Callback.h"
+#include <gtk/gtk.h>
 
 namespace hui
 {
@@ -43,15 +45,13 @@ public:
 
 	void __update_language();
 	void set_panel(Panel *panel);
-	
-#ifdef HUI_API_GTK
+
 	void gtk_realize();
 	void gtk_unrealize();
 #if GTK_CHECK_VERSION(4,0,0)
 	GMenu *gmenu;
 #else
 	GtkWidget* widget;
-#endif
 #endif
 
 	shared_array<Control> items;

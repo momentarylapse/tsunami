@@ -5,7 +5,7 @@
 #define SRC_VIEW_DIALOG_NEWTRACKDIALOG_H
 
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 #include "../../data/base.h"
 #include "../../data/midi/Instrument.h"
 #include "../../data/rhythm/Bar.h"

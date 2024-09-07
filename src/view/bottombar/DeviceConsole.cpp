@@ -9,6 +9,9 @@
 #include "../../Session.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
+#include "../../lib/hui/Menu.h"
+#include "../../lib/hui/language.h"
+#include "../../lib/hui/Resource.h"
 
 namespace tsunami {
 

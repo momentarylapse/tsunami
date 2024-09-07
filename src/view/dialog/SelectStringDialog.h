@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_DIALOG_SELECTSTRINGDIALOG_H_
 #define SRC_VIEW_DIALOG_SELECTSTRINGDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 #include "../../lib/base/optional.h"
 
 namespace tsunami {

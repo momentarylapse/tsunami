@@ -13,6 +13,7 @@
 #include "../../lib/base/iter.h"
 #include "../../lib/math/rect.h"
 #include "../../lib/hui/config.h"
+#include "../../lib/image/Painter.h"
 #include "../../view/painter/MultiLinePainter.h"
 #include "../../view/ColorScheme.h"
 

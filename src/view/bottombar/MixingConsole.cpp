@@ -14,19 +14,20 @@
 #include "../audioview/AudioView.h"
 #include "../audioview/graph/AudioViewTrack.h"
 #include "../audioview/graph/TrackHeader.h"
+#include "../ColorScheme.h"
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
-#include "../../module/audio/AudioEffect.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/SignalChain.h"
 #include "../../Session.h"
 #include "../../Playback.h"
 #include "../../EditModes.h"
-#include "../../plugins/PluginManager.h"
-#include "../../device/DeviceManager.h"
 #include "../../module/stream/AudioOutput.h"
-#include <math.h>
+#include "../../lib/image/Painter.h"
+#include "../../lib/hui/Application.h"
+#include "../../lib/hui/language.h"
+#include <cmath>
 
 namespace tsunami {
 

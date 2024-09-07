@@ -6,7 +6,10 @@
  */
 
 #include "Toolbar.h"
-
+#include "Resource.h"
+#include "Menu.h"
+#include "Window.h"
+#include "language.h"
 #include "Controls/ToolItemButton.h"
 #include "Controls/ToolItemMenuButton.h"
 #include "Controls/ToolItemSeparator.h"

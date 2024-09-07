@@ -6,6 +6,7 @@
  */
 
 #include "ControlEdit.h"
+#include "../language.h"
 #include "../Event.h"
 
 #ifdef HUI_API_GTK

@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_DIALOG_SAMPLESELECTIONDIALOG_H_
 #define SRC_VIEW_DIALOG_SAMPLESELECTIONDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 
@@ -19,7 +19,7 @@ class Song;
 class SampleSelectionDialog : public hui::Dialog {
 public:
 	SampleSelectionDialog(Session *_session, hui::Panel *parent, Sample *old);
-	virtual ~SampleSelectionDialog();
+	~SampleSelectionDialog() override;
 
 	void fill_list();
 	void on_select();

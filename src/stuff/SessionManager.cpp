@@ -10,6 +10,7 @@
 #include "../lib/base/base.h"
 #include "../lib/base/iter.h"
 #include "../lib/base/optional.h"
+#include "../lib/hui/language.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/os/file.h"
 #include "../lib/doc/xml.h"

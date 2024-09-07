@@ -8,7 +8,7 @@
 #ifndef SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
 #define SRC_STORAGE_DIALOG_RAWCONFIGDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

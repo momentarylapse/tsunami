@@ -9,6 +9,7 @@
 #include "../dialog/RawConfigDialog.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../lib/math/math.h"
+#include "../../lib/hui/language.h"
 #include "../../lib/os/file.h"
 #include "../../lib/os/formatter.h"
 #include "../../data/base.h"

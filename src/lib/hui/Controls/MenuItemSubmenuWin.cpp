@@ -7,6 +7,7 @@
 
 #include "../Menu.h"
 #include "MenuItemSubmenu.h"
+#include "../language.h"
 
 namespace hui
 {

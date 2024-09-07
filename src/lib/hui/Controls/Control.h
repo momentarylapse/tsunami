@@ -10,8 +10,9 @@
 
 #include "../common.h"
 #include "../Event.h"
-#include "../language.h"
 #include "../../base/pointer.h"
+
+#include <gtk/gtk.h>
 #include <functional>
 
 namespace hui
@@ -37,13 +38,11 @@ public:
 	int type;
 	string id;
 
-#ifdef HUI_API_GTK
     GtkWidget *widget;
     GtkWidget *frame;
     GtkWidget *get_frame();
     void take_gtk_ownership();
 	virtual void disable_event_handlers_rec();
-#endif
 
 	int enabled: 1;
 	int visible: 1;

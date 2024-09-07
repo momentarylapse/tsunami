@@ -8,11 +8,13 @@
 #ifndef HUIPANEL_H_
 #define HUIPANEL_H_
 
-#include "hui.h"
+#include "Event.h"
 #include "../base/pointer.h"
 
+#include <gtk/gtk.h>
 
-class Painter;
+
+//class Painter;
 class rect;
 
 namespace hui
@@ -20,7 +22,7 @@ namespace hui
 
 class Menu;
 class Resource;
-class Painter;
+//class Painter;
 class Event;
 class EventListener;
 class EventKeyCode;

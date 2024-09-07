@@ -5,7 +5,7 @@
 #ifndef TSUNAMI_PRESETSELECTIONDIALOG_H
 #define TSUNAMI_PRESETSELECTIONDIALOG_H
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

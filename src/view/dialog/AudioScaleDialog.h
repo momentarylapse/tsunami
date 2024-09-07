@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_DIALOG_AUDIOSCALEDIALOG_H_
 #define SRC_VIEW_DIALOG_AUDIOSCALEDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

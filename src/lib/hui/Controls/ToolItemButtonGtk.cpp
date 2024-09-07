@@ -7,6 +7,7 @@
 
 #include "ToolItemButton.h"
 #include "../Event.h"
+#include "../language.h"
 
 #ifdef HUI_API_GTK
 

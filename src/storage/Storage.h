@@ -8,8 +8,12 @@
 #ifndef STORAGE_H_
 #define STORAGE_H_
 
+#include "../lib/base/future.h"
 #include "../lib/os/file.h"
-#include "../lib/hui/hui.h"
+
+namespace hui {
+	class Window;
+}
 
 namespace tsunami {
 

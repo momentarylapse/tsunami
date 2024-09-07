@@ -9,14 +9,13 @@
 #define AUDIOVIEW_H_
 
 #include "../../lib/base/pointer.h"
+#include "../../lib/image/image.h"
 #include "../../data/SongSelection.h"
 #include "../../data/midi/Scale.h"
 #include "TrackHeightManager.h"
 #include "ViewPort.h"
-#include "../ColorScheme.h"
 #include "../HoverData.h"
 #include "../mainview/MainViewNode.h"
-#include <atomic>
 
 namespace hui{
 	class Menu;

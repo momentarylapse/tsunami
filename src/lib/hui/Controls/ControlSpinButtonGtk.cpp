@@ -7,6 +7,7 @@
 
 #include "ControlSpinButton.h"
 #include "../Event.h"
+#include "../language.h"
 #include <math.h>
 
 #ifdef HUI_API_GTK

@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_HEADERBAR_H_
 #define SRC_VIEW_HEADERBAR_H_
 
-#include "../lib/hui/hui.h"
+#include "../lib/hui/Menu.h"
 
 namespace tsunami {
 

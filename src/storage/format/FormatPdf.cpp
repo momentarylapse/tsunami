@@ -12,6 +12,7 @@
 #include "../../data/Track.h"
 #include "../../data/SongSelection.h"
 #include "../../lib/doc/pdf.h"
+#include "../../lib/hui/language.h"
 #include "../../lib/math/rect.h"
 #include "../../view/ColorScheme.h"
 #include "../../view/helper/SymbolRenderer.h"

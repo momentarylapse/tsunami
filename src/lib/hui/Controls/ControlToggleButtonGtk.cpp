@@ -7,6 +7,7 @@
 
 #include "ControlToggleButton.h"
 #include "../Event.h"
+#include "../language.h"
 
 #ifdef HUGE
 #undef HUGE

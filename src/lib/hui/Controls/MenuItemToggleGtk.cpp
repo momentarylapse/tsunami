@@ -6,6 +6,7 @@
  */
 
 #include "MenuItemToggle.h"
+#include "../language.h"
 
 #ifdef HUI_API_GTK
 

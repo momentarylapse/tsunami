@@ -7,14 +7,14 @@
 
 #include "LayerHeader.h"
 #include "AudioViewLayer.h"
-#include "AudioViewTrack.h"
 #include "../AudioView.h"
+#include "../../ColorScheme.h"
 #include "../../helper/graph/Node.h"
 #include "../../helper/Drawing.h"
 #include "../../../data/base.h"
-#include "../../../data/Song.h"
-#include "../../../data/Track.h"
 #include "../../../data/TrackLayer.h"
+#include "../../../lib/image/Painter.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

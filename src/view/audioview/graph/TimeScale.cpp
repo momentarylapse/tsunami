@@ -8,7 +8,10 @@
 #include "TimeScale.h"
 #include "../AudioView.h"
 #include "../../painter/GridPainter.h"
+#include "../../ColorScheme.h"
 #include "../../../module/audio/SongRenderer.h"
+#include "../../../lib/image/Painter.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

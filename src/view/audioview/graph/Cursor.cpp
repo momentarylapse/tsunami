@@ -8,12 +8,15 @@
 #include "Cursor.h"
 #include "AudioViewLayer.h"
 #include "../AudioView.h"
+#include "../../ColorScheme.h"
 #include "../../TsunamiWindow.h"
 #include "../../../data/base.h"
 #include "../../../data/Song.h"
 #include "../../../data/TrackLayer.h"
 #include "../../../Session.h"
 #include "../../../Playback.h"
+#include "../../../lib/image/Painter.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

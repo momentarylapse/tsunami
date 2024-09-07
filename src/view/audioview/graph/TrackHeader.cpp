@@ -8,6 +8,7 @@
 #include "TrackHeader.h"
 #include "AudioViewTrack.h"
 #include "../AudioView.h"
+#include "../../ColorScheme.h"
 #include "../../MouseDelayPlanner.h"
 #include "../../helper/graph/Node.h"
 #include "../../helper/graph/SceneGraph.h"
@@ -18,6 +19,8 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../Session.h"
 #include "../../../EditModes.h"
+#include "../../../lib/image/Painter.h"
+#include "../../../lib/hui/language.h"
 
 namespace tsunami {
 

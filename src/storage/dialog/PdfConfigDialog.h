@@ -8,7 +8,7 @@
 #ifndef SRC_STORAGE_DIALOG_PDFCONFIGDIALOG_H_
 #define SRC_STORAGE_DIALOG_PDFCONFIGDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

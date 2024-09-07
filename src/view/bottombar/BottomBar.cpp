@@ -14,6 +14,7 @@
 #include "SessionConsole.h"
 #include "../audioview/AudioView.h"
 #include "../../Session.h"
+#include "../../lib/hui/Application.h"
 
 namespace tsunami {
 

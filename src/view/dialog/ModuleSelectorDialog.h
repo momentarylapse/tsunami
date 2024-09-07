@@ -8,8 +8,9 @@
 #ifndef SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_
 #define SRC_VIEW_DIALOG_MODULESELECTORDIALOG_H_
 
-#include "../../lib/hui/hui.h"
 #include "../../lib/base/optional.h"
+#include "../../lib/base/set.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

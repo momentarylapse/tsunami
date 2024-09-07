@@ -12,6 +12,7 @@
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../plugins/PluginManager.h"
 #include "../../lib/base/algo.h"
+#include "../../lib/hui/language.h"
 #include "../../lib/hui/Controls/Control.h"
 
 namespace tsunami {

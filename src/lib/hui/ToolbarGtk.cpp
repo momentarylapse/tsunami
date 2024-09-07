@@ -7,6 +7,7 @@
 
 #include "Controls/Control.h"
 #include "Toolbar.h"
+#include "Window.h"
 
 namespace hui
 {

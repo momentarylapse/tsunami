@@ -15,6 +15,7 @@
 #include "../action/song/ActionSongMoveSelection.h"
 #include "../processing/audio/BufferPitchShift.h"
 #include "../Session.h"
+#include "../lib/hui/language.h"
 
 #include <stdio.h>
 

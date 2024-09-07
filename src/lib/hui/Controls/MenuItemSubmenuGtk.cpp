@@ -7,6 +7,7 @@
 
 #include "../Menu.h"
 #include "MenuItemSubmenu.h"
+#include "../language.h"
 
 #ifdef HUI_API_GTK
 

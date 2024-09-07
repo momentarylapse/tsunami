@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_DIALOG_BARREPLACEDIALOG_H_
 #define SRC_VIEW_DIALOG_BARREPLACEDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 #include "../../data/rhythm/Bar.h"
 
 namespace tsunami {

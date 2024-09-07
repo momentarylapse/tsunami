@@ -7,8 +7,7 @@
 
 #pragma once
 
-#include "../../lib/hui/hui.h"
-#include "../../data/rhythm/Bar.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

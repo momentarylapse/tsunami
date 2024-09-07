@@ -9,7 +9,7 @@
 #define SRC_VIEW_BOTTOMBAR_BOTTOMBAR_H_
 
 #include "../../lib/base/pointer.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Panel.h"
 #include "../../lib/pattern/Observable.h"
 
 namespace tsunami {

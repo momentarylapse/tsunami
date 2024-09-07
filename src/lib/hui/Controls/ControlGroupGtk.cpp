@@ -6,6 +6,7 @@
  */
 
 #include "ControlGroup.h"
+#include "../language.h"
 #include "../Window.h"
 #include "../../os/msg.h"
 

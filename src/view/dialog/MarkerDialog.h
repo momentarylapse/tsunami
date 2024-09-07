@@ -9,7 +9,7 @@
 #define SRC_VIEW_DIALOG_MARKERDIALOG_H_
 
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 #include "../../data/Range.h"
 
 namespace tsunami {

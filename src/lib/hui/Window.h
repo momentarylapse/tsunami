@@ -9,11 +9,10 @@
 #ifndef _HUI_WINDOW_EXISTS_
 #define _HUI_WINDOW_EXISTS_
 
-#include "Event.h"
 #include "Panel.h"
 #include "../base/future.h"
 
-
+class vec2;
 class rect;
 class Painter;
 

@@ -9,7 +9,8 @@
 #define SIDEBAR_H_
 
 #include "../../lib/base/pointer.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/base/future.h"
+#include "../../lib/hui/Panel.h"
 #include "../../lib/pattern/Observable.h"
 
 namespace tsunami {

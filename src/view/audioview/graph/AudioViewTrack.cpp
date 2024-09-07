@@ -12,6 +12,7 @@
 #include "../../helper/SymbolRenderer.h"
 #include "../../painter/BufferPainter.h"
 #include "../../mode/ViewMode.h"
+#include "../../ColorScheme.h"
 #include "../../../Session.h"
 #include "../../../EditModes.h"
 #include "../../../data/base.h"
@@ -20,8 +21,6 @@
 #include "../../../data/TrackLayer.h"
 #include "../../../data/audio/AudioBuffer.h"
 #include "../../../data/midi/MidiData.h"
-#include "../../../data/CrossFade.h"
-#include "../../../module/audio/SongRenderer.h"
 
 namespace tsunami {
 

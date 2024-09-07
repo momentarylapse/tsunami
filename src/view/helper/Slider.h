@@ -9,8 +9,11 @@
 #define SLIDER_H_
 
 #include "../../lib/base/callable.h"
-#include "../../lib/hui/hui.h"
 #include "../../lib/pattern/Observable.h"
+
+namespace hui {
+	class Panel;
+}
 
 namespace tsunami {
 

@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_MODULE_CONFIGPANEL_H_
 #define SRC_VIEW_MODULE_CONFIGPANEL_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Panel.h"
 #include "../../lib/pattern/Observable.h"
 
 namespace tsunami {
@@ -17,7 +17,7 @@ class Module;
 
 class ConfigPanel : public obs::Node<hui::Panel> {
 public:
-	ConfigPanel(Module *c);
+	explicit ConfigPanel(Module *c);
 	~ConfigPanel() override;
 	void _cdecl __init__(Module *c);
 	void _cdecl __delete__() override;

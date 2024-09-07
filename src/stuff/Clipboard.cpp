@@ -20,6 +20,7 @@
 #include "../data/rhythm/Bar.h"
 #include "../data/rhythm/Beat.h"
 #include "../lib/base/iter.h"
+#include "../lib/hui/language.h"
 #include <assert.h>
 
 namespace tsunami {

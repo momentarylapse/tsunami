@@ -9,8 +9,10 @@
 #define SRC_VIEW_TSUNAMIWINDOW_H_
 
 #include "../lib/base/pointer.h"
-#include "../lib/hui/hui.h"
+#include "../lib/hui/Window.h"
 #include "../lib/pattern/Observable.h"
+
+class Path;
 
 namespace tsunami {
 

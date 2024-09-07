@@ -8,7 +8,7 @@
 #ifndef SETTINGSDIALOG_H_
 #define SETTINGSDIALOG_H_
 
-#include "../../lib/hui/hui.h"
+#include "../../lib/hui/Window.h"
 
 namespace tsunami {
 

@@ -26,6 +26,19 @@ Range Beat::sub(int index, int parts) {
 	return Range(start, length);
 }
 
+Beat Beat::operator+(int offset) const {
+	auto b = *this;
+	b.range.offset += offset;
+	return b;
+}
+Beat Beat::operator-(int offset) const {
+	return *this + (- offset);
+}
+
+string Beat::str() const {
+	return format("(%d, %d)", range.offset, level);
+}
+
 }
 
 

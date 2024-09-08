@@ -66,29 +66,31 @@ void fill(Array<T> &array, const T &t) {
 template<class F>
 struct filter {
 	const F &f;
-	filter(const F& _f) : f(_f) {}
-	template<class T>
-	friend Array<T> operator>>(const Array<T> &array, const filter<F> &t) {
-		Array<T> r;
-		for (T &e: array)
-			if (t.f(e))
-				r.add(e);
-		return r;
-	}
+	explicit filter(const F& _f) : f(_f) {}
 };
+
+template<class T, class F>
+Array<T> operator>>(const Array<T> &array, const filter<F> &t) {
+	Array<T> r;
+	for (T &e: array)
+		if (t.f(e))
+			r.add(e);
+	return r;
+}
 
 template<class F>
 struct transform {
 	const F &f;
-	transform(const F& _f) : f(_f) {}
-	template<class T>
-	friend auto operator>>(const Array<T> &array, const transform<F> &t) -> Array<decltype(t.f(T()))> {
-		Array<decltype(t.f(T()))> r;
-		for (T &e: array)
-			r.add(t.f(e));
-		return r;
-	}
+	explicit transform(const F& _f) : f(_f) {}
 };
+
+template<class T, class F>
+auto operator>>(const Array<T> &array, const transform<F> &t) -> Array<decltype(t.f(T()))> {
+	Array<decltype(t.f(T()))> r;
+	for (T &e: array)
+		r.add(t.f(e));
+	return r;
+}
 
 template<class T, class F>
 void replace_if(Array<T> &array, F f, const T &by) {

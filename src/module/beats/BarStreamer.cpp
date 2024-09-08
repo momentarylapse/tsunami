@@ -8,6 +8,8 @@
 #include "BarStreamer.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/rhythm/Bar.h"
+#include "../../lib/base/algo.h"
+#include "../../lib/os/msg.h"
 
 namespace tsunami {
 
@@ -19,10 +21,12 @@ BarStreamer::BarStreamer(BarCollection &_bars) {
 
 int BarStreamer::read(Array<Beat> &beats, int samples) {
 	perf_start();
-	beats = bars.get_beats(Range(offset, samples), false, false);
-	for (Beat &b: beats)
-		if (b.range.offset >= offset)
-			b.range.offset -= offset;
+	beats = bars.get_beats(Range(offset, samples), false, false)
+		>> base::transform([this] (const auto& b) {
+			return b - offset;
+		}) >> base::filter([] (const auto& b) {
+			return b.range.offset >= 0;
+		});
 	offset += samples;
 	perf_end();
 	return samples;

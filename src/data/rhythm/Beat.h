@@ -15,7 +15,7 @@ namespace tsunami {
 
 class Beat {
 public:
-	Beat(){}
+	Beat() {}
 	Beat(const Range &r, int beat, int level, int bar_index, int bar_no);
 	Range range;
 	int bar_index;
@@ -23,6 +23,9 @@ public:
 	int beat_no;
 	int level;
 	Range sub(int index, int parts);
+	Beat operator+(int offset) const;
+	Beat operator-(int offset) const;
+	string str() const;
 };
 
 }

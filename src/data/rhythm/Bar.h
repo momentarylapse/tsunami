@@ -53,7 +53,7 @@ public:
 	string format_beats(bool fancy=true) const;
 	string format_bpm(float sample_rate) const;
 
-	Array<Beat> get_beats(int offset, base::optional<int> sub_beat_partition = base::None) const;
+	Array<Beat> get_beats(int offset, const base::optional<int>& sub_beat_partition = base::None) const;
 
 	const BarPattern &pattern() const;
 	Bar *copy() const;

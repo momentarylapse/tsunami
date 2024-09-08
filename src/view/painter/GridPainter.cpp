@@ -119,7 +119,7 @@ void GridPainter::draw_time_numbers(Painter *c) {
 }
 
 
-void GridPainter::draw_bars(Painter *c, base::optional<int> beat_partition) {
+void GridPainter::draw_bars(Painter *c, const base::optional<int>& beat_partition) {
 	if (song->bars.num == 0)
 		return;
 	int s0 = cam->screen2sample(area.x1 - 1);
@@ -267,7 +267,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	c->set_line_width(local_theme.LINE_WIDTH);
 }
 
-void GridPainter::draw_whatever(Painter *c, base::optional<int> beat_partition) {
+void GridPainter::draw_whatever(Painter *c, const base::optional<int>& beat_partition) {
 	if (song->bars.num > 0)
 		draw_bars(c, beat_partition);
 	else

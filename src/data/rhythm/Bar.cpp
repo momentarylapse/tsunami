@@ -108,7 +108,7 @@ string Bar::format_beats(bool fancy) const {
 		return pat_str() + "/" + div;
 }
 
-Array<Beat> Bar::get_beats(int offset, base::optional<int> sub_beat_partition) const {
+Array<Beat> Bar::get_beats(int offset, const base::optional<int>& sub_beat_partition) const {
 	Array<Beat> _beats;
 	int sub_beat_length = length / (total_sub_beats * sub_beat_partition.value_or(1));
 	int level = 0;

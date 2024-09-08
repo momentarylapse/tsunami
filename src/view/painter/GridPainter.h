@@ -30,9 +30,9 @@ public:
 	void draw_empty_background(Painter *c);
 	void draw_time(Painter *c);
 	void draw_time_numbers(Painter *c);
-	void draw_bars(Painter *c, base::optional<int> beat_partition = base::None);
+	void draw_bars(Painter *c, const base::optional<int>& beat_partition = base::None);
 	void draw_bar_numbers(Painter *c);
-	void draw_whatever(Painter *c, base::optional<int> beat_partition = base::None);
+	void draw_whatever(Painter *c, const base::optional<int>& beat_partition = base::None);
 
 	std::function<Bar*()> get_hover_bar;
 	ViewPort *cam;

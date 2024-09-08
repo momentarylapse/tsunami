@@ -17,7 +17,7 @@ namespace tsunami {
 
 
 // pos is precise... beat length not...
-Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, base::optional<int> sub_beat_partition) const {
+Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, const base::optional<int>& sub_beat_partition) const {
 	Array<Beat> beats;
 
 	int pos_bar = 0;

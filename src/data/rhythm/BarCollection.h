@@ -24,7 +24,7 @@ class Range;
 
 class BarCollection : public shared_array<Bar> {
 public:
-	Array<Beat> get_beats(const Range &r, bool include_hidden = false, base::optional<int> sub_beat_partition = base::None) const;
+	Array<Beat> get_beats(const Range &r, bool include_hidden = false, const base::optional<int>& sub_beat_partition = base::None) const;
 	Array<Bar*> get_bars(const Range &r) const;
 	int get_bar_no(int pos) const;
 	int get_next_beat(int pos) const;

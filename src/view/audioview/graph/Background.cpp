@@ -110,7 +110,7 @@ void Background::on_draw(Painter* c) {
 		c->draw_rect(rr);
 		view->grid_painter->set_context(rr, g);
 		if (view->song->bars.num > 0)
-			view->grid_painter->draw_bars(c, 0);
+			view->grid_painter->draw_bars(c);
 		else
 			view->grid_painter->draw_time(c);
 	}

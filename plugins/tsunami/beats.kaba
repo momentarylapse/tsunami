@@ -26,7 +26,7 @@ struct Bar as shared
 
 
 struct Beat
-	var range: Range
+	var offset: i32
 	var bar_index = 0
 	var bar_no = 0
 	var beat_no = 0
@@ -34,7 +34,7 @@ struct Beat
 
 	func __init__()
 	func __init__(_offset: i32, _level: i32)
-		range = Range(_offset, 0)
+		offset = _offset
 		level = _level
 	
 	# on first sample AFTER chunk!

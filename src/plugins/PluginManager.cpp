@@ -26,6 +26,7 @@
 #include "../data/SampleRef.h"
 #include "../data/audio/AudioBuffer.h"
 #include "../data/rhythm/Bar.h"
+#include "../data/rhythm/Beat.h"
 #include "../processing/audio/BufferInterpolator.h"
 #include "../processing/audio/BufferPitchShift.h"
 #include "../module/ModuleFactory.h"
@@ -251,6 +252,14 @@ void PluginManager::link_app_data() {
 	ext->link_class_func("Range.covers", &Range::covers);
 	ext->link_class_func("Range.overlaps", &Range::overlaps);
 	ext->link_class_func("Range.is_inside", &Range::is_inside);
+
+	ext->declare_class_size("Beat", sizeof(Beat));
+	ext->declare_class_element("Beat.range", &Beat::range);
+	ext->declare_class_element("Beat.offset", &Beat::range);
+	ext->declare_class_element("Beat.level", &Beat::level);
+	ext->declare_class_element("Beat.bar_index", &Beat::bar_index);
+	ext->declare_class_element("Beat.bar_no", &Beat::bar_no);
+	ext->declare_class_element("Beat.beat_no", &Beat::beat_no);
 
 	ext->declare_class_size("Bar", sizeof(Bar));
 	ext->declare_class_element("Bar.beats", &Bar::beats);

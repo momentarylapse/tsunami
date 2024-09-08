@@ -85,12 +85,12 @@ class SequencerSource extends MidiSource
 		var offset = 0
 		for b in beats
 			if b.level in [0,1]
-				iterate_beat(midi, cur_beat, RangeTo(offset, b.range.offset), beat_fraction, 1.0)
-				offset = b.range.offset
+				iterate_beat(midi, cur_beat, RangeTo(offset, b.offset), beat_fraction, 1.0)
+				offset = b.offset
 			else if b.level < 0
 				# "keep-alive"
-				iterate_beat(midi, cur_beat, RangeTo(offset, b.range.offset), beat_fraction, b.keep_alive_fraction())
-				offset = b.range.offset
+				iterate_beat(midi, cur_beat, RangeTo(offset, b.offset), beat_fraction, b.keep_alive_fraction())
+				offset = b.offset
 			
 		return midi.samples
 	

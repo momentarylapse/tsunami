@@ -112,7 +112,7 @@ class GridPainter
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, colors: ColorScheme)
 	func extern mut set_context(area: rect, col: GridColors)
 	func extern mut draw_empty_background(p: hui.Painter)
-	func extern mut draw_bars(p: hui.Painter, partition: int)
+	func extern mut draw_bars(p: hui.Painter, partition: i32?)
 	func extern mut draw_bar_numbers(p: hui.Painter)
 	func extern mut draw_time(p: hui.Painter)
 	func extern mut draw_time_numbers(p: hui.Painter)

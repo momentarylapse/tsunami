@@ -555,12 +555,12 @@ void AudioView::snap_to_grid(int &pos) {
 	if (selection_snap_mode == SelectionSnapMode::None) {
 		float dmin = cam.dscreen2sample(SNAPPING_DIST);
 
-		int sub_beats = 0;
+		base::optional<int> sub_beats;
 		if (mode == mode_edit and mode_edit->mode == mode_edit_midi)
 			sub_beats = mode_edit_midi->sub_beat_partition;
 
 		// time bar...
-		auto beats = song->bars.get_beats(cam.range(), true, sub_beats>0, sub_beats);
+		auto beats = song->bars.get_beats(cam.range(), true, sub_beats);
 		for (Beat &b: beats)
 			_update_find_min(new_pos, found, dmin, pos, b.range.offset);
 
@@ -599,7 +599,7 @@ bool AudioView::on_left_button_down(const vec2 &m) {
 
 // extend to beats
 void align_to_beats(Song *s, Range &r, int beat_partition) {
-	auto beats = s->bars.get_beats(Range::ALL, true, beat_partition > 0, beat_partition);//audio->getRange());
+	auto beats = s->bars.get_beats(Range::ALL, true, beat_partition);//audio->getRange());
 	for (Beat &b: beats) {
 		/*for (int i=0; i<beat_partition; i++) {
 			Range sr = b.sub(i, beat_partition);

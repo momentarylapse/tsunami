@@ -8,7 +8,8 @@
 #ifndef SRC_DATA_RHYTHM_BAR_H_
 #define SRC_DATA_RHYTHM_BAR_H_
 
-#include "../../lib/base/pointer.h"
+#include <base/optional.h>
+#include <base/pointer.h>
 #include "../Range.h"
 
 
@@ -47,12 +48,12 @@ public:
 	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int divisor);
 	void __init__(int length, int num_beats, int divisor);
-	bool is_pause();
+	bool is_pause() const;
 
 	string format_beats(bool fancy=true) const;
 	string format_bpm(float sample_rate) const;
 
-	Array<Beat> get_beats(int offset, bool include_sub_beats = false, int sub_beat_partition = 1) const;
+	Array<Beat> get_beats(int offset, base::optional<int> sub_beat_partition = base::None) const;
 
 	const BarPattern &pattern() const;
 	Bar *copy() const;
@@ -62,7 +63,7 @@ public:
 	int index; // index in the Bar[] array
 	int index_text; // index without pause "bars" (well, text = n+1...)
 	int offset;
-	Range range();
+	Range range() const;
 };
 
 

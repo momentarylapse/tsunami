@@ -9,6 +9,8 @@
 #define SRC_VIEW_PAINTER_GRIDPAINTER_H_
 
 #include <functional>
+#include <base/optional.h>
+
 #include "BasicGridPainter.h"
 
 namespace tsunami {
@@ -28,9 +30,9 @@ public:
 	void draw_empty_background(Painter *c);
 	void draw_time(Painter *c);
 	void draw_time_numbers(Painter *c);
-	void draw_bars(Painter *c, int beat_partition = 0);
+	void draw_bars(Painter *c, base::optional<int> beat_partition = base::None);
 	void draw_bar_numbers(Painter *c);
-	void draw_whatever(Painter *c, int beat_partition = 0);
+	void draw_whatever(Painter *c, base::optional<int> beat_partition = base::None);
 
 	std::function<Bar*()> get_hover_bar;
 	ViewPort *cam;

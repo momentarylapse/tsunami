@@ -57,6 +57,6 @@ struct Beat
 
 struct BarCollection extends shared![Bar][]
 	func extern selfref get_bars(r: Range) -> Bar&[]
-	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: i32) -> Beat[]
+	func extern selfref get_beats(r: Range, include_hidden: bool, sub_beat_partition: i32?) -> Beat[]
 	func extern get_next_beat(pos: i32) -> i32
 	func extern get_prev_beat(pos: i32) -> i32

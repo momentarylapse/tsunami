@@ -85,6 +85,11 @@ public:
 			throw Exception("no value");
 		return *(T*)&_value;
 	}
+	T value_or(const T& alt) const {
+		if (!_is_set)
+			return alt;
+		return *(T*)&_value;
+	}
 	void clear() {
 		if (!_is_set)
 			return;
@@ -104,6 +109,13 @@ private:
 	}
 };
 
+}
+
+template<class T>
+string str(const base::optional<T>& o) {
+	if (o.has_value())
+		return str(o.value());
+	return "nil";
 }
 
 #endif /* SRC_LIB_BASE_OPTIONAL_H_ */

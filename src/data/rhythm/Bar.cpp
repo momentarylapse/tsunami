@@ -108,17 +108,16 @@ string Bar::format_beats(bool fancy) const {
 		return pat_str() + "/" + div;
 }
 
-Array<Beat> Bar::get_beats(int offset, bool include_sub_beats, int sub_beat_partition) const {
-	sub_beat_partition = max(sub_beat_partition, 1);
+Array<Beat> Bar::get_beats(int offset, base::optional<int> sub_beat_partition) const {
 	Array<Beat> _beats;
-	int sub_beat_length = length / (total_sub_beats * sub_beat_partition);
+	int sub_beat_length = length / (total_sub_beats * sub_beat_partition.value_or(1));
 	int level = 0;
 	int pos_beat = offset;
-	for (auto&& [beat_index, bb]: enumerate(beats)) {
-		int sub_beats = bb * sub_beat_partition;
+	for (auto&& [beat_index, beat]: enumerate(beats)) {
+		int sub_beats = beat * sub_beat_partition.value_or(1);
 		int beat_length = sub_beat_length * sub_beats;
 
-		if (include_sub_beats) {
+		if (sub_beat_partition.has_value()) {
 
 			for (int k=0; k<sub_beats; k++) {
 				int pos_sub_beat = pos_beat + k * sub_beat_length;
@@ -139,11 +138,11 @@ Array<Beat> Bar::get_beats(int offset, bool include_sub_beats, int sub_beat_part
 	return _beats;
 }
 
-bool Bar::is_pause() {
+bool Bar::is_pause() const {
 	return (beats.num == 0);
 }
 
-Range Bar::range() {
+Range Bar::range() const {
 	return Range(offset, length);
 }
 

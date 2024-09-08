@@ -452,7 +452,7 @@ void ViewModeDefault::draw_post(Painter *p) {
 void ViewModeDefault::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	view->grid_painter->set_context(l->area, l->grid_colors());
 	view->grid_painter->draw_empty_background(c);
-	view->grid_painter->draw_whatever(c, 0);
+	view->grid_painter->draw_whatever(c);
 
 
 	if (l->layer->type == SignalType::Midi) {

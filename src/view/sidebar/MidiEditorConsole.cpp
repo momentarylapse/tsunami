@@ -530,7 +530,7 @@ int align_to_beats(int pos, Array<Beat> &beats) {
 }
 
 void MidiEditorConsole::on_quantize() {
-	auto beats = song->bars.get_beats(Range::ALL, true, true, mode->sub_beat_partition);
+	auto beats = song->bars.get_beats(Range::ALL, true, mode->sub_beat_partition);
 
 	song->begin_action_group("quantize midi");
 	auto notes = layer->midi.get_notes_by_selection(view->sel);

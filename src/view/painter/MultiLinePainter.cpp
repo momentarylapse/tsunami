@@ -166,7 +166,7 @@ TrackMarker* get_bar_part(Song *s, int offset) {
 }
 
 void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r) {
-	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true, false);
+	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true);
 	for (auto b: beats) {
 		float x = cam->sample2screen(b.range.offset);
 		if (b.level == 0) {

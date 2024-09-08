@@ -44,7 +44,7 @@ void TestRhythm::test_bar_simple_no_partition() {
 void TestRhythm::test_bar_simple_partition_2() {
 	Bar bar = {1000, 4, 1};
 
-	auto beats = bar.get_beats(0, true, 2);
+	auto beats = bar.get_beats(0, 2);
 	assert_equal(beat_offsets(beats), {0, 125, 250, 375, 500, 625, 750, 875});
 }
 
@@ -60,14 +60,14 @@ void TestRhythm::test_bar_complex_partition_1() {
 	Bar bar = {100, 4, 2};
 	bar.set_pattern({3,3,2,2});
 
-	auto beats = bar.get_beats(0, true, 1);
+	auto beats = bar.get_beats(0, 1);
 	assert_equal(beat_offsets(beats), {0, 10, 20, 30, 40, 50, 60, 70, 80, 90});
 }
 void TestRhythm::test_bar_complex_partition_2() {
 	Bar bar = {100, 4, 2};
 	bar.set_pattern({3,3,2,2});
 
-	auto beats = bar.get_beats(0, true, 2);
+	auto beats = bar.get_beats(0, 2);
 	assert_equal(beat_offsets(beats), {0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95});
 }
 

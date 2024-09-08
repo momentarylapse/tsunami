@@ -17,7 +17,7 @@ namespace tsunami {
 
 
 // pos is precise... beat length not...
-Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool include_sub_beats, int sub_beat_partition) const {
+Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, base::optional<int> sub_beat_partition) const {
 	Array<Beat> beats;
 
 	int pos_bar = 0;
@@ -30,7 +30,7 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, bool i
 				beats.add(Beat(Range(pos_bar, b->length), 0, 0, bar_index, -1));
 			pos_bar += b->length;
 		} else {
-			auto _beats = b->get_beats(pos_bar, include_sub_beats, sub_beat_partition);
+			auto _beats = b->get_beats(pos_bar, sub_beat_partition);
 			for (Beat &bb: _beats)
 				if (r.overlaps(bb.range))
 					beats.add(bb);
@@ -78,7 +78,7 @@ int BarCollection::get_bar_no(int pos) const {
 }
 
 int BarCollection::get_next_beat(int pos) const {
-	auto beats = get_beats(Range::ALL, true, false);
+	auto beats = get_beats(Range::ALL, true);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
 			return b.range.offset;
@@ -86,7 +86,7 @@ int BarCollection::get_next_beat(int pos) const {
 }
 
 int BarCollection::get_prev_beat(int pos) const {
-	auto beats = get_beats(Range::ALL, true, false);
+	auto beats = get_beats(Range::ALL, true);
 	int prev = 0;
 	for (Beat &b: beats) {
 		if (b.range.offset >= pos)
@@ -97,7 +97,7 @@ int BarCollection::get_prev_beat(int pos) const {
 }
 
 int BarCollection::get_next_sub_beat(int pos, int sub_beat_partition) const {
-	auto beats = get_beats(Range::ALL, true, true, sub_beat_partition);
+	auto beats = get_beats(Range::ALL, true, sub_beat_partition);
 	for (Beat &b: beats)
 		if (b.range.offset > pos)
 			return b.range.offset;
@@ -105,7 +105,7 @@ int BarCollection::get_next_sub_beat(int pos, int sub_beat_partition) const {
 }
 
 int BarCollection::get_prev_sub_beat(int pos, int sub_beat_partition) const {
-	auto beats = get_beats(Range::ALL, true, true, sub_beat_partition);
+	auto beats = get_beats(Range::ALL, true, sub_beat_partition);
 	int prev = pos;
 	for (Beat &b: beats) {
 		if (b.range.offset >= pos)

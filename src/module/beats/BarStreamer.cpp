@@ -21,7 +21,7 @@ BarStreamer::BarStreamer(BarCollection &_bars) {
 
 int BarStreamer::read(Array<Beat> &beats, int samples) {
 	perf_start();
-	beats = bars.get_beats(Range(offset, samples), false, false)
+	beats = bars.get_beats(Range(offset, samples), false)
 		>> base::transform([this] (const auto& b) {
 			return b - offset;
 		}) >> base::filter([] (const auto& b) {
@@ -45,28 +45,28 @@ void BarStreamer::reset() {
 }
 
 int BarStreamer::beats_per_bar() {
-	auto beats = bars.get_beats(Range(0, offset), false, false);
+	auto beats = bars.get_beats(Range(0, offset), false);
 	if (beats.num > 0)
 		return bars[beats.back().bar_index]->beats.num;
 	return 4;
 }
 
 int BarStreamer::cur_beat() {
-	auto beats = bars.get_beats(Range(0, offset), false, false);
+	auto beats = bars.get_beats(Range(0, offset), false);
 	if (beats.num > 0)
 		return beats.back().beat_no;
 	return 0;
 }
 
 int BarStreamer::cur_bar() {
-	auto beats = bars.get_beats(Range(0, offset), false, false);
+	auto beats = bars.get_beats(Range(0, offset), false);
 	if (beats.num > 0)
 		return beats.back().bar_no;
 	return 0;
 }
 
 float BarStreamer::beat_fraction() {
-	auto beats = bars.get_beats(Range(0, offset), false, false);
+	auto beats = bars.get_beats(Range(0, offset), false);
 	if (beats.num > 0) {
 		auto &r = beats.back().range;
 		return (float)(offset - r.offset) / (float)r.length;

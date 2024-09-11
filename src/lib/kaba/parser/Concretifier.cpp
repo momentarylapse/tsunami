@@ -1819,6 +1819,8 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 	return node;
 }
 
+// TODO: wrap in block + save input in variable
+// TODO: variable life-time ... maybe in outer block?
 shared<Node> Concretifier::concretify_definitely(shared<Node> node, Block *block, const Class *ns) {
 	concretify_all_params(node, block, ns);
 	auto sub = node->params[0];
@@ -2379,7 +2381,39 @@ shared<Node> Concretifier::try_build_pipe_map_optional_unwrap(const shared<Node>
 	if (input->type->param[0] != pt)
 		return nullptr;
 
-	return nullptr;
+	auto ff = f->as_func();
+	bool needs_wrapping = !ff->literal_return_type->is_optional();
+	auto t_out = ff->literal_return_type;
+	if (needs_wrapping)
+		t_out = tree->request_implicit_class_optional(ff->literal_return_type, token_id);
+
+	auto b = new Block(block->function, block, t_out);
+	// variable into OUTER block for returnable life-time
+	auto v = block->add_var(b->function->create_slightly_hidden_name(), input->type);
+
+	b->add(auto_implementer->add_assign(block->function, "...", add_node_local(v), input));
+
+	auto cif = add_node_statement(StatementID::If, token_id, t_out);
+	cif->set_num_params(3);
+
+	auto f_has_val = input->type->get_member_func(Identifier::func::OptionalHasValue, TypeBool, {});
+	cif->set_param(0, add_node_member_call(f_has_val, add_node_local(v), token_id));
+	auto call = add_node_call(ff, token_id);
+	call->set_param(0, add_node_local(v)->change_type(input->type->param[0]));
+	if (needs_wrapping) {
+		for (auto c: t_out->get_constructors())
+			if (c->num_params == 2 and c->literal_param_type[1] == pt) {
+				cif->set_param(1, add_node_constructor(c, token_id));
+				cif->params[1]->params[1] = call;
+			}
+	} else {
+		cif->set_param(1, call);
+	}
+	cif->set_param(2, add_node_constructor(t_out->get_default_constructor(), token_id));
+
+	b->add(cif);
+
+	return b;
 }
 
 shared<Node> Concretifier::try_build_pipe_map_direct(const shared<Node> &input, Node *f, const Class *rt, const Class *pt, Block *block, const Class *ns, int token_id) {
@@ -2450,6 +2484,7 @@ shared<Node> Concretifier::build_function_pipe(const shared<Node> &abs_input, co
 	if (input->type == TypeUnknown)
 		input = concretify_node(input, block, ns);
 	input = force_concrete_type(input);
+	input = deref_if_reference(input);
 
 	if ((rhs->kind == NodeKind::AbstractToken)) {
 		if (auto s = parser->which_special_function(rhs->as_token())) {

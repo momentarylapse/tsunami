@@ -228,13 +228,16 @@ bool node_is_assign_mem(Node *n) {
 SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 	/*----- direct nodes --------*/
-
+#if __cplusplus >= 202000
 	SerialNodeParam p{
 			.kind = com->kind,
 			.p = 0,
 			.type = com->type,
 			.shift = 0
 	};
+#else
+	SerialNodeParam p{com->kind, 0, 0, com->type, 0};
+#endif
 
 	if (com->kind == NodeKind::Memory) {
 		p.p = com->link_no;

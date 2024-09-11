@@ -24,6 +24,7 @@ static Array<CPUInstructionARM> cpu_instructions_arm;
 
 
 void add_inst_arm(InstID inst, unsigned int code, unsigned int filter, int param1, int param2 = AP_NONE, int param3 = AP_NONE) {
+#if __cplusplus >= 202000
 	CPUInstructionARM i{
 		.inst = inst,
 		.code = code,
@@ -31,6 +32,9 @@ void add_inst_arm(InstID inst, unsigned int code, unsigned int filter, int param
 		.p1 = param1,
 		.p2 = param2,
 		.p3 = param3};
+#else
+	CPUInstructionARM i{inst, code, filter, param1, param2, param3};
+#endif
 
 	cpu_instructions_arm.add(i);
 }

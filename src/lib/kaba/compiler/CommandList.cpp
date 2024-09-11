@@ -66,12 +66,16 @@ SerialNodeParam CommandList::_add_temp(const Class *t) {
 	v.type = t;
 	v.force_stack = (t->size > config.target.pointer_size) or t->is_list() or t->is_array() or (t->elements.num > 0);
 	temp_var.add(v);
+#if __cplusplus >= 202000
 	return SerialNodeParam {
 		.kind = NodeKind::VarTemp,
 		.p = temp_var.num - 1,
 		.type = t,
 		.shift = 0
 	};
+#else
+	return SerialNodeParam{NodeKind::VarTemp, temp_var.num - 1, -1, t, 0};
+#endif
 }
 
 
@@ -93,11 +97,15 @@ void CommandList::set_cmd_param(int index, int param_index, const SerialNodePara
 }
 
 void CommandList::add_cmd(Asm::ArmCond cond, Asm::InstID inst, const SerialNodeParam &p1, const SerialNodeParam &p2, const SerialNodeParam &p3) {
+#if __cplusplus >= 202000
 	SerialNode c{
 		.inst = inst,
 		.cond = cond,
 		.index = next_cmd_index
 	};
+#else
+	SerialNode c{inst, cond,{}, next_cmd_index};
+#endif
 
 	if (next_cmd_index == cmd.num) {
 		cmd.add(c);

@@ -24,6 +24,7 @@
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../lib/base/iter.h"
+#include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/hui/config.h"
 #include "../lib/hui/language.h"
@@ -87,6 +88,43 @@ Storage::~Storage() {
 	hui::config.set_float("Storage.DefaultOggQuality", default_ogg_quality);
 	hui::config.set_str("Storage.CurrentDirectory", current_directory.str());
 	hui::config.set_str("Storage.QuickExportDirectory", quick_export_directory.str());
+}
+
+
+bool song_is_simple_audio(Song *s) {
+	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::Audio) and (s->tracks[0]->layers.num == 1));
+}
+
+bool song_is_simple_midi(Song *s) {
+	for (Track* t: weak(s->tracks))
+		if ((t->type != SignalType::Midi) and (t->type != SignalType::Beats))
+			return false;
+	return true;
+}
+
+string Storage::suggest_filename(Song *s, const Path &dir) {
+	if (s->filename)
+		return s->filename.basename();
+	const string base = Date::now().format("%Y-%m-%d - %H-%M-%S");
+
+	string ext = "nami";
+	if (song_is_simple_audio(s))
+		ext = "ogg";
+	//else if (song_is_simple_midi(s))
+	//	ext = "midi";
+	{
+		const string name = base + "." + ext;
+		if (!os::fs::exists(dir | name))
+			return name;
+	}
+
+	for (int i=0; i<26; i++) {
+		string name = base + "a." + ext;
+		name[name.num - ext.num - 2] += i;
+		if (!os::fs::exists(dir | name))
+			return name;
+	}
+	return "";
 }
 
 base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flags) {
@@ -408,7 +446,7 @@ AudioBuffer Storage::decompress(const string &codec, const bytes &data) {
 	return r;
 }
 
-Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b) {
+Storage::Flags operator|(Storage::Flags a, Storage::Flags b) {
 	return (Storage::Flags)((int)a | (int)b);
 }
 

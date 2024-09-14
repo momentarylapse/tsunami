@@ -981,41 +981,10 @@ void TsunamiWindow::on_save_session() {
 }
 
 
-bool song_is_simple_audio(Song *s) {
-	return ((s->tracks.num == 1) and (s->tracks[0]->type == SignalType::Audio) and (s->tracks[0]->layers.num == 1));
-}
-
-bool song_is_simple_midi(Song *s) {
-	for (Track* t: weak(s->tracks))
-		if ((t->type != SignalType::Midi) and (t->type != SignalType::Beats))
-			return false;
-	return true;
-}
-
-string _suggest_filename(Song *s, const Path &dir) {
-	if (s->filename)
-		return s->filename.basename();
-	string base = Date::now().format("%Y-%m-%d");
-
-	string ext = "nami";
-	if (song_is_simple_audio(s))
-		ext = "ogg";
-	//else if (song_is_simple_midi(s))
-	//	ext = "midi";
-
-	for (int i=0; i<26; i++) {
-		string name = base + "a." + ext;
-		name[name.num - ext.num - 2] += i;
-		if (!os::fs::exists(dir | name))
-			return name;
-	}
-	return "";
-}
-
 void TsunamiWindow::on_save_as() {
 	string def;
 	if (song->filename == "")
-		def = _suggest_filename(song, session->storage->current_directory);
+		def = Storage::suggest_filename(song, session->storage->current_directory);
 
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		session->storage->save(song, filename).then([this] {
@@ -1028,7 +997,7 @@ void TsunamiWindow::on_save_as() {
 void TsunamiWindow::on_export() {
 	string def;
 	if (song->filename == "")
-		def = _suggest_filename(song, session->storage->current_directory);
+		def = Storage::suggest_filename(song, session->storage->current_directory);
 
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		session->storage->_export(song, filename).then([this] {
@@ -1076,7 +1045,7 @@ void TsunamiWindow::on_export_selection() {
 
 void TsunamiWindow::on_quick_export() {
 	const auto dir = session->storage->quick_export_directory;
-	session->storage->save(song, dir | _suggest_filename(song, dir)).then([this] {
+	session->storage->save(song, dir | Storage::suggest_filename(song, dir)).then([this] {
 		session->status(_("file saved"));
 	});
 }

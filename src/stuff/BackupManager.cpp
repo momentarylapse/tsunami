@@ -21,7 +21,12 @@ int BackupManager::next_uuid;
 
 Path BackupManager::get_filename(const string &extension) {
 	Date d = Date::now();
-	string base = d.format("backup-%Y-%m-%d");
+	string base = d.format("backup--%Y-%m-%d--%H-%M-%S");
+	{
+		const string fn = base + "." + extension;
+		if (!os::fs::exists(Tsunami::directory | fn))
+			return Tsunami::directory | fn;
+	}
 	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
@@ -35,7 +40,7 @@ Path BackupManager::get_filename(const string &extension) {
 void BackupManager::set_save_state(Session *session) {
 	for (auto &bf: files) {
 		if (bf.session == session) {
-			session->i(_("deleting backup: ") + bf.filename.str());
+			session->i(_("deleting backup: '") + str(bf.filename) + "'");
 			os::fs::_delete(bf.filename);
 			bf.session = nullptr; // auto remove
 		}
@@ -63,7 +68,7 @@ os::fs::FileStream *BackupManager::create_file(const string &extension, Session 
 	bf.uuid = -1;//next_uuid ++;
 	bf.session = session;
 	bf.filename = get_filename(extension);
-	session->i(_("creating backup: ") + bf.filename.str());
+	session->i(_("creating backup: '") + str(bf.filename) + "'");
 	try {
 		bf.f = os::fs::open(bf.filename, "wb");
 		files.add(bf);
@@ -83,7 +88,7 @@ void BackupManager::done(os::fs::FileStream *f) {
 	delete f;
 	auto bf = _find_by_file(f);
 	if (bf) {
-		bf->session->i(_("backup done: ") + bf->filename.str());
+		bf->session->i(_("backup done: '") + str(bf->filename) + "'");
 		bf->f = nullptr;
 	}
 }
@@ -128,7 +133,7 @@ int BackupManager::get_uuid_for_filename(const Path &filename) {
 void BackupManager::delete_old(int uuid) {
 	auto *bf = _find_by_uuid(uuid);
 	if (bf) {
-		Session::GLOBAL->i(_("deleting backup: ") + bf->filename.str());
+		Session::GLOBAL->i(_("deleting backup: '") + str(bf->filename) + "'");
 		os::fs::_delete(bf->filename);
 		bf->session = nullptr;
 	}

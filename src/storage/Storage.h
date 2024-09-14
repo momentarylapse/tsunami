@@ -83,9 +83,11 @@ public:
 	AudioBuffer decompress(const string &codec, const bytes &data);
 
 	static void mark_file_used(const Path& filename);
+
+	static string suggest_filename(Song *s, const Path &dir);
 };
 
-Storage::Flags operator|(const Storage::Flags a, const Storage::Flags b);
+Storage::Flags operator|(Storage::Flags a, Storage::Flags b);
 
 }
 

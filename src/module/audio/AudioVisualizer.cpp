@@ -24,28 +24,9 @@ int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
 	if (r <= 0)
 		return r;
 
-	PerformanceMonitor::start_busy(perf_channel);
 	buffer->buf.set_channels(buf.channels);
 	buffer->write(buf);
 
-	if (buffer->available() < chunk_size)
-		return r;
-
-	lock();
-	while (buffer->available() >= chunk_size) {
-		AudioBuffer b;
-		buffer->read_ref(b, chunk_size);
-		process(b);
-		buffer->read_ref_done(b);
-	}
-	unlock();
-	PerformanceMonitor::end_busy(perf_channel);
-
-	notify_counter ++;
-	hui::run_later(0.001f, [this] {
-		out_changed.notify();
-		notify_counter --;
-	});
 	return r;
 }
 
@@ -54,14 +35,26 @@ AudioVisualizer::AudioVisualizer() :
 {
 	buffer = new RingBuffer(1 << 18);
 	chunk_size = 2084;
-	notify_counter = 0;
+
+	id_runner = hui::run_repeated(0.02f, [this] {
+
+		if (buffer->available() < chunk_size)
+			return;
+
+		PerformanceMonitor::start_busy(perf_channel);
+		while (buffer->available() >= chunk_size) {
+			AudioBuffer b;
+			buffer->read_ref(b, chunk_size);
+			process(b);
+			buffer->read_ref_done(b);
+			out_changed.notify();
+		}
+		PerformanceMonitor::end_busy(perf_channel);
+	});
 }
 
 AudioVisualizer::~AudioVisualizer() {
-	// make sure all notifications have been handled
-	while (notify_counter > 0) {
-		hui::Application::do_single_main_loop();
-	}
+	hui::cancel_runner(id_runner);
 }
 
 void AudioVisualizer::__init__() {
@@ -74,22 +67,6 @@ void AudioVisualizer::__delete__() {
 
 void AudioVisualizer::set_chunk_size(int _chunk_size) {
 	chunk_size = _chunk_size;
-}
-
-void AudioVisualizer::lock() {
-
-}
-
-void AudioVisualizer::unlock() {
-
-}
-
-void AudioVisualizer::flip() {
-	if (next_writing > 0)
-		next_writing = 0;
-	else
-		next_writing = 1;
-	current_reading = 1 - next_writing;
 }
 
 }

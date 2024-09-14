@@ -37,16 +37,10 @@ public:
 	int chunk_size;
 	void set_chunk_size(int chunk_size);
 
+	int id_runner;
 
-	int next_writing = 0;
-	int current_reading = 1;
-	std::mutex mutex;
-	std::atomic<int> notify_counter;
-	void lock();
-	void unlock();
-	void flip();
-
-	virtual _cdecl void process(AudioBuffer &buf){}
+	// will be called in ui thread!
+	virtual void process(AudioBuffer &buf){}
 };
 
 }

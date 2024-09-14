@@ -168,16 +168,11 @@ class AudioVisualizer extends Module
 	var input: Module.InPort
 	var chunk_size: int
 	var ring_buffer: RingBuffer&
-	var next_writing: int
-	var current_reading: int
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
 	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
 	func extern mut set_chunk_size(chunk_size: int)
-	func extern mut lock()
-	func extern mut unlock()
-	func extern mut flip()
 
 
 

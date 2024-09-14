@@ -410,16 +410,11 @@ void PluginManager::link_app_data() {
 		ext->declare_class_element("AudioVisualizer.output", &AudioVisualizer::out);
 		ext->declare_class_element("AudioVisualizer.chunk_size", &AudioVisualizer::chunk_size);
 		ext->declare_class_element("AudioVisualizer.ring_buffer", &AudioVisualizer::buffer);
-		ext->declare_class_element("AudioVisualizer.next_writing", &AudioVisualizer::next_writing);
-		ext->declare_class_element("AudioVisualizer.current_reading", &AudioVisualizer::current_reading);
 		ext->link_class_func("AudioVisualizer.__init__", &AudioVisualizer::__init__);
 		ext->link_virtual("AudioVisualizer.__delete__", &AudioVisualizer::__delete__, &avis);
 		ext->link_virtual("AudioVisualizer.process", &AudioVisualizer::process, &avis);
 		ext->link_virtual("AudioVisualizer.read_audio", &AudioVisualizer::read_audio, &avis);
 		ext->link_class_func("AudioVisualizer.set_chunk_size", &AudioVisualizer::set_chunk_size);
-		ext->link_class_func("AudioVisualizer.lock", &AudioVisualizer::lock);
-		ext->link_class_func("AudioVisualizer.unlock", &AudioVisualizer::unlock);
-		ext->link_class_func("AudioVisualizer.flip", &AudioVisualizer::flip);
 	}
 
 	{

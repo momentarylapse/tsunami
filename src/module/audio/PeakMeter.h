@@ -48,7 +48,7 @@ public:
 
 	float i_to_freq(int i);
 
-	Array<PeakMeterData> channels[2];
+	Array<PeakMeterData> channels;
 	Array<PeakMeterData> read_channels();
 
 

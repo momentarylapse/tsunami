@@ -77,15 +77,13 @@ DrawingArea area '' height=200 expandy")
 		c.out_changed >> create_sink(on_update)
 	
 	func mut on_update()
-		c.lock()
-		grid.set(c.ffl[c.current_reading], c.ffr[c.current_reading])
-		c.unlock()
+		grid.set(c.ffl, c.ffr)
 		redraw("area")
 
 class Spectrum extends AudioVisualizer
 	
-	var ffr, ffl: float[][2]
-	var peak_max: float
+	var ffr, ffl: f32[]
+	var peak_max: f32
 	
 	func override __init__()
 		set_chunk_size(NUM_SAMPLES)
@@ -122,12 +120,11 @@ class Spectrum extends AudioVisualizer
 			tffr /= mmax
 		peak_max = max(max(tffr), max(tffl))
 		peak_max = 0.01
-		ffl[next_writing] = tffl
-		ffr[next_writing] = tffr
+		ffl = tffl
+		ffr = tffr
 	
 	func override process(buf: AudioBuffer)
 		do(buf)
-		flip()
 		
 	func override create_panel() -> xfer[ConfigPanel]
 		return new SpectrumPanel(self)

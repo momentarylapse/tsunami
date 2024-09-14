@@ -419,9 +419,7 @@ uniform float iVolume;
 	
 	func mut on_draw()
 		_time += timer.get()
-		c.lock()
-		var volume = max(c.buffer[c.current_reading].c[0])
-		c.unlock()
+		var volume = max(c.buffer.c[0])
 		
 		#gl.start()
 		gl.clear_color(color.RED)
@@ -436,11 +434,10 @@ uniform float iVolume;
 		#gl.end()
 
 class ShaderVis extends AudioVisualizer
-	var buffer: AudioBuffer[2]
+	var buffer: AudioBuffer
 	
 	func override process(buf: AudioBuffer)
-		buffer[next_writing] = buf
-		flip()
+		buffer = buf
 		
 	func override create_panel() -> xfer[ConfigPanel]
 		return new ShaderPanel(self)

@@ -49,10 +49,8 @@ Grid ? '' vertical
 		p.draw_rect([0, w, 0, h])
 		
 		var curve_before, curve_after: float[]
-		c.lock()
 		curve_before = c.curve_before
 		curve_after = c.curve_after
-		c.unlock()
 		
 		p.set_line_width(0.7)
 		p.set_color(color(0,1,0, 0.5))

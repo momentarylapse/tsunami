@@ -220,7 +220,7 @@ public:
 	ViewMode *mode;
 	void _set_mode(ViewMode *m);
 	void set_mode(const string& m);
-	bool in_mode(const string& m);
+	bool in_mode(const string& m) const;
 	string current_mode_name;
 
 	owned_array<ViewMode> all_modes;

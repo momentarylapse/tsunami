@@ -83,7 +83,7 @@ SideBar::SideBar(Session *_session, hui::Panel *parent) {
 
 	expand("revealer", false);
 	visible = false;
-	active_console = -1;
+	active_console = SideBarIndex::None;
 }
 
 SideBar::~SideBar() {
@@ -110,8 +110,8 @@ void SideBar::on_close() {
 }
 
 void SideBar::_show() {
-	if (!visible and (active_console >= 0))
-		consoles[active_console]->on_enter();
+	if (!visible and (active_console != SideBarIndex::None))
+		consoles[(int)active_console]->on_enter();
 
 	expand("revealer", true);
 	visible = true;
@@ -120,8 +120,8 @@ void SideBar::_show() {
 
 // FIXME: this is the official closing function...
 void SideBar::_hide() {
-	if (visible and (active_console >= 0))
-		consoles[active_console]->on_leave();
+	if (visible and (active_console != SideBarIndex::None))
+		consoles[(int)active_console]->on_leave();
 
 	expand("revealer", false);
 	visible = false;
@@ -129,13 +129,16 @@ void SideBar::_hide() {
 }
 
 void SideBar::choose(Index console) {
+	if (console == active_console)
+		return;
+
 	if ((int)active_console >= 0) {
 		if (visible)
 			consoles[(int)active_console]->on_leave();
 		consoles[(int)active_console]->hide();
 	}
 
-	active_console = (int)console;
+	active_console = console;
 
 	consoles[(int)active_console]->show();
 	if (visible)
@@ -154,11 +157,11 @@ void SideBar::open(Index console) {
 }
 
 bool SideBar::is_active(Index console) const {
-	return (active_console == (int)console) and visible;
+	return (active_console == console) and visible;
 }
 
 base::future<bool> SideBar::test_allow_close() {
-	if (!visible or active_console < 0)
+	if (!visible or active_console == SideBarIndex::None)
 		return base::success<bool>(true);
 	return consoles[(int)active_console]->test_allow_close();
 }

@@ -46,7 +46,8 @@ enum class SideBarIndex {
 	SamplerefConsole,
 	CaptureConsole,
 	SignalChainConsole,
-	Count
+	Count,
+	None = -1
 };
 
 class SideBar : public obs::Node<hui::Panel> {
@@ -65,7 +66,7 @@ public:
 	void choose(Index console);
 	void open(Index console);
 	bool is_active(Index console) const;
-	int active_console;
+	Index active_console;
 	bool visible;
 
 	base::future<bool> test_allow_close();

@@ -30,7 +30,7 @@ HoverData &ViewMode::hover() {
 }*/
 
 HoverData ViewMode::get_hover_data(AudioViewLayer *vlayer, const vec2 &m) {
-	return HoverData();
+	return {};
 }
 
 SongSelection ViewMode::get_selection(const Range &r, SelectionMode mode) {
@@ -40,19 +40,19 @@ SongSelection ViewMode::get_selection(const Range &r, SelectionMode mode) {
 		return get_selection_for_rect(r, hover().y0, hover().y1);
 	if (mode == SelectionMode::TrackRect)
 		return get_selection_for_track_rect(r, hover().y0, hover().y1);
-	return SongSelection();
+	return {};
 }
 
 SongSelection ViewMode::get_selection_for_range(const Range &r) {
-	return SongSelection();
+	return {};
 }
 
 SongSelection ViewMode::get_selection_for_rect(const Range &r, int y0, int y1) {
-	return SongSelection();
+	return {};
 }
 
 SongSelection ViewMode::get_selection_for_track_rect(const Range &r, int y0, int y1) {
-	return SongSelection();
+	return {};
 }
 
 void ViewMode::set_side_bar(SideBarIndex console) {

@@ -471,7 +471,7 @@ void AudioView::set_mode(const string& m) {
 	}
 }
 
-bool AudioView::in_mode(const string& m) {
+bool AudioView::in_mode(const string& m) const {
 	return current_mode_name == m;
 }
 

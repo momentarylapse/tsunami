@@ -85,10 +85,13 @@ void on_gtk_list_gesture_click_pressed(GtkGestureClick *gesture, int n_press, do
 	dbo("...click " + i2s(c->hover));
 	int hover = c->hover; // in case we mess something up
 
-	// select hover
-	c->set_int(hover);
-	c->notify(EventID::SELECT, false);
-	hui::Application::do_single_main_loop();
+	// select hover (if not selected)
+	auto sel = c->get_selection();
+	if (sel.find(hover) < 0) {
+		c->set_int(hover);
+		c->notify(EventID::SELECT, false);
+		hui::Application::do_single_main_loop();
+	}
 
 	c->hover = hover;
 	c->on_right_click(x, y);

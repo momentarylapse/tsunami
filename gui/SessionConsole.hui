@@ -1,3 +1,3 @@
 Dialog session-console "Sessions"
 	Grid ? "" vertical
-		ListView sessions "name" format=m nobar grid expandy "tooltip=A session is the current state of a single main window, i.e. active file, active plugins, zoom etc."
+		ListView sessions "name" format=m nobar grid selectmulti expandy "tooltip=A session is the current state of a single main window, i.e. active file, active plugins, zoom etc."

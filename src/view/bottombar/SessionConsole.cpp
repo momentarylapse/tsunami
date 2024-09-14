@@ -89,16 +89,20 @@ void SessionConsole::on_save() {
 }
 
 void SessionConsole::on_delete() {
-	const int n = get_int(id_list);
-	if (n < 0)
+	auto sel = get_selection(id_list);
+	if (sel.num == 0)
 		return;
-	auto l = session_labels[n];
-	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).then([this, l] (bool answer) {
+	Array<SessionLabel> to_del;
+	for (int n: sel)
+		to_del.add(session_labels[n]);
+	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).then([this, to_del] (bool answer) {
 		if (answer) {
-			if (l.is_backup()) {
-				session->backup_manager->delete_old(l.uuid);
-			} else if (l.is_persistent()) {
-				Tsunami::instance->session_manager->delete_saved_session(l.filename);
+			for (const auto& l: to_del) {
+				if (l.is_backup()) {
+					session->backup_manager->delete_old(l.uuid);
+				} else if (l.is_persistent()) {
+					Tsunami::instance->session_manager->delete_saved_session(l.filename);
+				}
 			}
 		}
 	});

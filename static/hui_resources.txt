@@ -7994,7 +7994,7 @@ vertical
 1
 ListView
 sessions
-format=m,nobar,grid,expandy
+format=m,nobar,grid,selectmulti,expandy
 0
 0
 0

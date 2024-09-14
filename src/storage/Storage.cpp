@@ -86,10 +86,7 @@ Storage::Storage(Session *_session) {
 Storage::~Storage() {
 	hui::config.set_float("Storage.DefaultOggQuality", default_ogg_quality);
 	hui::config.set_str("Storage.CurrentDirectory", current_directory.str());
-
-	for (auto *d: formats)
-		delete d;
-	formats.clear();
+	hui::config.set_str("Storage.QuickExportDirectory", quick_export_directory.str());
 }
 
 base::future<void> Storage::load_ex(Song *song, const Path &filename, Flags flags) {

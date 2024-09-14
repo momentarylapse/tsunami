@@ -15,6 +15,7 @@
 #include "../../device/DeviceManager.h"
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/hui/config.h"
 #include "../../lib/hui/language.h"
 #include "../../lib/hui/common_dlg.h"
@@ -64,14 +65,14 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 void SettingsDialog::load_data() {
 	// language
 	Array<string> lang = hui::get_languages();
-	foreachi(string &l, lang, i) {
+	for (const auto& [i, l]: enumerate(lang)) {
 		add_string("language", l);
 		if (l == hui::get_cur_language())
 			set_int("language", i);
 	}
 
 	// color scheme
-	foreachi(auto &b, view->win->main_view->themes, i) {
+	for (const auto& [i, b]: enumerate(view->win->main_view->themes)) {
 		add_string("color_scheme", b.name);
 		if (b.name == theme.name)
 			set_int("color_scheme", i);
@@ -81,7 +82,7 @@ void SettingsDialog::load_data() {
 	check("controls:headerbar", hui::config.get_bool("Window.HeaderBar", false));
 
 	// ogg quality
-	foreachi(auto &q, ogg_quality, i)
+	for (const auto& [i, q]: enumerate(ogg_quality))
 		if (Storage::default_ogg_quality > q.quality - 0.05f)
 			set_int("ogg_bitrate", i);
 	set_decimals(1);

@@ -65,7 +65,7 @@ public:
 	static Path temp_saving_file(const string &ext);
 
 //private:
-	Array<FormatDescriptor*> formats;
+	owned_array<FormatDescriptor> formats;
 	Path current_directory;
 	Path current_chain_directory;
 	static Path quick_export_directory;

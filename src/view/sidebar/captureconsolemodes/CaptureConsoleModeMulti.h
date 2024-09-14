@@ -15,7 +15,7 @@ namespace tsunami {
 
 class CaptureConsoleModeMulti: public CaptureConsoleMode {
 public:
-	CaptureConsoleModeMulti(CaptureConsole *cc);
+	explicit CaptureConsoleModeMulti(CaptureConsole *cc);
 	void enter() override;
 	void leave() override;
 	void allow_change_device(bool allow) override;

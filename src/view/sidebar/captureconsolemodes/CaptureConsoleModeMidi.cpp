@@ -24,20 +24,20 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 {}
 
 void CaptureConsoleModeMidi::on_source() {
-	int n = cc->get_int("");
+	const int n = console->get_int("");
 	items()[0].set_device(get_source(SignalType::Midi, n));
 }
 
 
 void CaptureConsoleModeMidi::enter() {
-	cc->hide_control("single_grid", false);
+	console->hide_control("single_grid", false);
 
 	{
 		CaptureTrackData c;
 		c.id_peaks = "level";
 		c.id_source = "source";
-		c.peak_meter_display = cc->peak_meter_display.get();
-		c.panel = cc;
+		c.peak_meter_display = console->peak_meter_display.get();
+		c.panel = console;
 		items().add(c);
 	}
 
@@ -48,7 +48,7 @@ void CaptureConsoleModeMidi::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(cc->event("source", [this] { on_source(); }));
+	event_ids.add(console->event("source", [this] { on_source(); }));
 
 	chain->set_buffer_size(512);
 

@@ -110,7 +110,7 @@ public:
 	PeakMeter *peak_meter;
 	AudioChannelSelector *selector;
 
-	ChannelMapPanel(AudioChannelSelector *sel) :
+	explicit ChannelMapPanel(AudioChannelSelector *sel) :
 			ConfigPanel(sel),
 			map(sel->config.map) {
 		selector = sel;

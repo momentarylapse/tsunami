@@ -15,7 +15,7 @@ namespace tsunami {
 
 class CaptureConsoleModeMidi : public CaptureConsoleMode {
 public:
-	CaptureConsoleModeMidi(CaptureConsole *cc);
+	explicit CaptureConsoleModeMidi(CaptureConsole *cc);
 
 	void on_source();
 	void enter() override;

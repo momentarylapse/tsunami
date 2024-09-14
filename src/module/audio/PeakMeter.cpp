@@ -22,14 +22,15 @@ const float PeakMeter::FreqMin = 40.0f;
 const float PeakMeter::FreqMax = 4000.0f;
 
 PeakMeterData::PeakMeterData() {
+	spec.resize(PeakMeter::SpectrumSize);
 	reset();
 }
 
 void PeakMeterData::reset() {
 	peak = 0;
 	super_peak = super_peak_t = 0;
-	spec.clear();
-	spec.resize(PeakMeter::SpectrumSize);
+	for (float& s: spec)
+		s = 0;
 }
 
 float PeakMeterData::get_sp() {
@@ -56,8 +57,7 @@ PeakMeter::PeakMeter() {
 	_set_channels(2);
 }
 
-PeakMeter::~PeakMeter() {
-}
+PeakMeter::~PeakMeter() = default;
 
 void PeakMeter::_set_channels(int num_channels) {
 	channels[0].resize(num_channels);
@@ -99,16 +99,16 @@ void PeakMeter::find_spectrum(AudioBuffer &buf) {
 		fft::r2c(buf.c[i], zz);
 		c.spec.resize(SpectrumSize);
 		float sample_rate = (float)session->sample_rate();
-		for (int i=0;i<SpectrumSize;i++) {
-			float f0 = i_to_freq(i);
-			float f1 = i_to_freq(i + 1);
-			int n0 = f0 * buf.length / sample_rate;
-			int n1 = max((int)(f1 * buf.length / sample_rate), n0 + 1);
+		for (int k=0; k<SpectrumSize; k++) {
+			float f0 = i_to_freq(k);
+			float f1 = i_to_freq(k + 1);
+			int n0 = (int)(f0 * (float)buf.length / sample_rate);
+			int n1 = max((int)(f1 * (float)buf.length / sample_rate), n0 + 1);
 			float s = 0;
 			for (int n=n0; n<n1; n++)
 				if (n < zz.num)
 					s = max(s, zz[n].abs_sqr());
-			c.spec[i] = sqrt(sqrt(s) / (float)SpectrumSize / pi / 2);
+			c.spec[k] = sqrt(sqrt(s) / (float)SpectrumSize / pi / 2);
 		}
 	}
 }
@@ -136,7 +136,7 @@ Array<PeakMeterData> PeakMeter::read_channels() {
 
 class PeakMeterPanel : public ConfigPanel {
 public:
-	PeakMeterPanel(PeakMeter *p) : ConfigPanel(p) {
+	explicit PeakMeterPanel(PeakMeter *p) : ConfigPanel(p) {
 		add_grid("", 0, 0, "root");
 		set_target("root");
 		add_drawing_area("!expandx,noexpandy,height=20", 0, 0, "area");

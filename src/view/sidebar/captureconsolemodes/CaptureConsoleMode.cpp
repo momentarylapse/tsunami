@@ -22,11 +22,11 @@
 
 namespace tsunami {
 
-CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_cc) {
-	cc = _cc;
-	song = cc->song;
-	view = cc->view;
-	session = cc->session;
+CaptureConsoleMode::CaptureConsoleMode(CaptureConsole *_console) {
+	console = _console;
+	song = console->song;
+	view = console->view;
+	session = console->session;
 	chain = nullptr;
 }
 
@@ -41,7 +41,7 @@ void CaptureConsoleMode::sync() {
 }
 
 
-Array<CaptureTrackData> &CaptureConsoleMode::items() {
+Array<CaptureTrackData>& CaptureConsoleMode::items() const {
 	return this->view->mode_capture->data;
 }
 
@@ -55,12 +55,16 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->out_add_device >> create_data_sink<Device*>([this] (Device*) { update_device_list(); });
-	session->device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) { update_device_list(); });
+	session->device_manager->out_add_device >> create_data_sink<Device*>([this] (Device*) {
+		update_device_list();
+	});
+	session->device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) {
+		update_device_list();
+	});
 
 
 	for (auto &c: items()) {
-		cc->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
+		console->set_options(c.id_peaks, format("height=%d", PeakMeterDisplay::good_size(c.track->channels)));
 
 		c.input->out_changed >> create_sink([this] {
 			update_device_list();
@@ -70,30 +74,29 @@ void CaptureConsoleMode::update_data_from_items() {
 		});
 
 		if (c.channel_selector) {
-			c.channel_selector->out_changed >> create_sink([&] {
-				cc->peak_meter_display->set_channel_map(c.channel_map());
+			c.channel_selector->out_changed >> create_sink([this, &c] {
+				console->peak_meter_display->set_channel_map(c.channel_map());
 			});
-			c.channel_selector->out_state_changed >> create_sink([&] {
-				cc->peak_meter_display->set_channel_map(c.channel_map());
+			c.channel_selector->out_state_changed >> create_sink([this, &c] {
+				console->peak_meter_display->set_channel_map(c.channel_map());
 			});
 		}
 
 		if (c.id_mapper.num > 0 and c.channel_selector) {
-			cc->event(c.id_mapper, [&] {
-				//ModuleExternalDialog(c.channel_selector, cc);
-				hui::fly(new ChannelMapDialog(cc, c.channel_selector));
-			});
+			event_ids.add(console->event(c.id_mapper, [this, &c] {
+				hui::fly(new ChannelMapDialog(console, c.channel_selector));
+			}));
 		}
 		if (c.id_active.num > 0)
-			cc->event(c.id_active, [&] {
-				c.enable(cc->is_checked(""));
-			});
+			event_ids.add(console->event(c.id_active, [this, &c] {
+				c.enable(console->is_checked(""));
+			}));
 	}
 
 	update_device_list();
 }
 
-Device* CaptureConsoleMode::get_source(SignalType type, int i) {
+Device* CaptureConsoleMode::get_source(SignalType type, int i) const {
 	if (i >= 0) {
 		if (type == SignalType::Audio)
 			return sources_audio[i];
@@ -151,7 +154,7 @@ void CaptureConsoleMode::leave() {
 	session->device_manager->unsubscribe(this);
 
 	for (int id: event_ids)
-		cc->remove_event_handler(id);
+		console->remove_event_handler(id);
 	event_ids.clear();
 
 	for (auto &c: items()) {

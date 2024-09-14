@@ -36,7 +36,7 @@ enum class SignalType;
 
 class CaptureConsoleMode : public obs::Node<VirtualBase> {
 public:
-	CaptureConsoleMode(CaptureConsole *cc);
+	explicit CaptureConsoleMode(CaptureConsole *cc);
 	virtual void enter() = 0;
 	virtual void leave();
 	
@@ -51,21 +51,21 @@ public:
 	void accumulation_stop();
 	void accumulation_clear();
 
-	CaptureConsole *cc;
-	Session *session;
-	Song *song;
-	AudioView *view;
+	CaptureConsole* console;
+	Session* session;
+	Song* song;
+	AudioView* view;
 	shared<SignalChain> chain;
 
 
-	Array<CaptureTrackData> &items();
+	Array<CaptureTrackData>& items() const;
 	void update_data_from_items();
 	Array<int> event_ids;
 
 
 	Array<Device*> sources_audio;
 	Array<Device*> sources_midi;
-	Device *get_source(SignalType type, int i);
+	Device* get_source(SignalType type, int i) const;
 	void update_device_list();
 };
 

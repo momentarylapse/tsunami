@@ -13,7 +13,6 @@
 #include "../../../data/Song.h"
 #include "../../../data/Track.h"
 #include "../../../data/base.h"
-#include "../../../Session.h"
 #include "../../../module/SignalChain.h"
 #include "../../../lib/hui/language.h"
 
@@ -24,30 +23,30 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 }
 
 void CaptureConsoleModeAudio::on_source() {
-	int n = cc->get_int("");
+	const int n = console->get_int("");
 	items()[0].set_device(get_source(SignalType::Audio, n));
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
 	items()[0].track = t;
 
-	bool ok = (items()[0].track->type == SignalType::Audio);
-	cc->set_string("message", "");
+	const bool ok = (items()[0].track->type == SignalType::Audio);
+	console->set_string("message", "");
 	if (!ok)
-		cc->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio).c_str()));
-	cc->enable("start", ok);
+		console->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio).c_str()));
+	console->enable("start", ok);
 }
 
 void CaptureConsoleModeAudio::enter() {
-	cc->hide_control("single_grid", false);
+	console->hide_control("single_grid", false);
 
 	{
 		CaptureTrackData a;
-		a.panel = cc;
+		a.panel = console;
 		a.id_source = "source";
 		a.id_mapper = "channel-mapper";
 		a.id_peaks = "level";
-		a.peak_meter_display = cc->peak_meter_display.get();
+		a.peak_meter_display = console->peak_meter_display.get();
 		items().add(a);
 	}
 
@@ -58,7 +57,7 @@ void CaptureConsoleModeAudio::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(cc->event("source", [this] { on_source(); }));
+	event_ids.add(console->event("source", [this] { on_source(); }));
 
 
 	auto &c = items()[0];

@@ -29,6 +29,7 @@ class Clipboard;
 class TsunamiWindow;
 class Session;
 class SessionManager;
+class BackupManager;
 class PerformanceMonitor;
 
 class Tsunami : public hui::Application {
@@ -44,6 +45,7 @@ public:
 	void load_key_codes();
 
 	owned<Log> log;
+	owned<BackupManager> backup_manager;
 	owned<SessionManager> session_manager;
 	owned<DeviceManager> device_manager;
 	owned<PluginManager> plugin_manager;

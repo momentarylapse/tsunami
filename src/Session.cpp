@@ -57,6 +57,7 @@ Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plug
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
 	session_manager = _session_manager;
+	backup_manager = session_manager->backup_manager;
 	perf_mon = _perf_mon;
 	auto_delete = true;
 

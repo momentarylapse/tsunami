@@ -17,6 +17,7 @@
 namespace tsunami {
 
 class Session;
+class BackupManager;
 
 struct SessionPersistenceData {
 	Path song_filename;
@@ -34,7 +35,7 @@ struct SessionLabel {
 
 	Flags flags;
 	Path filename;
-	Session *session;
+	Session* session;
 	int uuid;
 	bool is_active() const;
 	bool is_recent() const;
@@ -44,22 +45,23 @@ struct SessionLabel {
 
 class SessionManager : public obs::Node<VirtualBase> {
 public:
-	SessionManager();
-	Session *spawn_new_session();
-	Session *get_empty_session(Session *session_caller);
-	void end_session(Session *s);
+	explicit SessionManager(BackupManager* backup_manager);
+	Session* spawn_new_session();
+	Session* get_empty_session(Session* session_caller);
+	void end_session(Session* s);
 
-	void save_session(Session *s);
-	void save_session(Session *s, const Path& filename);
-	Session *load_session(const Path &filename, Session *session_caller = nullptr);
-	void load_into_session(SessionPersistenceData *p, Session *session);
-	bool try_restore_session(Session *session, const Path &filename);
-	void delete_saved_session(const Path &filename);
+	void save_session(Session* s);
+	void save_session(Session* s, const Path& filename);
+	Session* load_session(const Path& filename, Session* session_caller = nullptr);
+	void load_into_session(SessionPersistenceData* p, Session* session);
+	bool try_restore_session(Session* session, const Path& filename);
+	void delete_saved_session(const Path& filename);
 
 	static Path directory();
 
 	static bool can_find_associated_session_file(const Path& filename);
 
+	BackupManager* backup_manager;
 	shared_array<Session> active_sessions;
 
 	// cache of all known *.session files (including all in tsunami's session folder)

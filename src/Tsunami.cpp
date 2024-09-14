@@ -89,7 +89,8 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 
 	ErrorHandler::init();
 
-	session_manager = new SessionManager;
+	backup_manager = new BackupManager;
+	session_manager = new SessionManager(backup_manager.get());
 
 	perf_mon = new PerformanceMonitor;
 

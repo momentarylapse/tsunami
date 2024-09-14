@@ -86,12 +86,12 @@ void AudioBackup::start() {
 	if (backup_file)
 		stop();
 	if (config.backup_mode != BackupMode::None)
-		backup_file = BackupManager::create_file("raw", session);
+		backup_file = session->backup_manager->create_file("raw", session);
 }
 
 void AudioBackup::stop() {
 	if (backup_file) {
-		BackupManager::done(backup_file);
+		session->backup_manager->done(backup_file);
 		backup_file = nullptr;
 		//if (backup_mode != BACKUP_MODE_KEEP)
 		//	file_delete(cur_backup_filename);

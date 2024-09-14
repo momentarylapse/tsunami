@@ -33,7 +33,7 @@
 
 namespace tsunami {
 
-string title_filename(const Path &filename);
+string title_filename(const Path& filename);
 xml::Element signal_chain_to_xml(SignalChain* chain);
 xfer<SignalChain> signal_chain_from_xml(Session *session, xml::Element& root);
 
@@ -54,7 +54,8 @@ bool SessionLabel::is_backup() const {
 	return flags & Flags::Backup;
 }
 
-SessionManager::SessionManager() {
+SessionManager::SessionManager(BackupManager* _backup_manager) {
+	backup_manager = _backup_manager;
 	//os::Timer t;
 	load_session_map_legacy();
 	//msg_write(f2s(t.get()*1000, 3));
@@ -547,8 +548,8 @@ Array<SessionLabel> SessionManager::enumerate_all_sessions() const {
 	sessions.append(enumerate_persistent_sessions());
 
 	// backups
-	BackupManager::check_old_files();
-	for (auto &f: BackupManager::files)
+	backup_manager->check_old_files();
+	for (auto &f: backup_manager->files)
 		sessions.add({SessionLabel::Flags::Backup, f.filename, nullptr, f.uuid});
 
 	return sessions;

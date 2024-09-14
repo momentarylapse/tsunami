@@ -365,9 +365,9 @@ TsunamiWindow::TsunamiWindow(Session *_session) :
 	}
 
 	hui::run_later(0.5f, [this] {
-		if (BackupManager::should_notify_found_backups()) {
+		if (session->backup_manager->should_notify_found_backups()) {
 			session->q("Old recording backup found\nto load or delete, open the session manager in the bottom bar", {"show-session-console:yes"});
-			BackupManager::notify_found_backups_done();
+			session->backup_manager->notify_found_backups_done();
 		}
 	});
 
@@ -929,7 +929,7 @@ void TsunamiWindow::on_update() {
 void TsunamiWindow::on_exit() {
 	test_allow_termination().then([this] (bool allow) {
 		if (allow) {
-			BackupManager::set_save_state(session);
+			session->backup_manager->set_save_state(session);
 			//request_destroy();
 			hui::run_later(0.01f, [this] { session->win = nullptr; });
 		}
@@ -950,10 +950,10 @@ void TsunamiWindow::on_open() {
 void TsunamiWindow::load_song_with_session(const Path& filename) {
 	auto *s = Tsunami::instance->session_manager->get_empty_session(session);
 	if (s->session_manager->try_restore_session(s, filename)) {
-		BackupManager::set_save_state(s);
+		session->backup_manager->set_save_state(s);
 	} else {
-		s->storage->load(s->song.get(), filename).then([s] {
-			BackupManager::set_save_state(s);
+		s->storage->load(s->song.get(), filename).then([this, s] {
+			session->backup_manager->set_save_state(s);
 		});
 	}
 	/*} else {
@@ -970,7 +970,7 @@ void TsunamiWindow::on_save() {
 	} else {
 		session->storage->save(song, song->filename).then([this] {
 			session->status(_("file saved"));
-			BackupManager::set_save_state(session);
+			session->backup_manager->set_save_state(session);
 			Storage::mark_file_used(song->filename);
 		});
 	}

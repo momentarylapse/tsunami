@@ -10,6 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/os/path.h"
+#include "../lib/pattern/Observable.h"
 
 namespace os::fs {
 	class FileStream;
@@ -25,10 +26,9 @@ enum class BackupMode {
 
 class Session;
 
-class BackupManager {
+class BackupManager : public obs::Node<VirtualBase> {
 public:
-	//BackupManager();
-	//virtual ~BackupManager();
+	BackupManager();
 
 	struct BackupFile {
 		Session *session;
@@ -36,27 +36,28 @@ public:
 		os::fs::FileStream *f;
 		int uuid;
 	};
-	static Array<BackupFile> files;
-	static int next_uuid;
-	static BackupFile* _find_by_file(os::fs::FileStream *f);
-	static BackupFile* _find_by_uuid(int uuid);
-	static BackupFile* _find_by_filename(const Path &filename);
-	static void _clear_old();
 
-	static void set_save_state(Session *sessoin);
-	static void check_old_files();
+	Array<BackupFile> files;
+	static int next_uuid;
+	BackupFile* _find_by_file(os::fs::FileStream *f);
+	BackupFile* _find_by_uuid(int uuid);
+	BackupFile* _find_by_filename(const Path &filename);
+	void _clear_old();
+
+	void set_save_state(Session *sessoin);
+	void check_old_files();
 
 	static Path get_filename(const string &extension);
-	static os::fs::FileStream *create_file(const string &extension, Session *session);
-	static void abort(os::fs::FileStream *f);
-	static void done(os::fs::FileStream *f);
-	static void delete_old(int uuid);
+	os::fs::FileStream *create_file(const string &extension, Session *session);
+	void abort(os::fs::FileStream *f);
+	void done(os::fs::FileStream *f);
+	void delete_old(int uuid);
 
-	static Path get_filename_for_uuid(int uuid);
-	static int get_uuid_for_filename(const Path &filename);
+	Path get_filename_for_uuid(int uuid);
+	int get_uuid_for_filename(const Path &filename);
 
-	static bool should_notify_found_backups();
-	static void notify_found_backups_done();
+	bool should_notify_found_backups();
+	void notify_found_backups_done();
 };
 
 }

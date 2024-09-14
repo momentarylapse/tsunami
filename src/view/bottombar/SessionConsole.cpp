@@ -6,10 +6,10 @@
 #include "../../lib/hui/Resource.h"
 #include "../../lib/hui/common_dlg.h"
 #include "../../lib/os/filesystem.h"
+#include "../../lib/os/msg.h"
 #include "../../stuff/SessionManager.h"
 #include "../../stuff/BackupManager.h"
 #include "../../storage/Storage.h"
-#include "../../data/Song.h"
 #include "../../Tsunami.h"
 #include "../../Session.h"
 
@@ -46,6 +46,7 @@ SessionConsole::SessionConsole(Session *s, BottomBar *bar) :
 	event(id_list, [this] { on_list_double_click(); });
 	event_x(id_list, "hui:right-button-down", [this] { on_right_click(); });
 
+	Tsunami::instance->backup_manager->out_changed >> create_sink([this] { load_data(); });
 	Tsunami::instance->session_manager->out_changed >> create_sink([this] { load_data(); });
 }
 
@@ -88,17 +89,14 @@ void SessionConsole::on_save() {
 }
 
 void SessionConsole::on_delete() {
-	int n = get_int(id_list);
+	const int n = get_int(id_list);
 	if (n < 0)
 		return;
 	auto l = session_labels[n];
-	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).then([l] (bool answer) {
+	hui::question_box(win, _("Deleting session"), _("Can not be undone. Are you sure?")).then([this, l] (bool answer) {
 		if (answer) {
 			if (l.is_backup()) {
-				BackupManager::delete_old(l.uuid);
-
-				// TODO: make BackupManager observable :P
-				Tsunami::instance->session_manager->out_changed.notify();
+				session->backup_manager->delete_old(l.uuid);
 			} else if (l.is_persistent()) {
 				Tsunami::instance->session_manager->delete_saved_session(l.filename);
 			}
@@ -164,7 +162,6 @@ void SessionConsole::load_data() {
 	for (auto &l: session_labels) {
 		auto d = description(l);
 		auto m = markup(l);
-		//msg_write(l.filename.str());
 		add_string(id_list, format("<span %s>%s\n      <small>%s</small></span>", m, nice_filename(l.filename), d));
 	}
 }

@@ -27,7 +27,7 @@ struct base_source {
 	void unsubscribe(base_sink& sink);
 	void unsubscribe(VirtualBase* node);
 
-	int count_subscribers() { return connected_sinks.num; }
+	int count_subscribers() const { return connected_sinks.num; }
 
 protected:
 	void _subscribe(base_sink& sink);
@@ -127,7 +127,7 @@ class Node : public Base {
 
 public:
 	template<typename... Args>
-	Node(Args... args) : Base(args...) {}
+	explicit Node(Args... args) : Base(args...) {}
 	~Node() {
 		out_death();
 	}

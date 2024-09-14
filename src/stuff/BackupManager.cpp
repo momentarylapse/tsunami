@@ -6,6 +6,9 @@
  */
 
 #include "BackupManager.h"
+
+#include <base/algo.h>
+
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../lib/hui/config.h"
@@ -13,11 +16,13 @@
 #include "../lib/os/date.h"
 #include "../lib/os/file.h"
 #include "../lib/os/filesystem.h"
+#include "../lib/os/msg.h"
 
 namespace tsunami {
 
-Array<BackupManager::BackupFile> BackupManager::files;
-int BackupManager::next_uuid;
+int BackupManager::next_uuid = 0;
+
+BackupManager::BackupManager() = default;
 
 Path BackupManager::get_filename(const string &extension) {
 	Date d = Date::now();
@@ -51,16 +56,23 @@ void BackupManager::set_save_state(Session *session) {
 void BackupManager::check_old_files() {
 	_clear_old();
 
+	bool found_new = false;
+
 	// update list
 	auto _files = os::fs::search(Tsunami::directory, "backup-*", "f");
 	for (auto &f: _files) {
+		if (_find_by_filename(Tsunami::directory | f))
+			continue;
 		BackupFile bf;
 		bf.uuid = next_uuid ++;
-		bf.session = nullptr;
+		bf.session = Session::GLOBAL;
 		bf.f = nullptr;
 		bf.filename = Tsunami::directory | f;
 		files.add(bf);
+		found_new = true;
 	}
+	if (found_new)
+		out_changed();
 }
 
 os::fs::FileStream *BackupManager::create_file(const string &extension, Session *session) {
@@ -86,8 +98,7 @@ void BackupManager::abort(os::fs::FileStream *f) {
 
 void BackupManager::done(os::fs::FileStream *f) {
 	delete f;
-	auto bf = _find_by_file(f);
-	if (bf) {
+	if (auto bf = _find_by_file(f)) {
 		bf->session->i(_("backup done: '") + str(bf->filename) + "'");
 		bf->f = nullptr;
 	}
@@ -117,34 +128,38 @@ BackupManager::BackupFile* BackupManager::_find_by_filename(const Path &filename
 }
 
 Path BackupManager::get_filename_for_uuid(int uuid) {
-	auto *bf = _find_by_uuid(uuid);
-	if (bf)
+	if (auto *bf = _find_by_uuid(uuid))
 		return bf->filename;
 	return "";
 }
 
 int BackupManager::get_uuid_for_filename(const Path &filename) {
-	auto *bf = _find_by_filename(filename);
-	if (bf)
+	if (auto *bf = _find_by_filename(filename))
 		return bf->uuid;
 	return -1;
 }
 
 void BackupManager::delete_old(int uuid) {
-	auto *bf = _find_by_uuid(uuid);
-	if (bf) {
+	if (auto *bf = _find_by_uuid(uuid)) {
 		Session::GLOBAL->i(_("deleting backup: '") + str(bf->filename) + "'");
 		os::fs::_delete(bf->filename);
 		bf->session = nullptr;
+		_clear_old();
+	} else {
+		msg_error("not found");
 	}
 }
 
 void BackupManager::_clear_old() {
+	bool changed = false;
 	for (int i=0; i<files.num; i++)
 		if (!files[i].session) {
 			files.erase(i);
 			i --;
+			changed = true;
 		}
+	if (changed)
+		out_changed();
 }
 
 bool BackupManager::should_notify_found_backups() {

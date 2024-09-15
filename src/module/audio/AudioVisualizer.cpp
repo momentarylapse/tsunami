@@ -24,10 +24,14 @@ int AudioVisualizer::read_audio(int port, AudioBuffer& buf) {
 	if (r <= 0)
 		return r;
 
-	buffer->buf.set_channels(buf.channels);
-	buffer->write(buf);
+	feed(buf);
 
 	return r;
+}
+
+void AudioVisualizer::feed(const AudioBuffer& buf) {
+	buffer->buf.set_channels(buf.channels);
+	buffer->write(buf);
 }
 
 AudioVisualizer::AudioVisualizer() :

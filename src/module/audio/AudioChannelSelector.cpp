@@ -45,6 +45,14 @@ AudioChannelSelector::AudioChannelSelector() : Module(ModuleCategory::Plumbing, 
 		_class->_vtable_location_target_ = kaba::get_vtable(&config);
 	}
 	config.kaba_class = _class;
+
+	id_runner = hui::run_repeated(0.02f, [this] {
+		peak_meter->out_changed.notify();
+	});
+}
+
+AudioChannelSelector::~AudioChannelSelector() {
+	hui::cancel_runner(id_runner);
 }
 
 ModuleConfiguration *AudioChannelSelector::get_config() const {
@@ -62,11 +70,8 @@ int AudioChannelSelector::read_audio(int port, AudioBuffer& buf) {
 	int r = in.source->read_audio(buf_in);
 
 	if (r > 0) {
-		if (peak_meter) {
-			peak_meter->process(buf_in);
-			// FIXME should we go to main thread?
-			peak_meter->out_changed.notify();
-		}
+		if (peak_meter)
+			peak_meter->feed(buf_in);
 		apply(buf_in.ref(0, r), buf);
 	}
 

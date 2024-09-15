@@ -18,13 +18,14 @@ namespace tsunami {
 class AudioChannelSelector : public Module {
 public:
 	AudioChannelSelector();
+	~AudioChannelSelector() override;
 
 	AudioOutPort out{this};
 	AudioInPort in{this};
 
 	int read_audio(int port, AudioBuffer &buf) override;
 
-	void _cdecl set_channel_map(int num_in, const Array<int> &map);
+	void set_channel_map(int num_in, const Array<int> &map);
 
 	void apply(const AudioBuffer &buf_in, AudioBuffer &buf_out);
 
@@ -44,6 +45,7 @@ public:
 	ModuleConfiguration* get_config() const override;
 
 	owned<PeakMeter> peak_meter;
+	int id_runner;
 };
 
 }

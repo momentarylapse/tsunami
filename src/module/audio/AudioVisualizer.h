@@ -11,8 +11,6 @@
 #include "../Module.h"
 #include "../port/Port.h"
 #include "../../lib/base/pointer.h"
-#include <mutex>
-#include <atomic>
 
 namespace tsunami {
 
@@ -32,6 +30,7 @@ public:
 	AudioInPort in{this};
 
 	int read_audio(int port, AudioBuffer &buf) override;
+	void feed(const AudioBuffer& buf);
 
 	owned<RingBuffer> buffer;
 	int chunk_size;

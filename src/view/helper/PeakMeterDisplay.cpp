@@ -7,10 +7,10 @@
 
 #include "PeakMeterDisplay.h"
 #include "../ColorScheme.h"
-#include "../../Tsunami.h"
-#include "../../lib/hui/hui.h"
+#include "../../lib/image/Painter.h"
+#include "../../lib/hui/Panel.h"
 #include "../../module/audio/PeakMeter.h"
-#include <math.h>
+#include <cmath>
 
 namespace tsunami {
 
@@ -215,7 +215,7 @@ bool PeakMeterDisplay::on_right_button_down(const vec2 &m) {
 	return true;
 }
 
-// in PeakMeter/SignalChain's thread
+// in ui thread
 void PeakMeterDisplay::on_update() {
 	if (source) {
 		channels.clear();
@@ -227,7 +227,6 @@ void PeakMeterDisplay::on_update() {
 			channels = source->read_channels();
 		}
 	}
-	//hui::RunLater(0, std::bind(&hui::Panel::redraw, panel, id));
 	if (panel)
 		panel->redraw(id);
 }

@@ -284,10 +284,10 @@ find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
 
 #=======================================================================================
-#    target tsunami
+#    target common
 #=======================================================================================
 
-add_executable(tsunami
+add_library(common
 	src/action/bar/Action__ScaleData.cpp
 	src/action/bar/Action__ShiftData.cpp
 	src/action/bar/ActionBar__Add.cpp
@@ -685,19 +685,6 @@ add_executable(tsunami
 	src/stuff/Log.cpp
 	src/stuff/PerformanceMonitor.cpp
 	src/stuff/SessionManager.cpp
-	src/test/TestAudioBuffer.cpp
-	src/test/TestInterpolator.cpp
-	src/test/TestMidiPreview.cpp
-	src/test/TestMixer.cpp
-	src/test/TestPlugins.cpp
-	src/test/TestPointer.cpp
-	src/test/TestRhythm.cpp
-	src/test/TestRingBuffer.cpp
-	src/test/TestSignalChain.cpp
-	src/test/TestStreams.cpp
-	src/test/TestThreads.cpp
-	src/test/TestTrackVersion.cpp
-	src/test/UnitTest.cpp
 	src/view/audioview/graph/AudioViewLayer.cpp
 	src/view/audioview/graph/AudioViewTrack.cpp
 	src/view/audioview/graph/Background.cpp
@@ -817,12 +804,50 @@ add_executable(tsunami
 	src/Playback.cpp
 	src/Session.cpp
 	src/Tsunami.cpp)
+target_include_directories(common PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_directories(common PUBLIC ${LINK_DIRECTORIES})
+target_compile_options(common PUBLIC ${COMPILE_OPTIONS})
+target_compile_definitions(common PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_link_libraries(common PUBLIC ${DEPS})
+target_include_directories(common PUBLIC src/lib)
+
+#=======================================================================================
+#    target test-runner
+#=======================================================================================
+
+add_executable(test-runner
+	src/test/main.cpp
+	src/test/TestAudioBuffer.cpp
+	src/test/TestInterpolator.cpp
+	src/test/TestMidiPreview.cpp
+	src/test/TestMixer.cpp
+	src/test/TestPlugins.cpp
+	src/test/TestPointer.cpp
+	src/test/TestRhythm.cpp
+	src/test/TestRingBuffer.cpp
+	src/test/TestSignalChain.cpp
+	src/test/TestStreams.cpp
+	src/test/TestThreads.cpp
+	src/test/TestTrackVersion.cpp
+	src/test/UnitTest.cpp)
+target_include_directories(test-runner PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_directories(test-runner PUBLIC ${LINK_DIRECTORIES})
+target_compile_options(test-runner PUBLIC ${COMPILE_OPTIONS})
+target_compile_definitions(test-runner PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_link_libraries(test-runner PUBLIC ${DEPS} common)
+set_target_properties(test-runner PROPERTIES EXCLUDE_FROM_ALL TRUE)
+
+#=======================================================================================
+#    target tsunami
+#=======================================================================================
+
+add_executable(tsunami
+	src/main.cpp)
 target_include_directories(tsunami PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(tsunami PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(tsunami PUBLIC ${COMPILE_OPTIONS})
 target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
-target_link_libraries(tsunami PUBLIC ${DEPS})
-target_include_directories(tsunami PUBLIC src/lib)
+target_link_libraries(tsunami PUBLIC ${DEPS} common)
 
 #=======================================================================================
 #    install

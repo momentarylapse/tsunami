@@ -15,7 +15,6 @@
 #include "data/Song.h"
 #include "module/SignalChain.h"
 #include "module/audio/AudioEffect.h"
-#include "module/audio/PeakMeter.h"
 #include "view/TsunamiWindow.h"
 #include "Session.h"
 #include "EditModes.h"
@@ -31,12 +30,6 @@
 #include "device/DeviceManager.h"
 #include "command/song/Diff.h"
 #include "command/song/Show.h"
-#include "test/TestRingBuffer.h"
-#ifndef NDEBUG
-#include "module/ModuleFactory.h"
-#include "view/module/ConfigPanel.h"
-#include "view/module/ConfigurationDialog.h"
-#endif
 
 namespace tsunami {
 
@@ -236,82 +229,6 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			session->execute_tsunami_plugin(a[0], a.sub_ref(1));
 		});
 	});
-#ifndef NDEBUG
-	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
-		UnitTest::print_all_names();
-	});
-	p.cmd("test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
-		UnitTest::run_all(a[0]);
-	});
-	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
-			auto session = session_manager->spawn_new_session();
-			session->win->hide();
-			Module *m = nullptr;
-			if (a[0] == "fx") {
-				m = ModuleFactory::create(session, ModuleCategory::AudioEffect, a[1]);
-				configure_module(session->win.get(), m);
-			} else if (a[0] == "mfx") {
-				m = ModuleFactory::create(session, ModuleCategory::MidiEffect, a[1]);
-				configure_module(session->win.get(), m);
-			} else if (a[0] == "synth") {
-				m = ModuleFactory::create(session, ModuleCategory::Synthesizer, a[1]);
-				configure_module(session->win.get(), m);
-			} else if (a[0] == "vis") {
-				m = ModuleFactory::create(session, ModuleCategory::AudioVisualizer, a[1]);
-				auto *dlg = new hui::Window("", 800, 600);
-				dlg->add_grid("", 0, 0, "root");
-				ConfigPanel::_hidden_parent_ = dlg;
-				auto *p = m->create_panel();
-				dlg->embed(p, "root", 0,0);
-				hui::fly(dlg);
-			} else {
-				msg_error("unknown type: " + a[0] + " (try fx|mfx|synth|vis)");
-			}
-		});
-	});
-	p.cmd("listview", "", "bla", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
-			auto dlg = new hui::Window("ListView", 800, 600);
-			dlg->from_source("ListView list 'a'");
-			dlg->add_string("list", "0");
-			dlg->add_string("list", "1");
-			dlg->add_string("list", "2");
-			if (a == Array<string>({"long"}))
-				for (int i=3; i<1000; i++)
-					dlg->add_string("list", i2s(i));
-			hui::fly_and_wait(dlg);
-		});
-	});
-	p.cmd("columnview", "", "bla", [this] (const Array<string> &) {
-		run_after_gui_init([this] {
-			auto dlg = new hui::Window("ColumnView", 800, 600);
-			dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
-			dlg->add_string("list", "true\\<b>test</b>\\x");
-			dlg->add_string("list", "false\\<i>more test</i>\\y");
-			dlg->event_x("list", "hui:change", [dlg] {
-				auto e = hui::get_event();
-				msg_write(format("edit: %d %d  %s", e->row, e->column, dlg->get_cell("list", e->row, e->column)));
-			});
-			dlg->event("button", [dlg] {
-				dlg->change_string("list", 0, "false\\bla\\z");
-			});
-			hui::fly_and_wait(dlg);
-		});
-	});
-	p.cmd("treeview", "", "bla", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
-			auto dlg = new hui::Window("TreeView", 400, 600);
-			dlg->from_source("TreeView list 'a'");
-			dlg->add_string("list", "0");
-			dlg->add_string("list", "1");
-			dlg->add_string("list", "2");
-			for (int i=3; i<30; i++)
-				dlg->add_child_string("list", i % 3, i2s(i));
-			hui::fly_and_wait(dlg);
-		});
-	});
-#endif
 	p.parse(args);
 
 
@@ -323,4 +240,3 @@ void Tsunami::load_key_codes() {
 
 }
 
-HUI_EXECUTE(tsunami::Tsunami);

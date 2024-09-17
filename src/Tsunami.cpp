@@ -237,13 +237,13 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		});
 	});
 #ifndef NDEBUG
-	p.cmd("test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
+	p.cmd("@hidden test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
 		UnitTest::print_all_names();
 	});
-	p.cmd("test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
+	p.cmd("@hidden test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
 		UnitTest::run_all(a[0]);
 	});
-	p.cmd("previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this] (const Array<string> &a) {
+	p.cmd("@hidden previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this] (const Array<string> &a) {
 		run_after_gui_init([this, a] {
 			auto session = session_manager->spawn_new_session();
 			session->win->hide();
@@ -270,7 +270,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			}
 		});
 	});
-	p.cmd("listview", "", "bla", [this] (const Array<string> &a) {
+	p.cmd("@hidden listview", "", "bla", [this] (const Array<string> &a) {
 		run_after_gui_init([this, a] {
 			auto dlg = new hui::Window("ListView", 800, 600);
 			dlg->from_source("ListView list 'a'");
@@ -283,7 +283,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			hui::fly_and_wait(dlg);
 		});
 	});
-	p.cmd("columnview", "", "bla", [this] (const Array<string> &) {
+	p.cmd("@hidden columnview", "", "bla", [this] (const Array<string> &) {
 		run_after_gui_init([this] {
 			auto dlg = new hui::Window("ColumnView", 800, 600);
 			dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
@@ -299,7 +299,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			hui::fly_and_wait(dlg);
 		});
 	});
-	p.cmd("treeview", "", "bla", [this] (const Array<string> &a) {
+	p.cmd("@hidden treeview", "", "bla", [this] (const Array<string> &a) {
 		run_after_gui_init([this, a] {
 			auto dlg = new hui::Window("TreeView", 400, 600);
 			dlg->from_source("TreeView list 'a'");

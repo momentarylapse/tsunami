@@ -1146,7 +1146,7 @@ void SIAddPackageMath(Context *c) {
 	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::Static | Flags::Pure);
 		func_add_param("z", TypeComplex);
 
-	// int[]
+	// i32[]
 	add_func("sum", TypeInt32, &XList<int>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeIntList);
 	add_func("sum_sqr", TypeInt32, &XList<int>::sum_sqr, Flags::Static | Flags::Pure);
@@ -1166,7 +1166,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param_def("end", TypeInt32, DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeInt32, 1);
 
-	// float[]
+	// f32[]
 	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
 	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::Static | Flags::Pure);
@@ -1178,6 +1178,8 @@ void SIAddPackageMath(Context *c) {
 	add_func("argmin", TypeInt32, &XList<float>::argmin, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
 	add_func("argmax", TypeInt32, &XList<float>::argmax, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeFloatList);
+	add_func("unique", TypeFloatList, &XList<float>::unique, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeFloatList);
 	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::Static | Flags::Pure);
 		func_add_param("start", TypeFloat32);
@@ -1218,6 +1220,8 @@ void SIAddPackageMath(Context *c) {
 
 	// string[]
 	add_func("sum", TypeString, &XList<string>::sum, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeStringList);
+	add_func("unique", TypeStringList, &XList<string>::unique, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeStringList);
 
 	// other types

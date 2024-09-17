@@ -120,6 +120,8 @@ public:
 		int ndiff = 0;
 		int i0 = 1;
 		Array<T> r = list;
+		if (list.num == 0)
+			return r;
 		while (r[i0] != r[i0-1])
 			i0 ++;
 		for (int i=i0; i<r.num;i++) {

@@ -22,11 +22,12 @@ void CommandLineParser::option(const string &name, const string &p, const string
 // "A B/C D"
 void CommandLineParser::cmd(const string &name, const string &params, const string &comment, CallbackStringList cb) {
 	Array<Array<string>> names;
-	for (auto &n: name.replace(",", "/").explode("/"))
+	bool hidden = (name.head(8) == "@hidden ");
+	for (auto &n: name.replace("@hidden ", "").replace(",", "/").explode("/"))
 		names.add(n.explode(" "));
 	if (names.num == 0)
 		names.add({});
-	commands.add({names, params.explode(" "), comment, cb});
+	commands.add({names, params.explode(" "), comment, cb, hidden});
 }
 
 void CommandLineParser::info(const string &p, const string &i) {
@@ -34,7 +35,7 @@ void CommandLineParser::info(const string &p, const string &i) {
 	_info = i;
 }
 
-static string format_title_with_block(const string &title, const string block, int n = 28) {
+static string format_title_with_block(const string &title, const string& block, int n = 28) {
 	string s = "  " + title;
 	if (s.num + 2 <= n)
 		s += string(" ").repeat(n - s.num);
@@ -44,7 +45,7 @@ static string format_title_with_block(const string &title, const string block, i
 }
 
 int CommandLineParser::non_default_commands() const {
-	return base::count_if(commands, [] (const Command &c) { return !c.is_default(); });
+	return base::count_if(commands, [] (const Command &c) { return !c.is_default() and !c.is_hidden; });
 }
 
 CommandLineParser::Command *CommandLineParser::default_command() const {
@@ -66,7 +67,7 @@ void CommandLineParser::show() {
 	if (non_default_commands() > 0) {
 		msg_write("\ncommands:");
 		for (auto &c: commands)
-			if (!c.is_default())
+			if (!c.is_default() and !c.is_hidden)
 				msg_write(format_title_with_block(c.sig(), c.comment));
 	}
 

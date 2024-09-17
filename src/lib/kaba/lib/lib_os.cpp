@@ -31,6 +31,7 @@ const Class* TypeCallbackString;
 
 extern const Class *TypeStringList;
 extern const Class *TypeAny;
+extern const Class *TypeAnyDict;
 const Class *TypeOsConfiguration;
 
 
@@ -424,6 +425,7 @@ void SIAddPackageOS(Context *c) {
 
 
 	add_class(TypeOsConfiguration);
+		class_add_element("dict", TypeAnyDict, &Configuration::map);
 		class_add_func(Identifier::func::Init, TypeVoid, &Configuration::__init__, Flags::Mutable);
 		class_add_func(Identifier::func::Delete, TypeVoid, &Configuration::__del__, Flags::Mutable);
 		class_add_func("load", TypeBool, &Configuration::load, Flags::Mutable);

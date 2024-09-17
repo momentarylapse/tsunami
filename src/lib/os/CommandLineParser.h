@@ -38,6 +38,7 @@ public:
 		Array<string> params;
 		string comment;
 		CallbackStringList callback;
+		bool is_hidden = false;
 
 		bool match(const Array<string> &arg, int &offset) const;
 		int min_params() const;

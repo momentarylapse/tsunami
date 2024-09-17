@@ -20,7 +20,7 @@ class Config extends Module.Config
 		q = 1
 		mix = 0.5
 
-class LowPassFilter extends AudioEffect
+class Phaser extends AudioEffect
 	var config: Config
 	var filter1, filter2: BiquadMultiFilter
 	var phase: float
@@ -33,26 +33,33 @@ class LowPassFilter extends AudioEffect
 		pass
 		
 	func override process(out buf: AudioBuffer)
-		var f1, f2, q, gain: float[]
-		f1.resize(len(buf))
-		f2.resize(len(buf))
-		q.resize(len(buf))
-		gain.resize(len(buf))
-		
-		q = config.q
-		
-		var dphi = config.lfo * 2 * pi / session.sample_rate() / 2
-		for i in 0:len(buf)
-			phase += dphi
-			if phase > 2 * pi
-				phase -= 2 * pi
-			var x = sqr(cos(phase))
-			f1[i] = exp(log(config.f_min) + (log(config.f_max) - log(config.f_min)) * x)
-			f2[i] = f1[i] * 1.4
-		filter1.create(FilterType.ALL_PASS, f1, q, gain, session.sample_rate())
-		filter2.create(FilterType.ALL_PASS, f2, q, gain, session.sample_rate())
-		var bb = buf
-		filter1.apply(bb)
-		filter2.apply(bb)
-		buf.scale(1 - config.mix)
-		buf.add(bb, 0, config.mix)
+		print("TODO: phaser")
+#		var f1, f2, q, gain: float[]
+#		f1.resize(len(buf))
+#		f2.resize(len(buf))
+#		q.resize(len(buf))
+#		gain.resize(len(buf))
+#		
+#		q = config.q
+#		
+#		var dphi = config.lfo * 2 * pi / session.sample_rate() / 2
+#		for i in 0:len(buf)
+#			phase += dphi
+#			if phase > 2 * pi
+#				phase -= 2 * pi
+#			var x = sqr(cos(phase))
+#			f1[i] = exp(log(config.f_min) + (log(config.f_max) - log(config.f_min)) * x)
+#			f2[i] = f1[i] * 1.4
+#		print("a")
+#		filter1.create(FilterType.ALL_PASS, f1, q, gain, session.sample_rate())
+#		filter2.create(FilterType.ALL_PASS, f2, q, gain, session.sample_rate())
+#		print("b")
+#		var bb = buf
+#		print("b2")
+#		filter1.apply(bb)
+#		print("c")
+#		filter2.apply(bb)
+#		print("d")
+#		buf.scale(1 - config.mix)
+#		buf.add(bb, 0, config.mix)
+#		print("/phaser")

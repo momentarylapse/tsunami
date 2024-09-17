@@ -37,8 +37,7 @@ UnitTest::UnitTest(const string &_name) {
 	name = _name;
 }
 
-UnitTest::~UnitTest() {
-}
+UnitTest::~UnitTest() = default;
 
 void UnitTest::run(const string &filter, TestProtocoll &protocoll) {
 	msg_write(format("%s==  %s  ==%s", os::terminal::BOLD, name, os::terminal::END));

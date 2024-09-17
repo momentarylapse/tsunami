@@ -240,8 +240,11 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	p.cmd("@hidden test list", "", "debug: list internal unit tests", [] (const Array<string> &) {
 		UnitTest::print_all_names();
 	});
-	p.cmd("@hidden test run", "FILTER", "debug: run internal unit tests", [] (const Array<string> &a) {
-		UnitTest::run_all(a[0]);
+	p.cmd("@hidden test run", "[FILTER]", "debug: run internal unit tests", [] (const Array<string> &a) {
+		if (a.num > 0)
+			UnitTest::run_all(a[0]);
+		else
+			UnitTest::run_all("all");
 	});
 	p.cmd("@hidden previewgui", "TYPE NAME", "debug: show the config gui of a plugin", [this] (const Array<string> &a) {
 		run_after_gui_init([this, a] {

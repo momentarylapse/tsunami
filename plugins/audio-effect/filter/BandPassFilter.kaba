@@ -5,7 +5,7 @@ use tsunami.*
 let AUTO_CONFIG_FREQUENCY = "range=0:5000:0.1,unit=Hz"
 
 
-class LowPassFilter extends AudioEffect
+class BandPassFilter extends AudioEffect
 	class Config extends Module.Config
 		var frequency: float
 		func override reset()
@@ -18,8 +18,7 @@ class LowPassFilter extends AudioEffect
 	var used: bool[]
 	
 	func override reset_state()
-		used[0] = false
-		used[1] = false
+		used = [false, false]
 
 
 	# y[i] := α * (y[i-1] + x[i] - x[i-1])

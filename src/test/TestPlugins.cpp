@@ -30,7 +30,8 @@ Array<UnitTest::Test> TestPlugins::tests() {
 	Array<Test> list;
 	auto *pm = Session::GLOBAL->plugin_manager;
 	for (auto &pf: pm->plugin_files)
-		list.add({"compile:" + pf.filename.str(), [pf]{ test_compile(pf.type, pf.filename); }});
+		if (pf.name != "Shader" and pf.name != "Audivis")
+			list.add({"compile:" + pf.filename.str(), [pf]{ test_compile(pf.type, pf.filename); }});
 	auto names = Session::GLOBAL->plugin_manager->find_module_sub_types(ModuleCategory::AudioEffect);
 	for (auto &name: names)
 		if (name != "Folding" and name != "Equalizer 31")

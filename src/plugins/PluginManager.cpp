@@ -1032,6 +1032,8 @@ void PluginManager::find_plugins_in_dir_absolute(const Path &_dir, const string 
 		dir |= group;
 	auto list = os::fs::search(dir, "*.kaba", "f");
 	for (auto &e: list) {
+		if (str(e).head(2) == "__")
+			continue;
 		PluginManager::PluginFile pf;
 		pf.type = type;
 		pf.name = e.no_ext().str();

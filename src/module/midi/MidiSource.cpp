@@ -53,12 +53,12 @@ public:
 };
 
 MidiProduceData create_produce_data(Song *song, int offset) {
-	MidiProduceData data;
-	data.bar = nullptr;
-	data.beat_no = 0;
-	auto bb = song->bars.get_bars(Range(offset, 0));
-	if (bb.num > 0)
-		data.bar = bb[0];
+	MidiProduceData data{};
+	if (song) {
+		auto bb = song->bars.get_bars(Range(offset, 0));
+		if (bb.num > 0)
+			data.bar = bb[0];
+	}
 	return data;
 }
 
@@ -66,6 +66,7 @@ MidiProduceData create_produce_data(Song *song, int offset) {
 int MidiSource::read(MidiEventBuffer &midi) {
 	bh_midi = &midi;
 	read_pos += midi.samples;
+
 	while (produce_pos < read_pos) {
 		auto data = create_produce_data(session->song.get(), produce_pos);
 		if (!on_produce(data))
@@ -84,6 +85,8 @@ void MidiSource::skip(int beats) {
 
 // FIXME: argh, how can we know where to start when "applying"...
 int skip_beats(int pos, Song *song, int beats, int sub_beats, int beat_partition) {
+	if (!song)
+		return pos + beats * 10000;
 	int pos0 = pos;
 	for (int i=0; i<beats; i++)
 		pos = song->bars.get_next_beat(pos);

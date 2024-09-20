@@ -8,10 +8,8 @@
 #include "AudioEffect.h"
 #include "../ModuleFactory.h"
 #include "../../Session.h"
-#include "../../lib/math/math.h"
 #include "../../action/track/buffer/ActionTrackEditBuffer.h"
 #include "../../data/base.h"
-#include "../../data/Song.h"
 #include "../../data/TrackLayer.h"
 
 namespace tsunami {

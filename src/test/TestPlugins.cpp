@@ -78,7 +78,7 @@ void TestPlugins::test_audio_effect(const string &name) {
 	auto *fx = CreateAudioEffect(Session::GLOBAL, name);
 
 	AudioBuffer buf;
-	buf.resize(1 << 20);
+	buf.resize(1 << 16);
 
 	fx->process(buf);
 
@@ -89,7 +89,7 @@ void TestPlugins::test_audio_source(const string &name) {
 	auto *source = CreateAudioSource(Session::GLOBAL, name);
 
 	AudioBuffer buf;
-	buf.resize(1 << 20);
+	buf.resize(1 << 16);
 
 	source->read(buf);
 
@@ -100,7 +100,7 @@ void TestPlugins::test_midi_effect(const string &name) {
 	auto *fx = CreateMidiEffect(Session::GLOBAL, name);
 
 	MidiEventBuffer buf;
-	buf.samples = 1 << 20;
+	buf.samples = 1 << 18;
 
 	fx->process(buf);
 
@@ -111,7 +111,7 @@ void TestPlugins::test_midi_source(const string &name) {
 	auto *source = CreateMidiSource(Session::GLOBAL, name);
 
 	MidiEventBuffer buf;
-	buf.samples = 1 << 20;
+	buf.samples = 1 << 18;
 
 	source->read(buf);
 

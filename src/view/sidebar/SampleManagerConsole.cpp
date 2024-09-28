@@ -89,7 +89,7 @@ public:
 		s->out_reference >> create_sink([this] { on_update(); });
 		s->out_unreference >> create_sink([this] { on_update(); });
 	}
-	virtual ~SampleManagerItem() {
+	~SampleManagerItem() override {
 		zombify();
 	}
 	void on_delete() {
@@ -145,7 +145,7 @@ SampleManagerConsole::SampleManagerConsole(Session *session, SideBar *bar) :
 	event("sample-paste", [this] { on_insert(); });
 	event_x(id_list, "hui:change", [this] { on_list_edit(); });
 	event_x(id_list, "hui:right-button-down", [this] { on_list_right_click(); });
-	event("sample-list", [this] { on_preview(); });
+	event(id_list, [this] { on_preview(); });
 
 	progress = nullptr;
 }
@@ -178,7 +178,7 @@ void SampleManagerConsole::update_list() {
 void SampleManagerConsole::on_list_edit() {
 	int sel = hui::get_event()->row;
 	int col = hui::get_event()->column;
-	if (col == 2)
+	if (col == 0)
 		song->edit_sample_name(items[sel]->s, get_cell(id_list, sel, col));
 	//else if (col == 4)
 	//	items[sel]->s->auto_delete = get_cell(id_list, sel, col)._bool();
@@ -340,6 +340,8 @@ void SampleManagerConsole::on_preview() {
 	if (progress)
 		end_preview();
 	int sel = get_int(id_list);
+	if (sel < 0)
+		return;
 	preview.sample = items[sel]->s;
 	preview.chain = session->create_signal_chain_system("sample-preview");
 	if (preview.sample->type == SignalType::Audio) {

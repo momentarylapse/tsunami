@@ -123,7 +123,7 @@ void list_view_notify_cell_change(GtkWidget *widget, ControlListView::ItemMapper
 	h->list_view->__set_cell(row, col, val);
 	h->list_view->panel->win->input.column = col;
 	h->list_view->panel->win->input.row = row;
-	h->list_view->notify(EventID::CHANGE);
+	h->list_view->notify(EventID::CHANGE, false);
 }
 
 void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h) {

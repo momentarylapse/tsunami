@@ -53,7 +53,7 @@ void SIAddStatements() {
 	// statements
 	add_statement(Identifier::Return, StatementID::Return); // return: ParamType will be defined by the parser!
 	add_statement(Identifier::If, StatementID::If, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
-	add_statement("-if/unwrap-", StatementID::IfUnwrap, 3); // [EXPR, OUT_VAR, BLOCK, [ELSE-BLOCK]]
+	add_statement("-if-compiletime-", StatementID::IfCompiletime, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
 	add_statement(Identifier::While, StatementID::While, 2); // [CMP, BLOCK]
 	add_statement("-for-con-", StatementID::ForContainer, 4); // [VAR, INDEX, ARRAY, BLOCK]
 	add_statement("-for-range-", StatementID::ForRange, 5); // [VAR, START, STOP, STEP, BLOCK]

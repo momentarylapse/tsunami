@@ -54,11 +54,13 @@ namespace Identifier {
 	const string Alias = "@alias";
 	const string RawPointer = "ptr";
 	const string Future = "future";
+	const string Promise = "promise";
 	const string TrustMe = "trust_me";
 	const string Pure = "pure";
 	const string Noauto = "@noauto";
 	const string Noframe = "@noframe";
 	const string Throws = "throws";
+	const string Compiletime = "@compiletime";
 	const string Use = "use";
 	const string Import = "import";
 	const string Return = "return";

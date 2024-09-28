@@ -36,6 +36,18 @@ public:
 	void complete_type(Class *t);
 };
 
+class AutoImplementerPromise : public AutoImplementer {
+public:
+	AutoImplementerPromise(Parser *p, SyntaxTree *tree) : AutoImplementer(p, tree) {}
+
+	void add_missing_function_headers(Class *t);
+	void implement_functions(const Class *t);
+
+	void implement_promise_constructor(Function *f, const Class *t);
+
+	void complete_type(Class *t);
+};
+
 }
 
 

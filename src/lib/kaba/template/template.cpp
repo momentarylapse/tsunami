@@ -303,6 +303,7 @@ extern const Class *TypeDictT;
 extern const Class *TypeOptionalT;
 extern const Class *TypeProductT;
 extern const Class *TypeFutureT;
+extern const Class *TypePromiseT;
 extern const Class *TypeFutureCoreT;
 extern const Class *TypeCallableFPT;
 extern const Class *TypeCallableBindT;
@@ -447,6 +448,10 @@ const Class *TemplateManager::request_optional(SyntaxTree *tree, const Class *pa
 
 const Class *TemplateManager::request_future(SyntaxTree *tree, const Class *param, int token_id) {
 	return request_class_instance(tree, TypeFutureT, {param}, token_id);
+}
+
+const Class *TemplateManager::request_promise(SyntaxTree *tree, const Class *param, int token_id) {
+	return request_class_instance(tree, TypePromiseT, {param}, token_id);
 }
 
 const Class *TemplateManager::request_futurecore(SyntaxTree *tree, const Class *param, int token_id) {

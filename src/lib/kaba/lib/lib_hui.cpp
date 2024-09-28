@@ -102,6 +102,10 @@ extern const Class *TypePath;
 extern const Class *TypeVec2;
 extern const Class* TypeCallback;
 extern const Class* TypeOsConfiguration;
+extern const Class* TypeVoidFuture;
+extern const Class* TypeVoidPromise;
+extern const Class* TypeStringFuture;
+extern const Class* TypeStringPromise;
 const Class *TypeHuiWindowP;
 
 
@@ -129,10 +133,8 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiClipboard = add_type("clipboard", 0);
 	const_cast<Class*>(TypeHuiClipboard)->from_template = TypeNamespaceT;
 
-	auto TypeHuiStringFuture = add_type("future[string]", sizeof(base::future<string>));
-	auto TypeHuiPathFuture = add_type("future[Path]", sizeof(base::future<Path>));
-	auto TypeHuiBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
-	auto TypeHuiVoidFuture = add_type("future[void]", sizeof(base::future<void>));
+	auto TypePathFuture = add_type("future[Path]", sizeof(base::future<Path>));
+	auto TypeBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
 
 	auto TypeCallbackPainter = add_type_func(TypeVoid, {TypeHuiPainter});
 	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
@@ -146,10 +148,13 @@ void SIAddPackageHui(Context *c) {
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
 
-	lib_create_future<string>(TypeHuiStringFuture, TypeString, TypeCallbackString);
-	lib_create_future<Path>(TypeHuiPathFuture, TypePath, TypeCallbackPath);
-	lib_create_future<bool>(TypeHuiBoolFuture, TypeBool, TypeCallbackBool);
-	lib_create_future<void>(TypeHuiVoidFuture, TypeVoid, TypeCallback);
+	lib_create_future<string>(TypeStringFuture, TypeString, TypeCallbackString);
+	lib_create_future<Path>(TypePathFuture, TypePath, TypeCallbackPath);
+	lib_create_future<bool>(TypeBoolFuture, TypeBool, TypeCallbackBool);
+	lib_create_future<void>(TypeVoidFuture, TypeVoid, TypeCallback);
+
+	lib_create_promise<void>(TypeVoidPromise, TypeVoid, TypeVoidFuture);
+	lib_create_promise<string>(TypeStringPromise, TypeString, TypeStringFuture);
 
 	add_class(TypeHuiMenu);
 		class_add_func(Identifier::func::Init, TypeVoid, hui_p(&hui::Menu::__init__), Flags::Mutable);
@@ -533,7 +538,7 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("f", TypeCallback);
 	add_func("cancel_runner", TypeVoid, hui_p(&hui::cancel_runner), Flags::Static);
 		func_add_param("id", TypeInt32);
-	add_func("fly", TypeHuiVoidFuture, hui_p(&hui::fly), Flags::Static);
+	add_func("fly", TypeVoidFuture, hui_p(&hui::fly), Flags::Static);
 		func_add_param("win", TypeHuiWindowShared);
 	add_func("fly_and_wait", TypeVoid, hui_p(&hui::fly_and_wait), Flags::Static);
 		func_add_param("win", TypeHuiWindowShared);
@@ -547,22 +552,22 @@ void SIAddPackageHui(Context *c) {
 		func_add_param("func", TypeFunctionP);*/
 	add_func("get_event", TypeHuiEventRef, hui_p(&hui::get_event), Flags::Static);
 	add_func("do_single_main_loop", TypeVoid, hui_p(&hui::Application::do_single_main_loop), Flags::Static);
-	add_func("file_dialog_open", TypeHuiPathFuture, hui_p(&hui::file_dialog_open), Flags::Static);
+	add_func("file_dialog_open", TypePathFuture, hui_p(&hui::file_dialog_open), Flags::Static);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-	add_func("file_dialog_save", TypeHuiPathFuture, hui_p(&hui::file_dialog_save), Flags::Static);
+	add_func("file_dialog_save", TypePathFuture, hui_p(&hui::file_dialog_save), Flags::Static);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-	add_func("file_dialog_dir", TypeHuiPathFuture, hui_p(&hui::file_dialog_dir), Flags::Static);
+	add_func("file_dialog_dir", TypePathFuture, hui_p(&hui::file_dialog_dir), Flags::Static);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("dir", TypePath);
 		func_add_param("params", TypeStringList);
-	add_func("question_box", TypeHuiBoolFuture, hui_p(&hui::question_box), Flags::Static);
+	add_func("question_box", TypeBoolFuture, hui_p(&hui::question_box), Flags::Static);
 		func_add_param("root", TypeHuiWindowP);
 		func_add_param("title", TypeString);
 		func_add_param("text", TypeString);
@@ -590,7 +595,7 @@ void SIAddPackageHui(Context *c) {
 
 
 	add_class(TypeHuiClipboard);
-		class_add_func("paste", TypeHuiStringFuture, hui_p(&hui::clipboard::paste), Flags::Static);
+		class_add_func("paste", TypeStringFuture, hui_p(&hui::clipboard::paste), Flags::Static);
 		class_add_func("copy", TypeVoid, hui_p(&hui::clipboard::copy), Flags::Static);
 			func_add_param("text", TypeString);
 

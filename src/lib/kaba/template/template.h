@@ -99,6 +99,7 @@ public:
 	const Class *request_callable_bind(SyntaxTree *tree, const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
 	const Class *request_product(SyntaxTree *tree, const Array<const Class*> &classes, int token_id);
 	const Class *request_future(SyntaxTree *tree, const Class *base, int token_id);
+	const Class *request_promise(SyntaxTree *tree, const Class *base, int token_id);
 	const Class *request_futurecore(SyntaxTree *tree, const Class *base, int token_id);
 
 private:
@@ -211,6 +212,11 @@ class TemplateClassInstantiatorCallableBind : public TemplateClassInstantiator {
 };
 
 class TemplateClassInstantiatorFuture : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
+class TemplateClassInstantiatorPromise : public TemplateClassInstantiator {
 	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
 	void add_function_headers(Class* c) override;
 };

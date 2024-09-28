@@ -16,13 +16,15 @@ void db_out(const string &s) {
 
 Array<void*> prepare_const_func_params(shared<Node> c, bool allow_placeholder) {
 	Array<void*> p;
-	for (int i=0;i<c->params.num;i++) {
+	for (int i=0; i<c->params.num; i++) {
 		if (c->params[i]->kind == NodeKind::Dereference and c->params[i]->params[0]->kind == NodeKind::Constant) {
 			db_out("pp: " + c->params[i]->params[0]->str(tree->base_class));
 			p.add(*(void**)c->params[i]->params[0]->as_const()->p());
 		} else if (c->params[i]->kind == NodeKind::Constant) {
 			db_out("p: " + c->params[i]->str(tree->base_class));
 			p.add(c->params[i]->as_const()->p());
+		} else if (c->params[i]->kind == NodeKind::Class) {
+			p.add(const_cast<Class*>(c->params[i]->as_class()));
 		} else if (c->params[i]->kind == NodeKind::Placeholder and allow_placeholder) {
 			p.add(nullptr);
 		} else {

@@ -46,6 +46,7 @@ enum class Flags {
 	Macro = 1 << 19,
 	TrustMe = 1 << 20,
 	Try = 1 << 21,
+	CompileTime = 1 << 22,
 
 	AutoImport = 1<<24,
 	FullyParsed = 1<<25,

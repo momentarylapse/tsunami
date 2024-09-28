@@ -21,6 +21,7 @@ use processing.*
 
 let EXPORT_IMPORTS = true
 
+use async.*
 use hui
 use kaba
 use os

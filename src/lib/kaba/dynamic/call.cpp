@@ -385,6 +385,27 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call2<int,CBR,CBR>(ff, ret, param);
 				return true;
 			}
+		} else if (return_type == TypeBool) {
+			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
+				call2<bool,int,int>(ff, ret, param);
+				return true;
+			}
+			if (ptype[0]->is_some_pointer() and ptype[1]->is_some_pointer()) {
+				call2<bool,void*,void*>(ff, ret, param);
+				return true;
+			}
+			/*if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
+				call2<bool,CBR,int>(ff, ret, param);
+				return true;
+			}
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+				call2<bool,CBR,float>(ff, ret, param);
+				return true;
+			}
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1]->uses_call_by_reference())) {
+				call2<bool,CBR,CBR>(ff, ret, param);
+				return true;
+			}*/
 		} else if (return_type == TypeFloat32) {
 			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
 				call2<float,float,float>(ff, ret, param);

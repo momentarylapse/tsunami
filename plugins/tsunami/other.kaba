@@ -2,6 +2,7 @@ use common.*
 use modules.*
 use streams.*
 use song.*
+use async.*
 use os
 use kaba
 

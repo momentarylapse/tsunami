@@ -715,6 +715,7 @@ void SIAddStatements();
 void SIAddXCommands(Context *c);
 void SIAddPackageBase(Context *c);
 void SIAddPackageKaba(Context *c);
+void SIAddPackageAsync(Context *c);
 void SIAddPackageTime(Context *c);
 void SIAddPackageOS(Context *c);
 void SIAddPackageOSPath(Context *c);
@@ -732,6 +733,7 @@ void init_lib(Context *c) {
 
 
 	SIAddPackageBase(c);
+	SIAddPackageAsync(c);
 	SIAddPackageOSPath(c);
 	SIAddPackageKaba(c);
 	SIAddPackageMath(c);

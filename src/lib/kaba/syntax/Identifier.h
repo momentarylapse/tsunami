@@ -54,11 +54,13 @@ namespace Identifier {
 	extern const string Alias;
 	extern const string RawPointer;
 	extern const string Future;
+	extern const string Promise;
 	extern const string TrustMe;
 	extern const string Pure;
 	extern const string Noauto;
 	extern const string Noframe;
 	extern const string Throws;
+	extern const string Compiletime;
 	extern const string Use;
 	extern const string Import;
 	extern const string Return;

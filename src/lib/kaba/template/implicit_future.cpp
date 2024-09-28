@@ -14,6 +14,8 @@
 
 namespace kaba {
 
+extern const Class* TypePromiseT;
+
 void AutoImplementerFutureCore::add_missing_function_headers(Class *t) {
 	//auto t_shared_core = tree->request_implicit_class_shared_not_null(BLA, -1);
 	msg_error("NEW FUTURE CORE: ");
@@ -91,6 +93,15 @@ Class* TemplateClassInstantiatorFutureCore::declare_new_instance(SyntaxTree *tre
 void TemplateClassInstantiatorFutureCore::add_function_headers(Class* c) {
 	AutoImplementerFutureCore ai(nullptr, c->owner);
 	ai.complete_type(c);
+}
+
+Class* TemplateClassInstantiatorPromise::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
+	return create_raw_class(tree, format("%s[%s]", Identifier::Promise, params[0]->name), TypePromiseT, sizeof(base::promise<void>), config.target.pointer_size, 0, nullptr, params, token_id);
+}
+void TemplateClassInstantiatorPromise::add_function_headers(Class* c) {
+	/*AutoImplementerPromise ai(nullptr, c->owner);
+	ai.complete_type(c);*/
+	msg_error("TODO  promise[T]");
 }
 
 }

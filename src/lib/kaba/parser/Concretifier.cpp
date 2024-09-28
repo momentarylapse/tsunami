@@ -444,7 +444,7 @@ shared<Node> Concretifier::concretify_call(shared<Node> node, Block *block, cons
 		} else if (l->type->is_callable()) {
 			links[i] = make_func_pointer_node_callable(l);
 		} else if (auto c = l->type->get_call()) {
-			return add_node_member_call(c, l, {});
+			links[i] = add_node_member_call(c, l, node->token_id, {});
 		} else {
 			do_error(format("this %s does not seem callable", kind2str(l->kind)), l);
 		}
@@ -715,6 +715,28 @@ shared<Node> Concretifier::concretify_statement_if(shared<Node> node, Block *blo
 	return node;
 }
 
+shared<Node> Concretifier::concretify_statement_if_compiletime(shared<Node> node, Block *block, const Class *ns) {
+	// [COND, TRUE-BLOCK, [FALSE-BLOCK]]
+	auto cond = concretify_node(node->params[0], block, ns);
+
+	// try to eval condition
+	cond = tree->transform_node(cond, [this] (shared<Node> n) {
+		return tree->conv_eval_const_func(n);
+	});
+
+	if (cond->kind != NodeKind::Constant)
+		do_error("'if @compiletime' expects a compile-time constant expression", cond);
+	if (cond->type != TypeBool)
+		do_error(format("if condition must be of type 'bool', not '%s'", cond->type->name), cond);
+
+	if (cond->as_const()->as_int() == 1)
+		return concretify_node(node->params[1], block, ns);
+	if (node->params.num >= 3)
+		return concretify_node(node->params[2], block, ns);
+
+	return add_node_statement(StatementID::Pass, node->token_id);
+}
+
 shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> node, shared<Node> container, Block *block, const Class *ns) {
 	// [OUT-VAR, ---, EXPRESSION, TRUE-BLOCK, [FALSE-BLOCK]]
 	auto expr = container;//concretify_node(node->params[2], block, ns);
@@ -955,13 +977,7 @@ shared<Node> Concretifier::concretify_special_function_sizeof(shared<Node> node,
 shared<Node> Concretifier::concretify_special_function_typeof(shared<Node> node, Block *block, const Class *ns) {
 	auto sub = concretify_node(node->params[0], block, block->name_space());
 	sub = force_concrete_type(sub);
-
-	auto c = add_node_const(tree->add_constant(TypeClassRef), node->token_id);
-	if (sub->kind == NodeKind::Class) {
-		return add_node_class(sub->as_class(), node->token_id);
-	} else {
-		return add_node_class(sub->type, node->token_id);
-	}
+	return add_node_class(sub->type, node->token_id);
 }
 
 shared<Node> implement_len(shared<Node> node, Concretifier *con, Block *block, const Class *ns, int token_id) {
@@ -1410,34 +1426,35 @@ shared<Node> Concretifier::concretify_statement_match(shared<Node> node, Block *
 
 shared<Node> Concretifier::concretify_statement(shared<Node> node, Block *block, const Class *ns) {
 	auto s = node->as_statement();
-	if (s->id == StatementID::Return) {
+	if (s->id == StatementID::Return)
 		return concretify_statement_return(node, block, ns);
-	} else if (s->id == StatementID::If) {
+	if (s->id == StatementID::If)
 		return concretify_statement_if(node, block, ns);
-	} else if (s->id == StatementID::While) {
+	if (s->id == StatementID::IfCompiletime)
+		return concretify_statement_if_compiletime(node, block, ns);
+	if (s->id == StatementID::While)
 		return concretify_statement_while(node, block, ns);
-	} else if (s->id == StatementID::ForRange) {
+	if (s->id == StatementID::ForRange)
 		return concretify_statement_for_range(node, block, ns);
-	} else if (s->id == StatementID::ForContainer) {
+	if (s->id == StatementID::ForContainer)
 		return concretify_statement_for_container(node, block, ns);
-	} else if (s->id == StatementID::New) {
+	if (s->id == StatementID::New)
 		return concretify_statement_new(node, block, ns);
-	} else if (s->id == StatementID::Delete) {
+	if (s->id == StatementID::Delete)
 		return concretify_statement_delete(node, block, ns);
-	} else if (s->id == StatementID::RawFunctionPointer) {
+	if (s->id == StatementID::RawFunctionPointer)
 		return concretify_statement_raw_function_pointer(node, block, ns);
-	} else if (s->id == StatementID::Try) {
+	if (s->id == StatementID::Try)
 		return concretify_statement_try(node, block, ns);
-	} else if (s->id == StatementID::Raise) {
+	if (s->id == StatementID::Raise)
 		return concretify_statement_raise(node, block, ns);
-	} else if (s->id == StatementID::Lambda) {
+	if (s->id == StatementID::Lambda)
 		return concretify_statement_lambda(node, block, ns);
-	} else if (s->id == StatementID::Match) {
+	if (s->id == StatementID::Match)
 		return concretify_statement_match(node, block, ns);
-	} else {
-		node->show();
-		do_error("INTERNAL: unexpected statement", node);
-	}
+
+	node->show();
+	do_error("INTERNAL: unexpected statement", node);
 	return nullptr;
 }
 

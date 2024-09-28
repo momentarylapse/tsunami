@@ -119,7 +119,6 @@ public:
 	shared<Node> parse_abstract_statement_raise(Block *block);
 	shared<Node> parse_abstract_statement_try(Block *block);
 	shared<Node> parse_abstract_statement_if(Block *block);
-	shared<Node> parse_abstract_statement_if_unwrap(Block *block);
 	shared<Node> parse_abstract_statement_pass(Block *block);
 	shared<Node> parse_abstract_statement_new(Block *block);
 	shared<Node> parse_abstract_statement_delete(Block *block);

@@ -115,23 +115,23 @@ ControlListView::ItemMapper *list_view_find_item(ControlListView *lv, GtkListIte
 	return nullptr;
 }
 
-void list_view_notify_cell_change(GtkWidget *widget, ControlListView::ItemMapper *h, const string &val) {
-	if (!h->list_view->allow_change_messages)
-		return;
+void on_list_view_cell_change(GtkWidget *widget, ControlListView::ItemMapper *h, const string &val) {
 	int col = h->column;
 	int row = h->row_in_model;
-	h->list_view->__set_cell(row, col, val);
+	h->list_view->__update_cell(row, col, val, false);
+	if (!h->list_view->allow_change_messages)
+		return;
 	h->list_view->panel->win->input.column = col;
 	h->list_view->panel->win->input.row = row;
 	h->list_view->notify(EventID::CHANGE, false);
 }
 
 void on_gtk_list_checkbox_clicked(GtkWidget *widget, ControlListView::ItemMapper *h) {
-	list_view_notify_cell_change(widget, h, b2s(gtk_check_button_get_active(GTK_CHECK_BUTTON(widget))));
+	on_list_view_cell_change(widget, h, b2s(gtk_check_button_get_active(GTK_CHECK_BUTTON(widget))));
 }
 
 void on_gtk_list_edit_changed(GtkWidget *widget, ControlListView::ItemMapper *h) {
-	list_view_notify_cell_change(widget, h, gtk_editable_get_text(GTK_EDITABLE(widget)));
+	on_list_view_cell_change(widget, h, gtk_editable_get_text(GTK_EDITABLE(widget)));
 }
 
 
@@ -253,6 +253,33 @@ void on_gtk_list_item_setup(GtkListItemFactory *factory, GtkListItem *list_item,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 
+void gtk_list_view_update_item_view(ControlListView* list_view, int column, GtkWidget* w, const char* s) {
+	char f = list_view->effective_format[column];
+	list_view->allow_change_messages = false;
+	if (f == 'S') {
+		gtk_switch_set_active(GTK_SWITCH(w), string(s)._bool());
+	} else if (f == 'C') {
+		gtk_check_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
+	} else if (f == 'B') {
+		//gtk_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
+	} else if (f == 'i') {
+		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(s);
+		//#if GTK_CHECK_VERSION(4,12,0)
+		// TODO use gtk paintable for images
+		//		gtk_picture_set_paintable(GTK_PICTURE(w), p);
+		//#else
+		gtk_picture_set_pixbuf(GTK_PICTURE(w), p);
+		//#endif
+	} else if (f == 'T') {
+		gtk_editable_set_text(GTK_EDITABLE(w), s);
+	} else if (f == 'm') {
+		gtk_label_set_markup(GTK_LABEL(w), s);
+	} else {
+		gtk_label_set_label(GTK_LABEL(w), s);
+	}
+	list_view->allow_change_messages = true;
+}
+
 void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, ControlListView *list_view) {
 	int column = base::find_index(list_view->factories, factory);
 	if (column < 0 or column >= list_view->effective_format.num)
@@ -268,31 +295,8 @@ void on_gtk_list_item_bind(GtkListItemFactory *factory, GtkListItem *list_item, 
 	dbo(format("LIST BIND %s  %d %d", p2s(list_item), row_no, column));
 
 	// update widget
-	char f = list_view->effective_format[column];
 	GtkWidget *w = gtk_list_item_get_child(list_item);
-	list_view->allow_change_messages = false;
-	if (f == 'S') {
-		gtk_switch_set_active(GTK_SWITCH(w), string(s)._bool());
-	} else if (f == 'C') {
-		gtk_check_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
-	} else if (f == 'B') {
-		//gtk_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
-	} else if (f == 'i') {
-		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(s);
-//#if GTK_CHECK_VERSION(4,12,0)
-		// TODO use gtk paintable for images
-//		gtk_picture_set_paintable(GTK_PICTURE(w), p);
-//#else
-		gtk_picture_set_pixbuf(GTK_PICTURE(w), p);
-//#endif
-	} else if (f == 'T') {
-		gtk_editable_set_text(GTK_EDITABLE(w), s);
-	} else if (f == 'm') {
-		gtk_label_set_markup(GTK_LABEL(w), s);
-	} else {
-		gtk_label_set_label(GTK_LABEL(w), s);
-	}
-	list_view->allow_change_messages = true;
+	gtk_list_view_update_item_view(list_view, column, w, s);
 
 	// mapping stuff
 	auto m = list_view_find_item(list_view, list_item);
@@ -626,7 +630,7 @@ void ControlListView::__change_string(int row, const string& str) {
 #if GTK_CHECK_VERSION(4,0,0)
 	auto parts = split_title(str);
 	for (auto&& [i,p]: enumerate(parts))
-		__set_cell(row, i, p);
+		__update_cell(row, i, p, true);
 #else
 	auto parts = split_title(str);
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
@@ -673,11 +677,9 @@ string ControlListView::get_cell(int row, int column) {
 #endif
 }
 
-void ControlListView::__set_cell(int row, int column, const string& str) {
-	dbo(format("SET CELL %d %d  %s", row, column, str));
-	if (row < 0)
-		return;
+
 #if GTK_CHECK_VERSION(4,0,0)
+void ControlListView::__update_cell(int row, int column, const string& str, bool update_view) {
 	auto store_row = g_list_model_get_item(G_LIST_MODEL(store), row);
 	if (!store_row)
 		return;
@@ -686,19 +688,29 @@ void ControlListView::__set_cell(int row, int column, const string& str) {
 	g_list_store_insert(G_LIST_STORE(store_row), column, obj);
 	//g_list_model_items_changed(G_LIST_MODEL(store), row, 1, 1);*/
 
-	// probably not a good strategy...
-	// FIXME do we really own items when get()ing them?!?
-	auto new_row = g_list_store_new(G_TYPE_OBJECT);
-	for (int i=0; i<columns.num; i++)
-		if (i == column) {
-			auto ob = gtk_string_object_new(str.c_str());
-			g_list_store_append(G_LIST_STORE(new_row), ob);
-		} else {
-			auto ob = g_list_model_get_item(G_LIST_MODEL(store_row), i);
-			g_list_store_append(G_LIST_STORE(new_row), ob);
-		}
-	g_list_store_remove(G_LIST_STORE(store), row);
-	g_list_store_insert(G_LIST_STORE(store), row, new_row);
+	//auto it = g_list_model_get_object(G_LIST_MODEL(store_row), column);
+	//g_object_set(it, "string", str.c_str(), nullptr);
+
+	auto obj = gtk_string_object_new(str.c_str());
+	g_list_store_splice(G_LIST_STORE(store_row), column, 1, (gpointer*)&obj, 1);
+
+	if (update_view) {
+		g_list_model_items_changed(G_LIST_MODEL(store), row, 1, 1);
+
+		for (auto& i: _item_map_)
+			if (i->row_in_model == row and i->column == column)
+				gtk_list_view_update_item_view(this, column, i->widget, str.c_str());
+	}
+
+}
+#endif
+
+void ControlListView::__set_cell(int row, int column, const string& str) {
+	dbo(format("SET CELL %d %d  %s", row, column, str));
+	if (row < 0 or column < 0)
+		return;
+#if GTK_CHECK_VERSION(4,0,0)
+	__update_cell(row, column, str, true);
 #else
 	GtkListStore *store = GTK_LIST_STORE(gtk_tree_view_get_model(GTK_TREE_VIEW(widget)));
 	GtkTreeIter iter;

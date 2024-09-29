@@ -23,6 +23,7 @@
 #include "../../module/audio/SongRenderer.h"
 #include "../../module/midi/MidiEventStreamer.h"
 #include "../../storage/Storage.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/math/math.h"
 #include "../../lib/image/image.h"
 #include "../../lib/os/msg.h"
@@ -96,6 +97,8 @@ public:
 		hui::run_later(0.001f, [this] { manager->remove(this); });
 	}
 	void on_update() {
+		if (manager->editing_cell)
+			return;
 		int n = manager->get_index(s);
 		if (n >= 0) {
 			icon = render_sample(s, view);
@@ -176,12 +179,14 @@ void SampleManagerConsole::update_list() {
 }
 
 void SampleManagerConsole::on_list_edit() {
+	editing_cell = true;
 	int sel = hui::get_event()->row;
 	int col = hui::get_event()->column;
 	if (col == 0)
 		song->edit_sample_name(items[sel]->s, get_cell(id_list, sel, col));
 	//else if (col == 4)
 	//	items[sel]->s->auto_delete = get_cell(id_list, sel, col)._bool();
+	editing_cell = false;
 }
 
 void SampleManagerConsole::on_list_right_click() {
@@ -285,7 +290,7 @@ void SampleManagerConsole::add(SampleManagerItem *item) {
 }
 
 void SampleManagerConsole::remove(SampleManagerItem *item) {
-	foreachi(auto *si, items, i)
+	for (auto&& [i, si]: enumerate(items))
 		if (si == item) {
 			msg_write("--------SampleManagerConsole erase...");
 			items.erase(i);
@@ -318,7 +323,8 @@ void SampleManagerConsole::on_progress_cancel() {
 }
 
 void SampleManagerConsole::on_song_update() {
-	update_list();
+	if (!editing_cell)
+		update_list();
 }
 
 void SampleManagerConsole::on_preview_tick() {

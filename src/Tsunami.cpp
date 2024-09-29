@@ -283,7 +283,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			if (a == Array<string>({"long"}))
 				for (int i=3; i<1000; i++)
 					dlg->add_string("list", i2s(i));
-			hui::fly_and_wait(dlg);
+			hui::fly(dlg);
 		});
 	});
 	p.cmd("@hidden columnview", "", "bla", [this] (const Array<string> &) {
@@ -292,6 +292,9 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
 			dlg->add_string("list", "true\\<b>test</b>\\x");
 			dlg->add_string("list", "false\\<i>more test</i>\\y");
+			dlg->add_string("list", "false\\<i>more test</i>\\z");
+			dlg->add_string("list", "true\\<i>more test</i>\\a");
+			dlg->add_string("list", "false\\<i>more test</i>\\b");
 			dlg->event_x("list", "hui:change", [dlg] {
 				auto e = hui::get_event();
 				msg_write(format("edit: %d %d  %s", e->row, e->column, dlg->get_cell("list", e->row, e->column)));
@@ -299,7 +302,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			dlg->event("button", [dlg] {
 				dlg->change_string("list", 0, "false\\bla\\z");
 			});
-			hui::fly_and_wait(dlg);
+			hui::fly(dlg);
 		});
 	});
 	p.cmd("@hidden treeview", "", "bla", [this] (const Array<string> &a) {
@@ -311,7 +314,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			dlg->add_string("list", "2");
 			for (int i=3; i<30; i++)
 				dlg->add_child_string("list", i % 3, i2s(i));
-			hui::fly_and_wait(dlg);
+			hui::fly(dlg);
 		});
 	});
 #endif

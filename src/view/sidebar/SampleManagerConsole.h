@@ -72,6 +72,7 @@ public:
 	
 	string id_list;
 	owned<hui::Menu> menu_samples;
+	bool editing_cell = false;
 };
 
 }

@@ -16,11 +16,13 @@ namespace tsunami {
 class ActionTagAdd : public Action
 {
 public:
-	ActionTagAdd(const Tag &tag);
-	virtual ~ActionTagAdd();
+	explicit ActionTagAdd(const Tag &tag);
+	~ActionTagAdd() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	string name() const override { return ":##:add tag"; }
+
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	Tag tag;

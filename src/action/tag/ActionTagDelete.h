@@ -15,11 +15,13 @@ namespace tsunami {
 
 class ActionTagDelete : public Action {
 public:
-	ActionTagDelete(int index);
-	virtual ~ActionTagDelete();
+	explicit ActionTagDelete(int index);
+	~ActionTagDelete() override;
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	string name() const override { return ":##:delete tag"; }
+
+	void *execute(Data *d) override;
+	void undo(Data *d) override;
 
 private:
 	int index;

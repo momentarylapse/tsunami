@@ -15,7 +15,7 @@ class Track;
 
 class ActionTrackDelete : public ActionGroup {
 public:
-	ActionTrackDelete(Track *track);
+	explicit ActionTrackDelete(Track *track);
 
 	string name() const override { return ":##:delete track"; }
 

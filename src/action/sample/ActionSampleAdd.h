@@ -18,7 +18,9 @@ class Sample;
 
 class ActionSampleAdd : public Action {
 public:
-	ActionSampleAdd(shared<Sample> s);
+	explicit ActionSampleAdd(shared<Sample> s);
+
+	string name() const override { return ":##:add sample"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

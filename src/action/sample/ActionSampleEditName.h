@@ -14,9 +14,11 @@ namespace tsunami {
 
 class Sample;
 
-class ActionSampleEditName: public ActionMergable<string> {
+class ActionSampleEditName : public ActionMergable<string> {
 public:
 	ActionSampleEditName(shared<Sample> s, const string &name);
+
+	string name() const override { return ":##:change sample name"; }
 
 	void *execute(Data *d) override;
 	void undo(Data *d) override;

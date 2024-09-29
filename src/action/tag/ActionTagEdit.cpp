@@ -33,5 +33,13 @@ void ActionTagEdit::undo(Data *d) {
 	a->tags[index] = old_tag;
 }
 
+
+bool ActionTagEdit::mergable(Action *a) {
+	auto *aa = dynamic_cast<ActionTagEdit*>(a);
+	if (!aa)
+		return false;
+	return (aa->index == index);
+}
+
 }
 

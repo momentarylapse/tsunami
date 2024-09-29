@@ -62,9 +62,19 @@ func rel_pitch_name(pitch_rel: int) -> string
 		return "B"
 	return "???"
 
+func subscript_int(i: i32) -> string
+	if i >= -1 and i <= 9
+		return ["₋₁", "₀", "₁", "₂", "₃", "₄", "₅", "₆", "₇", "₈", "₉"][i+1]
+	return str(i)
+
 func pitch_name(pitch: int) -> string
 	var name_rel = rel_pitch_name(pitch_to_rel(pitch))
 	var name_oct = str(pitch_get_octave(pitch))
+	return name_rel + name_oct
+
+func pitch_name_pretty(pitch: int) -> string
+	var name_rel = rel_pitch_name(pitch_to_rel(pitch))
+	var name_oct = subscript_int(pitch_get_octave(pitch))
 	return name_rel + name_oct
 
 

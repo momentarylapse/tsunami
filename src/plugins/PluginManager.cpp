@@ -83,6 +83,8 @@ namespace tsunami {
 
 #define _offsetof(CLASS, ELEMENT) (int)( (char*)&((CLASS*)1)->ELEMENT - (char*)((CLASS*)1) )
 
+string get_sample_preview(Sample *s, AudioView *view);
+
 PluginManager::PluginManager() {
 	presets = new PresetManager;
 
@@ -215,6 +217,7 @@ void PluginManager::link_app_data() {
 	ext->link("draw_arrow_head", (void*)&draw_arrow_head);
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
+	ext->link("get_sample_preview", (void*)&get_sample_preview);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
 
 

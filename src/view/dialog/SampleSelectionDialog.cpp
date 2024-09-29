@@ -15,7 +15,7 @@
 
 namespace tsunami {
 
-string render_sample(Sample *s, AudioView *view);
+string get_sample_preview(Sample *s, AudioView *view);
 
 SampleSelectionDialog::SampleSelectionDialog(Session *_session, hui::Panel *parent, Sample *old) :
 	hui::Dialog("sample_selection_dialog", parent->win)
@@ -41,8 +41,9 @@ SampleSelectionDialog::SampleSelectionDialog(Session *_session, hui::Panel *pare
 }
 
 SampleSelectionDialog::~SampleSelectionDialog() {
-	for (string &name: icon_names)
-		hui::delete_image(name);
+	// no, keep them forever! ...
+	//for (string &name: icon_names)
+	//	hui::delete_image(name);
 }
 
 void SampleSelectionDialog::fill_list() {
@@ -51,7 +52,7 @@ void SampleSelectionDialog::fill_list() {
 	set_string(list_id, _("\\- none -\\"));
 	set_int(list_id, 0);
 	foreachi(Sample *s, weak(song->samples), i) {
-		icon_names.add(render_sample(s, session->view));
+		icon_names.add(get_sample_preview(s, session->view));
 		set_string(list_id, icon_names[i] + "\\" + song->get_time_str_long(s->buf->length) + "\\" + s->name);
 		if (s == selected)
 			set_int(list_id, i + 1);

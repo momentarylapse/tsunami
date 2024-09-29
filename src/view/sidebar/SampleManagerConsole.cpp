@@ -67,7 +67,9 @@ void render_midi(Image &im, MidiNoteBuffer &m) {
 	}
 }
 
-string render_sample(Sample *s, AudioView *view) {
+// TODO find a good strategy to delete obsolete images
+// for now, assume we only have a limited number of samples/uids...
+string get_sample_preview(Sample *s, AudioView *view) {
 	Image im;
 	im.create(SAMPLE_PREVIEW_WIDTH, SAMPLE_PREVIEW_HEIGHT, color(0, 0, 0, 0));
 	if (s->type == SignalType::Audio)
@@ -84,7 +86,7 @@ public:
 		manager = _manager;
 		s = _s;
 		view = _view;
-		icon = render_sample(s, view);
+		icon = get_sample_preview(s, view);
 		s->out_death >> create_sink([this] { on_delete(); });
 		s->out_changed_by_action >> create_sink([this] { on_update(); });
 		s->out_reference >> create_sink([this] { on_update(); });
@@ -101,7 +103,7 @@ public:
 			return;
 		int n = manager->get_index(s);
 		if (n >= 0) {
-			icon = render_sample(s, view);
+			icon = get_sample_preview(s, view);
 			manager->change_string(manager->id_list, n, str());
 		}
 	}

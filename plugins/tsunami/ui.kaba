@@ -133,6 +133,8 @@ var extern theme: ColorScheme
 
 var extern clipboard: Clipboard&
 
+func extern get_sample_preview(s: Sample, view: AudioView) -> string
+
 func extern get_style_colors(p: hui.Panel, id: string) -> color{}
 
 

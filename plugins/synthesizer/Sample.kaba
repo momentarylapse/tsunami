@@ -46,17 +46,19 @@ class SamplePanel extends ConfigPanel
 	var override c: SampleSynthesizer&
 	func override __init__(_s: Module)
 		sc := &c.config
-		add_list_view("!expandx\\Note\\Sample", 0, 0, "list")
+		add_list_view("!expandx,format=ttti\\Index\\Note\\Sample\\Preview", 0, 0, "list")
 		event("list", on_select)
 
 	func override update()
 		reset("list")
 		for i in 0:MAX_PITCH
 			var name = ""
+			var preview = ""
 			if i < len(sc.samples)
 				for s in sc.samples[i]
 					name = s.origin.name
-			set_string("list", pitch_name(i) + "\\" + name)
+					preview = get_sample_preview(s.origin, c.session.view)
+			set_string("list", "{{i}}\\{{pitch_name_pretty(i)}}\\{{name}}\\{{preview}}")
 		
 	func mut on_select()
 		var n = get_int("")

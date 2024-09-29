@@ -34,6 +34,7 @@ public:
 	void on_update();
 	
 	owned<hui::Menu> menu_tags;
+	bool editing_cell = false;
 };
 
 }

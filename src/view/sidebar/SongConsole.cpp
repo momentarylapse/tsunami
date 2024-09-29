@@ -97,12 +97,14 @@ void SongConsole::on_tags_edit() {
 	int r = hui::get_event()->row;
 	if (r < 0)
 		return;
+	editing_cell = true;
 	Tag t = song->tags[r];
 	if (hui::get_event()->column == 0)
 		t.key = get_cell("tags", r, 0);
 	else
 		t.value = get_cell("tags", r, 1);
 	song->edit_tag(r, t.key, t.value);
+	editing_cell = false;
 }
 
 void SongConsole::on_tags_right_click() {
@@ -122,7 +124,8 @@ void SongConsole::on_tag_delete() {
 }
 
 void SongConsole::on_update() {
-	load_data();
+	if (!editing_cell)
+		load_data();
 }
 
 }

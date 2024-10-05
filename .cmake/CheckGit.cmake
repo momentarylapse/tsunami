@@ -32,6 +32,7 @@ function(CheckGitVersion)
         COMMAND git describe --tags
         WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
         OUTPUT_VARIABLE GIT_HASH
+        ERROR_VARIABLE GIT_HASH_ERROR
         OUTPUT_STRIP_TRAILING_WHITESPACE
         )
 

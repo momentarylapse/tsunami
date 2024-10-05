@@ -36,6 +36,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Set reusable strings
       id: strings
@@ -45,7 +47,7 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         
     - name: Install Dependencies
-      run: sudo apt-get install -y libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev portaudio19-dev #libpipewire-0.3-dev libspa-0.2-dev
+      run: sudo apt-get install -y git libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev portaudio19-dev #libpipewire-0.3-dev libspa-0.2-dev
       
     - name: Configure CMake
       run: >

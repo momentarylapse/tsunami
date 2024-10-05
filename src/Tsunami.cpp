@@ -37,11 +37,12 @@
 #include "view/module/ConfigPanel.h"
 #include "view/module/ConfigurationDialog.h"
 #endif
+#include "git-version.h"
 
 namespace tsunami {
 
 const string AppName = "Tsunami";
-const string AppVersion = "0.7.116.0";
+const string AppVersion = GitHash;
 const string AppNickname = "absolute 2er0";
 
 Tsunami *Tsunami::instance = nullptr;
@@ -179,6 +180,9 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	});
 	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {
 		p.show();
+	});
+	p.cmd("version", "", "show the program version", [&p] (const Array<string> &) {
+		msg_write(AppName + "  " + AppVersion);
 	});
 	p.cmd("info", "FILE1 ...", "show information about the file", [&flags] (const Array<string> &a) {
 		Session *session = Session::GLOBAL;

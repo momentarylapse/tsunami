@@ -632,8 +632,23 @@ void about_box(Window *win) {
 	gtk_about_dialog_set_license(GTK_ABOUT_DIALOG(dlg), Application::get_property("license").c_str());
 	gtk_about_dialog_set_website(GTK_ABOUT_DIALOG(dlg), Application::get_property("website").c_str());
 #if GTK_CHECK_VERSION(4,0,0)
-	auto *_logo = gdk_texture_new_from_file(g_file_new_for_path(Application::get_property("logo").c_str()), &error);
-	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(_logo));
+
+	auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
+	auto icon = gtk_icon_theme_lookup_icon(icon_theme,
+									   "tsunami", // icon name
+									   nullptr,
+									   128, // icon size
+									   1,  // scale
+									   GTK_TEXT_DIR_NONE,
+									   GTK_ICON_LOOKUP_FORCE_REGULAR);  // flags);
+
+	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(icon));
+
+	//msg_write("ABOUT..." + Application::get_property("logo"));
+	/*auto *_logo = gdk_texture_new_from_file(g_file_new_for_path(Application::get_property("logo").c_str()), &error);
+	if (error)
+		msg_error(error->message);
+	gtk_about_dialog_set_logo(GTK_ABOUT_DIALOG(dlg), GDK_PAINTABLE(_logo));*/
 
 
 	/*auto icon_theme = gtk_icon_theme_get_for_display(gtk_widget_get_display(dlg));

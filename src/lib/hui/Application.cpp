@@ -128,7 +128,6 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 	else if (os::fs::exists(directory_static | "icon.ico"))
 		set_property("logo", str(directory_static | "icon.ico"));
 
-
 	// default "icon" used for windows (just name)
 	set_property("icon", app_name);
 }
@@ -238,6 +237,11 @@ static std::function<void()> _run_after_gui_init_func_;
 static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data) {
 	auto app = reinterpret_cast<Application*>(user_data);
 	_init_global_css_classes_();
+
+	// add local icon theme
+	auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
+	gtk_icon_theme_add_search_path(icon_theme, str(Application::directory_static | "icons").c_str());
+
 	if (_run_after_gui_init_func_)
 		_run_after_gui_init_func_();
 	else

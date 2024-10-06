@@ -61,7 +61,7 @@ Tsunami::Tsunami() :
 
 	set_property("name", AppName);
 	set_property("version", AppVersion);
-	set_property("comment", _("Editor for audio files"));
+	set_property("comment", _("The friendly audio workstation"));
 	set_property("website", "http://michi.is-a-geek.org/software");
 	set_property("copyright", "© 2007-2024 by Michael Ankele");
 	set_property("author", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
@@ -121,7 +121,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	auto flags = Storage::Flags::None;
 
 	CommandLineParser p;
-	p.info("tsunami", AppName + " - the ultimate audio editor");//AppName + " " + AppVersion);
+	p.info("tsunami", AppName + " - The friendly audio workstation");//AppName + " " + AppVersion);
 	p.option("--slow", "", [] {
 		ugly_hack_slow = true;
 	});

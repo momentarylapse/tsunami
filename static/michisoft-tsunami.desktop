@@ -4,9 +4,9 @@
 Type=Application
 Name=Tsunami Audio Editor
 Name[de]=Tsunami Audio-Editor
-Comment=Edits Audio Files
-Comment[de]=Editor für Audio-Dateien
+Comment=The friendly audio workstation
+Comment[de]=Der freundliche Audio Editor
 Categories=AudioVideo;Audio
-Exec=${INSTALL_PREFIX}/bin/tsunami
+Exec=tsunami
 Icon=${INSTALL_PREFIX}/share/tsunami/icons/hicolor/scalable/apps/tsunami.svg
 MimeType=application/michisoft-nami;application/ogg;audio/ogg;audio/x-vorbis+ogg;application/x-ogg;audio/x-wav;application/flac;application/x-flac;audio/x-flac;audio/flac;audio/midi;audio/mpeg3;audio/x-mpeg;audio/x-mpeg-3;audio/x-gtp;audio/mp4a-latm

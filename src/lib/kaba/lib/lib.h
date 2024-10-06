@@ -204,6 +204,8 @@ _Pragma("GCC optimize(\"no-inline\")") \
 _Pragma("GCC optimize(\"0\")")
 #elif defined(COMPILER_CLANG)
 #define KABA_LINK_GROUP_BEGIN _Pragma("clang attribute push (__attribute((noinline)), apply_to = function)")
+#else
+#define KABA_LINK_GROUP_BEGIN
 #endif
 
 
@@ -211,6 +213,8 @@ _Pragma("GCC optimize(\"0\")")
 #define KABA_LINK_GROUP_END _Pragma("GCC pop_options")
 #elif defined(COMPILER_CLANG)
 #define KABA_LINK_GROUP_END _Pragma("clang attribute pop")
+#else
+#define KABA_LINK_GROUP_END
 #endif
 
 

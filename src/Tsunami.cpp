@@ -62,7 +62,7 @@ Tsunami::Tsunami() :
 	set_property("name", AppName);
 	set_property("version", AppVersion);
 	set_property("comment", _("The friendly audio workstation"));
-	set_property("website", "http://michi.is-a-geek.org/software");
+	set_property("website", "https://github.com/momentarylapse/tsunami");
 	set_property("copyright", "© 2007-2024 by Michael Ankele");
 	set_property("author", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");
 	//set_property("designer", "Michael Ankele <michi@lupina.de>;2er0;Benji <mail@benji.is>");

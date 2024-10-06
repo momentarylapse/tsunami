@@ -199,7 +199,7 @@ void Track::_register_midi_fx(MidiEffect *fx) {
 }
 
 void Track::_register_synth(Synthesizer *s) {
-	s->set_func_edit([this, s] { edit_synthesizer(); });
+	s->set_func_edit([this] { edit_synthesizer(); });
 }
 
 // execute after editing...

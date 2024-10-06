@@ -20,7 +20,7 @@ namespace tsunami {
 class Song;
 class Track;
 class SongSelection;
-class AudioOutPort;
+struct AudioOutPort;
 class AudioBuffer;
 class Range;
 class TrackLayer;

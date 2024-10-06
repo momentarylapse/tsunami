@@ -30,13 +30,14 @@ extern const Class *TypeCallableBase;
 #define CALL_DEBUG_X		0
 
 // call-by-reference dummy
-class CBR {
+struct
+CBR {
 	int _dummy_[1024];
 };
 
-class vec2 { float a; float b; };
-class vec3 { float a; float b; float c; };
-class vec4 { float a; float b; float c; float d; };
+struct vec2 { float a; float b; };
+struct vec3 { float a; float b; float c; };
+struct vec4 { float a; float b; float c; float d; };
 
 void call0_void(void *ff, void *ret, const Array<void*> &param) {
 	((void(*)())ff)();

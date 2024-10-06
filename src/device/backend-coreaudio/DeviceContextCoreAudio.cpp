@@ -63,7 +63,7 @@ void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool s
 	for (Device *d: device_manager->input_devices)
 		d->present = false;
 
-	auto check_device = [this, device_manager] (AudioDeviceID id, DeviceType type, bool is_default) {
+	auto check_device = [this] (AudioDeviceID id, DeviceType type, bool is_default) {
 
 		UInt32 propsize = sizeof(Float32);
 		UInt32 mSafetyOffset;

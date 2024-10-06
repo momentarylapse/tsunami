@@ -15,13 +15,13 @@ class Module;
 class SyntaxTree;
 class Function;
 class Serializer;
-class CommandList;
-class SerialNode;
-class SerialNodeParam;
+struct CommandList;
+struct SerialNode;
+struct SerialNodeParam;
 
 class Interpreter {
 public:
-	Interpreter(Module *m);
+	explicit Interpreter(Module *m);
 	~Interpreter();
 
 	void add_function(Function *f, Serializer *ser);

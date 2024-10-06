@@ -412,7 +412,7 @@ shared_array<Node> Parser::parse_abstract_call_parameters(Block *block) {
 	// list of parameters
 	if (try_consume(")"))
 		return params;
-	for (int p=0;;p++) {
+	while (true) {
 		// find parameter
 		params.add(parse_abstract_operand_greedy(block));
 
@@ -1547,8 +1547,8 @@ void Parser::parse_enum(Class *_namespace) {
 
 	int next_value = 0;
 
-	for (int i=0;!Exp.end_of_file();i++) {
-		for (int j=0;!Exp.end_of_line();j++) {
+	while (!Exp.end_of_file()) {
+		while (!Exp.end_of_line()) {
 			auto *c = tree->add_constant(_class, _class);
 			c->name = Exp.consume();
 
@@ -2065,7 +2065,7 @@ Function *Parser::parse_function_header(const Class *default_type, Class *name_s
 	// parameter list
 	expect_identifier("(", "'(' expected after function name");
 	if (!try_consume(")")) {
-		for (int k=0;;k++) {
+		while (true) {
 			// like variable definitions
 
 			auto param_flags = parse_flags();

@@ -5,8 +5,8 @@
 #include "SerialNode.h"
 
 namespace Asm {
-	class InstructionWithParamsList;
-	class InstructionParam;
+	struct InstructionWithParamsList;
+	struct InstructionParam;
 	enum class RegID;
 	enum class InstID;
 }

@@ -526,7 +526,7 @@ Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 
 // not active, not recent!
 Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
-	auto is_recent = [this] (const Path& path) {
+	auto is_recent = [] (const Path& path) {
 		return Storage::recently_used_files.find(path) >= 0;
 	};
 	Array<SessionLabel> sessions;

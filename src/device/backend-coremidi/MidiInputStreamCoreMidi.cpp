@@ -17,7 +17,7 @@ namespace tsunami {
 	auto s = SecCopyErrorMessageString(err, nullptr);
 }*/
 
-static void MyMIDIReceiveBlock(const MIDIEventList *evtlist, void * __nullable srcConnRefCon) {
+[[maybe_unused]] static void MyMIDIReceiveBlock(const MIDIEventList *evtlist, void * __nullable srcConnRefCon) {
 	msg_write("in");
 }
 

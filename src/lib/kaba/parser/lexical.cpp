@@ -291,7 +291,7 @@ bool ExpressionBuffer::analyse_line(const char *source, ExpressionBuffer::Line *
 	l->length = 0;
 	l->tokens.clear();
 
-	for (int i=0;true;i++) {
+	while (true) {
 		if (analyse_expression(source, pos, l, line_no))
 			break;
 	}
@@ -358,7 +358,7 @@ void ExpressionBuffer::do_error_analyse(const string& msg, int pos, int line_no)
 bool ExpressionBuffer::analyse_expression(const char *source, int &pos, ExpressionBuffer::Line *l, int &line_no) {
 	// skip whitespace and other "invisible" stuff to find the first interesting character
 
-	for (int i=0;true;i++) {
+	while (true) {
 		// end of file
 		if (source[pos] == 0) {
 			strcpy(Temp, "");
@@ -413,7 +413,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 				if (c == '{') {
 					if (source[pos] == '{') {
 						// string interpolation {{..}}
-						for (int j=0; true; j++) {
+						while (true) {
 							c = Temp[TempLength ++] = source[pos ++];
 							if (c == 0)
 								do_error_analyse("string interpolation exceeds file", pos, line_no);

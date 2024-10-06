@@ -48,7 +48,7 @@ private:
 
 	Array<OggQuality> ogg_quality;
 	AudioView *view;
-	DeviceConsole *device_console = nullptr;
+	//DeviceConsole *device_console = nullptr;
 };
 
 }

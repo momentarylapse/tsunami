@@ -17,7 +17,7 @@ BufferCompressionDialog::BufferCompressionDialog(hui::Window *parent) : hui::Dia
 		add_string("codec", c);
 	set_int("codec", 0);
 
-	event("codec", [this] {
+	event("codec", [] {
 		//enable("quality", get_int("codec") == 0);
 	});
 	event("ok", [this] {

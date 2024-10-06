@@ -14,7 +14,7 @@
 
 namespace hui {
 
-const int FRAME_INDENT = 0; //20;
+//const int FRAME_INDENT = 0; //20;
 
 void on_gtk_expander_expand(GObject* object, GParamSpec *param_spec, gpointer user_data) {
 	auto expander = reinterpret_cast<ControlExpander*>(user_data);

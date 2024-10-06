@@ -231,7 +231,7 @@ ImportSource resolve_import_source(Parser *parser, const Array<string> &name, in
 }
 
 void namespace_import_contents(SyntaxTree *tree, Scope &dest, const Class *source, int token_id) {
-	auto check = [tree, token_id, source] (bool ok, const string &name) {
+	auto check = [tree, source] (bool ok, const string &name) {
 		if (!ok)
 			tree->do_error(format("can not import class '%s' since symbol '%s' is already in scope", source->long_name(), name));
 	};

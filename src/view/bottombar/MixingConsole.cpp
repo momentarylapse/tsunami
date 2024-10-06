@@ -350,7 +350,7 @@ MixingConsole::MixingConsole(Session *_session, BottomBar *bar) :
 	spectrum_meter->enable(false);
 
 	event("output-volume", [this] { on_output_volume(); });
-	event_xp("fancy-separator", "hui:draw", [this] (Painter* p) {
+	event_xp("fancy-separator", "hui:draw", [] (Painter* p) {
 		p->set_color(theme.grid);
 		p->draw_rect(p->area());
 		/*p->set_color(Grey);

@@ -57,7 +57,7 @@ void PluginConsole::on_add_button() {
 void PluginConsole::on_add_plugin(TsunamiPlugin *plugin) {
 	auto *p = new ModulePanel(plugin, this, ConfigPanelMode::FixedWidth | ConfigPanelMode::Delete | ConfigPanelMode::Profiles);
 	p->set_options(p->root_control->id, "class=card");
-	p->set_func_delete([this, plugin] {
+	p->set_func_delete([plugin] {
 		plugin->stop_request();
 	});
 	embed(p, "panel-grid", next_x ++, 0);

@@ -22,7 +22,7 @@ Array<Beat> BarCollection::get_beats(const Range &r, bool include_hidden, const 
 
 	int pos_bar = 0;
 	int bar_index = 0;
-	int bar_no = 0;
+	[[maybe_unused]] int bar_no = 0;
 
 	for (Bar *b: weak(*this)) {
 		if (b->is_pause()) {

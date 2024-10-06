@@ -97,7 +97,7 @@ public:
 		(*this)[num - 1] = item;
 	}
 	T _cdecl pop() {
-		T r;
+		T r{};
 		if (num > 0) {
 			//memcpy(&r, &back(), element_size);
 			//DynamicArray::resize(num - 1);

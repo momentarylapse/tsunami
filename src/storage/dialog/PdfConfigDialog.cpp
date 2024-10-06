@@ -62,7 +62,7 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	update_params();
 
 	//event_xp("area", "hui:draw", [this] (Painter *p) { on_draw(p); });
-	event_x("area", "hui:mouse-wheel", [this] () { on_mouse_wheel(); });
+	event_x("area", "hui:mouse-wheel", [this] () { _on_mouse_wheel(); });
 	event("line-height", [this] { update_params(); });
 	event("line-space", [this] { update_params(); });
 	event("track-space", [this] { update_params(); });
@@ -111,7 +111,7 @@ void PdfConfigDialog::update_params() {
 	redraw("area");
 }
 
-void PdfConfigDialog::on_mouse_wheel() {
+void PdfConfigDialog::_on_mouse_wheel() {
 	float dy = hui::get_event()->scroll.y * hui::config.get_float("View.MouseWheelSpeed", 1.0f) * (5000.0f / area_width);
 	preview_offset_y = max(preview_offset_y + dy, 0.0f);
 	redraw("area");

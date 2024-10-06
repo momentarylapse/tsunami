@@ -181,7 +181,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 	p.cmd("help", "", "show this help page", [&p] (const Array<string> &) {
 		p.show();
 	});
-	p.cmd("version", "", "show the program version", [&p] (const Array<string> &) {
+	p.cmd("version", "", "show the program version", [] (const Array<string> &) {
 		msg_write(AppName + "  " + AppVersion);
 	});
 	p.cmd("info", "FILE1 ...", "show information about the file", [&flags] (const Array<string> &a) {
@@ -278,7 +278,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		});
 	});
 	p.cmd("@hidden listview", "", "bla", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
+		run_after_gui_init([a] {
 			auto dlg = new hui::Window("ListView", 800, 600);
 			dlg->from_source("ListView list 'a'");
 			dlg->add_string("list", "0");
@@ -291,7 +291,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		});
 	});
 	p.cmd("@hidden columnview", "", "bla", [this] (const Array<string> &) {
-		run_after_gui_init([this] {
+		run_after_gui_init([] {
 			auto dlg = new hui::Window("ColumnView", 800, 600);
 			dlg->from_source("Grid ? ''\n\tListView list 'a\\b\\c' format=CmT\n\tButton button 'x'");
 			dlg->add_string("list", "true\\<b>test</b>\\x");
@@ -310,7 +310,7 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		});
 	});
 	p.cmd("@hidden treeview", "", "bla", [this] (const Array<string> &a) {
-		run_after_gui_init([this, a] {
+		run_after_gui_init([a] {
 			auto dlg = new hui::Window("TreeView", 400, 600);
 			dlg->from_source("TreeView list 'a'");
 			dlg->add_string("list", "0");

@@ -13,7 +13,7 @@
 
 namespace hui {
 
-const int FRAME_MARGIN = 8;
+//const int FRAME_MARGIN = 8;
 
 
 void DBDEL_X(const string &m);

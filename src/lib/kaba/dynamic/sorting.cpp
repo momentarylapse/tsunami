@@ -19,10 +19,12 @@ extern const Class *TypePath;
 	
 	
 
+#ifdef COMPILER_GCC
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
+#endif
 
 
 void array_inplace_reverse(DynamicArray &array) {
@@ -112,7 +114,7 @@ void _array_sort_p(DynamicArray &array, int offset_by, bool stable) {
 template<class T>
 void _array_sort_pf(DynamicArray &array, Function *func, bool stable) {
 	auto f = [func] (void *a, void *b) {
-		T r1, r2;
+		T r1{}, r2{};
 		if (!call_function(func, &r1, {a}) or !call_function(func, &r2, {b}))
 			kaba_raise_exception(new KabaException("call failed " + func->long_name()));
 		return (r1 <= r2);
@@ -221,7 +223,9 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 }
 
 
+#ifdef COMPILER_GCC
 #pragma GCC pop_options
+#endif
 
 	
 	

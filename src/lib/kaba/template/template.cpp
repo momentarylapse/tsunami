@@ -82,7 +82,7 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	f->block = cp_node(f0->block.get())->as_block();
 	flags_clear(f->flags, Flags::NeedsOverride);
 
-	auto convert = [f,tree](shared<Node> n) {
+	auto convert = [f] (shared<Node> n) {
 		if (n->kind != NodeKind::Block)
 			return n;
 		auto b = n->as_block();
@@ -227,7 +227,7 @@ TemplateClassInstanceManager& TemplateManager::get_class_manager(SyntaxTree *tre
 
 shared<Node> TemplateManager::node_replace(SyntaxTree *tree, shared<Node> n, const Array<string> &names, const Array<const Class*> &params) {
 	//return parser->concretify_as_type(n, block, ns);
-	return tree->transform_node(n, [tree, &names, &params](shared<Node> nn) {
+	return tree->transform_node(n, [&names, &params] (shared<Node> nn) {
 		if (nn->kind == NodeKind::AbstractToken) {
 			string token = nn->as_token();
 			for (int i=0; i<names.num; i++)

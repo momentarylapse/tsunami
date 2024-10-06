@@ -36,7 +36,7 @@ public:
 	}
 	T pop() {
 		mtx.lock();
-		T t;
+		T t{};
 		if (buffer.num > 0) {
 			t = buffer[0];
 			buffer.erase(0);

@@ -297,7 +297,7 @@ void Clipboard::paste_aligned_to_beats(AudioView *view) {
 		return (x - source_beats[overlap_beats - 1].range.end()) + dest_beats[dest_first_beat + overlap_beats - 1].range.end();
 	};
 
-	auto paste_layer = [this, remap] (int offset, TrackLayer *source, TrackLayer *dest) {
+	auto paste_layer = [remap] (TrackLayer *source, TrackLayer *dest) {
 		if (dest->type != SignalType::Midi)
 			return;
 
@@ -309,7 +309,7 @@ void Clipboard::paste_aligned_to_beats(AudioView *view) {
 	};
 
 	for (auto&& [i,source]: enumerate(source_list))
-		paste_layer(offset, source, target_list[i]);
+		paste_layer(source, target_list[i]);
 
 	s->end_action_group();
 }

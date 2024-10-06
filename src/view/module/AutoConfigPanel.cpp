@@ -342,7 +342,7 @@ public:
 		p->add_slider("!expandx", 0, 0, "slider-" + i2s(i));
 		p->add_spin_button("", 1, 0, "spin-" + i2s(i));
 		volume_control = new VolumeControl(p, "slider-" + i2s(i), "spin-" + i2s(i), "unit-" + i2s(i));
-		volume_control->out_volume >> create_data_sink<float>([this, callback] (float f) {
+		volume_control->out_volume >> create_data_sink<float>([callback] (float f) {
 			callback();
 		});
 		volume_control->set_range(value_min, value_max);

@@ -177,7 +177,7 @@ void FormatMp3::load_track(StorageOperationData *od) {
 
 		//msg_write("start");
 		int sample_offset = 0;
-		int bytes_offset = 0;
+		[[maybe_unused]] int bytes_offset = 0;
 		while (true) {
 			if (data.num < 4096*4) {
 				bytes temp = f->read(4096*5 - data.num);

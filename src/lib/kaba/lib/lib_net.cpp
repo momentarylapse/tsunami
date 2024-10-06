@@ -24,10 +24,13 @@ namespace kaba {
 #endif
 
 
+
+#ifdef COMPILER_GCC
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
+#endif
 
 
 xfer<Socket> __socket_listen__(int port, bool block) {
@@ -45,7 +48,9 @@ xfer<Socket> __socket_create_udp__(int port) {
 	return nullptr;
 }
 
+#ifdef COMPILER_GCC
 #pragma GCC pop_options
+#endif
 
 void SIAddPackageNet(Context *c) {
 	add_package(c, "net");

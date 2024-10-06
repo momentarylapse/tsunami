@@ -22,8 +22,8 @@ public:
 	void on_close();
 	void on_ok();
 
-	void on_draw(Painter *p);
-	void on_mouse_wheel();
+	void on_draw(Painter *p) override;
+	void _on_mouse_wheel();
 
 	void update_params();
 

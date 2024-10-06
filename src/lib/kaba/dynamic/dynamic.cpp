@@ -17,11 +17,12 @@ extern const Class *TypeSpecialFunction;
 
 	
 	
-
+#ifdef COMPILER_GCC
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
+#endif
 
 
 void var_assign(void *pa, const void *pb, const Class *type) {
@@ -381,7 +382,10 @@ DynamicArray array_map(void *fff, DynamicArray *a, const Class *ti, const Class 
 	return r;
 }
 
+
+#ifdef COMPILER_GCC
 #pragma GCC pop_options
+#endif
 
 	
 	

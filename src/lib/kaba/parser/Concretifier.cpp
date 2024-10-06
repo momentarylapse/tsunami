@@ -388,7 +388,7 @@ shared<Node> apply_macro(Concretifier *con, Function* f, shared<Node> node, shar
 		con->do_error(format("can not pass %d parameters to a macro expecting %d", params.num, f->num_params), node);
 
 	auto b = cp_node(f->block.get());
-	con->tree->transform_block((Block*)b.get(), [con, f, params] (shared<Node> n) {
+	con->tree->transform_block((Block*)b.get(), [f, params] (shared<Node> n) {
 		if (n->kind == NodeKind::AbstractToken) {
 			for (int i=0; i<params.num; i++) {
 				if (n->as_token() == f->var[i]->name) {

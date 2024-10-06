@@ -30,7 +30,9 @@
 // which compiler?
 
 #if defined(_MSC_VER)
-	#define COMPILER_VISUAL_STUDIO
+#define COMPILER_VISUAL_STUDIO
+#elif defined(__clang__)
+#define COMPILER_CLANG
 #elif defined(__GNUC__)
 	#define COMPILER_GCC
 #endif

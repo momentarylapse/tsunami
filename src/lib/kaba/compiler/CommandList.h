@@ -20,9 +20,8 @@ namespace Asm {
 namespace kaba {
 
 class Serializer;
-class VirtualRegister;
-class SerialNode;
-class SerialNodeParam;
+struct SerialNode;
+struct SerialNodeParam;
 class Class;
 
 

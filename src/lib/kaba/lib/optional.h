@@ -19,10 +19,13 @@ namespace kaba {
 
 	extern const Class *TypeNone;
 
+
+#ifdef COMPILER_GCC
 #pragma GCC push_options
 #pragma GCC optimize("no-omit-frame-pointer")
 #pragma GCC optimize("no-inline")
 #pragma GCC optimize("0")
+#endif
 
 
 template<class T>
@@ -65,7 +68,9 @@ public:
 	}*/
 };
 
+#ifdef COMPILER_GCC
 #pragma GCC pop_options
+#endif
 
 template<class T>
 void lib_create_optional(const Class *tt) {

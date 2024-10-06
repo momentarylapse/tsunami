@@ -16,13 +16,12 @@ namespace tsunami {
 	::UInt32 frames,
 	::AudioBufferList *ioData)
 {
-    static float theta;
 	auto stream = reinterpret_cast<AudioOutputStreamCoreAudio*>(inRefCon);
 
     auto *out = (float *)ioData->mBuffers[0].mData;
 
 
-	bool out_of_data = stream->shared_data.feed_stream_output(frames, out);
+	const bool out_of_data = stream->shared_data.feed_stream_output((int)frames, out);
 
 	if (out_of_data)
 		stream->signal_out_of_data();
@@ -34,7 +33,7 @@ AudioOutputStreamCoreAudio::AudioOutputStreamCoreAudio(Session *session, Device 
 
 	int dev_sample_rate = session->sample_rate();
 
-	int chunk_size = hui::config.get_int("Output.Portaudio.chunk-size", 256);
+	[[maybe_unused]] int chunk_size = hui::config.get_int("Output.Portaudio.chunk-size", 256);
 	if (device->is_default()) {
 	} else {
 	}

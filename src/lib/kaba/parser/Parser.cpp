@@ -1197,9 +1197,11 @@ shared<Node> Parser::parse_abstract_statement_pass(Block *block) {
 //  type: class
 //  p[0]: call to constructor (optional)
 shared<Node> Parser::parse_abstract_statement_new(Block *block) {
-	int token0 = Exp.consume_token(); // "new"
+	const int token0 = Exp.consume_token(); // "new"
+	const auto flags = parse_flags();
 	auto cmd = add_node_statement(StatementID::New, token0, TypeUnknown);
 	cmd->set_param(0, parse_abstract_operand(block));
+	flags_set(cmd->flags, flags);
 	return cmd;
 }
 

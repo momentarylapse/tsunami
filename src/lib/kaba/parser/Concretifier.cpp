@@ -1025,8 +1025,19 @@ shared<Node> Concretifier::concretify_statement_new(shared<Node> node, Block *bl
 	auto tt = ff->name_space;
 	//do_error("NEW " + tt->long_name());
 
-	//node->type = tree->get_pointer(tt, -1);
-	node->type = tree->request_implicit_class_xfer(tt, -1);
+	// return xfer[T]
+	node->type = tree->request_implicit_class_xfer(tt, node->token_id);
+
+	// new shared T() ?
+	if (flags_has(node->flags, Flags::Shared)) {
+		// return shared![T]
+		auto t = tree->request_implicit_class_shared_not_null(tt, node->token_id);
+		CastingDataSingle cd{};
+		if (!type_match_with_cast(node, false, t, cd))
+			do_error("can not convert to shared![T]...", node);
+		return apply_type_cast(cd, node, t);
+	}
+
 	return node;
 }
 
@@ -1520,13 +1531,13 @@ shared<Node> Concretifier::concretify_operator(shared<Node> node, Block *block, 
 	}
 }
 
-const Class *type_ownify_xfer(SyntaxTree *tree, const Class *t) {
+const Class *type_ownify_xfer(SyntaxTree *tree, const Class *t, int token_id) {
 	if (t->is_pointer_xfer_not_null())
-		return tree->request_implicit_class_owned_not_null(t->param[0], -1);
+		return tree->request_implicit_class_owned_not_null(t->param[0], token_id);
 	if (t->is_list()) {
-		auto tt = type_ownify_xfer(tree, t->param[0]);
+		auto tt = type_ownify_xfer(tree, t->param[0], token_id);
 		if (tt != t->param[0])
-			return tree->request_implicit_class_list(tt, -1);
+			return tree->request_implicit_class_list(tt, token_id);
 	}
 	return t;
 }
@@ -1578,7 +1589,7 @@ shared<Node> Concretifier::concretify_var_declaration(shared<Node> node, Block *
 		auto rhs = force_concrete_type(concretify_node(node->params[2]->params[1], block, ns));
 		node->params[2]->params[1] = rhs;
 		// don't create xfer[X] variables!
-		type = type_ownify_xfer(tree, rhs->type);
+		type = type_ownify_xfer(tree, rhs->type, node->token_id);
 	}
 
 	//as_const

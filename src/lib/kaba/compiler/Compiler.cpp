@@ -194,7 +194,7 @@ void* get_nice_memory(int64 size, bool executable, Module *module) {
 				return mem;
 			//munmap(mem, size);
 			//if (config.verbose)
-				msg_write("...try again");
+			msg_write("...try again");
 		}
 		if (i > 5000) {
 #if defined(OS_WINDOWS) || defined(OS_MINGW)

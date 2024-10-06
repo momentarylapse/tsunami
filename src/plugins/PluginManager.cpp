@@ -114,12 +114,8 @@ xfer<Module> _CreateBeatMidifier(Session *s) {
 	return new BeatMidifier();
 }
 
-#ifdef COMPILER_GCC
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
-#endif
+
+KABA_LINK_GROUP_BEGIN
 
 class XSignalChain : public SignalChain {
 public:
@@ -137,9 +133,8 @@ public:
 	}
 };
 
-#ifdef COMPILER_GCC
-#pragma GCC pop_options
-#endif
+
+KABA_LINK_GROUP_END
 
 template<class T>
 class ObservableKabaWrapper : public T {

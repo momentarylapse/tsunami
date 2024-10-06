@@ -16,10 +16,8 @@ namespace kaba {
 	#define gl_p(p)		p
 
 
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
+
+KABA_LINK_GROUP_BEGIN
 
 xfer<nix::Texture> __LoadTexture(const Path &filename) {
 	KABA_EXCEPTION_WRAPPER(return nix::Texture::load(filename));
@@ -36,7 +34,7 @@ xfer<nix::Shader> __ContextCreateShader(nix::Context *ctx, const string &source)
 	return nullptr;
 }
 
-#pragma GCC pop_options
+KABA_LINK_GROUP_END
 
 class KabaShader : public nix::Shader {
 public:

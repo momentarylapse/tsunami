@@ -21,10 +21,8 @@ namespace kaba {
 
 
 
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
+
+KABA_LINK_GROUP_BEGIN
 
 xfer<vulkan::Texture> __vulkan_load_texture(const Path &filename) {
 	KABA_EXCEPTION_WRAPPER(return vulkan::Texture::load(filename));
@@ -46,7 +44,7 @@ xfer<void> __vulkan_device_create_simple(vulkan::Instance *instance, GLFWwindow*
 	return nullptr;
 }
 
-#pragma GCC pop_options
+KABA_LINK_GROUP_END
 
 class VulkanTexture : vulkan::Texture {
 	public:

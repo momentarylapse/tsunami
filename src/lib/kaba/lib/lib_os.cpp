@@ -43,14 +43,7 @@ Any _os_config_get(Configuration &c, const string &key) {
 static shared<Stream> _kaba_stdin;
 
 
-#ifdef COMPILER_GCC
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
-#endif
-
-
+KABA_LINK_GROUP_BEGIN
 
 class KabaFileError : public KabaException {
 public:
@@ -206,9 +199,7 @@ string _cdecl kaba_shell_execute(const string &cmd) {
 	return "";
 }
 
-#ifdef COMPILER_GCC
-#pragma GCC pop_options
-#endif
+KABA_LINK_GROUP_END
 
 class KabaPath : public Path {
 public:

@@ -16,15 +16,8 @@ extern const Class *TypeAny;
 extern const Class *TypePath;
 
 
-	
-	
 
-#ifdef COMPILER_GCC
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
-#endif
+KABA_LINK_GROUP_BEGIN
 
 
 void array_inplace_reverse(DynamicArray &array) {
@@ -223,9 +216,7 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 }
 
 
-#ifdef COMPILER_GCC
-#pragma GCC pop_options
-#endif
+KABA_LINK_GROUP_END
 
 	
 	

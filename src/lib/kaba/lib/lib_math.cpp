@@ -233,12 +233,7 @@ public:
 };
 
 
-#ifdef COMPILER_GCC
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
-#endif
+KABA_LINK_GROUP_BEGIN
 
 
 class KabaAny : public Any {
@@ -326,9 +321,8 @@ Any pointer2any(const void *p) {
 	return Any(p);
 }
 
-#ifdef COMPILER_GCC
-#pragma GCC pop_options
-#endif
+
+KABA_LINK_GROUP_END
 
 
 template<int N>

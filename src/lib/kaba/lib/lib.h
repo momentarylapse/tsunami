@@ -197,6 +197,22 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 
 
 
+#if defined(COMPILER_GCC)
+#define KABA_LINK_GROUP_BEGIN _Pragma("GCC push_options") \
+_Pragma("GCC optimize(\"no-omit-frame-pointer\")") \
+_Pragma("GCC optimize(\"no-inline\")") \
+_Pragma("GCC optimize(\"0\")")
+#elif defined(COMPILER_CLANG)
+#define KABA_LINK_GROUP_BEGIN _Pragma("clang attribute push (__attribute((noinline)), apply_to = function)")
+#endif
+
+
+#if defined(COMPILER_GCC)
+#define KABA_LINK_GROUP_END _Pragma("GCC pop_options")
+#elif defined(COMPILER_CLANG)
+#define KABA_LINK_GROUP_END _Pragma("clang attribute pop")
+#endif
+
 
 
 

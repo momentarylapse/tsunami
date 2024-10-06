@@ -210,7 +210,7 @@ void Window::_init_(const string &title, int width, int height, Window *_parent,
 	// icon
 #if GTK_CHECK_VERSION(4,0,0)
 
-	auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
+	//[[maybe_unused]] auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
 
 	string icon = Application::get_property("icon");
 	//msg_write(gtk_icon_theme_has_icon(icon_theme, icon.c_str()));

@@ -39,7 +39,7 @@ static void registry_event_global(void *data, uint32_t id,
 {
 	auto ctx = reinterpret_cast<DeviceContextPipewire*>(data);
 	bool is_sink = false;
-	for (int i=0; i<props->n_items; i++) {
+	for (int i=0; i<(int)props->n_items; i++) {
 		if (strcmp(props->items[i].key, "media.class") == 0 and strcmp(props->items[i].value, "Audio/Sink") == 0)
 			is_sink = true;
 	}
@@ -51,7 +51,7 @@ static void registry_event_global(void *data, uint32_t id,
 		d.channels = 2;
 		d.present = true;
 		string desc, nick;
-		for (int i=0; i<props->n_items; i++) {
+		for (int i=0; i<(int)props->n_items; i++) {
 			if (strcmp(props->items[i].key, PW_KEY_NODE_NAME) == 0)
 				d.internal_name = props->items[i].value;
 			if (strcmp(props->items[i].key, PW_KEY_NODE_NICK) == 0)

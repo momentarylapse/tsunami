@@ -1405,7 +1405,7 @@ shared<Node> Concretifier::concretify_statement_match(shared<Node> node, Block *
 
 	node->type = output_type;
 
-	bool is_exhaustive = false;
+	[[maybe_unused]] bool is_exhaustive = false;
 
 	if (!has_default) {
 		if (input_type->is_enum()) {
@@ -1781,8 +1781,8 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		concretify_all_params(node, block, ns);
 		if (auto t = try_digest_type(tree, node->params[0]))
 			return add_node_class(tree->request_implicit_class_optional(t, node->token_id), node->token_id);
-		auto t = node->params[0]->type;
-		/*if (t->is_optional()) {
+		/*auto t = node->params[0]->type;
+		if (t->is_optional()) {
 			auto n = new Node(NodeKind::MAYBE, 0, t->param[0], node->flags, node->token_id);
 			n->set_num_params(1);
 			n->set_param(0, node->params[0]);

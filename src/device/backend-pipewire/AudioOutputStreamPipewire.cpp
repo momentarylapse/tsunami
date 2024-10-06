@@ -34,7 +34,7 @@ static void on_pipewire_process(void *userdata) {
 	int stride = sizeof(float) * 2; // channels
 	int num_frames = buf->datas[0].maxsize / stride;
 	if (b->requested)
-		num_frames = SPA_MIN(b->requested, num_frames);
+		num_frames = SPA_MIN((int)b->requested, num_frames);
 	
 	//printf("..%d\n", num_frames);
 
@@ -51,7 +51,7 @@ static void on_pipewire_process(void *userdata) {
 }
 
 void on_pipewire_drawined(void *userdata) {
-	auto stream = reinterpret_cast<AudioOutputStreamPipewire*>(userdata);
+	[[maybe_unused]] auto stream = reinterpret_cast<AudioOutputStreamPipewire*>(userdata);
 	printf("drained\n");
 }
 
@@ -96,7 +96,7 @@ AudioOutputStreamPipewire::AudioOutputStreamPipewire(Session *session, Device *d
 		id = PW_ID_ANY;
 	//msg_write(id);
 
-	int r = pw_stream_connect(stream,
+	[[maybe_unused]] int r = pw_stream_connect(stream,
 	                  PW_DIRECTION_OUTPUT,
 	                  id,
 	                  pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT |
@@ -111,7 +111,7 @@ AudioOutputStreamPipewire::AudioOutputStreamPipewire(Session *session, Device *d
 
 AudioOutputStreamPipewire::~AudioOutputStreamPipewire() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_disconnect(stream);
+	[[maybe_unused]] int r = pw_stream_disconnect(stream);
 	//msg_write(format("disconnect: %d", r));
 	pw_stream_destroy(stream);
 	DeviceContextPipewire::instance->unlock();
@@ -119,14 +119,14 @@ AudioOutputStreamPipewire::~AudioOutputStreamPipewire() {
 
 void AudioOutputStreamPipewire::pause() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_set_active(stream, false);
+	[[maybe_unused]] int r = pw_stream_set_active(stream, false);
 	//msg_write(format("pause: %d", r));
 	DeviceContextPipewire::instance->unlock();
 }
 
 void AudioOutputStreamPipewire::unpause() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_set_active(stream, true);
+	[[maybe_unused]] int r = pw_stream_set_active(stream, true);
 	//msg_write(format("unpause: %d", r));
 	DeviceContextPipewire::instance->unlock();
 }

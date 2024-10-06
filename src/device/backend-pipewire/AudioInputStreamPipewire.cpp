@@ -35,7 +35,7 @@ static void on_pipewire_process(void *userdata) {
 	int stride = sizeof(float) * channels;
 	int num_frames = buf->datas[0].chunk->size / stride;
 	if (b->requested)
-		num_frames = SPA_MIN(b->requested, num_frames);
+		num_frames = SPA_MIN((int)b->requested, num_frames);
 
 	stream->handle_input(dst, num_frames);
 
@@ -110,7 +110,7 @@ AudioInputStreamPipewire::AudioInputStreamPipewire(Session *session, Device *dev
 	//msg_write(id);
 	//msg_write(i2s(device->channels) + "  /  " + i2s(this->shared_data.num_channels));
 
-	int r = pw_stream_connect(stream,
+	[[maybe_unused]] int r = pw_stream_connect(stream,
 	                          PW_DIRECTION_INPUT,
 	                          id,
 	                          pw_stream_flags(PW_STREAM_FLAG_AUTOCONNECT |
@@ -125,7 +125,7 @@ AudioInputStreamPipewire::AudioInputStreamPipewire(Session *session, Device *dev
 
 AudioInputStreamPipewire::~AudioInputStreamPipewire() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_disconnect(stream);
+	[[maybe_unused]] int r = pw_stream_disconnect(stream);
 	//msg_write(format("disconnect: %d", r));
 	pw_stream_destroy(stream);
 	DeviceContextPipewire::instance->unlock();
@@ -134,14 +134,14 @@ AudioInputStreamPipewire::~AudioInputStreamPipewire() {
 
 void AudioInputStreamPipewire::pause() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_set_active(stream, false);
+	[[maybe_unused]] int r = pw_stream_set_active(stream, false);
 	//msg_write(format("pause: %d", r));
 	DeviceContextPipewire::instance->unlock();
 }
 
 void AudioInputStreamPipewire::unpause() {
 	DeviceContextPipewire::instance->lock();
-	int r = pw_stream_set_active(stream, true);
+	[[maybe_unused]] int r = pw_stream_set_active(stream, true);
 	//msg_write(format("unpause: %d", r));
 	DeviceContextPipewire::instance->unlock();
 

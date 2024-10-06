@@ -624,7 +624,7 @@ void about_box(Window *win) {
 	auto documenters = sa2ca_nt(Application::get_property("documenter").explode(";"));
 	auto translators = sa2ca_nt(Application::get_property("translator").explode(";"));
 
-	GError *error = nullptr;
+	[[maybe_unused]] GError *error = nullptr;
 	auto dlg = gtk_about_dialog_new();
 	gtk_about_dialog_set_program_name(GTK_ABOUT_DIALOG(dlg), Application::get_property("name").c_str());
 	gtk_about_dialog_set_version(GTK_ABOUT_DIALOG(dlg), Application::get_property("version").c_str());

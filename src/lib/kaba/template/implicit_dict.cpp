@@ -281,7 +281,7 @@ void AutoImplementer::implement_dict_contains(Function *f, const Class *t) {
 }
 
 void AutoImplementer::_implement_functions_for_dict(const Class *t) {
-	auto t_el = t->param[0];
+	[[maybe_unused]] auto t_el = t->param[0];
 
 	implement_dict_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
 	implement_dict_clear(prepare_auto_impl(t, t->get_destructor()), t);

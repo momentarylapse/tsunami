@@ -298,7 +298,7 @@ list(APPEND DEPS git-version)
 #    target tsunami
 #=======================================================================================
 
-add_executable(tsunami
+add_executable(tsunami WIN32
 	src/action/bar/Action__ScaleData.cpp
 	src/action/bar/Action__ShiftData.cpp
 	src/action/bar/ActionBar__Add.cpp
@@ -848,6 +848,7 @@ install(FILES "static/hui_resources.txt" DESTINATION share/tsunami)
 install(FILES "static/license.txt" DESTINATION share/tsunami)
 install(FILES "static/license_small.txt" DESTINATION share/tsunami)
 install(DIRECTORY "plugins" DESTINATION share/tsunami)
+install(FILES "static/icons/tsunami.svg" DESTINATION share/icons/hicolor/scalable/apps)
 
 # install .desktop file
 set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")

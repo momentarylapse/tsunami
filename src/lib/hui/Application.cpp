@@ -211,6 +211,12 @@ void Application::guess_directories(const Array<string> &arg, const string &app_
 			directory_static = Path(getenv("APPDIR")) | "usr" | "share" | app_name;
 		}
 
+		// inside MacOS bundle?
+		if (str(filename).find(".app/Contents/MacOS/") >= 0) {
+			installed = true;
+			directory_static = filename.parent().parent() | "Resources";
+		}
+
 		directory = format("%s/.%s/", getenv("HOME"), app_name);
 		os::fs::create_directory(directory);
 	#endif

@@ -6,8 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
 
+
 #=======================================================================================
-#    libs
+#    libraries
 #=======================================================================================
 
 find_package(PkgConfig REQUIRED)
@@ -294,11 +295,42 @@ include(.cmake/CheckGit.cmake)
 CheckGitSetup()
 list(APPEND DEPS git-version)
 
+
+#=======================================================================================
+#    MacOS bundle icon
+#=======================================================================================
+
+if (APPLE)
+	add_custom_command(OUTPUT tsunami.icns
+		COMMAND [ -e tsunami.iconset ] || mkdir tsunami.iconset
+		COMMAND sips -z 16 16 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16@2x.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32.png
+		COMMAND sips -z 64 64 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32@2x.png
+		COMMAND sips -z 128 128 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128@2x.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256@2x.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512.png
+		COMMAND sips -z 1024 1024 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512@2x.png
+		COMMAND iconutil -c icns tsunami.iconset
+		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/static/icons/tsunami.svg"
+		VERBATIM)
+
+
+	set(MACOSX_BUNDLE_ICON_FILE tsunami.icns)
+	set_source_files_properties(tsunami.icns
+		PROPERTIES
+		MACOSX_PACKAGE_LOCATION "Resources")
+endif()
+
+
 #=======================================================================================
 #    target tsunami
 #=======================================================================================
 
-add_executable(tsunami WIN32
+add_executable(tsunami WIN32 MACOSX_BUNDLE
+	${MACOSX_BUNDLE_ICON_FILE}
 	src/action/bar/Action__ScaleData.cpp
 	src/action/bar/Action__ShiftData.cpp
 	src/action/bar/ActionBar__Add.cpp
@@ -836,28 +868,55 @@ target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX=
 target_link_libraries(tsunami PUBLIC ${DEPS})
 target_include_directories(tsunami PUBLIC src/lib)
 
+
 #=======================================================================================
 #    install
 #=======================================================================================
+		
+if (APPLE)
+	set_target_properties(tsunami
+		PROPERTIES
+		BUNDLE True
+		MACOSX_BUNDLE_BUNDLE_NAME tsunami
+		MACOSX_BUNDLE_GUI_IDENTIFIER "michisoft"
+		MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
+		MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
+		RESOURCE "${resource_files}")
+	set(RESOURCE_DESTINATION bin/tsunami.app/Contents/Resources)
+else ()
+	set(RESOURCE_DESTINATION share/tsunami)
+endif ()
 
-install(TARGETS tsunami DESTINATION bin)
-install(DIRECTORY "static/icons" DESTINATION share/tsunami)
-install(DIRECTORY "static/SignalChains" DESTINATION share/tsunami)
-install(FILES "static/favorites_demo.txt" DESTINATION share/tsunami)
-install(FILES "static/hui_resources.txt" DESTINATION share/tsunami)
-install(FILES "static/license.txt" DESTINATION share/tsunami)
-install(FILES "static/license_small.txt" DESTINATION share/tsunami)
-install(DIRECTORY "plugins" DESTINATION share/tsunami)
-install(FILES "static/icons/tsunami.svg" DESTINATION share/icons/hicolor/scalable/apps)
+# binaries
+install(TARGETS tsunami DESTINATION bin)	
 
-# install .desktop file
-set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-tsunami.desktop" /tmp/michisoft-tsunami.desktop NO_SOURCE_PERMISSIONS)
-install(FILES /tmp/michisoft-tsunami.desktop DESTINATION share/applications)
+# resources
+install(DIRECTORY "static/icons" DESTINATION ${RESOURCE_DESTINATION})
+install(DIRECTORY "static/SignalChains" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/favorites_demo.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/hui_resources.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/license.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/license_small.txt" DESTINATION ${RESOURCE_DESTINATION})
+install(DIRECTORY "plugins" DESTINATION ${RESOURCE_DESTINATION})
 
-# install mime
-find_program(XDG_MIME_EXECUTABLE xdg-mime)
-if(NOT XDG_MIME_EXECUTABLE STREQUAL "XDG_MIME_EXECUTABLE_NOTFOUND")
-	install(CODE "message(STATUS \"installing mime file\")")
-	install(CODE "execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-nami.xml)")
+if (UNIX AND NOT APPLE)
+	# icon
+	install(FILES "static/icons/tsunami.svg" DESTINATION share/icons/hicolor/scalable/apps)
+endif ()
+
+
+if (UNIX AND NOT APPLE)
+	# install .desktop file
+	set(INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+	configure_file("${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-tsunami.desktop" /tmp/michisoft-tsunami.desktop NO_SOURCE_PERMISSIONS)
+	install(FILES /tmp/michisoft-tsunami.desktop DESTINATION share/applications)
+endif ()
+
+if (UNIX AND NOT APPLE)
+	# install mime
+	find_program(XDG_MIME_EXECUTABLE xdg-mime)
+	if(NOT XDG_MIME_EXECUTABLE STREQUAL "XDG_MIME_EXECUTABLE_NOTFOUND")
+		install(CODE "message(STATUS \"installing mime file\")")
+		install(CODE "execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/static/michisoft-nami.xml)")
+	endif()
 endif()

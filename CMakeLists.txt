@@ -297,40 +297,10 @@ list(APPEND DEPS git-version)
 
 
 #=======================================================================================
-#    MacOS bundle icon
-#=======================================================================================
-
-if (APPLE)
-	add_custom_command(OUTPUT tsunami.icns
-		COMMAND [ -e tsunami.iconset ] || mkdir tsunami.iconset
-		COMMAND sips -z 16 16 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16.png
-		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16@2x.png
-		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32.png
-		COMMAND sips -z 64 64 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32@2x.png
-		COMMAND sips -z 128 128 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128.png
-		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128@2x.png
-		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256.png
-		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256@2x.png
-		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512.png
-		COMMAND sips -z 1024 1024 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512@2x.png
-		COMMAND iconutil -c icns tsunami.iconset
-		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/static/icons/tsunami.svg"
-		VERBATIM)
-
-
-	set(MACOSX_BUNDLE_ICON_FILE tsunami.icns)
-	set_source_files_properties(tsunami.icns
-		PROPERTIES
-		MACOSX_PACKAGE_LOCATION "Resources")
-endif()
-
-
-#=======================================================================================
 #    target tsunami
 #=======================================================================================
 
-add_executable(tsunami WIN32 MACOSX_BUNDLE
-	${MACOSX_BUNDLE_ICON_FILE}
+add_executable(tsunami WIN32
 	src/action/bar/Action__ScaleData.cpp
 	src/action/bar/Action__ShiftData.cpp
 	src/action/bar/ActionBar__Add.cpp
@@ -870,22 +840,52 @@ target_include_directories(tsunami PUBLIC src/lib)
 
 
 #=======================================================================================
+#    MacOS bundle
+#=======================================================================================
+
+if (APPLE)
+	add_custom_command(OUTPUT tsunami.icns
+		COMMAND [ -e tsunami.iconset ] || mkdir tsunami.iconset
+		COMMAND sips -z 16 16 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_16x16@2x.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32.png
+		COMMAND sips -z 64 64 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_32x32@2x.png
+		COMMAND sips -z 128 128 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_128x128@2x.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_256x256@2x.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512.png
+		COMMAND sips -z 1024 1024 ${CMAKE_CURRENT_SOURCE_DIR}/static/icons/hicolor/64x64/apps/tsunami.png --out tsunami.iconset/icon_512x512@2x.png
+		COMMAND iconutil -c icns tsunami.iconset
+		DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/static/icons/tsunami.svg"
+		VERBATIM)
+
+	add_custom_target(bundle
+		COMMAND [ -e tsunami.app ] || mkdir tsunami.app
+		COMMAND [ -e tsunami.app/Contents ] || mkdir tsunami.app/Contents
+		COMMAND [ -e tsunami.app/Contents/MacOS ] || mkdir tsunami.app/Contents/MacOS
+		COMMAND cp -f tsunami tsunami.app/Contents/MacOS
+		COMMAND [ -e tsunami.app/Contents/Resources ] || mkdir tsunami.app/Contents/Resources
+		COMMAND cp -rf tsunami.icns tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/icons" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/SignalChains" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/favorites_demo.txt" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/hui_resources.txt" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/license.txt" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/license_small.txt" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/plugins/" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/.cmake/Info.plist" tsunami.app/Contents
+		DEPENDS tsunami tsunami.icns
+		VERBATIM)
+
+endif()
+
+
+#=======================================================================================
 #    install
 #=======================================================================================
-		
-if (APPLE)
-	set_target_properties(tsunami
-		PROPERTIES
-		BUNDLE True
-		MACOSX_BUNDLE_BUNDLE_NAME tsunami
-		MACOSX_BUNDLE_GUI_IDENTIFIER "michisoft"
-		MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
-		MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
-		RESOURCE "${resource_files}")
-	set(RESOURCE_DESTINATION bin/tsunami.app/Contents/Resources)
-else ()
-	set(RESOURCE_DESTINATION share/tsunami)
-endif ()
+
+set(RESOURCE_DESTINATION share/tsunami)
 
 # binaries
 install(TARGETS tsunami DESTINATION bin)	

@@ -1,20 +1,26 @@
 # Development plans (long-term)
 
-## gtk4 migration
-
-Mostly done, now.
-
 
 ## Windows version
 
-Multiple problems:
+Mostly working.
 
-* building with gtk on windows constantly breaks
-  * `vcpkg` worked for a short time, before breaking automatic include directories
-  * ok, a mix of `vcpkg` and `gvsbuild` seems to work
+Remaining issues:
+
+* `gtk` is annoying on windows
 * not all utf-8 supported?!?
-* my `kaba` JIT compiler has not been tested on windows for a while, might need fixes
+* installing and file associations would be nice
 
+
+## MacOS version
+
+Also mostly working on MacBooks with (aarch64) M1 chip or newer.
+
+Remaining issues:
+
+* (properly) distributable app bundles
+* file associations
+* `CoreAudio`
 
 ## Modular synthesizers
 

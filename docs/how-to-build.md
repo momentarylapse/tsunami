@@ -9,19 +9,19 @@ Install libraries (the developer version):
 
 ### Arch / Manjaro
 
-```
+```bash
 sudo pacman -S gtk4 libogg libvorbis flac fftw libpulse alsa-lib libunwind
 ```
 
 ### Fedora
 
-```
+```bash
 sudo dnf install libogg-devel libvorbis-devel flac-devel fftw3-devel pulseaudio-libs-devel alsa-lib-devel libunwind-devel
 ```
 
 ### Debian / Ubuntu
 
-```
+```bash
 sudo apt-get install git make g++
 sudo apt-get install libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev libportaudio19-dev
 ```
@@ -29,7 +29,7 @@ sudo apt-get install libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-
 ## Building, installing
 
 Assuming you are in the repository's root folder, type
-```
+```bash
 mkdir build
 cd build
 ccmake .. -GNinja
@@ -41,21 +41,13 @@ sudo ninja install   # optional
 By default, this will use **gtk4**. If you want to try **gtk3**, you can (in the `cmake ..` step) edit the option `GTK4_OR_GTK3` to "gtk3".
 
 
-<!---Alternatively, you can use **meson** to compile (might be broken...):
-```
-meson build
-cd build
-ninja
-```
---->
-
 
 ## Running
 
-If you installed via `sudo make install`, tsunami should be registered in your desktop environment. Probably just find the friendly icon in the menu and click. You can also open a terminal and type `tsunami`.
+If you installed via `sudo ninja install`, tsunami should be registered in your desktop environment. Probably just find the friendly icon in the menu and click. You can also open a terminal and type `tsunami`.
 
 Tsunami can also be used without installing. Open a terminal, and
-```
+```bash
 cd <REPOSITORY-ROOT>  # important to run the program from here!
 ./build/tsunami
 ```
@@ -73,7 +65,9 @@ Follow the steps here: https://github.com/wingtk/gvsbuild
 
 But instead of `gvsbuild build gtk4` run
 
-```gvsbuild build gtk4 libadwaita adwaita-icon-theme```
+```bash
+gvsbuild build gtk4 libadwaita adwaita-icon-theme
+```
 
 ## Visual Studio
 
@@ -91,7 +85,7 @@ Also **experimental** support, using `homebrew`, `gtk4` and `coreaudio` or `port
 
 ## Preparation: installing libraries
 
-```
+```bash
 brew install cmake extra-cmake-modules pkg-config ninja
 brew install fftw libogg libvorbis flac
 brew install gtk4 libadwaita portaudio
@@ -99,7 +93,7 @@ brew install gtk4 libadwaita portaudio
 
 ## Building
 
-```
+```bash
 # (in the repository root folder)
 mkdir build
 cd build
@@ -113,8 +107,17 @@ Installing is not supported!
 
 ## Running
 
-````
+````bash
 # (in the repository root folder)
 ./build/tsunami
 ````
+
+## App bundle
+
+You can build an .app bundle by following the [building](#building) steps, and adding
+```bash
+ninja bundle
+```
+
+The produced `tsunami.app` can be installed in the system, by dragging it into the `Applications` folder in `Finder`.
 

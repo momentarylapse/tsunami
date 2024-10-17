@@ -1,6 +1,6 @@
 # Internal design
 
-*might be outdated!*
+*might be outdated!* TODO
 
 * [Data](data.md)
 * [Actions](actions.md)

@@ -7,6 +7,7 @@
 
 #include "HeaderBar.h"
 #include "TsunamiWindow.h"
+#include "ColorScheme.h"
 #include "sidebar/SideBar.h"
 #include "../Session.h"
 #include "../EditModes.h"
@@ -17,6 +18,9 @@
 #include "../lib/base/iter.h"
 #include "mainview/MainView.h"
 #include "mainview/MainViewNode.h"
+
+
+#include "../lib/os/msg.h"
 
 namespace tsunami {
 
@@ -106,14 +110,23 @@ void HeaderBar::update() {
 	win->set_string("session-indicator", "\u2713 (session)");
 
 	auto label = [] (const SessionLabel& l) {
-		string s;
+		string xx;
 		if (l.is_persistent())
-			s = "    <span fgcolor=\"#8080ff\"><b>session</b></span>";
-		return format("<big>%s.<span alpha=\"50%%\">%s</span></big>\n <small><span alpha=\"50%%\">%s</span>%s</small>",
-					  l.filename.basename_no_ext(),
-					  l.filename.extension(),
-					  nice_filename(l.filename.dirname()),
-					  s);
+			xx = format("<b><span fgcolor=\"%s\">\u25cf</span></b> ",
+			            theme.pitch_text[loop(str(l.filename).hash() + 5, 0, 11)].hex());
+		string a, b;
+		if (l.is_persistent()) {
+			a = "<b>";
+			b = "</b>";
+		}
+		return format(
+				"%s%s%s%s<span alpha=\"50%%\">.%s</span>\n <span size=\"x-small\" alpha=\"50%%\">%s</span>",
+				xx,
+				a,
+				l.filename.basename_no_ext(),
+				b,
+				l.filename.extension(),
+				nice_filename(l.filename.dirname()));
 	};
 
 	if (auto c = reinterpret_cast<hui::ControlMenuButton*>(win->_get_control_("open-menu"))) {
@@ -121,10 +134,16 @@ void HeaderBar::update() {
 		menu_load->add("Open...", "open");
 		menu_load->add_separator();
 		auto files = win->session->session_manager->enumerate_all_sessions();
-		menu_load->add("Recently used files", "recent-files");
+		menu_load->add("<small><i>Recently used sessions:</i></small>", "recent-sessions");
+		menu_load->enable("recent-sessions", false);
+		for (auto&& [i,l]: enumerate(files)) {
+			if (l.is_recent() and !l.is_active() and l.is_persistent())
+				menu_load->add(label(l), format("open-recent-%d", i));
+		}
+		menu_load->add("<small><i>Recently used files:</i></small>", "recent-files");
 		menu_load->enable("recent-files", false);
 		for (auto&& [i,l]: enumerate(files)) {
-			if (l.is_recent() and !l.is_active())
+			if (l.is_recent() and !l.is_active() and !l.is_persistent())
 				menu_load->add(label(l), format("open-recent-%d", i));
 		}
 		/*if (files.num == 0) {

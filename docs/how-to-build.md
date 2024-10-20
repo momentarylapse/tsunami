@@ -16,7 +16,8 @@ sudo pacman -S gtk4 libogg libvorbis flac fftw libpulse alsa-lib libunwind
 ### Fedora
 
 ```bash
-sudo dnf install libogg-devel libvorbis-devel flac-devel fftw3-devel pulseaudio-libs-devel alsa-lib-devel libunwind-devel
+sudo dnf install cmake-gui ninja g++
+sudo dnf install libadwaita-devel libogg-devel libvorbis-devel flac-devel fftw3-devel pulseaudio-libs-devel alsa-lib-devel pipewire-devel portaudio-devel libunwind-devel
 ```
 
 ### Debian / Ubuntu

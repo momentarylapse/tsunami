@@ -3,7 +3,7 @@
 ## Current state
 
 * [internal design](design/main.md) (TODO)
-* plugins (TODO)
+* [plugins](design/plugins.md)
 
 ## Forward
 

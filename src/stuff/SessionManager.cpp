@@ -9,6 +9,7 @@
 #include "BackupManager.h"
 #include "../lib/base/base.h"
 #include "../lib/base/iter.h"
+#include "../lib/base/algo.h"
 #include "../lib/base/optional.h"
 #include "../lib/hui/language.h"
 #include "../lib/os/filesystem.h"
@@ -334,7 +335,7 @@ void SessionManager::save_session(Session *s, const Path &filename) {
 	parser.elements.add(e);
 	parser.save(filename);
 
-	Storage::mark_file_used(filename);
+	Storage::mark_file_used(filename, true);
 	s->out_changed();
 	out_changed();
 }
@@ -443,7 +444,7 @@ void SessionManager::load_into_session(SessionPersistenceData *p, Session *sessi
 		}
 	}
 
-	Storage::mark_file_used(p->session_filename);
+	Storage::mark_file_used(p->session_filename, false);
 	out_changed.notify();
 }
 
@@ -506,19 +507,19 @@ Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 	};
 	Array<SessionLabel> sessions;
 	for (auto& f: Storage::recently_used_files) {
-		if (is_active(f))
+		if (is_active(f.filename))
 			continue;
 	//	if (find_for_filename(f))
 	//		continue;
-		if (can_find_associated_session_file(f)) {
-			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, f});
-		} else if (f.extension() == "session") {
-			auto file = associated_song_filename(f);
+		if (can_find_associated_session_file(f.filename)) {
+			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, f.filename});
+		} else if (f.filename.extension() == "session") {
+			auto file = associated_song_filename(f.filename);
 			if (file.is_empty())
-				file = f;
+				file = f.filename;
 			sessions.add({SessionLabel::Recent | SessionLabel::Persistent, file});
 		} else {
-			sessions.add({SessionLabel::Recent, f});
+			sessions.add({SessionLabel::Recent, f.filename});
 		}
 	}
 	return sessions;
@@ -526,8 +527,8 @@ Array<SessionLabel> SessionManager::enumerate_recently_used_files() const {
 
 // not active, not recent!
 Array<SessionLabel> SessionManager::enumerate_persistent_sessions() const {
-	auto is_recent = [] (const Path& path) {
-		return Storage::recently_used_files.find(path) >= 0;
+	auto is_recent = [] (const Path& path) -> bool {
+		return base::find_by_element(Storage::recently_used_files, &Storage::RecentlyUsedFile::filename, path);
 	};
 	Array<SessionLabel> sessions;
 	for (auto p: known_persistence_data) {

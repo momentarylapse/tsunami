@@ -9,11 +9,14 @@
 #define STORAGE_H_
 
 #include "../lib/base/future.h"
+#include "../lib/base/optional.h"
 #include "../lib/os/file.h"
+#include "../lib/os/date.h"
 
 namespace hui {
 	class Window;
 }
+class Any;
 
 namespace tsunami {
 
@@ -71,7 +74,16 @@ public:
 	static Path quick_export_directory;
 	static float default_ogg_quality;
 
-	static Array<Path> recently_used_files;
+	struct RecentlyUsedFile {
+		Path filename;
+		int usage_count = 0;
+		Date last_use;
+		Any to_any() const;
+		float significance(const Date& now) const;
+		static base::optional<RecentlyUsedFile> parse(const Any& a);
+	};
+
+	static Array<RecentlyUsedFile> recently_used_files;
 
 	static string options_in;
 	static string options_out;
@@ -82,7 +94,7 @@ public:
 	bytes compress(AudioBuffer &buffer, const string &codec);
 	AudioBuffer decompress(const string &codec, const bytes &data);
 
-	static void mark_file_used(const Path& filename);
+	static void mark_file_used(const Path& filename, bool saving);
 
 	static string suggest_filename(Song *s, const Path &dir);
 };

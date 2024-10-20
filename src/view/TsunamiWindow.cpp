@@ -943,7 +943,7 @@ void TsunamiWindow::on_new() {
 void TsunamiWindow::on_open() {
 	session->storage->ask_open(this).then([this] (const Path &filename) {
 		load_song_with_session(filename);
-		Storage::mark_file_used(filename);
+		Storage::mark_file_used(filename, false);
 	});
 }
 
@@ -971,7 +971,7 @@ void TsunamiWindow::on_save() {
 		session->storage->save(song, song->filename).then([this] {
 			session->status(_("file saved"));
 			session->backup_manager->set_save_state(session);
-			Storage::mark_file_used(song->filename);
+			Storage::mark_file_used(song->filename, true);
 		});
 	}
 }
@@ -989,7 +989,7 @@ void TsunamiWindow::on_save_as() {
 	session->storage->ask_save(this, {"default=" + def}).then([this] (const Path &filename) {
 		session->storage->save(song, filename).then([this] {
 			session->status(_("file saved"));
-			Storage::mark_file_used(song->filename);
+			Storage::mark_file_used(song->filename, true);
 		});
 	});
 }

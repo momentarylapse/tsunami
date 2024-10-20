@@ -43,6 +43,11 @@ int find_index(const Array<T> &array, const T &t) {
 	return find_index_if(array, [&t] (const T &v) { return v == t; });
 }
 
+template<class T, class E, class V>
+int find_index_by_element(const Array<T> &array, E e, const V &t) {
+	return find_index_if(array, [&t, e] (const T &v) { return v.*e == t; });
+}
+
 template<class T, class F>
 int count_if(const Array<T> &array, F f) {
 	int n = 0;

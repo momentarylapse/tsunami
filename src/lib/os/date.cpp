@@ -10,23 +10,21 @@
 #include <chrono>
 #include <ctime>
 
-
-Date time2date(time_t t) {
-	Date d;
-	d.time = (int64)t;
-	[[maybe_unused]] tm *tm = localtime(&t);
-	d.milli_second = 0;
-	return d;
-}
-
 Date Date::now() {
 	auto now = std::chrono::system_clock::now();
 	auto t = std::chrono::system_clock::to_time_t(now);
-	auto d = time2date(t);
+	auto d = from_unix((int64)t);
 
 	auto dtn = now.time_since_epoch();
 	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dtn);
 	d.milli_second = ms.count() % 1000;
+	return d;
+}
+
+Date Date::from_unix(int64 t) {
+	Date d;
+	d.time = t;
+	d.milli_second = 0;
 	return d;
 }
 

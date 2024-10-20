@@ -59,8 +59,6 @@
 	#define _unlink	::unlink
 #endif
 
-Date time2date(time_t t);
-
 
 namespace os::fs {
 
@@ -192,19 +190,19 @@ int64 FileStream::size() const {
 Date FileStream::ctime() {
 	struct stat s;
 	fstat(handle, &s);
-	return time2date(s.st_ctime);
+	return Date::from_unix(s.st_ctime);
 }
 
 Date FileStream::mtime() {
 	struct stat s;
 	fstat(handle, &s);
-	return time2date(s.st_mtime);
+	return Date::from_unix(s.st_mtime);
 }
 
 Date FileStream::atime() {
 	struct stat s;
 	fstat(handle, &s);
-	return time2date(s.st_atime);
+	return Date::from_unix(s.st_atime);
 }
 
 // where is the current reading position in the file?

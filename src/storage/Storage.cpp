@@ -24,6 +24,8 @@
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../lib/base/iter.h"
+#include "../lib/base/algo.h"
+#include "../lib/base/sort.h"
 #include "../lib/os/date.h"
 #include "../lib/os/filesystem.h"
 #include "../lib/hui/config.h"
@@ -45,7 +47,42 @@ string Storage::options_in;
 string Storage::options_out;
 Path Storage::quick_export_directory;
 float Storage::default_ogg_quality;
-Array<Path> Storage::recently_used_files;
+Array<Storage::RecentlyUsedFile> Storage::recently_used_files;
+
+constexpr int MAX_RECENTLY_USED_FILES = 32;
+
+
+Any Storage::RecentlyUsedFile::to_any() const {
+	Any r = Any::EmptyDict;
+	r["filename"] = str(filename);
+	r["count"] = usage_count;
+	r["last"] = (int)last_use.time;
+	return r;
+}
+
+float Storage::RecentlyUsedFile::significance(const Date& now) const {
+	float age = max((float)(now.time - last_use.time), 100.0f);
+	float s = (float)usage_count / age;
+	if (filename.extension() == "session")
+		s *= 4;
+	return s;
+}
+
+base::optional<Storage::RecentlyUsedFile> Storage::RecentlyUsedFile::parse(const Any& a) {
+	if (a.is_dict()) {
+		RecentlyUsedFile ruf;
+		ruf.filename = str(a["filename"]);
+		if (a.has("count"))
+			ruf.usage_count = a["count"]._int();
+		if (a.has("last"))
+			ruf.last_use = Date::from_unix(a["count"]._int());
+		return ruf;
+	} else if (a.is_string()) {
+		// legacy: pure filename
+		return Storage::RecentlyUsedFile{a.as_string(), 1, Date::now()};
+	}
+	return base::None;
+}
 
 Storage::Storage(Session *_session) {
 	session = _session;
@@ -79,9 +116,18 @@ Storage::Storage(Session *_session) {
 
 	current_directory = hui::config.get_str("Storage.CurrentDirectory", "");
 
+	auto as_list = [](const Any& a) -> Array<Any> {
+		if (a.is_list())
+			return a.as_list();
+		return Any::EmptyList.as_list();
+	};
+
 	recently_used_files.clear();
-	for (auto& s: hui::config.get_str_array("Storage.RecentFiles"))
-		recently_used_files.add(s);
+	for (const auto& a: as_list(hui::config.get("Storage.RecentFiles"))) {
+		const auto r = RecentlyUsedFile::parse(a);
+		if (r.has_value())
+			recently_used_files.add(*r);
+	}
 }
 
 Storage::~Storage() {
@@ -450,30 +496,44 @@ Storage::Flags operator|(Storage::Flags a, Storage::Flags b) {
 	return (Storage::Flags)((int)a | (int)b);
 }
 
-void Storage::mark_file_used(const Path& filename) {
+void Storage::mark_file_used(const Path& filename, bool saving) {
 	auto f = filename.absolute();
 
-	int index = recently_used_files.find(f);
-	if (index >= 0)
-		recently_used_files.erase(index);
+	const auto now = Date::now();
 
-	recently_used_files.insert(f, 0);
+	// already in list?
+	int index = base::find_index_by_element(recently_used_files, &RecentlyUsedFile::filename, f);
+	if (index >= 0) {
+		// -> update
+		if (!saving) // don't spam count on every tiny save!
+			recently_used_files[index].usage_count ++;
+		recently_used_files[index].last_use = now;
+	} else {
+		// new
+		recently_used_files.insert({f, 1, now}, 0);
+	}
 
-	// prefer the .session over the audio file
+	// FILTER: prefer the .session over the audio file
 	for (int i=0; i<recently_used_files.num; i++)
 		for (int k=0; k<recently_used_files.num; k++)
-			if (recently_used_files[i] == recently_used_files[k].with(".tsunami.session")) {
+			if (recently_used_files[i].filename == recently_used_files[k].filename.with(".tsunami.session")) {
 				recently_used_files.erase(k);
 				k --;
 			}
 
-	while (recently_used_files.num > 30)
+	// SORT: significance
+	base::inplace_sort(recently_used_files, [now] (const RecentlyUsedFile& a, const RecentlyUsedFile& b) {
+		return a.significance(now) >= b.significance(now);
+	});
+
+	// FILTER: too many
+	while (recently_used_files.num > MAX_RECENTLY_USED_FILES)
 		recently_used_files.pop();
 
-	Array<string> ruf;
+	Any ruf = Any::EmptyList;
 	for (const auto& ff: recently_used_files)
-		ruf.add(str(ff));
-	hui::config.set_str_array("Storage.RecentFiles", ruf);
+		ruf.add(ff.to_any());
+	hui::config.set("Storage.RecentFiles", ruf);
 }
 
 }

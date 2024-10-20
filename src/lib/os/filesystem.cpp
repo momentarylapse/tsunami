@@ -47,8 +47,6 @@
 	}
 #endif
 
-Date time2date(time_t t);
-
 namespace os::fs {
 
 bool func_did_not_throw(std::function<void()> f) {
@@ -82,7 +80,7 @@ Date mtime(const Path &path) {
 	struct stat s;
 	if (stat(path.str().c_str(), &s) != 0)
 		throw FileError(format("unable to stat '%s'", path));
-	return time2date(s.st_mtime);
+	return Date::from_unix(s.st_mtime);
 }
 
 bool is_directory(const Path &path) {

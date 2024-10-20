@@ -68,6 +68,13 @@ void draw_points(VertexBuffer *vb) {
 	glDrawArrays(GL_POINTS, 0, vb->count());
 }
 
+void draw_mesh_tasks(int offset, int count) {
+#if HAS_LIB_GLEW
+	if (Context::CURRENT->supports_mesh_shaders)
+		glDrawMeshTasksNV(offset, count);
+#endif
+}
+
 
 void clear(const color &c) {
 	glClearColor(c.r, c.g, c.b, c.a);

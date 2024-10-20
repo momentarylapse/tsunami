@@ -22,7 +22,7 @@
 
 namespace nix{
 
-string version = "0.14.0.1";
+string version = "0.14.1.0";
 // currently, requiring OpenGL 4.5
 
 
@@ -133,6 +133,10 @@ xfer<Context> init(const Array<string>& flags) {
 
 	Context::CURRENT = ctx;
 
+#if HAS_LIB_GLEW
+	glewInit();
+#endif
+
 	if (!sa_contains(flags, "silent"))
 		ctx->verbosity = 1;
 	if (sa_contains(flags, "verbose"))
@@ -145,9 +149,9 @@ xfer<Context> init(const Array<string>& flags) {
 	}
 
 	ctx->version = version;
-	ctx->gl_version = (char*)glGetString(GL_VERSION);
-	ctx->gl_renderer = (char*)glGetString(GL_RENDERER);
-	ctx->glsl_version = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
+	ctx->gl_version = (char *) glGetString(GL_VERSION);
+	ctx->gl_renderer = (char *) glGetString(GL_RENDERER);
+	ctx->glsl_version = (char *) glGetString(GL_SHADING_LANGUAGE_VERSION);
 
 	if (ctx->verbosity >= 1) {
 		msg_write("OpenGL: " + ctx->gl_version);
@@ -166,7 +170,7 @@ xfer<Context> init(const Array<string>& flags) {
 	int num_extension = 0;
 	glGetIntegerv(GL_NUM_EXTENSIONS, &num_extension);
 	for (int i = 0; i < num_extension; i++) {
-		ctx->extensions.add((char*)glGetStringi(GL_EXTENSIONS, i));
+		ctx->extensions.add((char *) glGetStringi(GL_EXTENSIONS, i));
 	}
 
 
@@ -201,6 +205,13 @@ xfer<Context> init(const Array<string>& flags) {
 	ctx->default_framebuffer->height = vp[3];
 
 	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
+
+#if HAS_LIB_GLEW
+	ctx->supports_mesh_shaders = glewIsSupported("GL_NV_mesh_shader");
+#endif
+
+	if (ctx->verbosity >= 2)
+		msg_write("mesh shader support: " + str(ctx->supports_mesh_shaders));
 
 	if (ctx->verbosity >= 1) {
 		msg_ok();

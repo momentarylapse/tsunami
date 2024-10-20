@@ -35,6 +35,7 @@ struct ShaderSourcePart {
 Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 	Array<ShaderSourcePart> parts;
 	bool has_vertex = false;
+	bool has_mesh = false;
 	bool has_fragment = false;
 	int pos = 0;
 	while (pos < source.num - 5) {
@@ -70,6 +71,11 @@ Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 			p.type = GL_TESS_EVALUATION_SHADER;
 		} else if (tag == "GeometryShader") {
 			p.type = GL_GEOMETRY_SHADER;
+		} else if (tag == "TaskShader") {
+			p.type = GL_TASK_SHADER_NV;
+		} else if (tag == "MeshShader") {
+			p.type = GL_MESH_SHADER_NV;
+			has_mesh = true;
 		} else if (tag == "Module") {
 			p.type = TYPE_MODULE;
 		} else if (tag == "Layout") {
@@ -80,7 +86,7 @@ Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 		}
 		parts.add(p);
 	}
-	if (has_fragment and !has_vertex) {
+	if (has_fragment and !has_vertex and !has_mesh) {
 		msg_write(" ...auto import " + ctx->vertex_module_default);
 		parts.add({GL_VERTEX_SHADER, format("#import %s\n", ctx->vertex_module_default)});
 	}

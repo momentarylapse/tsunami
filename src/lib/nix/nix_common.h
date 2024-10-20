@@ -18,8 +18,11 @@
 	//#include <gl\wglext.h>
 #endif
 #if defined(OS_LINUX) || defined(OS_MAC)
+#if HAS_LIB_GLEW
+	#include <GL/glew.h>
+#else
 	#define GL_GLEXT_PROTOTYPES
-	//#include <GL/glx.h>
+#endif
 	#include <GL/gl.h>
 	#include <GL/glext.h>
 #endif

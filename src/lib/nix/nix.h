@@ -67,6 +67,8 @@ public:
 	VertexBuffer *vb_temp = nullptr;
 	VertexBuffer *vb_temp_i = nullptr;
 
+	bool supports_mesh_shaders = false;
+
 
 	xfer<Shader> load_shader(const Path &filename);
 	xfer<Shader> create_shader(const string &source);

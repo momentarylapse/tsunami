@@ -24,6 +24,7 @@ void _cdecl draw_triangles(VertexBuffer *vb);
 void _cdecl draw_instanced_triangles(VertexBuffer *vb, int count);
 void _cdecl draw_lines(VertexBuffer *vb, bool contiguous);
 void _cdecl draw_points(VertexBuffer *vb);
+void draw_mesh_tasks(int offset, int count);
 
 };
 

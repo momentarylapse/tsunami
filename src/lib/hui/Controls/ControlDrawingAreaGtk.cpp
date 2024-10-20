@@ -31,7 +31,6 @@ static std::thread::id main_thread_id = std::this_thread::get_id();
 namespace hui
 {
 
-static ControlDrawingArea *NixGlArea = nullptr;
 GdkGLContext *gtk_gl_context = nullptr;
 
 static base::set<ControlDrawingArea*> _recently_deleted_areas;
@@ -66,6 +65,14 @@ base::map<string,color> get_style_colors(Panel *p, const string &id) {
  * drawing                                                                         */
 
 
+int get_screen_scale(GtkWidget *w) {
+#if GTK_CHECK_VERSION(4,0,0)
+	return gtk_widget_get_scale_factor(w);
+#else
+	return gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(w)));
+#endif
+}
+
 
 #if GTK_CHECK_VERSION(4,0,0)
 
@@ -77,6 +84,8 @@ void on_gtk_area_draw(GtkDrawingArea* drawing_area, cairo_t* cr, int width, int 
 #if STUPID_HACK
 	da->redraw_area.clear();
 #endif
+	int scale = get_screen_scale(GTK_WIDGET(da->widget));
+	da->panel->win->input.row_target = scale;
 	da->notify(EventID::DRAW);
 	//msg_write("/draw " + da->id);
 }
@@ -100,15 +109,6 @@ gboolean on_gtk_area_draw(GtkWidget *widget, cairo_t *cr, gpointer user_data) {
 
 #endif
 
-
-
-int get_screen_scale(GtkWidget *w) {
-#if GTK_CHECK_VERSION(4,0,0)
-	return 1;
-#else
-	return gdk_monitor_get_scale_factor(gdk_display_get_monitor_at_window(gdk_display_get_default(), gtk_widget_get_parent_window(w)));
-#endif
-}
 
 
 /*---------------------------------------------------------------------------------*
@@ -145,11 +145,10 @@ void on_gtk_gl_area_realize(GtkGLArea *area, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	gtk_gl_area_make_current(area);
-	if (gtk_gl_area_get_error(area) != nullptr){
-		msg_error("hui: gtk_gl_area error");
+	if (auto error = gtk_gl_area_get_error(area)) {
+		msg_error(format("hui realize: gtk_gl_area_make_current() error: %s", error->message));
 		return;
 	}
-
 	da->notify(EventID::REALIZE);
 }
 
@@ -157,8 +156,8 @@ void on_gtk_gl_area_unrealize(GtkGLArea *area, gpointer user_data) {
 	auto *da = reinterpret_cast<ControlDrawingArea*>(user_data);
 
 	gtk_gl_area_make_current(area);
-	if (gtk_gl_area_get_error(area) != nullptr){
-		printf("unrealize: gl area make current error...\n");
+	if (auto error = gtk_gl_area_get_error(area)) {
+		msg_error(format("hui unrealize: gtk_gl_area_make_current() error: %s", error->message));
 		return;
 	}
 	da->notify(EventID::UNREALIZE);
@@ -771,11 +770,13 @@ ControlDrawingArea::ControlDrawingArea(const string &title, const string &id) :
 	is_opengl = option_has(get_option_from_title(title), "opengl");
 	GtkWidget *da;
 	if (is_opengl) {
-		NixGlArea = this;
 		da = gtk_gl_area_new();
 		auto vv = option_value(get_option_from_title(title), "opengl").explode(".");
 		if (vv.num == 2)
 			gtk_gl_area_set_required_version(GTK_GL_AREA(da), vv[0]._int(), vv[1]._int());
+#if GTK_CHECK_VERSION(4,12,0)
+		gtk_gl_area_set_allowed_apis(GTK_GL_AREA(da), GDK_GL_API_GL);
+#endif
 		gtk_gl_area_set_has_stencil_buffer(GTK_GL_AREA(da), true);
 		gtk_gl_area_set_has_depth_buffer(GTK_GL_AREA(da), true);
 		gtk_gl_area_attach_buffers(GTK_GL_AREA(da));

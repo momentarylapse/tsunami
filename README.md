@@ -2,11 +2,13 @@
 
 Tsunami is an open-source *Digital Audio Workstation* (DAW). It is designed for ease of use and not-looking-crappy™.
 
-Written for Linux, can also run on Windows and MacOS.
+![tsunami1](https://raw.githubusercontent.com/momentarylapse/github-assets/refs/heads/main/screenshots/tsunami-2024-10-20.png)
+
+Initially written for Linux. Usable on Windows and MacOS, but still working on full support.
 
 ## Features
 
-It was mostly developed for my personal home recording needs, i.e.
+It was mainly developed for my personal home recording needs, i.e.
  * multi-track mixing
  * multi-version audio recording
  * audio effects
@@ -16,8 +18,6 @@ It was mostly developed for my personal home recording needs, i.e.
  * plugin system
  * signal chains
  * persistent sessions
-
-![tsunami1](https://raw.githubusercontent.com/momentarylapse/github-assets/refs/heads/main/screenshots/tsunami-2024-10-20.png)
 
 ### Plugin system
 

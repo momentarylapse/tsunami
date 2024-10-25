@@ -22,7 +22,7 @@ if(GTK4_FOUND)
 	list(APPEND GTK4_OR_GTK3_FOUND "gtk4")
 endif()
 pkg_check_modules(GTK+30 gtk+-3.0)
-if(GTK3_FOUND)
+if(GTK+30_FOUND)
 	list(APPEND GTK4_OR_GTK3_FOUND "gtk3")
 endif()
 if(GTK4_OR_GTK3_FOUND)
@@ -275,7 +275,7 @@ endif()
 # lib: gl (optional)
 set(LIB_GL_ENABLED true CACHE BOOL "Use gl library?")
 find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE)
+if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
 else()
 	set(LIB_GL_ENABLED false CACHE BOOL "gl library not found" FORCE)
 endif()
@@ -830,7 +830,8 @@ add_executable(tsunami WIN32
 	src/view/TsunamiWindow.cpp
 	src/Playback.cpp
 	src/Session.cpp
-	src/Tsunami.cpp)
+	src/Tsunami.cpp
+	src/tsunami.rc)
 target_include_directories(tsunami PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(tsunami PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(tsunami PUBLIC ${COMPILE_OPTIONS})

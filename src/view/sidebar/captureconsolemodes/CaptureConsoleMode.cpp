@@ -121,7 +121,7 @@ void CaptureConsoleMode::update_device_list() {
 		// add all
 		c.panel->reset(c.id_source);
 		for (Device *d: sources)
-			c.panel->set_string(c.id_source, shorten(d->get_name(), 42));
+			c.panel->add_string(c.id_source, shorten(d->get_name(), 42));
 
 		// select current
 		foreachi(Device *d, sources, i)

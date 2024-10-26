@@ -10,7 +10,6 @@
 #include "../CaptureConsole.h"
 #include "../../audioview/AudioView.h"
 #include "../../mode/ViewModeCapture.h"
-#include "../../../data/Song.h"
 #include "../../../data/Track.h"
 #include "../../../data/base.h"
 #include "../../../module/SignalChain.h"
@@ -57,7 +56,9 @@ void CaptureConsoleModeAudio::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(console->event("source", [this] { on_source(); }));
+	event_ids.add(console->event("source", [this] {
+		on_source();
+	}));
 
 
 	auto &c = items()[0];

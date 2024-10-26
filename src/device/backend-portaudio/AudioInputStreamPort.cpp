@@ -30,13 +30,13 @@ AudioInputStreamPort::AudioInputStreamPort(Session *session, Device *device, Aud
 		                                   &portaudio_stream_request_callback, this);
 		_portaudio_test_error(err, "Pa_OpenDefaultStream");
 	} else {
-		session->i(format("open stream %d  %d", _sample_rate, num_channels));
-		PaStreamParameters params;
+		session->i(format("open stream %d  %d    %d", _sample_rate, num_channels, device->index_in_lib));
+		PaStreamParameters params{};
 		params.channelCount = num_channels;
 		params.sampleFormat = paFloat32;
 		params.device = device->index_in_lib;
 		params.hostApiSpecificStreamInfo = nullptr;
-		params.suggestedLatency = 0;
+		params.suggestedLatency = 0;//Pa_GetDeviceInfo(device->index_in_lib)->defaultLowInputLatency;
 		PaError err = Pa_OpenStream(&portaudio_stream, &params, nullptr, _sample_rate, chunk_size,
 		                            paNoFlag, &portaudio_stream_request_callback, this);
 		_portaudio_test_error(err, "Pa_OpenStream");

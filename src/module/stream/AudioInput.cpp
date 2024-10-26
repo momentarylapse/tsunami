@@ -104,6 +104,8 @@ Device *AudioInput::get_device() {
 }
 
 void AudioInput::set_device(Device *device) {
+	if (device == config.device)
+		return;
 	config.device = device;
 	changed();
 }

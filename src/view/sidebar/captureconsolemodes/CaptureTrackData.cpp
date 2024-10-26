@@ -163,7 +163,6 @@ void CaptureTrackData::set_map(const Array<int> &_map) {
 }
 
 void CaptureTrackData::set_device(Device *device) {
-
 	if (type() == SignalType::Audio) {
 		audio_input()->set_device(device);
 		set_map(create_default_channel_map(device->channels, track->channels));

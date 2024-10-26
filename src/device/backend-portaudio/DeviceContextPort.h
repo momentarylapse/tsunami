@@ -15,8 +15,8 @@ namespace tsunami {
 
 class DeviceContextPort : public DeviceContext {
 public:
-	DeviceContextPort(Session* session);
-	~DeviceContextPort();
+	explicit DeviceContextPort(Session* session);
+	~DeviceContextPort() override;
 
 	bool init(Session* session) override;
 	void update_device(DeviceManager* device_manager, bool serious) override;

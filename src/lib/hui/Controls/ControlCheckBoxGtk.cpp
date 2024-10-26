@@ -39,6 +39,7 @@ ControlCheckBox::ControlCheckBox(const string &title, const string &id) :
 		is_switch = false;
 	if (is_switch) {
 		widget = gtk_switch_new();
+		gtk_widget_set_valign(widget, GTK_ALIGN_CENTER);
 		g_signal_connect(G_OBJECT(widget), "notify::active", G_CALLBACK(&on_gtk_switch_clicked), this);
 		//g_signal_connect(G_OBJECT(widget), "state-set", G_CALLBACK(&on_gtk_switch_clicked2), this);
 	} else {

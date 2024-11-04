@@ -1,0 +1,71 @@
+use tsunami.*
+use helper.tone.*
+use hui
+
+func e2s(e: MidiEvent) -> string
+	if e.is_note_on()
+		return as_binary(&e.raw, 8).hex() + "  --  NOTE ON   pitch={{e.pitch|.0}} {{pitch_name_pretty(e.pitch)}}  volume={{e.volume*100|.1}}%"
+	if e.is_note_off()
+		return as_binary(&e.raw, 8).hex() + "  --  NOTE OFF  pitch={{e.pitch|.0}} {{pitch_name_pretty(e.pitch)}}"
+	return as_binary(&e.raw, 8).hex() + "  --  ???"
+
+class MidiDebuggerPanel extends ConfigPanel
+	var override c: MidiDebugger&
+	var session: Session&
+	var source_panel: shared[ConfigPanel]
+	
+	var runner_id = -1
+	
+	func __init__(_session: Session, _mlp: MidiDebugger)
+		super.__init__(_mlp)
+		session := &_session
+		from_source("Grid grid ''
+	.
+	---|
+	ListView events 'e' nobar expandx expandy")
+		
+		
+		source_panel = c.source.create_panel()
+		embed(source_panel, "grid", 0, 0)
+		for p in source_panel
+			p.update()
+		
+		runner_id = hui.run_repeated(0.2, on_tick)
+
+
+	func override __delete__()
+		hui.cancel_runner(runner_id)
+
+
+	func mut on_tick()
+		reset("events")
+		let events = c.accumulator.buffer[-12:]
+		for e in events
+			add_string("events", e2s(e))
+
+
+
+class MidiDebugger extends TsunamiPlugin
+	var source, output: shared![Module]
+	var accumulator: shared![MidiAccumulator]
+	var synth: shared![Synthesizer]
+	var chain: shared![SignalChain]
+	func override on_start()
+		chain = session.create_signal_chain("midi-debug")
+		source = chain.add_basic(Module.Type.STREAM, "MidiInput")
+		accumulator = chain.add[MidiAccumulator]()
+		output = chain.add_basic(Module.Type.STREAM, "AudioOutput")
+		synth = chain.add_synth("")
+		chain.connect(source, 0, accumulator, 0)
+		chain.connect(accumulator, 0, synth, 0)
+		chain.connect(synth, 0, output, 0)
+		chain.start()
+		
+		accumulator.command(Module.Command.ACCUMULATION_START, 0)
+
+	func override on_stop()
+		chain = nil
+	
+	func override create_panel() -> xfer[ConfigPanel]
+		return new MidiDebuggerPanel(session, self)
+

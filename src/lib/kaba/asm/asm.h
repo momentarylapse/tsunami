@@ -39,7 +39,8 @@ enum class RegID {
 	W8, W9, W10, W11, W12, W13, W14, W15, W31 = W0 + 31,
 	XMM0 = W0 + 32, XMM1, XMM2, XMM3, XMM4, XMM5, XMM6, XMM7, // 16 byte
 	S0, S1, S2, S3, S4, S5, S6, S7, S8, S31 = S0 + 31, // arm float
-	D0, D1, D2, D3, D4, D5, D6, D7, D8, D31 = D0 + 31, // arm double
+	D0, D1, D2, D3, D4, D5, D6, D7, D8, D15 = D0 + 15, // arm double
+	_DUMMY = D0 + 31, // ???
 	COUNT
 };
 
@@ -362,6 +363,7 @@ enum class InstID {
 	FCMP,
 	SCVTF,
 	FCVTZS,
+	FCVT,
 
 	// fake
 	MODULO,

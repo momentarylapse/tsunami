@@ -439,6 +439,7 @@ const InstructionName instruction_names[(int)InstID::NUM_INSTRUCTION_NAMES + 1] 
 	{InstID::FCMP,	"fcmp"},
 	{InstID::SCVTF,	"scvtf"},
 	{InstID::FCVTZS,	"fcvtzs"},
+	{InstID::FCVT,	"fcvt"},
 
 	{InstID::MODULO, "modulo"},
 	{InstID::LABEL, "-label-"},

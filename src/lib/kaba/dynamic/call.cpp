@@ -133,7 +133,7 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	const int N = 6; // #regs
 	static int64 temp[N*4+2];
 	memset(&temp, 0, sizeof(temp));
-	// r0..5, s0..5, ret, f, r0:out, s0:out
+	// r0..5, d0..5, ret, f, r0:out, d0:out
 
 	temp[N*2+1] = (int_p)ff;
 
@@ -153,6 +153,8 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 			temp[nrreg ++] = *(int64*)param[i];
 		else if (ptype[i] == TypeFloat32)
 			temp[N + nsreg ++] = *(int*)param[i]; // float
+		else if (ptype[i] == TypeFloat64)
+			temp[N + nsreg ++] = *(int64*)param[i];
 		else if (ptype[i]->uses_return_by_memory())
 			temp[nrreg ++] = (int_p)param[i];
 		else
@@ -179,17 +181,17 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 		"add x20, x20, 0x08\n"
 		"ldr x5, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"ldr s0, [x20]\n" // -> s0
+		"ldr d0, [x20]\n" // -> d0
 		"add x20, x20, 0x08\n"
-		"ldr s1, [x20]\n"
+		"ldr d1, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"ldr s2, [x20]\n"
+		"ldr d2, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"ldr s3, [x20]\n"
+		"ldr d3, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"ldr s4, [x20]\n"
+		"ldr d4, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"ldr s5, [x20]\n"
+		"ldr d5, [x20]\n"
 		"add x20, x20, 0x08\n"
 		"ldr x8, [x20]\n" // -> r8
 		"add x20, x20, 0x08\n"
@@ -208,20 +210,20 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 		"add x20, x20, 0x08\n"
 		"str x6, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"str s0, [x20]\n" // -> s0:out
+		"str d0, [x20]\n" // -> d0:out
 		"add x20, x20, 0x08\n"
-		"str s1, [x20]\n"
+		"str d1, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"str s2, [x20]\n"
+		"str d2, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"str s3, [x20]\n"
+		"str d3, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"str s4, [x20]\n"
+		"str d4, [x20]\n"
 		"add x20, x20, 0x08\n"
-		"str s5, [x20]\n"
+		"str d5, [x20]\n"
 		 :
 		 : "r"(p)
-		 : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "s0", "s1", "s2", "s3", "s4", "s5");
+		 : "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "r8", "d0", "d1", "d2", "d3", "d4", "d5");
 
 	/*msg_write("ok");
 	msg_write(temp[N*2+2]);
@@ -235,7 +237,9 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 		*(int64*)ret = temp[N*2+2];
 	} else if (return_type == TypeInt8 or return_type == TypeUInt8 or return_type == TypeBool) {
 		*(int8*)ret = (int8)temp[N*2+2];
-	} else if (return_type->_return_in_float_registers()) {
+	} else if (return_type == TypeFloat64) {
+		*(int64*)ret = temp[N*3+2];
+	} else if (return_type->_return_in_float_registers() or return_type == TypeFloat64) {
 		//msg_error("ret in float");
 		for (int i=0; i<return_type->size/4; i++)
 			((int*)ret)[i] = (int)temp[N*3+2+i];

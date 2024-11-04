@@ -13,7 +13,8 @@
 
 namespace kaba {
 
-	extern const Class *TypeIntOptional;
+extern const Class* TypeIntOptional;
+extern const Class* TypeFloatOptional;
 
 
 #ifdef KABA_EXPORT_VULKAN
@@ -512,6 +513,7 @@ void SIAddPackageVulkan(Context *c) {
 			func_add_param("rp", TypeRenderPassP);
 			func_add_param("attachments", TypeTextureSharedNNList);
 		class_add_func(Identifier::func::Delete, TypeVoid, vul_p(&VulkanFrameBuffer::__delete__), Flags::Mutable);
+		class_add_func("area", TypeRect, vul_p(&vulkan::FrameBuffer::area));
 
 
 	add_class(TypeShader);
@@ -680,6 +682,10 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_func("end", TypeVoid, vul_p(&vulkan::CommandBuffer::end), Flags::Mutable);
 		class_add_func("set_bind_point", TypeVoid, vul_p(&vulkan::CommandBuffer::set_bind_point), Flags::Mutable);
 			func_add_param("bp", TypePipelineBindPoint);
+		class_add_func("clear", TypeVoid, vul_p(&vulkan::CommandBuffer::clear), Flags::Mutable);
+			func_add_param("area", TypeRect);
+			func_add_param("colors", TypeColorList);
+			func_add_param("z", TypeFloatOptional);
 		class_add_func("bind_pipeline", TypeVoid, vul_p(&vulkan::CommandBuffer::bind_pipeline), Flags::Mutable);
 			func_add_param("p", TypePipelineP);
 		class_add_func("draw", TypeVoid, vul_p(&vulkan::CommandBuffer::draw), Flags::Mutable);

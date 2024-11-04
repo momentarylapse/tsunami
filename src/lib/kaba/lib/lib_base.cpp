@@ -45,6 +45,7 @@ extern const Class *TypeAny;
 extern const Class *TypeNoValueError;
 
 const Class *TypeIntOptional;
+const Class *TypeFloatOptional;
 
 const Class *TypeRawT;
 const Class *TypeXferT;
@@ -452,6 +453,7 @@ void SIAddPackageBase(Context *c) {
 	TypeBoolList    = add_type_list(TypeBool);
 	TypeIntP        = add_type_p_raw(TypeInt32);
 	TypeIntOptional = add_type_optional(TypeInt32);
+	TypeFloatOptional = add_type_optional(TypeFloat32);
 	TypeIntList     = add_type_list(TypeInt32);
 	TypeFloatP      = add_type_p_raw(TypeFloat32);
 	TypeFloatList   = add_type_list(TypeFloat32);
@@ -483,6 +485,7 @@ void SIAddPackageBase(Context *c) {
 
 
 	lib_create_optional<int>(TypeIntOptional);
+	lib_create_optional<float>(TypeFloatOptional);
 
 
 	auto TypeInt32Ref = add_type_ref(TypeInt32);

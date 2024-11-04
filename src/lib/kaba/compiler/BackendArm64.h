@@ -33,7 +33,7 @@ public:
 
 	void _immediate_to_register_8(int val, int r);
 
-	int _to_register_float(const SerialNodeParam &p, int force_vreg);
+	int _to_register_float(const SerialNodeParam &p, int vreg);
 	void _from_register_float(int sreg, const SerialNodeParam &p);
 
 	struct CallData {

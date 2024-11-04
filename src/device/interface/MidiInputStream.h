@@ -26,8 +26,6 @@ public:
 
 	virtual bool start() = 0;
 	virtual bool stop() = 0;
-	virtual bool unconnect() = 0;
-	virtual bool update_device(Device* device) = 0;
 	virtual void clear_input_queue() = 0;
 	virtual void read(MidiEventBuffer& buffer) = 0;
 

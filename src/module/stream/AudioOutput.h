@@ -28,8 +28,8 @@ class Session;
 
 class AudioOutput : public Module {
 public:
-	AudioOutput(Session *session);
-	virtual ~AudioOutput();
+	explicit AudioOutput(Session *session);
+	~AudioOutput() override;
 
 	AudioInPort in{this, "in"};
 

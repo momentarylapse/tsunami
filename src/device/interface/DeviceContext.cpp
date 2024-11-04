@@ -44,8 +44,6 @@ public:
 	MidiInputStreamDummy(Session* session, SharedData& shared_data) : MidiInputStream(session, shared_data) {}
 	bool start() override { return false; }
 	bool stop() override { return false; }
-	bool unconnect() override { return false; }
-	bool update_device(Device* device) override { return false; }
 	void clear_input_queue() override {}
 	void read(MidiEventBuffer& buffer) override {}
 };

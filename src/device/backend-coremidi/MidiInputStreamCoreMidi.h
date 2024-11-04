@@ -14,19 +14,20 @@ namespace tsunami {
 
 	class MidiInputStreamCoreMidi : public MidiInputStream {
 	public:
-		MidiInputStreamCoreMidi(Session *session, Device *device, SharedData& shared_data);
+		MidiInputStreamCoreMidi(Session* session, Device* device, SharedData& shared_data);
 		~MidiInputStreamCoreMidi() override;
 
 		bool start() override;
 		bool stop() override;
-		bool unconnect() override;
-		bool update_device(Device* device) override;
+		bool connect(Device* device);
+		bool unconnect();
 		void clear_input_queue() override;
 		void read(MidiEventBuffer& buffer) override;
 
 		int port = -1;
 		int endpoit_ref = -1;
 		MidiEventBuffer buffer;
+		bool active = false;
 	};
 
 }

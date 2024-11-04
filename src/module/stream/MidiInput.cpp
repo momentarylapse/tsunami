@@ -10,8 +10,6 @@
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
 #include "../../Session.h"
-#include "../../data/base.h"
-#include "../../lib/kaba/lib/extern.h"
 #include "../../lib/os/time.h"
 #include "../../lib/hui/language.h"
 #include "../../plugins/PluginManager.h"
@@ -90,7 +88,6 @@ MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::Stream, "MidiIn
 
 MidiInput::~MidiInput() {
 	stop();
-	unconnect();
 	_kill_dev();
 	delete timer;
 }
@@ -113,12 +110,6 @@ void MidiInput::_kill_dev() {
 	state = State::NoDevice;
 }
 
-bool MidiInput::unconnect() {
-	if (stream)
-		return stream->unconnect();
-	return true;
-}
-
 void MidiInput::set_device(Device *d) {
 	config.device = d;
 	changed();
@@ -129,15 +120,17 @@ Device *MidiInput::get_device() {
 }
 
 void MidiInput::update_device() {
+	auto old_state = state;
 	if (state != State::NoDevice)
-		unconnect();
+		_kill_dev();
 
 	cur_device = config.device;
 
 	if (state == State::NoDevice)
 		_create_dev();
 
-	stream->update_device(cur_device);
+	if (old_state == State::Capturing)
+		start();
 }
 
 bool MidiInput::start() {

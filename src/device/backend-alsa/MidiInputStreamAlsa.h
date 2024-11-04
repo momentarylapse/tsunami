@@ -21,8 +21,8 @@ public:
 
 	bool start() override;
 	bool stop() override;
-	bool unconnect() override;
-	bool update_device(Device* device) override;
+	bool unconnect();
+	bool update_device(Device* device);
 	void clear_input_queue() override;
 	void read(MidiEventBuffer& buffer) override;
 

@@ -60,37 +60,38 @@ MidiInputStreamCoreMidi::MidiInputStreamCoreMidi(Session *session, Device *devic
 	if (result) {
 		session->e(string("Error creating midi port: ") + i2s(result));
 		error = true;
+		return;
 	}
 
-	if (device->index_in_lib >= 0) {
-		result = MIDIPortConnectSource((MIDIPortRef)port, (MIDIEndpointRef)device->index_in_lib, this);
-		if (result) {
-			session->e(string("Error connecting to midi source: ") + i2s(result));
-			error = true;
-		} else {
-			endpoit_ref = device->index_in_lib;
-		}
-	}
+	connect(device);
 }
 
 MidiInputStreamCoreMidi::~MidiInputStreamCoreMidi() {
-	MidiInputStreamCoreMidi::unconnect();
+	unconnect();
 	if (port >= 0)
 		MIDIPortDispose((MIDIPortRef)port);
 }
 
 bool MidiInputStreamCoreMidi::start() {
+	active = true;
 	return true;
 }
 
 bool MidiInputStreamCoreMidi::stop() {
+	active = false;
 	return true;
 }
 
-bool MidiInputStreamCoreMidi::update_device(Device* device) {
-	if ((device->client < 0) or (device->port < 0))
+bool MidiInputStreamCoreMidi::connect(Device* device) {
+	if (device->index_in_lib < 0)
 		return true;
-
+	auto result = MIDIPortConnectSource((MIDIPortRef)port, (MIDIEndpointRef)device->index_in_lib, this);
+	if (result) {
+		session->e(string("Error connecting to midi source: ") + i2s(result));
+		error = true;
+		return false;
+	}
+	endpoit_ref = device->index_in_lib;
 	return true;
 }
 

@@ -27,8 +27,8 @@ class Session;
 class MidiInput : public Module {
 public:
 
-	MidiInput(Session *session);
-	virtual ~MidiInput();
+	explicit MidiInput(Session *session);
+	~MidiInput() override;
 
 	void _create_dev();
 	void _kill_dev();
@@ -51,7 +51,6 @@ public:
 
 	int _cdecl sample_rate() { return _sample_rate; }
 
-	bool _cdecl unconnect();
 	void _cdecl set_device(Device *d);
 	Device *_cdecl get_device();
 

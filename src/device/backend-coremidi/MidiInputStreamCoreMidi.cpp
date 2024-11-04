@@ -32,13 +32,16 @@ void MyMIDIReadProc(const MIDIPacketList *pktlist, void* readProcRefCon, void* s
 		int cmd = data[0];
 		if ((cmd & 0xf0) == 0x80 and data.num >= 3) {
 			// note off
-			stream->buffer.add(MidiEvent(0, data[1], 0));
+			stream->buffer.add(MidiEvent(0, data[1], 0).with_raw(data));
 			//msg_write("off " + i2s(data[1]));
 
 		} else if ((cmd & 0xf0) == 0x90 and data.num >= 3) {
 			// note on
-			stream->buffer.add(MidiEvent(0, data[1], (float)data[2] / 127.0f));
+			stream->buffer.add(MidiEvent(0, data[1], (float)data[2] / 127.0f).with_raw(data));
 			//msg_write("on " + i2s(data[1]));
+		} else {
+			// whatever
+			stream->buffer.add(MidiEvent::special(data));
 		}
 	}
 }

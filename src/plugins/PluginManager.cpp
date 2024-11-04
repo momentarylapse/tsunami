@@ -648,10 +648,14 @@ void PluginManager::link_app_data() {
 	ext->declare_class_element("MidiEvent.stringno", &MidiEvent::stringno);
 	ext->declare_class_element("MidiEvent.clef_position", &MidiEvent::clef_position);
 	ext->declare_class_element("MidiEvent.flags", &MidiEvent::flags);
+	ext->declare_class_element("MidiEvent.raw", &MidiEvent::raw);
+	ext->link_class_func("MidiEvent.is_note_on", &MidiEvent::is_note_on);
+	ext->link_class_func("MidiEvent.is_note_off", &MidiEvent::is_note_off);
+	ext->link_class_func("MidiEvent.is_special", &MidiEvent::is_special);
 
 	ext->declare_class_size("MidiEventBuffer", sizeof(MidiEventBuffer));
 	ext->declare_class_element("MidiEventBuffer.samples", &MidiEventBuffer::samples);
-	ext->link_class_func("MidiEventBuffer.__init__", &MidiEventBuffer::__init__);
+	ext->link_class_func("MidiEventBuffer.__init__", &generic__init__<MidiEventBuffer>);
 	ext->link_class_func("MidiEventBuffer.get_events", &MidiEventBuffer::get_events);
 	ext->link_class_func("MidiEventBuffer.get_notes", &MidiEventBuffer::get_notes);
 	ext->link_class_func("MidiEventBuffer.get_range", &MidiEventBuffer::range);
@@ -659,8 +663,8 @@ void PluginManager::link_app_data() {
 
 	ext->declare_class_size("MidiNoteBuffer", sizeof(MidiNoteBuffer));
 	ext->declare_class_element("MidiNoteBuffer.samples", &MidiNoteBuffer::samples);
-	ext->link_class_func("MidiNoteBuffer.__init__", &MidiNoteBuffer::__init__);
-	ext->link_class_func("MidiNoteBuffer.__delete__", &MidiNoteBuffer::__delete__);
+	ext->link_class_func("MidiNoteBuffer.__init__", &generic__init__<MidiNoteBuffer>);
+	ext->link_class_func("MidiNoteBuffer.__delete__", &generic__delete__<MidiNoteBuffer>);
 	ext->link_class_func("MidiNoteBuffer.get_events", &MidiNoteBuffer::get_events);
 	ext->link_class_func("MidiNoteBuffer.get_notes", &MidiNoteBuffer::get_notes);
 	ext->link_class_func("MidiNoteBuffer.get_range", &MidiNoteBuffer::range);

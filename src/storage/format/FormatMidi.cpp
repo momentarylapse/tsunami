@@ -430,12 +430,12 @@ void FormatMidi::save_song(StorageOperationData* od) {
 					v = bar_midi_offset + clamp(v, 0, bar_midi_ticks);
 					write_var(f, v - moffset);
 					moffset = v;
-					if (e.volume > 0) {
+					if (e.is_note_on()) {
 						// on
 						f->write_byte(0x90 + channel);
 						f->write_byte((int) (e.pitch));
 						f->write_byte((int) (e.volume * 127.0f));
-					} else {
+					} else if (e.is_note_off()) {
 						// off
 						f->write_byte(0x80 + channel);
 						f->write_byte((int) (e.pitch));

@@ -5,38 +5,42 @@ let MAX_PITCH = 128
 
 struct MidiNote as shared
 	var range: Range
-	var pitch: float
-	var volume: float
+	var pitch: f32
+	var volume: f32
 	var stringno = -1
 	var clef_position = -1
 	var modifier = 0
 	var flags = 0
 	func __init__()
-	func __init__(r: Range, _pitch: float, _volume: float)
+	func __init__(r: Range, _pitch: f32, _volume: f32)
 		range = r
 		pitch = _pitch
 		volume = _volume
-	func extern mut set(mask: int)
-	func extern is(mask: int) -> bool
-	func extern copy(offset: int) -> xfer[MidiNote]
+	func extern mut set(mask: i32)
+	func extern is(mask: i32) -> bool
+	func extern copy(offset: i32) -> xfer[MidiNote]
 
 struct MidiEvent
-	var pos: int
-	var pitch: float
-	var volume: float
+	var pos: i32
+	var pitch: f32
+	var volume: f32
 	var flags = 0
 	var stringno = -1
 	var clef_position = -1
+	var raw: i64
 	func __init__()
-	func __init__(_pos: int, _pitch: float, _volume: float)
+	func __init__(_pos: i32, _pitch: f32, _volume: f32)
 		pos = _pos
 		pitch = _pitch
 		volume = _volume
+	func extern is_note_on() -> bool
+	func extern is_note_off() -> bool
+	func extern is_special() -> bool
 	func __str__() -> string
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
 struct MidiEventBuffer extends MidiEvent[]
-	var samples: int
+	var samples: i32
 	func extern override __init__()
 	func extern get_notes(r: Range) -> MidiNoteBuffer
 	func extern get_events(r: Range) -> MidiEvent[]
@@ -44,10 +48,10 @@ struct MidiEventBuffer extends MidiEvent[]
 	func mut add_note(n: MidiNote)
 		add(MidiEvent(n.range.offset, n.pitch, n.volume))
 		add(MidiEvent(n.range.end(), n.pitch, 0))
-	func extern mut add_metronome_click(pos: int, level: int, volume: float)
+	func extern mut add_metronome_click(pos: i32, level: i32, volume: f32)
 
 struct MidiNoteBuffer extends shared![MidiNote][]
-	var samples: int
+	var samples: i32
 	func extern override __init__()
 	func extern override __delete__()
 	#extern selfref MidiNoteBuffer get_notes(Range r)
@@ -57,8 +61,8 @@ struct MidiNoteBuffer extends shared![MidiNote][]
 
 
 struct Instrument
-	var type: int
-	var string_pitch: int[]
+	var type: i32
+	var string_pitch: i32[]
 	func __init__()
 	func extern name() -> string
 	func extern static enumerate() -> Instrument[]

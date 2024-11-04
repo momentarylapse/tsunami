@@ -199,10 +199,6 @@ MidiEventBuffer::MidiEventBuffer() {
 	samples = 0;
 }
 
-void MidiEventBuffer::__init__() {
-	new(this) MidiEventBuffer;
-}
-
 void MidiEventBuffer::clear() {
 	Array<MidiEvent>::clear();
 	samples = 0;
@@ -221,7 +217,7 @@ int MidiEventBuffer::read(MidiEventBuffer &data, const Range &r) const {
 	data.samples = r.length;//min(r.length, samples - r.offset);
 	for (MidiEvent &e: *this)
 		if (r.is_inside(e.pos))
-			data.add(MidiEvent(e.pos - r.offset, e.pitch, e.volume));
+			data.add(e.shifted(- r.offset));
 	return data.samples;
 }
 
@@ -270,9 +266,9 @@ void MidiEventBuffer::sanify(const Range &r) {
 			continue;
 		}
 
-		if (e.volume > 0) {
+		if (e.is_note_on()) {
 			active.add(p);
-		} else {
+		} else if (e.is_note_off()) {
 			if (active.contains(p)) {
 				active.erase(p);
 			} else {
@@ -315,7 +311,7 @@ void MidiEventBuffer::add_metronome_click(int pos, int level, float volume) {
 
 void MidiEventBuffer::append(const MidiEventBuffer &data) {
 	for (MidiEvent &e: data)
-		add(MidiEvent(e.pos + samples, e.pitch, e.volume));
+		add(e.shifted(samples));
 	samples += data.samples;
 }
 
@@ -327,16 +323,7 @@ MidiNoteBuffer::MidiNoteBuffer(const MidiNoteBuffer &midi) {
 	*this = midi;
 }
 
-MidiNoteBuffer::~MidiNoteBuffer() {
-}
-
-void MidiNoteBuffer::__init__() {
-	new(this) MidiNoteBuffer;
-}
-
-void MidiNoteBuffer::__delete__() {
-	this->MidiNoteBuffer::~MidiNoteBuffer();
-}
+MidiNoteBuffer::~MidiNoteBuffer() = default;
 
 void MidiNoteBuffer::clear() {
 	shared_array<MidiNote>::clear();
@@ -447,7 +434,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 	MidiNoteBuffer a;
 	MidiEventBuffer start_events;
 	for (MidiEvent &e: events) {
-		if (e.volume > 0) {
+		if (e.is_note_on()) {
 			bool exists = false;
 			for (MidiEvent &bb: start_events)
 				if ((int)bb.pitch == (int)e.pitch) {
@@ -456,7 +443,7 @@ MidiNoteBuffer midi_events_to_notes(const MidiEventBuffer &events) {
 				}
 			if (!exists)
 				start_events.add(e);
-		} else {
+		} else if (e.is_note_off()) {
 			for (auto&& [i,bb]: enumerate(start_events))
 				if ((int)bb.pitch == (int)e.pitch) {
 					MidiNote *n = new MidiNote(Range::to(bb.pos, e.pos), bb.pitch, bb.volume);

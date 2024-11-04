@@ -34,7 +34,7 @@ int MidiEventStreamer::read(MidiEventBuffer& _midi) {
 	//midi.read(_midi, r);
 	for (MidiEvent &e : midi)
 		if (r.is_inside(e.pos))
-			_midi.add(MidiEvent(e.pos - offset, e.pitch, e.volume));
+			_midi.add(e.shifted(- offset));
 	offset += n;
 	return n;
 }

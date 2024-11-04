@@ -159,9 +159,9 @@ void Synthesizer::_handle_event(const MidiEvent &e) {
 	auto *pr = get_pitch_renderer((int)e.pitch);
 	if (!pr)
 		return;
-	if (e.volume > 0) {
+	if (e.is_note_on()) {
 		pr->on_start(e.volume);
-	} else {
+	} else if (e.is_note_off()) {
 		pr->on_end();
 	}
 }
@@ -182,7 +182,7 @@ void Synthesizer::render(AudioBuffer& buf) {
 
 				offset = e.pos;
 				_handle_event(e);
-				if (e.volume > 0)
+				if (e.is_note_on())
 					active_pitch.add(p);
 			}
 

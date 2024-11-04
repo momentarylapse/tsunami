@@ -29,5 +29,35 @@ MidiEvent::MidiEvent(const MidiNote *n) {
 	clef_position = n->clef_position;
 }
 
+bool MidiEvent::is_note_on() const {
+	return volume > 0;
+}
+
+bool MidiEvent::is_note_off() const {
+	return volume == 0;
+}
+
+bool MidiEvent::is_special() const {
+	return volume < 0;
+}
+
+
+MidiEvent MidiEvent::with_raw(const bytes& raw) const {
+	auto e = *this;
+	int size = min(raw.num, 8);
+	memcpy(&e.raw, raw.data, size);
+	return e;
+}
+
+MidiEvent MidiEvent::shifted(int offset) const {
+	auto e = *this;
+	e.pos += offset;
+	return e;
+}
+
+MidiEvent MidiEvent::special(const bytes& raw) {
+	return MidiEvent(-1, -1, -1).with_raw(raw);
+}
+
 }
 

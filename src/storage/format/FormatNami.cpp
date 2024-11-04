@@ -509,6 +509,7 @@ public:
 };
 
 
+// DEPRECATED
 class FileChunkMidiEvent : public FileChunk<MidiNoteBuffer,MidiEvent> {
 public:
 	FileChunkMidiEvent() : FileChunk<MidiNoteBuffer,MidiEvent>("event") {}
@@ -528,9 +529,9 @@ public:
 			if ((n->pitch == e.pitch) and (n->range.length == -1))
 				unended = i;
 
-		if ((unended >= 0) and (e.volume == 0)) {
+		if ((unended >= 0) and e.is_note_off()) {
 			(*parent)[unended]->range.set_end(e.pos);
-		}else if ((unended < 0) and (e.volume > 0)) {
+		}else if ((unended < 0) and e.is_note_on()) {
 			parent->add(new MidiNote(Range(e.pos, -1), e.pitch, e.volume));
 		}else if (unended >= 0) {
 			error("nami/midi: starting new note without ending old one");

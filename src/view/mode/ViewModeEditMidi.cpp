@@ -431,13 +431,13 @@ void ViewModeEditMidi::on_midi_input() {
 
 		// insert
 		for (auto &e: rec->buffer) {
-			if (e.volume > 0) {
+			if (e.is_note_on()) {
 				if (ri_keys.num > 0 and ri_timer.peek() > 0.3f)
 					ri_insert();
 				e.pos = 0;
 				ri_keys.add(e);
 				ri_timer.get();
-			} else {
+			} else if (e.is_note_off()) {
 				ri_insert();
 			}
 		}

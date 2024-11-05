@@ -874,7 +874,7 @@ if (APPLE)
 		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/hui_resources.txt" tsunami.app/Contents/Resources
 		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/license.txt" tsunami.app/Contents/Resources
 		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/static/license_small.txt" tsunami.app/Contents/Resources
-		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/plugins/" tsunami.app/Contents/Resources
+		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/plugins" tsunami.app/Contents/Resources
 		COMMAND cp -rf "${CMAKE_CURRENT_SOURCE_DIR}/.cmake/Info.plist" tsunami.app/Contents
 		DEPENDS tsunami tsunami.icns
 		VERBATIM)

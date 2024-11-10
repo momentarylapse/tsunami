@@ -4453,31 +4453,31 @@ homogenousx,box,linked
 5
 ToggleButton
 type-audio
-flat,huge,expandx,ignorefocus
+margin=40,image=track-audio,flat,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 type-midi
-flat,huge,expandx,ignorefocus
+image=track-midi,flat,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 type-metronome
-image=track-time,flat,huge,expandx,ignorefocus
+image=track-time,flat,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 type-master
-image=track-group,flat,huge,expandx,ignorefocus
+image=track-group,flat,expandx,ignorefocus
 3
 0
 0
 ToggleButton
 type-preset
-flat,huge,expandx,ignorefocus
+image=heart,flat,expandx,ignorefocus
 4
 0
 0
@@ -10871,7 +10871,7 @@ new-track-dialog/save-preset
 
 Save as preset...
 new-track-dialog/type-audio
-∿
+
 Audio
 new-track-dialog/type-master
 
@@ -10880,10 +10880,10 @@ new-track-dialog/type-metronome
 
 Metronome
 new-track-dialog/type-midi
-♫
+
 Midi
 new-track-dialog/type-preset
-❤
+
 From list of presets
 new-track-dialog/user-revealer-synth
 Synthesizer

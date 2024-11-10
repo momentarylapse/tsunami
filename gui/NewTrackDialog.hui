@@ -1,11 +1,11 @@
 Dialog new-track-dialog "New track" width=300 height=80 headerbar closebutton=no
 	Grid ? "" vertical width=320
 		Grid ? "" homogenousx box linked
-			ToggleButton type-audio "∿" flat huge expandx "tooltip=Audio" ignorefocus
-			ToggleButton type-midi "♫" flat huge expandx "tooltip=Midi" ignorefocus
-			ToggleButton type-metronome "" image=track-time flat huge expandx "tooltip=Metronome" ignorefocus
-			ToggleButton type-master "" image=track-group flat huge expandx "tooltip=Master" ignorefocus
-			ToggleButton type-preset "❤" flat huge expandx "tooltip=From list of presets" ignorefocus
+			ToggleButton type-audio "" image=track-audio flat big expandx "tooltip=Audio" ignorefocus
+			ToggleButton type-midi "" image=track-midi flat big expandx "tooltip=Midi" ignorefocus
+			ToggleButton type-metronome "" image=track-time flat big expandx "tooltip=Metronome" ignorefocus
+			ToggleButton type-master "" image=track-group flat big expandx "tooltip=Master" ignorefocus
+			ToggleButton type-preset "" image=heart flat big expandx "tooltip=From list of presets" ignorefocus
 		Revealer revealer-channels ""
 			Group g-channels "Channels"
 				Grid ? ""

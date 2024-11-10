@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64px"
+   height="64px"
+   id="svg4485"
+   version="1.1"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="heart-symbolic.svg"
+   inkscape:export-filename="/home/michi/Projekte/Tsunami/static/track-audio.png"
+   inkscape:export-xdpi="18"
+   inkscape:export-ydpi="18"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs4487" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="11"
+     inkscape:cx="48.045455"
+     inkscape:cy="35.363637"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:document-units="px"
+     inkscape:grid-bbox="true"
+     inkscape:window-width="2560"
+     inkscape:window-height="1371"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4670" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata4490">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <g
+       aria-label="❤"
+       id="text313"
+       style="stroke-width:0.41"
+       transform="matrix(3.3584294,0,0,3.6492995,-66.933365,-55.415062)">
+      <path
+         d="m 29.511882,30.149043 q -1.427081,-2.489579 -5.770824,-5.010409 -2.02083,-1.177081 -2.02083,-3.031245 0,-0.781249 0.281249,-1.499998 0.291666,-0.718748 0.864582,-1.281248 0.552083,-0.541665 1.270832,-0.854165 0.677082,-0.291666 1.479164,-0.291666 0.802082,0 1.479164,0.291666 0.708332,0.302083 1.270831,0.854165 0.552083,0.541666 0.843749,1.260415 0.302083,0.708332 0.302083,1.520831 0,-0.812499 0.291666,-1.520831 0.302083,-0.718749 0.854166,-1.260415 0.562499,-0.552082 1.270831,-0.854165 0.677082,-0.291666 1.479164,-0.291666 0.802082,0 1.479165,0.291666 0.718748,0.3125 1.270831,0.854165 0.572916,0.5625 0.854165,1.281248 0.291666,0.718749 0.291666,1.499998 0,1.874997 -2.02083,3.031245 -4.343743,2.52083 -5.770824,5.010409 z"
+         style="font-size:21.3333px;font-family:'Noto Sans';-inkscape-font-specification:'Noto Sans, Normal'"
+         id="path419" />
+    </g>
+  </g>
+</svg>

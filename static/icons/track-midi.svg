@@ -2,22 +2,22 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64px"
    height="64px"
    id="svg2985"
    version="1.1"
-   inkscape:version="0.92.4 5da689c313, 2019-01-14"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    sodipodi:docname="track-midi.svg"
    inkscape:export-filename="/home/michi/Projekte/Tsunami/static/track-midi.png"
    inkscape:export-xdpi="18"
-   inkscape:export-ydpi="18">
+   inkscape:export-ydpi="18"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <defs
      id="defs2987" />
   <sodipodi:namedview
@@ -28,17 +28,24 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.7781746"
-     inkscape:cx="-22.691699"
-     inkscape:cy="32"
+     inkscape:cx="32.912607"
+     inkscape:cy="38.440896"
      inkscape:current-layer="layer1"
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="2560"
-     inkscape:window-height="1387"
+     inkscape:window-width="1920"
+     inkscape:window-height="1011"
      inkscape:window-x="0"
      inkscape:window-y="0"
-     inkscape:window-maximized="1" />
+     inkscape:window-maximized="1"
+     inkscape:showpageshadow="2"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid136" />
+  </sodipodi:namedview>
   <metadata
      id="metadata2990">
     <rdf:RDF>
@@ -56,44 +63,40 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="fill:none;stroke:#000000;stroke-width:2.37925792;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="m 25.360687,51.100614 0.05041,-36.420612"
+       style="fill:none;stroke:#000000;stroke-width:2.21157;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 25.759297,49.773511 25.806154,15.91985"
        id="path3781"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:2.37925792;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       d="M 54.812946,40.315675 54.863351,3.8441104"
+       style="fill:none;stroke:#000000;stroke-width:2.21157;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 53.13574,39.748702 53.182592,5.8476798"
        id="path3781-2"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc"
-       inkscape:transform-center-x="1.2084128"
-       inkscape:transform-center-y="1.2215592" />
+       inkscape:transform-center-x="1.1232428"
+       inkscape:transform-center-y="1.1354627" />
     <path
-       style="fill:#000000;fill-opacity:1;stroke:none"
-       d="M 25.14447,13.969248 55.203234,2.2824089 55.446626,9.90961 25.509557,21.842488 z"
+       style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.929519"
+       d="m 25.480148,14.867709 27.385456,-10.0747 0.859153,6.69267 -27.827083,11.09184 z"
        id="path3803"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
-    <path
-       sodipodi:type="arc"
-       style="fill:#000000;fill-opacity:1;stroke-width:2.41100001;stroke-miterlimit:4;stroke-dasharray:none"
+    <ellipse
+       style="fill:#000000;fill-opacity:1;stroke-width:2.411;stroke-miterlimit:4;stroke-dasharray:none"
        id="path2993-7"
-       sodipodi:cx="15.454545"
-       sodipodi:cy="42.454544"
-       sodipodi:rx="8.363636"
-       sodipodi:ry="8.636364"
-       d="m 23.818181,42.454544 a 8.363636,8.636364 0 1 1 -16.727272,0 8.363636,8.636364 0 1 1 16.727272,0 z"
-       transform="matrix(1.2303036,-0.11022806,0,0.99886788,26.879755,0.76112425)" />
-    <path
-       sodipodi:type="arc"
-       style="fill:#000000;fill-opacity:1;stroke-width:2.41100001;stroke-miterlimit:4;stroke-dasharray:none"
+       transform="matrix(0.99601044,-0.08923675,0,1,0,0)"
+       cx="45.024605"
+       cy="44.834015"
+       rx="9.6028891"
+       ry="8.0185785" />
+    <ellipse
+       style="fill:#000000;fill-opacity:1;stroke-width:2.411;stroke-miterlimit:4;stroke-dasharray:none"
        id="path2993-7-9"
-       sodipodi:cx="15.454545"
-       sodipodi:cy="42.454544"
-       sodipodi:rx="8.363636"
-       sodipodi:ry="8.636364"
-       d="m 23.818181,42.454544 a 8.363636,8.636364 0 1 1 -16.727272,0 8.363636,8.636364 0 1 1 16.727272,0 z"
-       transform="matrix(1.2303036,-0.11022806,0,0.99886788,-2.8747692,12.509473)" />
+       transform="matrix(0.99601044,-0.08923675,0,1,0,0)"
+       cx="17.256418"
+       cy="53.27639"
+       rx="9.6028891"
+       ry="8.0185785" />
   </g>
 </svg>

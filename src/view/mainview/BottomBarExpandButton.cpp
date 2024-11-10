@@ -38,13 +38,17 @@ void BottomBarExpandButton::on_draw(Painter *p) {
 	}
 	p->set_color(bg);
 	p->draw_circle(area.center(), radius);
+
+	// arrow
 	p->set_color(fg);
-	p->set_font_size(theme.FONT_SIZE_HUGE);
+	p->set_line_width(4);
+	const auto c = area.center();
+	const float dx = 11;
+	const float dy = 5;
 	if (bottom_bar()->visible)
-		draw_str_centered(p, area.center(),  "\u25bc");
+		p->draw_lines({c + vec2(-dx,-dy), c + vec2(0,dy), c + vec2(dx,-dy)});
 	else
-		draw_str_centered(p, area.center(),  "\u25b2");
-	p->set_font_size(theme.FONT_SIZE);
+		p->draw_lines({c + vec2(-dx,dy), c + vec2(0,-dy), c + vec2(dx,dy)});
 }
 bool BottomBarExpandButton::on_left_button_down(const vec2 &m) {
 	if (bottom_bar()->visible)

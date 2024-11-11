@@ -1,0 +1,206 @@
+use tsunami.*
+use synthesizer.Sample.*
+use hui
+
+let NSURFACES = 4
+let NRIMS = 9
+
+let SURFACE_PITCHES = [36, 38, 40, 41] # C2,D2,E2,F2
+let RIM_PITCHES = [48, 50, 52, 53, 55, 57, 59, 60, 72] # C3,D3,...,C4,  C5
+
+
+class Mandala extends TsunamiPlugin
+	class Config extends Module.Config
+		var number_of_zones: i32
+		var surface_samples: shared[SampleRef][]
+		var rim_samples: shared[SampleRef][]
+		func override reset()
+			number_of_zones = NSURFACES
+			surface_samples.clear()
+			surface_samples.resize(NSURFACES)
+			rim_samples.clear()
+			rim_samples.resize(NRIMS)
+		
+	var config: Config
+	
+	var source, output: shared[Module]
+	var synth: shared[SampleSynthesizer]
+	var chain: shared[SignalChain]
+	
+
+	func override on_start()
+		# create signal chain
+		# midi in => synth => audio out
+		chain = session.create_signal_chain("mandala")
+		source = chain!.add_basic(Module.Type.STREAM, "MidiInput")
+		output = chain!.add_basic(Module.Type.STREAM, "AudioOutput")
+		synth = chain!.add[SampleSynthesizer]()
+		chain!.connect(source, 0, synth, 0)
+		chain!.connect(synth, 0, output, 0)
+		chain!.start()
+
+	func override on_stop()
+		chain = nil
+	
+	func override on_config()
+		for s in synth
+			# configure synth with our samples
+			s.config.samples.clear()
+			s.config.samples.resize(128)
+			for i=>p in SURFACE_PITCHES
+				if i < len(config.surface_samples)
+					s.config.samples[p] = config.surface_samples[i]
+			for i=>p in RIM_PITCHES
+				if i < len(config.rim_samples)
+					s.config.samples[p] = config.rim_samples[i]
+			s.changed()
+		
+	
+	func override create_panel() -> xfer[ConfigPanel]
+		return new MandalaPanel(self)
+
+
+class MandalaPanel extends ConfigPanel
+	override c: Mandala&
+	var config: Mandala.Config&
+	var source_panel: shared[ConfigPanel]
+	var width, height: i32
+	
+	struct Hover
+		enum Type
+			SURFACE
+			RIM
+		type: Type
+		index: i32
+	
+	var hover: Hover?
+	
+	func override __init__(_s: Module)
+		config := &c.config
+		
+		from_source("
+Grid grid ''
+	.
+	---|
+	Grid ? ''
+		Label ? 'Zones'
+		ComboBox number-of-zones '1\\2\\4' expandx
+	---|
+	DrawingArea area '' expandx expandy")
+	
+		for s in c.source
+			source_panel = s.create_panel()
+		embed(source_panel, "grid", 0, 0)
+		for p in source_panel
+			p.update()
+		
+		event("number-of-zones", on_number_of_zones)
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:mouse-move", on_mouse_move)
+		event_x("area", "hui:left-button-down", on_left_button_down)
+	
+	func override update()
+		set_int("number-of-zones", clamp(config.number_of_zones, 1, 3) - 1)
+		redraw("area")
+	
+	func mut on_number_of_zones()
+		let n = get_int("number-of-zones")
+		config.number_of_zones = 2^n
+		changed()
+		redraw("area")
+	
+	func mut on_draw(p: hui.Painter)
+		width = p.width
+		height = p.height
+		
+		p.set_color(theme.background)
+		p.draw_rect([0,width, 0,height])
+		
+		p.set_color(theme.text)
+		#p.draw_str([10,10], "test")
+		
+		
+		# left: surfaces
+		let c1 = vec2(width / 4, height / 2)
+		let r = min(c1.x, c1.y) * 0.9
+		
+		p.set_color(theme.neon(4).with_alpha(0.3))
+		p.draw_circle(c1, r)
+		p.draw_circle(c1, r*0.75)
+		p.draw_circle(c1, r*0.5)
+		p.draw_circle(c1, r*0.25)
+		p.set_fill(false)
+		p.set_color(theme.text)
+		p.draw_circle(c1, r)
+		if config.number_of_zones == 4
+			p.draw_circle(c1, r*0.75)
+		if config.number_of_zones != 1
+			p.draw_circle(c1, r*0.5)
+		if config.number_of_zones == 4
+			p.draw_circle(c1, r*0.25)
+		
+		
+		# right: rims
+		let c2 = vec2(width * 3 / 4, height / 2)
+		p.set_color(theme.neon(4).with_alpha(0.3))
+		p.set_fill(true)
+		p.draw_circle(c2, r)
+		p.set_fill(false)
+		p.set_color(theme.text)
+		p.draw_circle(c2, r)
+		p.set_fill(true)
+		p.set_font_size(8)
+		for i in 0:NRIMS
+			let phi = f32(i) / NRIMS * 2 * pi
+			p.set_color(theme.text)
+			p.draw_circle(c2 + r * vec2(sin(phi), -cos(phi)), 5)
+			let phi2 = phi + pi / NRIMS
+			var fs = 8.0
+			p.set_color(theme.text_soft2)
+			for h in hover
+				if h.type == Hover.Type.RIM and h.index == i
+					p.set_color(theme.text)
+					fs = 10.0
+			p.set_font_size(fs)
+			p.draw_str(c2 + (r - 13) * vec2(sin(phi2), -cos(phi2)) + vec2(-fs/2,-fs/2), str(i+1))
+	
+	func get_hover(m: vec2) -> Hover?
+		# left: surfaces
+		let c1 = vec2(width / 4, height / 2)
+		let r = min(c1.x, c1.y) * 0.9
+		
+		for i in 0:NSURFACES
+			if len(m - c1) < r * f32(i) / f32(NSURFACES)
+				return [Hover.Type.SURFACE, i]
+		
+		
+		# right: rims
+		let c2 = vec2(width * 3 / 4, height / 2)
+		for i in 0:NRIMS
+			let phi = (f32(i) + 0.5) / NRIMS * 2 * pi
+			let c = c2 + (r - 13) * vec2(sin(phi), -cos(phi))
+			if len(m - c) < r * 0.3
+				return [Hover.Type.RIM, i]
+		
+		return nil
+	
+	func mut on_mouse_move()
+		hover = get_hover(hui.get_event().mouse)
+		redraw("area")
+
+	func mut on_left_button_down()
+		for h in hover
+			if h.type == Hover.Type.RIM
+				let i = h.index
+				var old: Sample* = nil
+				for s in config.rim_samples[i]
+					old = &s.origin
+				let f = func(ss: Sample*)
+					for _s in ss
+						config.rim_samples[i] = _s.create_ref()
+					else
+						config.rim_samples[i] = nil
+					changed()
+					update()
+				SelectSample(c.session, self, old).then(f)
+		

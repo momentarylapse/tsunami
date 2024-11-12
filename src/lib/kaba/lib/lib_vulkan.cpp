@@ -183,8 +183,8 @@ public:
 
 class VulkanComputePipeline : public vulkan::ComputePipeline {
 public:
-	void __init__(const string &dset_layouts, vulkan::Shader *shaders) {
-		new(this) vulkan::ComputePipeline(dset_layouts, shaders);
+	void __init__(vulkan::Shader *shaders) {
+		new(this) vulkan::ComputePipeline(shaders);
 	}
 };
 
@@ -599,7 +599,6 @@ void SIAddPackageVulkan(Context *c) {
 	add_class(TypeComputePipeline);
 		class_derive_from(TypePipeline);
 		class_add_func(Identifier::func::Init, TypeVoid, vul_p(&VulkanComputePipeline::__init__), Flags::Mutable);
-			func_add_param("layout", TypeString);
 			func_add_param("shader", TypeShaderP);
 
 

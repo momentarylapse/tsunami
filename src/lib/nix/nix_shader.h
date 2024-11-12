@@ -78,6 +78,8 @@ class Context;
 void init_shaders(Context* ctx);
 void _cdecl set_shader(Shader *s);
 
+void image_barrier();
+
 
 };
 

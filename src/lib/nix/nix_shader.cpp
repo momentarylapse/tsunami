@@ -400,6 +400,10 @@ void Shader::dispatch(int nx, int ny, int nz) {
 	glDispatchCompute(nx, ny, nz);
 }
 
+void image_barrier() {
+	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_BUFFER_UPDATE_BARRIER_BIT);
+}
+
 
 void init_shaders(Context *ctx) {
 	ctx->vertex_module_default = "vertex-default-nix";

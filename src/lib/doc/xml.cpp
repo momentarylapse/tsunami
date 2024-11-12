@@ -19,6 +19,13 @@ SyntaxError::SyntaxError() : Exception("xml syntax error") {}
 
 class EndOfFile {};
 
+string encode_attribute(const string& s) {
+	return s.replace("&", "&amp;").replace("\"", "&quot;");
+}
+string decode_text(const string& s) {
+	return s.replace("&quot;", "\"").replace("&apos;", "\'").replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&");
+}
+
 void skip_until_char(Stream *f, char c) {
 	while (!f->is_end()) {
 		char cc;
@@ -160,7 +167,7 @@ void Parser::write_element(Stream *f, Element &e, int indent) {
 
 	f->write("<" + e.tag);
 	for (auto &a: e.attributes)
-		f->write(" " + a.key + "=\"" + a.value + "\"");
+		f->write(" " + a.key + "=\"" + encode_attribute(a.value) + "\"");
 
 	if (e.text.num + e.elements.num == 0) {
 		f->write(" />\n");
@@ -320,7 +327,7 @@ Element Parser::read_tag(Stream *f) {
 		s = read_next_exp(f);
 		if (s != "=")
 			throw SyntaxError();
-		a.value = read_next_exp(f);
+		a.value = decode_text(read_next_exp(f));
 		e.attributes.add(a);
 	}
 

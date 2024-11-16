@@ -19,8 +19,8 @@ class Playback
 	func extern mut play()
 	func extern is_active() -> bool
 	func extern is_paused() -> bool
-	func extern get_pos() -> int
-	func extern mut set_pos(pos: int)
+	func extern get_pos() -> i32
+	func extern mut set_pos(pos: i32)
 	func extern mut set_loop(loop: bool)
 
 
@@ -30,11 +30,11 @@ class SongRenderer extends AudioSource
 	func extern mut render(r: Range, out buf: AudioBuffer)
 	func extern mut set_range(r: Range)
 	func extern mut set_loop(l: bool)
-	func extern override mut read(out b: AudioBuffer) -> int
+	func extern override mut read(out b: AudioBuffer) -> i32
 	#extern override void reset_state()
 	func extern range() -> Range
-	func extern get_pos() -> int
-	func extern mut set_pos(pos: int)
+	func extern get_pos() -> i32
+	func extern mut set_pos(pos: i32)
 	func extern selfref get_beat_source() -> BeatSource*
 
 
@@ -42,7 +42,7 @@ class SongRenderer extends AudioSource
 class Storage
 	func extern load(out s: Song, filename: os.Path) -> future[void]
 	func extern save(s: Song&, filename: os.Path) -> future[void]
-	func extern save_via_renderer(source: Module.OutPort, filename: os.Path, num_samples: int, tags: Tag[]) -> future[void]
+	func extern save_via_renderer(source: Module.OutPort, filename: os.Path, num_samples: i32, tags: Tag[]) -> future[void]
 	func extern load_buffer(filename: os.Path) -> future[AudioBuffer]
 	var current_directory: os.Path
 
@@ -64,12 +64,12 @@ class SignalChain extends Module
 		return weak(_add(M)) as xfer[M]
 	func extern mut add_existing(m: shared![Module]) -> shared![Module]
 	func extern mut delete(m: Module*)
-	func extern mut connect(source: Module*, source_port: int, target: Module*, target_port: int)
-	func extern mut disconnect(source: Module*, source_port: int, target: Module*, target_port: int)
-	func extern find_connected(m: Module&, port: int, direction: int) -> (Module&,int)?
+	func extern mut connect(source: Module*, source_port: i32, target: Module*, target_port: i32)
+	func extern mut disconnect(source: Module*, source_port: i32, target: Module*, target_port: i32)
+	func extern find_connected(m: Module&, port: i32, direction: i32) -> (Module&,i32)?
 	func extern mut start()
 	func extern mut stop()
 	func extern is_prepared() -> bool
 	func extern is_active() -> bool
-	func extern mut set_update_dt(dt: float)
-	func extern mut set_buffer_size(size: int)
+	func extern mut set_update_dt(dt: f32)
+	func extern mut set_buffer_size(size: i32)

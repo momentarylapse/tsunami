@@ -36,6 +36,7 @@ class Mandala extends TsunamiPlugin
 		# midi in => synth => audio out
 		chain = session.create_signal_chain("mandala")
 		source = chain!.add[MidiInput]()
+		source!.set_free_flow(true)
 		output = chain!.add[AudioOutput]()
 		synth = chain!.add[SampleSynthesizer]()
 		chain!.connect(source, 0, synth, 0)

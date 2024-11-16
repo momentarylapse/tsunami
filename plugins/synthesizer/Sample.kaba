@@ -16,11 +16,11 @@ class SampleRenderer extends PitchRenderer
 		sample = nil
 		if pitch < len(synth.config.samples)
 			sample = synth.config.samples[pitch]
-	func override on_start(volume: float)
+	func override on_start(volume: f32)
 		events.add(MidiEvent(0, 0, volume))
 	func override render(out buf: AudioBuffer) -> bool
 		for s in sample
-			var to_del: int[]
+			var to_del: i32[]
 			for mut i=>e in events
 				buf.add(s.origin.buf, e.pos, e.volume)
 				e.pos -= buf.length
@@ -35,7 +35,7 @@ class SampleRenderer extends PitchRenderer
 class SampleSynthesizer extends Synthesizer
 	var config: SampleConfig
 	
-	func override create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
+	func override create_pitch_renderer(pitch: i32) -> xfer[PitchRenderer]
 		return new SampleRenderer(self, pitch)
 	
 	func override create_panel() -> xfer[ConfigPanel]

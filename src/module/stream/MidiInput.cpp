@@ -6,10 +6,6 @@
  */
 
 #include "MidiInput.h"
-
-#include <os/msg.h>
-#include <threads/Thread.h>
-
 #include "../../device/interface/DeviceContext.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
@@ -27,8 +23,8 @@ namespace tsunami {
 int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 	const auto events = shared_data.buffer.read();
 
-	if (!config.free_flow)
-		msg_todo("MidiInput non-free-flowing!");
+	//if (!config.free_flow)
+	//	msg_todo("MidiInput non-free-flowing!");
 
 	//if (config.free_flow) {
 		for (auto &e: events) {
@@ -149,13 +145,12 @@ void MidiInput::update_device() {
 		start();
 }
 
-void MidiInput::set_free_flowing(bool free_flowing) {
-	config.free_flow = free_flowing;
+void MidiInput::set_free_flow(bool free_flow) {
+	config.free_flow = free_flow;
 	changed();
 }
 
 bool MidiInput::start() {
-	msg_write("START  " + p2s(pthread_self()));
 	if (state == State::NoDevice)
 		_create_dev();
 	if (state != State::Paused)

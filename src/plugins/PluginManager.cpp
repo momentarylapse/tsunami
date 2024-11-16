@@ -835,7 +835,8 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("MidiInput.stop",	 &MidiInput::stop);
 		ext->link_class_func("MidiInput.is_capturing", &MidiInput::is_capturing);
 		ext->link_class_func("MidiInput.sample_rate", &MidiInput::sample_rate);
-		ext->link_class_func("MidiInput.set_device", &AudioInput::set_device);
+		ext->link_class_func("MidiInput.set_device", &MidiInput::set_device);
+		ext->link_class_func("MidiInput.set_free_flow", &MidiInput::set_free_flow);
 	}
 
 	{

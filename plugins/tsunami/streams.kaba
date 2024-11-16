@@ -53,3 +53,4 @@ class MidiInput extends Module
 	func extern is_capturing() -> bool
 	func extern sample_rate() -> i32
 	func extern mut set_device(device: Device*)
+	func extern mut set_free_flow(free_flow: bool)

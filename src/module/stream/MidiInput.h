@@ -54,7 +54,7 @@ public:
 	void _cdecl set_device(Device *d);
 	Device *_cdecl get_device();
 
-	void set_free_flowing(bool free_flowing);
+	void set_free_flow(bool free_flow);
 
 	MidiOutPort out{this};
 

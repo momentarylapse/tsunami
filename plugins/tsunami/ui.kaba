@@ -2,6 +2,8 @@ use hui
 use common.*
 use midi.*
 use song.*
+use modules.*
+use streams.*
 
 
 let NUM_PEAK_LEVELS = 24
@@ -65,6 +67,13 @@ class Slider extends Object
 	func extern set_slider_range(v_min: f32, v_max: f32)
 	func extern set_scale(factor: f32)
 	func extern enable(enabled: bool)
+
+class DeviceSelector extends Object
+	func extern __init__(panel: hui.Panel, id: string, session: Session, type: Device.Type, on_update: void->void)
+	func override __delete__()
+	func extern get() -> Device*
+	func extern mut set(dev: Device*)
+
 
 #class Progress
 #	extern void __init__(string title, Window *parent)

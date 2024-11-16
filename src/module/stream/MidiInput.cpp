@@ -21,8 +21,8 @@ namespace kaba {
 namespace tsunami {
 
 int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
-	if (config.free_flow){
-		for (auto &e: events){
+	if (config.free_flow) {
+		for (auto &e: events) {
 			e.pos = 0;
 			midi.add(e);
 		}
@@ -33,7 +33,7 @@ int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 		int samples = min(midi.samples, events.samples);
 		if (samples < midi.samples)
 			return Return::NotEnoughData;
-		for (int i=events.num-1; i>=0; i--){
+		for (int i=events.num-1; i>=0; i--) {
 			if (events[i].pos < samples){
 				//msg_write("add " + format("%.0f  %f", events[i].pitch, events[i].volume));
 				midi.add(events[i]);
@@ -111,6 +111,8 @@ void MidiInput::_kill_dev() {
 }
 
 void MidiInput::set_device(Device *d) {
+	if (!d)
+		return;
 	config.device = d;
 	changed();
 }

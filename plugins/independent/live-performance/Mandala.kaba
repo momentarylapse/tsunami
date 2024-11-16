@@ -16,6 +16,7 @@ class Mandala extends TsunamiPlugin
 		var surface_samples: shared[SampleRef][]
 		var rim_samples: shared[SampleRef][]
 		func override reset()
+			device = nil
 			number_of_zones = NSURFACES
 			surface_samples.clear()
 			surface_samples.resize(NSURFACES)
@@ -56,6 +57,8 @@ class Mandala extends TsunamiPlugin
 				if i < len(config.rim_samples)
 					s.config.samples[p] = config.rim_samples[i]
 			s.changed()
+		for s in source
+			s.set_device(config.device)
 		
 	
 	func override create_panel() -> xfer[ConfigPanel]
@@ -65,7 +68,8 @@ class Mandala extends TsunamiPlugin
 class MandalaPanel extends ConfigPanel
 	override c: Mandala&
 	var config: Mandala.Config&
-	var source_panel: shared[ConfigPanel]
+#	var source_panel: shared[ConfigPanel]
+	var source_selector: owned![DeviceSelector]
 	var width, height: i32
 	
 	struct Hover
@@ -82,19 +86,23 @@ class MandalaPanel extends ConfigPanel
 		
 		from_source("
 Grid grid ''
-	.
 	---|
 	Grid ? ''
+		Label ? 'Device'
+		ComboBox source '' expandx
+		---|
 		Label ? 'Zones'
 		ComboBox number-of-zones '1\\2\\4' expandx
 	---|
 	DrawingArea area '' expandx expandy")
 	
-		for s in c.source
-			source_panel = s.create_panel()
-		embed(source_panel, "grid", 0, 0)
-		for p in source_panel
-			p.update()
+	#	for s in c.source
+	#		source_panel = s.create_panel()
+	#	embed(source_panel, "grid", 0, 0)
+	#	for p in source_panel
+	#		p.update()
+	
+		source_selector = new DeviceSelector(self, "source", c.session, Device.Type.MIDI_INPUT, on_source)
 		
 		event("number-of-zones", on_number_of_zones)
 		event_x("area", "hui:draw", on_draw)
@@ -110,6 +118,11 @@ Grid grid ''
 		config.number_of_zones = 2^n
 		changed()
 		redraw("area")
+	
+	func mut on_source()
+		config.device = source_selector.get()
+		
+		changed()
 	
 	func mut on_draw(p: hui.Painter)
 		width = p.width

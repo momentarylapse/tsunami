@@ -762,6 +762,7 @@ add_executable(tsunami WIN32
 	src/view/helper/graph/ToolTipOverlay.cpp
 	src/view/helper/BreadCrumps.cpp
 	src/view/helper/CpuDisplay.cpp
+	src/view/helper/DeviceSelector.cpp
 	src/view/helper/Dial.cpp
 	src/view/helper/Drawing.cpp
 	src/view/helper/FxListEditor.cpp

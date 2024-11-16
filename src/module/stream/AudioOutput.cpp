@@ -185,6 +185,8 @@ int AudioOutput::_read_stream_into_ring_buffer(int buffer_size) {
 }
 
 void AudioOutput::set_device(Device *d) {
+	if (!d)
+		return;
 	config.device = d;
 	on_config();
 	out_changed.notify();

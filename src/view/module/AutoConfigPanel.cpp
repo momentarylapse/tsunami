@@ -24,6 +24,7 @@
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
 #include "../../Session.h"
+#include "../helper/DeviceSelector.h"
 
 namespace kaba {
 	string find_enum_label(const Class *type, int value);
@@ -510,18 +511,15 @@ public:
 	}
 };
 
-class AutoConfigDataDevice: public AutoConfigData {
+class AutoConfigDataDevice: public obs::Node<AutoConfigData> {
 public:
-	Device **value;
+	Device **value = nullptr;
 	string id;
-	ConfigPanel *panel;
 	DeviceType type;
 	Session *session;
-	Array<Device*> list;
-	AutoConfigDataDevice(const string &_name, Session *_session) : AutoConfigData(_name) {
+	DeviceSelector* selector = nullptr;
+	AutoConfigDataDevice(const string &_name, Session *_session) : obs::Node<AutoConfigData>(_name) {
 		session = _session;
-		value = nullptr;
-		panel = nullptr;
 		type = DeviceType::AudioOutput;
 	}
 	void parse(const string &s) override {
@@ -531,30 +529,20 @@ public:
 		if (s == "midi:input")
 			type = DeviceType::MidiInput;
 	}
-	void update_list() {
-		list = session->device_manager->good_device_list(type);
-		if (panel) {
-			panel->reset(id);
-			for (auto *d: list)
-				panel->add_string(id, shorten(d->get_name(), 42));
-			panel->set_int(id, list.find(*value));
-		}
-	}
 	void add_gui(ConfigPanel *p, int i, const hui::Callback &callback) override {
 		id = "device-" + i2s(i);
-		panel = p;
 		p->add_combo_box("!expandx", 1, i, id);
-		p->event(id, callback);
-		update_list();
+
+		selector = new DeviceSelector(p, id, session, type);
+		selector->out_value >> create_data_sink<Device*>([callback] (Device*) {
+			callback();
+		});
 	}
 	void value_from_gui() override {
-		*value = session->device_manager->choose_device(type);
-		int n = panel->get_int(id);
-		if (n >= 0)
-			*value = list[n];
+		*value = selector->get();
 	}
 	void value_to_gui() override {
-		panel->set_int(id, list.find(*value));
+		selector->set(*value);
 	}
 };
 

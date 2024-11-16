@@ -48,6 +48,7 @@
 #include "../module/beats/BeatMidifier.h"
 #include "../view/module/ConfigPanel.h"
 #include "../view/helper/Progress.h"
+#include "../view/helper/DeviceSelector.h"
 #include "../storage/Storage.h"
 #include "../device/DeviceManager.h"
 #include "../module/stream/AudioInput.h"
@@ -1003,6 +1004,15 @@ void PluginManager::link_app_data() {
 		ext->link_class_func("Slider.set_slider_range", &Slider::set_slider_range);
 		ext->link_class_func("Slider.set_scale", &Slider::set_scale);
 		ext->link_class_func("Slider.enable", &Slider::enable);
+	}
+
+	{
+		DeviceSelector selector{nullptr, "", nullptr, DeviceType::None};
+		ext->declare_class_size("DeviceSelector", sizeof(DeviceSelector));
+		ext->link_class_func("DeviceSelector.__init__", &DeviceSelector::__init_ext__);
+		ext->link_virtual("DeviceSelector.__delete__", &DeviceSelector::__delete__, &selector);
+		ext->link_class_func("DeviceSelector.get", &DeviceSelector::get);
+		ext->link_class_func("DeviceSelector.set", &DeviceSelector::set);
 	}
 
 	{

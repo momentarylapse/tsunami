@@ -11,6 +11,7 @@ let RIM_PITCHES = [48, 50, 52, 53, 55, 57, 59, 60, 72] # C3,D3,...,C4,  C5
 
 class Mandala extends TsunamiPlugin
 	class Config extends Module.Config
+		var device: Device*
 		var number_of_zones: i32
 		var surface_samples: shared[SampleRef][]
 		var rim_samples: shared[SampleRef][]

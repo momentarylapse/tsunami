@@ -72,14 +72,6 @@ AudioOutput::~AudioOutput() {
 	_kill_dev();
 }
 
-void AudioOutput::__init__(Session *s) {
-	new(this) AudioOutput(s);
-}
-
-void AudioOutput::__delete__() {
-	this->AudioOutput::~AudioOutput();
-}
-
 void AudioOutput::_create_dev() {
 	if (has_device())
 		return;

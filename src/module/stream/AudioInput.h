@@ -27,11 +27,8 @@ class Session;
 class AudioInput : public Module {
 	friend class PluginManager;
 public:
-	AudioInput(Session *session);
-	virtual ~AudioInput();
-
-	void _cdecl __init__(Session *session);
-	void __delete__() override;
+	explicit AudioInput(Session *session);
+	~AudioInput() override;
 
 	void _cdecl set_device(Device *device);
 	Device* _cdecl get_device();

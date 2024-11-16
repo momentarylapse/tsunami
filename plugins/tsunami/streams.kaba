@@ -1,15 +1,23 @@
 use common.*
 use modules.*
 
+class Device
+	var name: string
+	var internal_name: string
+
+	func extern get_name() -> string
+
+
 class AudioOutput extends Module
 	var input: Module.InPort
+	
 	func extern __init__(session: Session)
 	func extern override __delete__()
 	func extern mut stop()
 	func extern mut start()
 	func extern is_playing() -> bool
-	func extern get_volume() -> float
-	func extern mut set_volume(volume: float)
+	func extern get_volume() -> f32
+	func extern mut set_volume(volume: f32)
 	func extern samples_played() -> i64?
 
 
@@ -17,10 +25,23 @@ class AudioInput extends Module
 	var output: Module.OutPort
 #	var current_buffer: RingBuffer
 #	var buffer: AudioBuffer
+
 	func extern __init__(session: Session)
 	func extern override __delete__()
 	func extern mut start() -> bool
 	func extern mut stop()
 	func extern is_capturing() -> bool
-	func extern sample_rate() -> int
-	func extern samples_recorded() -> int
+	func extern sample_rate() -> i32
+	func extern samples_recorded() -> i32
+
+
+class MidiInput extends Module
+	var output: Module.OutPort
+
+	func extern __init__(session: Session)
+	func extern override __delete__()
+	func extern mut start() -> bool
+	func extern mut stop()
+	func extern is_capturing() -> bool
+	func extern sample_rate() -> i32
+	func extern mut set_device(device: Device*)

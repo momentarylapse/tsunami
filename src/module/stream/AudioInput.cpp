@@ -84,14 +84,6 @@ AudioInput::~AudioInput() {
 		_kill_dev();
 }
 
-void AudioInput::__init__(Session *session) {
-	new(this) AudioInput(session);
-}
-
-void AudioInput::__delete__() {
-	this->AudioInput::~AudioInput();
-}
-
 void AudioInput::set_chunk_size(int size) {
 	if (size > 0)
 		shared_data.chunk_size = size;

@@ -33,9 +33,6 @@ public:
 
 	AudioInPort in{this, "in"};
 
-	void _cdecl __init__(Session *session);
-	void __delete__() override;
-
 	void _create_dev();
 	void _kill_dev();
 

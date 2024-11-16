@@ -27,6 +27,7 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/rhythm/Bar.h"
 #include "../data/rhythm/Beat.h"
+#include "../device/Device.h"
 #include "../processing/audio/BufferInterpolator.h"
 #include "../processing/audio/BufferPitchShift.h"
 #include "../module/ModuleFactory.h"
@@ -73,6 +74,7 @@
 #include "../lib/os/filesystem.h"
 #include "../lib/kaba/dynamic/exception.h"
 #include "../lib/kaba/lib/future.h"
+#include "../lib/kaba/lib/lib.h"
 
 
 namespace hui {
@@ -154,16 +156,6 @@ public:
 #endif
 };
 
-template<class T>
-void generic__init__(T *me) {
-	new(me) T;
-}
-
-template<class T>
-void generic__delete__(T *me) {
-	me->T::~T();
-}
-
 void AudioInPort__init(AudioInPort* p, Module* m, const string& name) {
 	new(p) AudioInPort(m, name);
 }
@@ -186,6 +178,18 @@ void MidiOutPort__init(MidiOutPort* p, Module* m, const string& name) {
 
 void BeatsOutPort__init(BeatsOutPort* p, Module* m, const string& name) {
 	new(p) BeatsOutPort(m, name);
+}
+
+void AudioOutput__init__(AudioOutput* o, Session *s) {
+	new(o) AudioOutput(s);
+}
+
+void AudioInput__init__(AudioInput* o, Session *session) {
+	new(o) AudioInput(session);
+}
+
+void MidiInput__init__(MidiInput* o, Session *session) {
+	new(o) MidiInput(session);
 }
 
 
@@ -221,8 +225,8 @@ void PluginManager::link_app_data() {
 
 
 	ext->declare_class_size("BufferPitchShift.Operator", sizeof(BufferPitchShift::Operator));
-	ext->link_class_func("BufferPitchShift.Operator.__init__", &generic__init__<BufferPitchShift::Operator>);
-	ext->link_class_func("BufferPitchShift.Operator.__delete__", &generic__delete__<BufferPitchShift::Operator>);
+	ext->link_class_func("BufferPitchShift.Operator.__init__", &kaba::generic_init<BufferPitchShift::Operator>);
+	ext->link_class_func("BufferPitchShift.Operator.__delete__", &kaba::generic_delete<BufferPitchShift::Operator>);
 	ext->link_class_func("BufferPitchShift.Operator.reset", &BufferPitchShift::Operator::reset);
 	ext->link_class_func("BufferPitchShift.Operator.process", &BufferPitchShift::Operator::process);
 
@@ -538,7 +542,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_element("MidiEventStreamer.loop", &MidiEventStreamer::loop);
 		ext->declare_class_element("MidiEventStreamer.offset", &MidiEventStreamer::offset);
 		ext->declare_class_element("MidiEventStreamer.midi", &MidiEventStreamer::midi);
-		ext->link_class_func("MidiEventStreamer.__init__", &generic__init__<MidiEventStreamer>);
+		ext->link_class_func("MidiEventStreamer.__init__", &kaba::generic_init<MidiEventStreamer>);
 		// TODO delete
 		ext->link_virtual("MidiEventStreamer.read", &MidiEventStreamer::read, &mstreamer);
 		ext->link_virtual("MidiEventStreamer.reset_state", &MidiEventStreamer::reset_state, &mstreamer);
@@ -655,7 +659,7 @@ void PluginManager::link_app_data() {
 
 	ext->declare_class_size("MidiEventBuffer", sizeof(MidiEventBuffer));
 	ext->declare_class_element("MidiEventBuffer.samples", &MidiEventBuffer::samples);
-	ext->link_class_func("MidiEventBuffer.__init__", &generic__init__<MidiEventBuffer>);
+	ext->link_class_func("MidiEventBuffer.__init__", &kaba::generic_init<MidiEventBuffer>);
 	ext->link_class_func("MidiEventBuffer.get_events", &MidiEventBuffer::get_events);
 	ext->link_class_func("MidiEventBuffer.get_notes", &MidiEventBuffer::get_notes);
 	ext->link_class_func("MidiEventBuffer.get_range", &MidiEventBuffer::range);
@@ -663,8 +667,8 @@ void PluginManager::link_app_data() {
 
 	ext->declare_class_size("MidiNoteBuffer", sizeof(MidiNoteBuffer));
 	ext->declare_class_element("MidiNoteBuffer.samples", &MidiNoteBuffer::samples);
-	ext->link_class_func("MidiNoteBuffer.__init__", &generic__init__<MidiNoteBuffer>);
-	ext->link_class_func("MidiNoteBuffer.__delete__", &generic__delete__<MidiNoteBuffer>);
+	ext->link_class_func("MidiNoteBuffer.__init__", &kaba::generic_init<MidiNoteBuffer>);
+	ext->link_class_func("MidiNoteBuffer.__delete__", &kaba::generic_delete<MidiNoteBuffer>);
 	ext->link_class_func("MidiNoteBuffer.get_events", &MidiNoteBuffer::get_events);
 	ext->link_class_func("MidiNoteBuffer.get_notes", &MidiNoteBuffer::get_notes);
 	ext->link_class_func("MidiNoteBuffer.get_range", &MidiNoteBuffer::range);
@@ -792,40 +796,59 @@ void PluginManager::link_app_data() {
 		AudioInput input(Session::GLOBAL);
 		ext->declare_class_size("AudioInput", sizeof(AudioInput));
 		ext->declare_class_element("AudioInput.output", &AudioInput::out);
-	//	ext->declare_class_element("AudioInput.current_buffer", &AudioInput::buffer);
-		//ext->declare_class_element("AudioInput.out", &AudioInput::out);
-		ext->link_class_func("AudioInput.__init__", &AudioInput::__init__);
+		ext->link_class_func("AudioInput.__init__", &AudioInput__init__);
 		ext->link_virtual("AudioInput.__delete__", &AudioInput::__delete__, &input);
 		ext->link_class_func("AudioInput.start", &AudioInput::start);
 		ext->link_class_func("AudioInput.stop",	 &AudioInput::stop);
 		ext->link_class_func("AudioInput.is_capturing", &AudioInput::is_capturing);
 		ext->link_class_func("AudioInput.sample_rate", &AudioInput::sample_rate);
 		ext->link_class_func("AudioInput.samples_recorded", &AudioInput::samples_recorded);
-		//ext->link_class_func("AudioInput.set_backup_mode", &AudioInput::set_backup_mode);
+		ext->link_class_func("AudioInput.set_device", &AudioInput::set_device);
 	}
 
 	{
 		AudioOutput stream(Session::GLOBAL);
 		ext->declare_class_size("AudioOutput", sizeof(AudioOutput));
 		ext->declare_class_element("AudioOutput.input", &AudioOutput::in);
-		ext->link_class_func("AudioOutput.__init__", &AudioOutput::__init__);
+		ext->link_class_func("AudioOutput.__init__", &AudioOutput__init__);
 		ext->link_virtual("AudioOutput.__delete__", &AudioOutput::__delete__, &stream);
-		//ext->link_class_func("AudioOutput.setSource", &AudioStream::setSource);
 		ext->link_class_func("AudioOutput.start", &AudioOutput::start);
 		ext->link_class_func("AudioOutput.stop", &AudioOutput::stop);
 		ext->link_class_func("AudioOutput.is_playing", &AudioOutput::is_playing);
 		//ext->link_class_func("AudioOutput.sample_rate", &OutputStream::sample_rate);
 		ext->link_class_func("AudioOutput.get_volume", &AudioOutput::get_volume);
 		ext->link_class_func("AudioOutput.set_volume", &AudioOutput::set_volume);
+		ext->link_class_func("AudioOutput.set_device", &AudioOutput::set_device);
 		ext->link_class_func("AudioOutput.samples_played", &AudioOutput::estimate_samples_played);
 		ext->link_virtual("AudioOutput.reset_state", &AudioOutput::reset_state, &stream);
 	}
-	
+
+	{
+		MidiInput input(Session::GLOBAL);
+		ext->declare_class_size("MidiInput", sizeof(MidiInput));
+		ext->declare_class_element("MidiInput.output", &MidiInput::out);
+		ext->declare_class_element("MidiInput.out", &MidiInput::out);
+		ext->link_class_func("MidiInput.__init__", &MidiInput__init__);
+		ext->link_virtual("MidiInput.__delete__", &MidiInput::__delete__, &input);
+		ext->link_class_func("MidiInput.start", &MidiInput::start);
+		ext->link_class_func("MidiInput.stop",	 &MidiInput::stop);
+		ext->link_class_func("MidiInput.is_capturing", &MidiInput::is_capturing);
+		ext->link_class_func("MidiInput.sample_rate", &MidiInput::sample_rate);
+		ext->link_class_func("MidiInput.set_device", &AudioInput::set_device);
+	}
+
+	{
+		ext->declare_class_size("Device", sizeof(Device));
+		ext->declare_class_element("Device.name", &Device::name);
+		ext->declare_class_element("Device.internal_name", &Device::internal_name);
+		ext->link_class_func("Device.get_name", &Device::get_name);
+	}
+
 	{
 		ext->declare_class_size("AudioAccumulator", sizeof(AudioAccumulator));
 		ext->declare_class_element("AudioAccumulator.input", &AudioAccumulator::in);
 		ext->declare_class_element("AudioAccumulator.output", &AudioAccumulator::out);
-		ext->link_class_func("AudioAccumulator.__init__", &generic__init__<AudioAccumulator>);
+		ext->link_class_func("AudioAccumulator.__init__", &kaba::generic_init<AudioAccumulator>);
 		ext->declare_class_element("AudioAccumulator.samples_skipped", &AudioAccumulator::samples_skipped);
 		ext->declare_class_element("AudioAccumulator.buffer", &AudioAccumulator::buffer);
 	}
@@ -834,7 +857,7 @@ void PluginManager::link_app_data() {
 		ext->declare_class_size("MidiAccumulator", sizeof(MidiAccumulator));
 		ext->declare_class_element("MidiAccumulator.input", &MidiAccumulator::in);
 		ext->declare_class_element("MidiAccumulator.output", &MidiAccumulator::out);
-		ext->link_class_func("MidiAccumulator.__init__", &generic__init__<MidiAccumulator>);
+		ext->link_class_func("MidiAccumulator.__init__", &kaba::generic_init<MidiAccumulator>);
 		ext->declare_class_element("MidiAccumulator.buffer", &MidiAccumulator::buffer);
 	}
 

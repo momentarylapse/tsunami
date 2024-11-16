@@ -397,11 +397,16 @@ void BackendX86::correct_implement_commands() {
 				insert_cmd(inst, p_xmm0, p3);
 				insert_cmd(inst_mov, p1, p_xmm0);
 			}
-		} else if (c.inst == Asm::InstID::UCOMISS) {
+		} else if (c.inst == Asm::InstID::FCMP) {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];
-			insert_cmd(Asm::InstID::MOVSS, p_xmm0, p1);
-			insert_cmd(Asm::InstID::UCOMISS, p_xmm0, p2);
+			if (p1.type == TypeFloat64) {
+				insert_cmd(Asm::InstID::MOVSD, p_xmm0, p1);
+				insert_cmd(Asm::InstID::UCOMISD, p_xmm0, p2);
+			} else {
+				insert_cmd(Asm::InstID::MOVSS, p_xmm0, p1);
+				insert_cmd(Asm::InstID::UCOMISS, p_xmm0, p2);
+			}
 		} else if (c.inst == Asm::InstID::CVTSI2SS) {
 			auto p1 = c.p[0];
 			auto p2 = c.p[1];

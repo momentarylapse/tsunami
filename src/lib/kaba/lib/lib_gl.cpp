@@ -36,19 +36,11 @@ xfer<nix::Shader> __ContextCreateShader(nix::Context *ctx, const string &source)
 
 KABA_LINK_GROUP_END
 
-class KabaShader : public nix::Shader {
-public:
-	void __delete__() { this->Shader::~Shader(); }
-};
-
 
 class KabaTexture : public nix::Texture {
 public:
 	void _cdecl __init__(int width, int height, const string &format) {
 		new(this) nix::Texture(width, height, format);
-	}
-	void _cdecl __delete__() {
-		reinterpret_cast<nix::Texture*>(this)->~Texture();
 	}
 
 	void _cdecl __init_multi_sample__(int width, int height, int samples, const string &format) {
@@ -72,9 +64,6 @@ class KabaFrameBuffer : public nix::FrameBuffer {
 public:
 	void __init__(const shared_array<nix::Texture> &attachments) {
 		new(this) nix::FrameBuffer(attachments);
-	}
-	void __delete__() {
-		reinterpret_cast<nix::FrameBuffer*>(this)->~FrameBuffer();
 	}
 };
 
@@ -114,7 +103,6 @@ void SIAddPackageGl(Context *c) {
 	auto TypeContext = add_type("Context", sizeof(nix::Context));
 	auto TypeContextXfer = add_type_p_xfer(TypeContext);
 	auto TypeVertexBuffer = add_type("VertexBuffer", sizeof(nix::VertexBuffer));
-	auto TypeVertexBufferP = add_type_p_raw(TypeVertexBuffer);
 	auto TypeVertexBufferRef = add_type_ref(TypeVertexBuffer);
 	auto TypeTexture = add_type("Texture", sizeof(nix::Texture));
 	auto TypeTextureXfer = add_type_p_xfer(TypeTexture);
@@ -132,12 +120,12 @@ void SIAddPackageGl(Context *c) {
 	auto TypeCubeMap = add_type("CubeMap", sizeof(nix::Texture));
 	auto TypeShader = add_type("Shader", sizeof(nix::Shader));
 	auto TypeShaderRef = add_type_ref(TypeShader);
-	auto TypeShaderP = add_type_p_raw(TypeShader);
 	auto TypeShaderXfer = add_type_p_xfer(TypeShader);
 	auto TypeBuffer = add_type("Buffer", sizeof(nix::Buffer));
-	auto TypeBufferP = add_type_p_raw(TypeBuffer);
 	auto TypeUniformBuffer = add_type("UniformBuffer", sizeof(nix::Buffer));
+	auto TypeUniformBufferRef = add_type_ref(TypeUniformBuffer);
 	auto TypeShaderStorageBuffer = add_type("ShaderStorageBuffer", sizeof(nix::Buffer));
+	auto TypeShaderStorageBufferRef = add_type_ref(TypeShaderStorageBuffer);
 	auto TypeAlpha = add_type_enum("Alpha");
 	auto TypeStencilOp = add_type_enum("StencilOp");
 	auto TypeFogMode = add_type_enum("FogMode");
@@ -190,7 +178,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("width", TypeInt32);
 			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Texture>), Flags::Mutable);
 		class_add_func("set_options", TypeVoid, gl_p(&nix::Texture::set_options), Flags::Mutable);
 			func_add_param("op", TypeString);
 		class_add_func("write", TypeVoid, gl_p(&nix::Texture::write), Flags::Mutable);
@@ -215,7 +203,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("ny", TypeInt32);
 			func_add_param("nz", TypeInt32);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::Override | Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Texture>), Flags::Override | Flags::Mutable);
 
 	add_class(TypeImageTexture);
 		class_derive_from(TypeTexture);
@@ -223,7 +211,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("width", TypeInt32);
 			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::Override | Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Texture>), Flags::Override | Flags::Mutable);
 
 	add_class(TypeDepthBuffer);
 		class_derive_from(TypeTexture);
@@ -231,19 +219,19 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("width", TypeInt32);
 			func_add_param("height", TypeInt32);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::Override | Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Texture>), Flags::Override | Flags::Mutable);
 
 	add_class(TypeCubeMap);
 		class_derive_from(TypeTexture);
 		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaTexture::__init_cube__), Flags::Mutable);
 			func_add_param("size", TypeInt32);
 			func_add_param("format", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaTexture::__delete__), Flags::Override | Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Texture>), Flags::Override | Flags::Mutable);
 
 	add_class(TypeFrameBuffer);
 		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaFrameBuffer::__init__), Flags::Mutable);
 			func_add_param("attachments", TypeTextureSharedNNList);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaFrameBuffer::__delete__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::FrameBuffer>), Flags::Mutable);
 		class_add_func("area", TypeRect, gl_p(&nix::FrameBuffer::area));
 		class_add_func("clear_color", TypeVoid, gl_p(&nix::FrameBuffer::clear_color), Flags::Mutable);
 			func_add_param("index", TypeInt32);
@@ -265,7 +253,7 @@ void SIAddPackageGl(Context *c) {
 		class_add_element(Identifier::SharedCount, TypeInt32, gl_p(&nix::FrameBuffer::_pointer_ref_counter));
 
 	add_class(TypeShader);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&KabaShader::__delete__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Shader>), Flags::Mutable);
 		class_add_func("location", TypeInt32, gl_p(&nix::Shader::get_location));
 			func_add_param("name", TypeString);
 		class_add_func("link_uniform_block", TypeVoid, gl_p(&nix::Shader::link_uniform_block), Flags::Mutable);
@@ -309,9 +297,8 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("nz", TypeInt32);
 		class_add_element(Identifier::SharedCount, TypeInt32, gl_p(&nix::Shader::_pointer_ref_counter));
 
-
 	add_class(TypeBuffer);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&nix::Buffer::__delete__), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Buffer>), Flags::Mutable);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update), Flags::Mutable);
 			func_add_param("data", TypeReference);
 			func_add_param("size", TypeInt32);
@@ -325,11 +312,11 @@ void SIAddPackageGl(Context *c) {
 
 	add_class(TypeUniformBuffer);
 		class_derive_from(TypeBuffer);
-		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&nix::UniformBuffer::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&generic_init<nix::UniformBuffer>), Flags::Mutable);
 
 	add_class(TypeShaderStorageBuffer);
 		class_derive_from(TypeBuffer);
-		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&nix::ShaderStorageBuffer::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&generic_init<nix::ShaderStorageBuffer>), Flags::Mutable);
 
 		// drawing
 	add_func("init", TypeContextXfer, gl_p(&nix::init), Flags::Static);
@@ -357,12 +344,12 @@ void SIAddPackageGl(Context *c) {
 	add_func("set_model_matrix", TypeVoid, gl_p(&nix::set_model_matrix), Flags::Static);
 		func_add_param("m", TypeMat4);
 	add_func("draw_triangles", TypeVoid, gl_p(&nix::draw_triangles), Flags::Static);
-		func_add_param("vb", TypeVertexBufferP); // -> ref
+		func_add_param("vb", TypeVertexBufferRef);
 	add_func("draw_lines", TypeVoid, gl_p(&nix::draw_lines), Flags::Static);
-		func_add_param("vb", TypeVertexBufferP); // -> ref
+		func_add_param("vb", TypeVertexBufferRef);
 		func_add_param("contiguous", TypeBool);
 	add_func("draw_points", TypeVoid, gl_p(&nix::draw_points), Flags::Static);
-		func_add_param("vb", TypeVertexBufferP); // -> ref
+		func_add_param("vb", TypeVertexBufferRef);
 	add_func("disable_alpha", TypeVoid, gl_p(&nix::disable_alpha), Flags::Static);
 	add_func("set_alpha", TypeVoid, gl_p(&nix::set_alpha_sd), Flags::Static);
 		func_add_param("source", TypeAlpha);
@@ -401,16 +388,19 @@ void SIAddPackageGl(Context *c) {
 		func_add_param("roughness", TypeFloat32);
 		func_add_param("metal", TypeFloat32);
 		func_add_param("emission", TypeColor);
-	add_func("bind_textures", TypeVoid, gl_p(&nix::set_textures), Flags::Static);
-		func_add_param("t", TypeTexturePList); // -> ref[]
+	add_func("bind_textures", TypeVoid, gl_p(&nix::bind_textures), Flags::Static);
+		func_add_param("t", TypeTexturePList);
 	add_func("bind_texture", TypeVoid, gl_p(&nix::bind_texture), Flags::Static);
 		func_add_param("binding", TypeInt32);
-		func_add_param("t", TypeTextureP); // -> ref
+		func_add_param("t", TypeTextureP);
 	add_func("set_shader", TypeVoid, gl_p(&nix::set_shader), Flags::Static);
-		func_add_param("s", TypeShaderP); // -> ref
-	add_func("bind_buffer", TypeVoid, gl_p(&nix::bind_buffer), Flags::Static);
+		func_add_param("s", TypeShaderRef);
+	add_func("bind_uniform_buffer", TypeVoid, gl_p(&nix::bind_uniform_buffer), Flags::Static);
 		func_add_param("binding", TypeInt32);
-		func_add_param("buf", TypeBufferP); // -> ref
+		func_add_param("buf", TypeUniformBufferRef);
+	add_func("bind_storage_buffer", TypeVoid, gl_p(&nix::bind_storage_buffer), Flags::Static);
+		func_add_param("binding", TypeInt32);
+		func_add_param("buf", TypeShaderStorageBufferRef);
 	add_func("bind_image", TypeVoid, gl_p(&nix::bind_image), Flags::Static);
 		func_add_param("binding", TypeInt32);
 		func_add_param("t", TypeTextureP); // -> ref

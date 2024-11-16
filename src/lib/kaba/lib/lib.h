@@ -190,6 +190,15 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, mf(func));
 }
 
+template<class T>
+void generic_init(T* t) {
+	new(t) T;
+}
+
+template<class T>
+void generic_delete(T* t) {
+	t->~T();
+}
 
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \

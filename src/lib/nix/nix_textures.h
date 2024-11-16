@@ -102,8 +102,7 @@ public:
 };
 
 
-//void _cdecl set_texture(Texture *texture);
-void _cdecl set_textures(const Array<Texture*> &textures);
+void bind_textures(const Array<Texture*> &textures);
 void bind_texture(int binding, Texture *t);
 void bind_image(int binding, Texture *t, int level, int layer, bool writable);
 

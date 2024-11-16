@@ -323,11 +323,7 @@ void bind_texture(int binding, Texture *t) {
 }
 
 
-void set_texture(Texture *t) {
-	bind_texture(0, t);
-}
-
-void set_textures(const Array<Texture*> &textures) {
+void bind_textures(const Array<Texture*> &textures) {
 	/*for (int i=0;i<num_textures;i++)
 		if (texture[i] >= 0)
 			refresh_texture(texture[i]);*/

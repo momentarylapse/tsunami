@@ -24,7 +24,6 @@ public:
 	Buffer();
 	~Buffer();
 
-	void __delete__();
 	void update(void *data, int size);
 	void update_array(const DynamicArray &a);
 
@@ -35,16 +34,15 @@ public:
 class UniformBuffer : public Buffer {
 public:
 	UniformBuffer();
-	void __init__();
 };
 
 class ShaderStorageBuffer : public Buffer {
 public:
 	ShaderStorageBuffer();
-	void __init__();
 };
 
-void bind_buffer(int binding, Buffer *buf);
+void bind_uniform_buffer(int binding, UniformBuffer *buf);
+void bind_storage_buffer(int binding, ShaderStorageBuffer *buf);
 
 };
 

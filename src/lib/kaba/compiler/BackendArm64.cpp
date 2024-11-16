@@ -537,7 +537,7 @@ void BackendArm64::correct_implement_commands() {
 			vreg_free(sreg1);
 			vreg_free(sreg2);
 
-		} else if (c.inst == Asm::InstID::UCOMISS) { // fcmp
+		} else if (c.inst == Asm::InstID::FCMP) {
 			auto p0 = c.p[0];
 			auto p1 = c.p[1];
 			auto t = p0.type;

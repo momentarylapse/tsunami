@@ -23,10 +23,6 @@ Buffer::~Buffer() {
 	glDeleteBuffers(1, &buffer);
 }
 
-void Buffer::__delete__() {
-	this->~Buffer();
-}
-
 void Buffer::update(void *data, int size) {
 	glNamedBufferData(buffer, size, data, GL_DYNAMIC_DRAW);
 }
@@ -50,26 +46,16 @@ UniformBuffer::UniformBuffer() {
 	type = Type::UNIFORM;
 }
 
-void UniformBuffer::__init__() {
-	new(this) UniformBuffer();
-}
-
-
 ShaderStorageBuffer::ShaderStorageBuffer() {
 	type = Type::SSBO;
 }
 
-void ShaderStorageBuffer::__init__() {
-	new(this) ShaderStorageBuffer();
+void bind_uniform_buffer(int binding, UniformBuffer *buf) {
+	glBindBufferBase(GL_UNIFORM_BUFFER, binding, buf->buffer);
 }
 
-
-void bind_buffer(int binding, Buffer *buf) {
-	//glUniformBlockBinding(program, binding, 0);
-	if (buf->type == Buffer::Type::UNIFORM)
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding, buf->buffer);
-	else if (buf->type == Buffer::Type::SSBO)
-		glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, buf->buffer);
+void bind_storage_buffer(int binding, ShaderStorageBuffer *buf) {
+	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, buf->buffer);
 }
 
 }

@@ -7,7 +7,7 @@
 
 namespace tsunami {
 
-MidiInputStream::SharedData::SharedData() {
+MidiInputStream::SharedData::SharedData() : buffer(4096) {
 }
 
 MidiInputStream::MidiInputStream(Session *_session, SharedData& _shared_data)
@@ -19,5 +19,9 @@ MidiInputStream::MidiInputStream(Session *_session, SharedData& _shared_data)
 }
 
 MidiInputStream::~MidiInputStream() = default;
+
+void MidiInputStream::clear_input_queue() {
+	shared_data.buffer.clear();
+}
 
 }

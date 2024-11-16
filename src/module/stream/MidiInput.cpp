@@ -6,6 +6,10 @@
  */
 
 #include "MidiInput.h"
+
+#include <os/msg.h>
+#include <threads/Thread.h>
+
 #include "../../device/interface/DeviceContext.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
@@ -21,16 +25,26 @@ namespace kaba {
 namespace tsunami {
 
 int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
-	if (config.free_flow) {
+	const auto events = shared_data.buffer.read();
+
+	if (!config.free_flow)
+		msg_todo("MidiInput non-free-flowing!");
+
+	//if (config.free_flow) {
 		for (auto &e: events) {
 			e.pos = 0;
 			midi.add(e);
 		}
-
-		events.clear();
 		return midi.samples;
-	} else {
-		int samples = min(midi.samples, events.samples);
+	/*} else {
+		double dt = timer->get();
+		double offset_new = offset + dt;
+		int pos = (int)(offset * (double)_sample_rate);
+		int pos_new = (int)(offset_new * (double)_sample_rate);
+		int samples = pos_new - pos;
+		offset = offset_new;
+
+
 		if (samples < midi.samples)
 			return Return::NotEnoughData;
 		for (int i=events.num-1; i>=0; i--) {
@@ -44,12 +58,12 @@ int MidiInput::read_midi(int port, MidiEventBuffer &midi) {
 
 		events.samples -= samples;
 		return samples;
-	}
+	}*/
 }
 
-void MidiInput::feed(const MidiEventBuffer &midi) {
+/*void MidiInput::feed(const MidiEventBuffer &midi) {
 	events.append(midi);
-}
+}*/
 
 void MidiInput::Config::reset() {
 	free_flow = true;
@@ -135,7 +149,13 @@ void MidiInput::update_device() {
 		start();
 }
 
+void MidiInput::set_free_flowing(bool free_flowing) {
+	config.free_flow = free_flowing;
+	changed();
+}
+
 bool MidiInput::start() {
+	msg_write("START  " + p2s(pthread_self()));
 	if (state == State::NoDevice)
 		_create_dev();
 	if (state != State::Paused)
@@ -170,7 +190,10 @@ void MidiInput::stop() {
 // TODO: allow multiple streams/ports
 //  need to buffer events for other ports
 int MidiInput::do_capturing() {
-	double dt = timer->get();
+	stream->tick();
+	return 0; // not sure...
+
+	/*double dt = timer->get();
 	double offset_new = offset + dt;
 	int pos = offset * (double)_sample_rate;
 	int pos_new = offset_new * (double)_sample_rate;
@@ -183,7 +206,7 @@ int MidiInput::do_capturing() {
 	if (current_midi.samples > 0)
 		feed(current_midi);
 
-	return current_midi.samples;
+	return current_midi.samples;*/
 }
 
 bool MidiInput::is_capturing() const {

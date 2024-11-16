@@ -25,8 +25,7 @@ RingBuffer::RingBuffer(int size) {
 	available_write = size - 1;
 }
 
-RingBuffer::~RingBuffer() {
-}
+RingBuffer::~RingBuffer() = default;
 
 void RingBuffer::__init__(int size) {
 	new(this) RingBuffer(size);

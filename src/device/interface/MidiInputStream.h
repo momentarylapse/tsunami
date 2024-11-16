@@ -5,6 +5,8 @@
 #ifndef TSUNAMI_MIDIINPUTSTREAM_H
 #define TSUNAMI_MIDIINPUTSTREAM_H
 
+#include "../../data/midi/MidiEventRingBuffer.h"
+
 namespace tsunami {
 
 class Session;
@@ -19,6 +21,7 @@ public:
 		SharedData();
 
 		int portid = -1;
+		MidiEventRingBuffer buffer;
 	};
 
 	MidiInputStream(Session* session, SharedData& shared_data);
@@ -26,8 +29,8 @@ public:
 
 	virtual bool start() = 0;
 	virtual bool stop() = 0;
-	virtual void clear_input_queue() = 0;
-	virtual void read(MidiEventBuffer& buffer) = 0;
+	virtual void clear_input_queue();
+	virtual void tick() {} // in case we have to poke the library (alsa)
 
 	/*virtual void pause() = 0;
 	virtual void unpause() = 0;

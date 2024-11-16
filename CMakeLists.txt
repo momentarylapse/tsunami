@@ -397,6 +397,7 @@ add_executable(tsunami WIN32
 	src/data/midi/Instrument.cpp
 	src/data/midi/MidiData.cpp
 	src/data/midi/MidiEvent.cpp
+	src/data/midi/MidiEventRingBuffer.cpp
 	src/data/midi/MidiNote.cpp
 	src/data/midi/Scale.cpp
 	src/data/midi/Temperament.cpp

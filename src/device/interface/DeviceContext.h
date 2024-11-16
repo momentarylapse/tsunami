@@ -18,7 +18,7 @@ class Session;
 
 class DeviceContext : public obs::Node<VirtualBase> {
 public:
-	DeviceContext(Session* session);
+	explicit DeviceContext(Session* session);
 
 	obs::source out_request_update{this, "request-update"};
 	obs::xsource<Device> out_device_found{this, "device-found"};

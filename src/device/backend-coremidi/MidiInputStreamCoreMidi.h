@@ -8,7 +8,6 @@
 #if HAS_LIB_COREMIDI
 
 #include "../interface/MidiInputStream.h"
-#include "../../data/midi/MidiData.h"
 
 namespace tsunami {
 
@@ -21,12 +20,9 @@ namespace tsunami {
 		bool stop() override;
 		bool connect(Device* device);
 		bool unconnect();
-		void clear_input_queue() override;
-		void read(MidiEventBuffer& buffer) override;
 
 		int port = -1;
 		int endpoit_ref = -1;
-		MidiEventBuffer buffer;
 		bool active = false;
 	};
 

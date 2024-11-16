@@ -54,14 +54,12 @@ public:
 	void _cdecl set_device(Device *d);
 	Device *_cdecl get_device();
 
-	MidiEventBuffer current_midi;
+	void set_free_flowing(bool free_flowing);
 
 	MidiOutPort out{this};
 
 	int read_midi(int port, MidiEventBuffer &midi) override;
-	void feed(const MidiEventBuffer &midi);
-
-	MidiEventBuffer events;
+	//void feed(const MidiEventBuffer &midi);
 
 	int _sample_rate;
 

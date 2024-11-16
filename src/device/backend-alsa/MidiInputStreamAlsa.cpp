@@ -92,10 +92,12 @@ void MidiInputStreamAlsa::clear_input_queue() {
 			break;
 		snd_seq_free_event(ev);
 	}
+	shared_data.buffer.clear();
 }
 
 
-void MidiInputStreamAlsa::read(MidiEventBuffer& buffer) {
+void MidiInputStreamAlsa::tick() {
+	Array<MidiEvent> buffer;
 	while (true){
 		snd_seq_event_t *ev;
 		int r = snd_seq_event_input(DeviceContextAlsa::instance->alsa_midi_handle, &ev);
@@ -112,6 +114,7 @@ void MidiInputStreamAlsa::read(MidiEventBuffer& buffer) {
 		}
 		snd_seq_free_event(ev);
 	}
+	shared_data.buffer.write(buffer);
 }
 
 }

@@ -25,6 +25,7 @@ void MyMIDIReadProc(const MIDIPacketList *pktlist, void* readProcRefCon, void* s
 	auto stream = reinterpret_cast<MidiInputStreamCoreMidi*>(srcConnRefCon);
 	//msg_write(p2s(stream));
 	//msg_write("in");
+	Array<MidiEvent> events;
 	for (int i=0; i<pktlist->numPackets; i++) {
 		auto pk = &pktlist->packet[i];
 		const auto data = bytes(pk->data, pk->length);
@@ -32,18 +33,19 @@ void MyMIDIReadProc(const MIDIPacketList *pktlist, void* readProcRefCon, void* s
 		int cmd = data[0];
 		if ((cmd & 0xf0) == 0x80 and data.num >= 3) {
 			// note off
-			stream->buffer.add(MidiEvent(0, data[1], 0).with_raw(data));
+			events.add(MidiEvent(0, data[1], 0).with_raw(data));
 			//msg_write("off " + i2s(data[1]));
 
 		} else if ((cmd & 0xf0) == 0x90 and data.num >= 3) {
 			// note on
-			stream->buffer.add(MidiEvent(0, data[1], (float)data[2] / 127.0f).with_raw(data));
+			events.add(MidiEvent(0, data[1], (float)data[2] / 127.0f).with_raw(data));
 			//msg_write("on " + i2s(data[1]));
 		} else {
 			// whatever
-			stream->buffer.add(MidiEvent::special(data));
+			events.add(MidiEvent::special(data));
 		}
 	}
+	stream->shared_data.buffer.write(events);
 }
 
 MidiInputStreamCoreMidi::MidiInputStreamCoreMidi(Session *session, Device *device, MidiInputStream::SharedData &shared_data) : MidiInputStream(session, shared_data) {
@@ -100,19 +102,6 @@ bool MidiInputStreamCoreMidi::unconnect() {
 		MIDIPortDisconnectSource((MIDIPortRef)port, (MIDIEndpointRef)endpoit_ref);
 	endpoit_ref = -1;
 	return true;
-}
-
-void MidiInputStreamCoreMidi::clear_input_queue() {
-}
-
-
-void MidiInputStreamCoreMidi::read(MidiEventBuffer& _buffer) {
-	if (buffer.num == 0)
-		return;
-	buffer.samples = _buffer.samples;
-	_buffer = buffer;
-	buffer.clear();
-
 }
 
 }

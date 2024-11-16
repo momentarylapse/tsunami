@@ -24,7 +24,7 @@ public:
 	bool unconnect();
 	bool update_device(Device* device);
 	void clear_input_queue() override;
-	void read(MidiEventBuffer& buffer) override;
+	void tick() override;
 
 	_snd_seq_port_subscribe* subs = nullptr;
 };

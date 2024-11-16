@@ -44,8 +44,6 @@ public:
 	MidiInputStreamDummy(Session* session, SharedData& shared_data) : MidiInputStream(session, shared_data) {}
 	bool start() override { return false; }
 	bool stop() override { return false; }
-	void clear_input_queue() override {}
-	void read(MidiEventBuffer& buffer) override {}
 };
 
 MidiInputStream* DeviceContext::create_midi_input_stream(Session *session, Device *device, void* shared_data) {

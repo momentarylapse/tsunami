@@ -12,9 +12,9 @@ class Session extends Object as shared
 	var song: shared![Session] # shared![Song]
 	var view: void&            # AudioView&
 	var storage: void&         # Storage&
-	var playback: owned![int]  # owned![Playback]
+	var playback: owned![i32]  # owned![Playback]
 	
-	func extern sample_rate() -> int
+	func extern sample_rate() -> i32
 	
 	func extern create_child() -> xfer[Session]
 #	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
@@ -94,9 +94,9 @@ class Module extends Object as shared
 	func extern mut unsubscribe(handler: Object)
 	func extern copy() -> xfer[Module]
 	
-	func extern virtual mut read_audio(port: int, out buf: AudioBuffer) -> int
-	func extern virtual mut read_midi(port: int, out midi: MidiEventBuffer) -> int
-	func extern virtual mut read_beats(port: int, out beats: Beat[], samples: int) -> int
+	func extern virtual mut read_audio(port: i32, out buf: AudioBuffer) -> i32
+	func extern virtual mut read_midi(port: i32, out midi: MidiEventBuffer) -> i32
+	func extern virtual mut read_beats(port: i32, out beats: Beat[], samples: i32) -> i32
 	
 	class OutPort
 		var type: SignalType
@@ -108,9 +108,9 @@ class Module extends Object as shared
 		func extern mut connect(source: InPort)
 		func mut __rshift__(source: InPort)
 			connect(source)
-		func extern mut read_audio(out buf: AudioBuffer) -> int
-		func extern mut read_midi(out midi: MidiEventBuffer) -> int
-		func extern mut read_beats(out beats: Beat[], samples: int) -> int
+		func extern mut read_audio(out buf: AudioBuffer) -> i32
+		func extern mut read_midi(out midi: MidiEventBuffer) -> i32
+		func extern mut read_beats(out beats: Beat[], samples: i32) -> i32
 	
 	class InPort
 		var type: SignalType
@@ -134,8 +134,8 @@ class Module extends Object as shared
 	func extern virtual get_config() -> Module.Config*
 	func extern config_to_string() -> string
 	func extern config_to_any() -> any
-	func extern mut config_from_string(version: int, s: string)
-	func extern mut config_from_any(version: int, a: any)
+	func extern mut config_from_string(version: i32, s: string)
+	func extern mut config_from_any(version: i32, a: any)
 
 	let VERSION_LATEST = -1
 	let VERSION_LEGACY = -2
@@ -145,13 +145,13 @@ class AudioEffect extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
 	var apply_to_whole_buffer: bool
-	var wetness: float
+	var wetness: f32
 	var source: Module.InPort
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
-	func extern virtual mut read(out buf: AudioBuffer) -> int
-	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
+	func extern virtual mut read(out buf: AudioBuffer) -> i32
+	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
 
 
 class MidiEffect extends Module
@@ -160,19 +160,19 @@ class MidiEffect extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out midi: MidiEventBuffer)
-	func extern override mut read_midi(port: int, out midi: MidiEventBuffer) -> int
+	func extern override mut read_midi(port: i32, out midi: MidiEventBuffer) -> i32
 
 
 class AudioVisualizer extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
-	var chunk_size: int
+	var chunk_size: i32
 	var ring_buffer: RingBuffer&
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut process(out buf: AudioBuffer)
-	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
-	func extern mut set_chunk_size(chunk_size: int)
+	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
+	func extern mut set_chunk_size(chunk_size: i32)
 
 
 
@@ -183,8 +183,8 @@ class AudioSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
-	func extern virtual mut read(out buf: AudioBuffer) -> int
-	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
+	func extern virtual mut read(out buf: AudioBuffer) -> i32
+	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
 
 
 struct MidiProduceData
@@ -196,61 +196,61 @@ class MidiSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
-	func extern virtual mut read(out midi: MidiEventBuffer) -> int
-	func extern override mut read_midi(port: int, out midi: MidiEventBuffer) -> int
+	func extern virtual mut read(out midi: MidiEventBuffer) -> i32
+	func extern override mut read_midi(port: i32, out midi: MidiEventBuffer) -> i32
 	# crappy experimental note api:
 	func extern virtual mut on_produce(data: MidiProduceData) -> bool
-	func extern mut note(pitch: float, volume: float, beats: int)
-	func extern mut skip(beats: int)
-	func extern mut note_x(pitch: float, volume: float, beats: int, sub_beats: int, beat_partition: int)
-	func extern mut skip_x(beats: int, sub_beats: int, beat_partition: int)
+	func extern mut note(pitch: f32, volume: f32, beats: i32)
+	func extern mut skip(beats: i32)
+	func extern mut note_x(pitch: f32, volume: f32, beats: i32, sub_beats: i32, beat_partition: i32)
+	func extern mut skip_x(beats: i32, sub_beats: i32, beat_partition: i32)
 	var bh_midi: MidiEventBuffer*
 	#extern void set_beat_source(BeatPort *source)
 
 
 class MidiEventStreamer extends MidiSource
 	func extern override __init__()
-	func extern override read(out midi: MidiEventBuffer) -> int
+	func extern override read(out midi: MidiEventBuffer) -> i32
 	func extern override reset_state()
 	func extern mut set_data(midi: MidiEventBuffer)
-	func extern mut set_pos(offset: int)
+	func extern mut set_pos(offset: i32)
 	
 	var loop: bool
-	var offset: int
+	var offset: i32
 	var midi: MidiEventBuffer
 
 
 class PitchDetector extends MidiSource
 	var input: Module.InPort
-	var frequency, volume: float
-	var pitch: int
+	var frequency, volume: f32
+	var pitch: i32
 	var loud_enough: bool
 	func extern override __init__()
-	func extern override mut read(out midi: MidiEventBuffer) -> int
+	func extern override mut read(out midi: MidiEventBuffer) -> i32
 	func extern virtual mut process(out midi: MidiEventBuffer, buf: AudioBuffer)
 
 
 class PitchRenderer as @noauto
-	func extern __init__(synth: Synthesizer, pitch: int)
+	func extern __init__(synth: Synthesizer, pitch: i32)
 	func extern virtual __delete__()
 	func extern virtual mut render(out buf: AudioBuffer) -> bool
 	#extern virtual void on_event(MidiEvent e)
-	func extern virtual mut on_start(volume: float)
+	func extern virtual mut on_start(volume: f32)
 	func extern virtual mut on_end()
 	func extern virtual mut on_config()
-	var pitch: int
-	var delta_phi: float
+	var pitch: i32
+	var delta_phi: f32
 	var synth: Synthesizer&
 
 
 class Synthesizer extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
-	var sample_rate: int
-	var keep_notes: int
-	var freq: float[MAX_PITCH]
-	var delta_phi: float[MAX_PITCH]
-	var active_pitch: int[]
+	var sample_rate: i32
+	var keep_notes: i32
+	var freq: f32[MAX_PITCH]
+	var delta_phi: f32[MAX_PITCH]
+	var active_pitch: i32[]
 	var instrument: Instrument
 	var auto_generate_stereo: bool
 	var render_by_ref: bool
@@ -258,11 +258,11 @@ class Synthesizer extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut render(out buf: AudioBuffer)
-	func extern override mut read_audio(port: int, out buf: AudioBuffer) -> int
+	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
 	func extern override mut on_config()
 	func extern override mut reset_state()
-	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
-	func extern mut set_sample_rate(sample_rate: int)
+	func extern virtual mut create_pitch_renderer(pitch: i32) -> xfer[PitchRenderer]
+	func extern mut set_sample_rate(sample_rate: i32)
 	func extern mut set_instrument(i: Instrument)
 
 
@@ -270,18 +270,18 @@ class DummySynthesizer extends Synthesizer
 	func extern override __init__()
 	#extern overwrite void __delete__()
 	func extern override mut render(out buf: AudioBuffer)
-	func extern override mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
+	func extern override mut create_pitch_renderer(pitch: i32) -> xfer[PitchRenderer]
 
 
 struct EnvelopeADSR
 	func extern __init__()
-	func extern mut set(t_attack: float, t_decay: float, sustain: float, t_release: float, sample_rate: int)
-	func extern mut set2(initial: float, peak: float)
+	func extern mut set(t_attack: f32, t_decay: f32, sustain: f32, t_release: f32, sample_rate: i32)
+	func extern mut set2(initial: f32, peak: f32)
 	func extern mut reset()
-	func extern mut start(volume: float)
+	func extern mut start(volume: f32)
 	func extern mut end()
-	func extern mut get() -> float
-	func extern mut read(n: int) -> float[]
+	func extern mut get() -> f32
+	func extern mut read(n: i32) -> f32[]
 	var just_killed: bool
 
 
@@ -289,27 +289,27 @@ class BeatSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
-	func extern virtual mut read(out beats: Beat[], samples: int) -> int
-	func extern override mut read_beats(port: int, out beats: Beat[], samples: int) -> int
-	func extern virtual beats_per_bar() -> int
-	func extern virtual cur_beat() -> int
-	func extern virtual cur_bar() -> int
-	func extern virtual beat_fraction() -> float
+	func extern virtual mut read(out beats: Beat[], samples: i32) -> i32
+	func extern override mut read_beats(port: i32, out beats: Beat[], samples: i32) -> i32
+	func extern virtual beats_per_bar() -> i32
+	func extern virtual cur_beat() -> i32
+	func extern virtual cur_bar() -> i32
+	func extern virtual beat_fraction() -> f32
 
 
 class BeatMidifier extends MidiSource
 	func extern override __init__()
 	#extern override void __delete__()
-	func extern override mut read(out midi: MidiEventBuffer) -> int
+	func extern override mut read(out midi: MidiEventBuffer) -> i32
 	var input: Module.InPort
-	var volume: float
+	var volume: f32
 
 
 class AudioAccumulator extends Module
 	func extern __init__()
 	var output: Module.OutPort
 	var input: Module.InPort
-	var samples_skipped: int
+	var samples_skipped: i32
 	var buffer: AudioBuffer
 
 

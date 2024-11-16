@@ -15,6 +15,7 @@
 #include "../data/SampleRef.h"
 #include "../data/Sample.h"
 #include "../data/Song.h"
+#include "../device/Device.h"
 #include "../Session.h"
 
 namespace kaba {
@@ -73,6 +74,10 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		if (!str_is_integer(l))
 			return Any(l);*/
 		return Any(*(const int*)v);
+	} else if (c->name == "Device*") {
+		if (const auto d = *reinterpret_cast<Device*const*>(v))
+			return Any(d->internal_name);
+		return Any();
 	} else if (c->name == "shared[SampleRef]") {
 		if (auto sr = *(SampleRef**)v)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
@@ -208,6 +213,8 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
 	} else if (type->is_enum()) {
 		*(int*)v = kaba::enum_parse(a.str(), type);
+	} else if (type->name == "Device*") {
+		*(Device**)v = nullptr;
 	} else if (type->name == "shared[SampleRef]") {
 		*(shared<SampleRef>*)v = nullptr;
 		if (a.is_string()) {

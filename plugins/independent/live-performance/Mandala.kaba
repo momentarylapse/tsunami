@@ -24,7 +24,8 @@ class Mandala extends TsunamiPlugin
 		
 	var config: Config
 	
-	var source, output: shared[Module]
+	var source: shared[MidiInput]
+	var output: shared[AudioOutput]
 	var synth: shared[SampleSynthesizer]
 	var chain: shared[SignalChain]
 	
@@ -33,8 +34,8 @@ class Mandala extends TsunamiPlugin
 		# create signal chain
 		# midi in => synth => audio out
 		chain = session.create_signal_chain("mandala")
-		source = chain!.add_basic(Module.Type.STREAM, "MidiInput")
-		output = chain!.add_basic(Module.Type.STREAM, "AudioOutput")
+		source = chain!.add[MidiInput]()
+		output = chain!.add[AudioOutput]()
 		synth = chain!.add[SampleSynthesizer]()
 		chain!.connect(source, 0, synth, 0)
 		chain!.connect(synth, 0, output, 0)

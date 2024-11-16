@@ -22,8 +22,8 @@ struct ColorScheme as @noauto
 	var blob_bg_selected: color
 	var blob_bg_hidden: color
 	var pitch: color[12]
-	func extern pitch_color(p: int) -> color
-	func extern neon(p: int) -> color
+	func extern pitch_color(p: i32) -> color
+	func extern neon(p: i32) -> color
 	func extern hoverify(c: color) -> color
 
 
@@ -38,9 +38,9 @@ class AudioView extends Object
 		func extern range() -> Range
 		func extern mut set_range(r: Range)
 		func extern sample2screen64(s: f64) -> f64
-		func extern sample2screen(s: float) -> float
+		func extern sample2screen(s: f32) -> f32
 		func extern screen2sample64(s: f64) -> f64
-		func extern screen2sample(s: float) -> float
+		func extern screen2sample(s: f32) -> f32
 		var area: rect
 	
 	class Layer extends SceneGraph.Node
@@ -59,21 +59,21 @@ class AudioView extends Object
 class Slider extends Object
 	func extern __init__(panel: hui.Panel, id_slider: string, id_edit: string, on_update: void->void)
 	func extern override __delete__()
-	func extern get() -> float
-	func extern mut set(f: float)
-	func extern set_range(v_min: float, v_max: float, step: float)
-	func extern set_slider_range(v_min: float, v_max: float)
-	func extern set_scale(factor: float)
+	func extern get() -> f32
+	func extern mut set(f: f32)
+	func extern set_range(v_min: f32, v_max: f32, step: f32)
+	func extern set_slider_range(v_min: f32, v_max: f32)
+	func extern set_scale(factor: f32)
 	func extern enable(enabled: bool)
 
 #class Progress
 #	extern void __init__(string title, Window *parent)
 #	virtual extern void __delete__()
-#	extern void set(string msg, float progress)
+#	extern void set(string msg, f32 progress)
 class ProgressX
 	func extern __init__(title: string, parent: hui.Window)
 	func extern virtual __delete__()
-	func extern mut set(msg: string, progress: float)
+	func extern mut set(msg: string, progress: f32)
 	func extern mut cancel()
 	func extern is_cancelled() -> bool
 
@@ -121,11 +121,11 @@ class GridPainter
 class MultiLinePainter
 	func extern __init__(song: Song, c: ColorScheme)
 	func extern __delete__()
-	func extern mut set_context(conf: any, page_width: float, avg_samples_per_line: float)
+	func extern mut set_context(conf: any, page_width: f32, avg_samples_per_line: f32)
 	func extern mut set(conf: any)
-	func extern mut draw_next_line(p: hui.Painter, out offset: int, pos: vec2) -> float
-	func extern mut next_line_samples(offset: int) -> int
-	func extern mut get_line_dy() -> float
+	func extern mut draw_next_line(p: hui.Painter, out offset: i32, pos: vec2) -> f32
+	func extern mut next_line_samples(offset: i32) -> i32
+	func extern mut get_line_dy() -> f32
 
 
 #extern PluginContext plugin_context

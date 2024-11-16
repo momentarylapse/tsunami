@@ -162,12 +162,26 @@ xfer<Module> ModuleFactory::create(Session* session, ModuleCategory type, const 
 	return m;
 }
 
+xfer<Module> _create_special_module_by_class_(Session* session, const kaba::Class *type) {
+	// TODO
+	if (type->name == "AudioInput")
+		return new AudioInput(session);
+	if (type->name == "MidiInput")
+		return new MidiInput(session);
+	if (type->name == "AudioOutput")
+		return new AudioOutput(session);
+	return nullptr;
+}
+
 xfer<Module> ModuleFactory::create_by_class(Session* session, const kaba::Class *type) {
 	//msg_error("CREATE MODULE BY CLASS");
 	//msg_write(type->long_name());
 	//msg_write(type->owner->module->filename.basename_no_ext());
 
-	auto m = reinterpret_cast<Module*>(type->create_instance());
+	auto m = _create_special_module_by_class_(session, type);
+	if (!m) {
+		m = reinterpret_cast<Module*>(type->create_instance());
+	}
 	if (!m) {
 		session->e("failed to instanciate class: " + type->long_name());
 		m = new Module(ModuleCategory::Other, "");

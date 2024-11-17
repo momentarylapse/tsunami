@@ -85,6 +85,8 @@ struct CaptureTrackData : obs::Node<VirtualBase> {
 	//owned<DeviceSelector> device_selector;
 	Array<int> channel_map();
 
+	Array<int> event_ids;
+
 	void set_device(Device *dev);
 	void set_channel_map(const Array<int> &map);
 	void enable(bool enabled);

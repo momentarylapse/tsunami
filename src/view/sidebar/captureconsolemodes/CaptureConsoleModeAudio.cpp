@@ -53,12 +53,11 @@ void CaptureConsoleModeAudio::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(console->event("source", [this] {
+	auto c = items()[0];
+	c->event_ids.add(console->event("source", [this] {
 		on_source();
 	}));
 
-
-	auto c = items()[0];
 	c->enable(true);
 
 	chain->start(); // for preview

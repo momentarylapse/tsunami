@@ -50,13 +50,6 @@ void CaptureConsoleMode::add_item(xfer<CaptureTrackData> c) {
 }
 
 void CaptureConsoleMode::clear_items() {
-	for (int id: event_ids)
-		console->remove_event_handler(id);
-	event_ids.clear();
-	for (auto c: items()) {
-		if (c->peak_meter_display)
-			c->peak_meter_display->set_source(nullptr);
-	}
 	view->mode_capture->data.clear();
 }
 
@@ -99,12 +92,12 @@ void CaptureConsoleMode::update_data_from_items() {
 		}
 
 		if (c->id_mapper.num > 0 and c->channel_selector) {
-			event_ids.add(console->event(c->id_mapper, [this, c] {
+			c->event_ids.add(console->event(c->id_mapper, [this, c] {
 				hui::fly(new ChannelMapDialog(console, c->channel_selector));
 			}));
 		}
 		if (c->id_active.num > 0)
-			event_ids.add(console->event(c->id_active, [this, c] {
+			c->event_ids.add(console->event(c->id_active, [this, c] {
 				c->enable(console->is_checked(""));
 			}));
 	}

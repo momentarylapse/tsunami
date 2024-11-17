@@ -46,7 +46,13 @@ CaptureTrackData::CaptureTrackData(hui::Panel* _panel, const string& _id_source,
 	id_peaks = _id_peaks;
 }
 
-CaptureTrackData::~CaptureTrackData() = default;
+CaptureTrackData::~CaptureTrackData() {
+	for (int id: event_ids)
+		panel->remove_event_handler(id);
+	event_ids.clear();
+	if (peak_meter_display)
+		peak_meter_display->set_source(nullptr);
+}
 
 void CaptureTrackData::attach_to_gui(SignalType type, Session* session) {
 	//device_selector = new DeviceSelector(panel, id_source, session, type == SignalType::Midi ? DeviceType::MidiInput : DeviceType::AudioInput);

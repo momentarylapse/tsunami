@@ -45,7 +45,7 @@ void CaptureConsoleModeMidi::enter() {
 
 	update_data_from_items();
 
-	event_ids.add(console->event("source", [this] { on_source(); }));
+	items()[0]->event_ids.add(console->event("source", [this] { on_source(); }));
 
 	chain->set_buffer_size(512);
 

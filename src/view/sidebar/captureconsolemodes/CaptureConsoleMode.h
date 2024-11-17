@@ -62,7 +62,6 @@ public:
 	void add_item(xfer<CaptureTrackData> c);
 	void clear_items();
 	void update_data_from_items();
-	Array<int> event_ids;
 
 
 	Array<Device*> sources_audio;

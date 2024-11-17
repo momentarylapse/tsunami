@@ -9,6 +9,7 @@
 #define SRC_VIEW_SIDEBAR_CAPTURECONSOLEMODES_CAPTURETRACKDATA_H_
 
 #include "../../../lib/base/base.h"
+#include "../../../lib/base/pointer.h"
 #include "../../../lib/base/optional.h"
 #include "../../../lib/pattern/Observable.h"
 
@@ -26,6 +27,7 @@ class AudioAccumulator;
 class MidiAccumulator;
 class AudioOutput;
 class AudioChannelSelector;
+class DeviceSelector;
 class PeakMeterDisplay;
 class PeakMeter;
 class Synthesizer;
@@ -33,6 +35,7 @@ class Module;
 class SignalChain;
 enum class SignalType;
 class Track;
+class Session;
 
 
 struct SyncPoint {
@@ -41,7 +44,9 @@ struct SyncPoint {
 	int delay(int64 samples_played_before_capture);
 };
 
-struct CaptureTrackData : public obs::Node<VirtualBase> {
+struct CaptureTrackData : obs::Node<VirtualBase> {
+	CaptureTrackData(hui::Panel* panel, const string& id_source, const string& id_peaks);
+	~CaptureTrackData() override;
 
 	SignalType type();
 
@@ -71,21 +76,23 @@ struct CaptureTrackData : public obs::Node<VirtualBase> {
 
 	Module *input = nullptr;
 	AudioChannelSelector *channel_selector = nullptr;
-	PeakMeterDisplay *peak_meter_display = nullptr;
+	owned<PeakMeterDisplay> peak_meter_display;
 	PeakMeter *peak_meter = nullptr;
 	Module *accumulator = nullptr;
 	Module *backup = nullptr;
 	Synthesizer *synth = nullptr;
 	string id_group, id_grid, id_source, id_active, id_peaks, id_mapper;
+	//owned<DeviceSelector> device_selector;
 	Array<int> channel_map();
 
 	void set_device(Device *dev);
-	void set_map(const Array<int> &map);
+	void set_channel_map(const Array<int> &map);
 	void enable(bool enabled);
 	void allow_edit(bool allow);
 	void accumulate(bool acc);
 
 	void add_into_signal_chain(SignalChain *chain, Device *preferred_device = nullptr);
+	void attach_to_gui(SignalType type, Session* session);
 };
 
 }

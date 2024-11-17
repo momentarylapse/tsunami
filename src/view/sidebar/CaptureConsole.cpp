@@ -40,10 +40,6 @@ CaptureConsole::CaptureConsole(Session *session, SideBar *bar):
 	embed_dialog("record_dialog", 0, 0);
 
 
-	// dialog
-	peak_meter_display = new PeakMeterDisplay(this, "level", nullptr);
-
-
 	event("cancel", [this] { on_cancel(); });
 	event("ok", [this] { on_ok(); });
 	event("start", [this] { on_start(); });

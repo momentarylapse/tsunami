@@ -7,6 +7,7 @@
 
 #include "CaptureTrackData.h"
 #include "../../helper/PeakMeterDisplay.h"
+#include "../../helper/DeviceSelector.h"
 #include "../../../data/base.h"
 #include "../../../data/Track.h"
 #include "../../../data/Song.h"
@@ -38,6 +39,20 @@ Array<int> create_default_channel_map(int n_in, int n_out) {
 
 
 // TODO: subscribe to input and catch device change -> update channel map...
+
+CaptureTrackData::CaptureTrackData(hui::Panel* _panel, const string& _id_source, const string& _id_peaks) {
+	panel = _panel;
+	id_source = _id_source;
+	id_peaks = _id_peaks;
+}
+
+CaptureTrackData::~CaptureTrackData() = default;
+
+void CaptureTrackData::attach_to_gui(SignalType type, Session* session) {
+	//device_selector = new DeviceSelector(panel, id_source, session, type == SignalType::Midi ? DeviceType::MidiInput : DeviceType::AudioInput);
+	panel->set_tooltip(id_source, _("Source device"));
+	peak_meter_display = new PeakMeterDisplay(panel, id_peaks, nullptr);
+}
 
 
 
@@ -152,9 +167,10 @@ Device *CaptureTrackData::get_device() {
 	if (type() == SignalType::Midi)
 		return midi_input()->get_device();
 	return nullptr;
+	//return device_selector->get();
 }
 
-void CaptureTrackData::set_map(const Array<int> &_map) {
+void CaptureTrackData::set_channel_map(const Array<int> &_map) {
 	int channels = 2;
 	auto dev = get_device();
 	if (dev)
@@ -165,7 +181,7 @@ void CaptureTrackData::set_map(const Array<int> &_map) {
 void CaptureTrackData::set_device(Device *device) {
 	if (type() == SignalType::Audio) {
 		audio_input()->set_device(device);
-		set_map(create_default_channel_map(device->channels, track->channels));
+		set_channel_map(create_default_channel_map(device->channels, track->channels));
 	} else if (type() == SignalType::Midi) {
 		midi_input()->set_device(device);
 	}
@@ -207,7 +223,7 @@ void CaptureTrackData::add_into_signal_chain(SignalChain *_chain, Device *prefer
 		backup->command(ModuleCommand::AccumulationStop, 0);
 		reinterpret_cast<AudioBackup*>(backup)->set_backup_mode(BackupMode::Temporary);
 		sucker->set_channels(t->channels);
-		set_map(create_default_channel_map(device->channels, track->channels));
+		set_channel_map(create_default_channel_map(device->channels, track->channels));
 
 		// link
 		chain->connect(input, 0, channel_selector, 0);

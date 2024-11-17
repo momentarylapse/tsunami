@@ -25,7 +25,7 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 
 void CaptureConsoleModeMidi::on_source() {
 	const int n = console->get_int("");
-	items()[0].set_device(get_source(SignalType::Midi, n));
+	items()[0]->set_device(get_source(SignalType::Midi, n));
 }
 
 
@@ -33,18 +33,15 @@ void CaptureConsoleModeMidi::enter() {
 	console->hide_control("single_grid", false);
 
 	{
-		CaptureTrackData c;
-		c.id_peaks = "level";
-		c.id_source = "source";
-		c.peak_meter_display = console->peak_meter_display.get();
-		c.panel = console;
-		items().add(c);
+		auto c = new CaptureTrackData(console, "source", "level");
+		c->attach_to_gui(SignalType::Midi, session);
+		add_item(c);
 	}
 
 
 	for (Track *t: weak(view->song->tracks))
 		if (view->sel.has(t) and (t->type == SignalType::Midi))
-			items()[0].track = t;
+			items()[0]->track = t;
 
 	update_data_from_items();
 
@@ -52,14 +49,14 @@ void CaptureConsoleModeMidi::enter() {
 
 	chain->set_buffer_size(512);
 
-	auto &c = items()[0];
-	c.enable(true);
+	auto c = items()[0];
+	c->enable(true);
 
 	chain->start();
 }
 
 void CaptureConsoleModeMidi::allow_change_device(bool allow) {
-	items()[0].allow_edit(allow);
+	items()[0]->allow_edit(allow);
 }
 
 }

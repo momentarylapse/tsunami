@@ -53,7 +53,6 @@ public:
 		PAUSED
 	} state;
 
-	owned<PeakMeterDisplay> peak_meter_display;
 	CaptureConsoleMode *mode;
 
 	owned<CaptureConsoleMode> mode_audio;

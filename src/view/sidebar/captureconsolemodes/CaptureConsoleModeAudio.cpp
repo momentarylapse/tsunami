@@ -23,13 +23,13 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 
 void CaptureConsoleModeAudio::on_source() {
 	const int n = console->get_int("");
-	items()[0].set_device(get_source(SignalType::Audio, n));
+	items()[0]->set_device(get_source(SignalType::Audio, n));
 }
 
 void CaptureConsoleModeAudio::set_target(Track *t) {
-	items()[0].track = t;
+	items()[0]->track = t;
 
-	const bool ok = (items()[0].track->type == SignalType::Audio);
+	const bool ok = (items()[0]->track->type == SignalType::Audio);
 	console->set_string("message", "");
 	if (!ok)
 		console->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio).c_str()));
@@ -40,13 +40,10 @@ void CaptureConsoleModeAudio::enter() {
 	console->hide_control("single_grid", false);
 
 	{
-		CaptureTrackData a;
-		a.panel = console;
-		a.id_source = "source";
-		a.id_mapper = "channel-mapper";
-		a.id_peaks = "level";
-		a.peak_meter_display = console->peak_meter_display.get();
-		items().add(a);
+		auto a = new CaptureTrackData(console, "source", "level");
+		a->id_mapper = "channel-mapper";
+		a->attach_to_gui(SignalType::Audio, session);
+		add_item(a);
 	}
 
 	for (Track *t: weak(view->song->tracks))
@@ -61,14 +58,14 @@ void CaptureConsoleModeAudio::enter() {
 	}));
 
 
-	auto &c = items()[0];
-	c.enable(true);
+	auto c = items()[0];
+	c->enable(true);
 
 	chain->start(); // for preview
 }
 
 void CaptureConsoleModeAudio::allow_change_device(bool allow) {
-	items()[0].allow_edit(allow);
+	items()[0]->allow_edit(allow);
 }
 
 }

@@ -9,6 +9,7 @@
 #define SRC_VIEW_MODE_VIEWMODECAPTURE_H_
 
 #include "ViewModeDefault.h"
+#include "../../lib/base/pointer.h"
 
 namespace tsunami {
 
@@ -28,9 +29,9 @@ public:
 	void draw_post(Painter *c) override;
 
 
-	virtual base::set<Track*> prevent_playback() override;
+	base::set<Track*> prevent_playback() override;
 
-	Array<CaptureTrackData> data;
+	owned_array<CaptureTrackData> data;
 	SignalChain *chain;
 	
 	void insert();

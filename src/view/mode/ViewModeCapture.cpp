@@ -48,10 +48,10 @@ void ViewModeCapture::draw_post(Painter *c) {
 		return;
 
 	int offset = view->get_playback_selection(true).offset;
-	for (auto &d: data) {
-		auto *l = view->get_layer(d.track->layers[0].get());
-		if (d.type() == SignalType::Audio) {
-			auto *rec = d.audio_recorder();
+	for (auto d: weak(data)) {
+		auto *l = view->get_layer(d->track->layers[0].get());
+		if (d->type() == SignalType::Audio) {
+			auto *rec = d->audio_recorder();
 
 			//view->buffer_painter->set_context(l->area, l->vtrack()->audio_mode);
 			view->buffer_painter->set_context(l->area, AudioViewMode(0));
@@ -60,8 +60,8 @@ void ViewModeCapture::draw_post(Painter *c) {
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			view->peak_database->update_peaks_now(rec->buffer);
 			view->buffer_painter->draw_buffer(c, rec->buffer, offset);
-		} else if (d.type() == SignalType::Midi) {
-			auto *rec = d.midi_recorder();
+		} else if (d->type() == SignalType::Midi) {
+			auto *rec = d->midi_recorder();
 			std::lock_guard<std::mutex> lock(rec->mtx_buf);
 			l->draw_midi(c, midi_events_to_notes(rec->buffer), true, offset);
 		}
@@ -73,9 +73,9 @@ void ViewModeCapture::draw_post(Painter *c) {
 
 base::set<Track*> ViewModeCapture::prevent_playback() {
 	base::set<Track*> prev;
-	for (auto &d: data)
-		if (d.enabled)
-			prev.add(d.track);
+	for (auto d: weak(data))
+		if (d->enabled)
+			prev.add(d->track);
 	return prev;
 }
 
@@ -85,8 +85,8 @@ void ViewModeCapture::insert() {
 	// FIXME stupid hack
 	auto clear_sync_data = [this] {
 		session->i("HACK: ignoring sync data");
-		for (auto& d : data)
-			d.sync_points.clear();
+		for (auto d : weak(data))
+			d->sync_points.clear();
 	};
 #ifdef OS_WINDOWS
 	clear_sync_data();
@@ -96,8 +96,8 @@ void ViewModeCapture::insert() {
 #endif
 
 	song->begin_action_group("insert capture");
-	for (auto &d: data)
-		d.insert(view->get_playback_selection(true).start());
+	for (auto d: weak(data))
+		d->insert(view->get_playback_selection(true).start());
 	song->end_action_group();
 }
 

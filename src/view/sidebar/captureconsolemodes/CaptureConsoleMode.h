@@ -58,7 +58,9 @@ public:
 	shared<SignalChain> chain;
 
 
-	Array<CaptureTrackData>& items() const;
+	Array<CaptureTrackData*> items() const;
+	void add_item(xfer<CaptureTrackData> c);
+	void clear_items();
 	void update_data_from_items();
 	Array<int> event_ids;
 

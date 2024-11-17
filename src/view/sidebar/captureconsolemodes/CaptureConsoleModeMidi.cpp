@@ -23,11 +23,6 @@ CaptureConsoleModeMidi::CaptureConsoleModeMidi(CaptureConsole *_cc) :
 	CaptureConsoleMode(_cc)
 {}
 
-void CaptureConsoleModeMidi::on_source() {
-	const int n = console->get_int("");
-	items()[0]->set_device(get_source(SignalType::Midi, n));
-}
-
 
 void CaptureConsoleModeMidi::enter() {
 	console->hide_control("single_grid", false);
@@ -44,8 +39,6 @@ void CaptureConsoleModeMidi::enter() {
 			items()[0]->track = t;
 
 	update_data_from_items();
-
-	items()[0]->event_ids.add(console->event("source", [this] { on_source(); }));
 
 	chain->set_buffer_size(512);
 

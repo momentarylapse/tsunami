@@ -17,7 +17,6 @@ class CaptureConsoleModeMidi : public CaptureConsoleMode {
 public:
 	explicit CaptureConsoleModeMidi(CaptureConsole *cc);
 
-	void on_source();
 	void enter() override;
 	void allow_change_device(bool allow) override;
 };

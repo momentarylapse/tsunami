@@ -62,12 +62,6 @@ public:
 	void add_item(xfer<CaptureTrackData> c);
 	void clear_items();
 	void update_data_from_items();
-
-
-	Array<Device*> sources_audio;
-	Array<Device*> sources_midi;
-	Device* get_source(SignalType type, int i) const;
-	void update_device_list();
 };
 
 }

@@ -64,23 +64,16 @@ void CaptureConsoleMode::update_data_from_items() {
 	chain->mark_all_modules_as_system();
 
 
-	session->device_manager->out_add_device >> create_data_sink<Device*>([this] (Device*) {
-		update_device_list();
-	});
-	session->device_manager->out_remove_device >> create_data_sink<Device*>([this] (Device*) {
-		update_device_list();
-	});
-
-
 	for (auto c: items()) {
 		console->set_options(c->id_peaks, format("height=%d", PeakMeterDisplay::good_size(c->track->channels)));
 
-		c->input->out_changed >> create_sink([this] {
+		// TODO!!!!
+		/*c->input->out_changed >> create_sink([this] {
 			update_device_list();
 		});
 		c->input->out_state_changed >> create_sink([this] {
 			update_device_list();
-		});
+		});*/
 
 		if (c->channel_selector) {
 			c->channel_selector->out_changed >> create_sink([this, c] {
@@ -100,42 +93,6 @@ void CaptureConsoleMode::update_data_from_items() {
 			c->event_ids.add(console->event(c->id_active, [this, c] {
 				c->enable(console->is_checked(""));
 			}));
-	}
-
-	update_device_list();
-}
-
-Device* CaptureConsoleMode::get_source(SignalType type, int i) const {
-	if (i >= 0) {
-		if (type == SignalType::Audio)
-			return sources_audio[i];
-		if (type == SignalType::Midi)
-			return sources_midi[i];
-	}
-	return nullptr;
-}
-
-
-string shorten(const string &s, int max_length);
-
-void CaptureConsoleMode::update_device_list() {
-	sources_audio = session->device_manager->good_device_list(DeviceType::AudioInput);
-	sources_midi = session->device_manager->good_device_list(DeviceType::MidiInput);
-
-	for (auto c: items()) {
-		auto sources = sources_audio;
-		if (c->track->type == SignalType::Midi)
-			sources = sources_midi;
-
-		// add all
-		c->panel->reset(c->id_source);
-		for (Device *d: sources)
-			c->panel->add_string(c->id_source, shorten(d->get_name(), 42));
-
-		// select current
-		foreachi(Device *d, sources, i)
-			if (d == c->get_device())
-				c->panel->set_int(c->id_source, i);
 	}
 }
 

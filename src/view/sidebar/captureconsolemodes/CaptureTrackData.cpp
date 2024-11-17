@@ -55,7 +55,10 @@ CaptureTrackData::~CaptureTrackData() {
 }
 
 void CaptureTrackData::attach_to_gui(SignalType type, Session* session) {
-	//device_selector = new DeviceSelector(panel, id_source, session, type == SignalType::Midi ? DeviceType::MidiInput : DeviceType::AudioInput);
+	device_selector = new DeviceSelector(panel, id_source, session, type == SignalType::Midi ? DeviceType::MidiInput : DeviceType::AudioInput);
+	device_selector->out_value >> create_data_sink<Device*>([this] (Device* d) {
+		set_device(d);
+	});
 	panel->set_tooltip(id_source, _("Source device"));
 	peak_meter_display = new PeakMeterDisplay(panel, id_peaks, nullptr);
 }

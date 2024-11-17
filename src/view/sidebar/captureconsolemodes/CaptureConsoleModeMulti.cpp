@@ -61,10 +61,6 @@ void CaptureConsoleModeMulti::enter() {
 		c->peak_meter_display->set_visible(false);
 
 		add_item(c);
-
-		c->event_ids.add(console->event(c->id_source, [this] {
-			on_source();
-		}));
 	}
 
 	update_data_from_items();
@@ -77,15 +73,6 @@ void CaptureConsoleModeMulti::allow_change_device(bool allow) {
 	for (auto c: items()) {
 		c->allow_edit(allow);
 	}
-}
-
-void CaptureConsoleModeMulti::on_source() {
-	int index = hui::get_event()->id.sub(7)._int();
-	if (index < 0 or index >= items().num)
-		return;
-	int n = console->get_int("");
-	auto c = items()[index];
-	c->set_device(get_source(c->track->type, n));
 }
 
 void CaptureConsoleModeMulti::leave() {

@@ -19,8 +19,6 @@ public:
 	void enter() override;
 	void leave() override;
 	void allow_change_device(bool allow) override;
-
-	void on_source();
 };
 
 }

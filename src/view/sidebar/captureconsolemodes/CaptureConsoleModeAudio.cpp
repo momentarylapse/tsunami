@@ -21,18 +21,13 @@ CaptureConsoleModeAudio::CaptureConsoleModeAudio(CaptureConsole *_cc) :
 		CaptureConsoleMode(_cc) {
 }
 
-void CaptureConsoleModeAudio::on_source() {
-	const int n = console->get_int("");
-	items()[0]->set_device(get_source(SignalType::Audio, n));
-}
-
 void CaptureConsoleModeAudio::set_target(Track *t) {
 	items()[0]->track = t;
 
 	const bool ok = (items()[0]->track->type == SignalType::Audio);
 	console->set_string("message", "");
 	if (!ok)
-		console->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio).c_str()));
+		console->set_string("message", format(_("Please select a track of type %s."), signal_type_name(SignalType::Audio)));
 	console->enable("start", ok);
 }
 
@@ -54,10 +49,6 @@ void CaptureConsoleModeAudio::enter() {
 	update_data_from_items();
 
 	auto c = items()[0];
-	c->event_ids.add(console->event("source", [this] {
-		on_source();
-	}));
-
 	c->enable(true);
 
 	chain->start(); // for preview

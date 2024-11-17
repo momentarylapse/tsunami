@@ -23,7 +23,6 @@ class CaptureConsoleModeAudio : public CaptureConsoleMode {
 public:
 	explicit CaptureConsoleModeAudio(CaptureConsole *_cc);
 
-	void on_source();
 	void set_target(Track *t);
 	void enter() override;
 	void allow_change_device(bool allow) override;

@@ -82,12 +82,12 @@ struct CaptureTrackData : obs::Node<VirtualBase> {
 	Module *backup = nullptr;
 	Synthesizer *synth = nullptr;
 	string id_group, id_grid, id_source, id_active, id_peaks, id_mapper;
-	//owned<DeviceSelector> device_selector;
+	owned<DeviceSelector> device_selector;
 	Array<int> channel_map();
 
 	Array<int> event_ids;
 
-	void set_device(Device *dev);
+	void set_device(Device *dev); // selector -> input
 	void set_channel_map(const Array<int> &map);
 	void enable(bool enabled);
 	void allow_edit(bool allow);

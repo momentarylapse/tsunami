@@ -425,12 +425,12 @@ uniform float iVolume;
 		gl.clear_color(color.RED)
 		gl.set_cull(gl.CullMode.NONE)
 		gl.set_z(false, false)
-		gl.set_shader(shader)
 		for s in shader
+			gl.set_shader(&s)
 			s.set_float("iTime", _time)
 			s.set_float("iVolume", volume)
-		context.vb_temp.create_quad(rect.ID_SYM, rect.ID)
-		gl.draw_triangles(context.vb_temp)
+			context.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+			gl.draw_triangles(context.vb_temp)
 		#gl.end()
 
 class ShaderVis extends AudioVisualizer

@@ -92,7 +92,7 @@ class SpectrumDialog extends hui.Dialog
 	var song: shared![Song]
 	var tracks: shared![Track][]
 	var dmis: DrawMidiInSpectrogram&
-	func __init__(plugin: TsunamiPlugin, _song: Song)
+	func __init__(plugin: DrawMidiInSpectrogram, _song: Song)
 		super.__init__("Spectrum", 600, 460, plugin.session.win, true)
 		set_options("", "headerbar,resizable,closebutton=no")
 		from_source("

@@ -83,12 +83,11 @@ bool type_match_up(const Class *given, const Class *wanted) {
 	if (given == wanted)
 		return true;
 
-
 	if (type_match_generic_pointer(given, wanted))
 		return true;
 
 	// nil  ->  any raw pointer
-	if (wanted->is_pointer_raw() and (given == TypeNone))
+	if ((given == TypeNone) and wanted->is_pointer_raw())
 		return true;
 
 	// compatible pointers (of same or derived class)
@@ -98,20 +97,20 @@ bool type_match_up(const Class *given, const Class *wanted) {
 			return true;
 	}
 
-	// ...  ->  shared not-null
+	// shared not-null  ->  shared
 	if (given->is_pointer_shared_not_null() and wanted->is_pointer_shared())
 		if (given->param[0]->is_derived_from(wanted->param[0]))
 			return true;
 
 	//msg_write(given->long_name() + "  ->  " + wanted->long_name());
 
-	// ...  ->  raw
-	if (wanted->is_pointer_raw() and (given->is_reference() or given->is_pointer_owned() or given->is_pointer_owned_not_null()))
+	// ref/owned/owned!  ->  raw
+	if ((given->is_reference() or given->is_pointer_owned() or given->is_pointer_owned_not_null()) and wanted->is_pointer_raw())
 		if (type_match_up(given->param[0], wanted->param[0]))
 			return true;
 
-	// ...  ->  ref
-	if (wanted->is_reference() and (given->is_reference() or given->is_pointer_owned_not_null()))
+	// ref/owned!  ->  ref
+	if ((given->is_reference() or given->is_pointer_owned_not_null()) and wanted->is_reference())
 		if (type_match_up(given->param[0], wanted->param[0]))
 			return true;
 
@@ -264,8 +263,8 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 		}
 	}
 
-	// ...  ->  raw
-	if (wanted->is_pointer_raw() and (given->is_some_pointer())) {
+	// ???  ->  raw
+	if (given->is_some_pointer() and wanted->is_pointer_raw()) {
 		if (type_match_up(given->param[0], wanted->param[0])) {
 			cd.penalty = 10;
 			cd.cast = TypeCastId::WEAK_POINTER;
@@ -362,7 +361,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			}
 		}
 
-	for (auto&& [i,c]: enumerate(context->type_casts))
+	for (const auto& [i,c]: enumerate(context->type_casts))
 		if (type_match_up(given, c.source) and type_match_up(c.dest, wanted)) {
 			cd.penalty = c.penalty;
 			cd.cast = i;

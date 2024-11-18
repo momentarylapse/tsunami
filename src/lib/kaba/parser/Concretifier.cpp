@@ -245,6 +245,9 @@ shared<Node> Concretifier::link_special_operator_tuple_extract(shared<Node> para
 
 // TODO clean-up
 shared<Node> Concretifier::link_special_operator_ref_assign(shared<Node> param1, shared<Node> param2, int token_id) {
+	// we already know, param1/2 are refs!
+	if (!type_match_up(param2->type->param[0], param1->type->param[0]))
+		do_error(format("can not assign references '%s' := '%s'. The left side must be equal or a base class of the right side!", param1->type->long_name(), param2->type->long_name()), token_id);
 	return add_node_operator_by_inline(InlineID::PointerAssign, param1, param2, token_id);
 }
 
@@ -258,12 +261,12 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 	if ((primop->id == OperatorID::Assign) and (param1->kind == NodeKind::Tuple))
 		return link_special_operator_tuple_extract(param1, param2, token_id);
 
+	if (left_modifiable and !param1->is_mutable())
+		do_error("trying to modify a constant expression", token_id);
+
 	// &ref := &ref
 	if ((primop->id == OperatorID::RefAssign) and (param1->type->is_reference() and param2->type->is_reference()))
 		return link_special_operator_ref_assign(param1, param2, token_id);
-
-	if (left_modifiable and !param1->is_mutable())
-		do_error("trying to modify a constant expression", token_id);
 
 	if (primop->id == OperatorID::Is)
 		return link_special_operator_is(param1, param2, token_id);
@@ -1873,7 +1876,14 @@ shared<Node> Concretifier::concretify_definitely(shared<Node> node, Block *block
 		}
 	} else if (t->is_pointer_raw() or t->is_pointer_owned() or t->is_pointer_shared()) {
 		// null-able pointer?
-		auto t_def = tree->request_implicit_class_reference(t->param[0], node->token_id);
+		const Class* t_def;
+		if (t->is_pointer_raw())
+			t_def = tree->request_implicit_class_reference(t->param[0], node->token_id);
+		if (t->is_pointer_owned())
+			t_def = tree->request_implicit_class_owned_not_null(t->param[0], node->token_id);
+		if (t->is_pointer_shared())
+			t_def = tree->request_implicit_class_shared_not_null(t->param[0], node->token_id);
+
 		if (block->is_trust_me()) {
 			return sub->change_type(t_def);
 		} else {

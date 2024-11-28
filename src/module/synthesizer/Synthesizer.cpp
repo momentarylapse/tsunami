@@ -121,6 +121,8 @@ xfer<PitchRenderer> Synthesizer::create_pitch_renderer(int pitch) {
 }
 
 PitchRenderer *Synthesizer::get_pitch_renderer(int pitch) {
+	if (pitch < 0 or pitch > MaxPitch)
+		return nullptr;
 	for (auto *p: pitch_renderer)
 		if (p->pitch == pitch)
 			return p;
@@ -169,13 +171,14 @@ void Synthesizer::_handle_event(const MidiEvent &e) {
 void Synthesizer::render(AudioBuffer& buf) {
 	base::set<int> pitch_involved = active_pitch;
 	for (MidiEvent &e: events)
-		pitch_involved.add((int)e.pitch);
+		if (!e.is_special())
+			pitch_involved.add((int)e.pitch);
 
 	for (int p: pitch_involved) {
 		int offset = 0;
 
 		for (MidiEvent &e: events)
-			if (e.pitch == p) {
+			if (!e.is_special() and (e.pitch == p)) {
 				// render before
 				if (active_pitch.contains(p))
 					_render_part(buf, p, offset, e.pos);

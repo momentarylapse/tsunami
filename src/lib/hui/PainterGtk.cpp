@@ -246,6 +246,7 @@ void Painter::draw_rect(const rect &r) {
 void Painter::draw_circle(const vec2 &c, float radius) {
 	if (!cr)
 		return;
+	cairo_new_sub_path(cr);
 	cairo_arc(cr, c.x, c.y, radius, 0, 2 * pi);
 
 	if (mode_fill)

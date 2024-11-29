@@ -19,9 +19,7 @@ void ToolTipOverlay::on_draw(Painter *p) {
 	if (graph()->hover.node)
 		tip = graph()->hover.node->get_tip();
 	if (tip.num > 0) {
-		p->set_font("", theme.FONT_SIZE, true, false);
 		draw_cursor_hover(p, tip, graph()->m, area);
-		p->set_font("", theme.FONT_SIZE, false, false);
 	}
 
 	// general hint (full line at bottom)

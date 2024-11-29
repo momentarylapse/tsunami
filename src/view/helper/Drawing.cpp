@@ -91,12 +91,12 @@ float draw_str_constrained(Painter *p, const vec2 &pos, float w_max, const strin
 }
 
 void draw_cursor_hover(Painter *c, const string &msg, const vec2 &m, const rect &area) {
-	//c->set_font("", -1, true, false);
+	c->set_font("", theme.FONT_SIZE, true, false);
 	vec2 size = c->get_str_size(msg);
 	float x = clamp(m.x - 20.0f, area.x1 + 2.0f, area.x2 - size.x);
 	float y = clamp(m.y + 30, area.y1 + 2.0f, area.y2 - size.y - 5);
 	draw_boxed_str(c, {x, y}, msg, theme.background, theme.text_soft1);
-	//c->set_font("", -1, false, false);
+	c->set_font("", theme.FONT_SIZE, false, false);
 }
 
 

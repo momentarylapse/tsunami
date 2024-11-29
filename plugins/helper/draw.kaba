@@ -39,6 +39,8 @@ enum Align
 
 func extern draw_boxed_str(p: hui.Painter, pos: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
 
+func extern draw_cursor_hover(p: hui.Painter, msg: string, cursor: vec2, area: rect)
+
 func extern draw_arrow_head(p: hui.Painter, tip: vec2, dir: vec2)
 
 # using color and line_width!

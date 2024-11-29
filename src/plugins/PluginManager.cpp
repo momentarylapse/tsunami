@@ -218,6 +218,7 @@ void PluginManager::link_app_data() {
 	ext->link("SelectSample", (void*)&SampleSelectionDialog::select);
 	ext->link("ChooseModule", (void*)&ModuleSelectorDialog::choose);
 	ext->link("draw_boxed_str", (void*)&draw_boxed_str);
+	ext->link("draw_cursor_hover", (void*)&draw_cursor_hover);
 	ext->link("draw_arrow_head", (void*)&draw_arrow_head);
 	ext->link("draw_arrow", (void*)&draw_arrow);
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);

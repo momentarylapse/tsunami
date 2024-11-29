@@ -6,8 +6,10 @@ use hui
 let NSURFACES = 4
 let NRIMS = 9
 
-let SURFACE_PITCHES = [36, 38, 40, 41] # C2,D2,E2,F2
-let RIM_PITCHES = [48, 50, 52, 53, 55, 57, 59, 60, 72] # C3,D3,...,C4,  C5
+let SURFACE_PITCHES = [36, 38, 40, 41] # C3,D3,E3,F3
+	# warning: Mandala calls these C2,D2,E2,F2
+let RIM_PITCHES = [48, 50, 52, 53, 55, 57, 59, 60, 72] # C4,D4,...,C5, C6
+	# warning: Mandala calls these C3,D3,...,C4, C5
 
 func sample_name(sample: shared[SampleRef]) -> string
 	for s in sample

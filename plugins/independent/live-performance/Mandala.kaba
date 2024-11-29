@@ -1,4 +1,5 @@
 use tsunami.*
+use helper.draw.*
 use synthesizer.Sample.*
 use hui
 
@@ -8,6 +9,10 @@ let NRIMS = 9
 let SURFACE_PITCHES = [36, 38, 40, 41] # C2,D2,E2,F2
 let RIM_PITCHES = [48, 50, 52, 53, 55, 57, 59, 60, 72] # C3,D3,...,C4,  C5
 
+func sample_name(sample: shared[SampleRef]) -> string
+	for s in sample
+		return s.origin.name
+	return "---"
 
 class Mandala extends TsunamiPlugin
 	class Config extends Module.Config
@@ -23,6 +28,9 @@ class Mandala extends TsunamiPlugin
 			rim_samples.clear()
 			rim_samples.resize(NRIMS)
 		
+		func group_size() -> i32
+			return NSURFACES / number_of_zones
+		
 	var config: Config
 	
 	var source: shared[MidiInput]
@@ -33,7 +41,7 @@ class Mandala extends TsunamiPlugin
 
 	func override on_start()
 		# create signal chain
-		# midi in => synth => audio out
+		# [midi in] => [synth] => [audio out]
 		chain = session.create_signal_chain("mandala")
 		source = chain!.add[MidiInput]()
 		source!.set_free_flow(true)
@@ -51,9 +59,11 @@ class Mandala extends TsunamiPlugin
 			# configure synth with our samples
 			s.config.samples.clear()
 			s.config.samples.resize(128)
+			let group_size = config.group_size()
 			for i=>p in SURFACE_PITCHES
-				if i < len(config.surface_samples)
-					s.config.samples[p] = config.surface_samples[i]
+				let source = (i / group_size) * group_size # grouping? => round down
+				if source < len(config.surface_samples)
+					s.config.samples[p] = config.surface_samples[source]
 			for i=>p in RIM_PITCHES
 				if i < len(config.rim_samples)
 					s.config.samples[p] = config.rim_samples[i]
@@ -69,7 +79,6 @@ class Mandala extends TsunamiPlugin
 class MandalaPanel extends ConfigPanel
 	override c: Mandala&
 	var config: Mandala.Config&
-#	var source_panel: shared[ConfigPanel]
 	var source_selector: owned![DeviceSelector]
 	var width, height: i32
 	
@@ -97,12 +106,6 @@ Grid grid ''
 	---|
 	DrawingArea area '' expandx expandy")
 	
-	#	for s in c.source
-	#		source_panel = s.create_panel()
-	#	embed(source_panel, "grid", 0, 0)
-	#	for p in source_panel
-	#		p.update()
-	
 		source_selector = new DeviceSelector(self, "source", c.session, Device.Type.MIDI_INPUT, on_source)
 		
 		event("number-of-zones", on_number_of_zones)
@@ -125,6 +128,17 @@ Grid grid ''
 		
 		changed()
 	
+	func draw_hollow_circle(p: hui.Painter, center: vec2, r0: f32, r1: f32)
+		var v: vec2[]
+		let N = 128
+		for i in 0:N+1
+			let phi = f32(i) / N * pi * 2
+			v.add(center + vec2(cos(phi) * r0, sin(phi) * r0))
+		for i in 0:N+1
+			let phi = f32(N - i) / N * pi * 2
+			v.add(center + vec2(cos(phi) * r1, sin(phi) * r1))
+		p.draw_polygon(v)
+	
 	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
@@ -132,19 +146,34 @@ Grid grid ''
 		p.set_color(theme.background)
 		p.draw_rect([0,width, 0,height])
 		
-		p.set_color(theme.text)
-		#p.draw_str([10,10], "test")
-		
 		
 		# left: surfaces
 		let c1 = vec2(width / 4, height / 2)
 		let r = min(c1.x, c1.y) * 0.9
 		
-		p.set_color(theme.neon(4).with_alpha(0.3))
-		p.draw_circle(c1, r)
-		p.draw_circle(c1, r*0.75)
-		p.draw_circle(c1, r*0.5)
-		p.draw_circle(c1, r*0.25)
+		let group_size = config.group_size()
+		
+		for i in 0:NSURFACES
+			if (i % group_size) == 0
+				var hovering = false
+				for h in hover
+					if h.type == Hover.Type.SURFACE and h.index >= i and h.index < i + group_size
+						hovering = true
+				let alpha = if hovering
+					0.6
+				else
+					0.3
+				p.set_color(theme.neon(4 - i).with_alpha(alpha))
+				let r0 = r/NSURFACES*i
+				let r1 = r/NSURFACES*(i+group_size)
+				draw_hollow_circle(p, c1, r0, r1)
+				var fs = 8.0
+				p.set_color(theme.text_soft2)
+				if hovering
+					p.set_color(theme.text)
+					fs = 10.0
+				p.set_font_size(fs)
+				p.draw_str(c1 + vec2(-2, -r0 - fs*1.7), str(i+1))
 		p.set_fill(false)
 		p.set_color(theme.text)
 		p.draw_circle(c1, r)
@@ -167,18 +196,29 @@ Grid grid ''
 		p.set_fill(true)
 		p.set_font_size(8)
 		for i in 0:NRIMS
+			var hovering = false
+			for h in hover
+				if h.type == Hover.Type.RIM and h.index == i
+					hovering = true
 			let phi = f32(i) / NRIMS * 2 * pi
 			p.set_color(theme.text)
 			p.draw_circle(c2 + r * vec2(sin(phi), -cos(phi)), 5)
 			let phi2 = phi + pi / NRIMS
 			var fs = 8.0
 			p.set_color(theme.text_soft2)
-			for h in hover
-				if h.type == Hover.Type.RIM and h.index == i
-					p.set_color(theme.text)
-					fs = 10.0
+			if hovering
+				p.set_color(theme.text)
+				fs = 10.0
 			p.set_font_size(fs)
 			p.draw_str(c2 + (r - 13) * vec2(sin(phi2), -cos(phi2)) + vec2(-fs/2,-fs/2), str(i+1))
+		
+		
+		# tooltip
+		for h in hover
+			if h.type == Hover.Type.SURFACE
+				draw_cursor_hover(p, "Surface #{{h.index+1}} - sample: {{sample_name(config.surface_samples[h.index])}}", hui.get_event().mouse, [0,width, 0,height])
+			if h.type == Hover.Type.RIM
+				draw_cursor_hover(p, "Rim #{{h.index+1}} - sample: {{sample_name(config.rim_samples[h.index])}}", hui.get_event().mouse, [0,width, 0,height])
 	
 	func get_hover(m: vec2) -> Hover?
 		# left: surfaces
@@ -186,7 +226,7 @@ Grid grid ''
 		let r = min(c1.x, c1.y) * 0.9
 		
 		for i in 0:NSURFACES
-			if len(m - c1) < r * f32(i) / f32(NSURFACES)
+			if len(m - c1) < r * f32(i + 1) / f32(NSURFACES)
 				return [Hover.Type.SURFACE, i]
 		
 		
@@ -206,6 +246,19 @@ Grid grid ''
 
 	func mut on_left_button_down()
 		for h in hover
+			if h.type == Hover.Type.SURFACE
+				let i = h.index
+				var old: Sample* = nil
+				for s in config.surface_samples[i]
+					old = &s.origin
+				let f = func(ss: Sample*)
+					for _s in ss
+						config.surface_samples[i] = _s.create_ref()
+					else
+						config.surface_samples[i] = nil
+					changed()
+					update()
+				SelectSample(c.session, self, old).then(f)
 			if h.type == Hover.Type.RIM
 				let i = h.index
 				var old: Sample* = nil

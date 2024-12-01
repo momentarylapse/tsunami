@@ -38,7 +38,7 @@ public:
 	int row_target;
 
 	string effective_format;
-#if GTK_CHECK_VERSION(4,10,0)
+#if GTK_CHECK_VERSION(4,0,0)
 	GListStore *store;
 	GtkTreeListModel *tree_model;
 	GtkSelectionModel *selection_model;

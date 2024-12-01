@@ -16,7 +16,7 @@
 namespace hui
 {
 
-#if !GTK_CHECK_VERSION(4,10,0)
+#if !GTK_CHECK_VERSION(4,0,0)
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str);
 #endif
 
@@ -62,7 +62,7 @@ void ControlEdit::__reset() {
 }
 
 void ControlEdit::completion_add(const string &text) {
-#if !GTK_CHECK_VERSION(4,10,0)
+#if !GTK_CHECK_VERSION(4,0,0)
 	GtkEntryCompletion *comp = gtk_entry_get_completion(GTK_ENTRY(widget));
 	if (!comp){
 		comp = gtk_entry_completion_new();

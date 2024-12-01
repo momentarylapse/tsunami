@@ -46,7 +46,7 @@ ModuleSelectorDialog::ModuleSelectorDialog(hui::Window* _parent, ModuleCategory 
 		if (i > 0)
 			if (g == labels[i-1].group)
 				g = "";
-		auto ll = format("<b>%s</b>\\%s\\%s", g, l.name, session->plugin_manager->is_favorite(session, type, l.name) ? "\u2764" : "");
+		auto ll = format("<b>%s</b>\\%s\\%s", g, l.name, session->plugin_manager->is_favorite(session, type, l.name) ? "hui:heart" : "");
 		/*if (ugroups.num > 0) {
 			int r = ugroups.find(l.group);
 			add_child_string("list", r, ll);

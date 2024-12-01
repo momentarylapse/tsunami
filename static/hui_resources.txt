@@ -4163,7 +4163,7 @@ Grid
 2
 ListView
 list
-format=mtt,nobar
+format=mti,nobar
 0
 0
 0
@@ -4187,7 +4187,7 @@ default
 0
 ToggleButton
 toggle-favorite
-
+image=heart
 1
 1
 0
@@ -4453,31 +4453,31 @@ homogenousx,box,linked
 5
 ToggleButton
 type-audio
-margin=40,image=track-audio,flat,expandx,ignorefocus
+image=track-audio,flat,big,expandx,ignorefocus
 0
 0
 0
 ToggleButton
 type-midi
-image=track-midi,flat,expandx,ignorefocus
+image=track-midi,flat,big,expandx,ignorefocus
 1
 0
 0
 ToggleButton
 type-metronome
-image=track-time,flat,expandx,ignorefocus
+image=track-time,flat,big,expandx,ignorefocus
 2
 0
 0
 ToggleButton
 type-master
-image=track-group,flat,expandx,ignorefocus
+image=track-group,flat,big,expandx,ignorefocus
 3
 0
 0
 ToggleButton
 type-preset
-image=heart,flat,expandx,ignorefocus
+image=heart,flat,big,expandx,ignorefocus
 4
 0
 0
@@ -5103,9 +5103,9 @@ expandy
 0
 0
 0
-Label
+Button
 favorite-label
-center,width=40,height=40,disabled
+image=heart,center,width=40,height=40,disabled
 0
 1
 0
@@ -9335,7 +9335,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-812
+811
 # Text
 /bars-add
 Add bars...
@@ -9935,7 +9935,7 @@ configurable-selection-dialog/ok
 Select
 
 configurable-selection-dialog/toggle-favorite
-❤
+
 Add to favorites or remove
 configurable_dialog/load_favorite
 
@@ -10948,9 +10948,6 @@ Pdf Export
 plugin-console/add
 
 add plugin
-plugin-console/favorite-label
-❤
-
 plugin-console/no-plugins-label
 no plugins active
 

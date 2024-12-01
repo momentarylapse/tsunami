@@ -8,5 +8,5 @@ Dialog plugin-console "Plugins" width=300 height=200
 		Grid favorite-grid ""
 			Label ? "" expandy
 			---|
-			Label favorite-label "❤" center width=40 height=40 disabled
+			Button favorite-label "" image=heart center width=40 height=40 disabled
 

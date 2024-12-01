@@ -14,7 +14,7 @@ namespace hui
 extern int HuiKeyID[256];
 extern void *invisible_cursor;
 extern void *get_gtk_image(const string &image, IconSize size);
-extern void *get_gtk_image_pixbuf(const string &image);
+extern void* get_gtk_image_paintable(const string &image);
 extern int allow_signal_level;
 
 
@@ -22,8 +22,9 @@ extern int allow_signal_level;
 struct HuiImage {
 	int type;
 	string filename;
-	Image *image;
-	void *pix_buf;
+	Image* image;
+	void* pix_buf = nullptr;
+	void* paintable = nullptr;
 };
 extern Array<HuiImage> _all_images_;
 

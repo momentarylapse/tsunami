@@ -355,22 +355,44 @@ void *get_gtk_image(const string &image, IconSize size) {
 	return get_gtk_image_x(image, size, nullptr);
 }
 
-void *get_gtk_image_pixbuf(const string &image) {
+#if GTK_CHECK_VERSION(4,0,0)
+void *get_gtk_image_paintable(const string &image) {
 	if (image.head(4) == "hui:") {
-#if !GTK_CHECK_VERSION(4,0,0)
+		// internal
+		auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
+		if (auto paintable = gtk_icon_theme_lookup_icon(icon_theme, get_gtk_icon_name(image).c_str(), nullptr, 24, 1, GTK_TEXT_DIR_LTR, (GtkIconLookupFlags)0))
+			return paintable;
+	} else {
+		// file
+		HuiImage *img = get_image(image);
+		if (img->type == 0) {
+		} else if (img->type == 1) {
+			if (!img->paintable) {
+				img->pix_buf = gdk_pixbuf_new_from_data((guchar*)img->image->data.data, GDK_COLORSPACE_RGB, true, 8, img->image->width, img->image->height, img->image->width * 4, nullptr, nullptr);
+				img->paintable = gdk_texture_new_for_pixbuf(GDK_PIXBUF(img->pix_buf));
+				for (int i=0; i<1000; i++)
+					g_object_ref(GDK_TEXTURE(img->paintable));
+			}
+			return img->paintable;
+		}
+	}
+	return nullptr;
+}
+#else
+void *get_gtk_image_paintable(const string &image) {
+	if (image.head(4) == "hui:") {
 		// internal
 		GdkPixbuf *pb = gtk_icon_theme_load_icon(gtk_icon_theme_get_default(), get_gtk_icon_name(image).c_str(), 24, (GtkIconLookupFlags)0, nullptr);
-		if (pb){
+		if (pb) {
 			GdkPixbuf *r = gdk_pixbuf_copy(pb);
 			g_object_unref(pb);
 			return r;
 		}
-#endif
-	}else{
+	} else {
 		// file
 		HuiImage *img = get_image(image);
-		if (img->type == 0){
-		}else if (img->type == 1){
+		if (img->type == 0) {
+		} else if (img->type == 1) {
 			if (!img->pix_buf) {
 				img->pix_buf = gdk_pixbuf_new_from_data((guchar*)img->image->data.data, GDK_COLORSPACE_RGB, true, 8, img->image->width, img->image->height, img->image->width * 4, nullptr, nullptr);
 				for (int i=0; i<1000; i++)
@@ -381,6 +403,7 @@ void *get_gtk_image_pixbuf(const string &image) {
 	}
 	return nullptr;
 }
+#endif
 
 /*void HuiMenu::SetText(const string &id, const string &text)
 {

@@ -7,6 +7,7 @@
 
 #include "ControlListView.h"
 #include "../hui.h"
+#include "../internal.h"
 #include "../../base/iter.h"
 #include "../../base/algo.h"
 #include "../../os/msg.h"
@@ -19,7 +20,6 @@ namespace hui
 
 #define dbo(s) //msg_write(s)
 
-void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
 string tree_get_cell(GtkTreeModel *store, GtkTreeIter &iter, int column);
 void configure_tree_view_columns(Control *c, GtkWidget *view, const string &_format, const Array<string> &parts);
 
@@ -263,13 +263,13 @@ void gtk_list_view_update_item_view(ControlListView* list_view, int column, GtkW
 	} else if (f == 'B') {
 		//gtk_button_set_active(GTK_CHECK_BUTTON(w), string(s)._bool());
 	} else if (f == 'i') {
-		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(s);
-		//#if GTK_CHECK_VERSION(4,12,0)
-		// TODO use gtk paintable for images
-		//		gtk_picture_set_paintable(GTK_PICTURE(w), p);
-		//#else
-		gtk_picture_set_pixbuf(GTK_PICTURE(w), p);
-		//#endif
+		void* p = get_gtk_image_paintable(s);
+#if GTK_CHECK_VERSION(4,0,0)
+		gtk_picture_set_paintable(GTK_PICTURE(w), (GdkPaintable*)p);
+#else
+		// unused...
+		gtk_picture_set_pixbuf(GTK_PICTURE(w), (GdkPixbuf*)p);
+#endif
 	} else if (f == 'T') {
 		gtk_editable_set_text(GTK_EDITABLE(w), s);
 	} else if (f == 'm') {
@@ -545,7 +545,7 @@ void ControlListView::__set_string(const string &str) {
 	__add_string(str);
 }
 
-#if !GTK_CHECK_VERSION(4,10,0)
+#if !GTK_CHECK_VERSION(4,0,0)
 void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const string &str) {
 	GType type = gtk_tree_model_get_column_type(GTK_TREE_MODEL(store), column);
 	if (type == G_TYPE_STRING) {
@@ -553,7 +553,7 @@ void set_list_cell(GtkListStore *store, GtkTreeIter &iter, int column, const str
 	} else if (type == G_TYPE_BOOLEAN) {
 		gtk_list_store_set(store, &iter, column, (str == "1") or (str == "true"), -1);
 	} else if (type == GDK_TYPE_PIXBUF) {
-		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(str);
+		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_paintable(str);
 		if (p)
 			gtk_list_store_set(store, &iter, column, p, -1);
 		else if (str != "")

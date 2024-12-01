@@ -138,7 +138,7 @@ void on_gtk_tree_select(GtkTreeSelection *selection, gpointer data) {
 	reinterpret_cast<Control*>(data)->notify(EventID::SELECT, false);
 }
 
-void *get_gtk_image_pixbuf(const string &image); // -> hui_menu_gtk.cpp
+void *get_gtk_image_paintable(const string &image); // -> hui_menu_gtk.cpp
 
 #endif
 
@@ -288,7 +288,7 @@ void set_tree_cell(GtkTreeStore *store, GtkTreeIter &_iter, int column, const st
 	else if (type == G_TYPE_BOOLEAN)
 		gtk_tree_store_set(store, &iter, column, (str == "1") || (str == "true"), -1);
 	else if (type == GDK_TYPE_PIXBUF) {
-		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_pixbuf(str);
+		GdkPixbuf *p = (GdkPixbuf*)get_gtk_image_paintable(str);
 		if (p)
 			gtk_tree_store_set(store, &iter, column, p, -1);
 	}

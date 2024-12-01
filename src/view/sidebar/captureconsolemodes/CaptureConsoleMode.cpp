@@ -76,10 +76,10 @@ void CaptureConsoleMode::update_data_from_items() {
 		});*/
 
 		if (c->channel_selector) {
-			c->channel_selector->out_changed >> create_sink([this, c] {
+			c->channel_selector->out_changed >> create_sink([c] {
 				c->peak_meter_display->set_channel_map(c->channel_map());
 			});
-			c->channel_selector->out_state_changed >> create_sink([this, c] {
+			c->channel_selector->out_state_changed >> create_sink([c] {
 				c->peak_meter_display->set_channel_map(c->channel_map());
 			});
 		}

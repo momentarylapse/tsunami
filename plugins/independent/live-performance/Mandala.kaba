@@ -115,6 +115,7 @@ Grid grid ''
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:mouse-move", on_mouse_move)
 		event_x("area", "hui:left-button-down", on_left_button_down)
+		event_x("area", "hui:mouse-leave", on_mouse_leave)
 	
 	func override update()
 		set_int("number-of-zones", clamp(config.number_of_zones, 1, 3) - 1)
@@ -245,6 +246,10 @@ Grid grid ''
 	
 	func mut on_mouse_move()
 		hover = get_hover(hui.get_event().mouse)
+		redraw("area")
+	
+	func mut on_mouse_leave()
+		hover = nil
 		redraw("area")
 
 	func mut on_left_button_down()

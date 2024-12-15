@@ -772,6 +772,7 @@ add_executable(tsunami WIN32
 	src/view/helper/PeakMeterDisplay.cpp
 	src/view/helper/PeakThread.cpp
 	src/view/helper/Progress.cpp
+	src/view/helper/SamplePreviewPlayer.cpp
 	src/view/helper/Slider.cpp
 	src/view/helper/SymbolRenderer.cpp
 	src/view/helper/VolumeControl.cpp

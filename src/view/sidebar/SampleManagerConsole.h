@@ -14,13 +14,9 @@ namespace tsunami {
 
 class Song;
 class Sample;
-class AudioOutput;
-class BufferStreamer;
-class MidiEventStreamer;
 class SampleManagerItem;
-class Progress;
 class Session;
-class SignalChain;
+class SamplePreviewPlayer;
 
 class SampleManagerConsole : public SideBarConsole {
 public:
@@ -44,12 +40,7 @@ public:
 	void on_delete();
 	void on_scale();
 
-	void on_progress_cancel();
 	void on_song_update();
-	void on_preview_tick();
-	void on_preview_stream_end();
-
-	void end_preview();
 
 	owned_array<SampleManagerItem> items;
 	Array<SampleManagerItem*> old_items;
@@ -59,16 +50,6 @@ public:
 	Array<Sample*> get_selected();
 
 	void set_selection(const Array<Sample*> &samples);
-
-	struct Preview {
-		shared<SignalChain> chain;
-		AudioOutput *stream = nullptr;
-		BufferStreamer *renderer = nullptr;
-		MidiEventStreamer *midi_streamer = nullptr;
-		Sample *sample = nullptr;
-	} preview;
-
-	owned<Progress> progress;
 	
 	string id_list;
 	owned<hui::Menu> menu_samples;

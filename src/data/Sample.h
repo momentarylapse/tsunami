@@ -23,10 +23,10 @@ enum class SignalType;
 
 class Sample : public Sharable<obs::Node<VirtualBase>> {
 public:
-	Sample(SignalType type);
+	explicit Sample(SignalType type);
 	Sample(const string &name, const AudioBuffer &buf);
 	Sample(const string &name, const MidiNoteBuffer &buf);
-	virtual ~Sample();
+	~Sample() override;
 
 	void __init__(const string &name, const AudioBuffer &buf);
 

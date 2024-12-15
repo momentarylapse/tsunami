@@ -23,8 +23,8 @@ class AudioView;
 
 class Playback : public obs::Node<VirtualBase> {
 public:
-	Playback(Session *s);
-	~Playback();
+	explicit Playback(Session *s);
+	~Playback() override;
 
 	obs::source out_tick{this, "tick"};
 	obs::source out_state_changed{this, "state-changed"};

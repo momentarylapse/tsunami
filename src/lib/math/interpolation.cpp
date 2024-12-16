@@ -17,15 +17,13 @@
 
 
 template<class T>
-Interpolator<T>::Interpolator(Type _type)
-{
+Interpolator<T>::Interpolator(Type _type) {
 	type = _type;
 	clear();
 }
 
 template<class T>
-void Interpolator<T>::__init__()
-{
+void Interpolator<T>::__init__() {
 	new(this) Interpolator<T>(TYPE_LERP);
 }
 
@@ -267,7 +265,7 @@ T Interpolator<T>::get(float t)
 
 
 template<class T>
-T Interpolator<T>::getTang(float t)
+T Interpolator<T>::get_derivative(float t)
 {
 	if (!ready)
 		update();
@@ -295,7 +293,7 @@ template<>
 inline void Interpolator<vec3>::print(){}
 
 template<class T>
-Array<T> Interpolator<T>::getList(Array<float> &t)
+Array<T> Interpolator<T>::get_list(Array<float> &t)
 {
 	//print();
 	Array<T> r;

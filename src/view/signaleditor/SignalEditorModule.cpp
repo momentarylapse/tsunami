@@ -19,6 +19,7 @@
 #include "../../module/port/Port.h"
 #include "../../data/base.h"
 #include "../../Session.h"
+#include "../../lib/base/iter.h"
 #include "../../lib/image/Painter.h"
 
 namespace tsunami {
@@ -112,7 +113,7 @@ public:
 	SignalEditorTab *tab;
 	Array<float> px0, py0;
 	vec2 m0;
-	MouseDelayModuleDnD(SignalEditorTab *t) {
+	explicit MouseDelayModuleDnD(SignalEditorTab *t) {
 		tab = t;
 		sel = tab->sel_modules;
 		for (auto *m: sel) {
@@ -122,7 +123,7 @@ public:
 		m0 = tab->graph()->m;
 	}
 	void on_update(const vec2 &m) override {
-		foreachi (auto mm, sel, i) {
+		for (auto&& [i,mm]: enumerate(sel)) {
 			mm->module_x = px0[i] + m.x - m0.x;
 			mm->module_y = py0[i] + m.y - m0.y;
 		}
@@ -141,12 +142,13 @@ public:
 
 
 SignalEditorModule::SignalEditorModule(SignalEditorTab *t, Module *m) : scenegraph::NodeRel({m->module_x, m->module_y}, MODULE_WIDTH, MODULE_HEIGHT) {
+	align.dz = 2;
 	tab = t;
 	module = m;
 	set_perf_name("se:module");
-	foreachi(auto p, m->port_in, i)
+	for(const auto& [i,p]: enumerate(m->port_in))
 		in.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_in_x(module, i), module_port_in_y(module, i), false));
-	foreachi(auto p, m->port_out, i)
+	for(const auto& [i,p]: enumerate(m->port_out))
 		out.add(new SignalEditorModulePort(tab, module, i, p->type, module_port_out_x(module, i), module_port_out_y(module, i), true));
 	for (auto p: in + out)
 		add_child(p);

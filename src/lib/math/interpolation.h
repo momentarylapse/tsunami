@@ -11,8 +11,7 @@
 #include "../base/base.h"
 
 template<class T>
-class Interpolator
-{
+class Interpolator {
 public:
 	enum Type{
 		TYPE_LERP,
@@ -20,7 +19,7 @@ public:
 		TYPE_CUBIC_SPLINE_NOTANG,
 		TYPE_ANGULAR_LERP,
 	};
-	Interpolator(Type type);
+	explicit Interpolator(Type type);
 	void _cdecl __init__();
 	void _cdecl setType(const string &type);
 
@@ -41,11 +40,10 @@ public:
 
 	// interpolated output
 	T _cdecl get(float t);
-	T _cdecl getTang(float t);
-	Array<T> _cdecl getList(Array<float> &t);
+	T _cdecl get_derivative(float t);
+	Array<T> _cdecl get_list(Array<float> &t);
 
-	struct Part
-	{
+	struct Part {
 		T pos0, pos1;
 		T vel0, vel1;
 		float t0, dt;

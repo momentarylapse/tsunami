@@ -1021,9 +1021,9 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("normalize", TypeVoid, &Interpolator<float>::normalize, Flags::Mutable);
 		class_add_func("get", TypeFloat32, &Interpolator<float>::get, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeFloat32, &Interpolator<float>::getTang, Flags::Pure);
+		class_add_func("get_derivative", TypeFloat32, &Interpolator<float>::get_derivative, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeFloatList, &Interpolator<float>::getList, Flags::Pure);
+		class_add_func("get_list", TypeFloatList, &Interpolator<float>::get_list, Flags::Pure);
 			func_add_param("t", TypeFloatList);
 
 
@@ -1051,9 +1051,9 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("normalize", TypeVoid, &Interpolator<vec3>::normalize, Flags::Mutable);
 		class_add_func("get", TypeVec3, &Interpolator<vec3>::get, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_tang", TypeVec3, &Interpolator<vec3>::getTang, Flags::Pure);
+		class_add_func("get_tang", TypeVec3, &Interpolator<vec3>::get_derivative, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::getList, Flags::Pure);
+		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::get_list, Flags::Pure);
 			func_add_param("t", TypeFloatList);
 
 	add_class(TypeFFT);

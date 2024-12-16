@@ -82,7 +82,7 @@ class SignalEditorBigButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, 32}, 45, 45) {
+	explicit SignalEditorBigButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, 32}, 45, 45) {
 		align.dz = 30;
 		align.horizontal = AlignData::Mode::Right;
 		align.vertical = AlignData::Mode::Top;

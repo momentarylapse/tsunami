@@ -1,0 +1,4 @@
+Menu popup-menu-sample-selection ""
+	Item header "Sample" disabled
+	Separator
+	Item sample-preview "Preview"

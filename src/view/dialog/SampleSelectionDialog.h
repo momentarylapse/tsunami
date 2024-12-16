@@ -23,10 +23,13 @@ public:
 
 	void fill_list();
 	void on_select();
+	void on_right_click();
+	void on_preview();
 	void on_list();
 	void on_import();
 	void on_ok();
 	void on_cancel();
+	Sample* get_selected();
 
 	Sample *selected;
 	Sample *_old;
@@ -34,6 +37,8 @@ public:
 	Song *song;
 	Session *session;
 	string list_id;
+
+	owned<hui::Menu> menu_samples;
 
 	base::promise<Sample*> _promise;
 

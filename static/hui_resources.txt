@@ -1,6 +1,6 @@
 t7
 # Number Of Resources
-89
+90
 # Resource
 Menu
 menu_fake
@@ -6540,6 +6540,31 @@ create-from-selection
 0
 # Resource
 Menu
+popup-menu-sample-selection
+
+0
+0
+3
+Item
+header
+disabled
+0
+0
+0
+Separator
+
+
+1
+0
+0
+Item
+sample-preview
+
+2
+0
+0
+# Resource
+Menu
 popup-menu-session-manager
 
 0
@@ -9335,7 +9360,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-811
+813
 # Text
 /bars-add
 Add bars...
@@ -11061,6 +11086,12 @@ Preview
 
 popup-menu-sample-manager/sample-scale
 Scale...
+
+popup-menu-sample-selection/header
+Sample
+
+popup-menu-sample-selection/sample-preview
+Preview
 
 popup-menu-sample/header
 Sample

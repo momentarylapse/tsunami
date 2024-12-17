@@ -297,6 +297,11 @@ void SceneGraph::integrate(hui::Panel *_panel, const string &id, std::function<v
 		on_mouse_move(hui::get_event()->m);
 		request_redraw();
 	});
+	panel->event_x(id, hui::EventID::MOUSE_LEAVE, [this] {
+		hover.type = tsunami::HoverData::Type::None;
+		hover.node = nullptr;
+		request_redraw();
+	});
 	panel->event_x(id, hui::EventID::KEY_DOWN, [this] {
 		on_key_down(hui::get_event()->key_code);
 	});

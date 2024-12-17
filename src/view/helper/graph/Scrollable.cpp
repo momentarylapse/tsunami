@@ -24,10 +24,10 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("scrollpad");
 	f_local_to_parent = [this] (const vec2& p) {
-		return project(p);
+		return project_to_parent(p);
 	};
 	f_parent_to_local = [this] (const vec2& p) {
-		return unproject(p);
+		return unproject_to_local(p);
 	};
 	scrollbar_h = new ScrollBarHorizontal();
 	scrollbar_v = new ScrollBar();
@@ -53,21 +53,15 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 }
 
 
-// coord -> screen
-vec2 ScrollPad::project(const vec2 &p) const {
+vec2 ScrollPad::project_to_parent(const vec2 &p) const {
 	return (p - view_pos) * scale;
 }
 
-rect ScrollPad::project(const rect &r) const {
-	return rect((r.x1 - view_pos.x) * scale, (r.x2 - view_pos.x) * scale, (r.y1 - view_pos.y) * scale, (r.y2 - view_pos.y) * scale);
-}
-
-// screen -> coord
-vec2 ScrollPad::unproject(const vec2 &p) const {
+vec2 ScrollPad::unproject_to_local(const vec2 &p) const {
 	return p / scale + view_pos;
 }
 
-rect ScrollPad::unproject(const rect &r) const {
+rect ScrollPad::unproject_to_local(const rect &r) const {
 	return rect(r.x1 / scale + view_pos.x, r.x2 / scale + view_pos.x, r.y1 / scale + view_pos.y, r.y2 / scale + view_pos.y);
 }
 
@@ -77,19 +71,25 @@ bool ScrollPad::on_mouse_wheel(const vec2 &d) {
 }
 
 void ScrollPad::zoom(float factor) {
+	vec2 m = area.center();
+	if (is_cur_hover())
+		m = cursor();
+	vec2 mm = project_to_parent(m);
 	scale = clamp(scale * factor, scale_min, scale_max);
+	view_pos = m - mm / scale;
+
 	out_changed();
 }
 
 bool ScrollPad::on_key_down(int key) {
 	if (key == hui::KEY_UP)
-		move_view({0, -10});
+		move_view({0, -30});
 	if (key == hui::KEY_DOWN)
-		move_view({0, 10});
+		move_view({0, 30});
 	if (key == hui::KEY_LEFT)
-		move_view({-10, 0});
+		move_view({-30, 0});
 	if (key == hui::KEY_RIGHT)
-		move_view({10, 0});
+		move_view({30, 0});
 	if (key == hui::KEY_PLUS)
 		zoom(1.1f);
 	if (key == hui::KEY_MINUS)
@@ -106,10 +106,12 @@ void ScrollPad::move_view(const vec2 &d) {
 }
 
 void ScrollPad::_update_scrollbars() {
-	scrollbar_h->set_view(view_pos.x, view_pos.x + area.width());
+	const auto v = unproject_to_local(area);
+
+	scrollbar_h->set_view(v.x1, v.x2);
 	scrollbar_h->set_content(content_area.x1, content_area.x2);
 
-	scrollbar_v->set_view(view_pos.y, view_pos.y + area.height());
+	scrollbar_v->set_view(v.y1, v.y2);
 	scrollbar_v->set_content(content_area.y1, content_area.y2);
 
 	//scrollbar_v->set_view_offset(-view_pos.y - content_area.y1);
@@ -123,7 +125,7 @@ void ScrollPad::update_geometry_recursive(const rect &target_area) {
 
 	for (auto *c: weak(children))
 		if (c != scrollbar_h and c != scrollbar_v)
-			c->update_geometry_recursive(unproject(area));
+			c->update_geometry_recursive(unproject_to_local(area));
 
 	scrollbar_h->update_geometry_recursive(area);
 	scrollbar_v->update_geometry_recursive(area);

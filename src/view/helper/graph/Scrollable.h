@@ -59,10 +59,10 @@ public:
 	void move_view(const vec2 &d);
 	void zoom(float factor);
 
-	vec2 project(const vec2 &p) const;
-	vec2 unproject(const vec2 &p) const;
-	rect project(const rect &r) const;
-	rect unproject(const rect &r) const;
+	vec2 project_to_parent(const vec2 &p) const;
+	vec2 unproject_to_local(const vec2 &p) const;
+	rect project_to_parent(const rect &r) const;
+	rect unproject_to_local(const rect &r) const;
 
 	void _update_scrollbars();
 

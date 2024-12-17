@@ -115,7 +115,7 @@ public:
 	base::set<Module*> sel;
 	SignalEditorTab *tab;
 	Array<float> px0, py0;
-	vec2 m0;
+	vec2 m0; // local coords
 	explicit MouseDelayModuleDnD(SignalEditorTab *t, const vec2& _m0) {
 		tab = t;
 		sel = tab->sel_modules;
@@ -123,19 +123,20 @@ public:
 			px0.add(m->module_x);
 			py0.add(m->module_y);
 		}
-		m0 = _m0;
+		m0 = tab->pad->pixel_to_local(_m0); // FIXME why is this not already in local coords?!?
 	}
 	void on_update(const vec2 &m) override {
+		vec2 d = tab->pad->pixel_to_local(m) - m0;
 		for (auto&& [i,mm]: enumerate(sel)) {
-			mm->module_x = px0[i] + m.x - m0.x;
-			mm->module_y = py0[i] + m.y - m0.y;
+			mm->module_x = px0[i] + d.x;
+			mm->module_y = py0[i] + d.y;
 		}
 		tab->update_module_positions();
 	}
 	void on_finish(const vec2 &m) override {
-		for (auto m: sel) {
-			m->module_x = (floor(m->module_x / MODULE_GRID) + 0.5f) * MODULE_GRID;
-			m->module_y = (floor(m->module_y / MODULE_GRID) + 0.5f) * MODULE_GRID;
+		for (auto mm: sel) {
+			mm->module_x = (floor(mm->module_x / MODULE_GRID) + 0.5f) * MODULE_GRID;
+			mm->module_y = (floor(mm->module_y / MODULE_GRID) + 0.5f) * MODULE_GRID;
 		}
 		tab->update_module_positions();
 	}

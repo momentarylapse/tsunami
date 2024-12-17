@@ -56,10 +56,10 @@ public:
 		p->set_color(theme.text);
 		if (target) {
 			p->set_line_width(5);
-			p->draw_line(port->area.center(), target->area.center());
+			p->draw_line(port->local_to_pixel(port->area.center()), target->local_to_pixel(target->area.center()));
 			p->set_line_width(1);
 		} else {
-			p->draw_line(port->area.center(), hui::get_event()->m);
+			p->draw_line(port->local_to_pixel(port->area.center()), hui::get_event()->m);
 		}
 	}
 };

@@ -274,7 +274,7 @@ void ViewModeEditAudio::left_click_handle_void(AudioViewLayer *vlayer, const vec
 		rubber.selected_type = rubber.hover_type;
 
 		if (rubber.hover >= 0) {
-			view->mdp_run(new MouseDelayRubberPoint(view, &rubber.points[rubber.hover], rubber.hover_type));
+			view->mdp_run(new MouseDelayRubberPoint(view, &rubber.points[rubber.hover], rubber.hover_type), m);
 		} else if (!view->sel.range().is_inside(smx)) {
 			ViewModeDefault::left_click_handle_void(vlayer, m);
 			return;

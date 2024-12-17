@@ -113,14 +113,14 @@ public:
 	SignalEditorTab *tab;
 	Array<float> px0, py0;
 	vec2 m0;
-	explicit MouseDelayModuleDnD(SignalEditorTab *t) {
+	explicit MouseDelayModuleDnD(SignalEditorTab *t, const vec2& _m0) {
 		tab = t;
 		sel = tab->sel_modules;
 		for (auto *m: sel) {
 			px0.add(m->module_x);
 			py0.add(m->module_y);
 		}
-		m0 = tab->graph()->m;
+		m0 = _m0;
 	}
 	void on_update(const vec2 &m) override {
 		for (auto&& [i,mm]: enumerate(sel)) {
@@ -188,7 +188,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 bool SignalEditorModule::on_left_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
 		tab->select_module(module, tab->session->win->get_key(hui::KEY_CONTROL));
-	tab->graph()->mdp_prepare(new MouseDelayModuleDnD(tab));
+	tab->graph()->mdp_prepare(new MouseDelayModuleDnD(tab, m), m);
 	return true;
 }
 

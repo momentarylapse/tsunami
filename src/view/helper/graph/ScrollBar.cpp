@@ -132,7 +132,7 @@ bool ScrollBar::on_left_button_down(const vec2 &m) {
 	if (auto g = graph()) {
 		g->mdp_prepare([this] (const vec2& m) {
 			drag_update(m);
-		});
+		}, m);
 	}
 	return true;
 }

@@ -243,12 +243,14 @@ class MouseDelayDndTrack : public ::scenegraph::MouseDelayAction {
 public:
 	AudioViewTrack *vtrack;
 	AudioView *view;
-	MouseDelayDndTrack(AudioViewTrack *t) {
+	explicit MouseDelayDndTrack(AudioViewTrack *t) {
 		vtrack = t;
 		view = vtrack->view;
 	}
+	void on_update(const vec2 &m) override {
+		scene_graph->update_hover(m);
+	}
 	void on_draw_post(Painter *c) override {
-		scene_graph->update_hover();
 		//int orig = get_track_index(moving_track);
 		int t = get_track_move_target(true);
 		float y = view->vtracks.back()->area.y2;
@@ -327,7 +329,7 @@ bool TrackHeader::on_left_button_down(const vec2 &m) {
 			view->select_under_cursor();
 		}
 	}
-	view->mdp_prepare(new MouseDelayDndTrack(vtrack));
+	view->mdp_prepare(new MouseDelayDndTrack(vtrack), m);
 	return true;
 }
 bool TrackHeader::on_left_double_click(const vec2 &m) {

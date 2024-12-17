@@ -305,14 +305,14 @@ void SignalEditorTab::on_add(ModuleCategory type) {
 	if (names.num > 1) {
 		ModuleSelectorDialog::choose(graph()->panel, session, type).then([this, type] (const string &name) {
 			auto m = chain->add(type, name);
-			m->module_x = graph()->m.x;
-			m->module_y = graph()->m.y;
+			m->module_x = randf(1000);//graph()->m.x;
+			m->module_y = randf(1000);//graph()->m.y;
 			update_module_positions();
 		});
 	} else {
 		auto m = chain->add(type);
-		m->module_x = graph()->m.x;
-		m->module_y = graph()->m.y;
+		m->module_x = randf(1000);//graph()->m.x;
+		m->module_y = randf(1000);//graph()->m.y;
 		update_module_positions();
 	}
 }

@@ -19,12 +19,12 @@ MouseDelayPlanner::MouseDelayPlanner(scenegraph::SceneGraph *sg) {
 	hui::config.set_int("View.MouseMinMoveToSelect", min_move_to_start);
 }
 
-void MouseDelayPlanner::prepare(MouseDelayAction *a) {
+void MouseDelayPlanner::prepare(MouseDelayAction *a, const vec2 &m) {
 	if (action)
 		cancel();
 	dist = 0;
-	x0 = scene_graph->m.x;
-	y0 = scene_graph->m.y;
+	x0 = m.x;
+	y0 = m.y;
 	action = a;
 	action->scene_graph = scene_graph;
 }

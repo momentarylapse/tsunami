@@ -45,7 +45,7 @@ public:
 	void left_click_handle_void_or(AudioViewLayer *vlayer, const vec2 &m) override;
 	void left_click_handle_void_xor(AudioViewLayer *vlayer, const vec2 &m) override;
 
-	void start_selection_rect(SelectionMode mode, bool keep_start = false);
+	void start_selection_rect(const vec2 &m, SelectionMode mode, bool keep_start = false);
 };
 
 }

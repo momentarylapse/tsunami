@@ -283,14 +283,14 @@ void ViewModeEditBars::left_click_handle_void(AudioViewLayer *vlayer, const vec2
 	
 	if (edit_mode == EditMode::Rubber) {
 		if (rubber_hover)
-			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target));
+			view->mdp_run(new MouseDelayDragRubberEndPoint(view, &rubber_end_target), m);
 		else
 			ViewModeDefault::left_click_handle_void(vlayer, m);
 	} else if (edit_mode == EditMode::AddAndSplit) {
 		auto h = view->hover();
 		if (h.type == HoverData::Type::BarGap) {
 			if (h.index > 0)
-				view->mdp_prepare(new MouseDelayBarGapDnD(view, h.index));
+				view->mdp_prepare(new MouseDelayBarGapDnD(view, h.index), m);
 		} else {
 			add_bar_at_cursor(m);
 		}

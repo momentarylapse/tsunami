@@ -475,8 +475,7 @@ bool AudioView::in_mode(const string& m) const {
 	return current_mode_name == m;
 }
 
-int AudioView::mouse_over_sample(SampleRef *s) {
-	vec2 m = cursor();
+int AudioView::mouse_over_sample(SampleRef *s, const vec2& m) {
 	if ((m.x >= s->area.x1) and (m.x < s->area.x2)) {
 		int offset = cam.screen2sample(m.x) - s->pos;
 		if ((m.y >= s->area.y1) and (m.y < s->area.y1 + theme.SAMPLE_FRAME_HEIGHT))
@@ -487,8 +486,8 @@ int AudioView::mouse_over_sample(SampleRef *s) {
 	return -1;
 }
 
-void AudioView::selection_update_pos(HoverData &s) {
-	s.pos = cam.screen2sample(cursor().x);
+void AudioView::selection_update_pos(HoverData &s, const vec2& m) {
+	s.pos = cam.screen2sample(m.x);
 }
 
 void AudioView::update_selection() {
@@ -511,9 +510,8 @@ void AudioView::set_selection(const SongSelection &s) {
 }
 
 
-bool AudioView::mouse_over_time(int pos) {
+bool AudioView::mouse_over_time(int pos, const vec2& m) {
 	int ssx = cam.sample2screen(pos);
-	vec2 m = cursor();
 	return ((m.x >= ssx - 5) and (m.x <= ssx + 5));
 }
 
@@ -1749,16 +1747,16 @@ scenegraph::MouseDelayPlanner *AudioView::mdp() {
 	return graph()->mdp.get();
 }
 
-void AudioView::mdp_prepare(scenegraph::MouseDelayAction *a) {
-	graph()->mdp_prepare(a);
+void AudioView::mdp_prepare(scenegraph::MouseDelayAction *a, const vec2 &m) {
+	graph()->mdp_prepare(a, m);
 }
 
-void AudioView::mdp_run(scenegraph::MouseDelayAction *a) {
-	graph()->mdp_run(a, cursor());
+void AudioView::mdp_run(scenegraph::MouseDelayAction *a, const vec2 &m) {
+	graph()->mdp_run(a, m);
 }
 
-void AudioView::mdp_prepare(std::function<void(const vec2&)> update) {
-	graph()->mdp_prepare(update);
+void AudioView::mdp_prepare(std::function<void(const vec2&)> update, const vec2 &m) {
+	graph()->mdp_prepare(update, m);
 }
 
 bool view_has_focus(AudioView *view) {

@@ -19,8 +19,8 @@ namespace scenegraph {
 
 class MouseDelayAction {
 public:
-	MouseDelayAction() {}
-	virtual ~MouseDelayAction() {}
+	MouseDelayAction() = default;
+	virtual ~MouseDelayAction() = default;
 	virtual void on_start(const vec2 &m) {}
 	virtual void on_update(const vec2 &m) {}
 	virtual void on_finish(const vec2 &m) {}
@@ -32,7 +32,7 @@ public:
 
 class MouseDelayPlanner {
 public:
-	MouseDelayPlanner(scenegraph::SceneGraph *scene_graph);
+	explicit MouseDelayPlanner(scenegraph::SceneGraph *scene_graph);
 
 	float dist = -1;
 	float x0 = 0, y0 = 0;
@@ -41,7 +41,7 @@ public:
 	::scenegraph::SceneGraph *scene_graph;
 	typedef std::function<void()> Callback;
 	owned<MouseDelayAction> action;
-	void prepare(MouseDelayAction *action);
+	void prepare(MouseDelayAction *action, const vec2 &m);
 	void start_acting(const vec2 &m);
 	bool update(const vec2 &m);
 	bool has_focus();

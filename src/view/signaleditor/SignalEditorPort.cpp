@@ -91,7 +91,7 @@ bool SignalEditorModulePort::on_left_button_down(const vec2 &m) {
 	} else {
 		tab->chain->disconnect_in(module, index);
 	}
-	tab->graph()->mdp_prepare(new MouseDelayCableCreate(tab, this));
+	tab->graph()->mdp_prepare(new MouseDelayCableCreate(tab, this), m);
 	return true;
 }
 

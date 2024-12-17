@@ -109,7 +109,7 @@ SceneGraph *Node::graph() const {
 }
 
 vec2 Node::cursor() const {
-	return graph()->m;
+	return graph()->__m;
 }
 
 bool Node::is_cur_hover() const {

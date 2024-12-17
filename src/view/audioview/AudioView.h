@@ -174,9 +174,9 @@ public:
 
 
 	scenegraph::MouseDelayPlanner *mdp();
-	void mdp_prepare(scenegraph::MouseDelayAction *action);
-	void mdp_run(scenegraph::MouseDelayAction *action);
-	void mdp_prepare(std::function<void(const vec2&)> update);
+	void mdp_prepare(scenegraph::MouseDelayAction *action, const vec2 &m);
+	void mdp_run(scenegraph::MouseDelayAction *action, const vec2 &m);
+	void mdp_prepare(std::function<void(const vec2&)> update, const vec2 &m);
 
 
 	void snap_to_grid(int &pos);
@@ -200,9 +200,9 @@ public:
 	void set_selection(const SongSelection &s);
 	Range get_playback_selection(bool for_recording);
 
-	int mouse_over_sample(SampleRef *s);
-	void selection_update_pos(HoverData &s);
-	bool mouse_over_time(int pos);
+	int mouse_over_sample(SampleRef *s, const vec2& m);
+	void selection_update_pos(HoverData &s, const vec2& m);
+	bool mouse_over_time(int pos, const vec2& m);
 
 	void select_sample(SampleRef *s, bool diff);
 

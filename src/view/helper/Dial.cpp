@@ -114,7 +114,7 @@ bool Dial::on_left_button_down(const vec2 &m) {
 			else
 				set_value(clamp(value - e->d.y * (val_max - val_min) * 0.002f, val_min, val_max));
 			out_value(value);
-		});
+		}, m);
 	}
 	return true;
 }

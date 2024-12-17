@@ -99,7 +99,7 @@ bool Cursor::on_left_button_down(const vec2 &_m) {
 		view->sel.range_raw = drag_range;
 		view->update_selection();
 		view->select_under_cursor();
-	});
+	}, _m);
 	return true;
 }
 

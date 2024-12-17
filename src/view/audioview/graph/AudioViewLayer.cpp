@@ -646,7 +646,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 
 	// TODO: prefer selected samples
 	for (auto *ss: weak(layer->samples)) {
-		int offset = view->mouse_over_sample(ss);
+		int offset = view->mouse_over_sample(ss, m);
 		if (offset >= 0) {
 			s.sample = ss;
 			s.type = HoverData::Type::Sample;

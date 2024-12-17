@@ -18,20 +18,20 @@ namespace scenegraph {
 SceneGraph::SceneGraph() {
 	align.horizontal = AlignData::Mode::Fill;
 	align.vertical = AlignData::Mode::Fill;
-	m = {-1, -1};
+	__m = {-1, -1};
 	mdp = new MouseDelayPlanner(this);
 	set_perf_name("graph");
 
 	show_debug = hui::config.get_bool("scene-graph.debug", false);
 }
 
-void SceneGraph::update_hover() {
+void SceneGraph::update_hover(const vec2& m) {
 	hover = get_hover_data(m);
 }
 
 bool SceneGraph::on_left_button_down(const vec2 &m) {
 	set_mouse(m);
-	update_hover();
+	update_hover(m);
 
 	if (hui::get_event()->just_focused)
 		if (!allow_handle_click_when_gaining_focus())
@@ -62,7 +62,7 @@ bool SceneGraph::on_left_button_up(const vec2 &m) {
 
 bool SceneGraph::on_left_double_click(const vec2 &m) {
 	set_mouse(m);
-	update_hover();
+	update_hover(m);
 	set_current(hover);
 
 	auto nodes = collect_children_down();
@@ -75,7 +75,7 @@ bool SceneGraph::on_left_double_click(const vec2 &m) {
 
 bool SceneGraph::on_right_button_down(const vec2 &m) {
 	set_mouse(m);
-	update_hover();
+	update_hover(m);
 	set_current(hover);
 
 	auto nodes = collect_children_down();
@@ -88,7 +88,7 @@ bool SceneGraph::on_right_button_down(const vec2 &m) {
 
 bool SceneGraph::on_right_button_up(const vec2 &m) {
 	set_mouse(m);
-	update_hover();
+	update_hover(m);
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
@@ -102,7 +102,7 @@ bool SceneGraph::on_mouse_move(const vec2 &m) {
 	set_mouse(m);
 
 	if (!mdp->update(m)) {
-		update_hover();
+		update_hover(m);
 
 		auto nodes = collect_children_down();
 		for (auto *c: nodes)
@@ -120,7 +120,7 @@ bool SceneGraph::on_mouse_wheel(const vec2 &d) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->has_hover(m))
+		if (c->is_cur_hover())
 			if (c->on_mouse_wheel(d))
 				return true;
 	return false;
@@ -129,7 +129,6 @@ bool SceneGraph::on_mouse_wheel(const vec2 &d) {
 bool SceneGraph::on_key_down(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		//if (c->has_hover(m))
 		if (c->on_key_down(key))
 			return true;
 	return false;
@@ -138,7 +137,6 @@ bool SceneGraph::on_key_down(int key) {
 bool SceneGraph::on_key_up(int key) {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		//if (c->has_hover(m))
 		if (c->on_key_up(key))
 			return true;
 	return false;
@@ -156,7 +154,7 @@ bool SceneGraph::on_gesture(const string &id, const vec2 &m, const vec2 &param) 
 bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->has_hover(m))
+		if (c->is_cur_hover_non_recursive())
 			return c->allow_handle_click_when_gaining_focus();
 	return false;
 }
@@ -175,7 +173,7 @@ string SceneGraph::get_tip() const {
 	auto nodes = collect_children_down();
 
 	for (auto *c: nodes)
-		if (c->has_hover(m))
+		if (c->is_cur_hover_non_recursive())
 			return c->get_tip();
 	return "";
 }
@@ -207,7 +205,7 @@ void SceneGraph::draw(Painter *p) {
 }
 
 void SceneGraph::set_mouse(const vec2 &_m) {
-	m = _m;
+	__m = _m;
 	//select_xor = win->get_key(hui::KEY_CONTROL);
 }
 
@@ -216,27 +214,27 @@ void SceneGraph::set_current(const tsunami::HoverData &h) {
 	out_current_changed();
 }
 
-void SceneGraph::mdp_prepare(MouseDelayAction *a) {
-	mdp->prepare(a);
+void SceneGraph::mdp_prepare(MouseDelayAction *a, const vec2 &m) {
+	mdp->prepare(a, m);
 }
 
 void SceneGraph::mdp_run(MouseDelayAction *a, const vec2 &m) {
-	mdp->prepare(a);
+	mdp->prepare(a, m);
 	mdp->start_acting(m);
 }
 
 class MouseDelayActionWrapper : public MouseDelayAction {
 public:
 	std::function<void(const vec2&)> callback;
-	MouseDelayActionWrapper(std::function<void(const vec2&)> c) { callback = c; }
+	explicit MouseDelayActionWrapper(std::function<void(const vec2&)> c) { callback = c; }
 	void on_update(const vec2 &m) override {
 		callback(m);
 		scene_graph->out_redraw();
 	}
 };
 
-void SceneGraph::mdp_prepare(MouseCallback update) {
-	mdp->prepare(new MouseDelayActionWrapper(update));
+void SceneGraph::mdp_prepare(MouseCallback update, const vec2 &m) {
+	mdp->prepare(new MouseDelayActionWrapper(update), m);
 }
 
 void SceneGraph::integrate(hui::Panel *_panel, const string &id, std::function<void(Painter *)> custom_draw, bool fill) {

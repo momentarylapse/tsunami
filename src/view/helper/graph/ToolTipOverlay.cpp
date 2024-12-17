@@ -10,6 +10,11 @@ ToolTipOverlay::ToolTipOverlay() {
 	align.dz = 9999;
 }
 
+bool ToolTipOverlay::has_hover(const vec2& _m) const {
+	m = _m;
+	return false;
+}
+
 void ToolTipOverlay::on_draw(Painter *p) {
 	p->set_font_size(theme.FONT_SIZE);
 	p->set_line_width(theme.LINE_WIDTH);
@@ -19,7 +24,7 @@ void ToolTipOverlay::on_draw(Painter *p) {
 	if (graph()->hover.node)
 		tip = graph()->hover.node->get_tip();
 	if (tip.num > 0) {
-		draw_cursor_hover(p, tip, graph()->m, area);
+		draw_cursor_hover(p, tip, m, area);
 	}
 
 	// general hint (full line at bottom)

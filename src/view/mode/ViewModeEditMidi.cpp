@@ -622,18 +622,18 @@ void ViewModeEditMidi::left_click_handle_void(AudioViewLayer *vlayer, const vec2
 	if (creation_mode == CreationMode::Select ) {
 		view->set_cursor_pos(hover().pos_snap);
 		select_in_edit_cursor();
-		start_selection_rect(SelectionMode::Rect);
+		start_selection_rect(m, SelectionMode::Rect);
 
 	} else /* note / chord */ {
 		if (mode == MidiMode::Classical) {
 			if (hover().type == HoverData::Type::ClefPosition) {
 				auto pitch = get_creation_pitch(hmi.pitch);
-				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos));
+				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos), m);
 			}
 		} else if (mode == MidiMode::Linear) {
 			if (hover().type == HoverData::Type::MidiPitch) {
 				auto pitch = get_creation_pitch(hmi.pitch);
-				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos));
+				view->mdp_run(new MouseDelayAddMidi(vlayer, pitch, hmi.clef_pos), m);
 			}
 		} else /* TAB */ {
 			view->set_cursor_pos(hover().pos_snap);
@@ -657,9 +657,9 @@ void ViewModeEditMidi::left_click_handle_object(AudioViewLayer *vlayer, const ve
 	// start drag'n'drop?
 	if (auto n = hover().note) {
 		if (hover_end_of_note(hover(), n))
-			view->mdp_prepare(new MouseDelayNotesScaleDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MidiNotes)));
+			view->mdp_prepare(new MouseDelayNotesScaleDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MidiNotes)), m);
 		else
-			view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MidiNotes)));
+			view->mdp_prepare(new MouseDelayNotesDnD(vlayer, view->sel.filter({vlayer->layer}).filter(SongSelection::Mask::MidiNotes)), m);
 	} else {
 		ViewModeDefault::left_click_handle_object(vlayer, m);
 	}

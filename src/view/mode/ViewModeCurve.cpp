@@ -59,7 +59,7 @@ void ViewModeCurve::left_click_handle_void(AudioViewLayer *vlayer, const vec2 &m
 			int pos = view->get_mouse_pos(m);
 			float value = clamp(screen2value(m.y), _curve->min, _curve->max);
 			cur_track()->curve_edit_point(_curve, view->cur_selection.index, pos, value);
-		});
+		}, m);
 	}
 }
 

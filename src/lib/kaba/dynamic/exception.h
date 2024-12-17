@@ -19,8 +19,8 @@ class KabaException {
 public:
 	string text;
 	KabaException(){}
-	KabaException(const string &message);
-	virtual ~KabaException(){}
+	explicit KabaException(const string &message);
+	virtual ~KabaException() = default;
 	void _cdecl __init__(const string &message);
 	virtual _cdecl void __delete__();
 	virtual _cdecl string message();
@@ -45,6 +45,7 @@ enum class ErrorID {
 
 void _cdecl kaba_raise_exception(KabaException *kaba_exception);
 void kaba_die(KabaException* e);
+void kaba_assert(bool b);
 
 
 

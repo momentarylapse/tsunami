@@ -11,21 +11,24 @@ public:
 	float x1, x2, y1, y2;
 	rect() {};
 	rect(float x1, float x2, float y1, float y2);
-	string _cdecl str() const;
-	float _cdecl width() const;
-	float _cdecl height() const;
-	float _cdecl area() const;
-	vec2 _cdecl center() const;
-	vec2 _cdecl size() const;
-	bool _cdecl inside(const vec2 &p) const;
-	bool _cdecl covers(const rect &r) const;
-	bool _cdecl overlaps(const rect &r) const;
+	rect(const vec2& p00, const vec2& p11);
+	string str() const;
+	float width() const;
+	float height() const;
+	float area() const;
+	vec2 center() const;
+	vec2 size() const;
+	vec2 p00() const;
+	vec2 p11() const;
+	bool inside(const vec2 &p) const;
+	bool covers(const rect &r) const;
+	bool overlaps(const rect &r) const;
 	rect grow(float d) const;
 
-	bool _cdecl operator==(const rect &r) const;
-	bool _cdecl operator!=(const rect &r) const;
-	rect _cdecl operator&&(const rect &r) const;
-	rect _cdecl operator||(const rect &r) const;
+	bool operator==(const rect &r) const;
+	bool operator!=(const rect &r) const;
+	rect operator&&(const rect &r) const;
+	rect operator||(const rect &r) const;
 
 	static const rect ID;
 	static const rect ID_SYM;

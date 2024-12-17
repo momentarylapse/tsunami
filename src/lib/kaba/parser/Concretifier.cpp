@@ -573,7 +573,7 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 			return tree->conv_eval_const_func(n);
 		});
 		if (index->type != TypeInt32)
-			do_error("tuple index must be of type 'int'", index);
+			do_error("tuple index must be of type 'i32'", index);
 		if (index->kind != NodeKind::Constant)
 			do_error("tuple index must be compile-time constant", index);
 		int i = index->as_const()->as_int();
@@ -592,19 +592,19 @@ shared<Node> Concretifier::concretify_array(shared<Node> node, Block *block, con
 	}
 
 	if (index->type != TypeInt32)
-		do_error(format("array index needs to be of type 'int', not '%s'", index->type->long_name()), index);
+		do_error(format("array index needs to be of type 'i32', not '%s'", index->type->long_name()), index);
 
 	index = tree->transform_node(index, [this] (shared<Node> n) {
 		return tree->conv_eval_const_func(n);
 	});
-	auto is_simple = [] (NodeKind k) {
+	auto is_directly_accessible = [] (NodeKind k) {
 		return k == NodeKind::VarGlobal or k == NodeKind::VarLocal or k == NodeKind::Constant;
 	};
 	if (index->kind == NodeKind::Constant) {
 		int n = index->as_const()->as_int();
 		if (n < 0) {
-			if (!is_simple(operand->kind))
-					do_error("negative indices only allowed for simple operands", index);
+			if (!is_directly_accessible(operand->kind))
+				do_error("negative indices only allowed for simple operands (variables or constants)", index);
 			auto l = add_node_special_function_call(SpecialFunctionID::Len, index->token_id, index->type);
 			l->set_param(0, operand);
 			l = concretify_special_function_len(l, block, ns);

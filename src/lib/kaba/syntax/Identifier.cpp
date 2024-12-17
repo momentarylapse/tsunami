@@ -67,6 +67,7 @@ namespace Identifier {
 	const string Raise = "raise";
 	const string Try = "try";
 	const string Except = "except";
+	const string Assert = "assert";
 	const string If = "if";
 	const string Else = "else";
 	const string While = "while";

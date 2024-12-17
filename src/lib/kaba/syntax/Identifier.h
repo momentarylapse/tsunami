@@ -67,6 +67,7 @@ namespace Identifier {
 	extern const string Raise;
 	extern const string Try;
 	extern const string Except;
+	extern const string Assert;
 	extern const string If;
 	extern const string Else;
 	extern const string While;

@@ -21,11 +21,16 @@ namespace nix {
 FrameBuffer *cur_framebuffer = nullptr;
 
 
-FrameBuffer::FrameBuffer() {
-	depth_buffer = nullptr;
-	width = height = 0;
+FrameBuffer::FrameBuffer() : FrameBuffer(0, 0, 0) {
+	glCreateFramebuffers(1, &frame_buffer);
+}
 
-	frame_buffer = 0;
+FrameBuffer::FrameBuffer(int index, int _width, int _height) {
+	depth_buffer = nullptr;
+	width = _width;
+	height = _height;
+
+	frame_buffer = index;
 	multi_samples = 0;
 }
 

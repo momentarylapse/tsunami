@@ -552,7 +552,7 @@ void SIAddPackageVulkan(Context *c) {
 		class_add_func("set_storage_image", TypeVoid, vul_p(&vulkan::DescriptorSet::set_storage_image), Flags::Mutable);
 			func_add_param("binding", TypeInt32);
 			func_add_param("tex", TypeTextureP);
-		class_add_func("set_buffer", TypeVoid, vul_p(&vulkan::DescriptorSet::set_buffer), Flags::Mutable);
+		class_add_func("set_uniform_buffer", TypeVoid, vul_p(&vulkan::DescriptorSet::set_uniform_buffer), Flags::Mutable);
 			func_add_param("binding", TypeInt32);
 			func_add_param("buf", TypeBufferP);
 		class_add_func("set_acceleration_structure", TypeVoid, vul_p(&vulkan::DescriptorSet::set_acceleration_structure), Flags::Mutable);

@@ -18,7 +18,9 @@ class DepthBuffer;
 class FrameBuffer : public Sharable<base::Empty> {
 public:
 	FrameBuffer();
-	FrameBuffer(const shared_array<Texture> &attachments);
+	// wrapper for pre-defined frame buffers:
+	FrameBuffer(int index, int width, int height);
+	explicit FrameBuffer(const shared_array<Texture> &attachments);
 	~FrameBuffer();
 
 	void update(const shared_array<Texture> &attachments);

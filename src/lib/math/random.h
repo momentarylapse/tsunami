@@ -7,7 +7,6 @@
 class Random {
 public:
 	Random();
-	void _cdecl __init__();
 	void _cdecl __assign__(Random *other);
 
 	void _cdecl seed(const string &s);
@@ -21,7 +20,7 @@ public:
 	vec3 _cdecl dir();
 
 private:
-	int Q[4096];
-	int c;
+	Array<unsigned int> Q;
+	unsigned int c;
 };
 

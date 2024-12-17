@@ -546,5 +546,12 @@ void kaba_die(KabaException* e) {
 	just_die(e, trace);
 }
 
+void kaba_assert(bool b) {
+	if (!b) {
+		auto e = new KabaException("assert failed");
+		kaba_die(e);
+	}
+}
+
 }
 

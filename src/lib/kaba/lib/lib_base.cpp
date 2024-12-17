@@ -527,6 +527,8 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::NotEqual, TypeBool, TypePointer, TypePointer, InlineID::PointerNotEqual, &pointer_not_equal);
 
 
+	// TODO define in template by exact X&:=X&
+	// then allow right side casting by standard rules
 	add_class(TypeReference);
 		add_operator(OperatorID::RefAssign, TypeVoid, TypeReference, TypeReference, InlineID::PointerAssign);
 
@@ -954,6 +956,8 @@ void SIAddPackageBase(Context *c) {
 		func_add_param("e", TypeExceptionXfer);
 	add_func("@die", TypeVoid, &kaba_die, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("e", TypePointer);
+	add_func(Identifier::Assert, TypeVoid, &kaba_assert, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("b", TypeBool);
 
 
 	// type casting

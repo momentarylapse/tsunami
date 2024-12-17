@@ -200,9 +200,7 @@ xfer<Context> init(const Array<string>& flags) {
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);
-	ctx->default_framebuffer = new FrameBuffer();
-	ctx->default_framebuffer->width = vp[2];
-	ctx->default_framebuffer->height = vp[3];
+	ctx->default_framebuffer = new FrameBuffer(0, vp[2], vp[3]);
 
 	glClipControl(GL_LOWER_LEFT, GL_ZERO_TO_ONE);
 

@@ -6,12 +6,14 @@
  */
 
 #include "Node.h"
+
+#include <base/sort.h>
+
 #include "SceneGraph.h"
 #include "../../../stuff/PerformanceMonitor.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/image/color.h"
 
-#include "../../../lib/os/msg.h"
 
 using namespace tsunami;
 
@@ -109,7 +111,7 @@ SceneGraph *Node::graph() const {
 }
 
 vec2 Node::cursor() const {
-	return graph()->__m;
+	return pixel_to_local(graph()->__m);
 }
 
 bool Node::is_cur_hover() const {
@@ -245,6 +247,36 @@ void Node::request_redraw() {
 		g->out_redraw.notify();
 }
 
+vec2 Node::local_to_pixel(const vec2& _p) const {
+	vec2 p = _p;
+	auto n = this;
+	while (n->parent) {
+		if (n->f_local_to_parent)
+			p = n->f_local_to_parent(p);
+		n = n->parent;
+	}
+	return p;
+}
+
+Array<const Node*> node_chain_up(const Node* n) {
+	Array<const Node*> chain;
+	chain.add(n);
+	while (n->parent) {
+		n = n->parent;
+		chain.add(n);
+	}
+	return chain;
+}
+
+vec2 Node::pixel_to_local(const vec2& _p) const {
+	vec2 p = _p;
+	auto chain = node_chain_up(this);
+	base::reverse(chain);
+	for (auto nn: chain)
+		if (nn->f_parent_to_local)
+			p = nn->f_parent_to_local(p);
+	return p;
+}
 
 
 

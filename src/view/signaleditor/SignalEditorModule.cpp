@@ -6,6 +6,9 @@
  */
 
 #include "SignalEditorModule.h"
+
+#include <os/msg.h>
+
 #include "SignalEditorTab.h"
 #include "SignalEditorPort.h"
 #include "SignalEditorBackground.h"
@@ -188,7 +191,7 @@ void SignalEditorModule::on_draw(Painter *p) {
 bool SignalEditorModule::on_left_button_down(const vec2 &m) {
 	if (!tab->sel_modules.contains(module))
 		tab->select_module(module, tab->session->win->get_key(hui::KEY_CONTROL));
-	tab->graph()->mdp_prepare(new MouseDelayModuleDnD(tab, m), m);
+	graph()->_mdp_prepare(new MouseDelayModuleDnD(tab, m), m);
 	return true;
 }
 

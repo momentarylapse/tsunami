@@ -53,9 +53,9 @@ public:
 	void set_current(const tsunami::HoverData &h);
 
 	owned<MouseDelayPlanner> mdp;
-	void mdp_prepare(MouseDelayAction *action, const vec2 &m);
-	void mdp_run(MouseDelayAction *action, const vec2 &m);
-	void mdp_prepare(MouseCallback update, const vec2 &m);
+	void _mdp_prepare(MouseDelayAction *action, const vec2 &m);
+	void _mdp_run(MouseDelayAction *action, const vec2 &m);
+	void _mdp_prepare(MouseCallback update, const vec2 &m);
 
 	vec2 __m;
 	void set_mouse(const vec2 &m);

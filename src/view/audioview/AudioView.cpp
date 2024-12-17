@@ -1748,15 +1748,15 @@ scenegraph::MouseDelayPlanner *AudioView::mdp() {
 }
 
 void AudioView::mdp_prepare(scenegraph::MouseDelayAction *a, const vec2 &m) {
-	graph()->mdp_prepare(a, m);
+	graph()->_mdp_prepare(a, m);
 }
 
 void AudioView::mdp_run(scenegraph::MouseDelayAction *a, const vec2 &m) {
-	graph()->mdp_run(a, m);
+	graph()->_mdp_run(a, m);
 }
 
 void AudioView::mdp_prepare(std::function<void(const vec2&)> update, const vec2 &m) {
-	graph()->mdp_prepare(update, m);
+	graph()->_mdp_prepare(update, m);
 }
 
 bool view_has_focus(AudioView *view) {

@@ -23,6 +23,12 @@ ScrollPad::ScrollPad() : scenegraph::NodeRel({0,0},0,0) {
 	align.horizontal = AlignData::Mode::Fill;
 	align.vertical = AlignData::Mode::Fill;
 	set_perf_name("scrollpad");
+	f_local_to_parent = [this] (const vec2& p) {
+		return project(p);
+	};
+	f_parent_to_local = [this] (const vec2& p) {
+		return unproject(p);
+	};
 	scrollbar_h = new ScrollBarHorizontal();
 	scrollbar_v = new ScrollBar();
 	scrollbar_h->out_offset >> create_data_sink<float>([&] (float offset) {

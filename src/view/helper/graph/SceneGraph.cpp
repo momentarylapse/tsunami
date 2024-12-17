@@ -12,7 +12,6 @@
 #include "../../../lib/hui/Event.h"
 #include "../../../lib/hui/hui.h"
 
-
 namespace scenegraph {
 
 SceneGraph::SceneGraph() {
@@ -40,10 +39,13 @@ bool SceneGraph::on_left_button_down(const vec2 &m) {
 	set_current(hover);
 
 	auto nodes = collect_children_down();
-	for (auto *c: nodes)
-		if (c->has_hover(m))
-			if (c->on_left_button_down(m))
+	for (auto *c: nodes) {
+		if (c->is_cur_hover()) {
+			const auto mm = pixel_to_local(m);
+			if (c->on_left_button_down(mm))
 				return true;
+		}
+	}
 	return false;
 }
 
@@ -54,9 +56,11 @@ bool SceneGraph::on_left_button_up(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->has_hover(m))
-			if (c->on_left_button_up(m))
+		if (c->is_cur_hover()) {
+			const auto mm = pixel_to_local(m);
+			if (c->on_left_button_up(mm))
 				return true;
+	}
 	return false;
 }
 
@@ -67,9 +71,11 @@ bool SceneGraph::on_left_double_click(const vec2 &m) {
 
 	auto nodes = collect_children_down();
 	for (auto *c: nodes)
-		if (c->has_hover(m))
-			if (c->on_left_double_click(m))
+		if (c->is_cur_hover()) {
+			const auto mm = pixel_to_local(m);
+			if (c->on_left_double_click(mm))
 				return true;
+	}
 	return false;
 }
 
@@ -79,10 +85,12 @@ bool SceneGraph::on_right_button_down(const vec2 &m) {
 	set_current(hover);
 
 	auto nodes = collect_children_down();
-	for (auto *c: nodes)
-		if (c->has_hover(m))
-			if (c->on_right_button_down(m))
+	for (auto *c: nodes) {
+		const auto mm = c->pixel_to_local(m);
+		if (c->has_hover(mm))
+			if (c->on_right_button_down(mm))
 				return true;
+	}
 	return false;
 }
 
@@ -106,9 +114,11 @@ bool SceneGraph::on_mouse_move(const vec2 &m) {
 
 		auto nodes = collect_children_down();
 		for (auto *c: nodes)
-			if (c->has_hover(m))
-				if (c->on_mouse_move(m))
+			if (c->is_cur_hover()) {
+				const auto mm = c->pixel_to_local(m);
+				if (c->on_mouse_move(mm))
 					return true;
+			}
 	}
 	return false;
 }
@@ -162,9 +172,11 @@ bool SceneGraph::allow_handle_click_when_gaining_focus() const {
 tsunami::HoverData SceneGraph::get_hover_data(const vec2 &m) {
 	auto nodes = collect_children_down();
 
-	for (auto *c: nodes)
-		if (c->has_hover(m))
-			return c->get_hover_data(m);
+	for (auto *c: nodes) {
+		const auto mm = c->pixel_to_local(m);
+		if (c->has_hover(mm))
+			return c->get_hover_data(mm);
+	}
 
 	return {};
 }
@@ -214,11 +226,11 @@ void SceneGraph::set_current(const tsunami::HoverData &h) {
 	out_current_changed();
 }
 
-void SceneGraph::mdp_prepare(MouseDelayAction *a, const vec2 &m) {
+void SceneGraph::_mdp_prepare(MouseDelayAction *a, const vec2 &m) {
 	mdp->prepare(a, m);
 }
 
-void SceneGraph::mdp_run(MouseDelayAction *a, const vec2 &m) {
+void SceneGraph::_mdp_run(MouseDelayAction *a, const vec2 &m) {
 	mdp->prepare(a, m);
 	mdp->start_acting(m);
 }
@@ -233,7 +245,7 @@ public:
 	}
 };
 
-void SceneGraph::mdp_prepare(MouseCallback update, const vec2 &m) {
+void SceneGraph::_mdp_prepare(MouseCallback update, const vec2 &m) {
 	mdp->prepare(new MouseDelayActionWrapper(update), m);
 }
 

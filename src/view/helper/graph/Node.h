@@ -94,6 +94,11 @@ public:
 	Array<Node*> collect_children_down() const;
 	void request_redraw();
 
+	std::function<vec2(const vec2&)> f_local_to_parent;
+	std::function<vec2(const vec2&)> f_parent_to_local;
+	vec2 local_to_pixel(const vec2& p) const;
+	vec2 pixel_to_local(const vec2& p) const;
+
 	static bool show_debug;
 };
 

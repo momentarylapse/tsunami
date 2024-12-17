@@ -38,7 +38,7 @@ class SignalEditorPlayButton : public scenegraph::NodeRel {
 public:
 	SignalEditorTab *tab;
 	SignalChain *chain;
-	SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, -32}, 45, 45) {
+	explicit SignalEditorPlayButton(SignalEditorTab *t) : scenegraph::NodeRel({-32, -32}, 45, 45) {
 		align.dz = 30;
 		align.horizontal = AlignData::Mode::Right;
 		align.vertical = AlignData::Mode::Bottom;

@@ -61,6 +61,8 @@
 #include "../view/ColorScheme.h"
 #include "../view/dialog/ModuleSelectorDialog.h"
 #include "../view/dialog/SampleSelectionDialog.h"
+#include "../view/dialog/QuestionDialog.h"
+#include "../view/dialog/PresetSelectionDialog.h"
 #include "../view/audioview/graph/AudioViewLayer.h"
 #include "../view/sidebar/SampleManagerConsole.h"
 #include "../view/mode/ViewModeCapture.h"
@@ -224,6 +226,8 @@ void PluginManager::link_app_data() {
 	ext->link("interpolate_buffer", (void*)&BufferInterpolator::interpolate);
 	ext->link("get_sample_preview", (void*)&get_sample_preview);
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
+	ext->link("ask_string", (void*)&QuestionDialogString::ask);
+	ext->link("ask_preset_name", (void*)&PresetSelectionDialog::ask);
 
 
 	ext->declare_class_size("BufferPitchShift.Operator", sizeof(BufferPitchShift::Operator));

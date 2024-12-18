@@ -1,4 +1,5 @@
 use hui
+use async.*
 use common.*
 use midi.*
 use song.*
@@ -145,6 +146,9 @@ var extern clipboard: Clipboard&
 func extern get_sample_preview(s: Sample, view: AudioView) -> string
 
 func extern get_style_colors(p: hui.Panel, id: string) -> color{}
+
+func extern ask_string(w: hui.Window*, question: string, options: string="") -> future[string]
+func extern ask_preset_name(w: hui.Window*, list: string[], save: bool) -> future[string]
 
 
 

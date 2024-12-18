@@ -247,12 +247,7 @@ void PresetManager::set(const ModulePreset &ff) {
 }
 
 base::future<string> PresetManager::select_name(hui::Window *win, Module *c, bool save) {
-	base::promise<string> promise;
-	auto dlg = new PresetSelectionDialog(win, get_list(c), save);
-	hui::fly(dlg).then([dlg, promise] () mutable {
-		promise(dlg->selection);
-	});
-	return promise.get_future();
+	return PresetSelectionDialog::ask(win, get_list(c), save);
 }
 
 bool PresetManager::Favorite::operator==(const Favorite &o) const {
@@ -279,9 +274,16 @@ bool PresetManager::is_favorite(Session *session, ModuleCategory type, const str
 	return base::find_index(favorites, x) >= 0;
 }
 
-void PresetManager::save_track_preset(Session *session, const PresetManager::TrackPreset &p) {
+void PresetManager::save_track_preset(Session *session, const TrackPreset &p) {
 	make_usable(session);
-	track_presets.add(p);
+	bool found = false;
+	for (auto& pp: track_presets)
+		if (pp.name == p.name) {
+			pp = p;
+			found = true;
+		}
+	if (!found)
+		track_presets.add(p);
 	save(session);
 }
 

@@ -19,6 +19,8 @@ PresetSelectionDialog::PresetSelectionDialog(hui::Window *parent, const Array<st
 	if (!save)
 		names.insert(":def:", 0);
 	hide_control("name", !save);
+	if (save)
+		set_string("ok", "Save");
 	event("list", [this] { on_list(); });
 	event_x("list", "hui:select", [this] { on_list_select(); });
 	event("name", [this] { on_name(); });
@@ -49,6 +51,16 @@ void PresetSelectionDialog::on_name() {
 void PresetSelectionDialog::on_ok() {
 	selection = get_string("name");
 	request_destroy();
+}
+
+
+base::future<string> PresetSelectionDialog::ask(hui::Window* parent, const Array<string> &names, bool save) {
+	base::promise<string> promise;
+	auto dlg = new PresetSelectionDialog(parent, names, save);
+	hui::fly(dlg).then([dlg, promise] () mutable {
+		promise(dlg->selection);
+	});
+	return promise.get_future();
 }
 
 }

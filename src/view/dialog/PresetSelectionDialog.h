@@ -6,6 +6,7 @@
 #define TSUNAMI_PRESETSELECTIONDIALOG_H
 
 #include "../../lib/hui/Window.h"
+#include "../../lib/base/future.h"
 
 namespace tsunami {
 
@@ -21,6 +22,8 @@ public:
 	bool save;
 	Array<string> names;
 	string selection;
+
+	static base::future<string> ask(hui::Window* parent, const Array<string> &names, bool save);
 };
 
 }

@@ -1565,7 +1565,7 @@ default,image=hui:ok
 # Resource
 Dialog
 favorite-dialog
-width=300,height=200,headerbar,closebutton=no,resizable
+width=300,height=400,headerbar,closebutton=no,resizable
 0
 0
 1
@@ -1577,7 +1577,7 @@ vertical
 3
 ListView
 list
-nobar
+nobar,style=navigation-sidebar
 0
 0
 0
@@ -10059,7 +10059,7 @@ edit-strings-dialog/ok
 Apply
 
 favorite-dialog/favorite-dialog
-Parameter
+Preset
 
 favorite-dialog/list
 Name

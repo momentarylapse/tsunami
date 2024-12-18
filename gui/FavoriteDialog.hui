@@ -1,6 +1,6 @@
-Dialog favorite-dialog "Parameter" width=300 height=200 headerbar closebutton=no resizable
+Dialog favorite-dialog "Preset" width=300 height=400 headerbar closebutton=no resizable
 	Grid ? "" vertical
-		ListView list "Name" nobar
+		ListView list "Name" nobar style=navigation-sidebar
 		Edit name ""
 		Grid ? "" buttonbar
 			Button /cancel "Cancel"

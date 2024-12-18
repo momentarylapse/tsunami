@@ -5,7 +5,6 @@
 #include "NewTrackDialog.h"
 #include "EditStringsDialog.h"
 #include "PresetSelectionDialog.h"
-#include "QuestionDialog.h"
 #include "../dialog/ModuleSelectorDialog.h"
 #include "../module/ModulePanel.h"
 #include "../module/ConfigPanel.h"
@@ -16,7 +15,6 @@
 #include "../../data/rhythm/Bar.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../action/ActionManager.h"
-#include "../../stuff/SessionManager.h"
 #include "../../plugins/PluginManager.h"
 #include "../../plugins/PresetManager.h"
 #include "../../Tsunami.h"
@@ -236,7 +234,7 @@ void NewTrackDialog::on_metronome() {
 }
 
 void NewTrackDialog::on_save_preset() {
-	QuestionDialogString::ask(this, _("Name of the track preset?")).then([this] (const string& name) {
+	PresetSelectionDialog::ask(this, session->plugin_manager->presets->enumerate_track_presets(session), true).then([this] (const string& name) {
 		PresetManager::TrackPreset p;
 		p.name = name;
 		p.type = type;

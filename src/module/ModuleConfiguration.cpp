@@ -11,6 +11,7 @@
 #include "Module.h"
 #include "../lib/kaba/syntax/Class.h"
 #include "../lib/kaba/syntax/SyntaxTree.h"
+#include "../lib/kaba/dynamic/dynamic.h"
 #include "../lib/os/msg.h"
 #include "../data/SampleRef.h"
 #include "../data/Sample.h"
@@ -197,20 +198,20 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 		*(string*)v = a.str();
 	} else if (type->is_array()) {
 		if (!a.is_list())
-			throw Exception("array expected");
+			throw Exception("list expected");
 		auto &array = a.as_list();
 		auto tel = type->get_array_element();
 		for (int i=0; i<min(type->array_length, array.num); i++)
 			var_from_any(tel, &v[i * tel->size], array[i], session);
 	} else if (type->is_list()) {
 		if (!a.is_list())
-			throw Exception("array expected");
-		auto &array = a.as_list();
+			throw Exception("list expected");
+		auto &list = a.as_list();
 		auto *aa = (DynamicArray*)v;
 		auto tel = type->get_array_element();
-		aa->simple_resize(array.num); // todo...
-		for (int i=0; i<array.num; i++)
-			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), array[i], session);
+		kaba::array_resize(v, type, list.num);
+		for (int i=0; i<list.num; i++)
+			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), list[i], session);
 	} else if (type->is_enum()) {
 		*(int*)v = kaba::enum_parse(a.str(), type);
 	} else if (type->name == "Device*") {

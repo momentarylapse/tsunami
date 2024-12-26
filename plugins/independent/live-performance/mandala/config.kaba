@@ -71,27 +71,60 @@ class MandalaConfig extends Module.Config
 	func mut apply_rim_profile(p: RimProfile)
 		current_rim_profile = p.name
 		rim_samples = p.samples
-		
+	
 	func mut apply_surface_profile(p: SurfaceProfile)
 		current_surface_profile = p.name
 		surface_samples = p.samples
 		number_of_zones = p.number_of_zones
 		
-	func mut save_rim_profile(name: string)
-		# existing? -> overwrite
-		for mut p in rim_profiles
+	
+	func selfref get_surface_profile(name: string) -> SurfaceProfile*
+		for p in surface_profiles
 			if p.name == name
-				p.samples = rim_samples
-				return
-		# new profile
-		rim_profiles.add([name, rim_samples])
+				return &p
+		return nil
+	
+	func selfref get_rim_profile(name: string) -> RimProfile*
+		for p in rim_profiles
+			if p.name == name
+				return &p
+		return nil
+		
+	func mut save_rim_profile(name: string)
+		for p in get_rim_profile(name)
+			# existing? -> overwrite
+			p.samples = rim_samples
+		else
+			# new profile
+			rim_profiles.add([name, rim_samples])
+			
+		current_rim_profile = name
 		
 	func mut save_surface_profile(name: string)
-		# existing? -> overwrite
-		for mut p in surface_profiles
-			if p.name == name
-				p.samples = surface_samples
-				p.number_of_zones = number_of_zones
-				return
-		# new profile
-		surface_profiles.add([name, number_of_zones, surface_samples])
+		for p in get_surface_profile(name)
+			# existing? -> overwrite
+			p.samples = surface_samples
+			p.number_of_zones = number_of_zones
+		else
+			# new profile
+			surface_profiles.add([name, number_of_zones, surface_samples])
+			
+		current_surface_profile = name
+
+	func surface_profile_names() -> string[]
+		return [for p in surface_profiles  p.name]
+	
+	func rim_profile_names() -> string[]
+		return [for p in rim_profiles  p.name]
+
+	func is_surface_profile_saved() -> bool
+		for name in current_surface_profile
+			for p in get_surface_profile(name)
+				return weak(p.samples) == weak(surface_samples)
+		return false
+
+	func is_rim_profile_saved() -> bool
+		for name in current_rim_profile
+			for p in get_rim_profile(name)
+				return weak(p.samples) == weak(rim_samples)
+		return false

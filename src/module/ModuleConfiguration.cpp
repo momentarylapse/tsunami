@@ -6,7 +6,6 @@
  */
 
 
-//#include "../lib/kaba/kaba.h"
 #include "ModuleConfiguration.h"
 #include "Module.h"
 #include "../lib/kaba/syntax/Class.h"
@@ -46,6 +45,27 @@ Array<kaba::ClassElement> get_unique_elements(const kaba::Class *c) {
 	return r;
 }
 
+bool* generic_optional_has_value(const kaba::Class *c, const char *v) {
+	// FIXME align(size)... round up to 1/2/4/8
+	return (bool*)&v[c->param[0]->size];
+}
+
+void generic_optional_init(const kaba::Class *c, char *v) {
+	if (auto f = c->param[0]->get_default_constructor()) {
+		typedef void f_t(void*);
+		((f_t*)f->address_preprocess)(v);
+	}
+	*generic_optional_has_value(c, v) = true;
+}
+
+void generic_optional_delete(const kaba::Class *c, char *v) {
+	if (auto f = c->param[0]->get_destructor()) {
+		typedef void f_t(void*);
+		((f_t*)f->address_preprocess)(v);
+	}
+	*generic_optional_has_value(c, v) = false;
+}
+
 Any var_to_any(const kaba::Class *c, const char *v) {
 	if (c == kaba::TypeInt32) {
 		return Any(*(const int*)v);
@@ -75,6 +95,10 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		if (!str_is_integer(l))
 			return Any(l);*/
 		return Any(*(const int*)v);
+	} else if (c->is_optional()) {
+		if (*generic_optional_has_value(c, v))
+			return var_to_any(c->param[0], v);
+		return {}; // nil
 	} else if (c->name == "Device*") {
 		if (const auto d = *reinterpret_cast<Device*const*>(v))
 			return Any(d->internal_name);
@@ -97,7 +121,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 				r.dict_set(e.name, var_to_any(e.type, &v[e.offset]));
 		return r;
 	}
-	return Any();
+	return {};
 }
 
 string get_next(const string &var_temp, int &pos) {
@@ -214,6 +238,15 @@ void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *sessi
 			var_from_any(tel, &(((char*)aa->data)[i * tel->size]), list[i], session);
 	} else if (type->is_enum()) {
 		*(int*)v = kaba::enum_parse(a.str(), type);
+	} else if (type->is_optional()) {
+		bool has_value_after = !a.is_empty();
+		bool has_value_before = *generic_optional_has_value(type, v);
+		if (!has_value_before and has_value_after)
+			generic_optional_init(type, v);
+		else if (has_value_before and !has_value_after)
+			generic_optional_delete(type, v);
+		if (has_value_after)
+			var_from_any(type->param[0], v, a, session);
 	} else if (type->name == "Device*") {
 		*(Device**)v = nullptr;
 	} else if (type->name == "shared[SampleRef]") {

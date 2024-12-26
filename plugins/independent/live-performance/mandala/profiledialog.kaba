@@ -1,0 +1,89 @@
+use tsunami.*
+use config.*
+use hui
+
+
+class ProfileDialog extends hui.Dialog
+	var mp: ConfigPanel&
+	var config: MandalaConfig&
+	
+	let LIST_ID = ["rim-list", "surface-list", "collection-list"]
+	
+	func __init__(_mp: ConfigPanel&, _config: MandalaConfig&)
+		super.__init__("Profiles", 400, 600, _mp.win, false)
+		set_options("", "headerbar,borderwidth=0,resizable")
+		from_source("
+Grid ? '' vertical
+	TabControl tab 'Rim\\Surface\\Song'
+		Grid ? ''
+			ListView rim-list 'profiles' style=navigation-sidebar nobar
+		Grid ? ''
+			ListView surface-list 'profiles' style=navigation-sidebar nobar
+		Grid ? ''
+			ListView collection-list 'profiles' style=navigation-sidebar nobar
+	Grid ? '' buttonbar
+		Button add 'Add new'
+		Button copy 'Copy'
+		Button delete 'Delete'")
+		
+		mp := _mp
+		config := _config
+		
+		fill()
+		
+		for id in LIST_ID
+			event_x(id, "hui:select", on_select)
+		event("delete", on_delete)
+		event("add", on_add)
+		event("copy", on_copy)
+		event("tab", on_tab)
+	
+	func mut fill()
+		for id in LIST_ID
+			reset(id)
+		for p in config.rim_profiles
+			add_string("rim-list", p.name)
+		for p in config.surface_profiles
+			add_string("surface-list", p.name)
+		for p in config.profile_collections
+			add_string("collection-list", p.name)
+	
+	func mut on_select()
+		let k = get_int("tab")
+		let n = get_int(LIST_ID[k])
+		enable("delete", n >= 0)
+		enable("copy", n >= 0)
+	func mut on_delete()
+		let k = get_int("tab")
+		let n = get_int(LIST_ID[k])
+		if n < 0
+			return
+		match k
+			0 => config.rim_profiles.remove(n)
+			1 => config.surface_profiles.remove(n)
+			2 => config.profile_collections.remove(n)
+			else => pass
+		mp.changed()
+		fill()
+	func mut on_add()
+		let k = get_int("tab")
+		match k
+			0 => config.rim_profiles.add(["x", []])
+			1 => config.surface_profiles.add(["x", 4, []])
+			2 => config.profile_collections.add(["x", [], []])
+			else => pass
+		mp.changed()
+		fill()
+	func mut on_copy()
+		let k = get_int("tab")
+		match k
+			0 => config.rim_profiles.add(["x", []])
+			1 => config.surface_profiles.add(["x", 4, []])
+			2 => config.profile_collections.add(["x", [], []])
+			else => pass
+		mp.changed()
+		fill()
+	func mut on_tab()
+		let k = get_int("tab")
+		let n = get_int(LIST_ID[k])
+		enable("delete", n >= 0)

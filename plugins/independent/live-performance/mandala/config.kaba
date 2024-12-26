@@ -1,0 +1,97 @@
+use tsunami.*
+use helper.draw.*
+use synthesizer.Sample.*
+use hui
+
+let NSURFACES = 4
+let NRIMS = 9
+
+
+let SURFACE_PITCHES = [48, 50, 52, 53] # C3,D3,E3,F3
+	# warning: Mandala calls these C2,D2,E2,F2
+let RIM_PITCHES = [60, 62, 64, 65, 67, 69, 71, 72, 84] # C4,D4,...,C5, C6
+	# warning: Mandala calls these C3,D3,...,C4, C5
+
+func sample_name(sample: shared[SampleRef]) -> string
+	for s in sample
+		return s.origin.name
+	return "---"
+
+
+struct RimProfile
+	var name: string
+	var samples: shared[SampleRef][]
+struct SurfaceProfile
+	var name: string
+	var number_of_zones: i32
+	var samples: shared[SampleRef][]
+	
+# "song"
+struct ProfileCollection
+	var name: string
+	var rim_profiles: string[]
+	var surface_profiles: string[]
+		
+	
+# data permanently stored in tsunami's config system
+class MandalaConfig extends Module.Config
+	var device: Device*
+		
+	var rim_profiles: RimProfile[]
+	var surface_profiles: SurfaceProfile[]
+	var profile_collections: ProfileCollection[]
+		
+	var current_collection: string?
+	var current_rim_profile: string?
+	var current_surface_profile: string?
+		
+	var number_of_zones: i32
+	var surface_samples: shared[SampleRef][]
+	var rim_samples: shared[SampleRef][]
+
+	# when tsunami asks for a "neutral/empty" configuration
+	func override reset()
+		device = nil
+		number_of_zones = NSURFACES
+		surface_samples.clear()
+		surface_samples.resize(NSURFACES)
+		rim_samples.clear()
+		rim_samples.resize(NRIMS)
+			
+		rim_profiles = []
+		surface_profiles = []
+		profile_collections = []
+		current_collection = nil
+		current_rim_profile = nil
+		current_surface_profile = nil
+		
+	func group_size() -> i32
+		return NSURFACES / number_of_zones
+		
+	func mut apply_rim_profile(p: RimProfile)
+		current_rim_profile = p.name
+		rim_samples = p.samples
+		
+	func mut apply_surface_profile(p: SurfaceProfile)
+		current_surface_profile = p.name
+		surface_samples = p.samples
+		number_of_zones = p.number_of_zones
+		
+	func mut save_rim_profile(name: string)
+		# existing? -> overwrite
+		for mut p in rim_profiles
+			if p.name == name
+				p.samples = rim_samples
+				return
+		# new profile
+		rim_profiles.add([name, rim_samples])
+		
+	func mut save_surface_profile(name: string)
+		# existing? -> overwrite
+		for mut p in surface_profiles
+			if p.name == name
+				p.samples = surface_samples
+				p.number_of_zones = number_of_zones
+				return
+		# new profile
+		surface_profiles.add([name, number_of_zones, surface_samples])

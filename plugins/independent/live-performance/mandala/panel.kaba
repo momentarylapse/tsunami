@@ -13,18 +13,16 @@ class MandalaPanel extends ConfigPanel
 	var source_selector: owned![DeviceSelector]
 	var width, height: i32
 	
-	struct Hover
+	struct HoverInfo
 		enum Type
 			SURFACE
 			RIM
-			LOAD_SURFACE_PRESET
 			SAVE_SURFACE_PRESET
-			LOAD_RIM_PRESET
 			SAVE_RIM_PRESET
 		type: Type
 		index: i32
 	
-	var hover: Hover?
+	var hover: HoverInfo?
 	
 	func override __init__(_s: Module)
 		for cc in c.get_config()
@@ -35,10 +33,14 @@ class MandalaPanel extends ConfigPanel
 Grid grid ''
 	---|
 	Grid ? ''
-		Label ? 'Device'
+		Label ? 'Profile'
 		Grid ? ''
-			ComboBox source '' expandx
+			ComboBox surface-profile '' expandx
+			ComboBox rim-profile '' expandx
 			Button edit-profiles '' image=hui:edit noexpandx
+		---|
+		Label ? 'Device'
+		ComboBox source '' expandx
 		---|
 		Label ? 'Zones'
 		ComboBox number-of-zones '1\\2\\4' expandx
@@ -48,6 +50,8 @@ Grid grid ''
 		source_selector = new DeviceSelector(self, "source", c.session, Device.Type.MIDI_INPUT, on_source)
 		
 		event("number-of-zones", on_number_of_zones)
+		event("rim-profile", on_rim_profile)
+		event("surface-profile", on_surface_profile)
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:mouse-move", on_mouse_move)
 		event_x("area", "hui:left-button-down", on_left_button_down)
@@ -57,12 +61,39 @@ Grid grid ''
 	func override update()
 		set_int("number-of-zones", clamp(config.number_of_zones, 1, 3) - 1)
 		redraw("area")
+		
+		reset("rim-profile")
+		for i=>p in config.rim_profiles
+			add_string("rim-profile", p.name)
+			for name in config.current_rim_profile
+				if p.name == name
+					set_int("rim-profile", i)
+		reset("surface-profile")
+		for i=>p in config.surface_profiles
+			add_string("surface-profile", p.name)
+			for name in config.current_surface_profile
+				if p.name == name
+					set_int("surface-profile", i)
 	
 	func mut on_number_of_zones()
 		let n = get_int("number-of-zones")
 		config.number_of_zones = 2^n
 		changed()
 		redraw("area")
+	
+	func mut on_rim_profile()
+		let n = get_int("rim-profile")
+		if n < 0
+			return
+		config.apply_rim_profile(config.rim_profiles[n])
+		changed()
+		
+	func mut on_surface_profile()
+		let n = get_int("surface-profile")
+		if n < 0
+			return
+		config.apply_surface_profile(config.surface_profiles[n])
+		changed()
 	
 	func mut on_source()
 		config.device = source_selector.get()
@@ -106,9 +137,7 @@ Grid grid ''
 	#	p.draw_polygon([[8,height-8],[8,height-25],[20,height-25],[25,height-20],[25,height-8]])
 	#	p.draw_polygon([[width-25,height-8],[width-25,height-25],[width-13,height-25],[width-8,height-20],[width-8,height-8]])
 	#	p.set_fill(true)
-		p.draw_str([10, height-15], "L")
-		p.draw_str([30, height-15], "S")
-		p.draw_str([width-40, height-15], "L")
+		p.draw_str([10, height-15], "S")
 		p.draw_str([width-20, height-15], "S")
 		
 		
@@ -116,12 +145,10 @@ Grid grid ''
 		for h in hover
 			var tip = ""
 			match h.type
-				Hover.Type.SURFACE => tip = "Surface #{{h.index+1}}\nsample: {{sample_name(config.surface_samples[h.index])}}"
-				Hover.Type.RIM => tip = "Rim #{{h.index+1}}\nsample: {{sample_name(config.rim_samples[h.index])}}"
-				Hover.Type.LOAD_SURFACE_PRESET => tip = "Load surface profile"
-				Hover.Type.SAVE_SURFACE_PRESET => tip = "Save surface profile"
-				Hover.Type.SAVE_RIM_PRESET => tip = "Save rim profile"
-				Hover.Type.LOAD_RIM_PRESET => tip = "Load rim profile"
+				HoverInfo.Type.SURFACE => tip = "Surface #{{h.index+1}}\nsample: {{sample_name(config.surface_samples[h.index])}}"
+				HoverInfo.Type.RIM => tip = "Rim #{{h.index+1}}\nsample: {{sample_name(config.rim_samples[h.index])}}"
+				HoverInfo.Type.SAVE_SURFACE_PRESET => tip = "Save surface profile"
+				HoverInfo.Type.SAVE_RIM_PRESET => tip = "Save rim profile"
 			draw_cursor_hover(p, tip, hui.get_event().mouse, [0,width, 0,height])
 	
 	
@@ -132,7 +159,7 @@ Grid grid ''
 			if (i % group_size) == 0
 				var hovering = false
 				for h in hover
-					if h.type == Hover.Type.SURFACE and h.index >= i and h.index < i + group_size
+					if h.type == HoverInfo.Type.SURFACE and h.index >= i and h.index < i + group_size
 						hovering = true
 				let alpha = if hovering
 					0.6
@@ -189,7 +216,7 @@ Grid grid ''
 		for i in 0:NRIMS
 			var hovering = false
 			for h in hover
-				if h.type == Hover.Type.RIM and h.index == i
+				if h.type == HoverInfo.Type.RIM and h.index == i
 					hovering = true
 					
 			# outer tick
@@ -223,14 +250,14 @@ Grid grid ''
 			p.draw_str([width/2 + 30,10], s)
 			
 			
-	func get_hover(m: vec2) -> Hover?
+	func get_hover(m: vec2) -> HoverInfo?
 		# left: surfaces
 		let c1 = vec2(width / 4, height / 2)
 		let r = min(c1.x, c1.y) * 0.9
 		
 		for i in 0:NSURFACES
 			if len(m - c1) < r * f32(i + 1) / f32(NSURFACES)
-				return [Hover.Type.SURFACE, i]
+				return [HoverInfo.Type.SURFACE, i]
 		
 		
 		# right: rims
@@ -239,16 +266,12 @@ Grid grid ''
 			let phi = (f32(i) + 0.5) / NRIMS * 2 * pi
 			let c = c2 + (r - 13) * vec2(sin(phi), -cos(phi))
 			if len(m - c) < r * 0.3
-				return [Hover.Type.RIM, i]
+				return [HoverInfo.Type.RIM, i]
 		
 		if m.x < 25 and m.y > height - 25
-			return [Hover.Type.LOAD_SURFACE_PRESET, 0]
-		if m.x < 50 and m.y > height - 25
-			return [Hover.Type.SAVE_SURFACE_PRESET, 0]
+			return [HoverInfo.Type.SAVE_SURFACE_PRESET, 0]
 		if m.x > width - 25 and m.y > height - 25
-			return [Hover.Type.SAVE_RIM_PRESET, 0]
-		if m.x > width - 50 and m.y > height - 25
-			return [Hover.Type.LOAD_RIM_PRESET, 0]
+			return [HoverInfo.Type.SAVE_RIM_PRESET, 0]
 		
 		return nil
 	
@@ -264,7 +287,7 @@ Grid grid ''
 	func mut on_left_button_down()
 		for h in hover
 			match h.type
-				Hover.Type.SURFACE =>
+				HoverInfo.Type.SURFACE =>
 					let i = h.index
 					var old: Sample* = nil
 					for s in config.surface_samples[i]
@@ -276,7 +299,7 @@ Grid grid ''
 							config.surface_samples[i] = nil
 						changed()
 					SelectSample(c.session, self, old).then(f)
-				Hover.Type.RIM =>
+				HoverInfo.Type.RIM =>
 					let i = h.index
 					var old: Sample* = nil
 					for s in config.rim_samples[i]
@@ -288,23 +311,11 @@ Grid grid ''
 							config.rim_samples[i] = nil
 						changed()
 					SelectSample(c.session, self, old).then(f)
-				Hover.Type.LOAD_SURFACE_PRESET =>
-					let f = func(s: string)
-						for p in config.get_surface_profile(s)
-							config.apply_surface_profile(p)
-							changed()
-					ask_preset_name(win, config.surface_profile_names(), false).then(f)
-				Hover.Type.SAVE_SURFACE_PRESET =>
+				HoverInfo.Type.SAVE_SURFACE_PRESET =>
 					let f = func(s: string)
 						config.save_surface_profile(s)
 					ask_preset_name(win, config.surface_profile_names(), true).then(f)
-				Hover.Type.LOAD_RIM_PRESET =>
-					let f = func(s: string)
-						for p in config.get_rim_profile(s)
-							config.apply_rim_profile(p)
-							changed()
-					ask_preset_name(win, config.rim_profile_names(), false).then(f)
-				Hover.Type.SAVE_RIM_PRESET =>
+				HoverInfo.Type.SAVE_RIM_PRESET =>
 					let f = func(s: string)
 						config.save_rim_profile(s)
 						changed()

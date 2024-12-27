@@ -163,7 +163,7 @@ Grid grid ''
 		p.set_color(theme.text_soft2)
 		for name in config.current_surface_profile
 			var s = name
-			if !config.is_surface_profile_saved()
+			if not config.is_surface_profile_saved()
 				s += " *"
 			p.draw_str([10,10], s)
 			
@@ -197,7 +197,7 @@ Grid grid ''
 		p.set_color(theme.text_soft2)
 		for name in config.current_rim_profile
 			var s = name
-			if !config.is_rim_profile_saved()
+			if not config.is_rim_profile_saved()
 				s += " *"
 			p.draw_str([width/2 + 30,10], s)
 			
@@ -242,51 +242,52 @@ Grid grid ''
 
 	func mut on_left_button_down()
 		for h in hover
-			if h.type == Hover.Type.SURFACE
-				let i = h.index
-				var old: Sample* = nil
-				for s in config.surface_samples[i]
-					old = &s.origin
-				let f = func(ss: Sample*)
-					for _s in ss
-						config.surface_samples[i] = _s.create_ref()
-					else
-						config.surface_samples[i] = nil
-					changed()
-				SelectSample(c.session, self, old).then(f)
-			if h.type == Hover.Type.RIM
-				let i = h.index
-				var old: Sample* = nil
-				for s in config.rim_samples[i]
-					old = &s.origin
-				let f = func(ss: Sample*)
-					for _s in ss
-						config.rim_samples[i] = _s.create_ref()
-					else
-						config.rim_samples[i] = nil
-					changed()
-				SelectSample(c.session, self, old).then(f)
-			if h.type == Hover.Type.LOAD_SURFACE_PRESET
-				let f = func(s: string)
-					for p in config.get_surface_profile(s)
-						config.apply_surface_profile(p)
+			match h.type
+				Hover.Type.SURFACE =>
+					let i = h.index
+					var old: Sample* = nil
+					for s in config.surface_samples[i]
+						old = &s.origin
+					let f = func(ss: Sample*)
+						for _s in ss
+							config.surface_samples[i] = _s.create_ref()
+						else
+							config.surface_samples[i] = nil
 						changed()
-				ask_preset_name(win, config.surface_profile_names(), false).then(f)
-			if h.type == Hover.Type.SAVE_SURFACE_PRESET
-				let f = func(s: string)
-					config.save_surface_profile(s)
-				ask_preset_name(win, config.surface_profile_names(), true).then(f)
-			if h.type == Hover.Type.LOAD_RIM_PRESET
-				let f = func(s: string)
-					for p in config.get_rim_profile(s)
-						config.apply_rim_profile(p)
+					SelectSample(c.session, self, old).then(f)
+				Hover.Type.RIM =>
+					let i = h.index
+					var old: Sample* = nil
+					for s in config.rim_samples[i]
+						old = &s.origin
+					let f = func(ss: Sample*)
+						for _s in ss
+							config.rim_samples[i] = _s.create_ref()
+						else
+							config.rim_samples[i] = nil
 						changed()
-				ask_preset_name(win, config.rim_profile_names(), false).then(f)
-			if h.type == Hover.Type.SAVE_RIM_PRESET
-				let f = func(s: string)
-					config.save_rim_profile(s)
-					changed()
-				ask_preset_name(win, config.rim_profile_names(), true).then(f)
+					SelectSample(c.session, self, old).then(f)
+				Hover.Type.LOAD_SURFACE_PRESET =>
+					let f = func(s: string)
+						for p in config.get_surface_profile(s)
+							config.apply_surface_profile(p)
+							changed()
+					ask_preset_name(win, config.surface_profile_names(), false).then(f)
+				Hover.Type.SAVE_SURFACE_PRESET =>
+					let f = func(s: string)
+						config.save_surface_profile(s)
+					ask_preset_name(win, config.surface_profile_names(), true).then(f)
+				Hover.Type.LOAD_RIM_PRESET =>
+					let f = func(s: string)
+						for p in config.get_rim_profile(s)
+							config.apply_rim_profile(p)
+							changed()
+					ask_preset_name(win, config.rim_profile_names(), false).then(f)
+				Hover.Type.SAVE_RIM_PRESET =>
+					let f = func(s: string)
+						config.save_rim_profile(s)
+						changed()
+					ask_preset_name(win, config.rim_profile_names(), true).then(f)
 
 	func mut on_edit_profiles()
 		hui.fly(new ProfileDialog(&self, config))

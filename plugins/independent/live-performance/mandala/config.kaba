@@ -17,6 +17,17 @@ func sample_name(sample: shared[SampleRef]) -> string
 		return s.origin.name
 	return "---"
 
+func sample_origin(s: SampleRef*) -> Sample*
+	for _s in s
+		return _s.origin
+	return nil
+
+
+func sample_list_equal(a: shared[SampleRef][], b: shared[SampleRef][]) -> bool
+	let aa = weak(a) |> sample_origin
+	let bb = weak(b) |> sample_origin
+	return aa == bb
+
 
 struct RimProfile
 	var name: string
@@ -120,11 +131,11 @@ class MandalaConfig extends Module.Config
 	func is_surface_profile_saved() -> bool
 		for name in current_surface_profile
 			for p in get_surface_profile(name)
-				return weak(p.samples) == weak(surface_samples)
+				return sample_list_equal(p.samples, surface_samples) and p.number_of_zones == number_of_zones
 		return false
 
 	func is_rim_profile_saved() -> bool
 		for name in current_rim_profile
 			for p in get_rim_profile(name)
-				return weak(p.samples) == weak(rim_samples)
+				return sample_list_equal(p.samples, rim_samples)
 		return false

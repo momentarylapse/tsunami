@@ -22,9 +22,9 @@ Grid ? '' vertical
 		Grid ? ''
 			ListView collection-list 'profiles' style=navigation-sidebar nobar
 	Grid ? '' buttonbar
-		Button add 'Add new'
-		Button copy 'Copy'
-		Button delete 'Delete'")
+		Button apply 'Apply' 'tooltip=Apply the selected profile'
+		Button save 'Save' 'tooltip=Save the current state as a new profile (or orverwrite an existing one)'
+		Button delete 'Delete' 'tooltip=Delete the selected profile'")
 		
 		mp := _mp
 		config := _config
@@ -34,25 +34,39 @@ Grid ? '' vertical
 		for id in LIST_ID
 			event_x(id, "hui:select", on_select)
 		event("delete", on_delete)
-		event("add", on_add)
-		event("copy", on_copy)
+		event("save", on_save)
+		event("apply", on_apply)
 		event("tab", on_tab)
 	
 	func mut fill()
 		for id in LIST_ID
 			reset(id)
 		for p in config.rim_profiles
-			add_string("rim-list", p.name)
+			var s = ""
+			for name in config.current_rim_profile
+				if p.name == name
+					s = "   (active)"
+			add_string("rim-list", p.name + s)
 		for p in config.surface_profiles
-			add_string("surface-list", p.name)
+			var s = ""
+			for name in config.current_surface_profile
+				if p.name == name
+					s = "   (active)"
+			add_string("surface-list", p.name + s)
 		for p in config.profile_collections
-			add_string("collection-list", p.name)
+			var s = ""
+			for name in config.current_collection
+				if p.name == name
+					s = " (active)"
+			add_string("collection-list", p.name + s)
+		on_select() # update buttons
 	
 	func mut on_select()
 		let k = get_int("tab")
 		let n = get_int(LIST_ID[k])
 		enable("delete", n >= 0)
-		enable("copy", n >= 0)
+		enable("apply", n >= 0)
+	
 	func mut on_delete()
 		let k = get_int("tab")
 		let n = get_int(LIST_ID[k])
@@ -65,28 +79,40 @@ Grid ? '' vertical
 			else => pass
 		mp.changed()
 		fill()
-	func mut on_add()
-		let k = get_int("tab")
-		match k
-			0 => config.rim_profiles.add(["x", []])
-			1 => config.surface_profiles.add(["x", 4, []])
-			2 => config.profile_collections.add(["x", [], []])
-			else => pass
-		mp.changed()
-		fill()
-	func mut on_copy()
-		let k = get_int("tab")
-		match k
-			0 => config.rim_profiles.add(["x", []])
-			1 => config.surface_profiles.add(["x", 4, []])
-			2 => config.profile_collections.add(["x", [], []])
-			else => pass
-		mp.changed()
-		fill()
-	func mut on_tab()
+
+	func mut on_apply()
 		let k = get_int("tab")
 		let n = get_int(LIST_ID[k])
-		enable("delete", n >= 0)
+		if n < 0
+			return
+		match k
+			0 => config.apply_rim_profile(config.rim_profiles[n])
+			1 => config.apply_surface_profile(config.surface_profiles[n])
+			else => pass
+		mp.changed()
+		fill()
+
+	func mut on_save()
+		let k = get_int("tab")
+		match k
+			0 =>
+				let f = func(s: string)
+					config.save_rim_profile(s)
+					mp.changed() # TODO proper event system
+					fill()
+				ask_preset_name(&self, config.rim_profile_names(), true).then(f)
+			1 =>
+				let f = func(s: string)
+					config.save_surface_profile(s)
+					mp.changed()
+					fill()
+				ask_preset_name(&self, config.surface_profile_names(), true).then(f)
+		#	2 => config.profile_collections.add(["x", [], []])
+			else => pass
+	
+	func mut on_tab()
+		on_select()
+		
 
 
 

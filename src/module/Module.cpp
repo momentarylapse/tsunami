@@ -204,8 +204,9 @@ void Module::changed() {
 xfer<Module> Module::copy() const {
 	Module *clone = ModuleFactory::create(session, module_category, module_class);
 	string param = config_to_string();
-	clone->config_from_string(Module::VersionNumber::Latest, param);
+	clone->config_from_string(VersionNumber::Latest, param);
 	clone->_config_latest_history = param;
+	clone->enabled = enabled;
 	return clone;
 }
 

@@ -47,6 +47,10 @@ void FrameBuffer::update(const shared_array<Texture> &attachments) {
 	update_x(attachments, -1);
 }
 
+bool format_is_depth(int format) {
+	return format == GL_DEPTH_COMPONENT16 or format == GL_DEPTH_COMPONENT32F or format == GL_DEPTH24_STENCIL8 or format == GL_DEPTH32F_STENCIL8;
+}
+
 void FrameBuffer::update_x(const shared_array<Texture> &attachments, int cube_face) {
 	// prevent deleting textures
 	shared<DepthBuffer> new_depth_buffer;
@@ -54,7 +58,7 @@ void FrameBuffer::update_x(const shared_array<Texture> &attachments, int cube_fa
 	int samples = 0;
 
 	for (auto a: weak(attachments)) {
-		if ((a->type == Texture::Type::DEPTH) or (a->type == Texture::Type::RENDERBUFFER))
+		if (format_is_depth(a->internal_format))
 			new_depth_buffer = (DepthBuffer*)a;
 		else
 			new_attachments.add(a);

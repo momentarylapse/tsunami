@@ -23,7 +23,7 @@ Buffer::~Buffer() {
 	glDeleteBuffers(1, &buffer);
 }
 
-void Buffer::update(void *data, int size) {
+void Buffer::update(const void *data, int size) {
 	glNamedBufferData(buffer, size, data, GL_DYNAMIC_DRAW);
 }
 
@@ -42,12 +42,14 @@ void Buffer::read_array(DynamicArray &a) {
 }
 
 
-UniformBuffer::UniformBuffer() {
+UniformBuffer::UniformBuffer(int size) {
 	type = Type::UNIFORM;
+	glNamedBufferData(buffer, size, nullptr, GL_DYNAMIC_DRAW);
 }
 
-ShaderStorageBuffer::ShaderStorageBuffer() {
+ShaderStorageBuffer::ShaderStorageBuffer(int size) {
 	type = Type::SSBO;
+	glNamedBufferData(buffer, size, nullptr, GL_DYNAMIC_DRAW);
 }
 
 void bind_uniform_buffer(int binding, UniformBuffer *buf) {

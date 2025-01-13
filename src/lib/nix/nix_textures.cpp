@@ -73,8 +73,14 @@ unsigned int parse_format(const string &_format) {
 		return GL_RGB16F;
 	if (_format == "rgba:f16")
 		return GL_RGBA16F;
-	if (_format == "d24s8")
+	if (_format == "d:i16")
+		return GL_DEPTH_COMPONENT16;
+	if (_format == "d:f32")
+		return GL_DEPTH_COMPONENT32F;
+	if (_format == "d24s8" or _format == "ds:u24i8")
 		return GL_DEPTH24_STENCIL8;
+	if (_format == "ds:f32i8")
+		return GL_DEPTH32F_STENCIL8;
 
 	msg_error("unknown format: " + _format);
 	return GL_RGBA8;

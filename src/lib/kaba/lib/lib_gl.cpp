@@ -67,6 +67,20 @@ public:
 	}
 };
 
+class KabaUniformBuffer : public nix::UniformBuffer {
+public:
+	void __init__(int size) {
+		new(this) nix::UniformBuffer(size);
+	}
+};
+
+class KabaShaderStorageBuffer : public nix::ShaderStorageBuffer {
+public:
+	void __init__(int size) {
+		new(this) nix::ShaderStorageBuffer(size);
+	}
+};
+
 
 #else
 	struct FakeTexture : public Sharable<base::Empty> {
@@ -312,11 +326,13 @@ void SIAddPackageGl(Context *c) {
 
 	add_class(TypeUniformBuffer);
 		class_derive_from(TypeBuffer);
-		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&generic_init<nix::UniformBuffer>), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaUniformBuffer::__init__), Flags::Mutable);
+			func_add_param("size", TypeInt32);
 
 	add_class(TypeShaderStorageBuffer);
 		class_derive_from(TypeBuffer);
-		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&generic_init<nix::ShaderStorageBuffer>), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaShaderStorageBuffer::__init__), Flags::Mutable);
+			func_add_param("size", TypeInt32);
 
 		// drawing
 	add_func("init", TypeContextXfer, gl_p(&nix::init), Flags::Static);

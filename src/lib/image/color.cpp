@@ -162,3 +162,19 @@ bool color::operator ==(const color &c) const {
 bool color::operator !=(const color &c) const {
 	return !(*this == c);
 }
+
+float color::brightness() const {
+	return (r + g + b) / 3.0f;
+}
+
+float color::hue() const {
+	// TODO
+	return 0;
+}
+
+float color::saturation() const {
+	// TODO
+	return 1;
+}
+
+

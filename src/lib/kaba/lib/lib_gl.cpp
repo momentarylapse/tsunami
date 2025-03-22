@@ -312,7 +312,6 @@ void SIAddPackageGl(Context *c) {
 		class_add_element(Identifier::SharedCount, TypeInt32, gl_p(&nix::Shader::_pointer_ref_counter));
 
 	add_class(TypeBuffer);
-		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Buffer>), Flags::Mutable);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update), Flags::Mutable);
 			func_add_param("data", TypeReference);
 			func_add_param("size", TypeInt32);
@@ -328,11 +327,13 @@ void SIAddPackageGl(Context *c) {
 		class_derive_from(TypeBuffer);
 		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaUniformBuffer::__init__), Flags::Mutable);
 			func_add_param("size", TypeInt32);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Buffer>), Flags::Mutable);
 
 	add_class(TypeShaderStorageBuffer);
 		class_derive_from(TypeBuffer);
 		class_add_func(Identifier::func::Init, TypeVoid, gl_p(&KabaShaderStorageBuffer::__init__), Flags::Mutable);
 			func_add_param("size", TypeInt32);
+		class_add_func(Identifier::func::Delete, TypeVoid, gl_p(&generic_delete<nix::Buffer>), Flags::Mutable);
 
 		// drawing
 	add_func("init", TypeContextXfer, gl_p(&nix::init), Flags::Static);

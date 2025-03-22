@@ -51,6 +51,12 @@ public:
 	T &operator*() {
 		return value();
 	}
+	T *operator ->() {
+		return &value();
+	}
+	const T *operator ->() const {
+		return &value();
+	}
 
 	void operator=(const T &o) {
 		_init();

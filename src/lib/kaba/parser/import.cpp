@@ -18,6 +18,8 @@
 #include "../../hui/Application.h"
 #elif defined(_X_USE_HUI_MINIMAL_)
 #include "../../hui_minimal/Application.h"
+#elif __has_include("../../xhui/xhui.h")
+#include "../../xhui/xhui.h"
 #endif
 
 
@@ -78,10 +80,15 @@ Path import_dir_match(const Path &dir0, const string &name) {
 }
 
 Path find_installed_lib_import(const string &name) {
-	Path kaba_dir = hui::Application::directory.parent() | "kaba";
-	if (hui::Application::directory.basename()[0] == '.')
-		kaba_dir = hui::Application::directory.parent() | ".kaba";
-	Path kaba_dir_static = hui::Application::directory_static.parent() | "kaba";
+#ifdef _X_USE_XHUI_
+	using App = xhui::Application;
+#else
+	using App = hui::Application;
+#endif
+	Path kaba_dir = App::directory.parent() | "kaba";
+	if (App::directory.basename()[0] == '.')
+		kaba_dir = App::directory.parent() | ".kaba";
+	Path kaba_dir_static = App::directory_static.parent() | "kaba";
 	for (auto &dir: Array<Path>({kaba_dir, kaba_dir_static})) {
 		auto path = (dir | "lib" | name).canonical();
 		if (os::fs::exists(path))

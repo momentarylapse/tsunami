@@ -28,7 +28,7 @@ void print(const string &s);
 
 extern string _print_postfix_;
 
-string shell_execute(const string &cmd);
+string shell_execute(const string &cmd, bool verbose = false);
 
 }
 

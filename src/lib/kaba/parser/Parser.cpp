@@ -412,9 +412,23 @@ shared_array<Node> Parser::parse_abstract_call_parameters(Block *block) {
 	// list of parameters
 	if (try_consume(")"))
 		return params;
+
+	bool has_named = false;
 	while (true) {
+
 		// find parameter
-		params.add(parse_abstract_operand_greedy(block));
+		if (Exp.peek_next() == "=") {
+			// names parameter:  name=...
+			int name_token = Exp.cur_token();
+			Exp.next();
+			Exp.next(); // =
+			params.add(add_node_named_parameter(tree, name_token, parse_abstract_operand_greedy(block)));
+			has_named = true;
+		} else {
+			if (has_named)
+				do_error("can not mix named and unnamed parameters", Exp.cur_token());
+			params.add(parse_abstract_operand_greedy(block));
+		}
 
 		if (!try_consume(",")) {
 			expect_identifier(")", "',' or ')' expected after parameter for function");
@@ -611,7 +625,7 @@ const Class *merge_type_tuple_into_product(SyntaxTree *tree, const Array<const C
 }
 
 shared<Node> Parser::parse_abstract_token() {
-	return new Node(NodeKind::AbstractToken, (int_p)tree, TypeUnknown, Flags::None, Exp.consume_token());
+	return add_node_token(tree, Exp.consume_token());
 }
 
 // minimal operand
@@ -647,7 +661,7 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 		operand = new Node(NodeKind::AbstractOperator, (int_p)w, TypeUnknown, Flags::None, Exp.cur_token());
 		Exp.next();
 		operand->set_num_params(1);
-		operand->set_param(0, parse_abstract_operand(block));
+		operand->set_param(0, parse_abstract_operand_greedy(block, false, 13)); // allow '*', don't allow '+'
 	} else {
 		operand = parse_abstract_token();
 	}
@@ -661,9 +675,9 @@ shared<Node> Parser::parse_abstract_operand(Block *block, bool prefer_class) {
 }
 
 // no type information
-shared<Node> Parser::parse_abstract_operator(OperatorFlags param_flags) {
+shared<Node> Parser::parse_abstract_operator(OperatorFlags param_flags, int min_op_level) {
 	auto op = which_abstract_operator(Exp.cur, param_flags);
-	if (!op)
+	if (!op or op->level < min_op_level)
 		return nullptr;
 
 	auto cmd = new Node(NodeKind::AbstractOperator, (int_p)op, TypeUnknown);
@@ -763,7 +777,7 @@ shared<Node> Parser::parse_operand_greedy(Block *block, bool allow_tuples) {
 }
 
 // greedily parse AxBxC...(operand, operator)
-shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tuples) {
+shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tuples, int min_op_level) {
 	shared_array<Node> operands;
 	shared_array<Node> operators;
 
@@ -779,7 +793,7 @@ shared<Node> Parser::parse_abstract_operand_greedy(Block *block, bool allow_tupl
 	while (true) {
 		if (!allow_tuples and Exp.cur == ",")
 			break;
-		if (auto op = parse_abstract_operator(OperatorFlags::Binary)) {
+		if (auto op = parse_abstract_operator(OperatorFlags::Binary, min_op_level)) {
 			operators.add(op);
 			expect_no_new_line("unexpected end of line after operator");
 			operands.add(parse_abstract_operand(block));

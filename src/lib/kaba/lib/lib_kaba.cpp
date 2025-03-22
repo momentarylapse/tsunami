@@ -157,6 +157,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("is_namespace", TypeBool, &Class::is_namespace, Flags::Pure);
 		class_add_func("is_interface", TypeBool, &Class::is_interface, Flags::Pure);
 		class_add_func("is_struct", TypeBool, &Class::is_struct, Flags::Pure);
+		class_add_func("is_template", TypeBool, &Class::is_template, Flags::Pure);
 		class_add_func("get_func", TypeFunctionP, &Class::get_func, Flags::Pure); // selfref
 			func_add_param("name", TypeString);
 			func_add_param("return_type", TypeClassP);

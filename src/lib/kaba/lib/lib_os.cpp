@@ -190,9 +190,9 @@ void kaba_dir_delete(const Path &f) {
 }
 
 
-string _cdecl kaba_shell_execute(const string &cmd) {
+string _cdecl kaba_shell_execute(const string &cmd, bool verbose) {
 	try {
-		return os::terminal::shell_execute(cmd);
+		return os::terminal::shell_execute(cmd, verbose);
 	} catch(::Exception &e) {
 		kaba_raise_exception(new KabaException(e.message()));
 	}
@@ -527,6 +527,7 @@ void SIAddPackageOS(Context *c) {
 	// system
 	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("cmd", TypeString);
+		func_add_param_def("verbose", TypeBool, false);
 
 
 	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");

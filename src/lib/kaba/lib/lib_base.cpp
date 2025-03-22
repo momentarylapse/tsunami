@@ -190,11 +190,19 @@ string kaba_int_format(int i, const string &fmt) {
 	}
 }
 
-string kaba_i16_to_str(unsigned short w) {
+string kaba_i16_to_str(short w) {
 	return str((int)w);
 }
 
-void kaba_i16_from_i32(unsigned short& w, int i) {
+void kaba_i16_from_i32(short& w, int i) {
+	w = i;
+}
+
+string kaba_u16_to_str(unsigned short w) {
+	return str((int)w);
+}
+
+void kaba_u16_from_i32(unsigned short& w, int i) {
 	w = i;
 }
 
@@ -363,6 +371,7 @@ void SIAddPackageBase(Context *c) {
 	TypeInt8			= add_type_simple  ("i8", 1, 1, Flags::ForceCallByValue);
 	TypeUInt8			= add_type_simple  ("u8", 1, 1, Flags::ForceCallByValue);
 	TypeInt16			= add_type_simple  ("i16", 2, 2, Flags::ForceCallByValue);
+	TypeUInt16			= add_type_simple  ("u16", 2, 2, Flags::ForceCallByValue);
 	TypeInt32			= add_type_simple  ("i32", sizeof(int32), 4, Flags::ForceCallByValue);
 	TypeInt64			= add_type_simple  ("i64", sizeof(int64), 8, Flags::ForceCallByValue);
 	TypeFloat32			= add_type_simple  ("f32", sizeof(float), 4, Flags::ForceCallByValue);
@@ -593,13 +602,24 @@ void SIAddPackageBase(Context *c) {
 		class_add_element("low", TypeUInt8, 0);
 		class_add_element("high", TypeUInt8, 1);
 		class_add_func(Identifier::func::Str, TypeString, &kaba_i16_to_str, Flags::Pure);
-		class_add_func("__i32__", TypeInt32, &kaba_cast<unsigned short,int>, Flags::Pure);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<short,int>, Flags::Pure);
 		//	func_set_inline(InlineID::INT16_TO_INT32);
 		add_operator(OperatorID::Assign, TypeVoid, TypeInt16, TypeInt16, InlineID::ChunkAssign);
 		//add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt32, InlineID::INT16_ASSIGN_INT32);
 		class_add_func("__assign__", TypeVoid, &kaba_i16_from_i32, Flags::Mutable);
 			func_add_param("o", TypeInt32);
 
+
+	add_class(TypeUInt16);
+		class_add_element("low", TypeUInt8, 0);
+		class_add_element("high", TypeUInt8, 1);
+		class_add_func(Identifier::func::Str, TypeString, &kaba_u16_to_str, Flags::Pure);
+		class_add_func("__i32__", TypeInt32, &kaba_cast<unsigned short,int>, Flags::Pure);
+		//	func_set_inline(InlineID::INT16_TO_INT32);
+		add_operator(OperatorID::Assign, TypeVoid, TypeUInt16, TypeUInt16, InlineID::ChunkAssign);
+		//add_operator(OperatorID::ASSIGN, TypeVoid, TypeInt16, TypeInt32, InlineID::INT16_ASSIGN_INT32);
+		class_add_func("__assign__", TypeVoid, &kaba_u16_from_i32, Flags::Mutable);
+			func_add_param("o", TypeInt32);
 
 	add_class(TypeInt32);
 		class_add_func(Identifier::func::Str, TypeString, &i2s, Flags::Pure);

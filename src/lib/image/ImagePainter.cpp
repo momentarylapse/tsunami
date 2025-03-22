@@ -185,6 +185,7 @@ void ImagePainter::draw_circle(const vec2 &c, float radius) {
 void ImagePainter::draw_str(const vec2 &p, const string& str) {
 #if 1
 #if HAS_LIB_GTK3 || HAS_LIB_GTK4
+#ifdef HAS_HUI_PAINTER
 
 	cairo_surface_t *surface = cairo_image_surface_create_for_data((unsigned char*)image->data.data, CAIRO_FORMAT_ARGB32, width, height, width * 4);
 	cairo_t *cr = cairo_create(surface);
@@ -211,6 +212,7 @@ void ImagePainter::draw_str(const vec2 &p, const string& str) {
 
 	cairo_destroy(cr);
 	cairo_surface_destroy(surface);
+#endif
 #endif
 #endif
 }

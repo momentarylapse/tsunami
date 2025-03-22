@@ -993,7 +993,7 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeBool, 0x1));
 			break;
 		case InlineID::Int8Negative:
-			cmd.add_cmd(Asm::InstID::SUB, ret, param[0], param_imm(TypeInt8, 0x0));
+			cmd.add_cmd(Asm::InstID::SUB, ret, param_imm(TypeInt8, 0x0), param[0]);
 			break;
 // vec2
 		case InlineID::Vec2AddAssign:

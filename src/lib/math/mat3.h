@@ -21,7 +21,8 @@ public:
 	};
 
 	mat3(){};
-	mat3(const float f[9]);
+	explicit mat3(const float f[9]);
+	mat3(const vec3& a, const vec3& b, const vec3& c);
 	mat3 _cdecl operator + (const mat3 &m) const;
 	mat3 _cdecl operator - (const mat3 &m) const;
 	mat3 _cdecl operator * (float f) const;

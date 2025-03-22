@@ -98,12 +98,12 @@ public:
 	shared<Node> parse_abstract_block(Block *parent, Block *block = nullptr);
 	shared<Node> parse_abstract_operand(Block *block, bool prefer_class = false);
 	shared<Node> parse_operand_greedy(Block *block, bool allow_tuples = false);
-	shared<Node> parse_abstract_operand_greedy(Block *block, bool allow_tuples = false);
+	shared<Node> parse_abstract_operand_greedy(Block *block, bool allow_tuples = false, int min_op_level = -999);
 	shared<Node> parse_operand_super_greedy(Block *block);
 	shared<Node> parse_abstract_set_builder(Block *block);
 	shared<Node> parse_abstract_token();
 
-	shared<Node> parse_abstract_operator(OperatorFlags param_flags);
+	shared<Node> parse_abstract_operator(OperatorFlags param_flags, int min_op_level = -999);
 	shared_array<Node> parse_abstract_call_parameters(Block *block);
 	shared<Node> try_parse_format_string(Block *block, Value &v, int token_id);
 	shared<Node> apply_format(shared<Node> n, const string &fmt);

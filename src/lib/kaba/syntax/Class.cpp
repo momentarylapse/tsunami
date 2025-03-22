@@ -81,6 +81,10 @@ bool Class::_return_in_float_registers() const {
 	return flags_has(flags, Flags::ReturnInFloatRegisters);
 }
 
+bool Class::is_template() const {
+	return flags_has(flags, Flags::Template);
+}
+
 bool reachable_from(const Class *ns, const Class *observer_ns) {
 	if (ns == observer_ns)
 		return true;

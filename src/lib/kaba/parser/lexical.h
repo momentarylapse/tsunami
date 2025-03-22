@@ -65,7 +65,7 @@ public:
 	Line *cur_line;
 	int _cur_exp;
 	string &cur;
-	string peek_next() const;
+	string peek_next(int steps = 1) const;
 
 	void reset_walker();
 	int next_line_indent() const;

@@ -137,6 +137,7 @@ public:
 	shared<Node> link_operator_id(OperatorID op_no, shared<Node> param1, shared<Node> param2, int token_id = -1);
 
 	Array<const Class*> get_wanted_param_types(shared<Node> link, int &mandatory_params);
+	int get_num_wanted_params(shared<Node> link);
 	shared<Node> check_param_link(shared<Node> link, const Class *type, const string &f_name = "", int param_no = -1, int num_params = 1);
 
 

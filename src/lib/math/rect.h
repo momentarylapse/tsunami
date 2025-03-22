@@ -19,7 +19,10 @@ public:
 	vec2 center() const;
 	vec2 size() const;
 	vec2 p00() const;
+	vec2 p01() const;
+	vec2 p10() const;
 	vec2 p11() const;
+	rect canonical() const;
 	bool inside(const vec2 &p) const;
 	bool covers(const rect &r) const;
 	bool overlaps(const rect &r) const;

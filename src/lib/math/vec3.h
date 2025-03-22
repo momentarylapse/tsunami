@@ -46,6 +46,7 @@ public:
 	vec3 _cdecl dir2ang() const;
 	vec3 _cdecl dir2ang2(const vec3 &up) const;
 	vec3 _cdecl ortho() const;
+	vec2& xy() const;
 	int _cdecl important_plane() const;
 //	vector _cdecl rotate(const vector &ang) const;
 //	vector _cdecl transform(const matrix &m) const;

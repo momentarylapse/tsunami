@@ -224,7 +224,7 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 }
 
 bool amd64_type_uses_int_register(const Class *t) {
-	return (t == TypeInt32) or (t == TypeInt64) or (t == TypeInt16) or (t == TypeInt8) or (t == TypeUInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == TypeInt32) or (t == TypeInt64) or (t == TypeInt16) or (t == TypeUInt16) or (t == TypeInt8) or (t == TypeUInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {

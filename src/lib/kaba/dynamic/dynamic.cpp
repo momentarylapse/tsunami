@@ -165,6 +165,10 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 	// fixed
 	if (type == TypeInt32) {
 		return str(*reinterpret_cast<const int32*>(p));
+	} else if (type == TypeInt16) {
+		return str((int)*reinterpret_cast<const short*>(p));
+	} else if (type == TypeUInt16) {
+		return str((int)*reinterpret_cast<const unsigned short*>(p));
 	} else if (type == TypeInt8) {
 		return str((int)*reinterpret_cast<const int8*>(p));
 	} if (type == TypeUInt8) {

@@ -84,6 +84,7 @@ public:
 	bool is_callable() const;
 	bool is_callable_fp() const;
 	bool is_callable_bind() const;
+	bool is_template() const;
 	bool fully_parsed() const;
 
 	Array<ClassElement> elements;
@@ -149,6 +150,7 @@ extern const Class *TypeBool;
 extern const Class *TypeInt8;
 extern const Class *TypeUInt8;
 extern const Class *TypeInt16;
+extern const Class *TypeUInt16;
 extern const Class *TypeInt32;
 extern const Class *TypeInt64;
 extern const Class *TypeFloat32;

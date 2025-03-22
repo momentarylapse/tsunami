@@ -31,8 +31,10 @@ ExpressionBuffer::ExpressionBuffer() : cur(dummy) {
 	clear();
 }
 
-string ExpressionBuffer::peek_next() const {
-	return cur_line->tokens[_cur_exp + 1].name;
+string ExpressionBuffer::peek_next(int steps) const {
+	if (_cur_exp + steps >= cur_line->tokens.num)
+		return "";
+	return cur_line->tokens[_cur_exp + steps].name;
 }
 
 int ExpressionBuffer::cur_token() const {

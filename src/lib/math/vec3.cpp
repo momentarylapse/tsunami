@@ -99,6 +99,11 @@ string vec3::str() const {
 	return format("(%f, %f, %f)", x, y, z);
 }
 
+vec2& vec3::xy() const {
+	return *(vec2*)&x;
+}
+
+
 // real length of the vector
 float vec3::length() const {
 	return sqrtf( x*x + y*y + z*z );

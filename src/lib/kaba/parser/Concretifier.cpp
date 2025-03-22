@@ -1839,9 +1839,11 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 	} else if (node->kind == NodeKind::Slice) {
 		concretify_all_params(node, block, ns);
 		node->type = TypeVoid;
-		return node;
 	} else if (node->kind == NodeKind::Definitely) {
 		return concretify_definitely(node, block, ns);
+	} else if (node->kind == NodeKind::NamedParameter) {
+		node->params[1] = concretify_node(node->params[1], block, ns);
+		node->type = node->params[1]->type;
 	} else {
 		node->show();
 		do_error("INTERNAL ERROR: unexpected node", node);
@@ -2256,21 +2258,83 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 	//force_concrete_types(params);
 	// no, keep params FLEXIBLE
 
-	auto params = _params;
-	if (node_is_member_function_with_instance(links[0]))
-		params.insert(links[0]->params[0], 0);
+	if (links.num == 0)
+		do_error("can not call ...WTF??", -1); //, links[0]);
 
-	// direct match...
-	for (auto& operand: links) {
-		if (direct_param_match(operand, params))
-			return check_const_params(tree, apply_params_direct(operand, params));
-	}
-
-	// advanced match...
 	CastingDataCall casts;
 	casts.penalty = 10000000;
 	shared<Node> chosen;
+	shared_array<Node> chosen_params;
+
+	struct ParamMapResult {
+		enum class Code {
+			Ok,
+			ErrorTooMany,
+			ErrorTooFew,
+			ErrorNameNotFound
+		};
+		Code code;
+		int index;
+	};
+
+
+	auto sort_params = [this, &_params] (shared_array<Node>& params, shared<Node> operand) -> ParamMapResult {
+		int offset = 0;
+		params.resize(get_num_wanted_params(operand));
+
+		// self?
+		if (node_is_member_function_with_instance(operand)) {
+			params[0] = operand->params[0];
+			offset = 1;
+		}
+
+		if (offset + _params.num > params.num)
+			return {ParamMapResult::Code::ErrorTooMany, params.num};
+
+		if (operand->is_function()) {
+			auto f = operand->as_func();
+
+			for (const auto& [i,p]: enumerate(weak(_params))) {
+				if (p->kind == NodeKind::NamedParameter) {
+					string name = p->params[0]->as_token();
+					bool found = false;
+					for (int k=0; k<f->num_params; k++)
+						if (f->var[k]->name == name) {
+							params[k] = p->params[1];
+							found = true;
+						}
+					if (!found)
+						return {ParamMapResult::Code::ErrorNameNotFound, i};
+				} else {
+					params[offset++] = p;
+				}
+			}
+			for (int i=0; i<f->num_params; i++)
+				if (!params[i]) {
+					if (i >= f->mandatory_params and f->default_parameters[i]) {
+						params[i] = f->default_parameters[i];
+					} else {
+						return {ParamMapResult::Code::ErrorTooFew, f->mandatory_params};
+					}
+				}
+		} else {
+			params = _params;
+		}
+		return {ParamMapResult::Code::Ok, 0};
+	};
+
 	for (auto& operand: links) {
+
+		//auto params = _params;
+		shared_array<Node> params;
+		if (sort_params(params, operand).code != ParamMapResult::Code::Ok)
+			continue;
+
+		// direct match...
+		if (direct_param_match(operand, params))
+			return check_const_params(tree, apply_params_direct(operand, params));
+
+		// advanced match...
 
 		// type casting?
 		CastingDataCall cur_casts;
@@ -2279,23 +2343,22 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 		if (cur_casts.penalty < casts.penalty){
 			casts = cur_casts;
 			chosen = operand;
+			chosen_params = params;
 		}
 	}
 
 	if (chosen)
-		return check_const_params(tree, apply_params_with_cast(chosen, params, casts));
+		return check_const_params(tree, apply_params_with_cast(chosen, chosen_params, casts));
 
 
 // error messages
 
-	if (links.num == 0)
-		do_error("can not call ...WTF??", -1); //, links[0]);
 
 	for (auto operand: links) {
 		if (operand->kind == NodeKind::CallFunction) {
 			auto f = operand->as_func();
 			if (f->is_template()) {
-				if (auto ff = match_template_params(operand, params, true)) {
+				if (auto ff = match_template_params(operand, _params, true)) {
 				} else {
 					do_error("template parameter matching or instantiation failed", operand);
 				}
@@ -2303,12 +2366,25 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 		}
 	}
 
+	//do_error("invalid parameters to call (TODO improve error)", links[0]);
 	if (links.num == 1) {
-		param_match_with_cast(links[0], params, casts);
-		do_error("invalid function parameters: " + param_match_with_cast_error(params, casts.wanted), links[0]);
+		shared_array<Node> params;
+		const auto res = sort_params(params, links[0]);
+		if (res.code == ParamMapResult::Code::Ok) {
+			param_match_with_cast(links[0], params, casts);
+			do_error("invalid function parameters: " + param_match_with_cast_error(params, casts.wanted), links[0]);
+		} else if (res.code == ParamMapResult::Code::ErrorTooMany) {
+			do_error(format("too many function parameters: %d given, %d expected", _params.num, res.index), links[0]);
+		} else if (res.code == ParamMapResult::Code::ErrorTooFew) {
+			do_error(format("too few function parameters: %d given, %d expected", _params.num, res.index), links[0]);
+		} else if (res.code == ParamMapResult::Code::ErrorNameNotFound) {
+			do_error(format("named function parameter not found: '%s'", _params[res.index]->params[0]->as_token()), _params[res.index]);
+		} else {
+			do_error("invalid function parameters: ... not mappable", links[0]);
+		}
 	}
 
-	string found = type_list_to_str(type_list_from_nodes(params));
+	string found = type_list_to_str(type_list_from_nodes(_params));
 	string available;
 	for (auto link: links) {
 		//auto p = get_wanted_param_types(link);
@@ -2597,6 +2673,22 @@ Array<const Class*> Concretifier::get_wanted_param_types(shared<Node> link, int 
 	return {};
 }
 
+int Concretifier::get_num_wanted_params(shared<Node> link) {
+	if (link->is_function()) {
+		auto f = link->as_func();
+		return f->num_params;
+	} else if (link->kind == NodeKind::Class) {
+		// should be caught earlier and turned to func...
+		const Class *t = link->as_class();
+		for (auto *c: t->get_constructors()) {
+			return c->num_params;
+		}
+	} else {
+		do_error("evil function...kind: "+kind2str(link->kind), link);
+	}
+	return 0;
+}
+
 // check, if the command <link> links to really has type <type>
 //   ...and try to cast, if not
 shared<Node> Concretifier::check_param_link(shared<Node> link, const Class *wanted, const string &f_name, int param_no, int num_params) {
@@ -2654,7 +2746,7 @@ bool Concretifier::param_match_with_cast(const shared<Node> _operand, const shar
 
 	int mandatory_params;
 	casts.wanted = get_wanted_param_types(operand, mandatory_params);
-	if ((params.num < mandatory_params) or (params.num > casts.wanted.num))
+	if (params.num != casts.wanted.num)
 		return false;
 	casts.params.resize(params.num);
 	casts.penalty = 0;

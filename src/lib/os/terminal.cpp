@@ -22,14 +22,12 @@ void print(const string &s) {
 	printf("%s%s", s.c_str(), _print_postfix_.c_str()); fflush(stdout);
 }
 
-string shell_execute(const string &cmd) {
+string shell_execute(const string &cmd, bool verbose) {
 #if defined(OS_LINUX) || defined(OS_MAC)
 	// thread safe...
-	char *s = new char[cmd.num + 1];
-	memcpy(s, cmd.data, cmd.num);
-	s[cmd.num] = 0;
-	FILE *f = popen(s, "r");
-	delete[] s;
+	string s = cmd;
+	s.add(0);
+	FILE *f = popen((char*)&s[0], "r");
 	//FILE *f = popen(cmd.c_str(), "r");
 	string buffer;
 
@@ -38,6 +36,8 @@ string shell_execute(const string &cmd) {
 		if (c == EOF)
 			break;
 		buffer.add(c);
+		if (verbose)
+			putc(c, stdout);
 	}
 
 	int r = pclose(f);

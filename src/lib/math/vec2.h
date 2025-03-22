@@ -41,6 +41,8 @@ public:
 	void _cdecl normalize();
 	vec2 _cdecl normalized() const;
 	vec2 _cdecl ortho() const;
+	static vec2 min(const vec2& a, const vec2& b);
+	static vec2 max(const vec2& a, const vec2& b);
 
 	static float cross(const vec2 &a, const vec2 &b);
 	static float dot(const vec2 &a, const vec2 &b);

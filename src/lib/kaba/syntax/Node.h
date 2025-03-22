@@ -52,6 +52,7 @@ enum class NodeKind {
 	SpecialFunctionName, // = len, sorted etc
 	Block,               // = block of commands {...}
 	Operator,
+	NamedParameter,
 	// data altering
 	AddressShift,        // = struct.element
 	Array,               // = []
@@ -184,6 +185,8 @@ shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class 
 shared<Node> add_node_slice(shared<Node> start, shared<Node> end);
 shared<Node> add_node_constructor(const Function *f, int token_id = -1);
 shared<Node> make_constructor_static(shared<Node> n, const string &name);
+shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, shared<Node> param);
+shared<Node> add_node_token(SyntaxTree* tree, int token_id);
 
 string kind2str(NodeKind kind);
 string node2str(SyntaxTree *s, Node *n);

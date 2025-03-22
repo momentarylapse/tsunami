@@ -43,10 +43,13 @@ public:
 
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
+	float brightness() const;
+	float hue() const;
+	float saturation() const;
 
 
 	static color _cdecl create_save(float r, float g, float b, float a);
-	static color _cdecl hsb(float a, float hue, float saturation, float brightness);
+	static color _cdecl hsb(float hue, float saturation, float brightness, float a);
 	static color _cdecl interpolate(const color &a, const color &b, float t);
 	static color _cdecl from_int_rgb(int *i);
 	static color _cdecl from_int_argb(int *i);

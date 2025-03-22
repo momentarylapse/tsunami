@@ -18,6 +18,11 @@ mat3::mat3(const float f[9]) {
 		e[i]=f[i];
 }
 
+mat3::mat3(const vec3& a, const vec3& b, const vec3& c) {
+	_00 = a.x; _01 = b.x; _02 = c.x;
+	_10 = a.y; _11 = b.y; _12 = c.y;
+	_20 = a.z; _21 = b.z; _22 = c.z;
+}
 
 mat3 mat3::operator + (const mat3 &m) const {
 	mat3 r;

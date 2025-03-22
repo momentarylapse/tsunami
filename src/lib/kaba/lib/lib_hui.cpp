@@ -14,9 +14,10 @@
 	#include "../../hui_minimal/config.h"
 	#define KABA_EXPORT_HUI_MINIMAL
 #else
-	#error("we are re screwed.... no hui or hui_minimal")
+	#warning("we are screwed.... no hui or hui_minimal")
 #endif
 
+#if defined(KABA_EXPORT_HUI_MINIMAL) || defined(KABA_EXPORT_HUI)
 
 namespace hui{
 #ifdef KABA_EXPORT_HUI_MINIMAL
@@ -726,3 +727,14 @@ void SIAddPackageHui(Context *c) {
 }
 
 };
+
+#else
+namespace kaba {
+
+	void SIAddPackageHui(Context *c) {
+		add_package(c, "hui");
+	}
+
+};
+
+#endif

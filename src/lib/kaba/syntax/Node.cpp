@@ -41,6 +41,8 @@ string kind2str(NodeKind kind) {
 		return "special function name";
 	if (kind == NodeKind::Operator)
 		return "operator";
+	if (kind == NodeKind::NamedParameter)
+		return "named parameter";
 	if (kind == NodeKind::AbstractToken)
 		return "token";
 	if (kind == NodeKind::AbstractOperator)
@@ -568,6 +570,17 @@ shared<Node> make_constructor_static(shared<Node> n, const string &name) {
 			return nn;
 		}
 	return n;
+}
+
+shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, shared<Node> param) {
+	auto n = new Node(NodeKind::NamedParameter, 0, param->type, Flags::None, name_token_id);
+	n->set_num_params(2);
+	n->set_param(0, add_node_token(tree, name_token_id));
+	n->set_param(1, param);
+	return n;
+}
+shared<Node> add_node_token(SyntaxTree* tree, int token_id) {
+	return new Node(NodeKind::AbstractToken, (int_p)tree, TypeUnknown, Flags::None, token_id);
 }
 
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {

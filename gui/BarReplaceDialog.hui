@@ -2,6 +2,7 @@ Dialog bar-replace-dialog "Replace bars" width=350 height=80 headerbar closebutt
 	Grid ? "" vertical
 		Grid ? "" vertical
 			Label t_info "Keeping the overall duration" expandx center italic
+			RadioButton type:bars "Bars"
 			Grid ? ""
 				Label t_number "Number" right disabled
 				SpinButton number "1" range=1:1000:1 expandx
@@ -15,6 +16,10 @@ Dialog bar-replace-dialog "Replace bars" width=350 height=80 headerbar closebutt
 				---|
 				Label t_result_bpm "=> Bpm" right disabled
 				Label result_bpm "" bold
+			RadioButton type:pause "Pause"
+			Grid ? ""
+				Label t_result_duration "=> Duration" right disabled
+				Label result_duration "" bold
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			---|

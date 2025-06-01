@@ -34,6 +34,13 @@ public:
 	void on_pattern();
 	void update_result_bpm();
 	void on_shift_data();
+
+	enum class Type {
+		Bars,
+		Pause
+	};
+	Type type;
+	void on_type(Type type);
 };
 
 }

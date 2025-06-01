@@ -1117,20 +1117,10 @@ void TsunamiWindow::on_edit_bars_speed() {
 void TsunamiWindow::on_replace_bars() {
 	if (view->sel._bars.num == 0)
 		return;
-	int num_bars = 0;
-	int num_pauses = 0;
-	for (int i: view->sel.bar_indices(song)) {
-		if (song->bars[i]->is_pause())
-			num_pauses++;
-		else
-			num_bars++;
-	}
-	if (num_bars > 0 and num_pauses == 0) {
+	if (view->sel.bar_indices(song).num > 0) {
 		hui::fly(new BarReplaceDialog(win, song, view->sel.bar_indices(song)));
-	} else if (num_bars == 0 and num_pauses == 1) {
-		hui::fly(new PauseEditDialog(win, song, view->sel.bar_indices(song)[0]));
 	} else {
-		session->e(_("Can only edit bars or a single pause at a time."));
+		session->e(_("No bars or pauses selected."));
 	}
 }
 

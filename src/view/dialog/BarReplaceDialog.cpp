@@ -24,6 +24,8 @@ BarReplaceDialog::BarReplaceDialog(hui::Window *parent, Song *_song, const Array
 		duration += song->bars[i]->length;
 
 	new_bar = song->bars[sel[0]]->pattern();
+	if (song->bars[sel[0]]->is_pause())
+		new_bar = BarPattern(duration, 4, 1);
 
 	set_int("number", sel.num);
 	set_int("beats", new_bar.beats.num);
@@ -36,10 +38,13 @@ BarReplaceDialog::BarReplaceDialog(hui::Window *parent, Song *_song, const Array
 	check("complex", !new_bar.is_uniform());
 	hide_control("beats", !new_bar.is_uniform());
 	hide_control("pattern", new_bar.is_uniform());
+	set_string("result_duration", song->get_time_str_long(duration));
+	check("type:bars", true);
 	check("shift-data", bar_dialog_move_data);
 	check("scale-audio", bar_dialog_scale_audio);
 	enable("scale-audio", bar_dialog_move_data);
 
+	on_type(Type::Bars);
 	update_result_bpm();
 
 	event("ok", [this] { on_ok(); });
@@ -51,6 +56,8 @@ BarReplaceDialog::BarReplaceDialog(hui::Window *parent, Song *_song, const Array
 	event("number", [this] { on_number(); });
 	event("complex", [this] { on_complex(); });
 	event("shift-data", [this] { on_shift_data(); });
+	event("type:bars", [this] { on_type(Type::Bars); });
+	event("type:pause", [this] { on_type(Type::Pause); });
 }
 
 void BarReplaceDialog::on_ok() {
@@ -58,23 +65,18 @@ void BarReplaceDialog::on_ok() {
 
 	int number = get_int("number");
 
-	//if (number != sel.num){
+	if (type == Type::Bars) {
 		foreachb(int i, sel)
 			song->delete_bar(i, false);
 		new_bar.length = duration / number;
 		for (int i=0; i<number; i++)
 			song->add_bar(sel[0], new_bar, BarEditMode::Ignore);
-	/*}else{
-		foreachb(int i, sel){
-			BarPattern b = *song->bars[i];
-			b.num_beats = new_bar.num_beats;
-			b.num_sub_beats = new_bar.num_sub_beats;
-			//set_bar_pattern(b, get_string("pattern"));
-			b.set_pattern(new_bar.pattern);
-			b.length = duration / number;
-			song->edit_bar(i, b, Bar::EditMode::IGNORE);
-		}
-	}*/
+	} else {
+		foreachb(int i, sel)
+			song->delete_bar(i, false);
+		new_bar = BarPattern(duration, 0, 1);
+		song->add_bar(sel[0], new_bar, BarEditMode::Ignore);
+	}
 	song->end_action_group();
 
 	request_destroy();
@@ -120,5 +122,17 @@ void BarReplaceDialog::update_result_bpm() {
 void BarReplaceDialog::on_shift_data() {
 	enable("scale-audio", is_checked(""));
 }
+
+void BarReplaceDialog::on_type(Type _type) {
+	type = _type;
+	enable("number", type == Type::Bars);
+	enable("beats", type == Type::Bars);
+	enable("pattern", type == Type::Bars);
+	enable("complex", type == Type::Bars);
+	enable("divisor", type == Type::Bars);
+	enable("result_bpm", type == Type::Bars);
+	enable("result_duration", type == Type::Pause);
+}
+
 
 }

@@ -685,17 +685,23 @@ Grid
 vertical
 0
 0
-2
+5
 Label
 t_info
 expandx,center,italic
 0
 0
 0
+RadioButton
+type:bars
+
+1
+0
+0
 Grid
 ?
 
-1
+2
 0
 8
 Label
@@ -757,6 +763,30 @@ result_bpm
 bold
 1
 2
+0
+RadioButton
+type:pause
+
+3
+0
+0
+Grid
+?
+
+4
+0
+2
+Label
+t_result_duration
+right,disabled
+0
+0
+0
+Label
+result_duration
+bold
+1
+0
 0
 Grid
 ?
@@ -9360,7 +9390,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-813
+816
 # Text
 /bars-add
 Add bars...
@@ -9375,7 +9405,7 @@ Delete
 Edit...
 
 /bars-edit-speed
-Edit speed...
+Edit speed/duration...
 
 /bars-replace
 Replace...
@@ -9853,6 +9883,15 @@ Number
 
 bar-replace-dialog/t_result_bpm
 => Bpm
+
+bar-replace-dialog/t_result_duration
+=> Duration
+
+bar-replace-dialog/type:bars
+Bars
+
+bar-replace-dialog/type:pause
+Pause
 
 bar_add_dialog/bad_t_beats
 Beats

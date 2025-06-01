@@ -11,8 +11,7 @@
 
 #include "math.h"
 
-class vec2 {
-public:
+struct vec2 {
 	float x, y;
 	vec2(){};
 	vec2(float x, float y);
@@ -51,5 +50,12 @@ public:
 	static vec2 bary_centric(const vec2 &P,const vec2 &A,const vec2 &B, const vec2 &C);
 
 	static const vec2 ZERO, EX, EY;
+};
+
+
+struct ivec2 {
+	int i,j;
+
+	string str() const;
 };
 

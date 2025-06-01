@@ -8,55 +8,54 @@ class Exception;
 
 #define REGEX_MAX_MATCHES			128
 
-class string;
+struct string;
 
-class bytes : public Array<char> {
-	public:
+struct bytes : Array<char> {
 
 	// constructors
 	bytes();
 	bytes(const bytes &s);
-	bytes(bytes &&s);
+	bytes(bytes &&s) noexcept;
 	bytes(const char *str);
 	bytes(const void *str, int l);
-	void _cdecl __init__();
+	void __init__();
 	~bytes();
 
 	// functions
-	void _cdecl add(unsigned char c)
+	void add(unsigned char c)
 	{	append_1_single(c);	}
-	void _cdecl insert(int pos, unsigned char c)
+	void insert(int pos, unsigned char c)
 	{	resize(num + 1);	for (int i=num-2;i>=pos;i--) (*this)[i+1] = (*this)[i];	(*this)[pos] = c;	}
-	void _cdecl erase(int index)
+	void erase(int index)
 	{	delete_single(index);	}
-	string _cdecl hex() const;
-	int _cdecl hash() const;
-	string _cdecl md5() const;
-	int _cdecl compare(const bytes &s) const;
-	bytes _cdecl repeat(int n) const;
-	bytes _cdecl sub(int start, int end = MAGIC_END_INDEX) const;
-	bytes _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const;
+	string hex() const;
+	int hash() const;
+	string md5() const;
+	int compare(const bytes &s) const;
+	bytes repeat(int n) const;
+	bytes sub(int start, int end = MAGIC_END_INDEX) const;
+	bytes sub_ref(int start, int end = MAGIC_END_INDEX) const;
 
 	// operators
-	void _cdecl operator = (const bytes &s)
+	void operator = (const bytes &s)
 	{	simple_assign(&s);	}
-	void _cdecl operator = (bytes &&s);
-	void _cdecl operator += (const bytes &s)
+	void operator = (bytes &&s);
+	void operator += (const bytes &s)
 	{	simple_append(&s);	}
-	bytes _cdecl operator + (const bytes &s) const
+	bytes operator + (const bytes &s) const
 	{	bytes r = *this;	r += s;	return r;	}
-	friend bytes _cdecl operator + (const char *s1, const bytes &s2)
+	friend bytes operator + (const char *s1, const bytes &s2)
 	{	return bytes(s1) + s2;	}
-	bool _cdecl operator == (const bytes &s) const;
-	bool _cdecl operator != (const bytes &s) const
+	bool operator == (const bytes &s) const;
+	bool operator != (const bytes &s) const
 	{	return !(*this == s);	}
-	bool _cdecl operator < (const bytes &s) const
+	bool operator < (const bytes &s) const
 	{	return compare(s) < 0;	}
-	bool _cdecl operator > (const bytes &s) const
+	bool operator > (const bytes &s) const
 	{	return compare(s) > 0;	}
-	bool _cdecl operator <= (const bytes &s) const
+	bool operator <= (const bytes &s) const
 	{	return compare(s) <= 0;	}
-	bool _cdecl operator >= (const bytes &s) const
+	bool operator >= (const bytes &s) const
 	{	return compare(s) >= 0;	}
 	unsigned char operator[] (int index) const
 	{	return ((unsigned char*)data)[index];	}
@@ -64,15 +63,14 @@ class bytes : public Array<char> {
 	{	return ((unsigned char*)data)[index];	}
 	unsigned char &_cdecl back()
 	{	return (*this)[num - 1];	}
-	unsigned char _cdecl back() const
+	unsigned char back() const
 	{	return (*this)[num - 1];	}
 };
 
 //--------------------------------------------------------------
 // cool string class
 
-class string : public bytes {
-	public:
+struct string : bytes {
 
 	// constructors
 	string();
@@ -87,67 +85,67 @@ class string : public bytes {
 #endif
 
 	// functions
-	string _cdecl repeat(int n) const;
-	int _cdecl find(const string &s, int start = 0) const;
-	int _cdecl rfind(const string &s, int start = -1) const;
+	string repeat(int n) const;
+	int find(const string &s, int start = 0) const;
+	int rfind(const string &s, int start = -1) const;
 	bool has_char(char c) const;
-	string _cdecl sub(int start, int end = MAGIC_END_INDEX) const;
-	string _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const;
-	string _cdecl head(int size) const;
-	string _cdecl tail(int size) const;
-	int _cdecl icompare(const string &s) const;
-	void _cdecl _replace0(int start, int length, const string &s);
-	string _cdecl replace(const string &sub, const string &by) const;
-	string _cdecl reverse() const;
-	string _cdecl trim() const;
-	Array<string> _cdecl explode(const string &s) const;
-	Array<string> _cdecl split_any(const string &splitters) const;
-	Array<string> _cdecl parse_tokens(const string &splitters = "") const;
-	string _cdecl lower() const;
-	string _cdecl upper() const;
-	string _cdecl unhex() const;
-	bool _cdecl match(const string &glob) const;
+	string sub(int start, int end = MAGIC_END_INDEX) const;
+	string sub_ref(int start, int end = MAGIC_END_INDEX) const;
+	string head(int size) const;
+	string tail(int size) const;
+	int icompare(const string &s) const;
+	void _replace0(int start, int length, const string &s);
+	string replace(const string &sub, const string &by) const;
+	string reverse() const;
+	string trim() const;
+	Array<string> explode(const string &s) const;
+	Array<string> split_any(const string &splitters) const;
+	Array<string> parse_tokens(const string &splitters = "") const;
+	string lower() const;
+	string upper() const;
+	string unhex() const;
+	bool match(const string &glob) const;
 	string repr() const;
 	string escape() const;
 	string unescape() const;
-	int _cdecl utf8len() const;
+	int utf8len() const;
 	string utf16_to_utf8() const;
 	string latin_to_utf8() const;
 	Array<int> utf8_to_utf32() const;
 	Array<int> utf16_to_utf32() const;
-	int _cdecl _int() const;
-	int64 _cdecl i64() const;
-	float _cdecl _float() const;
-	double _cdecl f64() const;
-	bool _cdecl _bool() const;
+	int _int() const;
+	int64 i64() const;
+	float _float() const;
+	double f64() const;
+	bool _bool() const;
 	const char *c_str() const;
 
 
 	// operators
-	void _cdecl operator = (const string &s)
+	void operator = (const string &s)
 	{	simple_assign(&s);	}
-	void _cdecl operator = (string &&s)
+	void operator = (string &&s)
 	{	exchange(s);	}
-	void _cdecl operator += (const string &s)
+	void operator += (const string &s)
 	{	simple_append(&s);	}
-	string _cdecl operator + (const string &s) const
+	string operator + (const string &s) const
 	{	string r = *this;	r += s;	return r;	}
-	friend string _cdecl operator + (const char *s1, const string &s2)
+	friend string operator + (const char *s1, const string &s2)
 	{	return string(s1) + s2;	}
 #if __cpp_char8_t
-	friend string _cdecl operator + (const char8_t *s1, const string &s2)
+	friend string operator + (const char8_t *s1, const string &s2)
 	{	return string(s1) + s2;	}
 #endif
-	bool _cdecl operator == (const string &s) const;
-	bool _cdecl operator != (const string &s) const
+	bool operator == (const string &s) const;
+	bool operator != (const string &s) const
 	{	return !(*this == s);	}
-	bool _cdecl operator < (const string &s) const
+	bool operator < (const string &s) const
 	{	return compare(s) < 0;	}
-	bool _cdecl operator > (const string &s) const
+	bool operator > (const string &s) const
 	{	return compare(s) > 0;	}
-	bool _cdecl operator <= (const string &s) const
+	bool operator <= (const string &s) const
 	{	return compare(s) <= 0;	}
-	bool _cdecl operator >= (const string &s) const
+	bool operator >= (const string &s) const
 	{	return compare(s) >= 0;	}
 };
 
@@ -174,15 +172,15 @@ string format(const string &s, T value, Args... args) {
 string format(const string &s);
 
 
-string _cdecl i2s(int i);
-string _cdecl i642s(int64 i);
-string _cdecl i2s2(int i, int l);
-string _cdecl f2s(float f, int dez);
-string _cdecl f642s(double f, int dez);
-string _cdecl f2sf(float f);
-string _cdecl f642sf(double f);
-string _cdecl b2s(bool b);
-string _cdecl p2s(const void *p);
+string i2s(int i);
+string i642s(int64 i);
+string i2s2(int i, int l);
+string f2s(float f, int dez);
+string f642s(double f, int dez);
+string f2sf(float f);
+string f642sf(double f);
+string b2s(bool b);
+string p2s(const void *p);
 
 template<class T>
 string str(const T &t) {
@@ -219,23 +217,23 @@ string str(const Array<T> &a) {
 }
 
 
-int _cdecl s2i(const string &s);
-bool _cdecl s2b(const string &s);
-float _cdecl s2f(const string &s);
-double _cdecl s2f64(const string &s);
+int s2i(const string &s);
+bool s2b(const string &s);
+float s2f(const string &s);
+double s2f64(const string &s);
 
 bool str_is_integer(const string &s);
 bool str_is_float(const string &s);
 
-string _cdecl d2h(const void *data, int bytes);
-string _cdecl i2h(int64, int bytes);
-string _cdecl h2d(const string &hex_str, int bytes);
+string d2h(const void *data, int bytes);
+string i2h(int64, int bytes);
+string h2d(const string &hex_str, int bytes);
 
-string _cdecl implode(const Array<string> &a, const string &glue);
-string _cdecl utf32_to_utf8(const Array<int> &s);
+string implode(const Array<string> &a, const string &glue);
+string utf32_to_utf8(const Array<int> &s);
 
 
-bool _cdecl sa_contains(const Array<string> &a, const string &s);
+bool sa_contains(const Array<string> &a, const string &s);
 
 //--------------------------------------------------------------
 // regular expressions

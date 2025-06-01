@@ -17,6 +17,7 @@ namespace nix {
 const int TYPE_LAYOUT = -41;
 const int TYPE_MODULE = -42;
 
+bool default_shader_bindings = true;
 
 
 
@@ -65,9 +66,9 @@ Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 			has_fragment = true;
 		} else if (tag == "ComputeShader") {
 			p.type = GL_COMPUTE_SHADER;
-		} else if (tag == "TessControlShader") {
+		} else if (tag == "TesselationControlShader") {
 			p.type = GL_TESS_CONTROL_SHADER;
-		} else if (tag == "TessEvaluationShader") {
+		} else if (tag == "TesselationEvaluationShader") {
 			p.type = GL_TESS_EVALUATION_SHADER;
 		} else if (tag == "GeometryShader") {
 			p.type = GL_GEOMETRY_SHADER;
@@ -223,7 +224,8 @@ void Shader::update(const string &source) {
 	program = prog;
 	ctx->shader_error = "";
 
-	find_locations();
+	//if (default_shader_bindings)
+		find_locations();
 }
 xfer<Shader> Shader::create(Context* ctx, const string &source) {
 	auto s = new Shader(ctx);
@@ -253,10 +255,12 @@ void Shader::find_locations() {
 	location[LOCATION_MATERIAL_METAL] = get_location("material.metal");
 	location[LOCATION_MATERIAL_EMISSION] = get_location("material.emission");
 
-	link_uniform_block("Matrix", 0);
-	link_uniform_block("LightData", 1);
-	link_uniform_block("Material", 2);
-	link_uniform_block("Fog", 3);
+	if (default_shader_bindings) {
+		link_uniform_block("Matrix", 0);
+		link_uniform_block("LightData", 1);
+		link_uniform_block("Material", 2);
+		link_uniform_block("Fog", 3);
+	}
 }
 
 xfer<Shader> Shader::load(Context *ctx, const Path &filename) {
@@ -389,6 +393,7 @@ void Shader::set_default_data() {
 		set_int_l(location[LOCATION_TEX + i], i);
 	if (tex_cube_level >= 0)
 		set_int_l(location[LOCATION_TEX_CUBE], tex_cube_level);
+
 	set_color_l(location[LOCATION_MATERIAL_ALBEDO], material.albedo);
 	set_float_l(location[LOCATION_MATERIAL_ROUGHNESS], material.roughness);
 	set_float_l(location[LOCATION_MATERIAL_METAL], material.metal);

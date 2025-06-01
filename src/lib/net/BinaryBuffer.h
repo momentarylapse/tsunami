@@ -11,7 +11,7 @@
 
 #include "../base/base.h"
 
-class vec3;
+struct vec3;
 
 
 class BinaryBuffer {

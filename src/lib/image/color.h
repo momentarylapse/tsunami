@@ -5,8 +5,7 @@
 
 #include "../base/base.h"
 
-class color {
-public:
+struct color {
 	float r,g,b,a;
 	color() {};
 	color(float a,float r,float g,float b)
@@ -44,6 +43,7 @@ public:
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
 	float brightness() const;
+	float hsb_brightness() const;
 	float hue() const;
 	float saturation() const;
 

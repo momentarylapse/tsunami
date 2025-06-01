@@ -12,9 +12,9 @@
 #include "../math/vec2.h"
 
 class Image;
-class color;
-class rect;
-class vec2;
+struct color;
+struct rect;
+struct vec2;
 
 class Painter : public VirtualBase {
 public:

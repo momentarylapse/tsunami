@@ -6,15 +6,14 @@
 
 //#define _element(row,col)	e[row+col*4]
 
-class mat4;
-class vec3;
-class quaternion;
-class plane;
+struct mat4;
+struct vec3;
+struct quaternion;
+struct plane;
 //matrix MatrixMultiply2(const matrix &m2, const matrix &m1);
 
 
-class mat4 {
-public:
+struct mat4 {
 	union {
 		struct {
 			// "OpenGL" column major order

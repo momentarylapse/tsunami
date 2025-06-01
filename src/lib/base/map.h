@@ -24,8 +24,7 @@ public:
 };
 
 template<class K, class V>
-class map : public set<MapEntry<K, V>> {
-public:
+struct map : set<MapEntry<K, V>> {
 	using KeyType = K;
 	using ValueType = V;
 	using Entry = MapEntry<K, V>;
@@ -151,12 +150,11 @@ struct HashMapEntry {
 };
 
 template<class K, class V>
-class hash_map : public set<HashMapEntry<K, V>> {
-public:
+struct hash_map : set<HashMapEntry<K, V>> {
 	typedef HashMapEntry<K, V> Entry;
 	using DynamicArray::num;
 	using DynamicArray::data;
-	int _cdecl add(const K &key, const V &value) {
+	int add(const K &key, const V &value) {
 		HashMapEntry<K, V> e = {key, key.hash(), value};
 		return ::base::set<HashMapEntry<K, V>>::add(e);
 	}

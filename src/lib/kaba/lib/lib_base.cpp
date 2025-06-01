@@ -13,7 +13,6 @@
 #include "../../os/terminal.h"
 #include "../../base/callable.h"
 #include "../../base/map.h"
-#include <algorithm>
 #include <math.h>
 #include <cstdio>
 
@@ -190,6 +189,16 @@ string kaba_int_format(int i, const string &fmt) {
 	}
 }
 
+string kaba_int64_format(int64 i, const string &fmt) {
+	try {
+		if (fmt.tail(1) == "x")
+			return _xf_str_<int64>(fmt, i);
+		return _xf_str_<int64>(fmt + "d", i);
+	} catch(::Exception &e) {
+		return "{ERROR: " + e.message() + "}";
+	}
+}
+
 string kaba_i16_to_str(short w) {
 	return str((int)w);
 }
@@ -210,9 +219,17 @@ string kaba_float2str(float f) {
 	return f2s(f, 6);
 }
 
-string kaba_float_format(float f, const string &fmt) {
+string kaba_f32_format(float f, const string &fmt) {
 	try {
 		return _xf_str_<float>(fmt + "f", f);
+	} catch(::Exception &e) {
+		return "{ERROR: " + e.message() + "}";
+	}
+}
+
+string kaba_f64_format(double f, const string &fmt) {
+	try {
+		return _xf_str_<double>(fmt + "f", f);
 	} catch(::Exception &e) {
 		return "{ERROR: " + e.message() + "}";
 	}
@@ -661,6 +678,8 @@ void SIAddPackageBase(Context *c) {
 
 	add_class(TypeInt64);
 		class_add_func(Identifier::func::Str, TypeString, &i642s, Flags::Pure);
+		class_add_func(Identifier::func::Format, TypeString, &kaba_int64_format, Flags::Pure);
+			func_add_param("fmt", TypeString);
 		class_add_func("__i32__", TypeInt32, &kaba_cast<int64,int>, Flags::Pure);
 			func_set_inline(InlineID::Int64ToInt32);
 		add_operator(OperatorID::Assign, TypeVoid, TypeInt64, TypeInt64, InlineID::Int64Assign);
@@ -692,7 +711,7 @@ void SIAddPackageBase(Context *c) {
 		class_add_func(Identifier::func::Str, TypeString, &kaba_float2str, Flags::Pure);
 		class_add_func("str2", TypeString, &f2s, Flags::Pure);
 			func_add_param("decimals", TypeInt32);
-		class_add_func(Identifier::func::Format, TypeString, &kaba_float_format, Flags::Pure);
+		class_add_func(Identifier::func::Format, TypeString, &kaba_f32_format, Flags::Pure);
 			func_add_param("fmt", TypeString);
 		class_add_func("__i32__", TypeInt32, &kaba_cast<float,int>, Flags::Pure);
 			func_set_inline(InlineID::FloatToInt32);    // sometimes causes floating point exceptions...
@@ -719,6 +738,8 @@ void SIAddPackageBase(Context *c) {
 
 	add_class(TypeFloat64);
 		class_add_func(Identifier::func::Str, TypeString, &kaba_float642str, Flags::Pure);
+		class_add_func(Identifier::func::Format, TypeString, &kaba_f64_format, Flags::Pure);
+			func_add_param("fmt", TypeString);
 		class_add_func("__f32__", TypeFloat32, &kaba_cast<double,float>, Flags::Pure);
 			func_set_inline(InlineID::Float64ToFloat32);
 		class_add_func("__i32__", TypeInt32, &kaba_cast<double,int>, Flags::Pure);

@@ -15,48 +15,46 @@
 
 
 
-class DynamicArray {
-public:
+struct DynamicArray {
 	static const int MAGIC_END_INDEX;
-	void _cdecl init(int _element_size_);
-	void _cdecl simple_reserve(int size);
-	void _cdecl simple_resize(int size);
-	void _cdecl insert_blank(int pos);
-	void _cdecl simple_append(const DynamicArray *a);
-	void _cdecl simple_assign(const DynamicArray *a);
-	void _cdecl exchange(DynamicArray &a);
-	void _cdecl append_p_single(void *p);
-	void _cdecl append_4_single(int x);
-	void _cdecl append_f_single(float x);
-	void _cdecl append_d_single(double x);
-	void _cdecl append_1_single(char x);
-	void _cdecl append_single(const void *d);
-	void _cdecl insert_p_single(void *p, int index);
-	void _cdecl insert_4_single(int x, int index);
-	void _cdecl insert_f_single(float x, int index);
-	void _cdecl insert_d_single(double x, int index);
-	void _cdecl insert_1_single(char x, int index);
-	void _cdecl insert_single(const void *d, int index);
-	void _cdecl delete_single(int index);
-	void _cdecl simple_swap(int i1, int i2);
-	void _cdecl simple_move(int source, int target);
-	void _cdecl reverse();
-	DynamicArray _cdecl ref_subarray(int start, int end = MAGIC_END_INDEX) const;
-	int _cdecl simple_index(const void *p) const;
+	void init(int _element_size_);
+	void simple_reserve(int size);
+	void simple_resize(int size);
+	void insert_blank(int pos);
+	void simple_append(const DynamicArray *a);
+	void simple_assign(const DynamicArray *a);
+	void exchange(DynamicArray &a);
+	void append_p_single(void *p);
+	void append_4_single(int x);
+	void append_f_single(float x);
+	void append_d_single(double x);
+	void append_1_single(char x);
+	void append_single(const void *d);
+	void insert_p_single(void *p, int index);
+	void insert_4_single(int x, int index);
+	void insert_f_single(float x, int index);
+	void insert_d_single(double x, int index);
+	void insert_1_single(char x, int index);
+	void insert_single(const void *d, int index);
+	void delete_single(int index);
+	void simple_swap(int i1, int i2);
+	void simple_move(int source, int target);
+	void reverse();
+	DynamicArray ref_subarray(int start, int end = MAGIC_END_INDEX) const;
+	int simple_index(const void *p) const;
 	void* simple_element(int index);
-	void _cdecl simple_clear();
+	void simple_clear();
 
 	// reference arrays
-	void _cdecl forget();
-	bool _cdecl is_ref() const;
+	void forget();
+	bool is_ref() const;
 
 	void *data;
 	int num, allocated, element_size;
 };
 
 template<class T> //requires std::is_copy_assignable_v<T>
-class Array : public DynamicArray {
-public:
+struct Array : DynamicArray {
 	Array() {
 		init(sizeof(T));
 	}
@@ -85,18 +83,18 @@ public:
 	~Array() {
 		clear();
 	}
-	void _cdecl clear() {
+	void clear() {
 		if (allocated > 0) {
 			for (int i=0; i<num; i++)
 				(*this)[i].~T();
 		}
 		simple_clear();
 	}
-	void _cdecl add(const T &item) /*requires std::is_copy_assignable_v<T>*/ {
+	void add(const T &item) /*requires std::is_copy_assignable_v<T>*/ {
 		resize(num + 1);
 		(*this)[num - 1] = item;
 	}
-	T _cdecl pop() {
+	T pop() {
 		T r{};
 		if (num > 0) {
 			//memcpy(&r, &back(), element_size);
@@ -106,20 +104,20 @@ public:
 		}
 		return r;
 	}
-	void _cdecl append(const Array<T> &a) /*requires std::is_copy_assignable_v<T>*/ {
+	void append(const Array<T> &a) /*requires std::is_copy_assignable_v<T>*/ {
 		int num0 = num;
 		resize(num + a.num);
 		for (int i=0; i<a.num; i++)
 			(*this)[num0 + i] = a[i];
 	}
-	void _cdecl erase(int index) {
+	void erase(int index) {
 		if ((index >= 0) and (index < num)) {
 			for (int i=index; i<num-1; i++)
 				(*this)[i] = std::move((*this)[i+1]);
 			resize(num - 1);
 		}
 	}
-	void _cdecl insert(const T &item, int index) {
+	void insert(const T &item, int index) {
 		resize(num + 1);
 		if (index < num-1)
 			for (int i=num-1; i>index; i--)
@@ -147,7 +145,7 @@ public:
 			clear();
 		}
 	}
-	void _cdecl resize(int size) {
+	void resize(int size) {
 		if (size < num) {
 			// shrink -> destruct
 			for (int i=size; i<num; i++)
@@ -190,7 +188,7 @@ public:
 		return -1;
 	}
 	template<class O>
-	O _cdecl sub_ref_as(int start, int end = MAGIC_END_INDEX) const {
+	O sub_ref_as(int start, int end = MAGIC_END_INDEX) const {
 		//return reinterpret_cast<Array<T>>(DynamicArray::ref_subarray(start, end));
 		O s;
 		if (start < 0)
@@ -206,10 +204,10 @@ public:
 		s.data = ((T*)this->data) + start;
 		return s;
 	}
-	const Array<T> _cdecl sub_ref(int start, int end = MAGIC_END_INDEX) const {
+	const Array<T> sub_ref(int start, int end = MAGIC_END_INDEX) const {
 		return sub_ref_as<Array<T>>(start, end);
 	}
-	Array<T> _cdecl sub_ref_nc(int start, int end = MAGIC_END_INDEX) {
+	Array<T> sub_ref_nc(int start, int end = MAGIC_END_INDEX) {
 		return sub_ref_as<Array<T>>(start, end);
 	}
 
@@ -261,7 +259,7 @@ public:
 	}
 
 	// reference arrays
-	void _cdecl set_ref(const Array<T> &a) {
+	void set_ref(const Array<T> &a) {
 		if (this != &a) {
 			clear();
 			num = a.num;
@@ -270,7 +268,7 @@ public:
 			allocated = 0;
 		}
 	}
-	void _cdecl make_own() {
+	void make_own() {
 		if (!is_ref())
 			return;
 		T *dd = (T*)data;
@@ -282,8 +280,7 @@ public:
 	}
 
 	// iterators
-	class Iterator {
-	public:
+	struct Iterator {
 		void operator ++()
 		{	index ++;	p ++;	}
 		void operator ++(int) // postfix

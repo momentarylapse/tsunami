@@ -167,14 +167,35 @@ float color::brightness() const {
 	return (r + g + b) / 3.0f;
 }
 
+float color::hsb_brightness() const {
+	return max(r, max(g, b));
+}
+
 float color::hue() const {
-	// TODO
-	return 0;
+	float _min = min(r, min(g, b));
+	float _max = hsb_brightness();
+	if (_max == _min)
+		return 0;
+
+	if (r >= g and g >= b)
+		return (g - b) / (r - b) / 6;
+	if (g >= r and r >= b)
+		return  (2 - (r - b) / (g - b)) / 6;
+	if (g >= b and b >= r)
+		return  (2 + (b - r) / (g - r)) / 6;
+	if (b >= g and g >= r)
+		return (4 - (g - r) / (b - r)) / 6;
+	if (b >= r and r >= g)
+		return (4 + (r - g) / (b - g)) / 6;
+	//if (r >= b and b >= g)
+	return (6 - (b - g) / (r - g)) / 6;
 }
 
 float color::saturation() const {
-	// TODO
-	return 1;
+	float _min = min(r, min(g, b));
+	float b = hsb_brightness();
+	if (b == 0)
+		return 0;
+	return 1 - _min / b;
 }
-
 

@@ -200,6 +200,11 @@ void generic_delete(T* t) {
 	t->~T();
 }
 
+template<class T>
+void generic_assign(T& a, const T& b) {
+	a = b;
+}
+
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \
 	class_link_vtable(*(void***)&my_instance);}

@@ -68,6 +68,8 @@ void Image::_load_flipped(const Path &filename) {
 void Image::_load(const Path &filename) {
 	_load_flipped(filename);
 	flip_v();
+
+	// the "top left" pixel (0,0) in an editor should be the first element in data now
 }
 
 inline unsigned int image_color_rgba(const color &c) {
@@ -126,6 +128,9 @@ void Image::clear()
 
 xfer<Image> Image::scale(int _width, int _height) const {
 	Image *r = new Image(_width, _height, Black);
+
+	if (width * height == 0)
+		return r;
 
 	for (int x=0;x<_width;x++)
 		for (int y=0;y<_height;y++) {

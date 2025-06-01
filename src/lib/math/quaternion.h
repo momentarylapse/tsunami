@@ -4,12 +4,11 @@
 
 #include "math.h"
 
-class vec3;
-class mat4;
-class string;
+struct vec3;
+struct mat4;
+struct string;
 
-class quaternion {
-public:
+struct quaternion {
 	float x, y, z, w;
 	quaternion(){};
 	quaternion(const float w, const vec3 &v);

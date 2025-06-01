@@ -1574,6 +1574,9 @@ void Parser::parse_enum(Class *_namespace) {
 
 				auto cv = parse_and_eval_const(tree->root_of_all_evil->block.get(), TypeInt32);
 				next_value = cv->as_const()->as_int();
+			} else {
+				// linked from host program?
+				next_value = context->external->process_class_offset(_class->cname(_namespace), c->name, next_value);
 			}
 			c->as_int() = (next_value ++);
 

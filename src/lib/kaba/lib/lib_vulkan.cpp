@@ -174,7 +174,7 @@ public:
 class VulkanGraphicsPipeline : public vulkan::GraphicsPipeline {
 public:
 	void __init__(vulkan::Shader *shader, vulkan::RenderPass *render_pass, int subpass, const string &topology, const string &format) {
-		new(this) vulkan::GraphicsPipeline(shader, render_pass, subpass, topology, format);
+		new(this) vulkan::GraphicsPipeline(shader, render_pass, subpass, vulkan::parse_topology(topology), format);
 	}
 	void __delete__() {
 		this->~VulkanGraphicsPipeline();

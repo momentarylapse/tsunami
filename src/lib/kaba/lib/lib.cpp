@@ -6,9 +6,6 @@
 |                                                                              |
 | last updated: 2010.07.07 (c) by MichiSoft TM                                 |
 \*----------------------------------------------------------------------------*/
-#include <algorithm>
-#include <string.h>
-
 #include "../kaba.h"
 #include "../template/template.h"
 #include "lib.h"

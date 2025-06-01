@@ -7,7 +7,7 @@
 
 #pragma once
 
-class DynamicArray;
+struct DynamicArray;
 
 namespace kaba {
 	

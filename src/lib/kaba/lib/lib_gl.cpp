@@ -317,6 +317,7 @@ void SIAddPackageGl(Context *c) {
 			func_add_param("size", TypeInt32);
 		class_add_func("update", TypeVoid, gl_p(&nix::Buffer::update_array), Flags::Mutable);
 			func_add_param("data", TypeDynamicArray);
+			func_add_param("offset", TypeInt32);
 		class_add_func("read", TypeVoid, gl_p(&nix::Buffer::read));
 			func_add_param("data", TypeReference);
 			func_add_param("size", TypeInt32);

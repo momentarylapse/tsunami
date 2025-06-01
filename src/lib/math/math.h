@@ -14,14 +14,14 @@
 
 #include <cmath>
 
-class color;
-class vec3;
-class plane;
-class complex;
-class mat4;
-class mat3;
-class quaternion;
-class Ray;
+struct color;
+struct vec3;
+struct plane;
+struct complex;
+struct mat4;
+struct mat3;
+struct quaternion;
+struct Ray;
 
 
 #include "../base/base.h"

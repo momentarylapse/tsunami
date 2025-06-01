@@ -10,7 +10,7 @@
 #pragma once
 
 class Image;
-class vec2;
+struct vec2;
 
 namespace nix {
 

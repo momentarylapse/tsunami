@@ -16,9 +16,9 @@
 class Path;
 class Painter;
 class Image;
-class color;
-class rect;
-class vec2;
+struct color;
+struct rect;
+struct vec2;
 
 namespace ttf {
 	class TTF;

@@ -34,50 +34,55 @@ void* mf(T tmf) {
 class ExternalLinkData {
 public:
 
-	Context *context;
+	Context* context;
 	struct ExternalLink {
 		string name;
-		void *pointer;
+		void* pointer;
 	};
 	Array<ExternalLink> external_links;
 
-	struct ClassOffsetData {
+	// also enum values
+	struct ClassOffset {
 		string class_name, element;
 		int offset;
 		bool is_virtual;
 	};
-	Array<ClassOffsetData> class_offsets;
+	Array<ClassOffset> class_offsets;
 
-	struct ClassSizeData {
+	struct ClassSize {
 		string class_name;
 		int size;
 	};
-	Array<ClassSizeData> class_sizes;
+	Array<ClassSize> class_sizes;
 
-	ExternalLinkData(Context *c);
+	explicit ExternalLinkData(Context* c);
 
 	void reset();
-	void link(const string &name, void *pointer);
+	void link(const string& name, void* pointer);
 	template<typename T>
-	void link_class_func(const string &name, T pointer) {
+	void link_class_func(const string& name, T pointer) {
 		link(name, mf(pointer));
 	}
-	void declare_class_size(const string &class_name, int offset);
-	void _declare_class_element(const string &name, int offset);
+	void declare_class_size(const string& class_name, int offset);
+	void _declare_class_element(const string& name, int offset);
 	template<class T>
-	void declare_class_element(const string &name, T pointer) {
+	void declare_class_element(const string& name, T pointer) {
 		_declare_class_element(name, *(int*)(void*)&pointer);
 	}
-	void _link_virtual(const string &name, void *p, void *instance);
+	void _link_virtual(const string& name, void* p, void* instance);
 	template<class T>
-	void link_virtual(const string &name, T pointer, void *instance) {
+	void link_virtual(const string& name, T pointer, void* instance) {
 		_link_virtual(name, mf(pointer), instance);
 	}
+	template<class T>
+	void declare_enum(const string& name, T value) {
+		_declare_class_element(name, (int)value);
+	}
 
-	void *get_link(const string &name);
-	int process_class_offset(const string &class_name, const string &element, int offset);
-	int process_class_size(const string &class_name, int size);
-	int process_class_num_virtuals(const string &class_name, int num_virtual);
+	void *get_link(const string& name);
+	int process_class_offset(const string& class_name, const string& element, int offset);
+	int process_class_size(const string& class_name, int size);
+	int process_class_num_virtuals(const string& class_name, int num_virtual);
 
 };
 

@@ -10,7 +10,7 @@
 
 #include <chrono>
 
-class string;
+struct string;
 
 namespace os {
 

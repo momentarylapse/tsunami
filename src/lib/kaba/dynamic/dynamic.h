@@ -1,8 +1,8 @@
 
 #pragma once
 
-class DynamicArray;
-class string;
+struct DynamicArray;
+struct string;
 class Any;
 
 namespace kaba {

@@ -11,7 +11,7 @@
 
 #include "../../base/base.h"
 
-class complex;
+struct complex;
 
 namespace kaba {
 

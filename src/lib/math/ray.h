@@ -11,12 +11,11 @@
 #include "vec3.h"
 #include "../base/optional.h"
 
-class vec3;
-class plane;
+struct vec3;
+struct plane;
 
 
-class Ray {
-public:
+struct Ray {
 	Ray();
 	Ray(const vec3 &a, const vec3 &b);
 	vec3 u, v;

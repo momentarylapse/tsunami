@@ -61,7 +61,7 @@ bytes::bytes(const bytes &s) {
 	simple_assign(&s);
 }
 
-bytes::bytes(bytes &&s) {
+bytes::bytes(bytes &&s) noexcept {
 	init(sizeof(unsigned char));
 	exchange(s);
 	s.clear();
@@ -764,9 +764,9 @@ struct xf_format_data {
 			return s;
 		int len = s.utf8len();
 		if (left_justify)
-			return s + bytes_repeat(" ", width - len);
+			return s + string(" ").repeat(width - len);
 		else
-			return bytes_repeat(" ", width - len) + s;
+			return string(" ").repeat(width - len) + s;
 	}
 };
 
@@ -968,7 +968,7 @@ float string::_float() const {
 // convert a string to a float
 double string::f64() const {
 	bool minus = false;
-	int e = -1;
+	double e = -1;
 	double res = 0;
 	for (int i=0; i<num; i++) {
 		if (e > 0)
@@ -982,7 +982,7 @@ double string::f64() const {
 			if (e < 0)
 				res = res * 10 + (c-48);
 			else
-				res += float(c-48) / (float)e;
+				res += double(c-48) / e;
 		} else if ((c == 'e') or (c == 'E')) {
 			int ex = sub(i+1)._int();
 			res *= pow(10.0, ex);

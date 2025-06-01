@@ -24,8 +24,10 @@ public:
 	Buffer();
 	~Buffer();
 
+	void allocate(int size);
 	void update(const void *data, int size);
-	void update_array(const DynamicArray &a);
+	void update_part(const void *data, int offset, int size);
+	void update_array(const DynamicArray &a, int offset=0);
 
 	void read(void *data, int size);
 	void read_array(DynamicArray &a);

@@ -13,8 +13,7 @@
 
 
 
-class vec4 {
-public:
+struct vec4 {
 	float x, y, z, w;
 	vec4() {}
 	vec4(float x, float y, float z, float w);
@@ -54,8 +53,7 @@ public:
 };
 
 
-class ivec4 {
-public:
+struct ivec4 {
 	int i,j,k,l;
 
 	int find(int x) const;

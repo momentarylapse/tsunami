@@ -1,6 +1,9 @@
 #include "Box.h"
 
 
+const Box Box::ID{{0,0,0}, {1,1,1}};
+const Box Box::ID_SYM{{-1,-1,-1}, {1,1,1}};
+
 vec3 Box::center() const {
 	return (min + max) / 2;
 }
@@ -26,6 +29,11 @@ vec3 Box::to_relative(const vec3& p) const {
 	const vec3 q = p - min;
 	return vec3(q.x / s.x, q.y / s.y, q.z / s.z);
 }
+
+string Box::str() const {
+	return ::str(min) + ":" + ::str(max);
+}
+
 
 Box Box::operator||(const Box& b) const {
 	Box r = *this;

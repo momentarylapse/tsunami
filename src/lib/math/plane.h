@@ -5,12 +5,11 @@
 #include "math.h"
 #include "vec3.h"
 
-class vec3;
-class mat4;
-class vec2;
+struct vec3;
+struct mat4;
+struct vec2;
 
-class plane {
-public:
+struct plane {
 	vec3 n;
 	float d;
 

@@ -4,12 +4,11 @@
 
 #include "math.h"
 
-class mat4;
-class mat3;
-class vec2;
+struct mat4;
+struct mat3;
+struct vec2;
 
-class vec3 {
-public:
+struct vec3 {
 	float x, y, z;
 	vec3(){};
 	vec3(float x, float y, float z);
@@ -83,4 +82,12 @@ bool _vec_between_(const vec3 &v,const vec3 &a,const vec3 &b);
 float _vec_factor_between_(const vec3 &v,const vec3 &a,const vec3 &b);
 
 bool inf_v(const vec3 &v);
+
+
+struct ivec3 {
+	int i,j,k;
+
+	string str() const;
+};
+
 

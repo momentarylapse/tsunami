@@ -4,10 +4,9 @@
 
 #include "math.h"
 
-class vec3;
+struct vec3;
 
-class mat3 {
-public:
+struct mat3 {
 	union {
 		struct {
 			// the squared form of this block is "transposed"!

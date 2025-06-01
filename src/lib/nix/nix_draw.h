@@ -9,7 +9,7 @@
 
 #pragma once
 
-class color;
+struct color;
 
 namespace nix{
 
@@ -20,6 +20,7 @@ void _cdecl clear(const color &c);
 void _cdecl clear_color(const color &c);
 void _cdecl clear_z();
 
+void _cdecl draw(PrimitiveTopology topology, VertexBuffer *vb);
 void _cdecl draw_triangles(VertexBuffer *vb);
 void _cdecl draw_instanced_triangles(VertexBuffer *vb, int count);
 void _cdecl draw_lines(VertexBuffer *vb, bool contiguous);

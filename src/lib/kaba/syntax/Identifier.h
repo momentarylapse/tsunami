@@ -7,7 +7,7 @@
 
 #pragma once
 
-class string;
+struct string;
 
 namespace kaba {
 

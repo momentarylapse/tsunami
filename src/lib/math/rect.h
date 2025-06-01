@@ -3,11 +3,10 @@
 
 #include "math.h"
 
-class string;
-class vec2;
+struct string;
+struct vec2;
 
-class rect {
-public:
+struct rect {
 	float x1, x2, y1, y2;
 	rect() {};
 	rect(float x1, float x2, float y1, float y2);

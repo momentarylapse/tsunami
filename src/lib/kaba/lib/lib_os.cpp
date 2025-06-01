@@ -13,7 +13,7 @@
 #include "../dynamic/exception.h"
 #include "../../base/callable.h"
 
-class vec3;
+struct vec3;
 
 
 namespace kaba {

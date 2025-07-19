@@ -13,7 +13,7 @@
 
 
 class Painter;
-class color;
+struct color;
 
 namespace tsunami {
 

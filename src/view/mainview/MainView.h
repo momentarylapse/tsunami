@@ -9,7 +9,7 @@
 #include "pattern/Observable.h"
 #include "math/vec2.h"
 
-class rect;
+struct rect;
 class Painter;
 namespace scenegraph {
 	class SceneGraph;

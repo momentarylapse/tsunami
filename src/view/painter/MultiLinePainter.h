@@ -14,7 +14,7 @@
 
 class Painter;
 class Any;
-class vec2;
+struct vec2;
 
 namespace tsunami {
 

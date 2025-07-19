@@ -9,7 +9,7 @@
 
 #include "../interface/DeviceContext.h"
 
-class string;
+struct string;
 
 struct pa_context;
 struct pa_threaded_mainloop;

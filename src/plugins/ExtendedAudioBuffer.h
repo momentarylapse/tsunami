@@ -9,7 +9,7 @@
 #define SRC_PLUGINS_EXTENDEDAUDIOBUFFER_H_
 
 #include "../data/audio/AudioBuffer.h"
-class complex;
+struct complex;
 
 namespace tsunami {
 

@@ -10,7 +10,7 @@
 
 
 #include "../../lib/base/base.h"
-class complex;
+struct complex;
 
 float sum(const Array<float> &a);
 float xmax(const Array<float> &a);

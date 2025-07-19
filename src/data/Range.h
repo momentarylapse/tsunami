@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 
-class string;
+struct string;
 
 namespace tsunami {
 

@@ -17,7 +17,7 @@
 #include "../../data/audio/AudioBuffer.h"
 #include <atomic>
 
-class rect;
+struct rect;
 
 namespace tsunami {
 

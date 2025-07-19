@@ -10,7 +10,7 @@
 
 #include "../../../lib/base/base.h"
 
-class color;
+struct color;
 class Painter;
 
 namespace tsunami {

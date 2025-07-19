@@ -15,8 +15,8 @@
 
 
 class Painter;
-class rect;
-class color;
+struct rect;
+struct color;
 
 namespace tsunami {
 

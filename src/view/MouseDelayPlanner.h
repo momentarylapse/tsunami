@@ -12,7 +12,7 @@
 #include <functional>
 
 class Painter;
-class vec2;
+struct vec2;
 
 namespace scenegraph {
 	class SceneGraph;

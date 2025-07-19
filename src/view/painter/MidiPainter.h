@@ -17,7 +17,7 @@
 #include "../../data/Range.h"
 #include "../../data/midi/Scale.h"
 
-class color;
+struct color;
 class Painter;
 
 namespace tsunami {

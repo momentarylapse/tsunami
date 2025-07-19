@@ -11,7 +11,7 @@
 #include "../../lib/base/base.h"
 
 class Painter;
-class vec2;
+struct vec2;
 
 namespace tsunami {
 

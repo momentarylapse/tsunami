@@ -8,10 +8,10 @@
 #pragma once
 
 class Painter;
-class rect;
-class vec2;
-class string;
-class color;
+struct rect;
+struct vec2;
+struct string;
+struct color;
 
 color color_heat_map(float f);
 

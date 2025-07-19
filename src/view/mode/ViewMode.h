@@ -12,9 +12,9 @@
 #include "../../lib/base/set.h"
 
 class Painter;
-class rect;
-class color;
-class vec2;
+struct rect;
+struct color;
+struct vec2;
 
 namespace tsunami {
 

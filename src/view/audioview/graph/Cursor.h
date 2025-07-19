@@ -11,7 +11,7 @@
 #include "../../helper/graph/Node.h"
 #include "../../../data/Range.h"
 
-class color;
+struct color;
 
 namespace tsunami {
 

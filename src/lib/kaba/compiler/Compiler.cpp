@@ -584,16 +584,21 @@ DynamicLibraryImport *get_dynamic_lib(const string &libname, Module *s) {
 	auto *d = new DynamicLibraryImport;
 	d->libname = libname;
 
-	Array<Path> dirs = {"/usr/lib/x86_64-linux-gnu/", "/usr/lib64", "/lib64", "/usr/lib", "/lib"};
 	Path filename;
-	for (auto &dir: dirs)
-		if (filename.is_empty())
-			for (auto &e: os::fs::search(dir, libname + "*.so.*", "f")) {
-				filename = dir | e;
-				break;
-			}
+	if (Path(libname).is_absolute()) {
+		filename = libname;
+	} else {
+		Array<Path> dirs = {"/usr/lib/x86_64-linux-gnu/", "/usr/lib64", "/lib64", "/usr/lib", "/lib"};
+		for (auto &dir: dirs)
+			if (filename.is_empty())
+				for (auto &e: os::fs::search(dir, libname + "*.so.*", "f")) {
+					filename = dir | e;
+					break;
+				}
+	}
 	if (filename.is_empty())
 		s->do_error_link("can't find external library " + libname);
+	//msg_write("LIB: " + str(filename));
 
 	d->handle = dlopen(filename.c_str(), RTLD_NOW);
 	if (!d->handle)

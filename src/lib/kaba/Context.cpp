@@ -1,11 +1,16 @@
 #include "Context.h"
 #include "kaba.h"
 #include "Interpreter.h"
+#include "../os/file.h"
+#include "../os/filesystem.h"
 #include "parser/Parser.h"
 #include "parser/Concretifier.h"
 #include "template/template.h"
 #include "compiler/Compiler.h"
 #include "../os/msg.h"
+#if HAS_LIB_DL
+#include <dlfcn.h>
+#endif
 
 namespace kaba {
 
@@ -82,6 +87,30 @@ void Context::__delete__() {
 	this->Context::~Context();
 }
 
+void try_import_dynamic_library_for_module(const Path& filename, Context* ctx, shared<Module> module) {
+#if HAS_LIB_DL
+	const auto dir = filename.parent();
+#ifdef OS_MAC
+	auto files = os::fs::search(dir, "lib*.dylib", "f");
+#elif defined(OS_LINUX)
+	auto files = os::fs::search(dir, "lib*.so", "f");
+#else
+	auto files = os::fs::search(dir, "lib*.dll", "f");
+#endif
+
+	if (files.num == 1) {
+		Exporter e(ctx, module.get());
+		auto handle = dlopen((dir | files[0]).c_str(), RTLD_NOW|RTLD_LOCAL);
+		typedef void t_f(Exporter*);
+		if (auto f = (t_f*)dlsym(handle, "export_symbols")) {
+			(*f)(&e);
+		} else {
+			msg_error(format("found dynamic library %s, but no 'export_symbols()'", dir | files[0]));
+		//	s->do_error_link("can't load symbol '" + name + "' from library " + libname);
+		}
+#endif
+	}
+}
 
 
 shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
@@ -95,7 +124,9 @@ shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
 			return ps;
 	
 	// load
-    auto s = create_empty_module(filename);
+	auto s = create_empty_module(filename);
+	if (!just_analyse)
+		try_import_dynamic_library_for_module(filename, this, s);
 	s->load(filename, just_analyse);
 
 	// store module in database

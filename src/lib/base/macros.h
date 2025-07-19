@@ -78,6 +78,7 @@ using int_p = int32;
 #endif
 
 // did cpu detection work correctly?
+static_assert(sizeof(int8) == 1);
 static_assert(sizeof(int32) == 4);
 static_assert(sizeof(int64) == 8);
 static_assert(sizeof(int_p) == sizeof(void*));

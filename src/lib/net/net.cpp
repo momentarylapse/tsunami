@@ -28,7 +28,7 @@ void NetInit() {
 void _cdecl NetSendBugReport(const string &sender, const string &program, const string &version, const string &comment) {
 	NetInit();
 
-	auto s = ownify(Socket::connect("michisoft.michi.is-a-geek.org", 80));
+	auto s = ownify(net::connect("michisoft.michi.is-a-geek.org", 80));
 	string temp, report;
 
 	// actual data to send

@@ -14,8 +14,8 @@
 
 typedef struct _GtkEventController GtkEventController;
 
-class vec2;
-class rect;
+struct vec2;
+struct rect;
 class Painter;
 
 namespace hui {

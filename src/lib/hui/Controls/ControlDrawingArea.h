@@ -13,7 +13,7 @@
 
 #include <gtk/gtk.h>
 
-class rect;
+struct rect;
 
 namespace hui
 {

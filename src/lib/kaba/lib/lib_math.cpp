@@ -86,10 +86,6 @@ extern const Class *TypeAnyList;
 extern const Class *TypeAnyDict;
 
 
-float _cdecl f_sqr(float f) {
-	return f*f;
-}
-
 template<class T>
 class VectorList : public Array<T> {
 public:
@@ -1088,7 +1084,7 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("invers", TypeBool);
 
 
-	// int
+	// i32
 	add_func("clamp", TypeInt32, &clamp<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", TypeInt32);
 		func_add_param("min", TypeInt32);
@@ -1108,7 +1104,23 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("a", TypeInt32);
 		func_add_param("b", TypeInt32);
 
-	// float
+	// i64
+	add_func("clamp", TypeInt64, &clamp<int64>, Flags::Static | Flags::Pure);
+		func_add_param("i", TypeInt64);
+		func_add_param("min", TypeInt64);
+		func_add_param("max", TypeInt64);
+	add_func("abs", TypeInt64, &abs<int64>, Flags::Static | Flags::Pure);
+		func_add_param("i", TypeInt64);
+	add_func("sign", TypeInt64, &sign<int64>, Flags::Static | Flags::Pure);
+		func_add_param("i", TypeInt64);
+	add_func("min", TypeInt64, &min<int64>, Flags::Static | Flags::Pure);
+		func_add_param("a", TypeInt64);
+		func_add_param("b", TypeInt64);
+	add_func("max", TypeInt64, &max<int64>, Flags::Static | Flags::Pure);
+		func_add_param("a", TypeInt64);
+		func_add_param("b", TypeInt64);
+
+	// f32
 	add_func("sin", TypeFloat32, &sinf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
 	add_func("cos", TypeFloat32, &cosf, Flags::Static | Flags::Pure);
@@ -1126,7 +1138,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("y", TypeFloat32);
 	add_func("sqrt", TypeFloat32, &sqrtf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
-	add_func("sqr", TypeFloat32, &f_sqr, Flags::Static | Flags::Pure);
+	add_func("sqr", TypeFloat32, &sqr<float>, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
 	add_func("exp", TypeFloat32, &expf, Flags::Static | Flags::Pure);
 		func_add_param("x", TypeFloat32);
@@ -1153,6 +1165,48 @@ void SIAddPackageMath(Context *c) {
 	add_func("max", TypeFloat32, &max<float>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeFloat32);
 		func_add_param("b", TypeFloat32);
+
+	// f64
+	add_func("sin", TypeFloat64, &sin, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("cos", TypeFloat64, &cos, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("tan", TypeFloat64, &tan, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("asin", TypeFloat64, &asin, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("acos", TypeFloat64, &acos, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("atan", TypeFloat64, &atan, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("atan2", TypeFloat64, &atan2, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+		func_add_param("y", TypeFloat64);
+	add_func("sqrt", TypeFloat64, &sqrt, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("sqr", TypeFloat64, &sqr<double>, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("exp", TypeFloat64, &exp, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("log", TypeFloat64, &log, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+	add_func("pow", TypeFloat64, &pow, Flags::Static | Flags::Pure);
+		func_add_param("x", TypeFloat64);
+		func_add_param("exp", TypeFloat64);
+	add_func("clamp", TypeFloat64, &clamp<double>, Flags::Static | Flags::Pure);
+		func_add_param("f", TypeFloat64);
+		func_add_param("min", TypeFloat64);
+		func_add_param("max", TypeFloat64);
+	add_func("abs", TypeFloat64, &abs<double>, Flags::Static | Flags::Pure);
+		func_add_param("f", TypeFloat64);
+	add_func("sign", TypeFloat64, &sign<double>, Flags::Static | Flags::Pure);
+		func_add_param("f", TypeFloat64);
+	add_func("min", TypeFloat64, &min<double>, Flags::Static | Flags::Pure);
+		func_add_param("a", TypeFloat64);
+		func_add_param("b", TypeFloat64);
+	add_func("max", TypeFloat64, &max<double>, Flags::Static | Flags::Pure);
+		func_add_param("a", TypeFloat64);
+		func_add_param("b", TypeFloat64);
 
 	// complex
 	add_func("abs", TypeFloat32, &KabaVector<complex>::abs, Flags::Static | Flags::Pure);
@@ -1197,6 +1251,12 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("start", TypeFloat32);
 		func_add_param_def("end", TypeFloat32, (float)DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeFloat32, 1.0f);
+	add_func("cubic_spline", TypeFloat32, &cubic_spline<float>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeFloatList);
+		func_add_param("t", TypeFloat32);
+	add_func("cubic_spline_d", TypeFloat32, &cubic_spline_d<float>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeFloatList);
+		func_add_param("t", TypeFloat32);
 
 	// float64[]
 	add_func("sum", TypeFloat64, &XList<double>::sum, Flags::Static | Flags::Pure);
@@ -1217,12 +1277,24 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("list", TypeVec2List);
 	add_func("sum_sqr", TypeFloat32, &VectorList<vec2>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec2List);
+	add_func("cubic_spline", TypeVec2, &cubic_spline<vec2>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeVec2List);
+		func_add_param("t", TypeFloat32);
+	add_func("cubic_spline_d", TypeVec2, &cubic_spline_d<vec2>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeVec2List);
+		func_add_param("t", TypeFloat32);
 
 	// vec3[]
 	add_func("sum", TypeVec3, &VectorList<vec3>::sum, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec3List);
 	add_func("sum_sqr", TypeFloat32, &VectorList<vec3>::sum_sqr, Flags::Static | Flags::Pure);
 		func_add_param("list", TypeVec3List);
+	add_func("cubic_spline", TypeVec3, &cubic_spline<vec3>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeVec3List);
+		func_add_param("t", TypeFloat32);
+	add_func("cubic_spline_d", TypeVec3, &cubic_spline_d<vec3>, Flags::Static | Flags::Pure);
+		func_add_param("points", TypeVec3List);
+		func_add_param("t", TypeFloat32);
 
 	// complex[]
 	add_func("sum", TypeComplex, &VectorList<complex>::sum, Flags::Static | Flags::Pure);

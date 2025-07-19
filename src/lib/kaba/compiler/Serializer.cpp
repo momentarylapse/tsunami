@@ -929,6 +929,9 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::Float32Negative:
 			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt32, 0x80000000));
 			break;
+		/*case InlineID::Float64Negative:
+			cmd.add_cmd(Asm::InstID::XOR, ret, param[0], param_imm(TypeInt64, 0x8000000000000000));
+			break;*/
 // bool/char
 		case InlineID::Int8Equal:
 		case InlineID::Int8NotEqual:

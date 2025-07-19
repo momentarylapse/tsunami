@@ -11,7 +11,7 @@
 
 #include "../base/future.h"
 
-class color;
+struct color;
 
 namespace hui {
 

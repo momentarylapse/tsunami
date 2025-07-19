@@ -10,15 +10,15 @@
 
 #include "../base/base.h"
 
-class complex;
+struct complex;
 
 namespace fft {
-	void _cdecl c2c(const Array<complex> &in, Array<complex> &out, bool inverse);
-	void _cdecl c2c_michi(const Array<complex> &in, Array<complex> &out, bool inverse);
-	void _cdecl r2c(const Array<float> &in, Array<complex> &out);
-	void _cdecl c2r_inv(const Array<complex> &in, Array<float> &out);
+	void c2c(const Array<complex> &in, Array<complex> &out, bool inverse);
+	void c2c_michi(const Array<complex> &in, Array<complex> &out, bool inverse);
+	void r2c(const Array<float> &in, Array<complex> &out);
+	void c2r_inv(const Array<complex> &in, Array<float> &out);
 
-	void _cdecl c2c_2d(const Array<complex> &in, Array<complex> &out, int n, bool inverse);
+	void c2c_2d(const Array<complex> &in, Array<complex> &out, int n, bool inverse);
 }
 
 #endif /* SRC_LIB_FFT_FFT_H_ */

@@ -38,7 +38,7 @@
 
 #endif
 
-
+namespace net {
 #define NET_DEBUG			0
 
 float NetConnectTimeout=5.0f;
@@ -58,15 +58,6 @@ void so(int dbg,int i) {
 
 
 
-
-void NetAddress::__init__() {
-	new(this) NetAddress();
-}
-
-void NetAddress::__delete__() {
-	this->NetAddress::~NetAddress();
-}
-
 Socket::Socket(Type _type) {
 	s = -1;
 	type = _type;
@@ -77,14 +68,6 @@ Socket::Socket(Type _type) {
 Socket::~Socket() {
 	if (s >= 0)
 		close();
-}
-
-void Socket::__init__() {
-	new(this) Socket(Type::TCP);
-}
-
-void Socket::__delete__() {
-	this->Socket::~Socket();
 }
 
 
@@ -159,7 +142,7 @@ void Socket::_listen() {
 	so(1,"  -ok");
 }
 
-Socket *Socket::listen(int port, bool block) {
+xfer<Socket> listen(int port, bool block) {
 	Socket *s = new Socket(Socket::Type::TCP);
 	try {
 		s->_create();
@@ -174,8 +157,8 @@ Socket *Socket::listen(int port, bool block) {
 }
 
 // host
-Socket *Socket::accept() {
-//	so(1,"accept...");
+xfer<Socket> Socket::accept() {
+	//	so(1,"accept...");
 	struct sockaddr_in remote_addr;
 	int size = sizeof(remote_addr);
 #ifdef USE_WINSOCK
@@ -197,7 +180,7 @@ Socket *Socket::accept() {
 
 	so(1,"  -client found");
 #ifdef USE_WINSOCK
-		so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
+	so(1, inet_ntoa(remote_addr.sin_addr));//.s_addr));
 #endif
 	con->set_blocking(true);
 
@@ -211,7 +194,7 @@ void Socket::_connect(const string &addr, int port) {
 
 
 	so(1,"GetHostByName...");
-		so(1,addr);
+	so(1,addr);
 	host = gethostbyname(addr.c_str());
 	if (host == nullptr) {
 		so(1,"  -ERROR (GetHostByName)");
@@ -252,9 +235,9 @@ void Socket::_connect(const string &addr, int port) {
 			so(2,status);
 			struct sockaddr address;
 #ifdef USE_WINSOCK
-				int address_len = sizeof(address);
+			int address_len = sizeof(address);
 #else
-				socklen_t address_len = sizeof(address);
+			socklen_t address_len = sizeof(address);
 #endif
 			if (getpeername(s,&address,&address_len) < 0) {
 				so(1,"peer name :(");
@@ -274,7 +257,7 @@ void Socket::_connect(const string &addr, int port) {
 	if (ttt>0) {
 		so(1,"  -ERROR (connect)");
 #ifdef USE_WINSOCK
-			so(0,WSAGetLastError());
+		so(0,WSAGetLastError());
 #endif
 		close();
 		throw SocketError("could not connect");
@@ -292,7 +275,7 @@ void Socket::_connect(const string &addr, int port) {
 	set_blocking(true);
 }
 
-Socket *Socket::connect(const string &addr, int port) {
+xfer<Socket> connect(const string& addr, int port) {
 	Socket *s = new Socket(Socket::Type::TCP);
 	try {
 		s->_connect(addr, port);
@@ -305,7 +288,7 @@ Socket *Socket::connect(const string &addr, int port) {
 	return nullptr;
 }
 
-Socket *Socket::create_udp(int port) {
+xfer<Socket> create_udp(int port) {
 	Socket *s = new Socket(Socket::Type::UDP);
 	try {
 		s->_create();
@@ -372,7 +355,7 @@ bool Socket::write(const bytes &buf) {
 		addr.sin_family = AF_INET;
 		addr.sin_port = htons(target.port);
 #ifdef USE_WINSOCK
-			msg_error("inet_aton() on windows...\n");
+		msg_error("inet_aton() on windows...\n");
 #else
 		if (inet_aton(target.host.c_str(), &addr.sin_addr)==0)
 			msg_error("inet_aton() failed\n");
@@ -396,7 +379,7 @@ bool Socket::write(const bytes &buf) {
 	return true;
 }
 
-void Socket::set_target(NetAddress &_target) {
+void Socket::set_target(const NetAddress& _target) {
 	target = _target;
 }
 
@@ -433,4 +416,5 @@ bool Socket::can_read() {
 	return (FD_ISSET(s, &r) > 0);
 }
 
+}
 

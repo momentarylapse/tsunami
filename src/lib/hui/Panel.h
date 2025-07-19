@@ -23,7 +23,7 @@ typedef struct _GSimpleActionGroup GSimpleActionGroup;
 
 
 //class Painter;
-class rect;
+struct rect;
 
 namespace hui
 {

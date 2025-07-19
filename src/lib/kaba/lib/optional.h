@@ -10,6 +10,7 @@
 
 
 #include "../../base/optional.h"
+#include "../../base/xparam.h"
 #include "../../os/msg.h"
 #include "../kaba.h"
 #include "lib.h"

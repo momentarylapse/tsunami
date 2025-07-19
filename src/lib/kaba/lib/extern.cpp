@@ -163,6 +163,29 @@ int ExternalLinkData::process_class_num_virtuals(const string &class_name, int n
 	return num_virtual;
 }
 
+
+
+Exporter::Exporter(Context* _ctx, Module* _module) {
+	ctx = _ctx;
+	module = _module;
+}
+Exporter::~Exporter() = default;
+void Exporter::declare_class_size(const string& name, int size) {
+	//msg_write("SIZE:  " + name);
+	ctx->external->declare_class_size(name, size);
+}
+void Exporter::_declare_class_element(const string& name, int offset) {
+	ctx->external->_declare_class_element(name, offset);
+}
+void Exporter::link(const string& name, void* p) {
+	//msg_write("LINK:  " + name);
+	ctx->external->link(name, p);
+}
+void Exporter::_link_virtual(const string& name, void* p, void* instance) {
+	//msg_write("LINK VIRTUAL:  " + name);
+	ctx->external->_link_virtual(name, p, instance);
+}
+
 }
 
 

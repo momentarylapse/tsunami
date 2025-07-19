@@ -20,6 +20,7 @@
 #include "../../hui_minimal/Application.h"
 #elif __has_include("../../xhui/xhui.h")
 #include "../../xhui/xhui.h"
+#include "../../xhui/Application.h"
 #endif
 
 
@@ -90,23 +91,22 @@ Path find_installed_lib_import(const string &name) {
 		kaba_dir = App::directory.parent() | ".kaba";
 	Path kaba_dir_static = App::directory_static.parent() | "kaba";
 	for (auto &dir: Array<Path>({kaba_dir, kaba_dir_static})) {
-		auto path = (dir | "lib" | name).canonical();
-		if (os::fs::exists(path))
-			return path;
+		auto path1 = (dir | "packages" | (name + ".kaba")).canonical();
+		if (os::fs::exists(path1))
+			return path1;
+		auto path2 = (dir | "packages" | name | (name + ".kaba")).canonical();
+		if (os::fs::exists(path2))
+			return path2;
 	}
 	return Path::EMPTY;
 }
 
 Path find_import(Module *s, const string &_name) {
 	string name = _name.replace(".kaba", "");
-	name = name.replace(".", "/") + ".kaba";
-
-	// deprecated...
-	if (name.head(2) == "@/")
-		return find_installed_lib_import(name.sub(2));
+	name = name.replace(".", "/");
 
 	for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
-		Path filename = import_dir_match((s->filename.parent() | string("../").repeat(i)).canonical(), name);
+		Path filename = import_dir_match((s->filename.parent() | string("../").repeat(i)).canonical(), name + ".kaba");
 		if (filename)
 			return filename;
 	}

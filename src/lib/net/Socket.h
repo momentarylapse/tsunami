@@ -11,13 +11,11 @@
 
 #include "../base/pointer.h"
 
-class NetAddress {
-public:
+namespace net {
+
+struct NetAddress {
 	string host;
 	int port;
-
-	void __init__();
-	void __delete__();
 };
 
 
@@ -29,15 +27,15 @@ public:
 		UDP
 	};
 
-	Socket(Type type);
+	explicit Socket(Type type = Type::TCP);
 	~Socket();
 
 	void _create();
 	void _bind(int port);
 	void _listen();
-	void _connect(const string &addr, int port);
+	void _connect(const string& addr, int port);
 
-	Socket *accept();
+	xfer<Socket> accept();
 	void close();
 	void set_blocking(bool blocking);
 	bool is_connected();
@@ -46,13 +44,9 @@ public:
 
 	// send / receive directly
 	bytes read(int size);
-	bool write(const bytes &buf);
+	bool write(const bytes& buf);
 	bool can_write();
 	bool can_read();
-
-	// kaba interface
-	void __init__();
-	void __delete__();
 
 	int uid;
 	int s;
@@ -60,17 +54,16 @@ public:
 	bool last_op_reading;
 
 	// udp
-	void set_target(NetAddress &target);
+	void set_target(const NetAddress& target);
 	NetAddress get_sender();
 	NetAddress target;
 	NetAddress sender;
-
-
-
-	static Socket *listen(int port, bool block);
-	static Socket *connect(const string &host, int port);
-	static Socket *create_udp(int port);
 };
 
+xfer<Socket> listen(int port, bool block);
+xfer<Socket> connect(const string& host, int port);
+xfer<Socket> create_udp(int port);
+
+}
 
 #endif /* SRC_LIB_NET_SOCKET_H_ */

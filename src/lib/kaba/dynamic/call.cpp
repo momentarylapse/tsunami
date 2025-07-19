@@ -347,6 +347,14 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call1<float,CBR>(ff, ret, param);
 				return true;
 			}
+		} else if (return_type == TypeFloat64) {
+			if (ptype[0] == TypeFloat32) {
+				call1<double,float>(ff, ret, param);
+				return true;
+			} else if (ptype[0] == TypeFloat64) {
+				call1<double,double>(ff, ret, param);
+				return true;
+			}
 		} else if (return_type == TypeVec3) {
 			if (ptype[0]->uses_call_by_reference()) {
 				call1<vec3,CBR>(ff, ret, param);

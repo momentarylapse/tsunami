@@ -759,7 +759,8 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::GreaterEqual, TypeBool, TypeFloat64, TypeFloat64, InlineID::Float64GreaterEqual, &op_double_ge);
 		add_operator(OperatorID::Smaller, TypeBool, TypeFloat64, TypeFloat64, InlineID::Float64Smaller, &op_double_l);
 		add_operator(OperatorID::SmallerEqual, TypeBool, TypeFloat64, TypeFloat64, InlineID::Float64SmallerEqual, &op_double_le);
-		add_operator(OperatorID::Negative, TypeFloat32, nullptr, TypeFloat64, InlineID::Float64Negative, &op_double_neg);
+//		add_operator(OperatorID::Negative, TypeFloat64, nullptr, TypeFloat64, InlineID::Float64Negative, &op_double_neg);
+		add_operator(OperatorID::Negative, TypeFloat64, nullptr, TypeFloat64, InlineID::None, &op_double_neg);
 
 
 	add_class(TypeString);

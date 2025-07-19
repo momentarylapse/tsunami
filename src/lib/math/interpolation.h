@@ -63,3 +63,21 @@ private:
 	bool closed;
 };
 
+// points = [p0, dp0, p1, dp1]
+template<class T>
+T cubic_spline(const Array<T>& points, float t) {
+	if (points.num < 4)
+		return T{};
+	const float tt = t*t;
+	const float ttt = tt*t;
+	return (2*ttt-3*tt+1) * points[0] + (ttt-2*tt+t) * points[1] + (-2*ttt+3*tt) * points[2] + (ttt-tt) * points[3];
+}
+
+template<class T>
+T cubic_spline_d(const Array<T>& points, float t) {
+	if (points.num < 4)
+		return T{};
+	const float tt = t*t;
+	return (6*tt-6*t) * points[0] + (3*tt-4*t+1) * points[1] + (-6*tt+6*t) * points[2] + (3*tt-2*t) * points[3];
+}
+

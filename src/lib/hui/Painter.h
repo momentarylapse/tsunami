@@ -13,9 +13,9 @@
 typedef struct _PangoLayout PangoLayout;
 typedef struct _PangoFontDescription PangoFontDescription;
 
-class vec2;
-class rect;
-class color;
+struct vec2;
+struct rect;
+struct color;
 
 typedef struct _cairo_surface cairo_surface_t;
 typedef struct _cairo cairo_t;

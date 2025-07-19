@@ -2,7 +2,7 @@
 # Title[Deutsch] = Tonerkennung
 use hui
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 
 const freq = 44100
 const f_min = 50

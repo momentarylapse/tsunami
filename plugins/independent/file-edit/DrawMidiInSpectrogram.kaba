@@ -3,8 +3,8 @@
 use hui
 use image.*
 use tsunami.*
-use helper.grid.*
-use helper.tone.*
+use tsunami.helper.grid.*
+use tsunami.helper.tone.*
 
 ##show
 ##disasm

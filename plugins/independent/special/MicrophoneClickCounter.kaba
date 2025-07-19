@@ -2,7 +2,7 @@
 # Title[Deutsch] = Tonerkennung
 use hui
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 use midisource.Click.*
 use audioeffect.special.ClickCounter.*
 

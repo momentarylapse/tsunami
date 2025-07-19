@@ -1,7 +1,7 @@
 use os
 use hui
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 
 # a single file
 struct MidiFont

@@ -1,5 +1,5 @@
 use tsunami.*
-use helper.filter.*
+use tsunami.helper.filter.*
 use hui
 
 func lufs_to_color(l: float) -> color

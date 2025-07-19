@@ -1,5 +1,5 @@
 use tsunami.*
-use helper.draw.*
+use tsunami.helper.draw.*
 use synthesizer.Sample.*
 use hui
 

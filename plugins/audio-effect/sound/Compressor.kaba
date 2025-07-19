@@ -2,7 +2,7 @@
 # Title[Deutsch] = Kompressor
 use hui
 use tsunami.*
-use helper.grid.*
+use tsunami.helper.grid.*
 
 let MIN_DB = -60.0
 let MAX_DB = 0.0

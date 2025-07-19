@@ -2,7 +2,7 @@
 # Title[Deutsch] = Spektrum zeigen
 use hui
 use tsunami.*
-use helper.grid.*
+use tsunami.helper.grid.*
 
 let N = 512
 let MIN_FREQ = 20.0

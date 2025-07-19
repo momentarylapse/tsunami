@@ -1,8 +1,8 @@
 use hui
 use tsunami.*
-use helper.tone.*
-use helper.grid.*
-use helper.filter.*
+use tsunami.helper.tone.*
+use tsunami.helper.grid.*
+use tsunami.helper.filter.*
 
 const NUM_HARMONICS = 9
 const HARMONIC_FREQS = [0.5, 1.0, 1.498823530, 2.0, 2.997647060, 4.0, 5.040941178, 5.995294120, 8.0]

@@ -2,7 +2,7 @@
 # Title[Deutsch] = Supernova
 use hui
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 
 #const int freq = 44100
 const f_min = 50

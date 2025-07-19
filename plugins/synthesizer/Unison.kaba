@@ -1,6 +1,6 @@
 use hui
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 
 const MAX_VOICES = 15
 

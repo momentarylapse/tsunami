@@ -1,7 +1,7 @@
 use hui
 use tsunami.*
-use helper.tone.*
-use helper.draw.*
+use tsunami.helper.tone.*
+use tsunami.helper.draw.*
 
 let NUM_OSCILLATORS = 6
 

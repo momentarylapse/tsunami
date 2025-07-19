@@ -2,8 +2,8 @@
 # Title[Deutsch] = Echo
 use hui
 use tsunami.*
-use helper.grid.*
-use helper.draw.*
+use tsunami.helper.grid.*
+use tsunami.helper.draw.*
 
 
 class MultiEcho extends AudioEffect

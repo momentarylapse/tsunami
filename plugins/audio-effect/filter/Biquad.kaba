@@ -1,9 +1,9 @@
 use hui
 use tsunami.*
-use helper.grid.*
-use helper.tone.*
-use helper.filter.*
-use helper.curves.*
+use tsunami.helper.grid.*
+use tsunami.helper.tone.*
+use tsunami.helper.filter.*
+use tsunami.helper.curves.*
 
 
 

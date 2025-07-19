@@ -2,7 +2,7 @@
 # Title[Deutsch] = Oszilloskop
 use hui
 use tsunami.*
-use helper.grid.*
+use tsunami.helper.grid.*
 
 const NUM_SAMPLES = 4096
 const MIN_FREQ = 20.0

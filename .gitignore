@@ -10,7 +10,7 @@ presets.xml
 *~
 Debug
 Release
-tsunami
+/tsunami
 ipch
 Tsunami.suo
 Tsunami.sdf

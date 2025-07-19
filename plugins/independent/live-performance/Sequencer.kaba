@@ -1,5 +1,5 @@
 use tsunami.*
-use helper.draw.*
+use tsunami.helper.draw.*
 use hui
 
 let TYPE_PITCH = [36, 38, 42, 43, 44, 45, 46, 47]

@@ -1,7 +1,7 @@
 use hui
 use tsunami.*
-use helper.tone.*
-use helper.grid.*
+use tsunami.helper.tone.*
+use tsunami.helper.grid.*
 
 const N = 4096*16
 

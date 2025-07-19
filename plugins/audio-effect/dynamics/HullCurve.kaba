@@ -2,7 +2,7 @@
 # Title[Deutsch] = Hüllkurve
 use hui
 use tsunami.*
-use helper.grid.*
+use tsunami.helper.grid.*
 
 
 

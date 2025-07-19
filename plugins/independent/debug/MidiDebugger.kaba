@@ -1,5 +1,5 @@
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 use hui
 
 func e2s(e: MidiEvent) -> string

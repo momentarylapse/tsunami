@@ -1,5 +1,5 @@
 use tsunami.*
-use helper.tone.*
+use tsunami.helper.tone.*
 use hui
 
 func next_ending(notes: shared![MidiNote][]) -> int

@@ -1,6 +1,6 @@
 use tsunami.*
 use hui
-use helper.grid.*
+use tsunami.helper.grid.*
 
 const FRAME_SIZE = 1024
 const FRAME_STEP = 512/2

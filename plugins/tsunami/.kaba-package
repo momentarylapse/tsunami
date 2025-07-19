@@ -1,3 +1,3 @@
-version 0.2
-#build xmake ../../ moduletsunami
+version 0.3
+build xmake ../../ moduletsunami
 

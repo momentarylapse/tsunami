@@ -1,11 +1,18 @@
 {
   "dependencies": [
     "fftw3",
+    "fftw3",
+    "libflac",
     "libflac",
     "libogg",
+    "libogg",
+    "libvorbis",
     "libvorbis",
     "opengl",
+    "opengl",
     "portaudio",
+    "portaudio",
+    "zlib",
     "zlib"
   ]
 }

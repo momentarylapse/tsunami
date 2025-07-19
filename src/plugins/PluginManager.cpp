@@ -199,8 +199,11 @@ void MidiInput__init__(MidiInput* o, Session *session) {
 void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
 
-	auto ext = kaba::default_context->external.get();
+	kaba::Exporter exporter(kaba::default_context, nullptr);
+	export_kaba(&exporter);
+}
 
+void PluginManager::export_kaba(kaba::Exporter* ext) {
 	// api definition
 	ext->link("device_manager", &Tsunami::instance->device_manager);
 	ext->link("theme", &theme);

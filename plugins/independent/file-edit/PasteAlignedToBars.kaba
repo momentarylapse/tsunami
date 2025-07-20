@@ -8,6 +8,7 @@ func update_bars(out bars: BarCollection)
 
 class XXX extends TsunamiPlugin
 	func override on_start()
+		var clipboard = tsunami!.clipboard
 		if !clipboard.has_data()
 			session.e("clipboard is empty")
 			stop()
@@ -41,7 +42,7 @@ class XXX extends TsunamiPlugin
 	
 	func paste(offset: int, source: TrackLayer, out dest: TrackLayer)
 		var b0 = first_bar(offset)
-		for i=>b in clipboard.temp.bars
+		for i=>b in tsunami!.clipboard.temp.bars
 			if b0+i < len(session.song.bars)
 				paste_bar(source, dest, b.range(), session.song.bars[b0+i].range())
 	

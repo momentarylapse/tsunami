@@ -79,7 +79,8 @@ SignalChain::SignalChain(Session *s, const string &_name) :
 }
 
 SignalChain::~SignalChain() {
-	stop_hard();
+	if (session)
+		stop_hard();
 	for (Module *m: weak(modules))
 		m->unsubscribe(this);
 }

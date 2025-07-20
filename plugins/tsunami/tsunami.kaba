@@ -44,6 +44,15 @@ class override Session
 	func extern mut load_signal_chain(filename: os.Path) -> shared[SignalChain]
 	func extern mut remove_signal_chain(chain: SignalChain*)
 
+class Tsunami
+	var clipboard: Clipboard&
+#	var device_manager: DeviceManager&
+
+var extern tsunami: Tsunami*
+
+# only used for stand-alone tools, not for plugins!
+func extern init_app()
+
 
 #class PluginContext
 #	Song *song

@@ -57,6 +57,10 @@
 #include "../module/audio/AudioAccumulator.h"
 #include "../module/midi/MidiAccumulator.h"
 #include "../stuff/Clipboard.h"
+#include "../stuff/BackupManager.h"
+#include "../stuff/SessionManager.h"
+#include "../stuff/Log.h"
+#include "../stuff/PerformanceMonitor.h"
 #include "../view/audioview/AudioView.h"
 #include "../view/ColorScheme.h"
 #include "../view/dialog/ModuleSelectorDialog.h"
@@ -203,11 +207,33 @@ void PluginManager::link_app_data() {
 	export_kaba(&exporter);
 }
 
+void init_app() {
+
+	auto t = new Tsunami();
+	Tsunami::instance = t;
+	t->backup_manager = new BackupManager;
+	t->session_manager = new SessionManager(t->backup_manager.get());
+
+	t->perf_mon = new PerformanceMonitor;
+
+	t->log = new Log;
+
+	Session::GLOBAL = new Session(t->log.get(), nullptr, nullptr, t->session_manager.get(), t->perf_mon.get());
+
+	t->clipboard = new Clipboard;
+
+	t->device_manager = new DeviceManager(Session::GLOBAL);
+	Session::GLOBAL->device_manager = t->device_manager.get();
+
+	// create (link) PluginManager after all other components are ready
+	t->plugin_manager = new PluginManager;
+	Session::GLOBAL->plugin_manager = t->plugin_manager.get();
+}
+
 void PluginManager::export_kaba(kaba::Exporter* ext) {
 	// api definition
-	ext->link("device_manager", &Tsunami::instance->device_manager);
+	ext->link("tsunami", &Tsunami::instance);
 	ext->link("theme", &theme);
-	ext->link("clipboard", &Tsunami::instance->clipboard);
 	//ext->link("view_input", &export_view_input);
 	ext->link("db2amp", (void*)&db2amplitude);
 	ext->link("amp2db", (void*)&amplitude2db);
@@ -231,6 +257,7 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link("get_style_colors", (void*)&hui::get_style_colors);
 	ext->link("ask_string", (void*)&QuestionDialogString::ask);
 	ext->link("ask_preset_name", (void*)&PresetSelectionDialog::ask);
+	ext->link("init_app", (void*)&init_app);
 
 
 	ext->declare_class_size("BufferPitchShift.Operator", sizeof(BufferPitchShift::Operator));
@@ -251,6 +278,11 @@ void PluginManager::export_kaba(kaba::Exporter* ext) {
 	ext->link_class_func("future[AudioBuffer].then_or_fail", &kaba::KabaFuture<AudioBuffer>::kaba_then_or_fail);
 
 	ext->link_class_func("obs.source.__rshift__", &obs::source::subscribe);
+
+
+	ext->declare_class_size("Tsunami", sizeof(Tsunami));
+	ext->declare_class_element("Tsunami.clipboard", &Tsunami::clipboard);
+	ext->declare_class_element("Tsunami.device_manager", &Tsunami::device_manager);
 
 	ext->declare_class_size("Clipboard", sizeof(Clipboard));
 	ext->declare_class_element("Clipboard.temp", &Clipboard::temp);

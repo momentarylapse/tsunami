@@ -74,11 +74,14 @@ string MidiInput::Config::auto_conf(const string &name) const {
 
 MidiInput::MidiInput(Session *_session) : Module(ModuleCategory::Stream, "MidiInput") {
 	session = _session;
-	_sample_rate = session->sample_rate();
 	state = State::NoDevice;
-
-	device_manager = session->device_manager;
 	cur_device = nullptr;
+
+	if (!session)
+		return;
+
+	_sample_rate = session->sample_rate();
+	device_manager = session->device_manager;
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	auto _class = session->plugin_manager->get_class("MidiInputConfig");

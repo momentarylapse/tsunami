@@ -49,6 +49,9 @@ AudioOutput::AudioOutput(Session *_session) :
 
 	config.volume = 1;
 
+	if (!session)
+		return;
+
 	shared_data.callback_played_end_of_stream = [this]{ on_played_end_of_stream(); }; // TODO prevent abort before playback really finished
 
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");

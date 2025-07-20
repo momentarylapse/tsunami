@@ -22,9 +22,9 @@ class SoftPaste extends TsunamiPlugin
 		dest.edit_buffers_finish(a)
 	
 	func check_clipboard() -> bool
-		if len(clipboard.temp.tracks) == 0
+		if len(tsunami!.clipboard.temp.tracks) == 0
 			return false
-		if clipboard.temp.tracks[0].type != SignalType.AUDIO
+		if tsunami!.clipboard.temp.tracks[0].type != SignalType.AUDIO
 			return false
 		return true
 		
@@ -44,7 +44,7 @@ class SoftPaste extends TsunamiPlugin
 			if t.type == SignalType.AUDIO
 				for mut l in t.layers
 					if session.view.sel.has_layer(l)
-						soft_paste(clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
+						soft_paste(tsunami!.clipboard.temp.tracks[0].layers[0].buffers[0], l, session.view.sel.range())
 						n ++
 
 		if n == 0

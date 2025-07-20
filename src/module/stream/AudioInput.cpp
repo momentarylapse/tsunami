@@ -59,11 +59,14 @@ string AudioInput::Config::auto_conf(const string &name) const {
 AudioInput::AudioInput(Session *_session) :
 		Module(ModuleCategory::Stream, "AudioInput") {
 	session = _session;
-	_sample_rate = session->sample_rate();
 	shared_data.num_channels = 2;
 
 	state = State::NoDevice;
 
+	if (!session)
+		return;
+
+	_sample_rate = session->sample_rate();
 	dev_man = session->device_manager;
 	auto *device_pointer_class = session->plugin_manager->get_class("Device*");
 	auto _class = session->plugin_manager->get_class("AudioInputConfig");

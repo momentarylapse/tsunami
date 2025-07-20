@@ -112,7 +112,7 @@ extern const Class *TypeDynamicArray;
 extern const Class *TypePath;
 
 void SIAddPackageGl(Context *c) {
-	add_package(c, "gl");
+	add_internal_package(c, "gl");
 
 	auto TypeContext = add_type("Context", sizeof(nix::Context));
 	auto TypeContextXfer = add_type_p_xfer(TypeContext);

@@ -68,7 +68,7 @@ public:
 };
 
 void SIAddPackageKaba(Context *c) {
-	add_package(c, "kaba");
+	add_internal_package(c, "kaba");
 
 
 	TypeClass = add_type  ("Class", sizeof(Class));
@@ -230,7 +230,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("max_params", TypeInt32, &SpecialFunction::max_params);
 
 	add_class(TypeContext);
-		class_add_element("packages", TypeModuleRefList, &Context::packages);
+		class_add_element("packages", TypeModuleRefList, &Context::internal_packages);
 		class_add_func(Identifier::func::Delete, TypeVoid, &Context::__delete__, Flags::Mutable);
 		class_add_func("load_module", TypeModuleShared, &KabaContext::__load_module__, Flags::RaisesExceptions | Flags::Mutable);
 			func_add_param("filename", TypePath);

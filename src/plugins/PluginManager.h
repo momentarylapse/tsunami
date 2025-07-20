@@ -43,7 +43,7 @@ public:
 	Path plugin_dir_local();
 
 	void link_app_data();
-	static void export_kaba(kaba::Exporter* e);
+	static void export_kaba_package_tsunami(kaba::Exporter* e);
 	void find_plugins();
 	void add_plugins_to_menu(TsunamiWindow *win);
 

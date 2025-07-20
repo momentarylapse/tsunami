@@ -5,6 +5,7 @@ use image.*
 use tsunami.*
 use tsunami.helper.grid.*
 use tsunami.helper.tone.*
+use fft
 
 ##show
 ##disasm

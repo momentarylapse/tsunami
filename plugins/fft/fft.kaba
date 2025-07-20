@@ -1,0 +1,4 @@
+func extern pure c2c(_in: complex[], out _out: complex[], inverse: bool)
+func extern pure r2c(_in: f32[], out _out: complex[])
+func extern pure c2r_inv(_in: complex[], out _out: f32[])
+func extern pure c2c_2d(_in: complex[], out _out: complex[], n: i32, inverse: bool)

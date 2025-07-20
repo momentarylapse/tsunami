@@ -43,7 +43,7 @@ xfer<net::Socket> __socket_create_udp__(int port) {
 KABA_LINK_GROUP_END
 
 void SIAddPackageNet(Context *c) {
-	add_package(c, "net");
+	add_internal_package(c, "net");
 
 	auto TypeAddress  = add_type("Address", sizeof(net::NetAddress));
 	auto TypeSocket      = add_type("Socket", sizeof(net::Socket));

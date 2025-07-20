@@ -132,8 +132,8 @@ Flags flags_mix(const Array<Flags> &f) {
 }
 
 
-void add_package(Context *c, const string &name, Flags flags) {
-	for (auto &p: c->packages)
+void add_internal_package(Context *c, const string &name, Flags flags) {
+	for (auto &p: c->internal_packages)
 		if (p->filename.str() == name) {
 			cur_package = p.get();
 			return;
@@ -141,7 +141,7 @@ void add_package(Context *c, const string &name, Flags flags) {
 	auto s = c->create_empty_module(name);
 	s->used_by_default = flags_has(flags, Flags::AutoImport);
 	s->tree->base_class->name = name;
-	c->packages.add(s);
+	c->internal_packages.add(s);
 	cur_package = s.get();
 }
 
@@ -726,7 +726,6 @@ void SIAddPackageHui(Context *c);
 void SIAddPackageGl(Context *c);
 void SIAddPackageNet(Context *c);
 void SIAddPackageImage(Context *c);
-void SIAddPackagePdf(Context *c);
 void SIAddPackageVulkan(Context *c);
 
 
@@ -741,14 +740,13 @@ void init_lib(Context *c) {
 	SIAddPackageTime(c);
 	SIAddPackageOS(c);
 	SIAddPackageImage(c);
-	SIAddPackagePdf(c);
-	SIAddPackageHui(c); // depends on doc
+	SIAddPackageHui(c); // depends on image
 	SIAddPackageGl(c);
 	SIAddPackageNet(c);
 	SIAddPackageThread(c);
 	SIAddPackageVulkan(c);
 
-	add_package(c, "base");
+	add_internal_package(c, "base");
 	SIAddXCommands(c);
 
 

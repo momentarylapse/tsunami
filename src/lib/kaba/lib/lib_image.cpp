@@ -27,7 +27,7 @@ const Class *TypeBasePainterXfer;
 
 
 void SIAddPackageImage(Context *c) {
-	add_package(c, "image");
+	add_internal_package(c, "image");
 
 	TypeImage = add_type("Image", sizeof(Image));
 	auto TypeImageXfer = add_type_p_xfer(TypeImage);

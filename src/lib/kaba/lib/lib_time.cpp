@@ -11,7 +11,7 @@ extern const Class *TypeDate;
 const Class *TypeTimer;
 
 void SIAddPackageTime(Context *c) {
-	add_package(c, "time");
+	add_internal_package(c, "time");
 
 	TypeDate = add_type("Date", sizeof(Date));
 	TypeTimer = add_type("Timer", sizeof(os::Timer));

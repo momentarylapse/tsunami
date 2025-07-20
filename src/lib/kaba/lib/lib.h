@@ -69,7 +69,7 @@ int element_offset(M C::* p) {
 	//return *(int*)(void*)&p;
 }
 
-void add_package(Context *c, const string &name, Flags = Flags::None);
+void add_internal_package(Context *c, const string &name, Flags = Flags::None);
 const Class *add_type(const string &name, int size, Flags = Flags::None, const Class *_namespace = nullptr);
 const Class *add_type_simple(const string &name, int size, int alignment, Flags flags = Flags::None, const Class *name_space = nullptr);
 const Class *add_type_p_raw(const Class *sub_type);

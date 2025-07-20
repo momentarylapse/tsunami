@@ -1,4 +1,5 @@
 use tsunami.*
+use fft
 
 let AUTO_CONFIG_SAMPLE = ""
 

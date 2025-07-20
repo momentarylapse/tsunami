@@ -2,6 +2,7 @@
 # Title[Deutsch] = Pitch Shift
 
 use tsunami.*
+use fft
 
 let AutoConfigFactor = "range=0:2:0.001,scale=100,unit=%"
 

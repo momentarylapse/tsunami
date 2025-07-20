@@ -2,6 +2,7 @@
 # Title[Deutsch] = Pitch Shift
 
 use tsunami.*
+use fft
 
 class PitchShift extends TsunamiPlugin
 

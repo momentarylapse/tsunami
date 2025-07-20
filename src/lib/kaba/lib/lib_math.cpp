@@ -38,12 +38,6 @@
 	#error("no any.h ... we're screwed")
 #endif
 
-#if __has_include("../../fft/fft.h")
-	#include "../../fft/fft.h"
-	#define HAS_FFT
-#else
-#endif
-
 namespace kaba {
 
 #ifdef HAS_ALGEBRA
@@ -58,11 +52,6 @@ namespace kaba {
 	#define any_p(p)		nullptr
 #endif
 
-#ifdef HAS_FFT
-	#define fft_p(p)		p
-#else
-	#define fft_p(p)		nullptr
-#endif
 
 // we're always using math types
 #define type_p(p)			p
@@ -367,7 +356,7 @@ public:
 };
 
 void SIAddPackageMath(Context *c) {
-	add_package(c, "math", Flags::AutoImport);
+	add_internal_package(c, "math", Flags::AutoImport);
 
 	// types
 	TypeComplex = add_type("complex", sizeof(complex));
@@ -397,8 +386,6 @@ void SIAddPackageMath(Context *c) {
 	auto TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
 	auto TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vec3>));
 	auto TypeRandom = add_type("Random", sizeof(Random));
-	auto TypeFFT = add_type("fft", 0);
-	const_cast<Class*>(TypeFFT)->from_template = TypeNamespaceT;
 
 	const_cast<Class*>(TypeVec3)->alignment = 4; // would be updated too late, otherwise...
 	auto TypeVec3Optional = add_type_optional(TypeVec3);
@@ -1065,23 +1052,6 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("t", TypeFloat32);
 		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::get_list, Flags::Pure);
 			func_add_param("t", TypeFloatList);
-
-	add_class(TypeFFT);
-		class_add_func("c2c", TypeVoid, fft_p(&fft::c2c), Flags::Static | Flags::Pure);
-			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeComplexList, Flags::Out);
-			func_add_param("invers", TypeBool);
-		class_add_func("r2c", TypeVoid, fft_p(&fft::r2c), Flags::Static | Flags::Pure);
-			func_add_param("in", TypeFloatList);
-			func_add_param("out", TypeComplexList, Flags::Out);
-		class_add_func("c2r_inv", TypeVoid, fft_p(&fft::c2r_inv), Flags::Static | Flags::Pure);
-			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeFloatList, Flags::Out);
-		class_add_func("c2c_2d", TypeVoid, fft_p(&fft::c2c_2d), Flags::Static | Flags::Pure);
-			func_add_param("in", TypeComplexList);
-			func_add_param("out", TypeComplexList, Flags::Out);
-			func_add_param("n", TypeInt32);
-			func_add_param("invers", TypeBool);
 
 
 	// i32

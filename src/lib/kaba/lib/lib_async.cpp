@@ -13,7 +13,7 @@ const Class* TypeStringFuture;
 const Class* TypeStringPromise;
 
 void SIAddPackageAsync(Context *c) {
-	add_package(c, "async");
+	add_internal_package(c, "async");
 
 	TypeFutureCoreT = add_class_template("@FutureCore", {"T"}, new TemplateClassInstantiatorFutureCore);
 	TypeFutureT = add_class_template("future", {"T"}, new TemplateClassInstantiatorFuture);

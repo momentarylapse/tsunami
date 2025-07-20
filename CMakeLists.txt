@@ -718,6 +718,7 @@ add_library(moduletsunami SHARED
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
+	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
 	src/lib/hui/Controls/Control.cpp
 	src/lib/hui/Controls/ControlButtonGtk.cpp
@@ -824,7 +825,6 @@ add_library(moduletsunami SHARED
 	src/lib/kaba/lib/lib_math.cpp
 	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
-	src/lib/kaba/lib/lib_pdf.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
 	src/lib/kaba/lib/lib_vulkan.cpp
@@ -1272,6 +1272,7 @@ add_executable(tsunami WIN32
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
+	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
 	src/lib/hui/Controls/Control.cpp
 	src/lib/hui/Controls/ControlButtonGtk.cpp
@@ -1378,7 +1379,6 @@ add_executable(tsunami WIN32
 	src/lib/kaba/lib/lib_math.cpp
 	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
-	src/lib/kaba/lib/lib_pdf.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
 	src/lib/kaba/lib/lib_vulkan.cpp

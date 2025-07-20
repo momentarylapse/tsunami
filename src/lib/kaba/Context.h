@@ -11,6 +11,7 @@
 #include "../base/pointer.h"
 #include "../os/path.h"
 #include "asm/asm.h"
+#include <functional>
 
 namespace kaba {
 
@@ -21,6 +22,7 @@ class TypeCast;
 class Operator;
 class TemplateManager;
 class ExternalLinkData;
+class Exporter;
 
 class Exception : public Asm::Exception {
 public:
@@ -37,15 +39,31 @@ public:
 struct LinkerException : Exception{};
 struct LinkerException : Exception{};*/
 
+struct Package {
+	string name;
+	Path directory;
+	owned<ExternalLinkData> external;
+};
+
 class Context {
 public:
     shared_array<Module> public_modules;
-    shared_array<Module> packages;
+    shared_array<Module> internal_packages; // TODO Package[]
     Array<TypeCast> type_casts;
     owned<TemplateManager> template_manager;
     owned<ExternalLinkData> external;
 
     shared_array<Operator> global_operators;
+
+	owned_array<Package> external_packages;
+
+	struct PackageInit {
+		string name;
+		Path dir;
+		std::function<void(Exporter*)> f;
+	};
+	Array<PackageInit> package_inits;
+	void register_package_init(const string& name, const Path& dir, std::function<void(Exporter*)> f);
 
     Context();
     ~Context();

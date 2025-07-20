@@ -120,7 +120,7 @@ Path find_import(Module *s, const string &_name) {
 shared<Module> get_import_module(Parser *parser, const string &name, int token_id) {
 
 	// internal packages?
-	for (auto p: parser->context->packages)
+	for (auto p: parser->context->internal_packages)
 		if (p->filename.str() == name)
 			return p;
 

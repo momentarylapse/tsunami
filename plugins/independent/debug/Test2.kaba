@@ -1,5 +1,6 @@
 use hui
 use tsunami.*
+use fft
 
 const CHUNK_SIZE = 1024
 const NUM_CHUNKS = 4

@@ -110,6 +110,10 @@ public:
 	void declare_enum(const string& name, T value) {
 		_declare_class_element(name, (int)value);
 	}
+	template <typename R, typename ...Args>
+	void link_func(const string& name, R (*func)(Args...)) {
+		link(name, (void*)func);
+	}
 	template<class T>
 	void link_virtual(const string& name, T pointer, void* instance) {
 		_link_virtual(name, mf(pointer), instance);

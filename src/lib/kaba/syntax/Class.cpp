@@ -100,7 +100,7 @@ bool ns_needed(const Class *ns, const Class *observer_ns) {
 		return false;
 	if (observer_ns and reachable_from(ns, observer_ns))
 		return false;
-	if (ns == ns->owner->module->context->packages[0]->base_class()) // always ignore "base"
+	if (ns == ns->owner->module->context->internal_packages[0]->base_class()) // always ignore "base"
 		if (ns == ns->owner->base_class)
 			return false;
 	return true;

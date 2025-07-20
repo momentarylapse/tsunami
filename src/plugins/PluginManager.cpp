@@ -79,6 +79,7 @@
 #include "../lib/hui/Menu.h"
 #include "../lib/hui/language.h"
 #include "../lib/os/filesystem.h"
+#include "../lib/fft/_kaba_export.h"
 #include "../lib/kaba/dynamic/exception.h"
 #include "../lib/kaba/lib/future.h"
 #include "../lib/kaba/lib/lib.h"
@@ -105,7 +106,7 @@ PluginManager::PluginManager() {
 
 	package = kaba::default_context->create_empty_module("<tsunami-internal>");
 	package->used_by_default = false;
-	kaba::default_context->packages.add(package);
+	kaba::default_context->internal_packages.add(package);
 	kaba::default_context->public_modules.add(package.get());
 
 	auto *type_dev = package->tree->create_new_class("Device", nullptr, 0, 0, nullptr, {}, package->tree->base_class, -1);
@@ -203,8 +204,11 @@ void MidiInput__init__(MidiInput* o, Session *session) {
 void PluginManager::link_app_data() {
 	kaba::config.directory = Path::EMPTY;
 
-	kaba::Exporter exporter(kaba::default_context, nullptr);
-	export_kaba(&exporter);
+//	kaba::Exporter exporter(kaba::default_context, nullptr);
+//	export_kaba_package_tsunami(&exporter);
+
+	kaba::default_context->register_package_init("tsunami", this->plugin_dir_static() | "tsunami", &PluginManager::export_kaba_package_tsunami);
+	kaba::default_context->register_package_init("fft", this->plugin_dir_static() | "fft", &export_package_fft);
 }
 
 void init_app() {
@@ -230,7 +234,7 @@ void init_app() {
 	Session::GLOBAL->plugin_manager = t->plugin_manager.get();
 }
 
-void PluginManager::export_kaba(kaba::Exporter* ext) {
+void PluginManager::export_kaba_package_tsunami(kaba::Exporter* ext) {
 	// api definition
 	ext->link("tsunami", &Tsunami::instance);
 	ext->link("theme", &theme);

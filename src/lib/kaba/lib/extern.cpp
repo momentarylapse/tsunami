@@ -70,10 +70,10 @@ string function_link_name(Function *f) {
 Module *link_most_likely_internal_lib_module(Context *context, const string &name) {
 	auto names = name.sub_ref(1).replace(":", ".").explode(".");
 
-	for (auto p: weak(context->packages))
+	for (auto p: weak(context->internal_packages))
 		if (str(p->filename) == names[0])
 			return p;
-	return context->packages[0].get(); // base
+	return context->internal_packages[0].get(); // base
 }
 
 // program variables - specific to the surrounding program, can't always be there...

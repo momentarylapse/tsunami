@@ -106,7 +106,7 @@ StackFrameInfo get_func_from_rip(void *rip) {
 		return r;
 
 	// externally linked...
-	for (auto p: default_context->packages) {
+	for (auto p: default_context->internal_packages) {
 		func_from_rip_test_module(r, p, rip, true);
 	}
 	return r;
@@ -197,7 +197,7 @@ const Class* get_type(void *p) {
 		return TypeUnknown;
 	void *vtable = *(void**)p;
 	auto modules = default_context->public_modules;
-	for (auto p: default_context->packages)
+	for (auto p: default_context->internal_packages)
 		modules.add(p);
 	for (auto s: modules) {
 		auto *r = _get_type(p, vtable, s->tree->base_class);

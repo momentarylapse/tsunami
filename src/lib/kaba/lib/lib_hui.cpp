@@ -112,7 +112,7 @@ const Class *TypeHuiWindowP;
 
 
 void SIAddPackageHui(Context *c) {
-	add_package(c, "hui");
+	add_internal_package(c, "hui");
 	
 	auto TypeHuiMenu = add_type("Menu",  sizeof(hui::Menu));
 	auto TypeHuiMenuXfer = add_type_p_xfer(TypeHuiMenu);
@@ -732,7 +732,7 @@ void SIAddPackageHui(Context *c) {
 namespace kaba {
 
 	void SIAddPackageHui(Context *c) {
-		add_package(c, "hui");
+		add_internal_package(c, "hui");
 	}
 
 };

@@ -87,9 +87,8 @@ void Context::__delete__() {
 	this->Context::~Context();
 }
 
-void try_import_dynamic_library_for_module(const Path& filename, Context* ctx, shared<Module> module) {
+void try_import_dynamic_library_for_module(const Path& dir, Context* ctx, shared<Module> module) {
 #if HAS_LIB_DL
-	const auto dir = filename.parent();
 #ifdef OS_MAC
 	auto files = os::fs::search(dir, "lib*.dylib", "f");
 #elif defined(OS_LINUX)
@@ -112,6 +111,34 @@ void try_import_dynamic_library_for_module(const Path& filename, Context* ctx, s
 	}
 }
 
+// FIXME ...this needs a lot of reworking, sorry...  m(-_-)m
+void try_initiate_package_for_module(const Path& filename, Context* ctx, shared<Module> module) {
+	const auto dir = filename.parent();
+
+	// already initialized?
+	for (const auto p: weak(ctx->external_packages))
+		if (p->directory == dir)
+			return;
+
+	// is a package directory?
+	if (!os::fs::exists(dir | ".kaba-package"))
+		return;
+	// TODO check parents...
+
+	Package* p = new Package;
+	p->directory = dir;
+	p->name = dir.basename();
+	ctx->external_packages.add(p);
+
+	for (const auto& init: ctx->package_inits)
+		if (init.dir == dir) {
+			Exporter exporter(ctx, module.get());
+			init.f(&exporter);
+		}
+
+	try_import_dynamic_library_for_module(filename, ctx, module);
+}
+
 
 shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
 	//msg_write("loading " + filename.str());
@@ -126,7 +153,7 @@ shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
 	// load
 	auto s = create_empty_module(filename);
 	if (!just_analyse)
-		try_import_dynamic_library_for_module(filename, this, s);
+		try_initiate_package_for_module(_filename, this, s);
 	s->load(filename, just_analyse);
 
 	// store module in database
@@ -182,7 +209,7 @@ void Context::execute_single_command(const string &cmd) {
 		return;
 	}
 	
-	for (auto p: packages)
+	for (auto p: internal_packages)
 		if (!p->used_by_default)
 			tree->import_data_selective(p->base_class(), nullptr, nullptr, nullptr, str(p->filename), -1);
 
@@ -267,12 +294,16 @@ const Class *Context::get_dynamic_type(const VirtualBase *p) const {
 	return nullptr;
 }
 
+void Context::register_package_init(const string& name, const Path& dir, std::function<void(Exporter*)> f) {
+	package_inits.add({name, dir.absolute(), f});
+}
+
 
 
 void Context::clean_up() {
 	global_operators.clear();
 	public_modules.clear();
-	packages.clear();
+	internal_packages.clear();
 	external->reset();
 }
 
@@ -280,7 +311,7 @@ extern Context *_secret_lib_context_;
 
 xfer<Context> Context::create() {
 	auto c = new Context;
-	c->packages = _secret_lib_context_->packages;
+	c->internal_packages = _secret_lib_context_->internal_packages;
 	c->type_casts = _secret_lib_context_->type_casts;
 	//c->external = _secret_lib_context_->external;
 	c->template_manager->copy_from(_secret_lib_context_->template_manager.get());

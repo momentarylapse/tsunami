@@ -1,5 +1,6 @@
 use tsunami.*
 use tsunami.helper.tone.*
+use fft
 
 const MIN_DETECT_PITCH = 40
 const MAX_DETECT_PITCH = 100

@@ -136,7 +136,7 @@ void try_initiate_package_for_module(const Path& filename, Context* ctx, shared<
 			init.f(&exporter);
 		}
 
-	try_import_dynamic_library_for_module(filename, ctx, module);
+	try_import_dynamic_library_for_module(dir, ctx, module);
 }
 
 

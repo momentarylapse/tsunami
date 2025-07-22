@@ -714,6 +714,7 @@ add_library(moduletsunami SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
@@ -906,6 +907,7 @@ add_library(moduletsunami SHARED
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
+	src/lib/threads/ThreadPool.cpp
 	src/module/audio/AudioAccumulator.cpp
 	src/module/audio/AudioBackup.cpp
 	src/module/audio/AudioChannelSelector.cpp
@@ -1268,6 +1270,7 @@ add_executable(tsunami WIN32
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
@@ -1460,6 +1463,7 @@ add_executable(tsunami WIN32
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
+	src/lib/threads/ThreadPool.cpp
 	src/module/audio/AudioAccumulator.cpp
 	src/module/audio/AudioBackup.cpp
 	src/module/audio/AudioChannelSelector.cpp

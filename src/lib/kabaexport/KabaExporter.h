@@ -3,6 +3,7 @@
 #include <lib/base/base.h>
 #if __has_include(<lib/kaba/lib/extern.h>)
 #include <lib/kaba/lib/extern.h>
+#include <lib/kaba/lib/lib.h>
 
 #else
 

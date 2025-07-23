@@ -5,6 +5,7 @@
 #include "../../os/CommandLineParser.h"
 #include "../../os/config.h"
 #include "../../os/terminal.h"
+#include "../../os/app.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
@@ -26,8 +27,8 @@ const Class *TypePathList;
 //const Class *TypeStreamP;
 //const Class *TypeStreamShared;
 
-const Class* TypeCallback;
-const Class* TypeCallbackString;
+extern const Class* TypeCallback;
+extern const Class* TypeCallbackString;
 
 extern const Class *TypeStringList;
 extern const Class *TypeAny;
@@ -313,8 +314,6 @@ void SIAddPackageOS(Context *c) {
 	TypeOsConfiguration = add_type("Configuration", sizeof(Configuration));
 	auto TypeTerminal = add_type("terminal", 0);
 
-	TypeCallback = add_type_func(TypeVoid, {});
-	TypeCallbackString = add_type_func(TypeVoid, {TypeString});
 	auto TypeCallbackStringList = add_type_func(TypeVoid, {TypeStringList});
 
 	lib_create_pointer_xfer(TypeStreamXfer);
@@ -528,6 +527,10 @@ void SIAddPackageOS(Context *c) {
 	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("cmd", TypeString);
 		func_add_param_def("verbose", TypeBool, false);
+
+
+	add_ext_var("app_directory_dynamic", TypePath, &os::app::directory_dynamic);
+	add_ext_var("app_directory_static", TypePath, &os::app::directory_static);
 
 
 	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");

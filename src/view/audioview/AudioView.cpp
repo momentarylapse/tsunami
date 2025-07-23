@@ -41,12 +41,13 @@
 #include "../../data/Sample.h"
 #include "../../data/rhythm/Beat.h"
 #include "../../data/SampleRef.h"
-#include "../../lib/image/Painter.h"
-#include "../../lib/hui/config.h"
-#include "../../lib/hui/Menu.h"
-#include "../../lib/hui/Resource.h"
-#include "../../lib/hui/language.h"
-#include "../../lib/os/msg.h"
+#include <lib/image/Painter.h>
+#include <lib/hui/config.h>
+#include <lib/hui/Menu.h>
+#include <lib/hui/Resource.h>
+#include <lib/hui/language.h>
+#include <lib/os/app.h>
+#include <lib/os/msg.h>
 #include "../../module/audio/SongRenderer.h"
 #include "../../plugins/TsunamiPlugin.h"
 #include "../../stuff/PerformanceMonitor.h"
@@ -227,14 +228,14 @@ AudioView::AudioView(Session *_session) :
 	set_high_details(hui::config.get_bool("View.HighDetails", true));
 	hui::config.set_float("View.ZoomSpeed", zoom_speed);
 
-	images.speaker = Image::load(Tsunami::directory_static | "icons/volume.png");
-	images.solo = Image::load(Tsunami::directory_static | "icons/solo.png");
-	images.config = Image::load(Tsunami::directory_static | "icons/wrench.png");
-	images.x = Image::load(Tsunami::directory_static | "icons/x.png");
-	images.track_audio = Image::load(Tsunami::directory_static | "icons/track-audio.png");
-	images.track_time = Image::load(Tsunami::directory_static | "icons/track-time.png");
-	images.track_midi = Image::load(Tsunami::directory_static | "icons/track-midi.png");
-	images.track_group = Image::load(Tsunami::directory_static | "icons/track-group.png");
+	images.speaker = Image::load(os::app::directory_static | "icons/volume.png");
+	images.solo = Image::load(os::app::directory_static | "icons/solo.png");
+	images.config = Image::load(os::app::directory_static | "icons/wrench.png");
+	images.x = Image::load(os::app::directory_static | "icons/x.png");
+	images.track_audio = Image::load(os::app::directory_static | "icons/track-audio.png");
+	images.track_time = Image::load(os::app::directory_static | "icons/track-time.png");
+	images.track_midi = Image::load(os::app::directory_static | "icons/track-midi.png");
+	images.track_group = Image::load(os::app::directory_static | "icons/track-group.png");
 
 	draw_runner_id = -1;
 

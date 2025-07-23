@@ -733,8 +733,8 @@ void init_lib(Context *c) {
 
 
 	SIAddPackageBase(c);
-	SIAddPackageAsync(c);
 	SIAddPackageOSPath(c);
+	SIAddPackageAsync(c); // depends on os.Path
 	SIAddPackageKaba(c);
 	SIAddPackageMath(c);
 	SIAddPackageTime(c);

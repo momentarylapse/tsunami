@@ -104,9 +104,11 @@ extern const Class *TypeVec2;
 extern const Class* TypeCallback;
 extern const Class* TypeOsConfiguration;
 extern const Class* TypeVoidFuture;
-extern const Class* TypeVoidPromise;
+//extern const Class* TypeVoidPromise;
 extern const Class* TypeStringFuture;
 extern const Class* TypeStringPromise;
+extern const Class* TypePathFuture;
+extern const Class* TypeBoolFuture;
 const Class *TypeHuiWindowP;
 
 
@@ -134,13 +136,7 @@ void SIAddPackageHui(Context *c) {
 	auto TypeHuiClipboard = add_type("clipboard", 0);
 	const_cast<Class*>(TypeHuiClipboard)->from_template = TypeNamespaceT;
 
-	auto TypePathFuture = add_type("future[Path]", sizeof(base::future<Path>));
-	auto TypeBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
-
 	auto TypeCallbackPainter = add_type_func(TypeVoid, {TypeHuiPainter});
-	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
-	auto TypeCallbackString = add_type_func(TypeVoid, {TypeString});
-	auto TypeCallbackBool = add_type_func(TypeVoid, {TypeBool});
 
 	lib_create_pointer_xfer(TypeHuiMenuXfer);
 	lib_create_pointer_xfer(TypeHuiPanelXfer);
@@ -148,14 +144,6 @@ void SIAddPackageHui(Context *c) {
 
 	lib_create_pointer_shared<hui::Panel>(TypeHuiPanelShared, TypeHuiPanelXfer);
 	lib_create_pointer_shared<hui::Window>(TypeHuiWindowShared, TypeHuiWindowXfer);
-
-	lib_create_future<string>(TypeStringFuture, TypeString, TypeCallbackString);
-	lib_create_future<Path>(TypePathFuture, TypePath, TypeCallbackPath);
-	lib_create_future<bool>(TypeBoolFuture, TypeBool, TypeCallbackBool);
-	lib_create_future<void>(TypeVoidFuture, TypeVoid, TypeCallback);
-
-	lib_create_promise<void>(TypeVoidPromise, TypeVoid, TypeVoidFuture);
-	lib_create_promise<string>(TypeStringPromise, TypeString, TypeStringFuture);
 
 	add_class(TypeHuiMenu);
 		class_add_func(Identifier::func::Init, TypeVoid, hui_p(&hui::Menu::__init__), Flags::Mutable);
@@ -719,10 +707,6 @@ void SIAddPackageHui(Context *c) {
 	add_enum("NUM_KEYS", TypeInt32,hui::NUM_KEYS);
 	add_enum("KEY_ANY", TypeInt32, hui::KEY_ANY);
 
-	add_ext_var("app_filename", TypePath, hui_p(&hui::Application::filename));
-	add_ext_var("app_directory", TypePath, hui_p(&hui::Application::directory));
-	add_ext_var("app_directory_static", TypePath, hui_p(&hui::Application::directory_static));
-	//add_ext_var("filename", TypePath, hui_p(&hui::Filename));
 	add_ext_var("app_config", TypeOsConfiguration, hui_p(&hui::config));
 }
 

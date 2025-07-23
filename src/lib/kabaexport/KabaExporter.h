@@ -1,9 +1,10 @@
 #pragma once
 
-#include <lib/base/base.h>
-#if __has_include(<lib/kaba/lib/extern.h>)
-#include <lib/kaba/lib/extern.h>
-#include <lib/kaba/lib/lib.h>
+#include "../base/base.h"
+#if __has_include("../kaba/lib/extern.h")
+#include "../kaba/lib/extern.h"
+#include "../kaba/lib/lib.h"
+#include "../kaba/dynamic/exception.h"
 
 #else
 

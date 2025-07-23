@@ -7,14 +7,15 @@
 
 #include "SessionManager.h"
 #include "BackupManager.h"
-#include "../lib/base/base.h"
-#include "../lib/base/iter.h"
-#include "../lib/base/algo.h"
-#include "../lib/base/optional.h"
-#include "../lib/hui/language.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/os/file.h"
-#include "../lib/doc/xml.h"
+#include <lib/base/base.h>
+#include <lib/base/iter.h>
+#include <lib/base/algo.h>
+#include <lib/base/optional.h>
+#include <lib/hui/language.h>
+#include <lib/os/app.h>
+#include <lib/os/filesystem.h>
+#include <lib/os/file.h>
+#include <lib/doc/xml.h>
 #include "../data/base.h"
 #include "../data/Track.h"
 #include "../data/Song.h"
@@ -31,6 +32,7 @@
 #include "../Playback.h"
 #include "../view/mainview/MainView.h"
 #include "../view/signaleditor/SignalEditorTab.h"
+#include "os/app.h"
 
 namespace tsunami {
 
@@ -472,7 +474,7 @@ void SessionManager::delete_saved_session(const Path& filename) {
 }
 
 Path SessionManager::directory() {
-	return Tsunami::directory | "sessions";
+	return os::app::directory_dynamic | "sessions";
 }
 
 static SessionLabel::Flags operator|(SessionLabel::Flags a, SessionLabel::Flags b) {

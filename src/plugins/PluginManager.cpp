@@ -75,14 +75,15 @@
 #include "../view/painter/MidiPainter.h"
 #include "../view/painter/MultiLinePainter.h"
 #include "../view/TsunamiWindow.h"
-#include "../lib/base/callable.h"
-#include "../lib/hui/Menu.h"
-#include "../lib/hui/language.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/fft/_kaba_export.h"
-#include "../lib/kaba/dynamic/exception.h"
-#include "../lib/kaba/lib/future.h"
-#include "../lib/kaba/lib/lib.h"
+#include <lib/base/callable.h>
+#include <lib/hui/Menu.h>
+#include <lib/hui/language.h>
+#include <lib/os/app.h>
+#include <lib/os/filesystem.h>
+#include <lib/fft/_kaba_export.h>
+#include <lib/kaba/dynamic/exception.h>
+#include <lib/kaba/lib/future.h>
+#include <lib/kaba/lib/lib.h>
 
 
 namespace hui {
@@ -1245,14 +1246,14 @@ Plugin *PluginManager::get_plugin(Session *session, ModuleCategory type, const s
 }
 
 Path PluginManager::plugin_dir_static() {
-	if (Tsunami::installed)
-		return Tsunami::directory_static | "plugins";
+	if (os::app::installed)
+		return os::app::directory_static | "plugins";
 	return "plugins";
 }
 
 Path PluginManager::plugin_dir_local() {
-	if (Tsunami::installed)
-		return Tsunami::directory | "plugins";
+	if (os::app::installed)
+		return os::app::directory_dynamic | "plugins";
 	return "plugins";
 }
 

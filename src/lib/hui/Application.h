@@ -51,8 +51,6 @@ public:
 	int run();
 	static void do_single_main_loop();
 
-	static void guess_directories(const Array<string> &arg, const string &app_name);
-
 
 
 	static void _cdecl about_box(Window *win);
@@ -61,13 +59,9 @@ public:
 
 	static base::map<string, string> _properties_;
 
-	static Path filename;
-	static Path directory;			// dir of changeable files (ie. ~/.app/)
-	static Path directory_static;	// dir of static files (ie. /usr/shar/app)
-	static Path initial_working_directory;
-	static bool installed; // installed into system folders?
 	static bool adwaita_started;
 	static Flags flags;
+	static bool allowed;
 
 	static Array<string> _args;
 
@@ -78,12 +72,14 @@ public:
 }
 
 #define HUI_EXECUTE(APP_CLASS) \
-int hui_main(const Array<string> &args) { \
+namespace os::app { \
+int main(const Array<string> &args) { \
 	APP_CLASS::_args = args; \
 	APP_CLASS *app = new APP_CLASS; \
 	int r = app->try_execute(args); \
 	delete app; \
 	return r; \
+} \
 }
 
 #endif /* HUIAPPLICATION_H_ */

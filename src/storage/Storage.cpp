@@ -40,6 +40,7 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/SongSelection.h"
 #include "../module/audio/BufferStreamer.h"
+#include "os/app.h"
 
 namespace tsunami {
 
@@ -104,13 +105,13 @@ Storage::Storage(Session *_session) {
 	formats.add(new FormatDescriptorMidi());
 	formats.add(new FormatDescriptorPdf());
 
-	current_chain_directory = hui::Application::directory_static | "SignalChains";
+	current_chain_directory = os::app::directory_static | "SignalChains";
 
 	hui::config.migrate("QuickExportDir", "Storage.QuickExportDirectory");
 	hui::config.migrate("CurrentDirectory", "Storage.CurrentDirectory");
 	hui::config.migrate("OggQuality", "Storage.DefaultOggQuality");
 
-	quick_export_directory = hui::config.get_str("Storage.QuickExportDirectory", str(hui::Application::directory));
+	quick_export_directory = hui::config.get_str("Storage.QuickExportDirectory", str(os::app::directory_dynamic));
 
 	default_ogg_quality = hui::config.get_float("Storage.DefaultOggQuality", 0.5f);
 
@@ -294,11 +295,11 @@ base::future<AudioBuffer> Storage::load_buffer(const Path &filename) {
 
 Path Storage::temp_saving_file(const string &ext) {
 	for (int i = 0; i < 1000; i++) {
-		Path p = (Tsunami::directory | format("-temp-saving-%03d-.", i)).with(ext);
+		Path p = (os::app::directory_dynamic | format("-temp-saving-%03d-.", i)).with(ext);
 		if (!os::fs::exists(p))
 			return p;
 	}
-	return (Tsunami::directory | "-temp-saving-.").with(ext);
+	return (os::app::directory_dynamic | "-temp-saving-.").with(ext);
 }
 
 // safety: first write to temp file, then (if successful) move

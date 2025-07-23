@@ -762,6 +762,7 @@ add_library(moduletsunami SHARED
 	src/lib/hui/Controls/ToolItemSeparatorWin.cpp
 	src/lib/hui/Controls/ToolItemToggleButtonGtk.cpp
 	src/lib/hui/Controls/ToolItemToggleButtonWin.cpp
+	src/lib/hui/_kaba_export.cpp
 	src/lib/hui/Application.cpp
 	src/lib/hui/Callback.cpp
 	src/lib/hui/Clipboard.cpp
@@ -883,6 +884,7 @@ add_library(moduletsunami SHARED
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
+	src/lib/nix/_kaba_export.cpp
 	src/lib/nix/nix.cpp
 	src/lib/nix/nix_buffer.cpp
 	src/lib/nix/nix_draw.cpp
@@ -892,6 +894,7 @@ add_library(moduletsunami SHARED
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -1114,7 +1117,7 @@ add_library(moduletsunami SHARED
 target_include_directories(moduletsunami PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(moduletsunami PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(moduletsunami PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(moduletsunami PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(moduletsunami PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(moduletsunami PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(moduletsunami PUBLIC -fvisibility=hidden)
@@ -1318,6 +1321,7 @@ add_executable(tsunami WIN32
 	src/lib/hui/Controls/ToolItemSeparatorWin.cpp
 	src/lib/hui/Controls/ToolItemToggleButtonGtk.cpp
 	src/lib/hui/Controls/ToolItemToggleButtonWin.cpp
+	src/lib/hui/_kaba_export.cpp
 	src/lib/hui/Application.cpp
 	src/lib/hui/Callback.cpp
 	src/lib/hui/Clipboard.cpp
@@ -1439,6 +1443,7 @@ add_executable(tsunami WIN32
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
+	src/lib/nix/_kaba_export.cpp
 	src/lib/nix/nix.cpp
 	src/lib/nix/nix_buffer.cpp
 	src/lib/nix/nix_draw.cpp
@@ -1448,6 +1453,7 @@ add_executable(tsunami WIN32
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -1669,7 +1675,7 @@ add_executable(tsunami WIN32
 target_include_directories(tsunami PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(tsunami PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(tsunami PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(tsunami PUBLIC ${DEPS})
 target_include_directories(tsunami PUBLIC src)
 target_include_directories(tsunami PUBLIC src/lib)

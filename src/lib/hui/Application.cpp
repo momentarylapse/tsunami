@@ -21,6 +21,8 @@
 
 #include <gtk/gtk.h>
 
+#include "../os/app.h"
+
 #ifdef OS_WINDOWS
 #include <windows.h>
 #endif
@@ -43,12 +45,8 @@ GtkApplication *Application::application = nullptr;
 base::map<string, string> Application::_properties_;
 
 Flags Application::flags = Flags::NONE;
-Path Application::filename;
-Path Application::directory;
-Path Application::directory_static;
-Path Application::initial_working_directory;
-bool Application::installed;
 bool Application::adwaita_started = false;
+bool Application::allowed = true;
 
 Array<string> Application::_args;
 
@@ -87,29 +85,34 @@ void _init_global_css_classes_() {
 #endif
 }
 
+void init_low_level() {
+	_InitInput_();
+	new(&Application::_properties_) base::map<string, string>();
+
+	separator = "\\";
+	_using_language_ = false;
+}
+
 Application::Application(const string &app_name, const string &def_lang, Flags _flags) {
+	init_low_level();
 	flags = _flags;
 
 #ifdef HUI_API_GTK
 	g_set_prgname(app_name.c_str());
 #endif
 
-	guess_directories(_args, app_name);
+	os::app::detect(_args, app_name);
 
 
-	_InitInput_();
-
-	separator = "\\";
-	_using_language_ = false;
 	if ((flags & Flags::NO_ERROR_HANDLER) == 0)
 		SetDefaultErrorHandler(nullptr);
 
-	if (os::fs::exists(directory | "config.txt"))
-		config.load(directory | "config.txt");
+	if (os::fs::exists(os::app::directory_dynamic | "config.txt"))
+		config.load(os::app::directory_dynamic | "config.txt");
 
 
 	if ((flags & Flags::DONT_LOAD_RESOURCE) == 0)
-		load_resource(directory_static | "hui_resources.txt");
+		load_resource(os::app::directory_static | "hui_resources.txt");
 
 	if (def_lang.num > 0)
 		set_language(config.get_str("Language", def_lang));
@@ -117,16 +120,16 @@ Application::Application(const string &app_name, const string &def_lang, Flags _
 
 	// default "logo" used for "about" dialog (full path)
 #if defined(OS_LINUX) || defined(OS_MAC)
-	if (os::fs::exists(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")))
-		set_property("logo", str(directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")));
-	else if (os::fs::exists(directory_static | "icon.svg"))
-		set_property("logo", str(directory_static | "icon.svg"));
+	if (os::fs::exists(os::app::directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")))
+		set_property("logo", str(os::app::directory_static | "icons" | "hicolor" | "scalable" | "apps" | (app_name + ".svg")));
+	else if (os::fs::exists(os::app::directory_static | "icon.svg"))
+		set_property("logo", str(os::app::directory_static | "icon.svg"));
 	else
 #endif
-	if (os::fs::exists(directory_static | "icon.png"))
-		set_property("logo", str(directory_static | "icon.png"));
-	else if (os::fs::exists(directory_static | "icon.ico"))
-		set_property("logo", str(directory_static | "icon.ico"));
+	if (os::fs::exists(os::app::directory_static | "icon.png"))
+		set_property("logo", str(os::app::directory_static | "icon.png"));
+	else if (os::fs::exists(os::app::directory_static | "icon.ico"))
+		set_property("logo", str(os::app::directory_static | "icon.ico"));
 
 	// default "icon" used for windows (just name)
 	set_property("icon", app_name);
@@ -136,7 +139,7 @@ Application::~Application() {
 	//foreachb(Window *w, _all_windows_)
 	//	delete(w);
 	if (config.changed)
-		config.save(directory | "config.txt");
+		config.save(os::app::directory_dynamic | "config.txt");
 	if ((msg_inited) /*&& (HuiMainLevel == 0)*/)
 		msg_end();
 
@@ -160,67 +163,6 @@ Path strip_dev_dirs(const Path &p) {
 	return p;
 }
 
-//   filename -> executable file
-//   directory ->
-//      NONINSTALLED:  binary dir
-//      INSTALLED:     ~/.MY_APP/      <<< now always this
-//   directory_static ->
-//      NONINSTALLED:  binary dir/static/
-//      INSTALLED:     /usr/local/share/MY_APP/
-//   initial_working_directory -> working dir before running this program
-void Application::guess_directories(const Array<string> &arg, const string &app_name) {
-
-	initial_working_directory = os::fs::current_directory();
-	installed = false;
-
-
-	// executable file
-#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
-	if (arg.num > 0)
-		filename = arg[0];
-#else // OS_WINDOWS
-	char *ttt = nullptr;
-	int r = _get_pgmptr(&ttt);
-	filename = ttt;
-	hui_win_instance = (void*)GetModuleHandle(nullptr);
-#endif
-
-
-	// first, assume a local/non-installed version
-	directory = initial_working_directory; //strip_dev_dirs(filename.parent());
-	directory_static = directory | "static";
-
-#ifdef INSTALL_PREFIX
-	// our build system should define this:
-	Path prefix = INSTALL_PREFIX;
-#else
-	// oh no... fall-back
-	Path prefix = "/usr/local";
-#endif
-
-	#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
-		// installed version?
-		if (filename.is_in(prefix) or (filename.str().find("/") < 0)) {
-			installed = true;
-			directory_static = prefix | "share" | app_name;
-		}
-
-		// inside an AppImage?
-		if (getenv("APPIMAGE")) {
-			installed = true;
-			directory_static = Path(getenv("APPDIR")) | "usr" | "share" | app_name;
-		}
-
-		// inside MacOS bundle?
-		if (str(filename).find(".app/Contents/MacOS/") >= 0) {
-			installed = true;
-			directory_static = filename.parent().parent() | "Resources";
-		}
-
-		directory = format("%s/.%s/", getenv("HOME"), app_name);
-		os::fs::create_directory(directory);
-	#endif
-}
 
 #if GTK_CHECK_VERSION(4,0,0)
 static bool keep_running = true;
@@ -246,7 +188,7 @@ static void on_gtk_application_activate(GApplication *_g_app, gpointer user_data
 
 	// add local icon theme
 	auto icon_theme = gtk_icon_theme_get_for_display(gdk_display_get_default());
-	gtk_icon_theme_add_search_path(icon_theme, str(Application::directory_static | "icons").c_str());
+	gtk_icon_theme_add_search_path(icon_theme, str(os::app::directory_static | "icons").c_str());
 
 	if (_run_after_gui_init_func_)
 		_run_after_gui_init_func_();
@@ -324,6 +266,8 @@ void Application::set_property(const string &name, const string &value) {
 }
 
 string Application::get_property(const string &name) {
+	if (!_properties_.contains(name))
+		return "";
 	try {
 		return _properties_[name];
 	} catch(...) {

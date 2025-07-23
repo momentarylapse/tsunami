@@ -10,6 +10,8 @@
 
 #include <gtk/gtk.h>
 
+#include "../os/app.h"
+
 #ifdef HUGE
 #undef HUGE
 #endif
@@ -231,7 +233,7 @@ GtkIconTheme *get_hui_icon_theme() {
 	if (!hui_icon_theme) {
 		hui_icon_theme = gtk_icon_theme_new();
 #if GTK_CHECK_VERSION(4,0,0)
-		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static | "icons"));
+		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(os::app::directory_static | "icons"));
 		/*gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static | "icons" | "64x64"));
 		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static | "icons" | "48x48"));
 		gtk_icon_theme_add_search_path(hui_icon_theme, sys_str_f(Application::directory_static | "icons" | "32x32"));*/
@@ -348,7 +350,7 @@ GtkWidget *get_gtk_image_x(const string &image, IconSize size, GtkWidget *widget
 	//	if ((img->filename[0] == '/') or (img->filename[1] == ':'))
 	//		return gtk_image_new_from_file(sys_str_f(img->filename));
 		// relative
-		return gtk_image_new_from_file(sys_str_f(Application::directory_static | image));
+		return gtk_image_new_from_file(sys_str_f(os::app::directory_static | image));
 	}
 }
 void *get_gtk_image(const string &image, IconSize size) {

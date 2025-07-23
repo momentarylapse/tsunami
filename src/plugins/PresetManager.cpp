@@ -6,10 +6,10 @@
  */
 
 #include "../module/Module.h"
-#include "../lib/base/algo.h"
-#include "../lib/hui/hui.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/doc/xml.h"
+#include <lib/base/algo.h>
+#include <lib/os/filesystem.h>
+#include <lib/os/app.h>
+#include <lib/doc/xml.h>
 #include "../data/base.h"
 #include "../view/dialog/PresetSelectionDialog.h"
 #include "../Tsunami.h"
@@ -125,14 +125,14 @@ void PresetManager::make_usable(Session *session) {
 }
 
 void PresetManager::load(Session *session) {
-	if (os::fs::exists(Tsunami::directory | "profiles.xml")) {
+	if (os::fs::exists(os::app::directory_dynamic | "profiles.xml")) {
 		// convert from legacy
-		load_from_file_old(Tsunami::directory | "profiles.xml", false, session);
+		load_from_file_old(os::app::directory_dynamic | "profiles.xml", false, session);
 		save(session);
-		os::fs::_delete(Tsunami::directory | "profiles.xml");
+		os::fs::_delete(os::app::directory_dynamic | "profiles.xml");
 	} else {
-		load_from_file(Tsunami::directory_static | "presets-demo.xml", true, session);
-		load_from_file(Tsunami::directory | "presets.xml", false, session);
+		load_from_file(os::app::directory_static | "presets-demo.xml", true, session);
+		load_from_file(os::app::directory_dynamic | "presets.xml", false, session);
 		save(session);
 	}
 	loaded = true;
@@ -190,7 +190,7 @@ void PresetManager::save(Session *session) {
 		root.add(tt);
 
 		p.elements.add(root);
-		p.save(Tsunami::directory | "presets.xml");
+		p.save(os::app::directory_dynamic | "presets.xml");
 	} catch (Exception &e) {
 		session->e(e.message());
 	}

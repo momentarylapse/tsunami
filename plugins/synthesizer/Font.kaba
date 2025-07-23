@@ -22,7 +22,7 @@ struct MidiFont
 		for s in sub
 			s.song = new Song(s, DEFAULT_SAMPLE_RATE)
 			song = weak(s.song)
-			s.storage.load(s.song, hui.app_directory | "Midi Fonts/{{name}}.nami")
+			s.storage.load(s.song, os.app_directory_dynamic | "Midi Fonts/{{name}}.nami")
 	
 	func mut instruments(session: Session) -> string[]
 		load(session)
@@ -70,7 +70,7 @@ class FontList as @noauto
 
 	#string[] find_drumsets()
 	func mut update()
-		let list = os.fs.search(hui.app_directory | "Midi Fonts", "*.nami", "f")
+		let list = os.fs.search(os.app_directory_dynamic | "Midi Fonts", "*.nami", "f")
 		for e in list
 			let name = str(e)[:-5]
 			for x in find(name)

@@ -15,10 +15,11 @@
 #include "../../device/DeviceManager.h"
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/SignalChain.h"
-#include "../../lib/base/iter.h"
-#include "../../lib/hui/config.h"
-#include "../../lib/hui/language.h"
-#include "../../lib/hui/common_dlg.h"
+#include <lib/base/iter.h>
+#include <lib/hui/config.h>
+#include <lib/hui/language.h>
+#include <lib/hui/common_dlg.h>
+#include <lib/os/app.h>
 #include "../../storage/Storage.h"
 #include "../../Session.h"
 #include "../../Playback.h"
@@ -50,7 +51,7 @@ SettingsDialog::SettingsDialog(AudioView *_view, hui::Window *_parent) :
 
 	set_options("default_artist", "placeholder=" + AppName);
 
-	set_options("quick_export_dir", "placeholder=" + hui::Application::directory.str());
+	set_options("quick_export_dir", "placeholder=" + str(os::app::directory_dynamic));
 
 	ogg_quality = {{0.0f, 64}, {0.1f, 80}, {0.2f, 96}, {0.3f, 112}, {0.4f, 128}, {0.5f, 160}, {0.6f, 192}, {0.7f, 224}, {0.8f, 256}, {0.9f, 320}, {1.0f, 500}};
 

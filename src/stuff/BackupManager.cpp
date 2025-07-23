@@ -11,12 +11,13 @@
 
 #include "../Tsunami.h"
 #include "../Session.h"
-#include "../lib/hui/config.h"
-#include "../lib/hui/language.h"
-#include "../lib/os/date.h"
-#include "../lib/os/file.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/os/msg.h"
+#include <lib/hui/config.h>
+#include <lib/hui/language.h>
+#include <lib/os/app.h>
+#include <lib/os/date.h>
+#include <lib/os/file.h>
+#include <lib/os/filesystem.h>
+#include <lib/os/msg.h>
 
 namespace tsunami {
 
@@ -29,14 +30,14 @@ Path BackupManager::get_filename(const string &extension) {
 	string base = d.format("backup--%Y-%m-%d--%H-%M-%S");
 	{
 		const string fn = base + "." + extension;
-		if (!os::fs::exists(Tsunami::directory | fn))
-			return Tsunami::directory | fn;
+		if (!os::fs::exists(os::app::directory_dynamic | fn))
+			return os::app::directory_dynamic | fn;
 	}
 	for (int i=0; i<26; i++) {
 		string fn = base + "a." + extension;
 		fn[fn.num - extension.num - 2] += i;
-		if (!os::fs::exists(Tsunami::directory | fn))
-			return Tsunami::directory | fn;
+		if (!os::fs::exists(os::app::directory_dynamic | fn))
+			return os::app::directory_dynamic | fn;
 	}
 	return "";
 }
@@ -59,15 +60,15 @@ void BackupManager::check_old_files() {
 	bool found_new = false;
 
 	// update list
-	auto _files = os::fs::search(Tsunami::directory, "backup-*", "f");
+	auto _files = os::fs::search(os::app::directory_dynamic, "backup-*", "f");
 	for (auto &f: _files) {
-		if (_find_by_filename(Tsunami::directory | f))
+		if (_find_by_filename(os::app::directory_dynamic | f))
 			continue;
 		BackupFile bf;
 		bf.uuid = next_uuid ++;
 		bf.session = Session::GLOBAL;
 		bf.f = nullptr;
-		bf.filename = Tsunami::directory | f;
+		bf.filename = os::app::directory_dynamic | f;
 		files.add(bf);
 		found_new = true;
 	}

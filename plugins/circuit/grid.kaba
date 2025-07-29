@@ -1,0 +1,51 @@
+use circuit64.*
+
+func simulate(N: i32)
+	print("------")
+	print(N)
+	var c: Circuit
+	c.clear()
+	
+	# nodes
+	let NX = 2*N+2
+	let NY = 2*N+1
+	for i in 0:NX
+		for j in 0:NY
+			c.nodes.add(Node([i,j]))
+	c.node_grounded = N*NY + N
+	c.node_input = (N+1)*NY + N
+	
+	
+	# edges - horizontal
+	for i in 0:NX-1
+		for j in 0:NY
+			let a = i*NY + j
+			let b = (i+1)*NY + j
+			c.edges.add(new Resistor([a,b], 1))
+	# edges - vertical
+	for i in 0:NX
+		for j in 0:NY-1
+			let a = i*NY + j
+			let b = i*NY + j+1
+			c.edges.add(new Resistor([a,b], 1))
+	
+	
+	#print(str(c))
+	var res: SimResult
+	# 1s, 1 step, 1A DC
+	c.simulate(1.0, 1.0, 1.0, 1, 0, res)
+	#print(str(c))
+	
+#	print("U = {{res.U}}")
+#	print("I = {{res.I}}")
+#	print("phi = {{res.phi}}")
+	
+	for i=>e in c.edges
+		if e.a == c.node_grounded and e.b == c.node_input
+			#print(res.U[0][i])
+			print(e.U)
+
+
+func main()
+	for N in 0:20
+		simulate(N)

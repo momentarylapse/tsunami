@@ -1,0 +1,304 @@
+
+# ===  vector functions  ===
+
+func vec_zero(n: i32) -> f32[]
+	var v: f32[]
+	v.resize(n)
+	return v
+
+func vec_basis(n: i32, k: i32) -> f32[]
+	var v: f32[]
+	v.resize(n)
+	v[k] = 1
+	return v
+
+func dot(a: f32[], b: f32[]) -> f32
+	if len(a) != len(b)
+		return 0
+	var r = 0.0
+	for i=>x in a
+		r += x*b[i]
+	return r
+
+
+# ===  matrix functions  ===
+
+struct Matrix
+	var e: f32[]
+	var m = 0 # rows
+	var n = 0 # cols
+	func __init__()
+	func __init__(el: f32[][])
+		m = len(el) # rows
+		n = len(el[0]) # columns
+		e.resize(m*n)
+		for i in 0:m
+			for j in 0:n
+				e[i*n + j] = el[i][j]
+	func mut clear(_m: i32, _n: i32)
+		m = _m
+		n = _n
+		e.clear()
+		e.resize(m*n)
+	func selfref get(i: i32, j: i32) -> f32&
+		return &e[i * n + j]
+	func __str__() -> string
+		var s: string[]
+		for i in 0:m
+			s.add(str(e[i*n:(i+1)*n]))
+		return "[" + s.join(",\n ") + "]"
+	func mut _diagonalize(out b: f32[])
+		for i in 0:m
+			var f = *get(i,i)
+			if abs(f) < 0.0000001
+				f = 0.0000001
+			#print f
+			for j in i:n
+				e[i * n + j] /= f
+			b[i] /= f
+			
+			for ii in i+1:m
+				var g = *get(ii, i)
+				for j in i:n
+					e[ii * n + j] -= e[i * n + j] * g
+				b[ii] -= b[i] * g
+
+func zeros(m: i32, n: i32) -> Matrix
+	var M: Matrix
+	M.clear(m, n)
+	return M
+
+func eye(n: i32) -> Matrix
+	var M: Matrix
+	M.clear(n, n)
+	for i in 0:n
+		M.get(i,i) = 1
+	return M
+
+func transpose(M: Matrix) -> Matrix
+	var r: Matrix
+	r.clear(M.n, M.m)
+	for i in 0:r.m
+		for j in 0:r.n
+			r.get(i,j) = M.get(j,i)
+	return r
+
+func solve(A: Matrix, b: f32[]) -> f32[]
+	if A.m != A.n or len(b) != A.m
+		raise(new Exception("size mismatch"))
+	var mm = A
+	var x: f32[]
+	x.resize(A.m)
+	var bb = b
+	mm._diagonalize(bb)
+	
+	var i = A.n-1
+	while i >= 0
+		var s = 0.0
+		for j in i+1:A.n
+			s += mm.get(i, j) * x[j]
+		let f = *mm.get(i, i)
+		if abs(f) > 0.00001
+			x[i] = (bb[i] - s) # / f
+		else
+			x[i] = 0
+		i --
+	return x
+
+
+func mul(M: Matrix, x: f32[]) -> f32[]
+	if M.n != len(x)
+		raise(new Exception("size mismatch"))
+	var y: f32[]
+	y.resize(M.m)
+	for i in 0:M.m
+		for j=>v in x
+			y[i] += M.get(i, j) * v
+	return y
+
+func mul(A: Matrix, B: Matrix) -> Matrix
+	if A.n != B.m
+		raise(new Exception("size mismatch"))
+	var r: Matrix
+	r.clear(A.m, B.n)
+	for i in 0:r.m
+		for j in 0:r.n
+			var x = 0.0
+			for k in 0:A.n
+				x += A.get(i,k) * B.get(k,j)
+			r.get(i,j) = x
+	return r
+
+func inverse(M: Matrix) -> Matrix
+	if M.m != M.n
+		raise(new Exception("not square"))
+	let n = M.n
+	var r: Matrix
+	r.clear(n, n)
+	for i in 0:n
+		let e = vec_basis(n, i)
+		let a = solve(M, e)
+		for j=>v in a
+			r.get(j,i) = v
+	return r
+
+
+func qr_decomposition(A: Matrix) -> (Matrix,Matrix)
+	var R = A
+	var Q = eye(A.m)
+	for j in 0:A.n-1
+		# H = 1 - tau w(x)w
+		var w = [for i in j:A.m  R.e[i*A.m + j]]
+		let snorm = sqrt(dot(w, w)) * sign(R.get(j,j))
+		let u = R.get(j,j) - snorm
+		let tau = -u / snorm
+		w /= u
+		w[0] = 1
+		# R = HR
+		var wR = vec_zero(A.n)
+		for i in j:A.m
+			for k in 0:A.n
+				wR[k] += w[i-j] * R.get(i,k)
+		for i in j:A.m
+			for k in 0:A.n
+				R.get(i,k) -= tau * w[i - j] * wR[k]
+		# Q = QH
+		var Qw = vec_zero(A.m)
+		for i in 0:A.m
+			for k in j:A.n
+				Qw[i] += Q.get(i,k) * w[k-j]
+		for i in 0:A.m
+			for k in j:A.n
+				Q.get(i,k) -= tau * Qw[i] * w[k - j]
+	return (Q,R)
+
+
+# === sparce matrix ===
+
+struct SparseRowMatrix
+	var m = 0
+	var n = 0
+	var rows: (i32,f32)[][]
+	func __init__()
+	func __init__(M: Matrix)
+		clear(M.m, M.n)
+		for i in 0:m
+			for j in 0:n
+				let v = *M.get(i,j)
+				if v != 0
+					set(i, j, v)
+
+	func mut clear(_m: i32, _n: i32)
+		m = _m
+		n = _n
+		rows.clear()
+		rows.resize(m)
+
+	func mut set(i: i32, j: i32, v: f32)
+		for mut x in rows[j]
+			if x[0] == i
+				x[1] = v
+				return
+		if v != 0
+			rows[j].add([i, v])
+
+	func get(i: i32, j: i32) -> f32
+		for x in rows[j]
+			if x[0] == i
+				return x[1]
+		return 0
+
+	func to_matrix() -> Matrix
+		var r: Matrix
+		r.clear(m, n)
+		for i=>row in rows
+			for e in row
+				r.get(i,e[0]) = e[1]
+		return r
+
+	func __str__() -> string
+		var s: string[]
+		for row in rows
+			s.add(str(row))
+		return "[" + s.join(",\n ") + "]"
+
+
+func mul(M: SparseRowMatrix, x: f32[]) -> f32[]
+	if M.n != len(x)
+		raise(new Exception("size mismatch"))
+	var y: f32[]
+	y.resize(M.m)
+	for i in 0:M.m
+		for el in M.rows[i]
+			y[i] += el[1] * x[el[0]]
+	return y
+
+func inverse(M: SparseRowMatrix) -> Matrix
+	return inverse(M.to_matrix())
+
+
+
+
+# A: inner, B: outer
+func outer_product(A: SparseRowMatrix, B: SparseRowMatrix) -> SparseRowMatrix
+	var r: Ret
+	r.clear(A.m*B.m, A.n*B.n)
+		
+	for i=>rowA in A.rows
+		for j=>rowB in B.rows
+			for eA in rowA
+				for eB in rowB
+					r.set(j*A.m+i, eB[0]*A.m+eA[0], eA[1]*eB[1])
+	return r
+
+# ok
+func _test_solve()
+#func main()
+	let M = Matrix([[2.,1.],[-1.,2.]])
+	print(M)
+	let x = solve(M, [1.0,1.0])
+	print(x)
+	print(mul(M, x))
+
+func _test_mul()
+	let M = Matrix([[1,2],[3,4],[5,6]])
+	print(M)
+	print(mul(M, [1,0]))
+
+func _test_inverse()
+#func main()
+	let M = Matrix([[2.,1.],[-1.,2.]])
+	print(M)
+	let I = inverse(M)
+	print(I)
+	print(mul(I,M))
+	print(mul(M,I))
+
+func _test_sparse_mul()
+	var M: SparseRowMatrix
+	M.clear(4,5)
+	M.set(3,2, 5)
+	M.set(1,2, 6)
+	M.set(3,2, 7)
+	print(M)
+	print(M.to_matrix())
+	print(mul(M, [99,1,1,0,0]))
+
+func _test_outer()
+	let A = SparseRowMatrix(Matrix([[1,2],[3,4]]))
+	let B = SparseRowMatrix(Matrix([[1,-1],[0,100]]))
+	print(A.to_matrix())
+	print(B.to_matrix())
+	print(outer_product(A, B).to_matrix())
+
+func _test_qr()
+#func main()
+	var A = Matrix([[12,-51,4],[6,167,-68],[-4,24,-41]])
+	#var A = Matrix([[1,2],[4,5],[5,6]])
+	#var A = Matrix([[1,2,3],[4,5,6]])
+	print(A)
+	let (Q,R) = qr_decomposition(A)
+	print(Q)
+	print(R)
+	print(mul(Q, R))
+	

@@ -1,0 +1,286 @@
+use hui
+use circuit.*
+
+enum SelectionType
+	NONE
+	NODE
+	EDGE
+
+class Selection
+	var type = SelectionType.NONE
+	var index = -1
+
+enum Mode
+	DEFAULT
+	ADD_NODE
+	ADD_EDGE
+	MOVE_NODE
+
+class CircuitPanel extends hui.Panel
+	var c: Circuit&
+	var w, h: float
+	var sel: Selection
+	
+	var res: SimResult
+	var NT: int
+	var umin, umax: float
+	var imin, imax: float
+	
+	var mode: Mode
+	var add_type: EdgeType
+	var first_node: int
+	
+	var COLOR_BACKGROUND: color
+	var COLOR_TEXT: color
+	var COLOR_SELECTION: color
+	
+	func __init__(_c: Circuit)
+		from_source("
+DrawingArea area '' grab-focus")
+		
+		c := &_c
+		
+		mode = Mode.DEFAULT
+		
+		umin = -100
+		umax = 100
+		imin = -2
+		imax = 2
+		
+		COLOR_BACKGROUND = color(0.1, 0.1, 0.1, 1)
+		COLOR_TEXT = color.WHITE
+		COLOR_SELECTION = color(0.4, 0.4, 1.0, 1)
+
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", on_left_button_down)
+		event_x("area", "hui:left-button-up", on_left_button_up)
+		event_x("area", "hui:mouse-move", on_mouse_move)
+		event_x("area", "hui:key-down", on_key_down)
+	
+	func mut redraw()
+		redraw("area")	
+		
+
+	func project_u(i: int, u: float) -> vec2
+		return vec2(float(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
+	func project_i(i: int, v: float) -> vec2
+		return vec2(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
+		
+	func mut on_simulate()
+		let duration = get_float("t")
+		let dt = get_float("dt")
+		let I = get_float("input-amp")
+		let f = get_float("input-freq")
+		let type = get_int("input-type")
+		res.clear()
+		c.reset_state()
+		c.simulate(duration, dt, I, f*2*pi, type, res)
+		auto_scale()
+		redraw("area")
+	
+	func mut auto_scale()
+		umax = 0
+		for uu in res.U
+			for u in uu
+				umax = max(umax, abs(u))
+		if umax == 0
+			umax = 1
+		umin = -umax
+		imax = 0
+		for ii in res.I
+			for i in ii
+				imax = max(imax, abs(i))
+		if imax == 0
+			imax = 1
+		imin = -imax
+	
+	func project(p: vec2) -> vec2
+		return vec2(p.x * w, h - p.y * h)
+	
+	func unproject(p: vec2) -> vec2
+		return vec2(p.x / w, (h - p.y) / h)
+	
+	func mut on_left_button_down()
+		sel.type = SelectionType.NONE
+		var m = hui.get_event().mouse
+		for i=>n in c.nodes
+			if (m - project(n.pos)).length() < 20
+				sel.type = SelectionType.NODE
+				sel.index = i
+				break
+		for i=>e in c.edges
+			var a = project(c.nodes[e.a].pos)
+			var b = project(c.nodes[e.b].pos)
+			var mm = (a+b)*0.5
+			if (m - mm).length() < 40
+				sel.type = SelectionType.EDGE
+				sel.index = i
+				break
+		
+		if mode == Mode.ADD_NODE
+			c.nodes.add(Node(unproject(m)))
+			res.clear()
+			mode = Mode.DEFAULT
+		else if mode == Mode.ADD_EDGE
+			if sel.type == SelectionType.NODE
+				if first_node < 0
+					first_node = sel.index
+				else
+					c.add_default([first_node, sel.index], add_type)
+					res.clear()
+					mode = Mode.DEFAULT
+		else if mode == Mode.DEFAULT
+			if sel.type == SelectionType.NODE
+				mode = Mode.MOVE_NODE
+		on_selection_change()
+		redraw("area")
+	
+	func mut on_left_button_up()
+		if mode == Mode.MOVE_NODE
+			mode = Mode.DEFAULT
+			redraw("area")
+
+	func mut on_mouse_move()
+		if mode == Mode.MOVE_NODE
+			var m = hui.get_event().mouse
+			c.nodes[sel.index].pos = unproject(m)
+			redraw("area")
+	
+	func mut on_key_down()
+		if hui.get_event().key == hui.KEY_DELETE
+			if sel.type == SelectionType.EDGE
+				#del c.edges[sel.index]
+				c.edges.remove(sel.index)
+				sel.type = SelectionType.NONE
+				res.clear()
+		redraw("area")
+
+	func mut on_draw(p: hui.Painter)
+		w = p.width
+		h = p.height
+		
+		# bg
+		p.set_color(COLOR_BACKGROUND)
+		p.draw_rect(rect(0,w, 0,h))
+		
+		draw_res(p)
+		
+		p.set_line_width(2)
+		p.set_fill(false)
+		for i=>e in c.edges
+			p.set_color(COLOR_TEXT)
+			if sel.type == SelectionType.EDGE and sel.index == i
+				p.set_color(COLOR_SELECTION)
+			let a = project(c.nodes[e.a].pos)
+			let b = project(c.nodes[e.b].pos)
+			let m = (a+b)*0.5
+			let d = (b-a)* (1.0 / len(b-a))
+			let dd = vec2(d.y, -d.x)
+			if e.type == EdgeType.CABLE
+				p.draw_line(a, b)
+			else if e.type == EdgeType.SOURCE
+				let l = 25.0
+				let r = 8.0
+				p.draw_line(b, m + d*(l+r))
+				p.draw_line(a, m - d*(l+r))
+				p.draw_circle(m + l*d, r)
+				p.draw_circle(m - l*d, r)
+			else if e.type == EdgeType.RESISTOR
+				let l = 35.0
+				let r = 10.0
+				p.draw_line(b, m + d*l)
+				p.draw_line(a, m - d*l)
+				p.draw_line(m + d*l + dd*r, m + d*l - dd*r)
+				p.draw_line(m - d*l + dd*r, m - d*l - dd*r)
+				p.draw_line(m + d*l + dd*r, m - d*l + dd*r)
+				p.draw_line(m + d*l - dd*r, m - d*l - dd*r)
+			else if e.type == EdgeType.CAPACITOR
+				let l = 30.0
+				let r = 5.0
+				p.draw_line(b, m + d*r)
+				p.draw_line(a, m - d*r)
+				p.draw_line(m + d*r - dd*l, m + d*r + dd*l)
+				p.draw_line(m - d*r - dd*l, m - d*r + dd*l)
+			else if e.type == EdgeType.INDUCTOR
+				let l = 40.0
+				let r = 10.0
+				p.draw_line(b, m + d*(l+r))
+				p.draw_line(a, m - d*(l+r))
+				for t in -1.0:1.01:0.5
+					p.draw_circle(m + t*l*d, r)
+			else if e.type == EdgeType.DIODE
+				let l = 20.0
+				p.draw_line(b, m + d*l)
+				p.draw_line(a, m - d*l)
+				p.draw_line(m + d*l, m - d*l + dd*l)
+				p.draw_line(m + d*l, m - d*l - dd*l)
+				p.draw_line(m - d*l + dd*l, m - d*l - dd*l)
+				p.draw_line(m + d*l + dd*l, m + d*l - dd*l)
+			
+			p.draw_line(m + dd*30 - d*30, m + dd*30 + d*30)
+			p.draw_line(m + dd*30 + d*30, m + dd*25 + d*25)
+			p.draw_line(m + dd*30 + d*30, m + dd*35 + d*25)
+		
+		p.set_fill(true)
+		for i=>n in c.nodes
+			p.set_color(COLOR_TEXT)
+			if sel.type == SelectionType.NODE and sel.index == i
+				p.set_color(COLOR_SELECTION)
+			let pp = project(n.pos)
+			p.draw_circle(pp, 5)
+			if i == 0
+				p.draw_line(pp, pp + vec2(0, 20))
+				p.draw_line(pp + vec2(-20, 20), pp + vec2(20, 20))
+				p.draw_line(pp + vec2(-12, 25), pp + vec2(12, 25))
+				p.draw_line(pp + vec2(-4, 30), pp + vec2(4, 30))
+			if i == 1
+				p.draw_str([pp.x - 38, pp.y - 10], "in")
+			if i == c._out
+				p.draw_str([pp.x + 20, pp.y - 10], "out")
+		
+		if mode == Mode.ADD_EDGE
+			if first_node < 0
+				p.draw_str([0, 0], "click first on node to connect with edge")
+			else
+				p.draw_str([0, 0], "click second on node to connect with edge")
+		else if mode == Mode.ADD_NODE
+			p.draw_str([0, 0], "place the node")
+		else if mode == Mode.MOVE_NODE
+			p.draw_str([0, 0], "move the node")
+			
+	func mut draw_res(p: hui.Painter)
+		
+		NT = len(res.U)
+		if NT == 0
+			return
+		
+		let e = sel.index
+		p.set_color(color(0.2,0.2,0.2, 1))
+		p.set_line_width(1)
+		p.draw_line(project_i(0,0), project_i(NT,0))
+		if sel.type == SelectionType.EDGE
+			p.set_color(color(0,0,0.8, 1))
+			var pp: vec2[]
+			for i in 0:NT
+				pp.add(project_i(i, res.I[i][e]))
+			p.set_line_width(2)
+			p.draw_lines(pp)
+			p.set_line_width(1)
+			pp.clear()
+			p.set_color(color(0.8,0,0, 1))
+			for i in 0:NT
+				pp.add(project_u(i, res.U[i][e]))
+			p.draw_lines(pp)
+		else if sel.type == SelectionType.NODE
+			p.set_color(color(0,0.8,0, 1))
+			var pp: vec2[]
+			for i in 0:NT
+				pp.add(project_u(i, res.phi[i][e]))
+			p.draw_lines(pp)
+		
+		p.set_color(COLOR_TEXT)
+		p.draw_str([20, h - 20], "Imax = {{imax}}    Umax = {{umax}}")
+	
+	func mut virtual on_selection_change()
+		pass
+

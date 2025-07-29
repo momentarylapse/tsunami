@@ -1,0 +1,133 @@
+use os.*
+use hui
+use circuit.*
+use panel.*
+
+class EditorPanel extends CircuitPanel
+	var ed: CircuitEditor&
+	func __init__(e: CircuitEditor)
+		super.__init__(e.c)
+		ed := &e
+	func override mut on_selection_change()
+		ed.load_from_part(nil)
+		if sel.type == SelectionType.EDGE
+			ed.load_from_part(weak(ed.c.edges[sel.index]))
+
+class CircuitEditor extends hui.Window
+	var c: Circuit
+	var panel: shared![CircuitPanel]
+	
+	
+	func __init__(arg: string[])
+		super.__init__("Circuit Editor", 800, 600)
+		from_source("
+Grid root ''
+	.
+	Grid ? '' width=250 vertical noexpandx
+		Group ? 'Add'
+			ListView add-type 'what' nobar height=200 noexpandy
+		Group ? 'Part'
+			ListView params 'name\\\\value' nobar format=tT height=120 noexpandy expandx
+		Group ? 'Simulation'
+			Grid ? '' vertical
+				Grid ? ''
+					Text ? 'time'
+					SpinButton t '5.0' range=0:100:0.1 expandx
+					---|
+					Text ? 'dt'
+					SpinButton dt '0.01' range=0:1:0.001
+					---|
+					Text ? 'I input'
+					SpinButton input-amp '1' range=0:100:0.001
+					---|
+					Text ? 'f input'
+					SpinButton input-freq '1' range=0:100:0.001
+					---|
+					Text ? 'type'
+					ComboBox input-type '⎻\\\\∿\\\\⎍\\\\◢'
+				Button simulate 'Run' expandx")
+		panel = new EditorPanel(self)
+		embed(panel, "root", 0,0)
+		for t in toolbar(0)
+			t.from_source("
+Toolbar toolbar ''
+	Item new 'New' image=hui:new
+	Item open 'Open' image=hui:open
+	Item save 'Save' image=hui:save
+	Separator
+	Item simulate 'Run' image=hui:media-play")
+		
+		set_maximized(true)
+		
+		for t in EdgeType.all()
+			set_string("add-type", str(t))
+		set_string("add-type", "Node")
+		
+		if len(arg) > 0
+			c.import(fs.read_text(Path(arg[0])))
+		
+		event("new", on_new)
+		event("open", on_open)
+		event("save", on_save)
+		event("simulate", on_simulate)
+		event("add-type", on_add_type)
+		event_x("params", "hui:change", on_param)
+		load_from_part(nil)
+	
+	func mut on_new()
+		panel.res.clear()
+		c.reset_default()
+		panel.redraw()
+	
+	func on_save()
+		var f = func(p: Path)
+			fs.write_text(p, c.export())
+		hui.file_dialog_save(&self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
+	
+	func mut on_open()
+		var f = func(p: Path)
+			c.import(fs.read_text(p))
+		hui.file_dialog_open(&self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
+	
+	func mut on_param()
+		var row = hui.get_event().row
+		var p = get_cell("params", row, 1)
+		if panel.sel.type == SelectionType.EDGE
+			c.edges[panel.sel.index].param[row] = float(p)
+	
+	func mut load_from_part(_e: Edge*)
+		reset("params")
+		for e in _e
+			var names = e.param_names()
+			for i=>n in names
+				add_string("params", "{{n}}\\{{e.param[i]}}")
+			
+		
+
+		
+	func mut on_simulate()
+		var duration = get_float("t")
+		var dt = get_float("dt")
+		var I = get_float("input-amp")
+		var f = get_float("input-freq")
+		var type = get_int("input-type")
+		panel.res.clear()
+		c.reset_state()
+		c.simulate(duration, dt, I, f*2*pi, type, panel.res)
+		panel.auto_scale()
+		panel.redraw()
+	
+	
+	func mut on_add_type()
+		var t = get_int("")
+		panel.first_node = -1
+		if t == len(EdgeType.all())
+			panel.mode = Mode.ADD_NODE
+		else if t >= 0
+			panel.mode = Mode.ADD_EDGE
+			panel.add_type = EdgeType.from_int(t)
+		panel.redraw()
+
+func main(arg: string[])
+	hui.fly_and_wait(new CircuitEditor(arg))
+

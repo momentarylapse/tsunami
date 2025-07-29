@@ -211,7 +211,6 @@ void PluginManager::link_app_data() {
 //	kaba::Exporter exporter(kaba::default_context, nullptr);
 //	export_kaba_package_tsunami(&exporter);
 
-	msg_error(str(plugin_dir_static()));
 	kaba::default_context->register_package_init("hui", this->plugin_dir_static() | "hui", &export_package_hui);
 	kaba::default_context->register_package_init("fft", this->plugin_dir_static() | "fft", &export_package_fft);
 	kaba::default_context->register_package_init("tsunami", this->plugin_dir_static() | "tsunami", &PluginManager::export_kaba_package_tsunami);

@@ -196,7 +196,7 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 bool AutoImplementer::needs_new(Function *f) {
 	if (!f)
 		return true;
-	return f->needs_overriding();
+	return f->is_unimplemented() and !f->is_extern();
 }
 
 Array<string> class_func_param_names(Function *cf) {
@@ -209,15 +209,16 @@ Array<string> class_func_param_names(Function *cf) {
 
 bool has_user_constructors(const Class *t) {
 	for (auto *cc: t->get_constructors())
-		if (!cc->needs_overriding())
+		if (!cc->is_unimplemented())
 			return true;
 	return false;
 }
 
 void AutoImplementer::remove_inherited_constructors(Class *t) {
 	for (int i=t->functions.num-1; i>=0; i--)
-		if (t->functions[i]->name == Identifier::func::Init and t->functions[i]->needs_overriding())
+		if (t->functions[i]->name == Identifier::func::Init and t->functions[i]->is_unimplemented() and !t->functions[i]->is_extern()) {
 			t->functions.erase(i);
+		}
 }
 
 void AutoImplementer::redefine_inherited_constructors(Class *t) {
@@ -327,7 +328,7 @@ Function* AutoImplementer::prepare_auto_impl(const Class *t, Function *f) {
 		return nullptr;
 	if (!f->auto_declared)
 		return nullptr;
-	flags_clear(f->flags, Flags::NeedsOverride); // we're about to implement....
+	flags_clear(f->flags, Flags::Unimplemented); // we're about to implement....
 	return f;
 }
 

@@ -9,27 +9,13 @@
 	#include "../../hui/hui.h"
 	#include "../../hui/config.h"
 	#define KABA_EXPORT_HUI
-#elif __has_include("../../hui_minimal/hui.h")
-	#include "../../hui_minimal/hui.h"
-	#include "../../hui_minimal/config.h"
-	#define KABA_EXPORT_HUI_MINIMAL
 #else
-	#warning("we are screwed.... no hui or hui_minimal")
+	#warning("we are screwed.... no hui")
 #endif
 
-#if defined(KABA_EXPORT_HUI_MINIMAL) || defined(KABA_EXPORT_HUI)
+#ifdef KABA_EXPORT_HUI
 
 namespace hui{
-#ifdef KABA_EXPORT_HUI_MINIMAL
-	typedef int Menu;
-	typedef int Toolbar;
-	class Panel : public Sharable<base::Empty> {
-	};
-	using Window = Panel;
-	using Dialog = Panel;
-	typedef int Event;
-	typedef int Painter;
-#endif
 #ifdef KABA_EXPORT_HUI
 	xfer<hui::Menu> create_menu_from_source(const string &source, hui::Panel*);
 #endif

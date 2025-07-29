@@ -22,6 +22,26 @@
 #include <GLFW/glfw3.h>
 #endif
 
+
+#ifndef NIX_USE_HUI
+namespace hui {
+	class Event {
+	public:
+		void *win;
+		string message, id;
+		bool is_default;
+		vec2 m, d;
+		vec2 scroll;
+		float pressure;
+		int key_code;
+		int width, height;
+		bool lbut, mbut, rbut;
+		int row, column, row_target;
+		bool just_focused;
+	};
+}
+#endif
+
 namespace nix {
 
 extern FrameBuffer *cur_framebuffer;
@@ -135,15 +155,14 @@ void screen_shot_to_image(Image &image) {
 					GL_RGBA, GL_UNSIGNED_BYTE, &image.data[0]);
 }
 
-#ifdef NIX_USE_HUI
-void start_frame_hui(Context *gl) {
+void start_frame_hui(Context *gl, hui::Event* e) {
 	Context::CURRENT = gl;
 	int fb;
 	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &fb);
 	// FIXME
 	gl->default_framebuffer->frame_buffer = fb;
-	gl->default_framebuffer->width = hui::get_event()->column;
-	gl->default_framebuffer->height = hui::get_event()->row;
+	gl->default_framebuffer->width = e->column;
+	gl->default_framebuffer->height = e->row;
 	cur_framebuffer = gl->default_framebuffer;
 	set_viewport(gl->default_framebuffer->area());
 }
@@ -151,7 +170,6 @@ void start_frame_hui(Context *gl) {
 void end_frame_hui() {
 	Context::CURRENT->default_framebuffer->frame_buffer = 0;
 }
-#endif
 
 
 #if HAS_LIB_GLFW

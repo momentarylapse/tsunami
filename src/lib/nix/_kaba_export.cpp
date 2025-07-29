@@ -173,13 +173,8 @@ void export_package_gl(kaba::Exporter* e) {
 		// drawing
 	e->link_func("init", &nix::init);
 	//add_func("kill", TypeVoid, gl_p(&nix::kill), Flags::STATIC);
-#ifdef _X_USE_HUI_
 	e->link_func("start_frame_hui", &nix::start_frame_hui);
 	e->link_func("end_frame_hui", &nix::end_frame_hui);
-#else
-	e->link_func("start_frame_hui", &_dummy_func);
-	e->link_func("end_frame_hui", &_dummy_func);
-#endif
 	e->link_func("bind_frame_buffer", &nix::bind_frame_buffer);
 	e->link_func("set_viewport", &nix::set_viewport);
 	e->link_func("clear_color", &nix::clear_color);
@@ -193,7 +188,7 @@ void export_package_gl(kaba::Exporter* e) {
 	e->link_func("set_alpha", &nix::set_alpha_sd);
 	e->link_func("set_stencil", &nix::set_stencil);
 	e->link_func("set_projection_perspective", &nix::set_projection_perspective);
-	e->link_func("set_projection_perspective_ext", &nix::set_projection_perspective_ext);
+	e->link_func("set_projection_perspective:vec2:vec2:f32:f32", &nix::set_projection_perspective_ext);
 	e->link_func("set_projection_ortho_relative", &nix::set_projection_ortho_relative);
 	e->link_func("set_projection_ortho_pixel", &nix::set_projection_ortho_pixel);
 	e->link_func("set_projection_ortho_ext", &nix::set_projection_ortho_ext);

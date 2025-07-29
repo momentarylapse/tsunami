@@ -436,7 +436,7 @@ class Grid extends Object
 		c.clip(plot_area)
 		on_draw(c)
 	
-	func redraw()
+	func mut redraw()
 		panel.redraw(id)
 	
 	func mut update_mouse()

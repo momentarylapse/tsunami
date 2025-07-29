@@ -40,7 +40,7 @@ enum class Flags {
 	Owned = 1<<13,
 	AutoCast = 1<<14,
 	Template = 1<<15,
-	NeedsOverride = 1<<16,
+	Unimplemented = 1<<16,
 	Noauto = 1 << 17,
 	Noframe = 1 << 18,
 	Macro = 1 << 19,

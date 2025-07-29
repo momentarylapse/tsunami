@@ -340,7 +340,7 @@ Class* TemplateClassInstantiatorPointerShared::declare_new_instance(SyntaxTree *
 	return create_raw_class(tree, format("%s[%s]", Identifier::Shared, params[0]->name), TypeSharedT, config.target.pointer_size, config.target.pointer_size, 0, nullptr, params, token_id);
 }
 void TemplateClassInstantiatorPointerShared::add_function_headers(Class* t) {
-	//flags_set(t->flags, Flags::FORCE_CALL_BY_VALUE); // FIXME why not?!?
+	//flags_set(t->flags, Flags::ForceCallByValue); // FIXME why not?!?
 	//t->derive_from(TypeSharedPointer);
 
 	auto t_xfer = t->owner->request_implicit_class_xfer(t->param[0], -1);

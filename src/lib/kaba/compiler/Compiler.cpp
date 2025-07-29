@@ -902,6 +902,7 @@ void Compiler::compile_functions(char *oc, int &ocs) {
 				f->address = (int_p)external->get_link(f->cname(f->owner()->base_class));
 			if (f->address == 0)
 				module->do_error_link(format("external function '%s' not linkable", name));
+			flags_clear(f->flags, Flags::Unimplemented);
 		} else {
 			f->_label = list->create_label("_FUNC_" + i2s(func_no ++));
 		}

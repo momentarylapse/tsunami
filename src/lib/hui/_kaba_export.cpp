@@ -8,16 +8,6 @@
 
 
 namespace hui{
-#ifdef KABA_EXPORT_HUI_MINIMAL
-	typedef int Menu;
-	typedef int Toolbar;
-	class Panel : public Sharable<base::Empty> {
-	};
-	using Window = Panel;
-	using Dialog = Panel;
-	typedef int Event;
-	typedef int Painter;
-#endif
 #ifdef KABA_EXPORT_HUI
 	xfer<hui::Menu> create_menu_from_source(const string &source, hui::Panel*);
 #endif
@@ -181,8 +171,10 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_class_func("Window.set_cursor_pos", &hui::Window::set_cursor_pos);
 	e->link_class_func("Window.get_mouse", &hui::Window::get_mouse);
 	e->link_class_func("Window.get_key", &hui::Window::get_key);
-	e->link_virtual("Window.on_mouse_move", &hui::Window::on_mouse_move, &win); // const or mutable?!?!?
+	e->link_virtual("Window.on_mouse_move", &hui::Window::on_mouse_move, &win);
 	e->link_virtual("Window.on_mouse_wheel", &hui::Window::on_mouse_wheel, &win);
+	e->link_virtual("Window.on_mouse_enter", &hui::Window::on_mouse_enter, &win);
+	e->link_virtual("Window.on_mouse_leave", &hui::Window::on_mouse_leave, &win);
 	e->link_virtual("Window.on_left_button_down", &hui::Window::on_left_button_down, &win);
 	e->link_virtual("Window.on_middle_button_down", &hui::Window::on_middle_button_down, &win);
 	e->link_virtual("Window.on_right_button_down", &hui::Window::on_right_button_down, &win);
@@ -233,13 +225,13 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_func("make_gui_image", &hui::set_image);
 
 
-	e->link_func("Clipboard.paste", &hui::clipboard::paste);
-	e->link_func("Clipboard.copy", &hui::clipboard::copy);
+	e->link_func("clipboard.paste", &hui::clipboard::paste);
+	e->link_func("clipboard.copy", &hui::clipboard::copy);
 
 	e->declare_class_size("Event", sizeof(hui::Event));
 	e->declare_class_element("Event.id", &hui::Event::id);
 	e->declare_class_element("Event.message", &hui::Event::message);
-	e->declare_class_element("Event.m", &hui::Event::m);
+	e->declare_class_element("Event.mouse", &hui::Event::m);
 	e->declare_class_element("Event.pressure", &hui::Event::pressure);
 	e->declare_class_element("Event.scroll", &hui::Event::scroll);
 	e->declare_class_element("Event.key", &hui::Event::key_code);
@@ -354,6 +346,7 @@ void export_package_hui(kaba::Exporter* e) {
 	add_enum("NUM_KEYS", TypeInt32,hui::NUM_KEYS);
 	add_enum("KEY_ANY", TypeInt32, hui::KEY_ANY);
 #endif
+
 	e->link("app_config", &hui::config);
 }
 

@@ -170,7 +170,7 @@ class SimResult
 		I.clear()
 		phi.clear()
 
-class Circuit as @noauto
+class Circuit #as @noauto
 	var nodes: Node[]
 	var edges: owned![Edge][]
 	var _out: int

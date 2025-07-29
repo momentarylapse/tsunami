@@ -83,7 +83,7 @@ void SIAddPackageImage(Context *c) {
 		class_derive_from(TypeObject, DeriveFlags::COPY_VTABLE);
 		class_add_element("width", TypeInt32, &Painter::width);
 		class_add_element("height", TypeInt32, &Painter::height);
-		class_add_func_virtual(Identifier::func::Delete, TypeVoid, &ImagePainter::__delete__, Flags::Mutable);
+		class_add_func_virtual(Identifier::func::Delete, TypeVoid, &ImagePainter::__delete__, Flags::Mutable | Flags::Override);
 		//class_add_func_virtual("end", TypeVoid, &HuiPainter::end));
 		class_add_func_virtual("set_color", TypeVoid, &Painter::set_color); // Flags::MUTABLE ...nope... let's allow const references for now...
 			func_add_param("c", TypeColor);

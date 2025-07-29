@@ -285,7 +285,7 @@ const Class *Class::get_array_element() const {
 
 // hmmm, very vague concept...
 bool Class::needs_constructor() const {
-	if (!uses_call_by_reference()) // int/float/pointer etc
+	if (!uses_call_by_reference() or flags_has(flags, Flags::Noauto)) // int/float/pointer etc
 		return false;
 	if (is_list() or is_dict() or is_optional())
 		return true;
@@ -477,7 +477,7 @@ void Class::link_virtual_table() {
 				msg_write("VIRTUAL   " + i2s(cf->virtual_index) + "   " + cf->signature());
 			vtable[cf->virtual_index] = (void*)cf->address;
 		}
-		if (cf->needs_overriding()) {
+		if (cf->is_unimplemented() and !cf->is_extern()) {
 			msg_error("needs overriding: " + cf->signature());
 		}
 	}

@@ -91,10 +91,13 @@ namespace hui
 {
 
 void _init_global_css_classes_();
+void init_low_level();
 
 void _MakeUsable_() {
 	if (_screen_opened_)
 		return;
+
+	init_low_level();
 
 	if (true) { //(Application::flags & Flags::LAZY_GUI_INITIALIZATION) == 0) {
 #if GTK_CHECK_VERSION(4,0,0)

@@ -271,8 +271,8 @@ public:
 	}
 };
 
-template<class T>
-void lib_create_list(const Class *tt, bool allow_str = true) {
+template<class T, bool allow_str = true>
+void lib_create_list(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
 	t->derive_from(TypeDynamicArray, DeriveFlags::SET_SIZE);
 	auto t_element = t->param[0];
@@ -294,13 +294,15 @@ void lib_create_list(const Class *tt, bool allow_str = true) {
 			func_add_param("index", TypeInt32);
 		class_add_func("resize", TypeVoid, &XList<T>::resize, Flags::Mutable);
 			func_add_param("num", TypeInt32);
-		if (allow_str)
+		if constexpr (allow_str)
 			class_add_func(Identifier::func::Str, TypeString, &XList<T>::str, Flags::Pure);
 
 		add_operator(OperatorID::Assign, TypeVoid, t, t, InlineID::None, &XList<T>::assign);
 		add_operator(OperatorID::In, TypeBool, t, t_element, InlineID::None, &XList<T>::__contains__);
 		add_operator(OperatorID::BitOr, t, t, t, InlineID::None, &XList<T>::__add__);
 		//add_operator(OperatorID::BIT_OR_ASSIGN, TypeVoid, t, t, InlineID::NONE, &XList<T>::__adds__);
+
+	// TODO: ==, !=, +, +=
 }
 
 }

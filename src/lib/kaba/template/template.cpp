@@ -80,7 +80,7 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	//msg_error("FULL COPY");
 	auto f = f0->create_dummy_clone(f0->name_space);
 	f->block = cp_node(f0->block.get())->as_block();
-	flags_clear(f->flags, Flags::NeedsOverride);
+	flags_clear(f->flags, Flags::Unimplemented);
 
 	auto convert = [f] (shared<Node> n) {
 		if (n->kind != NodeKind::Block)

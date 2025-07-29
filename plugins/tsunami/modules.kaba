@@ -230,7 +230,7 @@ class PitchDetector extends MidiSource
 	func extern virtual mut process(out midi: MidiEventBuffer, buf: AudioBuffer)
 
 
-class PitchRenderer as @noauto
+class PitchRenderer
 	func extern __init__(synth: Synthesizer, pitch: i32)
 	func extern virtual __delete__()
 	func extern virtual mut render(out buf: AudioBuffer) -> bool

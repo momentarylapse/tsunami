@@ -455,7 +455,6 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::Negative, TypeComplex, nullptr, TypeComplex, InlineID::Vec2Negative, &KabaVector<complex>::negate);
 
 	add_class(TypeComplexList);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<complex>::__init__, Flags::Mutable);
 		add_operator(OperatorID::Add, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::add_values);
 		add_operator(OperatorID::Subtract, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::sub_values);
 		add_operator(OperatorID::Multiply, TypeComplexList, TypeComplexList, TypeComplexList, InlineID::None, &VectorList<complex>::mul_values);
@@ -512,9 +511,6 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeVec2, TypeFloat32, InlineID::Vec2MultiplyAssign, &vec2::operator*=);
 		add_operator(OperatorID::DivideAssign, TypeVoid, TypeVec2, TypeFloat32, InlineID::Vec2DivideAssign, &vec2::operator/=);
 		add_operator(OperatorID::Negative, TypeVec2, nullptr, TypeVec2, InlineID::Vec2Negative, &KabaVector<vec2>::negate);
-
-	add_class(TypeVec2List);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<vec2>::__init__, Flags::Mutable);
 
 
 	add_class(TypeVec3);
@@ -580,9 +576,6 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeVec3, TypeFloat32, InlineID::Vec3MultiplyAssign, &vec3::operator*=);
 		add_operator(OperatorID::DivideAssign, TypeVoid, TypeVec3, TypeFloat32, InlineID::Vec3DivideAssign, &vec3::operator/=);
 		add_operator(OperatorID::Negative, TypeVec3, nullptr, TypeVec3, InlineID::Vec3Negative, &KabaVector<vec3>::negate);
-
-	add_class(TypeVec3List);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<vec3>::__init__, Flags::Mutable);
 
 
 	add_class(TypeQuaternion);
@@ -712,8 +705,6 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("ORANGE", TypeColor, &Orange);
 		class_add_const("PURPLE", TypeColor, &Purple);
 
-	add_class(TypeColorList);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<color>::__init__, Flags::Mutable);
 
 	add_class(TypePlane);
 		class_add_element("_a", TypeFloat32, 0);
@@ -741,9 +732,6 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::Assign, TypeVoid, TypePlane, TypePlane, InlineID::ChunkAssign);
 		add_operator(OperatorID::Equal, TypeBool, TypePlane, TypePlane, InlineID::ChunkEqual);
 		add_operator(OperatorID::NotEqual, TypeBool, TypePlane, TypePlane, InlineID::ChunkNotEqual);
-
-	add_class(TypePlaneList);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<plane>::__init__, Flags::Mutable);
 
 
 	add_class(TypeRay);

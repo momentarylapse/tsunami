@@ -392,7 +392,7 @@ void SIAddPackageVulkan(Context *c) {
 	auto TypePipelineBindPoint = add_type_enum("BindPoint", TypePipeline);
 
 	lib_create_list<vulkan::Texture*>(TypeTexturePList);
-	lib_create_list<shared<vulkan::Texture>>(TypeTextureSharedNNList);
+	//lib_create_list<shared<vulkan::Texture>>(TypeTextureSharedNNList); -> later?
 	lib_create_list<vulkan::Texture*>(TypeTextureXferList);
 	lib_create_list<vulkan::FrameBuffer*>(TypeFrameBufferXferList);
 	lib_create_list<vulkan::Shader*>(TypeShaderPList);

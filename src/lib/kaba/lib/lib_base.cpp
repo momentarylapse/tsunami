@@ -156,9 +156,6 @@ static int64 op_int64_add_int(int64 a, int b) { return a + b; }
 
 class StringList : public XList<string> {
 public:
-	void _cdecl assign(StringList &s) {
-		*this = s;
-	}
 	string _cdecl join(const string &glue) {
 		return implode(*this, glue);
 	}
@@ -882,8 +879,6 @@ void SIAddPackageBase(Context *c) {
 		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::ge_values_scalar);
 		add_operator(OperatorID::Equal, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::eq_values_scalar);
 		add_operator(OperatorID::NotEqual, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::ne_values_scalar);
-		class_add_func(Identifier::func::Contains, TypeBool, &XList<int>::__contains__, Flags::Pure);
-			func_add_param("i", TypeInt32);
 
 	add_class(TypeFloatList);
 		class_add_func(Identifier::func::Str, TypeString, &XList<float>::str, Flags::Pure);
@@ -949,25 +944,12 @@ void SIAddPackageBase(Context *c) {
 
 
 	add_class(TypeStringList);
-		class_add_func(Identifier::func::Init, TypeVoid, &StringList::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &StringList::clear, Flags::Mutable);
-		class_add_func("add", TypeVoid, &StringList::add, Flags::Mutable);
-			func_add_param("x", TypeString);
-		class_add_func("clear", TypeVoid, &StringList::clear, Flags::Mutable);
-		class_add_func("remove", TypeVoid, &StringList::erase, Flags::Mutable);
-			func_add_param("index", TypeInt32);
-		class_add_func("resize", TypeVoid, &StringList::resize, Flags::Mutable);
-			func_add_param("num", TypeInt32);
 		class_add_func("join", TypeString, &StringList::join, Flags::Pure);
 			func_add_param("glue", TypeString);
-		class_add_func(Identifier::func::Str, TypeString, &StringList::str, Flags::Pure);
-		add_operator(OperatorID::Assign, TypeVoid, TypeStringList, TypeStringList, InlineID::None, &StringList::assign);
 		add_operator(OperatorID::Equal, TypeBool, TypeStringList, TypeStringList, InlineID::None, &StringList::__eq__);
 		add_operator(OperatorID::NotEqual, TypeBool, TypeStringList, TypeStringList, InlineID::None, &StringList::__neq__);
-		add_operator(OperatorID::Add, TypeStringList, TypeStringList, TypeStringList, InlineID::None, &StringList::__add__);
-		add_operator(OperatorID::AddAssign, TypeVoid, TypeStringList, TypeStringList, InlineID::None, &StringList::__adds__);
-		class_add_func(Identifier::func::Contains, TypeBool, &StringList::__contains__, Flags::Pure);
-			func_add_param("s", TypeString);
+		add_operator(OperatorID::Add, TypeStringList, TypeStringList, TypeStringList, InlineID::None, &StringList::__add__); // legacy... |
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeStringList, TypeStringList, InlineID::None, &StringList::__adds__); // legacy... |=
 
 
 

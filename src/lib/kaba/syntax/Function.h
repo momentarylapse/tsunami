@@ -56,7 +56,7 @@ public:
 	bool throws_exceptions() const; // for external
 	bool is_template() const;
 	bool is_macro() const;
-	bool needs_overriding() const;
+	bool is_unimplemented() const;
 	InlineID inline_no;
 	int virtual_index;
 	int num_slightly_hidden_vars;

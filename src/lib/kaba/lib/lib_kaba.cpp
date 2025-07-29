@@ -188,7 +188,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("is_extern", TypeBool, &Function::is_extern, Flags::Pure);
 		class_add_func("is_selfref", TypeBool, &Function::is_selfref, Flags::Pure);
 		class_add_func("throws_exceptions", TypeBool, &Function::throws_exceptions, Flags::Pure);
-		class_add_func("needs_overriding", TypeBool, &Function::needs_overriding, Flags::Pure);
+		class_add_func("is_unimplemented", TypeBool, &Function::is_unimplemented, Flags::Pure);
 		class_add_element("virtual_index", TypeInt32, &Function::virtual_index);
 		class_add_element("inline_index", TypeInt32, &Function::inline_no);
 		class_add_element("code", TypeFunctionCodeRef, &Function::address);

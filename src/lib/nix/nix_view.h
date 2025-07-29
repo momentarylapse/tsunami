@@ -9,6 +9,10 @@
 
 #pragma once
 
+namespace hui {
+	class Event;
+}
+
 class Image;
 struct vec2;
 
@@ -35,7 +39,7 @@ void _cdecl set_scissor(const rect &r);
 void _cdecl screen_shot_to_image(Image &image);
 
 
-void start_frame_hui(Context *gl);
+void start_frame_hui(Context *gl, hui::Event* e);
 void end_frame_hui();
 #if HAS_LIB_GLFW
 void start_frame_glfw(Context *gl, void *win);

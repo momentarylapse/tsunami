@@ -71,7 +71,7 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
 			}
-			if (needs_new(t->get_destructor()))
+			if (needs_new(t->get_destructor()) and !flags_has(t->flags, Flags::Noauto))
 				add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, t->get_destructor(), Flags::Mutable);
 		}
 

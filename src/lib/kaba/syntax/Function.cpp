@@ -68,8 +68,8 @@ string Function::long_name() const {
 
 string Function::cname(const Class *ns) const {
 	string p;
-	p = (needs_overriding() ? " [NEEDS OVERRIDE]" : "");
-	p = (is_template() ? " [TEMPLATE]" : "");
+	p = (is_unimplemented() and !is_extern()) ? " [NEEDS OVERRIDE]" : "";
+	p = is_template() ? " [TEMPLATE]" : "";
 	return namespacify_rel(name, name_space, ns) + p;
 }
 
@@ -190,7 +190,8 @@ void Function::add_self_parameter() {
 // * update_parameters_after_parsing() called
 Function *Function::create_dummy_clone(const Class *_name_space) const {
 	Function *f = new Function(name, literal_return_type, _name_space, flags);
-	flags_set(f->flags, Flags::NeedsOverride);
+	flags_set(f->flags, Flags::Unimplemented);
+	flags_clear(f->flags, Flags::Extern);
 
 	f->num_params = num_params;
 	f->default_parameters = default_parameters;
@@ -260,8 +261,8 @@ bool Function::is_macro() const {
 	return flags_has(flags, Flags::Macro);
 }
 
-bool Function::needs_overriding() const {
-	return flags_has(flags, Flags::NeedsOverride);
+bool Function::is_unimplemented() const {
+	return flags_has(flags, Flags::Unimplemented);
 }
 
 }

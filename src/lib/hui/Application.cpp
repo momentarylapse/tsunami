@@ -86,6 +86,11 @@ void _init_global_css_classes_() {
 }
 
 void init_low_level() {
+	static bool inited = false;
+	if (inited)
+		return;
+	inited = true;
+
 	_InitInput_();
 	new(&Application::_properties_) base::map<string, string>();
 

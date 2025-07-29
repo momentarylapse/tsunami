@@ -722,11 +722,8 @@ void SIAddPackageOS(Context *c);
 void SIAddPackageOSPath(Context *c);
 void SIAddPackageMath(Context *c);
 void SIAddPackageThread(Context *c);
-void SIAddPackageHui(Context *c);
-void SIAddPackageGl(Context *c);
 void SIAddPackageNet(Context *c);
 void SIAddPackageImage(Context *c);
-void SIAddPackageVulkan(Context *c);
 
 
 void init_lib(Context *c) {
@@ -740,11 +737,8 @@ void init_lib(Context *c) {
 	SIAddPackageTime(c);
 	SIAddPackageOS(c);
 	SIAddPackageImage(c);
-	SIAddPackageHui(c); // depends on image
-	SIAddPackageGl(c);
 	SIAddPackageNet(c);
 	SIAddPackageThread(c);
-	SIAddPackageVulkan(c);
 
 	add_internal_package(c, "base");
 	SIAddXCommands(c);

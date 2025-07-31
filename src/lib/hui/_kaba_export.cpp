@@ -66,6 +66,7 @@ void _dummy() {}
 
 void export_package_hui(kaba::Exporter* e) {
 
+	e->declare_class_size("Menu", sizeof(hui::Menu));
 	e->link_class_func("Menu.__init__", &hui::Menu::__init__);
 	e->link_class_func("Menu.popup", &hui::Menu::open_popup);
 	e->link_class_func("Menu.add", &hui::Menu::add);
@@ -77,6 +78,7 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_class_func("Menu.check", &hui::Menu::check);
 
 
+	e->declare_class_size("Toolbar", sizeof(hui::Toolbar));
 	e->link_class_func("Toolbar.set_by_id", &hui::Toolbar::set_by_id);
 	e->link_class_func("Toolbar.from_source", &hui::Toolbar::from_source);
 	

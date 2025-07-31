@@ -450,7 +450,7 @@ string string::upper() const {
 }
 
 #define STR_SMALL_STACK_DEPTH			32
-#define STR_LARGE_STACK_DEPTH			8
+#define STR_LARGE_STACK_DEPTH			32
 #define STR_SMALL_SIZE					256
 
 static int _current_stack_small_pos_ = 0;
@@ -465,7 +465,7 @@ inline char *get_str(int size) {
 		_current_stack_large_pos_ = (_current_stack_large_pos_ + 1) % STR_LARGE_STACK_DEPTH;
 		if (_stack_large_str_[_current_stack_large_pos_])
 			delete[]_stack_large_str_[_current_stack_large_pos_];
-		_stack_large_str_[_current_stack_large_pos_] = new char[size + 1];
+		_stack_large_str_[_current_stack_large_pos_] = new char[size + 4];
 		return _stack_large_str_[_current_stack_large_pos_];
 	}
 }

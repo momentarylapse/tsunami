@@ -16,7 +16,7 @@ class FileChunkBasic;
 
 class ChunkedFileParser {
 public:
-	ChunkedFileParser(int _header_name_size);
+	explicit ChunkedFileParser(int _header_name_size);
 	virtual ~ChunkedFileParser();
 
 	bool read(const Path &filename, void *p);
@@ -58,7 +58,7 @@ public:
 
 class FileChunkBasic {
 public:
-	FileChunkBasic(const string &_name);
+	explicit FileChunkBasic(const string &_name);
 	virtual ~FileChunkBasic();
 	virtual void define_children() {};
 	virtual void read(Stream *f) = 0;

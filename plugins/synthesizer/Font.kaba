@@ -46,7 +46,7 @@ struct MidiFont
 					return t.synth.copy() as xfer[Synthesizer]
 		return new Synthesizer()
 
-class FontList as @noauto
+class FontList
 	var fonts: MidiFont[]
 	var dummy: MidiFont
 	

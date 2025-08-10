@@ -7,6 +7,7 @@
 #include "../../math/mat4.h"
 #include "../../math/mat3.h"
 #include "../../math/plane.h"
+#include "../../math/Box.h"
 #include "../../math/ray.h"
 #include "../../math/rect.h"
 #include "../../math/interpolation.h"
@@ -58,7 +59,7 @@ namespace kaba {
 
 extern const Class *TypeStringList;
 extern const Class *TypeComplexList;
-extern const Class *TypeFloatList;
+extern const Class *TypeFloat32List;
 extern const Class *TypeFloat64List;
 extern const Class *TypeVec3List;
 extern const Class *TypeVec2;
@@ -68,7 +69,7 @@ extern const Class *TypePlane;
 extern const Class *TypePlaneList;
 extern const Class *TypeColorList;
 extern const Class *TypeMat3;
-extern const Class *TypeIntList;
+extern const Class *TypeInt32List;
 extern const Class *TypeBoolList;
 extern const Class *TypeAny;
 extern const Class *TypeAnyList;
@@ -206,15 +207,6 @@ public:
 
 class KabaRect : public rect {
 public:
-	void assign(const rect& o) {
-		*(rect*)this = o;
-	}
-	void init(float x1, float x2, float y1, float y2) {
-		*(rect*)this = rect(x1, x2, y1, y2);
-	}
-	void init2(const vec2& p00, const vec2& p11) {
-		*(rect*)this = rect(p00, p11);
-	}
 	static rect set(float x1, float x2, float y1, float y2) {
 		return rect(x1, x2, y1, y2);
 	}
@@ -255,6 +247,11 @@ public:
 			return nullptr;
 		return (Array<int>*)&as_dict();
 	}
+
+	void set(const Any &a) {	*static_cast<Any*>(this) = a;	}
+	void _add(const Any &a) {	Any b = *this + a;	*static_cast<Any*>(this) = b;	}
+	void _sub(const Any &a) {	Any b = *this - a;	*static_cast<Any*>(this) = b;	}
+
 	
 	static void unwrap(Any &aa, void *var, const Class *type) {
 		if (type == TypeInt32) {
@@ -345,34 +342,37 @@ public:
 	}
 };
 
-class KabaRay : public Ray {
-public:
-	void init() {
-		new(this) Ray();
-	}
-	void init_ex(const vec3& u, const vec3& v) {
-		new(this) Ray(u, v);
+struct KabaBox : public Box {
+	KabaBox(const vec3& min, const vec3& max) {
+		this->min = min;
+		this->max = max;
 	}
 };
+
+template<class T>
+T kaba_xor(T a, T b) {
+	return a ^ b;
+}
 
 void SIAddPackageMath(Context *c) {
 	add_internal_package(c, "math", Flags::AutoImport);
 
 	// types
-	TypeComplex = add_type("complex", sizeof(complex));
+	TypeComplex = add_type("Complex", sizeof(complex));
 	TypeComplexList = add_type_list(TypeComplex);
 	TypeVec2 = add_type("vec2", sizeof(vec2));
 	TypeVec2List = add_type_list(TypeVec2);
 	TypeVec3 = add_type("vec3", sizeof(vec3));
 	TypeVec3List = add_type_list(TypeVec3);
-	TypeRect = add_type("rect", sizeof(rect));
+	TypeRect = add_type("Rect", sizeof(rect));
+	auto TypeBox = add_type("Box", sizeof(Box));
 	TypeMat4 = add_type("mat4", sizeof(mat4));
-	TypeQuaternion = add_type("quaternion", sizeof(quaternion));
-	TypePlane = add_type("plane", sizeof(plane));
+	TypeQuaternion = add_type("Quaternion", sizeof(quaternion));
+	TypePlane = add_type("Plane", sizeof(plane));
 	TypePlaneList = add_type_list(TypePlane);
-	TypeColor = add_type("color", sizeof(color));
+	TypeColor = add_type("Color", sizeof(color));
 	TypeColorList = add_type_list(TypeColor);
-	auto TypeRay = add_type("ray", sizeof(Ray));
+	auto TypeRay = add_type("Ray", sizeof(Ray));
 	TypeMat3 = add_type("mat3", sizeof(mat3));
 	auto TypeFloatArray3 = add_type_array(TypeFloat32, 3);
 	auto TypeFloatArray4 = add_type_array(TypeFloat32, 4);
@@ -380,9 +380,9 @@ void SIAddPackageMath(Context *c) {
 	auto TypeFloatArray16 = add_type_array(TypeFloat32, 16);
 	auto TypeFloatArray3x3 = add_type_array(TypeFloatArray3, 3);
 	auto TypeFloatArray9 = add_type_array(TypeFloat32, 9);
-	auto TypeVli = add_type("vli", sizeof(vli));
-	auto TypeCrypto = add_type("Crypto", sizeof(Crypto));
-	TypeAny = add_type("any", sizeof(Any));
+	auto TypeVli = add_type("vli", sizeof(vli)); // TODO external package
+	auto TypeCrypto = add_type("Crypto", sizeof(Crypto)); // TODO external package
+	TypeAny = add_type("Any", sizeof(Any));
 	auto TypeFloatInterpolator = add_type("FloatInterpolator", sizeof(Interpolator<float>));
 	auto TypeVectorInterpolator = add_type("VectorInterpolator", sizeof(Interpolator<vec3>));
 	auto TypeRandom = add_type("Random", sizeof(Random));
@@ -390,8 +390,7 @@ void SIAddPackageMath(Context *c) {
 	const_cast<Class*>(TypeVec3)->alignment = 4; // would be updated too late, otherwise...
 	auto TypeVec3Optional = add_type_optional(TypeVec3);
 
-	auto TypeAnyRef = add_type_ref(TypeAny);
-	auto TypeAnyRefOptional = add_type_optional(TypeAnyRef);
+	auto TypeAnyP = add_type_p_raw(TypeAny);
 	
 	// dirty hack :P
 	/*if (config.instruction_set == Asm::INSTRUCTION_SET_AMD64)*/ {
@@ -644,7 +643,7 @@ void SIAddPackageMath(Context *c) {
 		/*class_add_func("_create", TypeRect, &KabaRect::set2, Flags::Static | Flags::Pure);
 			func_add_param("p00", TypeVec2);
 			func_add_param("p11", TypeVec2);*/
-		class_add_func(Identifier::func::Init, TypeVoid, &KabaRect::init, Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init_ext<rect, float, float, float, float>, Flags::Mutable);
 			func_add_param("x1", TypeFloat32);
 			func_add_param("x2", TypeFloat32);
 			func_add_param("y1", TypeFloat32);
@@ -652,9 +651,31 @@ void SIAddPackageMath(Context *c) {
 		/*class_add_func(Identifier::func::Init, TypeVoid, &KabaRect::init2, Flags::Mutable);
 			func_add_param("p00", TypeVec2);
 			func_add_param("p11", TypeVec2);*/
-		add_operator(OperatorID::Assign, TypeVoid, TypeRect, TypeRect, InlineID::ChunkAssign, &KabaRect::assign);
+		add_operator(OperatorID::Assign, TypeVoid, TypeRect, TypeRect, InlineID::ChunkAssign, &generic_assign<rect>);
 		add_operator(OperatorID::Equal, TypeBool, TypeRect, TypeRect, InlineID::ChunkEqual, &rect::operator==);
 		add_operator(OperatorID::NotEqual, TypeBool, TypeRect, TypeRect, InlineID::ChunkNotEqual, &rect::operator!=);
+
+
+	add_class(TypeBox);
+		class_add_element("min", TypeVec3, &Box::min);
+		class_add_element("max", TypeVec3, &Box::max);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init<Box>, Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init_ext<KabaBox, const vec3&, const vec3&>, Flags::Mutable);
+			func_add_param("min", TypeVec3);
+			func_add_param("max", TypeVec3);
+		class_add_func("size", TypeVec3, &Box::size, Flags::Pure);
+			class_add_func("center", TypeVec3, &Box::center, Flags::Pure);
+		class_add_func("is_inside", TypeBool, &Box::is_inside, Flags::Pure);
+			func_add_param("p", TypeVec3);
+		class_add_func("to_relative", TypeVec3, &Box::to_relative, Flags::Pure);
+			func_add_param("p", TypeVec3);
+		class_add_func("to_absolute", TypeVec3, &Box::to_absolute, Flags::Pure);
+			func_add_param("p", TypeVec3);
+		class_add_func(Identifier::func::Str, TypeString, &Box::str, Flags::Pure);
+		class_add_const("ID",  TypeBox, &Box::ID);
+		class_add_const("ID_SYM",  TypeBox, &Box::ID_SYM);
+		add_operator(OperatorID::Assign, TypeVoid, TypeBox, TypeBox, InlineID::ChunkAssign, &generic_assign<Box>);
+
 
 	add_class(TypeColor);
 		class_add_element("r", TypeFloat32, &color::r);
@@ -669,8 +690,8 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("h", TypeFloat32);
 			func_add_param("s", TypeFloat32);
 			func_add_param("b", TypeFloat32);
-			func_add_param("a", TypeFloat32);
-		class_add_func("interpolate", TypeColor, &color::interpolate, Flags::Static | Flags::Pure);
+			func_add_param_def("a", TypeFloat32, 1.0f);
+		class_add_func("mix", TypeColor, &color::interpolate, Flags::Static | Flags::Pure);
 			func_add_param("c1", TypeColor);
 			func_add_param("c2", TypeColor);
 			func_add_param("t", TypeFloat32);
@@ -684,7 +705,7 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("r", TypeFloat32);
 			func_add_param("g", TypeFloat32);
 			func_add_param("b", TypeFloat32);
-			func_add_param("a", TypeFloat32);
+			func_add_param_def("a", TypeFloat32, 1.0f);
 		add_operator(OperatorID::Assign, TypeVoid, TypeColor, TypeColor, InlineID::ChunkAssign, &KabaColor::assign);
 		add_operator(OperatorID::Equal, TypeBool, TypeColor, TypeColor, InlineID::ChunkEqual);
 		add_operator(OperatorID::NotEqual, TypeBool, TypeColor, TypeColor, InlineID::ChunkNotEqual);
@@ -737,8 +758,8 @@ void SIAddPackageMath(Context *c) {
 	add_class(TypeRay);
 		class_add_element("u", TypeVec3, &Ray::u);
 		class_add_element("v", TypeVec3, &Ray::v);
-		class_add_func(Identifier::func::Init, TypeVoid, &KabaRay::init);
-		class_add_func(Identifier::func::Init, TypeVoid, &KabaRay::init_ex);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init<Ray>, Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init_ext<Ray, const vec3&, const vec3&>, Flags::Mutable);
 			func_add_param("a", TypeVec3);
 			func_add_param("b", TypeVec3);
 		class_add_func("dot", TypeFloat32, &Ray::dot, Flags::Static | Flags::Pure);
@@ -849,7 +870,7 @@ void SIAddPackageMath(Context *c) {
 
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);
-		class_add_element("data", TypeIntList, 4);
+		class_add_element("data", TypeInt32List, 4);
 		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&vli::__init__), Flags::Mutable);
 		class_add_func(Identifier::func::Delete, TypeVoid, algebra_p(&vli::__delete__), Flags::Mutable);
 		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_vli), Flags::Mutable);
@@ -889,21 +910,21 @@ void SIAddPackageMath(Context *c) {
 
 	add_class(TypeAny);
 		class_add_element("data", TypePointer, &Any::data);
-		class_add_func(Identifier::func::Init, TypeVoid, &Any::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &Any::__delete__, Flags::Mutable);
-		class_add_func(Identifier::func::Assign, TypeVoid, &Any::set, Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, &generic_init<Any>, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, &generic_delete<Any>, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, &KabaAny::set, Flags::Mutable);
 			func_add_param("a", TypeAny);
 		class_add_func("type", TypeClassRef, &KabaAny::_get_class);
 		class_add_func("clear", TypeVoid, &Any::clear, Flags::Mutable);
 		class_add_func(Identifier::func::Length, TypeInt32, &Any::length, Flags::Pure);
-		class_add_func(Identifier::func::Get, TypeAnyRefOptional, &KabaAny::dict_get, Flags::Ref);
+		class_add_func(Identifier::func::Get, TypeAnyP, &Any::dict_get, Flags::Ref);
 			func_add_param("key", TypeString);
-		class_add_func(Identifier::func::Set, TypeVoid, &KabaAny::dict_set, Flags::Mutable);
+		class_add_func(Identifier::func::Set, TypeVoid, &Any::dict_set, Flags::Mutable);
 			func_add_param("key", TypeString);
 			func_add_param("value", TypeAny);
-		class_add_func(Identifier::func::Get, TypeAnyRefOptional, &KabaAny::list_get, Flags::Ref);
+		class_add_func(Identifier::func::Get, TypeAnyP, &Any::list_get, Flags::Ref);
 			func_add_param("index", TypeInt32);
-		class_add_func(Identifier::func::Set, TypeVoid, &KabaAny::list_set, Flags::Mutable);
+		class_add_func(Identifier::func::Set, TypeVoid, &Any::list_set, Flags::Mutable);
 			func_add_param("index", TypeInt32);
 			func_add_param("value", TypeAny);
 		class_add_func("is_empty", TypeBool, &Any::is_empty, Flags::Pure);
@@ -924,11 +945,8 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("type", TypeClassRef);
 		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::Static | Flags::RaisesExceptions);
 			func_add_param("s", TypeString);
-		add_operator(OperatorID::AddAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &Any::_add);// operator+=);
-		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &Any::_sub);// operator-);
-
-
-	lib_create_optional<void*>(TypeAnyRefOptional);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &KabaAny::_add);// operator+=);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeAny, TypeAny, InlineID::None, &KabaAny::_sub);// operator-);
 
 
 	add_func("@int2any", TypeAny, &int2any, Flags::Static);
@@ -1008,8 +1026,8 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("t", TypeFloat32);
 		class_add_func("get_derivative", TypeFloat32, &Interpolator<float>::get_derivative, Flags::Pure);
 			func_add_param("t", TypeFloat32);
-		class_add_func("get_list", TypeFloatList, &Interpolator<float>::get_list, Flags::Pure);
-			func_add_param("t", TypeFloatList);
+		class_add_func("get_list", TypeFloat32List, &Interpolator<float>::get_list, Flags::Pure);
+			func_add_param("t", TypeFloat32List);
 
 
 	add_class(TypeVectorInterpolator);
@@ -1039,7 +1057,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("get_tang", TypeVec3, &Interpolator<vec3>::get_derivative, Flags::Pure);
 			func_add_param("t", TypeFloat32);
 		class_add_func("get_list", TypeVec3List, &Interpolator<vec3>::get_list, Flags::Pure);
-			func_add_param("t", TypeFloatList);
+			func_add_param("t", TypeFloat32List);
 
 
 	// i32
@@ -1061,6 +1079,10 @@ void SIAddPackageMath(Context *c) {
 	add_func("max", TypeInt32, &max<int>, Flags::Static | Flags::Pure);
 		func_add_param("a", TypeInt32);
 		func_add_param("b", TypeInt32);
+	add_func("xor", TypeInt32, &kaba_xor<int>, Flags::Static | Flags::Pure);
+		func_set_inline(InlineID::Int32BitXOr);
+		func_add_param("a", TypeInt32);
+		func_add_param("b", TypeInt32);
 
 	// i64
 	add_func("clamp", TypeInt64, &clamp<int64>, Flags::Static | Flags::Pure);
@@ -1075,6 +1097,10 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("a", TypeInt64);
 		func_add_param("b", TypeInt64);
 	add_func("max", TypeInt64, &max<int64>, Flags::Static | Flags::Pure);
+		func_add_param("a", TypeInt64);
+		func_add_param("b", TypeInt64);
+	add_func("xor", TypeInt64, &kaba_xor<int64>, Flags::Static | Flags::Pure);
+		func_set_inline(InlineID::Int64BitXOr);
 		func_add_param("a", TypeInt64);
 		func_add_param("b", TypeInt64);
 
@@ -1172,48 +1198,48 @@ void SIAddPackageMath(Context *c) {
 
 	// i32[]
 	add_func("sum", TypeInt32, &XList<int>::sum, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
+		func_add_param("list", TypeInt32List);
 	add_func("sum_sqr", TypeInt32, &XList<int>::sum_sqr, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
+		func_add_param("list", TypeInt32List);
 	add_func("min", TypeInt32, &XList<int>::min, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
+		func_add_param("list", TypeInt32List);
 	add_func("max", TypeInt32, &XList<int>::max, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
+		func_add_param("list", TypeInt32List);
 	add_func("argmin", TypeInt32, &XList<int>::argmin, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
+		func_add_param("list", TypeInt32List);
 	add_func("argmax", TypeInt32, &XList<int>::argmax, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
-	add_func("unique", TypeIntList, &XList<int>::unique, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeIntList);
-	add_func("range", TypeIntList, (void*)&kaba_range<int>, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeInt32List);
+	add_func("unique", TypeInt32List, &XList<int>::unique, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeInt32List);
+	add_func("range", TypeInt32List, (void*)&kaba_range<int>, Flags::Static | Flags::Pure);
 		func_add_param("start", TypeInt32);
 		func_add_param_def("end", TypeInt32, DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeInt32, 1);
 
 	// f32[]
 	add_func("sum", TypeFloat32, &XList<float>::sum, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
+		func_add_param("list", TypeFloat32List);
 	add_func("sum_sqr", TypeFloat32, &XList<float>::sum_sqr, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
+		func_add_param("list", TypeFloat32List);
 	add_func("min", TypeFloat32, &XList<float>::min, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
+		func_add_param("list", TypeFloat32List);
 	add_func("max", TypeFloat32, &XList<float>::max, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
+		func_add_param("list", TypeFloat32List);
 	add_func("argmin", TypeInt32, &XList<float>::argmin, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
+		func_add_param("list", TypeFloat32List);
 	add_func("argmax", TypeInt32, &XList<float>::argmax, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
-	add_func("unique", TypeFloatList, &XList<float>::unique, Flags::Static | Flags::Pure);
-		func_add_param("list", TypeFloatList);
-	add_func("range", TypeFloatList, (void*)&kaba_range<float>, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeFloat32List);
+	add_func("unique", TypeFloat32List, &XList<float>::unique, Flags::Static | Flags::Pure);
+		func_add_param("list", TypeFloat32List);
+	add_func("range", TypeFloat32List, (void*)&kaba_range<float>, Flags::Static | Flags::Pure);
 		func_add_param("start", TypeFloat32);
 		func_add_param_def("end", TypeFloat32, (float)DynamicArray::MAGIC_END_INDEX);
 		func_add_param_def("step", TypeFloat32, 1.0f);
 	add_func("cubic_spline", TypeFloat32, &cubic_spline<float>, Flags::Static | Flags::Pure);
-		func_add_param("points", TypeFloatList);
+		func_add_param("points", TypeFloat32List);
 		func_add_param("t", TypeFloat32);
 	add_func("cubic_spline_d", TypeFloat32, &cubic_spline_d<float>, Flags::Static | Flags::Pure);
-		func_add_param("points", TypeFloatList);
+		func_add_param("points", TypeFloat32List);
 		func_add_param("t", TypeFloat32);
 
 	// float64[]
@@ -1293,7 +1319,7 @@ void SIAddPackageMath(Context *c) {
 	auto TypeAnyListP = add_type_p_raw(TypeAnyList);
 
 	TypeAnyDict = add_type_dict(TypeAny);
-	lib_create_dict<Any>(TypeAnyDict, TypeAnyRefOptional);
+	lib_create_dict<Any>(TypeAnyDict, TypeAnyP);
 	auto TypeAnyDictP = add_type_p_raw(TypeAnyDict);
 
 

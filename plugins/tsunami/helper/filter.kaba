@@ -68,20 +68,20 @@ struct BiquadFilter
 			b[1] = 0
 			b[2] = 0
 		func gain(f: float, sample_rate: float) -> float
-			var z: complex
+			var z: Complex
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
-			var H = complex(b[0], 0) + b[1]*z + b[2]*z*z
-			var y = complex(1,0) + a[1]*z + a[2]*z*z
+			var H = Complex(b[0], 0) + b[1]*z + b[2]*z*z
+			var y = Complex(1,0) + a[1]*z + a[2]*z*z
 		
 			var fac = H.abs() / y.abs()
 			return factor_to_db(fac)
 		func phase_shift(f: float, sample_rate: float) -> float
-			var z: complex
+			var z: Complex
 			z.x = cos(2*pi*f/sample_rate)
 			z.y = sin(2*pi*f/sample_rate)
-			var H = complex(b[0], 0) + b[1]*z + b[2]*z*z
-			var y = complex(1,0) + a[1]*z + a[2]*z*z
+			var H = Complex(b[0], 0) + b[1]*z + b[2]*z*z
+			var y = Complex(1,0) + a[1]*z + a[2]*z*z
 			var zz = H * y.bar()
 			return atan2(zz.y, zz.x) * 10
 	
@@ -229,9 +229,9 @@ struct BiquadFilter
 		func mut create_all_pass(freq: float, q: float, sample_rate: float)
 			var phi = 2 * pi * freq / sample_rate
 			var l = 1 - phi / q
-			create_all_pass_z(l * complex(cos(phi), sin(phi)))
+			create_all_pass_z(l * Complex(cos(phi), sin(phi)))
 
-		func mut create_all_pass_z(z: complex)
+		func mut create_all_pass_z(z: Complex)
 			var l = z.abs()
 			b[0] = l*l
 			b[1] = - 2 * z.x

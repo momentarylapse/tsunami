@@ -114,6 +114,8 @@ bool Configuration::has(const string& name) const {
 }*/
 
 bool Configuration::load(const Path &filename) {
+	if (!os::fs::exists(filename))
+		return false;
 	try {
 		auto f = os::fs::open(filename, "rt");
 		map.clear();

@@ -42,7 +42,7 @@ class SpecGrid extends Grid
 		var xb = (x_axis.data.val_min - x_axis.data.val_min_min) / (x_axis.data.val_max_max - x_axis.data.val_min_min) * im0.width
 		
 		var im: Image
-		im.create(w, h, color.BLACK)
+		im.create(w, h, Color.BLACK)
 		for x in 0:w
 			for y in 0:h
 				im.set_pixel(x, y, im0.get_pixel(x * xa + xb, y * ya + yb))
@@ -140,13 +140,13 @@ Grid ? ''
 		
 		destroy()
 
-func f2col(_f: float) -> color
+func f2col(_f: float) -> Color
 	var f = sqrt(_f)
 	if f < 0.333
-		return color(0, 0, f * 3, f*0.3)
+		return Color(0, 0, f * 3, f*0.3)
 	else if f < 0.6666
-		return color(f * 3 - 1, 0, 2 - f * 3, 1)
-	return color(1, f * 3 - 2, 0, 1)
+		return Color(f * 3 - 1, 0, 2 - f * 3, 1)
+	return Color(1, f * 3 - 2, 0, 1)
 
 class DrawMidiInSpectrogram extends TsunamiPlugin
 
@@ -161,7 +161,7 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 		var renderer = new SongRenderer(song)
 		renderer.render(session.view.sel.range(), buf)
 	
-		var f: complex[]
+		var f: Complex[]
 		var sub: float[]
 		sub.resize(N)
 	
@@ -195,7 +195,7 @@ class DrawMidiInSpectrogram extends TsunamiPlugin
 				_max = max(_max, bmaxr)
 				sg[t][i] = bmaxr
 	
-		im0.create(NT, NF, color.BLACK)
+		im0.create(NT, NF, Color.BLACK)
 		for t in 0:NT
 			for i in 0:NF
 				var ff = sg[t][i] / _max

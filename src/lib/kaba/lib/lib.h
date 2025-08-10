@@ -205,6 +205,19 @@ void generic_assign(T& a, const T& b) {
 	a = b;
 }
 
+template<class T>
+class generic_virtual : public T {
+public:
+	void __delete__() {
+		this->~T();
+	}
+};
+
+template<class T, class... Args>
+void generic_init_ext(T* me, Args... args) {
+	new(me) T(args...);
+}
+
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \
 	class_link_vtable(*(void***)&my_instance);}

@@ -422,14 +422,14 @@ uniform float iVolume;
 		var volume = max(c.buffer.c[0])
 		
 		#gl.start()
-		gl.clear_color(color.RED)
+		gl.clear_color(Color.RED)
 		gl.set_cull(gl.CullMode.NONE)
 		gl.set_z(false, false)
 		for s in shader
 			gl.set_shader(&s)
 			s.set_float("iTime", _time)
 			s.set_float("iVolume", volume)
-			context.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+			context.vb_temp.create_quad(Rect.ID_SYM, Rect.ID)
 			gl.draw_triangles(context.vb_temp)
 		#gl.end()
 

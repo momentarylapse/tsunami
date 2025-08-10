@@ -18,7 +18,7 @@ class XXX extends TsunamiPlugin
 		stop()
 		
 	
-	func mut import_preset(p: any)
+	func mut import_preset(p: Any)
 		print("import {{p["name"]}}")
 				
 		var track = session.song.add_track(SignalType.MIDI, -1)
@@ -29,7 +29,7 @@ class XXX extends TsunamiPlugin
 		var synth = track.synth
 		track.set_synthesizer(synth)
 			
-		var a: any
+		var a: Any
 		a["zones"] = []
 		
 		track.layers[0].midi.add(new MidiNote(Range(0, 100000), 64, 1.0))
@@ -62,7 +62,7 @@ class XXX extends TsunamiPlugin
 				#print("I {{zz}}")
 
 				
-				var az: any
+				var az: Any
 				az["sample"] = "sample:{{s.uid|08x}}"
 				az["pitch_min"] = int(zz["keys"]![0]!)
 				az["pitch_max"] = int(zz["keys"]![1]!)
@@ -89,7 +89,7 @@ class XXX extends TsunamiPlugin
 		#print(a)
 		synth.config_from_any(1, a)
 
-func import_from_zone(out o: any, i: any, offset: int)
+func import_from_zone(out o: Any, i: Any, offset: int)
 	if i.has("keys")
 		o["pitch_min"] = int(i["keys"]![0]!)
 		o["pitch_max"] = int(i["keys"]![1]!)

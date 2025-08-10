@@ -34,7 +34,7 @@ Grid ? ''
 	func on_button()
 	
 	func mut on_draw(p: hui.Painter)
-		var r = rect(0, p.width, 0, p.height)
+		var r = Rect(0, p.width, 0, p.height)
 		cam.area = r
 		var pos = c.recorder.buffer.samples
 		cam.set_range(Range(pos-44100*3, 44100*5))
@@ -56,7 +56,7 @@ Grid ? ''
 		#mp.draw(p, c.midi)
 		mp.draw(p, midi)
 		
-		p.set_color(color.RED)
+		p.set_color(Color.RED)
 		#p.draw_str(100, 100, str(c.pitch_detector.frequency))
 		
 		for i=>pp in c.pitch_detector.pitch_power2

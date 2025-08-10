@@ -11,28 +11,28 @@ let NUM_PEAK_LEVELS = 24
 
 
 struct ColorScheme as @noauto
-	var background: color
-	var background_track: color
-	var background_track_selected: color
-	var text: color
-	var text_soft1: color
-	var text_soft2: color
-	var text_soft3: color
-	var grid: color
-	var selection: color
-	var hover: color
-	var blob_bg: color
-	var blob_bg_selected: color
-	var blob_bg_hidden: color
-	var pitch: color[12]
-	func extern pitch_color(p: i32) -> color
-	func extern neon(p: i32) -> color
-	func extern hoverify(c: color) -> color
+	var background: Color
+	var background_track: Color
+	var background_track_selected: Color
+	var text: Color
+	var text_soft1: Color
+	var text_soft2: Color
+	var text_soft3: Color
+	var grid: Color
+	var selection: Color
+	var hover: Color
+	var blob_bg: Color
+	var blob_bg_selected: Color
+	var blob_bg_hidden: Color
+	var pitch: Color[12]
+	func extern pitch_color(p: i32) -> Color
+	func extern neon(p: i32) -> Color
+	func extern hoverify(c: Color) -> Color
 
 
 class SceneGraph
 	class Node as shared
-		var area: rect
+		var area: Rect
 
 
 class AudioView extends Object
@@ -44,7 +44,7 @@ class AudioView extends Object
 		func extern sample2screen(s: f32) -> f32
 		func extern screen2sample64(s: f64) -> f64
 		func extern screen2sample(s: f32) -> f32
-		var area: rect
+		var area: Rect
 	
 	class Layer extends SceneGraph.Node
 		var layer: TrackLayer&
@@ -107,20 +107,20 @@ struct HoverData
 class MidiPainter
 	#extern void __init__(AudioView* view)
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
-	func extern mut set_context(area: rect, i: Instrument, playable: bool, mode: MidiMode)
+	func extern mut set_context(area: Rect, i: Instrument, playable: bool, mode: MidiMode)
 	func extern mut draw(p: hui.Painter, midi: MidiNoteBuffer)
 	func extern mut draw_background(c: hui.Painter)
 	var cam: AudioView.ViewPort&
 
 
 class GridColors
-	var bg, bg_sel: color
-	var fg, fg_sel: color
+	var bg, bg_sel: Color
+	var fg, fg_sel: Color
 
 
 class GridPainter
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, colors: ColorScheme)
-	func extern mut set_context(area: rect, col: GridColors)
+	func extern mut set_context(area: Rect, col: GridColors)
 	func extern mut draw_empty_background(p: hui.Painter)
 	func extern mut draw_bars(p: hui.Painter, partition: i32?)
 	func extern mut draw_bar_numbers(p: hui.Painter)
@@ -131,8 +131,8 @@ class GridPainter
 class MultiLinePainter
 	func extern __init__(song: Song, c: ColorScheme)
 	func extern __delete__()
-	func extern mut set_context(conf: any, page_width: f32, avg_samples_per_line: f32)
-	func extern mut set(conf: any)
+	func extern mut set_context(conf: Any, page_width: f32, avg_samples_per_line: f32)
+	func extern mut set(conf: Any)
 	func extern mut draw_next_line(p: hui.Painter, out offset: i32, pos: vec2) -> f32
 	func extern mut next_line_samples(offset: i32) -> i32
 	func extern mut get_line_dy() -> f32
@@ -143,7 +143,7 @@ var extern theme: ColorScheme
 
 func extern get_sample_preview(s: Sample, view: AudioView) -> string
 
-func extern get_style_colors(p: hui.Panel, id: string) -> color{}
+func extern get_style_colors(p: hui.Panel, id: string) -> Color{}
 
 func extern ask_string(w: hui.Window*, question: string, options: string="") -> future[string]
 func extern ask_preset_name(w: hui.Window*, list: string[], save: bool) -> future[string]

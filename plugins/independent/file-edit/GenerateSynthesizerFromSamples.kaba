@@ -3,7 +3,7 @@ use synthesizer.Sample.*
 use audioeffect.pitch.PitchShift.*
 use hui
 
-func get_instruments(p: any, i: any) -> int
+func get_instruments(p: Any, i: Any) -> int
 	var ins = 0
 	for z in p["zones"]!.as_list()!
 		if z.has("instrument")
@@ -11,7 +11,7 @@ func get_instruments(p: any, i: any) -> int
 			#keys += int(z["keys"][1]) - int(z["keys"][0]) + 1
 	return ins
 
-func get_samples(p: any, i: any) -> int
+func get_samples(p: Any, i: Any) -> int
 	var samples = 0
 	for z in p["zones"]!.as_list()!
 		if z.has("instrument")

@@ -833,6 +833,10 @@ void Serializer::serialize_inline_function(Node *com, const Array<SerialNodePara
 		case InlineID::Int32BitOr:
 		case InlineID::Int64BitOr:
 			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
+		break;
+		case InlineID::Int32BitXOr:
+		case InlineID::Int64BitXOr:
+			cmd.add_cmd(Asm::InstID::OR, ret, param[0], param[1]);
 			break;
 		case InlineID::Int32ShiftRight:
 		case InlineID::Int64ShiftRight:

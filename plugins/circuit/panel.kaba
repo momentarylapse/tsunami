@@ -30,9 +30,9 @@ class CircuitPanel extends hui.Panel
 	var add_type: EdgeType
 	var first_node: int
 	
-	var COLOR_BACKGROUND: color
-	var COLOR_TEXT: color
-	var COLOR_SELECTION: color
+	var COLOR_BACKGROUND: Color
+	var COLOR_TEXT: Color
+	var COLOR_SELECTION: Color
 	
 	func __init__(_c: Circuit)
 		from_source("
@@ -47,9 +47,9 @@ DrawingArea area '' grab-focus")
 		imin = -2
 		imax = 2
 		
-		COLOR_BACKGROUND = color(0.1, 0.1, 0.1, 1)
-		COLOR_TEXT = color.WHITE
-		COLOR_SELECTION = color(0.4, 0.4, 1.0, 1)
+		COLOR_BACKGROUND = Color(0.1, 0.1, 0.1, 1)
+		COLOR_TEXT = Color.WHITE
+		COLOR_SELECTION = Color(0.4, 0.4, 1.0, 1)
 
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:left-button-down", on_left_button_down)
@@ -161,7 +161,7 @@ DrawingArea area '' grab-focus")
 		
 		# bg
 		p.set_color(COLOR_BACKGROUND)
-		p.draw_rect(rect(0,w, 0,h))
+		p.draw_rect(Rect(0,w, 0,h))
 		
 		draw_res(p)
 		
@@ -255,11 +255,11 @@ DrawingArea area '' grab-focus")
 			return
 		
 		let e = sel.index
-		p.set_color(color(0.2,0.2,0.2, 1))
+		p.set_color(Color(0.2,0.2,0.2, 1))
 		p.set_line_width(1)
 		p.draw_line(project_i(0,0), project_i(NT,0))
 		if sel.type == SelectionType.EDGE
-			p.set_color(color(0,0,0.8, 1))
+			p.set_color(Color(0,0,0.8, 1))
 			var pp: vec2[]
 			for i in 0:NT
 				pp.add(project_i(i, res.I[i][e]))
@@ -267,12 +267,12 @@ DrawingArea area '' grab-focus")
 			p.draw_lines(pp)
 			p.set_line_width(1)
 			pp.clear()
-			p.set_color(color(0.8,0,0, 1))
+			p.set_color(Color(0.8,0,0, 1))
 			for i in 0:NT
 				pp.add(project_u(i, res.U[i][e]))
 			p.draw_lines(pp)
 		else if sel.type == SelectionType.NODE
-			p.set_color(color(0,0.8,0, 1))
+			p.set_color(Color(0,0.8,0, 1))
 			var pp: vec2[]
 			for i in 0:NT
 				pp.add(project_u(i, res.phi[i][e]))

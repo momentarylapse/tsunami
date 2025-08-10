@@ -29,10 +29,10 @@ namespace kaba {
 		void __set(const string &k, const typename base::xparam<T>::t v) {
 			this->set(k, v);
 		}
-		base::optional<T*> get_item(const string &k) {
+		T* get_item(const string &k) {
 			if (this->contains(k))
 				return &(*this)[k];
-			return base::None;
+			return nullptr;
 		}
 	};
 

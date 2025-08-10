@@ -24,7 +24,7 @@ class Equalizer15 extends AudioEffect
 
 	var FreqMin, FreqMax: float[NUM_BANDS]
 
-	var f: complex[]
+	var f: Complex[]
 
 	func override __init__()
 

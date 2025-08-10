@@ -3,8 +3,8 @@ use hui
 
 class DrawTest extends TsunamiPlugin
 	func override on_draw_post(p: hui.Painter)
-		p.set_color(color.RED)
-		p.draw_rect(rect(100,200, 100, 200))
+		p.set_color(Color.RED)
+		p.draw_rect(Rect(100,200, 100, 200))
 		p.draw_str([200, 200], str(session.view.cam.sample2screen(0.0)))
 		p.draw_str([200, 230], str(session.view.cam.sample2screen(10000.0)))
 		

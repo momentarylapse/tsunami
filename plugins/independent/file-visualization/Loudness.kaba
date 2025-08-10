@@ -2,8 +2,8 @@ use tsunami.*
 use tsunami.helper.filter.*
 use hui
 
-func lufs_to_color(l: float) -> color
-	let cc = [color(0,0,0,0.2), color(1,0,0,0.2), color(1,1,0,0.2), color(1,1,1,0.5)]
+func lufs_to_color(l: float) -> Color
+	let cc = [Color(0,0,0,0.2), Color(1,0,0,0.2), Color(1,1,0,0.2), Color(1,1,1,0.5)]
 	let ff = [-20., -10., -5., 0.]
 	if l > ff[2]
 		let a = (l-ff[2]) / (ff[3]-ff[2])
@@ -104,7 +104,7 @@ class Loudness extends TsunamiPlugin
 			let x0 = session.view.cam.sample2screen(i*dT)
 			let x1 = session.view.cam.sample2screen(i*dT + dT)
 			p.set_color(lufs_to_color(l))
-			p.draw_rect(rect(x0,x1, v.area.y1,v.area.y2))
+			p.draw_rect(Rect(x0,x1, v.area.y1,v.area.y2))
 
 	func override create_panel() -> xfer[ConfigPanel]
 		return new XPanel(self)

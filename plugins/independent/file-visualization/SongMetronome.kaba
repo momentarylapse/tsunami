@@ -27,7 +27,7 @@ struct BlurredDot
 		pos.x = x
 		pos.y = y
 		has_prev = false
-	func mut draw(p: hui.Painter, c: color, r: float)
+	func mut draw(p: hui.Painter, c: Color, r: float)
 		if has_prev
 			var dt = 1.0 / MOTION_BLUR_COUNT
 			var cc = c
@@ -120,14 +120,14 @@ Grid ? '' vertical
 		# background
 		var bg = theme.background
 		if allow_blink_background
-			bg = color.interpolate(color.RED, theme.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
+			bg = Color.mix(Color.RED, theme.background, 1 - MAX_BACKGROUND_REDNESS*pow(closeness, 15))
 		p.set_color(bg)
 		p.draw_rect([0, w, 0, h])
 		
 		if mode == AnimationMode.CIRCLE
 			# circle
 			p.set_line_width(r*0.05)
-			p.set_color(color.interpolate(theme.grid, theme.background, 0.5))
+			p.set_color(Color.mix(theme.grid, theme.background, 0.5))
 			p.set_fill(false)
 			p.draw_circle([x0, y0], r)
 		

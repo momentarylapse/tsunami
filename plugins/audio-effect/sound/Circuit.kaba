@@ -6,7 +6,7 @@ use circuit.circuit.*
 
 class CircuitEffect extends AudioEffect
 	class Config extends Module.Config
-		var nodes: complex[]
+		var nodes: Complex[]
 
 	var config: Config
 	var c: Circuit

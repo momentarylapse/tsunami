@@ -11,7 +11,7 @@ class TestDetector extends PitchDetector
 	var pitch_power2: float[]
 	func override process(midi: MidiEventBuffer, buf: AudioBuffer)
 		#print(len(buf))
-		var z: complex[]
+		var z: Complex[]
 		fft.r2c(buf.c[0], z)
 		
 		let N = len(buf)

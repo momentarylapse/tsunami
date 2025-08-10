@@ -28,13 +28,13 @@ class PitchShift extends AudioEffect
 		prev_no = 0
 		
 	func shift_buf(out b: float[], factor: float)
-		var buf1, buf2: complex[]
+		var buf1, buf2: Complex[]
 		fft.r2c(b, buf1)
 		let N = len(b)
 		let NN = len(buf1)
 		buf2.resize(NN)
 		for i in 0:NN
-			buf2[i] = complex(0, 0)
+			buf2[i] = Complex(0, 0)
 
 		let D = int(max(100, sqrt(N)*2))
 		for i in 0:NN
@@ -42,7 +42,7 @@ class PitchShift extends AudioEffect
 			let x0 = pi * kk
 			let j0 = max(kk - D, 0)
 			let j1 = min(kk + D, NN)
-			let M0 = complex(cos(x0), sin(x0)) * sin(x0)
+			let M0 = Complex(cos(x0), sin(x0)) * sin(x0)
 			for j in j0:j1
 				let dk = float(kk - j)
 				let x = pi * dk

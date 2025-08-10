@@ -108,7 +108,7 @@ class Song extends Object as shared
 	
 	var bars: BarCollection
 
-	var secret_data: any
+	var secret_data: Any
 	
 	func extern __init__(session: Session, sample_rate: int)
 	func extern override __delete__()

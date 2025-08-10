@@ -19,6 +19,15 @@ Box Box::canonical() const {
 	return r;
 }
 
+bool Box::is_inside(const vec3& p) const {
+	if (p.x < min.x || p.y < min.y || p.z < min.z)
+		return false;
+	if (p.x > max.x || p.y > max.y || p.z > max.z)
+		return false;
+	return true;
+	//return p.between(min, max); // WTF is that implementation?!?
+}
+
 vec3 Box::to_absolute(const vec3& p) const {
 	const vec3 s = size();
 	return min + vec3(p.x * s.x, p.y * s.y, p.z * s.z);

@@ -34,16 +34,16 @@ func get_note(f: float) -> string
 	#note = i2s(n)
 
 func DrawVolume(c: hui.Painter)
-	c.set_color(color(0.8, 0.8, 0.8, 1))
+	c.set_color(Color(0.8, 0.8, 0.8, 1))
 	var y0 = 30.0
 	var y1 = float(c.height) - 5
 	var h = y1 - y0
 	c.draw_rect([5, 10, y0 + h * (1 - Volume), y0 + h * (2 - Volume)])
-	c.set_color(color(0.6, 0.6, 0.6, 1))
+	c.set_color(Color(0.6, 0.6, 0.6, 1))
 	c.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 func Draw(c: hui.Painter)
-	c.set_color(color.WHITE)
+	c.set_color(Color.WHITE)
 	c.set_font_size(12)
 	var w = c.width
 	var h = c.height
@@ -51,7 +51,7 @@ func Draw(c: hui.Painter)
 	
 	DrawVolume(c)
 	
-	c.set_color(color.BLACK)
+	c.set_color(Color.BLACK)
 	c.draw_str([20, 20], "{{Frequency|.1}} Hz")
 	c.draw_str([20, 40], "{{Volume|.3}}")
 	for i=>p in played
@@ -61,7 +61,7 @@ func Draw(c: hui.Painter)
 		let y = h - h * (p - 40.0) / 60.0
 		c.draw_line([x, y], [x + 2, y])
 	
-	c.set_color(color.BLACK)
+	c.set_color(Color.BLACK)
 	if LoudEnough
 		c.draw_str([120, 20], rel_pitch_name(played[len(played) - 1] % 12))
 	else
@@ -89,7 +89,7 @@ func UpdateInput()
 #		float tt = i * w_f
 #		buf[i] = f2i(val_max * sin(tt) * 0.1)
 	
-	var bufc: complex[]
+	var bufc: Complex[]
 	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(buf, bufc)
 	var max = 0.0
@@ -124,7 +124,7 @@ func UpdateInput()
 	win.redraw("drawing")
 
 
-var bufc: complex[]
+var bufc: Complex[]
 
 func main()
 	win = new Dialog("Tonerkennung", 600, 400, MainWin, false)

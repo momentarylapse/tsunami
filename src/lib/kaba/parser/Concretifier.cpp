@@ -20,10 +20,10 @@ namespace kaba {
 
 extern const Class *TypeSpecialFunctionRef;
 
-extern const Class *TypeIntList;
+extern const Class *TypeInt32List;
 extern const Class *TypeAnyList;
 extern const Class *TypeAnyDict;
-extern const Class *TypeIntDict;
+extern const Class *TypeInt32Dict;
 extern const Class *TypeNone;
 
 
@@ -1994,7 +1994,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 
 	if (node->kind == NodeKind::ArrayBuilder) {
 		if (node->params.num == 0) {
-			node->type = TypeIntList;
+			node->type = TypeInt32List;
 			return node;
 		}
 
@@ -2016,7 +2016,7 @@ shared<Node> Concretifier::force_concrete_type(shared<Node> node) {
 		return node;
 	} else if (node->kind == NodeKind::DictBuilder) {
 		if (node->params.num == 0) {
-			node->type = TypeIntDict;
+			node->type = TypeInt32Dict;
 			return node;
 		}
 

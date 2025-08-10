@@ -8,8 +8,8 @@
 
 namespace kaba {
 	
-extern const Class *TypeIntList;
-extern const Class *TypeFloatList;
+extern const Class *TypeInt32List;
+extern const Class *TypeFloat32List;
 extern const Class *TypeBoolList;
 extern const Class *TypeAny;
 extern const Class *TypePath;
@@ -69,7 +69,7 @@ void array_resize(void *p, const Class *type, int num) {
 
 void array_add(DynamicArray &array, void *p, const Class *type) {
 	//msg_write("array add " + type->long_name());
-	if ((type == TypeIntList) or (type == TypeFloatList)) {
+	if ((type == TypeInt32List) or (type == TypeFloat32List)) {
 		array.append_4_single(*(int*)p);
 	} else if (type == TypeBoolList) {
 		array.append_1_single(*(char*)p);

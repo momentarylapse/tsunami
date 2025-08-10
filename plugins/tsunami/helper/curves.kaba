@@ -33,7 +33,7 @@ class SpectrumCurve extends Curve
 		var b: AudioBuffer
 		while ring.available() >= N
 			ring.read_ref(b, N)
-			var zr, zl: complex[]
+			var zr, zl: Complex[]
 			N = buf.length
 			b.get_spectrum(zr, zl, N)
 			spec.resize(len(zr))

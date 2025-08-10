@@ -25,7 +25,7 @@ func spline_vel(p0: vec2, t0: vec2, p1: vec2, t1: vec2, t: float) -> vec2
 	return t0 + 2*B*t + 3*A*t^2
 
 
-#func cool_color(index: int) -> color
+#func cool_color(index: int) -> Color
 #	let col = theme.neon(index)
 #	#return color.interpolate(col, theme.text_soft2, 0.3)
 #	return col
@@ -37,9 +37,9 @@ enum Align
 	CENTER = 0
 	RIGHT = 1
 
-func extern draw_boxed_str(p: hui.Painter, pos: vec2, str: string, col_text: color, col_bg: color, align: Align = Align.RIGHT)
+func extern draw_boxed_str(p: hui.Painter, pos: vec2, str: string, col_text: Color, col_bg: Color, align: Align = Align.RIGHT)
 
-func extern draw_cursor_hover(p: hui.Painter, msg: string, cursor: vec2, area: rect)
+func extern draw_cursor_hover(p: hui.Painter, msg: string, cursor: vec2, area: Rect)
 
 func extern draw_arrow_head(p: hui.Painter, tip: vec2, dir: vec2)
 

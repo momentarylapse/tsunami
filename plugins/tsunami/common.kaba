@@ -57,7 +57,7 @@ struct AudioBuffer
 	#extern void mix_stereo(float volume, float panning)
 	func extern mut set_as_ref(source: AudioBuffer, offset: i32, length: i32)
 	func extern selfref __subarray__(start: i32, end: i32) -> AudioBuffer
-	func extern get_spectrum(out spec_r: complex[], out spec_l: complex[], samples: i32)
+	func extern get_spectrum(out spec_r: Complex[], out spec_l: Complex[], samples: i32)
 	func mut scale(factor: f32)
 		for mut cc in c
 			cc *= factor

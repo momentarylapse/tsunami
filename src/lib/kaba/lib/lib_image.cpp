@@ -13,8 +13,8 @@
 namespace kaba {
 
 extern const Class *TypeImage;
-extern const Class *TypeIntList;
-extern const Class *TypeFloatList;
+extern const Class *TypeInt32List;
+extern const Class *TypeFloat32List;
 extern const Class *TypeVec2List;
 extern const Class *TypeVec2;
 extern const Class *TypeObject;
@@ -43,7 +43,7 @@ void SIAddPackageImage(Context *c) {
 		class_add_element("width", TypeInt32, &Image::width);
 		class_add_element("height", TypeInt32, &Image::height);
 		class_add_element("mode", TypeInt32, &Image::mode);
-		class_add_element("data", TypeIntList, &Image::data);
+		class_add_element("data", TypeInt32List, &Image::data);
 		class_add_element("error", TypeBool, &Image::error);
 		class_add_element("alpha_used", TypeBool, &Image::alpha_used);
 		class_add_func(Identifier::func::Init, TypeVoid, &Image::__init_ext__, Flags::Mutable);
@@ -90,7 +90,7 @@ void SIAddPackageImage(Context *c) {
 		class_add_func_virtual("set_line_width", TypeVoid, &Painter::set_line_width);
 			func_add_param("w", TypeFloat32);
 		class_add_func_virtual("set_line_dash", TypeVoid, &Painter::set_line_dash);
-			func_add_param("w", TypeFloatList);
+			func_add_param("w", TypeFloat32List);
 		class_add_func_virtual("set_roundness", TypeVoid, &Painter::set_roundness);
 			func_add_param("r", TypeFloat32);
 		class_add_func_virtual("set_antialiasing", TypeVoid, &Painter::set_antialiasing);

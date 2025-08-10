@@ -60,8 +60,8 @@ class SpecGrid extends Grid
 		create_lines()
 
 	func override on_draw(c: hui.Painter)
-		draw_curve_b(c, pr, true, color.RED)
-		draw_curve_b(c, pl, true, color.BLUE)
+		draw_curve_b(c, pr, true, Color.RED)
+		draw_curve_b(c, pl, true, Color.BLUE)
 
 class SpectrumPanel extends ConfigPanel
 	var override c: Spectrum&
@@ -90,7 +90,7 @@ class Spectrum extends AudioVisualizer
 		
 	
 	func mut do(buf: AudioBuffer)
-		var fl, fr: complex[]
+		var fl, fr: Complex[]
 		buf.get_spectrum(fl, fr, 4096)
 		var tffl, tffr: float[]
 		tffl.clear()

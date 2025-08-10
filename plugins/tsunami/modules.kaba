@@ -133,9 +133,9 @@ class Module extends Object as shared
 	func extern virtual mut on_config()
 	func extern virtual get_config() -> Module.Config*
 	func extern config_to_string() -> string
-	func extern config_to_any() -> any
+	func extern config_to_any() -> Any
 	func extern mut config_from_string(version: i32, s: string)
-	func extern mut config_from_any(version: i32, a: any)
+	func extern mut config_from_any(version: i32, a: Any)
 
 	let VERSION_LATEST = -1
 	let VERSION_LEGACY = -2

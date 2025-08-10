@@ -21,10 +21,10 @@ Grid ? '' vertical
 		var i = 0
 		for k=>c in cols
 			p.set_color(c)
-			p.draw_rect(rect(0,w, i*20,i*20 + 20))
-			p.set_color(color.BLACK)
+			p.draw_rect(Rect(0,w, i*20,i*20 + 20))
+			p.set_color(Color.BLACK)
 			p.draw_str([0,i*20], k)
-			p.set_color(color.WHITE)
+			p.set_color(Color.WHITE)
 			p.draw_str([200,i*20], k)
 			i ++
 

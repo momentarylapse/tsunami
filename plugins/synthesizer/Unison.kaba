@@ -84,14 +84,14 @@ Grid ? ''
 		return sqr(max(x,0) / width / 0.7)
 	func y2v(y: float) -> float
 		return max((height - y), 0) / 100
-	func draw_curve_exp(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_exp(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: Color)
 		var e = log(v1/v0)
 		var cc: vec2[]
 		for a in 0:1.01:0.05
 			var t = t0+a*(t1-t0)
 			var v = v0 * exp(a * e)
 			cc.add(vec2(t2x(t), v2y(v)))
-		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
+		var col2 = Color.mix(col, theme.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -101,11 +101,11 @@ Grid ? ''
 		col2.a = 0.2
 		p.set_color(col2)
 		p.draw_polygon(cc)
-	func draw_curve_lin(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color)
+	func draw_curve_lin(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: Color)
 		var cc: vec2[]
 		cc.add(vec2(t2x(t0), v2y(v0)))
 		cc.add(vec2(t2x(t1), v2y(v1)))
-		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
+		var col2 = Color.mix(col, theme.text_soft2, 0.3)
 		p.set_color(col2)
 		p.set_line_dash([5.0,2.0])
 		p.draw_lines(cc)
@@ -116,8 +116,8 @@ Grid ? ''
 		p.set_color(col2)
 		p.draw_polygon(cc)
 	
-	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: color, hover: bool)
-		var col2 = color.interpolate(col, theme.text_soft2, 0.3)
+	func draw_grabber(p: hui.Painter, t0: float, v0: float, t1: float, v1: float, col: Color, hover: bool)
+		var col2 = Color.mix(col, theme.text_soft2, 0.3)
 		if hover
 			col2 = theme.hoverify(col2)
 		p.set_color(col2)
@@ -130,15 +130,15 @@ Grid ? ''
 		var t1 = t0 + o.attack
 		var t2 = t1 + o.decay
 		var t3 = t2 + o.release
-		draw_curve_lin(p, t0, o.initial, t1, o.peak, color.RED)
-		draw_curve_lin(p, t1, o.peak, t2, o.sustain, color.ORANGE)
-		draw_curve_exp(p, t2, o.sustain, t3, 0.01, color.GREEN)
+		draw_curve_lin(p, t0, o.initial, t1, o.peak, Color.RED)
+		draw_curve_lin(p, t1, o.peak, t2, o.sustain, Color.ORANGE)
+		draw_curve_exp(p, t2, o.sustain, t3, 0.01, Color.GREEN)
 		
 		
-		draw_grabber(p, t1, 0, t1, 1, color.RED, hover == -10)
-		draw_grabber(p, t2, 0, t2, 1, color.ORANGE, hover == -11)
-		draw_grabber(p, t3, 0, t3, 1, color.GREEN, hover == -12)
-		draw_grabber(p, t1, o.sustain, t3, o.sustain, color.YELLOW, hover == -13)
+		draw_grabber(p, t1, 0, t1, 1, Color.RED, hover == -10)
+		draw_grabber(p, t2, 0, t2, 1, Color.ORANGE, hover == -11)
+		draw_grabber(p, t3, 0, t3, 1, Color.GREEN, hover == -12)
+		draw_grabber(p, t1, o.sustain, t3, o.sustain, Color.YELLOW, hover == -13)
 		p.set_color(theme.text_soft1)
 		p.set_font_size(9)
 		if hover == -10

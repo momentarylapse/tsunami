@@ -22,7 +22,7 @@ class MLVDialog extends hui.Dialog
 	
 	line_samples: int[]
 	line_y0: float[]
-	area: rect
+	area: Rect
 	dragging = false
 	drag_y_offset0: float
 	drag_timer: Timer
@@ -223,7 +223,7 @@ class MLVDialog extends hui.Dialog
 				return [0,line_y0[i]] # X: TODO
 		return [0,0]
 	
-	func mlp_config() -> any
+	func mlp_config() -> Any
 		var conf = dyn([])
 		for i=>t in session.song.tracks
 			if t.type != SignalType.MIDI

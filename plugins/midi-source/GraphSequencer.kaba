@@ -273,7 +273,7 @@ Grid ? '' vertical
 			let b = project(c.config.nodes[cb.target].pos)
 			draw_arrow(p, a, b + (a-b).normalized() * (R * 0.8), 14)
 		for s in c.signals
-			p.set_color(color.RED)
+			p.set_color(Color.RED)
 			let p1 = c.config.nodes[c.config.cables[s.cable].source].pos
 			let p2 = c.config.nodes[c.config.cables[s.cable].target].pos
 			p.draw_circle(project(p1 + (p2 - p1) * s.offset), 4)

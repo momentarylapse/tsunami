@@ -5,9 +5,7 @@
 
 string f2s_clean(float f, int dez);
 
-class AnyDict : public base::map<string, Any> {};
-
-AnyDict _empty_dummy_map_;
+Any::Dict _empty_dummy_map_;
 static DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
 
 Any EmptyVar;
@@ -44,14 +42,6 @@ Any::Any() {
 	type = Type::None;
 	data = nullptr;
 	parent = nullptr;
-}
-
-void Any::__init__() {
-	new(this) Any;
-}
-
-void Any::__delete__() {
-	this->~Any();
 }
 
 Any::Any(const Any &a) : Any() {
@@ -96,7 +86,7 @@ Any::Any(const Array<int> &a) : Any() {
 		as_list().add(i);
 }
 
-Any::Any(const AnyDict &m) : Any() {
+Any::Any(const Dict &m) : Any() {
 	create_type(Type::Dict);
 	as_dict() = m;
 }
@@ -132,7 +122,7 @@ void Any::create_type(Type _type) {
 	} else if (is_list()) {
 		data = new Array<Any>;
 	} else if (is_dict()) {
-		data = new AnyDict;
+		data = new Dict;
 	} else if (is_empty()) {
 	} else {
 		msg_error("can not create " + type_name(type));
@@ -632,20 +622,20 @@ string& Any::as_string() const {
 	return *(string*)data;
 }
 
-AnyDict& Any::as_dict() const {
-	return *(AnyDict*)data;
+Any::Dict& Any::as_dict() const {
+	return *(Dict*)data;
 }
 
 Array<Any>& Any::as_list() const {
 	return *(Array<Any>*)data;
 }
 
-base::optional<Any*> Any::list_get(int i) {
+Any* Any::list_get(int i) {
 	if (!is_list())
-		return base::None;
+		return nullptr;
 	if (i < 0 or i >= as_list().num)
-		return base::None;
-	return &(*this)[i];
+		return nullptr;
+	return &as_list()[i];
 }
 
 void Any::list_set(int i, const Any &value) {
@@ -663,11 +653,11 @@ void Any::list_set(int i, const Any &value) {
 	(*this)[i] = value;
 }
 
-base::optional<Any*> Any::dict_get(const string &key) {
+Any* Any::dict_get(const string &key) {
 	if (!is_dict())
-		return base::None;
+		return nullptr;
 	if (!as_dict().contains(key))
-		return base::None;
+		return nullptr;
 	return &as_dict()[key];
 }
 

@@ -91,7 +91,7 @@ class CorrelationGrid extends Grid
 			p.set_color([1,1,1, 0.1])
 			var x0 = x_axis.project(curve[max(hover_peak-10, 0)].x)
 			var x1 = x_axis.project(curve[min(hover_peak+10, len(curve)-1)].x)
-			p.draw_rect(rect(x0,x1, 0,p.height))
+			p.draw_rect(Rect(x0,x1, 0,p.height))
 	
 		var q = [for c in curve project2(c)]
 		p.set_line_width(2)

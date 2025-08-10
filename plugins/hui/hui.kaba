@@ -72,8 +72,8 @@ class Panel extends Object as shared
 	func extern mut delete_control(id: string)
 	func extern mut set_int(id: string, i: i32)
 	func extern get_int(id: string) -> i32
-	func extern mut set_color(id: string, c: color)
-	func extern get_color(id: string) -> color
+	func extern mut set_color(id: string, c: Color)
+	func extern get_color(id: string) -> Color
 	func extern mut set_selection(id: string, sel: i32[])
 	func extern get_selection(id: string) -> i32[]
 	func extern mut set_image(id: string, image: string)

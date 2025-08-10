@@ -31,20 +31,20 @@ extern const Class *TypePointerList;
 extern const Class *TypeObject;
 extern const Class *TypeObjectP;
 extern const Class *TypeBoolList;
-extern const Class *TypeIntP;
-extern const Class *TypeIntList;
-extern const Class *TypeFloatP;
-extern const Class *TypeFloatList;
+extern const Class *TypeInt32P;
+extern const Class *TypeInt32List;
+extern const Class *TypeFloat32P;
+extern const Class *TypeFloat32List;
 extern const Class *TypeFloat64List;
 extern const Class *TypeStringList;
-extern const Class *TypeIntDict;
-extern const Class *TypeFloatDict;
+extern const Class *TypeInt32Dict;
+extern const Class *TypeFloat32Dict;
 extern const Class *TypeStringDict;
 extern const Class *TypeAny;
 extern const Class *TypeNoValueError;
 
-const Class *TypeIntOptional;
-const Class *TypeFloatOptional;
+const Class *TypeInt32Optional;
+const Class *TypeFloat32Optional;
 
 const Class *TypeRawT;
 const Class *TypeXferT;
@@ -474,12 +474,12 @@ void SIAddPackageBase(Context *c) {
 	const_cast<Class*>(TypeNone)->name = "None";
 	TypePointerList = add_type_list(TypePointer);
 	TypeBoolList    = add_type_list(TypeBool);
-	TypeIntP        = add_type_p_raw(TypeInt32);
-	TypeIntOptional = add_type_optional(TypeInt32);
-	TypeFloatOptional = add_type_optional(TypeFloat32);
-	TypeIntList     = add_type_list(TypeInt32);
-	TypeFloatP      = add_type_p_raw(TypeFloat32);
-	TypeFloatList   = add_type_list(TypeFloat32);
+	TypeInt32P      = add_type_p_raw(TypeInt32);
+	TypeInt32Optional = add_type_optional(TypeInt32);
+	TypeFloat32Optional = add_type_optional(TypeFloat32);
+	TypeInt32List   = add_type_list(TypeInt32);
+	TypeFloat32P    = add_type_p_raw(TypeFloat32);
+	TypeFloat32List = add_type_list(TypeFloat32);
 	TypeFloat64List = add_type_list(TypeFloat64);
 	TypeBytes      = add_type_list(TypeUInt8);
 	TypeCString     = add_type_array(TypeUInt8, 256);
@@ -490,8 +490,8 @@ void SIAddPackageBase(Context *c) {
 	TypeStringList  = add_type_list(TypeString);
 	capture_implicit_type(TypeBytes, "bytes"); // bytes := u8[]
 
-	TypeIntDict     = add_type_dict(TypeInt32);
-	TypeFloatDict   = add_type_dict(TypeFloat32);
+	TypeInt32Dict   = add_type_dict(TypeInt32);
+	TypeFloat32Dict = add_type_dict(TypeFloat32);
 	TypeStringDict  = add_type_dict(TypeString);
 
 	TypeException		= add_type  ("Exception", sizeof(KabaException));
@@ -499,32 +499,23 @@ void SIAddPackageBase(Context *c) {
 
 	lib_create_list<void*>(TypePointerList);
 	lib_create_list<bool>(TypeBoolList);
-	lib_create_list<int>(TypeIntList);
-	lib_create_list<float>(TypeFloatList);
+	lib_create_list<int>(TypeInt32List);
+	lib_create_list<float>(TypeFloat32List);
 	lib_create_list<double>(TypeFloat64List);
 	lib_create_list<char>(TypeString);
 	lib_create_list<uint8>(TypeBytes);
 	lib_create_list<string>(TypeStringList);
 
 
-	lib_create_optional<int>(TypeIntOptional);
-	lib_create_optional<float>(TypeFloatOptional);
+	lib_create_optional<int>(TypeInt32Optional);
+	lib_create_optional<float>(TypeFloat32Optional);
 
 
-	auto TypeInt32Ref = add_type_ref(TypeInt32);
-	auto TypeInt32RefOptional = add_type_optional(TypeInt32Ref);
-	auto TypeFloat32Ref = add_type_ref(TypeFloat32);
-	auto TypeFloat32RefOptional = add_type_optional(TypeFloat32Ref);
-	auto TypeStringRef = add_type_ref(TypeString);
-	auto TypeStringRefOptional = add_type_optional(TypeStringRef);
+	auto TypeStringP = add_type_p_raw(TypeString);
 
-	lib_create_optional<void*>(TypeInt32RefOptional);
-	lib_create_optional<void*>(TypeFloat32RefOptional);
-	lib_create_optional<void*>(TypeStringRefOptional);
-
-	lib_create_dict<int>(TypeIntDict, TypeInt32RefOptional);
-	lib_create_dict<float>(TypeFloatDict, TypeFloat32RefOptional);
-	lib_create_dict<string>(TypeStringDict, TypeStringRefOptional);
+	lib_create_dict<int>(TypeInt32Dict, TypeInt32P);
+	lib_create_dict<float>(TypeFloat32Dict, TypeFloat32P);
+	lib_create_dict<string>(TypeStringDict, TypeStringP);
 
 
 
@@ -773,7 +764,7 @@ void SIAddPackageBase(Context *c) {
 			func_add_param("size", TypeInt32);
 		class_add_func("tail", TypeString, &string::tail, Flags::Pure);
 			func_add_param("size", TypeInt32);
-		class_add_func("find", TypeIntOptional, &KabaString::_find, Flags::Pure);
+		class_add_func("find", TypeInt32Optional, &KabaString::_find, Flags::Pure);
 			func_add_param("str", TypeString);
 			func_add_param_def("start", TypeInt32, 0);
 		class_add_func("compare", TypeInt32, &string::compare, Flags::Pure);
@@ -804,7 +795,7 @@ void SIAddPackageBase(Context *c) {
 		class_add_func("trim", TypeString, &string::trim, Flags::Pure);
 		class_add_func("escape", TypeString, &string::escape, Flags::Pure);
 		class_add_func("unescape", TypeString, &string::unescape, Flags::Pure);
-		class_add_func("utf8_to_utf32", TypeIntList, &string::utf8_to_utf32, Flags::Pure);
+		class_add_func("utf8_to_utf32", TypeInt32List, &string::utf8_to_utf32, Flags::Pure);
 		class_add_func("utf8_length", TypeInt32, &string::utf8len, Flags::Pure);
 		class_add_func("encode", TypeBytes, &KabaString::encode, Flags::Pure);
 		class_add_func("decode", TypeString, &KabaString::decode, Flags::Pure | Flags::Static);
@@ -824,7 +815,7 @@ void SIAddPackageBase(Context *c) {
 		class_add_func("md5", TypeString, &bytes::md5, Flags::Pure);
 		class_add_func("hex", TypeString, &bytes::hex, Flags::Pure);
 		class_add_func("utf8", TypeString, &KabaBytes::utf8, Flags::Pure);
-		class_add_func("find", TypeIntOptional, &KabaBytes::_find, Flags::Pure);
+		class_add_func("find", TypeInt32Optional, &KabaBytes::_find, Flags::Pure);
 			func_add_param("str", TypeBytes);
 			func_add_param_def("start", TypeInt32, 0);
 		//class_add_func(Identifier::Func::REPR, TypeString, &bytes::hex, Flags::PURE);
@@ -849,66 +840,66 @@ void SIAddPackageBase(Context *c) {
 
 
 
-	add_class(TypeIntList);
+	add_class(TypeInt32List);
 		class_add_func(Identifier::func::Str, TypeString, &XList<int>::str, Flags::Pure);
-		add_operator(OperatorID::AddAssign, TypeVoid, TypeIntList, TypeIntList, InlineID::None, &XList<int>::iadd_values);
-		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeIntList, TypeIntList, InlineID::None, &XList<int>::isub_values);
-		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeIntList, TypeIntList, InlineID::None, &XList<int>::imul_values);
-		add_operator(OperatorID::DivideAssign, TypeVoid, TypeIntList, TypeIntList, InlineID::None, &XList<int>::idiv_values);
-		add_operator(OperatorID::Add, TypeIntList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::add_values);
-		add_operator(OperatorID::Subtract, TypeIntList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::sub_values);
-		add_operator(OperatorID::Multiply, TypeIntList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::mul_values);
-		add_operator(OperatorID::Divide, TypeIntList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::div_values);
-		add_operator(OperatorID::Exponent, TypeIntList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::exp_values);
-		add_operator(OperatorID::Add, TypeIntList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::add_values_scalar);
-		add_operator(OperatorID::Subtract, TypeIntList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::sub_values_scalar);
-		add_operator(OperatorID::Multiply, TypeIntList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::mul_values_scalar);
-		add_operator(OperatorID::Divide, TypeIntList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::div_values_scalar);
-		add_operator(OperatorID::Exponent, TypeIntList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::exp_values_scalar);
-		add_operator(OperatorID::Assign, TypeVoid, TypeIntList, TypeInt32, InlineID::None, &XList<int>::assign_values_scalar);
-		add_operator(OperatorID::Smaller, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::lt_values);
-		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::le_values);
-		add_operator(OperatorID::Greater, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::gt_values);
-		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::ge_values);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::iadd_values);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::isub_values);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::imul_values);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::idiv_values);
+		add_operator(OperatorID::Add, TypeInt32List, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::add_values);
+		add_operator(OperatorID::Subtract, TypeInt32List, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::sub_values);
+		add_operator(OperatorID::Multiply, TypeInt32List, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::mul_values);
+		add_operator(OperatorID::Divide, TypeInt32List, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::div_values);
+		add_operator(OperatorID::Exponent, TypeInt32List, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::exp_values);
+		add_operator(OperatorID::Add, TypeInt32List, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::add_values_scalar);
+		add_operator(OperatorID::Subtract, TypeInt32List, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::sub_values_scalar);
+		add_operator(OperatorID::Multiply, TypeInt32List, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::mul_values_scalar);
+		add_operator(OperatorID::Divide, TypeInt32List, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::div_values_scalar);
+		add_operator(OperatorID::Exponent, TypeInt32List, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::exp_values_scalar);
+		add_operator(OperatorID::Assign, TypeVoid, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::assign_values_scalar);
+		add_operator(OperatorID::Smaller, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::lt_values);
+		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::le_values);
+		add_operator(OperatorID::Greater, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::gt_values);
+		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::ge_values);
 		// don't we prefer  int[] == int[] -> bool ???
-		add_operator(OperatorID::Equal, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::eq_values);
-		add_operator(OperatorID::NotEqual, TypeBoolList, TypeIntList, TypeIntList, InlineID::None, &XList<int>::ne_values);
-		add_operator(OperatorID::Smaller, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::lt_values_scalar);
-		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::le_values_scalar);
-		add_operator(OperatorID::Greater, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::gt_values_scalar);
-		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::ge_values_scalar);
-		add_operator(OperatorID::Equal, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::eq_values_scalar);
-		add_operator(OperatorID::NotEqual, TypeBoolList, TypeIntList, TypeInt32, InlineID::None, &XList<int>::ne_values_scalar);
+		add_operator(OperatorID::Equal, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::eq_values);
+		add_operator(OperatorID::NotEqual, TypeBoolList, TypeInt32List, TypeInt32List, InlineID::None, &XList<int>::ne_values);
+		add_operator(OperatorID::Smaller, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::lt_values_scalar);
+		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::le_values_scalar);
+		add_operator(OperatorID::Greater, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::gt_values_scalar);
+		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::ge_values_scalar);
+		add_operator(OperatorID::Equal, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::eq_values_scalar);
+		add_operator(OperatorID::NotEqual, TypeBoolList, TypeInt32List, TypeInt32, InlineID::None, &XList<int>::ne_values_scalar);
 
-	add_class(TypeFloatList);
+	add_class(TypeFloat32List);
 		class_add_func(Identifier::func::Str, TypeString, &XList<float>::str, Flags::Pure);
-		add_operator(OperatorID::AddAssign, TypeVoid, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::iadd_values);
-		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::isub_values);
-		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::imul_values);
-		add_operator(OperatorID::DivideAssign, TypeVoid, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::idiv_values);
-		add_operator(OperatorID::Add, TypeFloatList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::add_values);
-		add_operator(OperatorID::Subtract, TypeFloatList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::sub_values);
-		add_operator(OperatorID::Multiply, TypeFloatList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::mul_values);
-		add_operator(OperatorID::Divide, TypeFloatList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::div_values);
-		add_operator(OperatorID::Exponent, TypeFloatList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::exp_values);
-		add_operator(OperatorID::Add, TypeFloatList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::add_values_scalar);
-		add_operator(OperatorID::Subtract, TypeFloatList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::sub_values_scalar);
-		add_operator(OperatorID::Multiply, TypeFloatList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::mul_values_scalar);
-		add_operator(OperatorID::Divide, TypeFloatList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::div_values_scalar);
-		add_operator(OperatorID::Exponent, TypeFloatList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::exp_values_scalar);
-		add_operator(OperatorID::AddAssign, TypeVoid, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::iadd_values_scalar);
-		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::isub_values_scalar);
-		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::imul_values_scalar);
-		add_operator(OperatorID::DivideAssign, TypeVoid, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::idiv_values_scalar);
-		add_operator(OperatorID::Assign, TypeVoid, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::assign_values_scalar);
-		add_operator(OperatorID::Smaller, TypeBoolList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::lt_values);
-		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::le_values);
-		add_operator(OperatorID::Greater, TypeBoolList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::gt_values);
-		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeFloatList, TypeFloatList, InlineID::None, &XList<float>::ge_values);
-		add_operator(OperatorID::Smaller, TypeBoolList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::lt_values_scalar);
-		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::le_values_scalar);
-		add_operator(OperatorID::Greater, TypeBoolList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::gt_values_scalar);
-		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeFloatList, TypeFloat32, InlineID::None, &XList<float>::ge_values_scalar);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::iadd_values);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::isub_values);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::imul_values);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::idiv_values);
+		add_operator(OperatorID::Add, TypeFloat32List, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::add_values);
+		add_operator(OperatorID::Subtract, TypeFloat32List, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::sub_values);
+		add_operator(OperatorID::Multiply, TypeFloat32List, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::mul_values);
+		add_operator(OperatorID::Divide, TypeFloat32List, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::div_values);
+		add_operator(OperatorID::Exponent, TypeFloat32List, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::exp_values);
+		add_operator(OperatorID::Add, TypeFloat32List, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::add_values_scalar);
+		add_operator(OperatorID::Subtract, TypeFloat32List, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::sub_values_scalar);
+		add_operator(OperatorID::Multiply, TypeFloat32List, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::mul_values_scalar);
+		add_operator(OperatorID::Divide, TypeFloat32List, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::div_values_scalar);
+		add_operator(OperatorID::Exponent, TypeFloat32List, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::exp_values_scalar);
+		add_operator(OperatorID::AddAssign, TypeVoid, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::iadd_values_scalar);
+		add_operator(OperatorID::SubtractAssign, TypeVoid, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::isub_values_scalar);
+		add_operator(OperatorID::MultiplyAssign, TypeVoid, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::imul_values_scalar);
+		add_operator(OperatorID::DivideAssign, TypeVoid, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::idiv_values_scalar);
+		add_operator(OperatorID::Assign, TypeVoid, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::assign_values_scalar);
+		add_operator(OperatorID::Smaller, TypeBoolList, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::lt_values);
+		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::le_values);
+		add_operator(OperatorID::Greater, TypeBoolList, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::gt_values);
+		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeFloat32List, TypeFloat32List, InlineID::None, &XList<float>::ge_values);
+		add_operator(OperatorID::Smaller, TypeBoolList, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::lt_values_scalar);
+		add_operator(OperatorID::SmallerEqual, TypeBoolList, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::le_values_scalar);
+		add_operator(OperatorID::Greater, TypeBoolList, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::gt_values_scalar);
+		add_operator(OperatorID::GreaterEqual, TypeBoolList, TypeFloat32List, TypeFloat32, InlineID::None, &XList<float>::ge_values_scalar);
 
 
 	add_class(TypeFloat64List);

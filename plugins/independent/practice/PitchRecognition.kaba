@@ -32,12 +32,12 @@ class PitchRecognitionPanel extends ConfigPanel
 		#note = i2s(n)
 
 	func draw_volume(p: hui.Painter)
-		p.set_color(color(0.8, 0.8, 0.8, 1))
+		p.set_color(Color(0.8, 0.8, 0.8, 1))
 		let y0 = 30.0
 		let y1 = float(p.height) - 5
 		let h = y1 - y0
 		p.draw_rect([5, 10, y0 + h * (1 - c.pitch_detector.volume), y0 + h * (2 - c.pitch_detector.volume)])
-		p.set_color(color(0.6, 0.6, 0.6, 1))
+		p.set_color(Color(0.6, 0.6, 0.6, 1))
 		p.draw_line([2, (y0 + y1) / 2], [13, (y0 + y1) / 2])
 
 	func on_draw(p: hui.Painter)

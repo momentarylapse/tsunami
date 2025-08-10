@@ -15,7 +15,7 @@ class Test extends TsunamiPlugin
 		
 		for j in 0:NUM_CHUNKS
 			print("-----")
-			var c: complex[]
+			var c: Complex[]
 			var b, b2: float[]
 			for i in 0:CHUNK_SIZE
 				b.add(buf.c[0][i + j*CHUNK_SIZE])

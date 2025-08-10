@@ -3,13 +3,12 @@
 #define __ANY_INCLUDED__
 
 #include "../base/base.h"
-#include "../base/optional.h"
+#include "../base/map.h"
 
-
-class AnyDict;
 
 class Any {
 public:
+	using Dict = base::map<string, Any>;
 
 	enum class Type {
 		None,
@@ -32,7 +31,7 @@ public:
 	Any(const void *p);
 	Any(const Array<Any> &a);
 	Any(const Array<int> &a);
-	Any(const AnyDict &m);
+	Any(const Dict &m);
 	~Any();
 
 	void clear();
@@ -79,7 +78,7 @@ public:
 	bool& as_bool() const;
 	string& as_string() const;
 	Array<Any>& as_list() const;
-	AnyDict& as_dict() const;
+	Dict& as_dict() const;
 	const void*& as_pointer() const;
 
 	// map/dict
@@ -94,17 +93,11 @@ public:
 	Any *parent;
 
 	// kaba
-	void __init__();
-	void __delete__();
-	void set(const Any &a){	*this = a;	}
-	void _add(const Any &a){	Any b = *this + a;	*this = b;	}
-	void _sub(const Any &a){	Any b = *this - a;	*this = b;	}
-	base::optional<Any*> list_get(int i);
+	Any* list_get(int i);
 	void list_set(int i, const Any &value);
-	base::optional<Any*> dict_get(const string &key);
+	Any* dict_get(const string &key);
 	void dict_set(const string &key, const Any &value);
 	void dict_drop(const string &key);
-
 
 	static Any EmptyDict;
 	static Any EmptyList;

@@ -172,11 +172,11 @@ Grid ? '' vertical
 			let col0 = theme.pitch_color(pitch.pitch)
 			var x0 = border
 			for i in 0:subbeats
-				var col = color.interpolate(col0, theme.background, 0.4)
+				var col = Color.mix(col0, theme.background, 0.4)
 				if i == active
 					col = col0
 				if not pitch.is_active(i)
-					col = color.interpolate(col0, theme.background, 0.92)
+					col = Color.mix(col0, theme.background, 0.92)
 				for h in hover
 					if k == h[0] and i == h[1]
 						col = theme.hoverify(col)
@@ -187,7 +187,7 @@ Grid ? '' vertical
 					x0 += beat_border
 		
 		if c.cur_beat >= 0
-			p.set_color(color.GREEN)
+			p.set_color(Color.GREEN)
 			let x = f32(width) * total_fraction
 			p.draw_line([x,0], [x,height])
 	

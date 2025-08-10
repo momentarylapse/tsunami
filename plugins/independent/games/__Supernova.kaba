@@ -215,7 +215,7 @@ func UpdateInput()
 	
 	var temp = buf.r + buf.l
 	
-	var bufc: complex[]
+	var bufc: Complex[]
 	bufc.resize(len(buf) / 2 + 1)
 	fft_r2c(temp, bufc)
 	var max: float = 0
@@ -315,7 +315,7 @@ func StopLesson()
 	win.enable("speed", true)
 	win.enable("cancel", false)
 
-var bufc: complex[]
+var bufc: Complex[]
 
 func main()
 	MidiTrack = nil

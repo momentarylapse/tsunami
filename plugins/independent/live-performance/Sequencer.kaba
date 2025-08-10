@@ -96,7 +96,7 @@ class SequencerPanel extends ConfigPanel
 			if n.pos == current_pos
 				p.set_color(c0)
 			else
-				p.set_color(color.interpolate(c0, theme.text_soft2, 0.8))
+				p.set_color(Color.mix(c0, theme.text_soft2, 0.8))
 			p.draw_rect([w * n.pos + b, w * (n.pos + 1) - b, height - h * (n.type + 1) + b, height - h * n.type - b])
 			
 		for s in c.output.samples_played()
@@ -104,7 +104,7 @@ class SequencerPanel extends ConfigPanel
 			let rel = float(int(s) % total) / total
 			let x = rel * width
 			current_pos = int(rel * 16.0)
-			p.set_color(color.GREEN)
+			p.set_color(Color.GREEN)
 			p.draw_line([x, 0], [x, height])
 		
 	func mut on_left_button_down()

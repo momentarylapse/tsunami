@@ -74,6 +74,19 @@ template<class T>
 void generic_assign(T& a, const T& b) {
 	a = b;
 }
+
+template<class T>
+class generic_virtual : public T {
+public:
+	void __delete__() {
+		this->~T();
+	}
+};
+
+template<class T, class... Args>
+void generic_init_ext(T* me, Args... args) {
+	new(me) T(args...);
+}
 }
 
 #endif

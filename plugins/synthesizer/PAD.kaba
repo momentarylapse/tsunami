@@ -42,7 +42,7 @@ class PADRenderer extends PitchRenderer
 	func mut create()
 		var freq = pitch_to_freq(pitch)
 	
-		var c: complex[]
+		var c: Complex[]
 		var amp: float[]
 		c.resize(N / 2 + 1)
 		amp.resize(N / 2 + 1)
@@ -60,7 +60,7 @@ class PADRenderer extends PitchRenderer
 		
 		for i in 0:len(c)
 			var phi = rand(2 * pi)
-			c[i] = complex(cos(phi), sin(phi)) * amp[i]
+			c[i] = Complex(cos(phi), sin(phi)) * amp[i]
 		
 		prebuf.resize(N)
 		fft.c2r_inv(c, prebuf)
@@ -114,7 +114,7 @@ class PADGrid extends Grid
 		var curve: vec2[]
 		for i=>a in pc.A
 			pc.fill_curve(curve, i)
-			draw_curve_b(c, curve, false, color.RED)
+			draw_curve_b(c, curve, false, Color.RED)
 	
 		# points
 		for i=>a in pc.A

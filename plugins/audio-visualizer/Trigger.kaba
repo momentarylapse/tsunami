@@ -53,11 +53,11 @@ Grid ? '' vertical
 		curve_after = c.curve_after
 		
 		p.set_line_width(0.7)
-		p.set_color(color(0,1,0, 0.5))
+		p.set_color(Color(0,1,0, 0.5))
 		p.draw_line([0,h/2], [w,h/2])
 		p.draw_line([w/2,0], [w/2,h])
 		
-		p.set_color(color(0,1,0, 1))
+		p.set_color(Color(0,1,0, 1))
 		p.set_line_width(1.5)
 		var z: vec2[]
 		for i=>v in curve_before

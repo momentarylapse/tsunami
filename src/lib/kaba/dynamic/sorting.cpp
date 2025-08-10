@@ -9,8 +9,8 @@
 
 namespace kaba {
 	
-extern const Class *TypeIntList;
-extern const Class *TypeFloatList;
+extern const Class *TypeInt32List;
+extern const Class *TypeFloat32List;
 extern const Class *TypeBoolList;
 extern const Class *TypeAny;
 extern const Class *TypePath;

@@ -3,14 +3,14 @@ use fft
 
 let AUTO_CONFIG_SAMPLE = ""
 
-func fold(x: float[], h: float[], out HH: complex[], out result: float[])
+func fold(x: float[], h: float[], out HH: Complex[], out result: float[])
 	var N = len(x)
 	var K = len(h)
 	
 	# fft of input
 	var xx = x
 	xx.resize(N + K)
-	var XX: complex[]
+	var XX: Complex[]
 	fft.r2c(xx, XX)
 	
 	# fft of kernel
@@ -32,7 +32,7 @@ func test()
 	var x = [1.0, 1.0, 0.0, 1.0]
 	var h = [0.5, 0.5, 0.0, 0.0]
 	var result: float[]
-	var HH: complex[]
+	var HH: Complex[]
 	fold(x, h, HH, result)
 	print(result)
 
@@ -46,7 +46,7 @@ class Folding extends AudioEffect
 	var config: Config
 
 	var h: float[]
-	var HH: complex[]
+	var HH: Complex[]
 	
 	var buf_overlap: AudioBuffer
 	

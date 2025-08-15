@@ -73,7 +73,7 @@ ColorScheme create_pdf_default_color_scheme() {
 }
 
 ColorScheme get_pdf_color_scheme(const Any &params) {
-	if (params["theme"]._int() == 1)
+	if (params["theme"].to_i32() == 1)
 		return ColorSchemeDark();
 	return create_pdf_default_color_scheme();
 }
@@ -86,7 +86,7 @@ MultiLinePainter *prepare_pdf_multi_line_view(Song *song, const ColorScheme &_co
 
 	float border = 25;
 
-	float horizontal_scale = params["horizontal-scale"]._float();
+	float horizontal_scale = params["horizontal-scale"].to_f32();
 	float avg_scale = 65.0f / song->sample_rate * horizontal_scale;
 	float avg_samples_per_line = (page_width - 2*border) / avg_scale;
 

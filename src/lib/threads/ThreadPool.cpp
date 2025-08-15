@@ -21,24 +21,23 @@ public:
 	}
 	int id;
 	int channel = -1;
-	std::atomic<int> task_id_begin = -1;
-	std::atomic<int> task_id_end = -1;
-	std::function<void(int)> f;
+	std::atomic<bool> awake = false;
+	std::atomic<bool> has_work = false;
+	std::function<void()> f;
 	void on_run() override {
 		while (true) {
-			if (f and task_id_begin >= 0) {
+			if (has_work) {
 #ifdef USE_PROFILER
 				profiler::begin(channel);
 #endif
-				for (int i=task_id_begin; i<task_id_end; i++)
-					f(i);
+				f();
 #ifdef USE_PROFILER
 				profiler::end(channel);
 #endif
-				task_id_begin = -1;
+				has_work = false;
 			}
 			cancelation_point();
-			if (f)
+			if (awake)
 				usleep(10);
 			else
 				usleep(100);
@@ -60,38 +59,40 @@ ThreadPool::~ThreadPool() {
 		delete t;
 }
 
-void ThreadPool::run(int n, std::function<void(int)> f, int cluster_size) {
+void ThreadPool::_begin() {
 	for (auto t: threads) {
-		t->f = f;
 		if (!t->running)
 			t->run();
 	}
+}
 
-	for (int i = 0; i < n; i+=cluster_size) {
-		bool found = false;
-		while (!found) {
-			for (auto t: threads)
-				if (t->task_id_begin < 0) {
-					t->task_id_end = min((i + cluster_size), n );
-					t->task_id_begin = i;
-					found = true;
-					break;
-				}
-		}
-	}
+void ThreadPool::_end() {
 
 	// wait till finished
 	bool any_running = true;
 	while (any_running) {
 		any_running = false;
 		for (auto t: threads)
-			if (t->task_id_begin >= 0)
+			if (t->has_work)
 				any_running = true;
 	}
 
 	for (auto t: threads)
-		t->f = nullptr;
-		//t->join();
+		t->awake = false;
+	//t->join();
+}
+
+
+
+void ThreadPool::_emit_cluster(std::function<void()> f) {
+	while (true) {
+		for (auto t: threads)
+			if (!t->has_work) {
+				t->f = f;
+				t->has_work = true;
+				return;
+			}
+	}
 }
 
 

@@ -233,7 +233,7 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _av
 
 		Any at;
 		for (Any &a: conf.as_list())
-			if (a["index"]._int() == ti)
+			if (a["index"].to_i32() == ti)
 				at = a;
 		bool allow_classical = at.has("classical");
 		bool allow_tab = at.has("tab") and (t->instrument.string_pitch.num > 0);
@@ -245,27 +245,27 @@ void MultiLinePainter::set_context(const Any &conf, float _page_width, float _av
 
 void MultiLinePainter::set(const Any &conf) {
 	if (conf.has("border"))
-		border = conf["border"]._float();
+		border = conf["border"].to_f32();
 	if (conf.has("line-height"))
-		line_height = conf["line-height"]._float();
+		line_height = conf["line-height"].to_f32();
 	if (conf.has("line-space"))
-		line_space = conf["line-space"]._float();
+		line_space = conf["line-space"].to_f32();
 	if (conf.has("track-space"))
-		track_space = conf["track-space"]._float();
+		track_space = conf["track-space"].to_f32();
 	padding_y_classical = line_height * 0.25f;
 	padding_y_tab = line_height * 0.15f;
 	if (conf.has("padding-y-classical"))
-		padding_y_classical = conf["padding-y-classical"]._float();
+		padding_y_classical = conf["padding-y-classical"].to_f32();
 	if (conf.has("padding-y-tab"))
-		padding_y_tab = conf["padding-y-tab"]._float();
+		padding_y_tab = conf["padding-y-tab"].to_f32();
 	if (conf.has("antialiasing"))
-		antialiasing = conf["antialiasing"]._bool();
+		antialiasing = conf["antialiasing"].to_bool();
 	if (conf.has("allow-shadows"))
-		allow_shadows = conf["allow-shadows"]._bool();
+		allow_shadows = conf["allow-shadows"].to_bool();
 	if (conf.has("min-font-size"))
-		min_font_size = conf["min-font-size"]._float();
+		min_font_size = conf["min-font-size"].to_f32();
 	if (conf.has("part-colors"))
-		allow_part_colors = conf["part-colors"]._bool();
+		allow_part_colors = conf["part-colors"].to_bool();
 	update_scales();
 }
 

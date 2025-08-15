@@ -66,15 +66,15 @@ Any Configuration::get(const string& name, const Any& default_val) const {
 }
 
 int Configuration::get_int(const string& name, int default_val) const {
-	return get(name, Any(default_val))._int();
+	return get(name, Any(default_val)).to_i32();
 }
 
 float Configuration::get_float(const string& name, float default_val) const {
-	return get(name, Any(default_val))._float();
+	return get(name, Any(default_val)).to_f32();
 }
 
 bool Configuration::get_bool(const string& name, bool default_val) const {
-	return get(name, Any(default_val))._bool();
+	return get(name, Any(default_val)).to_bool();
 }
 
 string Configuration::get_str(const string& name, const string& default_val) const {
@@ -128,7 +128,7 @@ bool Configuration::load(const Path &filename) {
 				string temp = f->read_str();
 				string key = temp.sub(3);
 				string value = f->read_str();
-				map.set(key, value);
+				map.set(key, Any(value));
 			}
 		} else if (t.head(3) == "// ") {
 			// semi old format
@@ -139,7 +139,7 @@ bool Configuration::load(const Path &filename) {
 					break;
 				string key = temp.sub(3).lower().replace(" ", "-");
 				string value = f->read_str();
-				map.set(key, value);
+				map.set(key, Any(value));
 			}
 		} else {
 			// new format

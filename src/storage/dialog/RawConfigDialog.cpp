@@ -23,13 +23,13 @@ RawConfigDialog::RawConfigDialog(StorageOperationData *_od, hui::Window *parent)
 		add_string("format", format_name((SampleFormat)i));
 	set_int("format", (int)format_from_code(od->parameters["format"].str()) - 1);
 
-	if (od->parameters["channels"]._int() == 2)
+	if (od->parameters["channels"].to_i32() == 2)
 		check("channels:stereo", true);
 	else
 		check("channels:mono", true);
 
-	set_int("sample_rate", od->parameters["samplerate"]._int());
-	set_int("offset", od->parameters["offset"]._int());
+	set_int("sample_rate", od->parameters["samplerate"].to_i32());
+	set_int("offset", od->parameters["offset"].to_i32());
 
 	event("hui:close", [this] { on_close(); });
 	event("close", [this] { on_close(); });

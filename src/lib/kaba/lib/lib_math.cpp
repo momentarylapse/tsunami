@@ -223,9 +223,9 @@ class KabaAny : public Any {
 public:
 	const Class* _get_class() {
 		if (type == Any::Type::Int)
-			return TypeInt32;
+			return TypeInt32; // legacy...
 		if (type == Any::Type::Float)
-			return TypeFloat32;
+			return TypeFloat32; // legacy...
 		if (type == Any::Type::Bool)
 			return TypeBool;
 		if (type == Any::Type::String)
@@ -255,9 +255,13 @@ public:
 	
 	static void unwrap(Any &aa, void *var, const Class *type) {
 		if (type == TypeInt32) {
-			*(int*)var = aa.as_int();
+			*(int*)var = (int)aa.as_int();
+		} else if (type == TypeInt64) {
+			*(int64*)var = aa.as_int();
 		} else if (type == TypeFloat32) {
-			*(float*)var = aa.as_float();
+			*(float*)var = (float)aa.as_float();
+		} else if (type == TypeFloat64) {
+			*(double*)var = aa.as_float();
 		} else if (type == TypeBool) {
 			*(bool*)var = aa.as_bool();
 		} else if (type == TypeString) {
@@ -871,14 +875,14 @@ void SIAddPackageMath(Context *c) {
 	add_class(TypeVli);
 		class_add_element("sign", TypeBool, 0);
 		class_add_element("data", TypeInt32List, 4);
-		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&vli::__init__), Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, algebra_p(&vli::__delete__), Flags::Mutable);
-		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_vli), Flags::Mutable);
-			func_add_param("v", TypeVli);
-		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_str), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&generic_init<vli>), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p((&generic_init_ext<vli, const string&>)), Flags::Mutable);
 			func_add_param("s", TypeString);
-		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&vli::set_int), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p((&generic_init_ext<vli, int>)), Flags::Mutable);
 			func_add_param("i", TypeInt32);
+		class_add_func(Identifier::func::Delete, TypeVoid, algebra_p(&generic_delete<vli>), Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&generic_assign<vli>), Flags::Mutable);
+			func_add_param("v", TypeVli);
 		class_add_func(Identifier::func::Str, TypeString, algebra_p(&vli::to_string), Flags::Pure);
 		class_add_func("compare", TypeInt32, algebra_p(&vli::compare), Flags::Pure);
 			func_add_param("v", TypeVli);
@@ -888,13 +892,16 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("div", TypeVli, algebra_p(&vli::_div), Flags::Pure);
 			func_add_param("div", TypeVli);
 			func_add_param("rem", TypeVli);
-		class_add_func("pow", TypeVli, algebra_p(&vli::pow), Flags::Pure);
+		class_add_func("pow", TypeVli, algebra_p(&vli::pow), Flags::Pure | Flags::Static);
+			func_add_param("x", TypeVli);
 			func_add_param("exp", TypeVli);
-		class_add_func("pow_mod", TypeVli, algebra_p(&vli::pow_mod), Flags::Pure);
+		class_add_func("pow_mod", TypeVli, algebra_p(&vli::pow_mod), Flags::Pure | Flags::Static);
+			func_add_param("x", TypeVli);
 			func_add_param("exp", TypeVli);
 			func_add_param("mod", TypeVli);
-		class_add_func("gcd", TypeVli, algebra_p(&vli::gcd), Flags::Pure);
-			func_add_param("v", TypeVli);
+		class_add_func("gcd", TypeVli, algebra_p(&vli::gcd), Flags::Pure | Flags::Static);
+			func_add_param("a", TypeVli);
+			func_add_param("b", TypeVli);
 		add_operator(OperatorID::Equal, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator==));
 		add_operator(OperatorID::NotEqual, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator!=));
 		add_operator(OperatorID::Greater, TypeBool, TypeVli, TypeVli, InlineID::None, algebra_p(&vli::operator<));
@@ -935,9 +942,11 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("drop", TypeVoid, &Any::dict_drop, Flags::RaisesExceptions | Flags::Mutable);
 			func_add_param("key", TypeString);
 		class_add_func("keys", TypeStringList, &Any::keys, Flags::Pure);//, Flags::RAISES_EXCEPTIONS);
-		class_add_func("__bool__", TypeBool, &Any::_bool, Flags::Pure);
-		class_add_func("__i32__", TypeInt32, &Any::_int, Flags::Pure);
-		class_add_func("__f32__", TypeFloat32, &Any::_float, Flags::Pure);
+		class_add_func("__bool__", TypeBool, &Any::to_bool, Flags::Pure);
+		class_add_func("__i32__", TypeInt32, &Any::to_i32, Flags::Pure);
+		class_add_func("__i64__", TypeInt32, &Any::to_i64, Flags::Pure);
+		class_add_func("__f32__", TypeFloat32, &Any::to_f32, Flags::Pure);
+		class_add_func("__f64__", TypeFloat64, &Any::to_f64, Flags::Pure);
 		class_add_func(Identifier::func::Str, TypeString, &Any::str, Flags::Pure);
 		class_add_func(Identifier::func::Repr, TypeString, &Any::repr, Flags::Pure);
 		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RaisesExceptions);
@@ -964,14 +973,16 @@ void SIAddPackageMath(Context *c) {
 	add_class(TypeCrypto);
 		class_add_element("n", TypeVli, 0);
 		class_add_element("k", TypeVli, sizeof(vli));
-		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&Crypto::__init__), Flags::Mutable);
+		class_add_func(Identifier::func::Init, TypeVoid, algebra_p(&generic_init<Crypto>), Flags::Mutable);
+		class_add_func(Identifier::func::Delete, TypeVoid, algebra_p(&generic_delete<Crypto>), Flags::Mutable);
+		class_add_func(Identifier::func::Assign, TypeVoid, algebra_p(&generic_assign<Crypto>), Flags::Mutable);
 		class_add_func(Identifier::func::Str, TypeString, algebra_p(&Crypto::str), Flags::Pure);
 		class_add_func("from_str", TypeVoid, algebra_p(&Crypto::from_str), Flags::Mutable);
 			func_add_param("str", TypeString);
-		class_add_func("encrypt", TypeString, algebra_p(&Crypto::Encrypt), Flags::Pure);
-			func_add_param("str", TypeString);
-		class_add_func("decrypt", TypeString, algebra_p(&Crypto::Decrypt), Flags::Pure);
-			func_add_param("str", TypeString);
+		class_add_func("encrypt", TypeBytes, algebra_p(&Crypto::encrypt), Flags::Pure);
+			func_add_param("data", TypeBytes);
+		class_add_func("decrypt", TypeBytes, algebra_p(&Crypto::decrypt), Flags::Pure);
+			func_add_param("data", TypeBytes);
 			func_add_param("cut", TypeBool);
 		class_add_func("create_keys", TypeVoid, algebra_p(&CryptoCreateKeys), Flags::Static);
 			func_add_param("c1", TypeCrypto);

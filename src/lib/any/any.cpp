@@ -3,7 +3,7 @@
 #include "../os/msg.h"
 
 
-string f2s_clean(float f, int dez);
+string f642s_clean(double f, int dez);
 
 Any::Dict _empty_dummy_map_;
 static DynamicArray _empty_dummy_array_ = {NULL, 0, 0, sizeof(Any)};
@@ -41,19 +41,22 @@ static string type_name(Any::Type t) {
 Any::Any() {
 	type = Type::None;
 	data = nullptr;
-	parent = nullptr;
 }
 
 Any::Any(const Any &a) : Any() {
 	*this = a;
 }
 
-Any::Any(int i) : Any() {
+Any::Any(int i) : Any((int64)i) {}
+
+Any::Any(int64 i) : Any() {
 	create_type(Type::Int);
 	as_int() = i;
 }
 
-Any::Any(float f) : Any() {
+Any::Any(float f) : Any((double)f) {}
+
+Any::Any(double f) : Any() {
 	create_type(Type::Float);
 	as_float() = f;
 }
@@ -83,7 +86,7 @@ Any::Any(const Array<Any> &a) : Any() {
 Any::Any(const Array<int> &a) : Any() {
 	create_type(Type::List);
 	for (int i: a)
-		as_list().add(i);
+		as_list().add(Any(i));
 }
 
 Any::Any(const Dict &m) : Any() {
@@ -91,28 +94,13 @@ Any::Any(const Dict &m) : Any() {
 	as_dict() = m;
 }
 
-Any Any::ref() {
-	Any r;
-	r.parent = this;
-	r.type = type;
-	r.data = data;
-	any_db(format("ref  %s -> %s:   %s", p2s(this), p2s(parent), str()));
-	return r;
-}
-
 void Any::create_type(Type _type) {
-	if (parent) {
-		any_db(format("parent create  %s -> %s:   %s", p2s(this), p2s(parent), str()));
-		parent->create_type(_type);
-		sync_from_parent();
-		return;
-	}
 	clear();
 	type = _type;
 	if (is_int()) {
-		data = new int;
+		data = new int64;
 	} else if (is_float()) {
-		data = new float;
+		data = new double;
 	} else if (is_bool()) {
 		data = new bool;
 	} else if (is_pointer()) {
@@ -129,24 +117,6 @@ void Any::create_type(Type _type) {
 	}
 }
 
-void Any::sync_to_parent() {
-	if (parent) {
-		any_db(format("sync  %s -> %s:   %s", p2s(this), p2s(parent), str()));
-		parent->data = data;
-		parent->type = type;
-		parent->sync_to_parent();
-	}
-}
-
-void Any::sync_from_parent() {
-	if (parent) {
-		any_db(format("sync  %s << %s:   %s", p2s(this), p2s(parent), parent->str()));
-		parent->sync_from_parent();
-		data = parent->data;
-		type = parent->type;
-	}
-}
-
 /*Any::Any(const AnyHashMap &a)
 {
 	type = TYPE_DICT;
@@ -155,36 +125,29 @@ void Any::sync_from_parent() {
 }*/
 
 Any::~Any() {
-	if (!parent)
-		clear();
+	clear();
 }
 
 void Any::clear() {
 	//any_db(format("clear  %s", p2s(this)));
-	if (parent) {
-		any_db(format("parent clear  %s -> %s:   %s", p2s(this), p2s(parent), str()));
-		parent->clear();
-		sync_from_parent();
-	} else {
-		if (is_int())
-			delete &as_int();
-		else if (is_float())
-			delete &as_float();
-		else if (is_bool())
-			delete &as_bool();
-		else if (is_string())
-			delete &as_string();
-		else if (is_list())
-			delete &as_list();
-		else if (is_dict())
-			delete &as_dict();
-		else if (is_pointer())
-			delete &as_pointer();
-		else if (!is_empty())
-			msg_error("any.clear(): " + type_name(type));
-		type = Type::None;
-		data = nullptr;
-	}
+	if (is_int())
+		delete &as_int();
+	else if (is_float())
+		delete &as_float();
+	else if (is_bool())
+		delete &as_bool();
+	else if (is_string())
+		delete &as_string();
+	else if (is_list())
+		delete &as_list();
+	else if (is_dict())
+		delete &as_dict();
+	else if (is_pointer())
+		delete &as_pointer();
+	else if (!is_empty())
+		msg_error("any.clear(): " + type_name(type));
+	type = Type::None;
+	data = nullptr;
 }
 
 bool Any::is_empty() const {
@@ -244,9 +207,9 @@ string minimal_key_repr(const string &k) {
 
 string Any::repr() const {
 	if (is_int()) {
-		return i2s(as_int());
+		return i642s(as_int());
 	} else if (is_float()) {
-		return f2s_clean(as_float(), 6);
+		return f642s_clean(as_float(), 6);
 	} else if (is_bool()) {
 		return b2s(as_bool());
 	} else if (is_string()) {
@@ -349,10 +312,10 @@ void any_parse_part(Any &a, const Array<string> &tokens, int &pos) {
 	} else if (str_is_number(cur)) {
 		if (cur.has_char('.')) {
 			a.create_type(Any::Type::Float);
-			a.as_float() = cur._float();
+			a.as_float() = (double)cur._float();
 		} else {
 			a.create_type(Any::Type::Int);
-			a.as_int() = cur._int();
+			a.as_int() = (int64)cur._int();
 		}
 		pos ++;
 	} else if (cur == "true" or cur == "false") {
@@ -385,7 +348,7 @@ Any Any::parse(const string &s) {
 	return r;
 }
 
-bool Any::_bool() const {
+bool Any::to_bool() const {
 	if (is_bool())
 		return as_bool();
 	if (is_int())
@@ -394,22 +357,30 @@ bool Any::_bool() const {
 	//throw Exception("can not interpret as bool: " + type_name(type));
 }
 
-int Any::_int() const {
+int Any::to_i32() const {
+	return (int)to_i64();
+}
+
+int64 Any::to_i64() const {
 	if (is_int())
 		return as_int();
 	if (is_bool())
-		return (int)as_bool();
+		return (int64)as_bool();
 	if (is_float())
-		return (int)as_float();
+		return (int64)as_float();
 	if (is_string())
 		return as_string()._int();
 	return 0;
 	//throw Exception("can not interpret as int: " + type_name(type));
 }
 
-float Any::_float() const {
+float Any::to_f32() const {
+	return (float)to_f64();
+}
+
+double Any::to_f64() const {
 	if (is_int())
-		return (float)as_int();
+		return (double)as_int();
 	if (is_float())
 		return as_float();
 	if (is_string())
@@ -420,9 +391,6 @@ float Any::_float() const {
 
 void Any::operator = (const Any &a) {
 	if (&a != this) {
-		bool b = parent;
-		if (parent)
-			any_db("=   IS REF " + str());
 		create_type(a.type);
 		if (a.is_int()) {
 			as_int() = a.as_int();
@@ -444,36 +412,34 @@ void Any::operator = (const Any &a) {
 			clear();
 			msg_error("any = any: " + type_name(a.type));
 		}
-		if (b)
-			any_db(str());
 	}
 }
 
 Any Any::operator + (const Any &a) const {
 	if (is_int() and a.is_int())
-		return _int() + a._int();
+		return Any(to_i64() + a.to_i64());
 	if ((is_float() or is_int()) and (a.is_float() or a.is_int()))
-		return _float() + a._float();
+		return Any(to_f64() + a.to_f64());
 	if (is_string() and a.is_string())
-		return str() + a.str();
+		return Any(str() + a.str());
 	throw Exception(format("%s + %s not allowed", type_name(type), type_name(a.type)));
 	return Any();
 }
 
 Any Any::operator - (const Any &a) const {
 	if (is_int() and a.is_int())
-		return _int() - a._int();
+		return Any(to_i64() - a.to_i64());
 	if ((is_float() or is_int()) and (a.is_float() or a.is_int()))
-		return _float() - a._float();
+		return Any(to_f64() - a.to_f64());
 	throw Exception(format("%s - %s not allowed", type_name(type), type_name(a.type)));
 	return Any();
 }
 
 void Any::operator += (const Any &a) {
 	if (is_int() and (a.is_int() or a.is_float()))
-		as_int() += a._int();
+		as_int() += a.to_i64();
 	else if (is_float() and (a.is_float() or a.is_int()))
-		as_float() += a._float();
+		as_float() += a.to_f64();
 	else if (is_string() and a.is_string())
 		as_string() += a.str();
 	else if (is_list() and a.is_list())
@@ -507,12 +473,6 @@ bool Any::operator != (const Any& a) const {
 }
 
 void Any::add(const Any &a) {
-	if (parent) {
-		parent->add(a);
-		sync_from_parent();
-		any_db(format("parent add  %s -> %s:   %s", p2s(this), p2s(parent), str()));
-		return;
-	}
 	if (!is_list())
 		create_type(Type::List);
 	if (&a == this) {
@@ -525,11 +485,6 @@ void Any::add(const Any &a) {
 
 // TODO: map.append(map)
 void Any::append(const Any &a) {
-	if (parent) {
-		parent->append(a);
-		sync_from_parent();
-		return;
-	}
 	if (!a.is_list())
 		throw Exception("parameter not an array: " + type_name(a.type));
 	if (is_empty())
@@ -568,7 +523,7 @@ const Any &Any::operator[] (int index) const {
 	return as_list()[index];
 }
 
-Any &Any::back() {
+Any &Any::back() const {
 	if (!is_list())
 		msg_error("only allowed for arrays: " + type_name(type));
 	return as_list().back();
@@ -602,12 +557,12 @@ bool Any::has(const string &key) const {
 	return sa_contains(as_dict().keys(), key);
 }
 
-int& Any::as_int() const {
-	return *(int*)data;
+int64& Any::as_int() const {
+	return *(int64*)data;
 }
 
-float& Any::as_float() const {
-	return *(float*)data;
+double& Any::as_float() const {
+	return *(double*)data;
 }
 
 bool& Any::as_bool() const {
@@ -641,11 +596,6 @@ Any* Any::list_get(int i) {
 void Any::list_set(int i, const Any &value) {
 	if (i < 0)
 		return;
-	if (parent) {
-		parent->list_set(i, value);
-		sync_from_parent();
-		return;
-	}
 	if (!is_list())
 		create_type(Type::List);
 	if (as_list().num <= i)
@@ -662,22 +612,12 @@ Any* Any::dict_get(const string &key) {
 }
 
 void Any::dict_set(const string &key, const Any &value) {
-	if (parent) {
-		parent->dict_set(key, value);
-		sync_from_parent();
-		return;
-	}
 	if (!is_dict())
 		create_type(Type::Dict);
 	as_dict().set(key, value);
 }
 
 void Any::dict_drop(const string &key) {
-	if (parent) {
-		parent->dict_drop(key);
-		sync_from_parent();
-		return;
-	}
 	if (is_dict())
 		as_dict().drop(key);
 }

@@ -52,12 +52,12 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 		event(id_classic, [this] { update_params(); });
 		event(id_tab, [this] { update_params(); });
 	}
-	set_float("line-height", od->parameters["line-height"]._float());
-	set_float("line-space", od->parameters["line-space"]._float() / od->parameters["line-height"]._float());
-	set_float("track-space", od->parameters["track-space"]._float() / od->parameters["line-height"]._float());
-	set_float("border", od->parameters["border"]._float());
-	set_float("horizontal-scale", od->parameters["horizontal-scale"]._float() * 100);
-	check("allow-shadows", od->parameters["allow-shadows"]._bool());
+	set_float("line-height", od->parameters["line-height"].to_f32());
+	set_float("line-space", od->parameters["line-space"].to_f32() / od->parameters["line-height"].to_f32());
+	set_float("track-space", od->parameters["track-space"].to_f32() / od->parameters["line-height"].to_f32());
+	set_float("border", od->parameters["border"].to_f32());
+	set_float("horizontal-scale", od->parameters["horizontal-scale"].to_f32() * 100);
+	check("allow-shadows", od->parameters["allow-shadows"].to_bool());
 
 	update_params();
 

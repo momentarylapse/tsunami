@@ -211,13 +211,17 @@ int h2i(const string &h) {
 
 void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *session) {
 	if (type == kaba::TypeInt32) {
-		*(int*)v = a._int();
+		*(int*)v = a.to_i32();
+	} else if (type == kaba::TypeInt64) {
+		*(int64*)v = a.to_i64();
 	} else if (type == kaba::TypeInt8) {
-		*(char*)v = a._int();
+		*(char*)v = (char)a.to_i32();
 	} else if (type == kaba::TypeFloat32) {
-		*(float*)v = a._float();
+		*(float*)v = a.to_f32();
+	} else if (type == kaba::TypeFloat64) {
+		*(double*)v = a.to_f64();
 	} else if (type == kaba::TypeBool) {
-		*(bool*)v = a._bool();
+		*(bool*)v = a.to_bool();
 	} else if (type == kaba::TypeString) {
 		*(string*)v = a.str();
 	} else if (type->is_array()) {

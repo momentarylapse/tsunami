@@ -51,9 +51,9 @@ Device::Device(DeviceType _type, const Any &a) {
 	if (a.has("internal"))
 		internal_name = str(a["internal"]);
 	if (a.has("channels"))
-		channels = a["channels"]._int();
+		channels = a["channels"].to_i32();
 	if (a.has("visible"))
-		visible = a["visible"]._bool();
+		visible = a["visible"].to_bool();
 }
 
 string Device::get_name() const {

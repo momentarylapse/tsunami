@@ -74,9 +74,9 @@ base::optional<Storage::RecentlyUsedFile> Storage::RecentlyUsedFile::parse(const
 		RecentlyUsedFile ruf;
 		ruf.filename = str(a["filename"]);
 		if (a.has("count"))
-			ruf.usage_count = a["count"]._int();
+			ruf.usage_count = a["count"].to_i32();
 		if (a.has("last"))
-			ruf.last_use = Date::from_unix(a["count"]._int());
+			ruf.last_use = Date::from_unix(a["count"].to_i32());
 		return ruf;
 	} else if (a.is_string()) {
 		// legacy: pure filename

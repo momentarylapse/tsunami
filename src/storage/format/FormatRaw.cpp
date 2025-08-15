@@ -49,8 +49,8 @@ void FormatRaw::save_via_renderer(StorageOperationData *od) {
 
 	auto f = os::fs::open(od->filename, "wb");
 	
-	int offset = od->parameters["offset"]._int();
-	int channels = od->parameters["channels"]._int();
+	int offset = od->parameters["offset"].to_i32();
+	int channels = od->parameters["channels"].to_i32();
 	auto format = format_from_code(od->parameters["format"].str());
 	
 
@@ -76,9 +76,9 @@ void FormatRaw::save_via_renderer(StorageOperationData *od) {
 }
 
 void FormatRaw::load_track(StorageOperationData *od) {
-	int offset = od->parameters["offset"]._int();
-	int channels = od->parameters["channels"]._int();
-	int sample_rate = od->parameters["samplerate"]._int();
+	int offset = od->parameters["offset"].to_i32();
+	int channels = od->parameters["channels"].to_i32();
+	int sample_rate = od->parameters["samplerate"].to_i32();
 	auto format = format_from_code(od->parameters["format"].str());
 
 	bytes data;

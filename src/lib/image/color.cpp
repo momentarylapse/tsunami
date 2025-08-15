@@ -47,7 +47,7 @@ color color::parse(const string &s) {
 		if (bb.num >= 4)
 			c.a = (float)(unsigned char)bb[3] / 255.0f;
 	} else {
-		auto xx = s.replace("(", "").replace(")", "").replace(",", "").explode(" ");
+		auto xx = s.replace("(", "").replace(")", "").replace("[", "").replace("]", "").replace(" ", ",").replace(",,", ",").explode(",");
 		if (xx.num > 0)
 			c.r = xx[0]._float();
 		if (xx.num > 1)

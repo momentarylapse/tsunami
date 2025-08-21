@@ -24,6 +24,14 @@ struct tuple {
 		a = t.a;
 		b = t.b;
 	}
+	bool operator==(const tuple<A,B>& t) const{
+		return a == t.a and b == t.b;
+	}
+	bool operator>(const tuple<A,B>& t) const{
+		if (a == t.a)
+			return b > t.b;
+		return a > t.a;
+	}
 	A a;
 	B b;
 };

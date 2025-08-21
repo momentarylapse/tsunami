@@ -69,17 +69,12 @@ bool rect::covers(const rect &r) const {
 }
 
 bool rect::overlaps(const rect &r) const {
-	if (covers(r) or r.covers(*this))
-		return true;
-	if (inside({r.x1, r.y1}))
-		return true;
-	if (inside({r.x2, r.y1}))
-		return true;
-	if (inside({r.x1, r.y2}))
-		return true;
-	if (inside({r.x2, r.y2}))
-		return true;
-	return false;
+	const auto a = canonical();
+	const auto b = r.canonical();
+	auto range_overlaps = [] (float f0, float f1, float g0, float g1) {
+		return f0 <= g1 and f1 >= g0;
+	};
+	return range_overlaps(a.x1, a.x2, b.x1, b.x2) and range_overlaps(a.y1, a.y2, b.y1, b.y2);
 }
 
 rect rect::grow(float d) const {

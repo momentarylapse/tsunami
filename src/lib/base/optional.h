@@ -16,7 +16,6 @@ namespace base {
 class Empty;
 extern Empty None;
 
-// still very experimental!
 template<class T>
 class optional {
 public:

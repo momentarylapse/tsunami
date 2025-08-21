@@ -28,6 +28,9 @@ public:
 	virtual void _cdecl set_line_width(float w) = 0;
 	virtual void _cdecl set_roundness(float radius) {}
 	virtual void _cdecl set_line_dash(const Array<float> &dash, float offset) = 0;
+	void set_contiguous(bool _contiguous) {
+		contiguous = _contiguous;
+	}
 	virtual void _cdecl set_fill(bool fill) = 0;
 	virtual void _cdecl set_clip(const rect &r) = 0;
 	virtual void _cdecl draw_point(const vec2 &p) = 0;
@@ -49,6 +52,7 @@ public:
 	int width = 0;
 	int height = 0;
 	float font_size = 12;
+	bool contiguous = true;
 	virtual rect area() const; // ImagePainter.cpp...
 	virtual rect clip() const = 0;
 };

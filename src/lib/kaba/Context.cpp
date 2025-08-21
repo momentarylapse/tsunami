@@ -107,8 +107,8 @@ void try_import_dynamic_library_for_module(const Path& dir, Context* ctx, shared
 			msg_error(format("found dynamic library %s, but no 'export_symbols()'", dir | files[0]));
 		//	s->do_error_link("can't load symbol '" + name + "' from library " + libname);
 		}
-#endif
 	}
+#endif
 }
 
 // FIXME ...this needs a lot of reworking, sorry...  m(-_-)m

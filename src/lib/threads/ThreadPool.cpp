@@ -4,7 +4,8 @@
 
 #include "ThreadPool.h"
 #include <atomic>
-#include <unistd.h>
+#include <thread>
+#include <chrono>
 #include "../os/msg.h"
 #if __has_include("../profiler/Profiler.h")
 #include "../profiler/Profiler.h"
@@ -38,9 +39,9 @@ public:
 			}
 			cancelation_point();
 			if (awake)
-				usleep(10);
+				std::this_thread::sleep_for(std::chrono::microseconds(10));
 			else
-				usleep(100);
+				std::this_thread::sleep_for(std::chrono::microseconds(100));
 		}
 
 	}

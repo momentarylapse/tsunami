@@ -4,6 +4,9 @@
 
 #include "app.h"
 #include "filesystem.h"
+#ifdef OS_WINDOWS
+	#include <Windows.h>
+#endif
 
 
 namespace os::app {
@@ -15,6 +18,10 @@ namespace os::app {
 	Path install_prefix;
 	Path source_root;
 	bool installed = false;
+
+#ifdef OS_WINDOWS
+	void* win_instance = nullptr;
+#endif
 
 	//   filename -> executable file
 	//   directory_dynamic ->
@@ -49,7 +56,7 @@ namespace os::app {
 		char *ttt = nullptr;
 		int r = _get_pgmptr(&ttt);
 		filename = ttt;
-		hui_win_instance = (void*)GetModuleHandle(nullptr);
+		win_instance = (void*)GetModuleHandle(nullptr);
 #endif
 
 
@@ -110,13 +117,13 @@ namespace os::app {
 #ifdef OS_WINDOWS
 
 int main(int num_args, char* args[]) {
-	return hui_main(hui::make_args(num_args, args));
+	return os::app::main(os::app::make_args(num_args, args));
 }
 
 #ifdef _CONSOLE
 
 int _tmain(int num_args, _TCHAR *args[]) {
-	return hui_main(hui::make_args(num_args, args));
+	return os::app::main(hui::make_args(num_args, args));
 }
 
 #else
@@ -166,7 +173,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 					 LPTSTR    lpCmdLine,
 					 int       nCmdShow)
 {
-	return hui_main(parse_command_line(lpCmdLine));
+	return os::app::main(parse_command_line(lpCmdLine));
 }
 
 #endif

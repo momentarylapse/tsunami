@@ -1,6 +1,7 @@
 #include "random.h"
 #include "vec3.h"
 #include "../os/date.h"
+#include <cmath>
 
 #define PHI 0x9e3779b9
 

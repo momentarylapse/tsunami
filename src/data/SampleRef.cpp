@@ -30,10 +30,6 @@ SampleRef::~SampleRef() {
 	//msg_write("  del SampleRef " + p2s(this));
 }
 
-void SampleRef::__init__(shared<Sample> sam) {
-	new(this) SampleRef(sam);
-}
-
 void SampleRef::__delete__() {
 	this->SampleRef::~SampleRef();
 }

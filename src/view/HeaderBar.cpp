@@ -112,7 +112,7 @@ void HeaderBar::update() {
 	auto label = [] (const SessionLabel& l) {
 		string xx;
 		if (l.is_persistent())
-			xx = format("<b><span fgcolor=\"%s\">\u25cf</span></b> ",
+			xx = format("<b><span fgcolor=\"%s\">\u2b53</span></b> ",
 			            theme.pitch_text[loop(str(l.filename).hash() + 5, 0, 11)].hex());
 		string a, b;
 		if (l.is_persistent()) {

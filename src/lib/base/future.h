@@ -15,6 +15,19 @@
 
 namespace base {
 
+// future<X>  - an X that might get its value later (asynchronously)
+// promise<X> - "remote control" to update the value
+//
+// Rules:
+// * a promise can have multiple futures
+// * don't trigger a promise multiple times!
+//   use promise.reset() in between
+// * setting a callback AFTER the value has been defined will directly trigger the callback
+//
+// Warning: callbacks will be triggered even after futures die!
+//   future<X> get() { ... }
+//   get().then([] { ... });
+
 
 typedef std::function<void()> Callback;
 
@@ -41,8 +54,8 @@ enum class PromiseState {
 // internal/shared data structure
 template<class T>
 struct _promise_core_ : public Sharable<base::Empty> {
-	typename xcallback<T>::t cb_success;
-	Callback cb_fail;
+	Array<typename xcallback<T>::t> cb_success;
+	Array<Callback> cb_fail;
 	PromiseState state = PromiseState::Unfinished;
 	mutable T result;
 
@@ -51,18 +64,19 @@ struct _promise_core_ : public Sharable<base::Empty> {
 	void success(typename xparam<T>::t t) {
 		state = PromiseState::Succeeded;
 		result = t;
-		if (cb_success)
-			cb_success(t);
+		for (auto& f: cb_success)
+			f(t);
 	}
 	void fail() {
 		state = PromiseState::Failed;
-		if (cb_fail)
-			cb_fail();
+		for (auto& f: cb_fail)
+			f();
 	}
+	// clears the "value" AND (kind of) detaches all previous futures
 	void reset() {
 		state = PromiseState::Unfinished;
-		cb_success = nullptr;
-		cb_fail = nullptr;
+		cb_success.clear();
+		cb_fail.clear();
 	}
 };
 
@@ -105,7 +119,7 @@ struct future {
 	}
 
 	future<T>& then(typename xcallback<T>::t cb) {
-		core->cb_success = cb;
+		core->cb_success.add(cb);
 		if (core->state == PromiseState::Succeeded) {
 			if constexpr (std::is_same_v<T, void>)
 				cb();
@@ -116,7 +130,7 @@ struct future {
 	}
 
 	future<T>& on_fail(Callback cb) {
-		core->cb_fail = cb;
+		core->cb_fail.add(cb);
 		if (core->state == PromiseState::Failed)
 			cb();
 		return *this;
@@ -126,24 +140,24 @@ struct future {
 
 template<>
 struct _promise_core_<void> : public Sharable<base::Empty> {
-	Callback cb_success;
-	Callback cb_fail;
+	Array<Callback> cb_success;
+	Array<Callback> cb_fail;
 	PromiseState state = PromiseState::Unfinished;
 
 	void success() {
 		state = PromiseState::Succeeded;
-		if (cb_success)
-			cb_success();
+		for (auto& f: cb_success)
+			f();
 	}
 	void fail() {
 		state = PromiseState::Failed;
-		if (cb_fail)
-			cb_fail();
+		for (auto& f: cb_fail)
+			f();
 	}
 	void reset() {
 		state = PromiseState::Unfinished;
-		cb_success = nullptr;
-		cb_fail = nullptr;
+		cb_success.clear();
+		cb_fail.clear();
 	}
 };
 

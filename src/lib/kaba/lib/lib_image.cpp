@@ -31,7 +31,7 @@ void SIAddPackageImage(Context *c) {
 
 	TypeImage = add_type("Image", sizeof(Image));
 	auto TypeImageXfer = add_type_p_xfer(TypeImage);
-	TypeBasePainter = add_type("Painter", sizeof(Painter), Flags::None, TypeImage);
+	TypeBasePainter = add_type("Painter", sizeof(Painter), Flags::None);
 	TypeBasePainterP = add_type_p_raw(TypeBasePainter);
 	TypeBasePainterXfer = add_type_p_xfer(TypeBasePainter);
 
@@ -84,7 +84,8 @@ void SIAddPackageImage(Context *c) {
 		class_add_element("width", TypeInt32, &Painter::width);
 		class_add_element("height", TypeInt32, &Painter::height);
 		class_add_func_virtual(Identifier::func::Delete, TypeVoid, &ImagePainter::__delete__, Flags::Mutable | Flags::Override);
-		//class_add_func_virtual("end", TypeVoid, &HuiPainter::end));
+	//class_add_func_virtual("end", TypeVoid, &HuiPainter::end));
+		class_add_func_virtual("area", TypeRect, &Painter::area);
 		class_add_func_virtual("set_color", TypeVoid, &Painter::set_color); // Flags::MUTABLE ...nope... let's allow const references for now...
 			func_add_param("c", TypeColor);
 		class_add_func_virtual("set_line_width", TypeVoid, &Painter::set_line_width);
@@ -95,6 +96,8 @@ void SIAddPackageImage(Context *c) {
 			func_add_param("r", TypeFloat32);
 		class_add_func_virtual("set_antialiasing", TypeVoid, &Painter::set_antialiasing);
 			func_add_param("enabled", TypeBool);
+		class_add_func("set_contiguous", TypeVoid, &Painter::set_contiguous);
+			func_add_param("contiguous", TypeBool);
 		class_add_func_virtual("set_font", TypeVoid, &Painter::set_font);
 			func_add_param("font", TypeString);
 			func_add_param("size", TypeFloat32);
@@ -104,7 +107,7 @@ void SIAddPackageImage(Context *c) {
 			func_add_param("size", TypeFloat32);
 		class_add_func_virtual("set_fill", TypeVoid, &Painter::set_fill);
 			func_add_param("fill", TypeBool);
-		class_add_func_virtual("clip", TypeVoid, &Painter::set_clip);
+		class_add_func_virtual("set_clip", TypeVoid, &Painter::set_clip);
 			func_add_param("r", TypeRect);
 		class_add_func_virtual("draw_point", TypeVoid, &Painter::draw_point);
 			func_add_param("p", TypeVec2);

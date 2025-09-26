@@ -17,10 +17,7 @@ struct vec3;
 class BinaryBuffer {
 public:
 	BinaryBuffer();
-	~BinaryBuffer() {}
-
-	void __init__();
-	void __delete__();
+	~BinaryBuffer() = default;
 
 	bytes data;
 	int pos;

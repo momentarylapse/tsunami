@@ -26,6 +26,7 @@
 #include "../../Session.h"
 
 #include "../../lib/os/msg.h"
+#include <cmath>
 
 namespace tsunami {
 

@@ -9,15 +9,17 @@
 #define SRC_LIB_XFILE_XML_H_
 
 #include "../base/base.h"
+#include "../base/error.h"
 
 class Stream;
 class Path;
 
 namespace xml{
 
-class SyntaxError : public Exception {
-public:
-	SyntaxError();
+enum class Error {
+	None,
+	SyntaxError,
+	EndOfFile
 };
 
 struct Attribute {
@@ -41,17 +43,17 @@ struct Element : Tag {
 	Element with(const string &tag, const string &text = "");
 	Element witha(const string &key, const string &value);
 	Element* find(const string &tag);
-	string value(const string &key, const string &def = "");
+	string value(const string &key, const string &def = "") const;
 };
 
 class Parser {
 public:
-	void _cdecl load(const Path &filename);
+	Error load(const Path &filename);
 
-	Element read_element(Stream *f);
-	Element read_tag(Stream *f);
+	base::expected<Element, Error> read_element(Stream *f);
+	base::expected<Element, Error> read_tag(Stream *f);
 
-	void _cdecl save(const Path &filename);
+	void save(const Path &filename);
 	void write_element(Stream *f, Element &e, int indent);
 
 	Array<Element> elements;

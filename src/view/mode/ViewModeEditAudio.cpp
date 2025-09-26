@@ -13,6 +13,7 @@
 #include "../../processing/audio/BufferInterpolator.h"
 #include "../../processing/audio/BufferPitchShift.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 namespace tsunami {
 

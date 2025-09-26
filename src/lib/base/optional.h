@@ -82,12 +82,12 @@ public:
 
 	T &value() const {
 		if (!_is_set)
-			throw Exception("no value");
+			{ int* p = nullptr; *p = 13; } //throw Exception("no value");
 		return *(T*)&_value;
 	}
 	T &value() {
 		if (!_is_set)
-			throw Exception("no value");
+			{ int* p = nullptr; *p = 13; } //throw Exception("no value");
 		return *(T*)&_value;
 	}
 	T value_or(const T& alt) const {

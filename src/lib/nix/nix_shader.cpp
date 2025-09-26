@@ -113,18 +113,20 @@ string expand_shader_source(Context *ctx, const string &source, ShaderMetaData &
 		if (p < 0)
 			break;
 		int p2 = r.find("\n", p);
-		string imp = r.sub(p + 7, p2).replace(" ", "");
-		//msg_error("import '" + imp + "'");
+		string import_name = r.sub(p + 7, p2).replace(" ", "");
+		//msg_error("import '" + import_name + "'");
 
 		bool found = false;
 		for (auto &m: ctx->shader_modules)
-			if (m.meta.name == imp) {
+			if (m.meta.name == import_name) {
 				//msg_error("FOUND " + imp);
-				r = r.head(p) + "\n// <<\n" + m.source + "\n// >>\n" + r.sub(p2);
+				string rr = r.head(p) + "\n// <<" + import_name + "\n" + m.source + "\n// " + import_name + ">>\n" + r.sub(p2);
+				r = rr;
 				found = true;
+				break;
 			}
 		if (!found)
-			throw Exception(format("shader import '%s' not found", imp));
+			throw Exception(format("shader import '%s' not found", import_name));
 	}
 
 	string intro;
@@ -147,6 +149,7 @@ int create_gl_shader(Context* ctx, const string &_source, int type, ShaderMetaDa
 
 	pbuf[0] = source.c_str();
 	glShaderSource(gl_shader, 1, pbuf, NULL);
+
 
 	glCompileShader(gl_shader);
 

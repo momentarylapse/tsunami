@@ -8,6 +8,7 @@
 #include "common.h"
 #include "../../lib/math/complex.h"
 #include "../../lib/math/math.h"
+#include <cmath>
 
 float sum(const Array<float> &a) {
 	float r = 0;
@@ -43,7 +44,7 @@ namespace tsunami {
 void apply_window_function(Array<float> &data, WindowFunction wf) {
 	if (wf == WindowFunction::Hann) {
 		for (int k=0; k<data.num; k++) {
-			float s = sin((float)k * pi / (data.num - 1));
+			float s = sinf((float)k * pi / (data.num - 1));
 			data[k] *= s*s * 2;
 		}
 	}

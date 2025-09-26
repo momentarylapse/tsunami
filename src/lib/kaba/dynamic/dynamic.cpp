@@ -2,9 +2,13 @@
 #include "../kaba.h"
 #include "exception.h"
 #include "call.h"
-#include "../../any/any.h"
-#include "../../base/callable.h"
-#include "../../os/msg.h"
+#include <lib/base/callable.h>
+#include <lib/os/msg.h>
+#include <lib/any/any.h>
+#include <lib/any/conversion.h>
+#include <lib/image/color.h>
+#include <lib/math/vec3.h>
+#include <lib/math/vec2.h>
 
 namespace kaba {
 	
@@ -309,12 +313,22 @@ string _cdecl var2str(const void *p, const Class *type) {
 Any _cdecl dynify(const void *var, const Class *type) {
 	if (type == TypeInt32 or type->is_enum())
 		return Any(*(int*)var);
+	if (type == TypeInt64)
+		return Any(*(int64*)var);
 	if (type == TypeFloat32)
 		return Any(*(float*)var);
+	if (type == TypeFloat64)
+		return Any(*(double*)var);
 	if (type == TypeBool)
 		return Any(*(bool*)var);
 	if (type == TypeString)
 		return Any(*(string*)var);
+	if (type == TypeVec3)
+		return vec3_to_any(*(vec3*)var);
+	if (type == TypeVec2)
+		return vec2_to_any(*(vec2*)var);
+	if (type == TypeColor)
+		return color_to_any(*(color*)var);
 	if (type->is_some_pointer())
 		return Any(*(void**)var);
 	if (type == TypeAny)
@@ -354,33 +368,52 @@ Any _cdecl dynify(const void *var, const Class *type) {
 	return a;
 }
 
-Array<const Class*> func_effective_params(const Function *f);
-
-// deprecated, but who knows...
-DynamicArray array_map(void *fff, DynamicArray *a, const Class *ti, const Class *to) {
-	//msg_write("map " + ti->long_name() + " -> " + to->long_name());
-
-	DynamicArray r;
-	r.init(to->size);
-	if (to->needs_constructor()) {
-		if (to == TypeString) {
-			((Array<string>*)&r)->resize(a->num);
-		} else  {
-			kaba_raise_exception(new KabaException("map(): output type not allowed: " + to->long_name()));
-		}
+void unwrap_any(const Any &aa, void *var, const Class *type) {
+	if (type == TypeInt32) {
+		*(int*)var = aa.to_i32();
+	} else if (type == TypeInt64) {
+		*(int64*)var = aa.to_i64();
+	} else if (type == TypeFloat32) {
+		*(float*)var = aa.to_f32();
+	} else if (type == TypeFloat64) {
+		*(double*)var = aa.to_f64();
+	} else if (type == TypeBool) {
+		*(bool*)var = aa.to_bool();
+	} else if (type == TypeString) {
+		*(string*)var = aa.str();
+	} else if (type == TypeVec3) {
+		*(vec3*)var = any_to_vec3(aa);
+	} else if (type == TypeVec2) {
+		*(vec2*)var = any_to_vec2(aa);
+	} else if (type == TypeColor) {
+		*(color*)var = any_to_color(aa);
+	} else if (type->is_pointer_raw() and aa.is_pointer()) {
+		*(const void**)var = aa.as_pointer();
+	} else if (type->is_list() and aa.is_list()) {
+		auto *t_el = type->get_array_element();
+		auto *a = (DynamicArray*)var;
+		auto &b = aa.as_list();
+		int n = b.num;
+		array_resize(var, type, n);
+		for (int i=0; i<n; i++)
+			unwrap_any(aa[i], (char*)a->data + i * t_el->size, t_el);
+	} else if (type->is_array() and aa.is_list()) {
+		auto *t_el = type->get_array_element();
+		auto &b = aa.as_list();
+		int n = min(type->array_length, b.num);
+		for (int i=0; i<n; i++)
+			unwrap_any(b[i], (char*)var + i*t_el->size, t_el);
+	} else if (aa.is_dict()) {
+		[[maybe_unused]] auto &map = aa.as_dict();
+		auto keys = aa.keys();
+		for (auto &e: type->elements)
+			for (string &k: keys)
+				if (e.name == k)
+					unwrap_any(aa[k], (char*)var + e.offset, e.type);
 	} else {
-		r.simple_resize(a->num);
+		msg_error("unwrap... "  + aa.str() + " -> " + type->long_name());
 	}
-	for (int i=0; i<a->num; i++) {
-		void *po = r.simple_element(i);
-		void *pi = a->simple_element(i);
-		bool ok = call_callable(fff, po, {pi}, to, {ti});
-		if (!ok)
-			kaba_raise_exception(new KabaException(format("map(): failed to dynamically call %s -> %s", ti->long_name(), to->long_name())));
-	}
-	return r;
 }
-
 
 KABA_LINK_GROUP_END
 

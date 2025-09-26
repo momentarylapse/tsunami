@@ -8,6 +8,7 @@
 #include "../../../data/midi/Clef.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -168,7 +169,7 @@ float MidiPainterModeClassical::clef_pos_to_screen(int pos) const {
 }
 
 int MidiPainterModeClassical::screen_to_clef_pos(float y) const {
-	return (int)floor((mp->area.center().y - y) * 2.0f / clef_dy + 0.5f) + 4;
+	return (int)floorf((mp->area.center().y - y) * 2.0f / clef_dy + 0.5f) + 4;
 }
 
 float MidiPainterModeClassical::pitch2y(int pitch) const {

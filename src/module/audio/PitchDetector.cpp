@@ -12,6 +12,7 @@
 #include "../../data/midi/MidiData.h"
 #include "../../lib/fft/fft.h"
 #include "../../lib/math/complex.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -90,15 +91,15 @@ void DummyPitchDetector::process(MidiEventBuffer &midi, AudioBuffer &buf) {
 				imax2 = i * 1.5f;
 			}
 		}
-	max /= sqrt((float)buf.length) * 2 * pi;
+	max /= sqrtf((float)buf.length) * 2 * pi;
 	volume = clamp(max / THRESHOLD / 2, 0.0f, 1.0f);
 	loud_enough = (max > THRESHOLD);
 	float fmax = get_freq((float)imax);
 
 	// update values with some inertia
 	if (loud_enough) {
-		if (abs(log(fmax / frequency)) < 0.1f)
-			frequency *= 1 + log(fmax / frequency) * 0.1;
+		if (abs(logf(fmax / frequency)) < 0.1f)
+			frequency *= 1 + logf(fmax / frequency) * 0.1;
 		else
 			frequency = fmax;
 		//frequency = fmax

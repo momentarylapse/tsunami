@@ -556,7 +556,6 @@ add_library(moduletsunami SHARED
 	src/lib/kaba/lib/lib_image.cpp
 	src/lib/kaba/lib/lib_kaba.cpp
 	src/lib/kaba/lib/lib_math.cpp
-	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
@@ -611,6 +610,7 @@ add_library(moduletsunami SHARED
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
@@ -852,6 +852,7 @@ target_link_libraries(moduletsunami PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(moduletsunami PUBLIC -fvisibility=hidden)
 endif()
+target_include_directories(moduletsunami PUBLIC src/)
 target_include_directories(moduletsunami PUBLIC src)
 target_include_directories(moduletsunami PUBLIC src/lib)
 set_target_properties(moduletsunami PROPERTIES EXCLUDE_FROM_ALL TRUE)
@@ -1113,7 +1114,6 @@ add_executable(tsunami WIN32
 	src/lib/kaba/lib/lib_image.cpp
 	src/lib/kaba/lib/lib_kaba.cpp
 	src/lib/kaba/lib/lib_math.cpp
-	src/lib/kaba/lib/lib_net.cpp
 	src/lib/kaba/lib/lib_os.cpp
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
@@ -1168,6 +1168,7 @@ add_executable(tsunami WIN32
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/net/_kaba_export.cpp
 	src/lib/net/BinaryBuffer.cpp
 	src/lib/net/net.cpp
 	src/lib/net/Socket.cpp
@@ -1405,6 +1406,7 @@ target_link_directories(tsunami PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(tsunami PUBLIC ${COMPILE_OPTIONS})
 target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(tsunami PUBLIC ${DEPS})
+target_include_directories(tsunami PUBLIC src/)
 target_include_directories(tsunami PUBLIC src)
 target_include_directories(tsunami PUBLIC src/lib)
 

@@ -91,7 +91,7 @@ Texture::Texture() {
 	type = Type::NONE;
 	internal_format = 0;
 	valid = true;
-	width = height = nz = samples = 0;
+	width = height = depth = samples = 0;
 	texture = NO_TEXTURE;
 }
 
@@ -107,6 +107,7 @@ int mip_levels(int width, int height) {
 void Texture::_create_2d(int w, int h, unsigned int _format) {
 	width = w;
 	height = h;
+	depth = 1;
 	type = Type::DEFAULT;
 	internal_format = _format;
 
@@ -128,12 +129,12 @@ VolumeTexture::VolumeTexture(int w, int h, int _nz, const string &_format) : Tex
 	msg_write(format("creating volume texture [%d x %d x %d: %s] ", w, h, _nz, _format));
 	width = w;
 	height = h;
-	nz = _nz;
+	depth = _nz;
 	type = Type::VOLUME;
 	internal_format = parse_format(_format);
 
 	glCreateTextures(GL_TEXTURE_3D, 1, &texture);
-	glTextureStorage3D(texture, 1, internal_format, width, height, nz);
+	glTextureStorage3D(texture, 1, internal_format, width, height, depth);
 	glTextureParameteri(texture, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -195,8 +196,10 @@ void Texture::set_options(const string &options) const {
 				glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_REPEAT);
 				glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_REPEAT);
 			} else if (value == "clamp") {
-				glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-				glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+				glTextureParameteri(texture, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+				glTextureParameteri(texture, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+				if (depth > 1)
+					glTextureParameteri(texture, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 			} else {
 				throw Exception("unknown value for key: " + x);
 			}
@@ -255,10 +258,10 @@ unsigned int _gl_channels_(int channels) {
 
 void Texture::read_float(DynamicArray &data) const {
 	int ch = channels();
-	data.simple_resize(width * height * ch / (data.element_size / sizeof(float)));
-	int format = _gl_channels_(ch);
+	data.simple_resize(width * height * depth * ch / (data.element_size / (int)sizeof(float)));
+	unsigned int format = _gl_channels_(ch);
 
-	glGetTextureSubImage(texture, 0, 0, 0, 0, width, height, 1, format, GL_FLOAT, width * height * ch * sizeof(float), data.data);
+	glGetTextureSubImage(texture, 0, 0, 0, 0, width, height, depth, format, GL_FLOAT, width * height * depth * ch * (int)sizeof(float), data.data);
 }
 
 int Texture::channels() const {
@@ -273,18 +276,16 @@ int Texture::channels() const {
 
 void Texture::write_float(const DynamicArray &data) {
 	int ch = channels();
-	int size_expected = width * height * ch * sizeof(float);
-	if (type == Type::VOLUME)
-		size_expected *= nz;
+	int size_expected = width * height * depth * ch * (int)sizeof(float);
 	int data_size = data.num * data.element_size;
 	if (data_size != size_expected) {
 		msg_error(format("Texture.write_float: array of size %d b given, but %d b expected", data_size, size_expected));
 		return;
 	}
 
-	int format = _gl_channels_(ch);
+	unsigned int format = _gl_channels_(ch);
 	if (type == Type::VOLUME) {
-		glTextureSubImage3D(texture, 0, 0, 0, 0, width, height, nz, format, GL_FLOAT, data.data);
+		glTextureSubImage3D(texture, 0, 0, 0, 0, width, height, depth, format, GL_FLOAT, data.data);
 	} else {
 		glTextureSubImage2D(texture, 0, 0, 0, width, height, format, GL_FLOAT, data.data);
 	}

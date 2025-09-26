@@ -10,6 +10,7 @@
 #include "../../data/Song.h"
 #include "../../data/audio/AudioBuffer.h"
 #include "../../lib/math/math.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -27,7 +28,7 @@ public:
 			if (volume == 0)
 				return false;
 
-			float d = sin(phi) * volume;
+			float d = sinf(phi) * volume;
 			buf.c[0][i] += d;
 
 			phi += delta_phi;

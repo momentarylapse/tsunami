@@ -12,7 +12,7 @@
 #define _TYPES_INCLUDED_
 
 
-#include <cmath>
+//#include <cmath>
 
 struct color;
 struct vec3;
@@ -76,17 +76,7 @@ const float pi = 3.141592654f;
 
 // faster functions
 
-inline bool inf_f(float f) {
-	/*int t=*(int*)&f;
-	int m=0x7f000000;
-	if ((t&m)==m)   return true;
-	return (f!=f);*/
-#ifdef OS_WINDOWS
-	return false;
-#else
-	return !std::isfinite(f);
-#endif
-}
+bool inf_f(float f);
 
 
 

@@ -9,6 +9,7 @@
 #include "../math/complex.h"
 #include "../os/msg.h"
 #include <mutex>
+#include <cmath>
 
 
 #if HAS_LIB_FFTW3

@@ -5,6 +5,7 @@
 #include "conversion.h"
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
+#if __has_include(<lib/image/color.h>)
 #include <lib/image/color.h>
 
 color any_to_color(const Any& a) {
@@ -25,6 +26,7 @@ Any color_to_any(const color& c) {
 	r.add(Any(c.a));
 	return r;
 }
+#endif
 
 vec3 any_to_vec3(const Any& a) {
 	const auto list = any_to_float_list<float>(a);

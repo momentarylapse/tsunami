@@ -10,6 +10,7 @@
 #include "../ColorScheme.h"
 #include "../audioview/AudioView.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -32,8 +33,8 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	const color col2 = color::interpolate(theme.background, theme.grid, 0.2f);
 
 	float D = MODULE_GRID;
-	int i0 = floor(area.x1 / D);
-	int i1 = ceil(area.x2 / D);
+	int i0 = floorf(area.x1 / D);
+	int i1 = ceilf(area.x2 / D);
 	for (int i=i0; i<=i1; i++) {
 		float x = i * D;
 		if ((i % 5) == 0)
@@ -42,8 +43,8 @@ void SignalEditorBackground::on_draw(Painter *p) {
 			p->set_color(col2);
 		p->draw_line({x, area.y1}, {x, area.y2});
 	}
-	int j0 = floor(area.y1 / D);
-	int j1 = ceil(area.y2 / D);
+	int j0 = floorf(area.y1 / D);
+	int j1 = ceilf(area.y2 / D);
 	for (int j=j0; j<=j1; j++) {
 		float y = j * D;
 		if ((j % 5) == 0)

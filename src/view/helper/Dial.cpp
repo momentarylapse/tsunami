@@ -9,6 +9,7 @@
 #include "graph/SceneGraph.h"
 #include "../ColorScheme.h"
 #include "../../lib/hui/hui.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -51,7 +52,7 @@ void Dial::draw_arc(Painter *p, float v0, float v1, float R) {
 
 vec2 Dial::rel_to_pos(float rel, float R) {
 	float phi = -dphi + dphi * 2 * rel;
-	return area.center() + vec2(sin(phi), - cos(phi)) * R;
+	return area.center() + vec2(sinf(phi), - cosf(phi)) * R;
 }
 
 void Dial::on_draw(Painter *p) {

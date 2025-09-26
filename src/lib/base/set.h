@@ -12,6 +12,10 @@ struct set : Array<T> {
 
 	set() : Array<T>(){}
 	set(const T &item) : Array<T>({item}){}
+	set(const std::initializer_list<T> il) : Array<T>() {
+		for (const auto& e: il)
+			add(e);
+	}
 
 	int add(const T &item) {
 		int i0 = 0;

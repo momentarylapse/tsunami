@@ -679,11 +679,9 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 void *Class::create_instance() const {
 	void *p = malloc(size);
 	memset(p, 0, size);
-	Function *c = get_default_constructor();
-	if (c) {
+	if (Function *c = get_default_constructor()) {
 		typedef void con_func(void *);
-		con_func * f = (con_func*)c->address;
-		if (f)
+		if (const auto f = reinterpret_cast<con_func*>(c->address))
 			f(p);
 	}
 	return p;

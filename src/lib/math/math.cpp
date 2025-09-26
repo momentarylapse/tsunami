@@ -1,5 +1,6 @@
 #include "math.h"
 #include <stdlib.h>
+#include <cmath>
 
 
 //------------------------------------------------------------------------------------------------//
@@ -55,3 +56,15 @@ float randf(float m) {
 	return (float)rand()*m/(float)RAND_MAX;
 }
 
+
+bool inf_f(float f) {
+	/*int t=*(int*)&f;
+	int m=0x7f000000;
+	if ((t&m)==m)   return true;
+	return (f!=f);*/
+#ifdef OS_WINDOWS
+	return false;
+#else
+	return !std::isfinite(f);
+#endif
+}

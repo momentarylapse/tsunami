@@ -722,7 +722,6 @@ void SIAddPackageOS(Context *c);
 void SIAddPackageOSPath(Context *c);
 void SIAddPackageMath(Context *c);
 void SIAddPackageThread(Context *c);
-void SIAddPackageNet(Context *c);
 void SIAddPackageImage(Context *c);
 
 
@@ -737,7 +736,6 @@ void init_lib(Context *c) {
 	SIAddPackageTime(c);
 	SIAddPackageOS(c);
 	SIAddPackageImage(c);
-	SIAddPackageNet(c);
 	SIAddPackageThread(c);
 
 	add_internal_package(c, "base");

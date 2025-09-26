@@ -6,15 +6,15 @@
  */
 
 #include "xml.h"
+#include "../base/error.h"
 #include "../os/file.h"
 #include "../os/msg.h"
+#include "lib/base/optional.h"
 
 namespace xml{
 
 int nn = 0;
 const int NMAX = 1000000;
-
-SyntaxError::SyntaxError() : Exception("xml syntax error") {}
 
 
 class EndOfFile {};
@@ -26,21 +26,21 @@ string decode_text(const string& s) {
 	return s.replace("&quot;", "\"").replace("&apos;", "\'").replace("&gt;", ">").replace("&lt;", "<").replace("&amp;", "&");
 }
 
-void skip_until_char(Stream *f, char c) {
+bool skip_until_char(Stream *f, char c) {
 	while (!f->is_end()) {
 		char cc;
 		f->read(&cc, 1);
 		if (cc == c)
-			return;
+			return true;
 	}
-	throw EndOfFile();
+	return false;
 }
 
 bool is_whitespace(char c) {
 	return (c == ' ' or c == '\t' or c == '\n' or c == '\r');
 }
 
-char skip_whitespace(Stream *f, bool back = true) {
+base::optional<char> skip_whitespace(Stream *f, bool back = true) {
 	while (!f->is_end()) {
 		char c;
 		f->read(&c, 1);
@@ -50,27 +50,29 @@ char skip_whitespace(Stream *f, bool back = true) {
 			f->seek(-1);
 		return c;
 	}
-	throw EndOfFile();
-	return ' ';
+	return base::None;
 }
 
-char next_non_whitespace(Stream *f) {
+base::optional<char> next_non_whitespace(Stream *f) {
 	return skip_whitespace(f, false);
 }
 
-string read_next_exp(Stream *f) {
+base::expected<string, Error> read_next_exp(Stream *f) {
 	string e;
-	char c0 = next_non_whitespace(f);
+	auto cc=  next_non_whitespace(f);
+	if (!cc.has_value())
+		return Error::EndOfFile;
+	char c0 = *cc;
 	if (c0 == '=')
-		return "=";
+		return string("=");
 	if (c0 == '>')
-		return ">";
+		return string(">");
 	if (c0 == '<')
-		return "<";
+		return string("<");
 	if (c0 == '/')
-		return "/";
+		return string("/");
 	if (c0 == '?')
-		return "?";
+		return string("?");
 	bool in_string = (c0 == '\"') or (c0 == '\'');
 	if (in_string) {
 		while (!f->is_end()) {
@@ -80,8 +82,7 @@ string read_next_exp(Stream *f) {
 				return e;
 			e.add(c);
 		}
-		throw EndOfFile();
-		return e;
+		return Error::EndOfFile;
 	}
 
 	e.add(c0);
@@ -94,8 +95,7 @@ string read_next_exp(Stream *f) {
 		}
 		e.add(c);
 	}
-	throw EndOfFile();
-	return e;
+	return Error::EndOfFile;
 }
 
 Element::Element(const string &_tag, const string &_text) {
@@ -133,7 +133,7 @@ Element* Element::find(const string &tag) {
 	return &dummy_element;
 }
 
-string Element::value(const string &key, const string &def) {
+string Element::value(const string &key, const string &def) const {
 	for (auto &a: attributes)
 		if (a.key == key)
 			return a.value;
@@ -143,22 +143,20 @@ string Element::value(const string &key, const string &def) {
 	return def;
 }
 
-void Parser::load(const Path &filename) {
+Error Parser::load(const Path &filename) {
 	auto *f = os::fs::open(filename, "rb");
 
 	while(true) {
-		try{
-			Element e = read_element(f);
-			//msg_write(e.tag);
-			if ((e.tag != "!--") and (e.tag != "!DOCTYPE") and (e.tag != "?xml"))
-				elements.add(e);
-		}catch (EndOfFile &eof) {
-			//msg_write("eof");
-
-			//show();
-			return;
+		auto e = read_element(f);
+		if (e.has_value()) {
+			if ((e->tag != "!--") and (e->tag != "!DOCTYPE") and (e->tag != "?xml"))
+				elements.add(*e);
+		} else {
+			//return e.error();
+			break;
 		}
 	}
+	return Error::None;
 }
 
 void Parser::write_element(Stream *f, Element &e, int indent) {
@@ -198,6 +196,7 @@ void Parser::save(const Path &filename) {
 
 void Parser::show() {
 	msg_write("-------");
+	msg_write(elements.num);
 	for (Element &e: elements) {
 		show_element(e, "");
 	}
@@ -213,7 +212,7 @@ void Parser::show_element(Element &e, const string &pre) {
 		show_element(c, pre + "    ");
 }
 
-void skip_recursive(Stream *f) {
+bool skip_recursive(Stream *f) {
 	int level = 0;
 	while(!f->is_end()) {
 		char c;
@@ -227,18 +226,22 @@ void skip_recursive(Stream *f) {
 		}//else
 			//msg_write(string(&c, 1));
 		if (level < 0)
-			return;
+			return true;
 	}
-	throw EndOfFile();
+	return false;
 }
 
-Element Parser::read_element(Stream *f) {
+base::expected<Element, Error> Parser::read_element(Stream *f) {
 	//msg_write("<< element");
-	Element e;
-	e = read_tag(f);
-	if (e.single or e.closing) {
-		//msg_write("-----single/cl");
-		//msg_write(">> element");
+	//msg_right();
+	auto e = read_tag(f);
+	if (!e.has_value())
+		return e;
+	//msg_write(e->tag);
+	if (e->single or e->closing) {
+		/*msg_write("-----single/closing");
+		msg_left();
+		msg_write(">> element");*/
 		return e;
 	}
 	if (nn > NMAX)
@@ -251,40 +254,54 @@ Element Parser::read_element(Stream *f) {
 			f->seek(-1);
 			break;
 		}
-		e.text.add(c);
+		e->text.add(c);
 	}
-	e.text = e.text.trim();
+	e->text = e->text.trim();
 	while (!f->is_end()) {
-		Element ee = read_element(f);
-		if (ee.closing and (ee.tag == e.tag)) {
-			//msg_write(">> element (with closing)");
+		auto ee = read_element(f);
+		if (!ee.has_value())
+			return ee;
+		if (ee->closing and (ee->tag == e->tag)) {
+			//msg_left();
+			//msg_write(">> element (with closing) " + e->tag);
 			return e;
 		}
 		//msg_write(">>>>  child");
-		if (ee.tag != "!--")
-			e.elements.add(ee);
+		if (ee->tag != "!--")
+			e->elements.add(*ee);
 		if (nn > NMAX)
 			return e;
 	}
-	//msg_write(">> element");
+	//msg_left();
+	//msg_write(">> element " + e->tag);
 	return e;
 }
 
-Element Parser::read_tag(Stream *f) {
+base::expected<Element, Error> Parser::read_tag(Stream *f) {
 	nn ++;
 	//msg_write("--tag");
 	Element e;
 	e.single = false;
 	e.closing = false;
-	skip_until_char(f, '<');
-	e.tag = read_next_exp(f);
+	if (!skip_until_char(f, '<'))
+		return Error::EndOfFile;
+	auto ee = read_next_exp(f);
+	if (!ee.has_value())
+		return ee.error();
+	e.tag = *ee;
 	if (e.tag == "?") {
-		e.tag += read_next_exp(f);
+		auto x = read_next_exp(f);
+		if (!x.has_value())
+			return x.error();
+		e.tag += *x;
 		e.single = true;
 	}
 	if (e.tag == "/") {
 		e.closing = true;
-		e.tag = read_next_exp(f);
+		auto x = read_next_exp(f);
+		if (!x.has_value())
+			return x.error();
+		e.tag = *x;
 	}
 	//msg_write("             tag: " + (e.closing ? string("/") : string("")) + e.tag);
 
@@ -294,7 +311,8 @@ Element Parser::read_tag(Stream *f) {
 	}
 
 	if ((e.tag == "!ELEMENT") or (e.tag == "!DOCTYPE")) {
-		skip_recursive(f);
+		if (!skip_recursive(f))
+			return Error::EndOfFile;
 		e.single = true;
 		return e;
 	}
@@ -303,37 +321,45 @@ Element Parser::read_tag(Stream *f) {
 
 	// attributes
 	while (!f->is_end()) {
-		string s = read_next_exp(f);
+		auto s = read_next_exp(f);
+		if (!s.has_value())
+			return s.error();
 		//msg_write(s);
-		if (s == "?")
+		if (*s == "?")
 			continue;
-		if (s == ">") {
+		if (*s == ">") {
 			//msg_write("-end");
 			return e;
 		}
 
 		// />
-		if (s == "/") {
+		if (*s == "/") {
 			s = read_next_exp(f);
-			if (s != ">")
-				throw SyntaxError();
+			if (!s.has_value())
+				return s.error();
+			if (*s != ">")
+				return Error::SyntaxError;
 			e.single = true;
 			return e;
 		}
 
 		//msg_write("attr...");
 		Attribute a;
-		a.key = s;
+		a.key = *s;
 		s = read_next_exp(f);
-		if (s != "=")
-			throw SyntaxError();
-		a.value = decode_text(read_next_exp(f));
+		if (!s.has_value())
+			return s.error();
+		if (*s != "=")
+			return Error::SyntaxError;
+		s = read_next_exp(f);
+		if (!s.has_value())
+			return s.error();
+		a.value = decode_text(*s);
 		e.attributes.add(a);
 	}
 
 	//skip_until_char(f, '>');
-	throw EndOfFile();
-	return e;
+	return Error::EndOfFile;
 }
 
 

@@ -16,6 +16,7 @@
 #include "../module/stream/AudioOutput.h"
 #include "../Session.h"
 #include <cstdio>
+#include <cmath>
 
 namespace tsunami {
 
@@ -39,8 +40,8 @@ public:
 	virtual int _cdecl read(AudioBuffer &buf){
 		printf("read %d\n", buf.length);
 		for (int i=0; i<buf.length; i++){
-			buf.c[0][i] = sin(phi);
-			buf.c[1][i] = sin(phi);
+			buf.c[0][i] = sinf(phi);
+			buf.c[1][i] = sinf(phi);
 			phi += omega;
 		}
 		return buf.length;

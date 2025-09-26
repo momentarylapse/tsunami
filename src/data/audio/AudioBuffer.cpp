@@ -9,7 +9,7 @@
 #include "../base.h"
 #include "../../lib/math/math.h"
 #include "../../lib/os/msg.h"
-//#include <math.h>
+#include <cmath>
 #include <assert.h>
 
 
@@ -248,8 +248,8 @@ void AudioBuffer::mix_stereo(float volume, float panning) {
 		else
 			fr *= (1 + panning);
 	} else if (channels == 1) {
-		fl = volume * cos((panning + 1) / 4 * pi) * sqrt(2.0f);
-		fr = volume * sin((panning + 1) / 4 * pi) * sqrt(2.0f);
+		fl = volume * cosf((panning + 1) / 4 * pi) * sqrtf(2.0f);
+		fr = volume * sinf((panning + 1) / 4 * pi) * sqrtf(2.0f);
 	}
 
 	// scale

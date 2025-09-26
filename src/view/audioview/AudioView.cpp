@@ -54,7 +54,7 @@
 #include "../../Session.h"
 #include "../../Playback.h"
 #include "../../EditModes.h"
-#include "../../Tsunami.h"
+#include <cmath>
 
 namespace tsunami {
 

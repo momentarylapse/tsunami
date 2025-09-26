@@ -24,9 +24,8 @@ enum class SignalType;
 
 class SampleRef : public Sharable<obs::Node<VirtualBase>> {
 public:
-	SampleRef(shared<Sample> sample);
-	virtual ~SampleRef();
-	void _cdecl __init__(shared<Sample> sample);
+	explicit SampleRef(shared<Sample> sample);
+	~SampleRef() override;
 	virtual void _cdecl __delete__();
 
 	obs::source out_changed_by_action{this, "changed-by-action"};

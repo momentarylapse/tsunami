@@ -2,6 +2,7 @@
 #include "../os/file.h"
 #include "../os/msg.h"
 #include "../math/math.h"
+#include <cmath>
 
 #define USE_FAST_COSINE_TRAFO	1
 

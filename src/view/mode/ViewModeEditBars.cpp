@@ -13,6 +13,7 @@
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 
 namespace tsunami {

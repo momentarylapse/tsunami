@@ -545,7 +545,7 @@ void PluginManager::export_kaba_package_tsunami(kaba::Exporter* ext) {
 		ext->link_class_func("SampleRef.midi", &SampleRef::midi);
 		ext->declare_class_element("SampleRef.origin", &SampleRef::origin);
 		ext->declare_class_element("SampleRef." + kaba::Identifier::SharedCount, &SampleRef::_pointer_ref_counter);
-		ext->link_class_func("SampleRef.__init__", &SampleRef::__init__);
+		ext->link_class_func("SampleRef.__init__", &kaba::generic_init_ext<SampleRef, shared<Sample>>);
 		ext->link_virtual("SampleRef.__delete__", &SampleRef::__delete__, &sampleref);
 	}
 

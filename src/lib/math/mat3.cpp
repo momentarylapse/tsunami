@@ -2,6 +2,7 @@
 #include "vec3.h"
 #include "quaternion.h"
 #include "../os/msg.h"
+#include <cmath>
 
 //------------------------------------------------------------------------------------------------//
 //                                          3x3-matrices                                          //

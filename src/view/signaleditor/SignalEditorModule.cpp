@@ -24,6 +24,7 @@
 #include "../../Session.h"
 #include "../../lib/base/iter.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -91,22 +92,22 @@ color module_color(Module *m) {
 
 static float module_port_in_x(Module *m, int index) {
 	float phi = ((float)index - (float)(m->port_in.num-1) / 2) * PORT_SWARM_DPHI;
-	return PORT_SWARM_CENTER_OFFSET - cos(phi) * PORT_SWARM_RADIUS;
+	return PORT_SWARM_CENTER_OFFSET - cosf(phi) * PORT_SWARM_RADIUS;
 }
 
 static float module_port_in_y(Module *m, int index) {
 	float phi = ((float)index - (float)(m->port_in.num-1) / 2) * PORT_SWARM_DPHI;
-	return MODULE_HEIGHT/2 + sin(phi) * PORT_SWARM_RADIUS;
+	return MODULE_HEIGHT/2 + sinf(phi) * PORT_SWARM_RADIUS;
 }
 
 static float module_port_out_x(Module *m, int index) {
 	float phi = ((float)index - (float)(m->port_out.num-1) / 2) * PORT_SWARM_DPHI;
-	return MODULE_WIDTH - PORT_SWARM_CENTER_OFFSET + cos(phi) * PORT_SWARM_RADIUS;
+	return MODULE_WIDTH - PORT_SWARM_CENTER_OFFSET + cosf(phi) * PORT_SWARM_RADIUS;
 }
 
 static float module_port_out_y(Module *m, int index) {
 	float phi = ((float)index - (float)(m->port_out.num-1) / 2) * PORT_SWARM_DPHI;
-	return MODULE_HEIGHT/2 + sin(phi) * PORT_SWARM_RADIUS;
+	return MODULE_HEIGHT/2 + sinf(phi) * PORT_SWARM_RADIUS;
 }
 
 
@@ -135,8 +136,8 @@ public:
 	}
 	void on_finish(const vec2 &m) override {
 		for (auto mm: sel) {
-			mm->module_x = (floor(mm->module_x / MODULE_GRID) + 0.5f) * MODULE_GRID;
-			mm->module_y = (floor(mm->module_y / MODULE_GRID) + 0.5f) * MODULE_GRID;
+			mm->module_x = (floorf(mm->module_x / MODULE_GRID) + 0.5f) * MODULE_GRID;
+			mm->module_y = (floorf(mm->module_y / MODULE_GRID) + 0.5f) * MODULE_GRID;
 		}
 		tab->update_module_positions();
 	}

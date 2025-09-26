@@ -200,16 +200,39 @@ void generic_delete(T* t) {
 	t->~T();
 }
 
-template<class T>
-void generic_assign(T& a, const T& b) {
-	a = b;
+#define CREATE_GENERIC_IMPLACE_OPERATOR(NAME, OP) \
+template<class T, class O = const T&> \
+void generic_##NAME(T& a, O b) { \
+	a OP b; \
 }
+
+#define CREATE_GENERIC_OPERATOR(NAME, OP) \
+template<class T, class O = const T&> \
+T generic_##NAME(const T& a, O b) { \
+	return a OP b; \
+}
+
+CREATE_GENERIC_IMPLACE_OPERATOR(assign, =)
+CREATE_GENERIC_OPERATOR(add, +)
+CREATE_GENERIC_IMPLACE_OPERATOR(iadd, +=)
+CREATE_GENERIC_OPERATOR(sub, -)
+CREATE_GENERIC_IMPLACE_OPERATOR(isub, -=)
+CREATE_GENERIC_OPERATOR(mul, *)
+CREATE_GENERIC_IMPLACE_OPERATOR(imul, *=)
+CREATE_GENERIC_OPERATOR(div, /)
+CREATE_GENERIC_IMPLACE_OPERATOR(idiv, /=)
+
+/*template<class T, class O = const T&>
+void generic_assign(T& a, O b) {
+	a = b;
+}*/
 
 template<class T>
 class generic_virtual : public T {
 public:
+	~generic_virtual() = default;
 	void __delete__() {
-		this->~T();
+		this->~generic_virtual();
 	}
 };
 

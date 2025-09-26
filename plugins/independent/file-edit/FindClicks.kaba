@@ -36,7 +36,7 @@ func find_clicks(b: float[]) -> int[]
 func unclick(out b: float[], out l: TrackLayer, offset: int)
 	var clicks = find_clicks(b)
 	for i in 0:len(clicks):2
-		l.add_marker(new TrackMarker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click"))
+		let m = l.add_marker(new TrackMarker(Range(clicks[i  ] + offset, clicks[i+1]-clicks[i]), "click"))
 		#l.addMarker(clicks[i+1] + offset, "]")
 
 class FindClicks extends TsunamiPlugin

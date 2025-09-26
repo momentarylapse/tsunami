@@ -15,14 +15,6 @@ BinaryBuffer::BinaryBuffer() {
 	block_pos = 0;
 }
 
-void BinaryBuffer::__init__() {
-	new(this) BinaryBuffer();
-}
-
-void BinaryBuffer::__delete__() {
-	this->BinaryBuffer::~BinaryBuffer();
-}
-
 void BinaryBuffer::read(void *p, int size) {
 	memcpy(p, &data[pos], size);
 	pos += size;

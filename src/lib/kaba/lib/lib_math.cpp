@@ -252,47 +252,6 @@ public:
 	void _add(const Any &a) {	Any b = *this + a;	*static_cast<Any*>(this) = b;	}
 	void _sub(const Any &a) {	Any b = *this - a;	*static_cast<Any*>(this) = b;	}
 
-	
-	static void unwrap(Any &aa, void *var, const Class *type) {
-		if (type == TypeInt32) {
-			*(int*)var = (int)aa.as_int();
-		} else if (type == TypeInt64) {
-			*(int64*)var = aa.as_int();
-		} else if (type == TypeFloat32) {
-			*(float*)var = (float)aa.as_float();
-		} else if (type == TypeFloat64) {
-			*(double*)var = aa.as_float();
-		} else if (type == TypeBool) {
-			*(bool*)var = aa.as_bool();
-		} else if (type == TypeString) {
-			*(string*)var = aa.as_string();
-		} else if (type->is_pointer_raw()) {
-			*(const void**)var = aa.as_pointer();
-		} else if (type->is_list() and (aa.type == Type::List)) {
-			auto *t_el = type->get_array_element();
-			auto *a = (DynamicArray*)var;
-			auto &b = aa.as_list();
-			int n = b.num;
-			array_resize(var, type, n);
-			for (int i=0; i<n; i++)
-				unwrap(aa[i], (char*)a->data + i * t_el->size, t_el);
-		} else if (type->is_array() and (aa.type == Type::List)) {
-			auto *t_el = type->get_array_element();
-			auto &b = aa.as_list();
-			int n = min(type->array_length, b.num);
-			for (int i=0; i<n; i++)
-				unwrap(b[i], (char*)var + i*t_el->size, t_el);
-		} else if (aa.type == Type::Dict) {
-			[[maybe_unused]] auto &map = aa.as_dict();
-			auto keys = aa.keys();
-			for (auto &e: type->elements)
-				for (string &k: keys)
-					if (e.name == k)
-						unwrap(aa[k], (char*)var + e.offset, e.type);
-		} else {
-			msg_error("unwrap... "  + aa.str() + " -> " + type->long_name());
-		}
-	}
 	static Any _cdecl parse(const string &s)
 	{ KABA_EXCEPTION_WRAPPER(return Any::parse(s)); return Any(); }
 };
@@ -949,7 +908,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("__f64__", TypeFloat64, &Any::to_f64, Flags::Pure);
 		class_add_func(Identifier::func::Str, TypeString, &Any::str, Flags::Pure);
 		class_add_func(Identifier::func::Repr, TypeString, &Any::repr, Flags::Pure);
-		class_add_func("unwrap", TypeVoid, &KabaAny::unwrap, Flags::RaisesExceptions);
+		class_add_func("unwrap", TypeVoid, &unwrap_any);//, Flags::RaisesExceptions);
 			func_add_param("var", TypeReference);
 			func_add_param("type", TypeClassRef);
 		class_add_func("parse", TypeAny, &KabaAny::parse, Flags::Static | Flags::RaisesExceptions);

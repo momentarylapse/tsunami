@@ -24,7 +24,7 @@ class XXX extends TsunamiPlugin
 		for b in session.song.bars.get_bars(r)
 			var rr = b.range()
 			var chord = guess_chord(l.midi.get_notes(rr), rr)
-			l.add_marker(new TrackMarker(b.range(), chord))
+			let m = l.add_marker(new TrackMarker(b.range(), chord))
 	
 	func score_overlap(midi: MidiNote&[], pitch: int[], r: Range) -> int
 		var score = 0

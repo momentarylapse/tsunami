@@ -13,6 +13,7 @@
 #include "../../Session.h"
 #include "../../stuff/Log.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -145,7 +146,7 @@ void LogNotifier::on_draw(Painter* p) {
 
 void LogNotifier::draw_status(Painter *c, Message &m) {
 	float a = min(m.ttl*8, 1.0f);
-	a = pow(a, 0.4f);
+	a = powf(a, 0.4f);
 	color c1 = theme.high_contrast_a.with_alpha(a);
 	color c2 = theme.high_contrast_b.with_alpha(a);
 	c->set_font_size(theme.FONT_SIZE * 1.3f * m.size * a);

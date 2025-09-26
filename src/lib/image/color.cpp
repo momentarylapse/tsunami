@@ -1,5 +1,6 @@
 #include "color.h"
 #include "../math/math.h"
+#include <cmath>
 
 
 const color White  = color(1, 1, 1, 1);

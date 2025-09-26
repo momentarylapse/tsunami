@@ -12,6 +12,7 @@
 #include "../../lib/math/math.h"
 #include "../../lib/fft/fft.h"
 #include "../../lib/threads/Thread.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -55,7 +56,7 @@ Array<float> spectrogram(AudioBuffer &b, int step_size, int window_size, WindowF
 }
 
 inline float exp_interpolate(float x, float x_min, float x_max) {
-	return x_min * exp( log(x_max / x_min) *x);
+	return x_min * expf( logf(x_max / x_min) *x);
 }
 
 Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, float f_min, float f_max, int f_count, WindowFunction wf) {
@@ -70,8 +71,8 @@ Array<float> log_spectrogram(AudioBuffer &b, float sample_rate, int step_size, f
 	for (int i=0; i<s.num/fft_size; i++) {
 		auto z = s.sub_ref(i*fft_size, (i+1)*fft_size);
 		for (int k=0; k<f_count; k++) {
-			float bin_f_min = f_min * exp( log(f_max / f_min) / (f_count - 1) * k);
-			float bin_f_max = f_min * exp( log(f_max / f_min) / (f_count - 1) * (k + 1));
+			float bin_f_min = f_min * expf( logf(f_max / f_min) / (f_count - 1) * k);
+			float bin_f_max = f_min * expf( logf(f_max / f_min) / (f_count - 1) * (k + 1));
 			int j0 = clamp(int(bin_f_min * ww), 0, z.num);
 			int j1 = clamp(int(bin_f_max * ww) + 1, 0, z.num);
 			float f = xmax(z.sub_ref(j0, j1));

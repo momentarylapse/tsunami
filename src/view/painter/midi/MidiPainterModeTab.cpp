@@ -9,6 +9,7 @@
 #include "../../../data/midi/Instrument.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/math/vec2.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -140,7 +141,7 @@ float MidiPainterModeTab::string_to_screen(int string_no) const {
 }
 
 int MidiPainterModeTab::screen_to_string(float y) const {
-	return clamp((int)floor((string_y0 - y) / string_dy + 0.5f), 0, mp->instrument->string_pitch.num-1);
+	return clamp((int)floorf((string_y0 - y) / string_dy + 0.5f), 0, mp->instrument->string_pitch.num-1);
 }
 
 }

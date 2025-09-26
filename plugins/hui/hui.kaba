@@ -3,7 +3,7 @@ use os
 use async.*
 
 
-class Painter extends image.Image.Painter as @noauto
+class Painter extends image.Painter as @noauto
 	func extern override __delete__()
 
 

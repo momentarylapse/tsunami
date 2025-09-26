@@ -1,6 +1,7 @@
 #include "Box.h"
 
 
+const Box Box::EMPTY{{0,0,0}, {0,0,0}};
 const Box Box::ID{{0,0,0}, {1,1,1}};
 const Box Box::ID_SYM{{-1,-1,-1}, {1,1,1}};
 
@@ -43,6 +44,13 @@ string Box::str() const {
 	return ::str(min) + ":" + ::str(max);
 }
 
+bool Box::operator==(const Box &o) const {
+	return min == o.min && max == o.max;
+}
+
+bool Box::operator!=(const Box &o) const {
+	return !(*this == o);
+}
 
 Box Box::operator||(const Box& b) const {
 	Box r = *this;

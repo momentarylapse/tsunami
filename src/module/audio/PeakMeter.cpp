@@ -13,6 +13,7 @@
 #include "../../lib/math/complex.h"
 #include "../../view/module/ConfigPanel.h"
 #include "../../view/helper/PeakMeterDisplay.h"
+#include <cmath>
 
 namespace tsunami {
 
@@ -34,7 +35,7 @@ void PeakMeterData::reset() {
 }
 
 float PeakMeterData::get_sp() {
-	return max(super_peak * (1 - (float)pow(super_peak_t, 3)*0.2f), 0.0001f);
+	return max(super_peak * (1 - powf(super_peak_t, 3)*0.2f), 0.0001f);
 }
 
 void PeakMeterData::update(Array<float> &buf, float dt) {

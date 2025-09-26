@@ -36,6 +36,7 @@
 #include "../../../data/midi/MidiData.h"
 #include "../../../lib/image/Painter.h"
 #include "../../../lib/hui/language.h"
+#include <cmath>
 
 namespace tsunami {
 

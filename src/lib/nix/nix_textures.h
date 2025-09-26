@@ -36,7 +36,7 @@ public:
 	};
 	Type type;
 	Path filename;
-	int width, height, nz, samples;
+	int width, height, depth, samples;
 	bool valid;
 	
 	unsigned int texture;

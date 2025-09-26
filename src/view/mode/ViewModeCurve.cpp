@@ -17,6 +17,7 @@
 #include "../../module/stream/AudioOutput.h"
 #include "../../module/audio/SongRenderer.h"
 #include "../../lib/image/Painter.h"
+#include <cmath>
 
 namespace tsunami {
 

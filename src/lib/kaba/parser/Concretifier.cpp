@@ -761,6 +761,8 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> 
 	n_p2b->set_param(0, add_node_local(var));
 	n_if->set_param(0, n_p2b);
 	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x), block_x, ns));
+	if (n_if->params[1]->type != TypeVoid)
+		do_error("typed block not allowed in for statement", node);
 	if (node->params.num >= 5)
 		n_if->set_param(2, concretify_node(cp_node(node->params[4], block_x), block_x, ns));
 	block_x->add(n_if);
@@ -788,6 +790,8 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer_shared(shared
 	n_p2b->set_param(0, add_node_local(var));
 	n_if->set_param(0, n_p2b);
 	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x), block_x, ns));
+	if (n_if->params[1]->type != TypeVoid)
+		do_error("typed block not allowed in for statement", node);
 	if (node->params.num >= 5)
 		n_if->set_param(2, concretify_node(cp_node(node->params[4], block_x), block_x, ns));
 	block_x->add(n_if);
@@ -875,6 +879,8 @@ shared<Node> Concretifier::concretify_statement_for_range(shared<Node> node, Blo
 	// block
 	node->params[4] = concretify_node(node->params[4], block, ns);
 	parser->post_process_for(node);
+	if (node->params[4]->type != TypeVoid and !flags_has(node->flags, Flags::Extern))
+		do_error("typed block not allowed in for loop A", node);
 
 	node->type = TypeVoid;
 	return node;
@@ -888,13 +894,13 @@ shared<Node> Concretifier::concretify_statement_for_container(shared<Node> node,
 	auto t_c = container->type;
 	if (t_c->is_pointer_shared() and flags_has(node->flags, Flags::Shared))
 		return concretify_statement_for_unwrap_pointer_shared(node, container, block, ns);
-	else if (t_c->is_pointer_shared() or t_c->is_pointer_owned() or t_c->is_pointer_raw())
+	if (t_c->is_pointer_shared() or t_c->is_pointer_owned() or t_c->is_pointer_raw())
 		return concretify_statement_for_unwrap_pointer(node, container, block, ns);
-	else if (t_c->is_optional())
+	if (t_c->is_optional())
 		return concretify_statement_for_unwrap_optional(node, container, block, ns);
-	else if (t_c->usable_as_list() or t_c->is_array())
+	if (t_c->usable_as_list() or t_c->is_array())
 		return concretify_statement_for_array(node, container, block, ns);
-	else if (t_c->is_dict())
+	if (t_c->is_dict())
 		return concretify_statement_for_dict(node, container, block, ns);
 
 	do_error(format("unable to iterate over type '%s' - array/list/dict/shared/owned/optional expected as second parameter in 'for . in .'", t_c->long_name()), container);
@@ -925,6 +931,8 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	// block
 	node->params[3] = concretify_node(node->params[3], block, ns);
 	parser->post_process_for(node);
+	if (node->params[3]->type != TypeVoid and !flags_has(node->flags, Flags::Extern))
+		do_error("typed block not allowed in for loop XXX", node);
 
 	node->type = TypeVoid;
 	return node;
@@ -951,6 +959,8 @@ shared<Node> Concretifier::concretify_statement_for_dict(shared<Node> node, shar
 	// block
 	node->params[3] = concretify_node(node->params[3], block, ns);
 	parser->post_process_for(node);
+	if (node->params[3]->type != TypeVoid)
+		do_error("typed block not allowed in for loop", node);
 
 	node->type = TypeVoid;
 	return node;
@@ -1642,6 +1652,7 @@ shared<Node> Concretifier::concretify_array_builder_for(shared<Node> node, Block
 
 	// first pass: find types in the for loop
 	auto fake_for = cp_node(n_for); //->shallow_copy();
+	flags_set(fake_for->flags, Flags::Extern); // magic marker to prevent return value check... :P
 	fake_for->set_param(fake_for->params.num - 1, cp_node(n_exp)); //->shallow_copy());
 	fake_for = concretify_node(fake_for, block, ns);
 	// TODO: remove new variables!

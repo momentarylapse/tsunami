@@ -245,6 +245,12 @@ void export_package_hui(kaba::Exporter* e) {
 	e->declare_class_element("Event.row", &hui::Event::row);
 	e->declare_class_element("Event.column", &hui::Event::column);
 
+	e->declare_class_size("Resource", sizeof(hui::Resource));
+	e->link_class_func("Resource.show", &hui::Resource::show);
+	e->link_class_func("Resource.str", &hui::Resource::to_string);
+
+	e->link_func("parse_resource", &hui::parse_resource);
+
 #if 0
 	// key ids (int)
 	add_enum("KEY_CONTROL", TypeInt32, hui::KEY_CONTROL);

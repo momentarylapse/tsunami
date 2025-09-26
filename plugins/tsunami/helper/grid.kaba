@@ -433,7 +433,7 @@ class Grid extends Object
 		let h = float(c.height)
 
 		draw_background(c, 0, 0, w, h)
-		c.clip(plot_area)
+		c.set_clip(plot_area)
 		on_draw(c)
 	
 	func mut redraw()

@@ -32,7 +32,7 @@ Grid ? '' vertical
 		fill()
 		
 		for id in LIST_ID
-			event_x(id, "hui:select", on_select)
+			let _id = event_x(id, "hui:select", on_select)
 		event("delete", on_delete)
 		event("save", on_save)
 		event("apply", on_apply)

@@ -26,7 +26,7 @@ class SampleRef : public Sharable<obs::Node<VirtualBase>> {
 public:
 	explicit SampleRef(shared<Sample> sample);
 	~SampleRef() override;
-	virtual void _cdecl __delete__();
+	void __delete__() override;
 
 	obs::source out_changed_by_action{this, "changed-by-action"};
 

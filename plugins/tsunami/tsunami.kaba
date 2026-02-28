@@ -9,15 +9,15 @@
 #                                                                      #
 #----------------------------------------------------------------------#
 
-use common.*
-use beats.*
-use midi.*
-use modules.*
-use song.*
-use streams.*
-use other.*
-use ui.*
-use processing.*
+use .common.*
+use .beats.*
+use .midi.*
+use .modules.*
+use .song.*
+use .streams.*
+use .other.*
+use .ui.*
+use .processing.*
 
 let EXPORT_IMPORTS = true
 

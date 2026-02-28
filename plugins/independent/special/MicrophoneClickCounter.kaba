@@ -3,8 +3,8 @@
 use hui
 use tsunami.*
 use tsunami.helper.tone.*
-use midisource.Click.*
-use audioeffect.special.ClickCounter.*
+use midi_source.Click.*
+use audio_effect.special.ClickCounter.*
 
 
 class ClickCounterPanel extends ConfigPanel

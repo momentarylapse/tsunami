@@ -1,8 +1,8 @@
-use config.*
+use .config.*
 use tsunami.*
 use tsunami.helper.draw.*
 use hui
-use profiledialog.*
+use .profiledialog.*
 
 
 

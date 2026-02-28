@@ -1,5 +1,5 @@
 use tsunami.*
-use config.*
+use .config.*
 use hui
 
 

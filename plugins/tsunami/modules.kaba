@@ -1,6 +1,6 @@
-use common.*
-use midi.*
-use beats.*
+use .common.*
+use .midi.*
+use .beats.*
 use hui
 use kaba
 

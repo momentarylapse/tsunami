@@ -20,7 +20,7 @@ namespace kaba {
 extern Array<shared<Module>> loading_module_stack;
 void SetImmortal(SyntaxTree *ps);
 
-string canonical_import_name(const string &s) {
+/*string canonical_import_name(const string &s) {
 	return s.lower().replace(" ", "").replace("_", "").replace("-", "");
 }
 
@@ -67,39 +67,74 @@ Path import_dir_match(const Path &dir0, const string &name) {
 	if (os::fs::exists(dir0 | name))
 		return dir0 | name;
 	return Path::EMPTY;
-}
+}*/
 
-Path find_installed_lib_import(const string &name) {
-	//const Path dir = Context::packages_root();
+Path check_package_dir(const Path& dir, const string& name) {
+	//msg_write(format("CHECK %s  %s", dir, name));
+	auto xx = name.explode("/");
+	string name2 = name;
+	if (xx.num >= 2)
+		name2 = implode(xx.sub_ref(1), "/");
 
-	Path kaba_dir = os::app::directory_dynamic.parent() | "kaba";
-	if (os::app::directory_dynamic.basename()[0] == '.')
-		kaba_dir = os::app::directory_dynamic.parent() | ".kaba";
-	Path kaba_dir_static = os::app::directory_static.parent() | "kaba";
-	for (auto &dir: Array<Path>({kaba_dir, kaba_dir_static})) {
-		auto path1 = (dir | "packages" | (name + ".kaba")).canonical();
-		if (os::fs::exists(path1))
-			return path1;
-		auto path2 = (dir | "packages" | name | (name + ".kaba")).canonical();
-		if (os::fs::exists(path2))
-			return path2;
-	}
+	const auto fn = dir | (name2 + ".kaba");
+	if (os::fs::exists(fn))
+		return fn;
 	return Path::EMPTY;
 }
 
-Path find_import(Module *s, const string &_name) {
+Path find_installed_package_import(Context* ctx, string& package_name, const string &name) {
+
+	// packages provided by host program
+	for (auto& i: ctx->package_inits)
+		if (i.name == package_name)
+			if (auto fn = check_package_dir(i.dir, name))
+				return fn;
+
+	// system wide install
+	if (auto fn = check_package_dir(Context::packages_root() | package_name, name))
+		return fn;
+
+	return Path::EMPTY;
+}
+
+Path find_import_module_file(Module *s, const string &_name) {
 	string name = _name.replace(".kaba", "");
 	name = name.replace(".", "/");
 
-	for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
-		Path filename = import_dir_match((s->filename.parent() | string("../").repeat(i)).canonical(), name + ".kaba");
-		if (filename)
+	if (name.head(1) == "/") {
+		// relative....
+
+		// count leading /s
+		int n = 0;
+		while (n < name.num and name[n] == '/')
+			n++;
+
+		Path filename = (s->filename.parent() | string("../").repeat(n-1)).canonical() | (name.sub(n) + ".kaba");
+		if (os::fs::exists(filename))
 			return filename;
+	} else if (name.num > 0) {
+		// "absolute"...
+
+		string package_name = name.explode("/")[0];
+
+		// already loaded package
+		for (auto p: s->context->external_packages)
+			if (p->name == package_name)
+				if (auto fn = check_package_dir(p->directory, name))
+					return fn;
+
+		// installed?
+		if (auto fn = find_installed_package_import(s->context, package_name, name))
+			return fn;
+
+		// local/relative path
+		for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
+			if (auto fn = check_package_dir((s->filename.parent() | string("../").repeat(i)).canonical() | package_name, name))
+				return fn;
+			if (auto fn = check_package_dir((s->filename.parent() | string("../").repeat(i)).canonical(), name))
+				return fn;
+		}
 	}
-
-	// installed?
-	return find_installed_lib_import(name);
-
 	return Path::EMPTY;
 }
 
@@ -110,7 +145,7 @@ shared<Module> get_import_module(Parser* parser, const string& name, int token_i
 		if (p->main_module->filename.str() == name)
 			return p->main_module;
 
-	Path filename = find_import(parser->tree->module, name);
+	Path filename = find_import_module_file(parser->tree->module, name);
 	if (!filename)
 		return nullptr;
 		//parser->do_error(format("can not find import '%s'", name), token_id);
@@ -192,6 +227,7 @@ ImportSource resolve_import_source(Parser *parser, const Array<string> &name, in
 	if (!source.module)
 		parser->do_error(format("can not find import '%s'", implode(name, ".")), token);
 
+	// symbol in module...
 	for (int i=i_module+1; i<name.num; i++) {
 		if (source._class) {
 			source = resolve_import_sub(source, name[i]);

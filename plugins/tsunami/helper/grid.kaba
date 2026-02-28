@@ -1,6 +1,6 @@
 use hui
 use tsunami.*
-use tone.*
+use .tone.*
 
 struct Curve
 	var col, col_below: Color

@@ -1,6 +1,6 @@
 use hui
 use tsunami.*
-use audiovisualizer.Shader.*
+use audio_visualizer.Shader.*
 
 enum Mode
 	FORWARD

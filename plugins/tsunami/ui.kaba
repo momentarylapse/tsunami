@@ -1,10 +1,10 @@
 use hui
 use async.*
-use common.*
-use midi.*
-use song.*
-use modules.*
-use streams.*
+use .common.*
+use .midi.*
+use .song.*
+use .modules.*
+use .streams.*
 
 
 let NUM_PEAK_LEVELS = 24

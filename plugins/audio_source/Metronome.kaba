@@ -2,7 +2,7 @@
 # Title[Deutsch] = Metronom
 
 use tsunami.*
-use midisource.Metronome.*
+use midi_source.Metronome.*
 
 
 func CreateMidiSourceX[T](session: Session, name: string) -> xfer[T]

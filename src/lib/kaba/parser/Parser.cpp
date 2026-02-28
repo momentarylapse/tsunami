@@ -352,10 +352,14 @@ void Parser::parse_import() {
 	if (try_consume("@export") or try_consume("out"))
 		also_export = true;
 
-	// parse source name (a.b.c)
-	Array<string> name = {Exp.cur};
-	int token = Exp.consume_token();
+	// parse source name (a.b.c, might contain leading dots)
+	// "..a.b.c" -> ["", "", "a", "b", "c"]
+	int token = Exp.cur_token();
+	Array<string> name = {};
 	bool recursively = false;
+	while (try_consume("."))
+		name.add("");
+	name.add(Exp.consume());
 	while (!Exp.end_of_line()) {
 		if (!try_consume("."))
 			break;

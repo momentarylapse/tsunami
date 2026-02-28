@@ -1152,42 +1152,42 @@ void PluginManager::add_plugins_in_dir(const Path &dir, hui::Menu *m, const stri
 
 void PluginManager::find_plugins() {
 
-	// "audio-source"
-	find_plugins_in_dir("audio-source", "", ModuleCategory::AudioSource);
+	// "audiosource"
+	find_plugins_in_dir("audio_source", "", ModuleCategory::AudioSource);
 
-	// "audio-effect"
-	find_plugins_in_dir("audio-effect", "channels", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "dynamics", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "echo", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "filter", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "pitch", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "repair", ModuleCategory::AudioEffect);
-	find_plugins_in_dir("audio-effect", "sound", ModuleCategory::AudioEffect);
+	// "audioeffect"
+	find_plugins_in_dir("audio_effect", "channels", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "dynamics", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "echo", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "filter", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "pitch", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "repair", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "sound", ModuleCategory::AudioEffect);
 	// hidden...
-	find_plugins_in_dir("audio-effect", "special", ModuleCategory::AudioEffect);
+	find_plugins_in_dir("audio_effect", "special", ModuleCategory::AudioEffect);
 
-	// "audio-visualizer"
-	find_plugins_in_dir("audio-visualizer", "", ModuleCategory::AudioVisualizer);
+	// "audiovisualizer"
+	find_plugins_in_dir("audio_visualizer", "", ModuleCategory::AudioVisualizer);
 
-	// "midi-source"
-	find_plugins_in_dir("midi-source", "", ModuleCategory::MidiSource);
+	// "midisource"
+	find_plugins_in_dir("midi_source", "", ModuleCategory::MidiSource);
 
-	// "midi-effect"
-	find_plugins_in_dir("midi-effect", "", ModuleCategory::MidiEffect);
+	// "midieffect"
+	find_plugins_in_dir("midi_effect", "", ModuleCategory::MidiEffect);
 
-	// "beat-source"
-	find_plugins_in_dir("beat-source", "", ModuleCategory::BeatSource);
+	// "beatsource"
+	find_plugins_in_dir("beat_source", "", ModuleCategory::BeatSource);
 
-	// "pitch-detector"
-	find_plugins_in_dir("pitch-detector", "", ModuleCategory::PitchDetector);
+	// "pitchdetector"
+	find_plugins_in_dir("pitch_detector", "", ModuleCategory::PitchDetector);
 
 	// rest
 	find_plugins_in_dir("independent", "debug", ModuleCategory::TsunamiPlugin);
-	find_plugins_in_dir("independent", "file-edit", ModuleCategory::TsunamiPlugin);
-	find_plugins_in_dir("independent", "file-management", ModuleCategory::TsunamiPlugin);
-	find_plugins_in_dir("independent", "file-visualization", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file_edit", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file_management", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "file_visualization", ModuleCategory::TsunamiPlugin);
 	find_plugins_in_dir("independent", "games", ModuleCategory::TsunamiPlugin);
-	find_plugins_in_dir("independent", "live-performance", ModuleCategory::TsunamiPlugin);
+	find_plugins_in_dir("independent", "live_performance", ModuleCategory::TsunamiPlugin);
 	find_plugins_in_dir("independent", "practice", ModuleCategory::TsunamiPlugin);
 	find_plugins_in_dir("independent", "special", ModuleCategory::TsunamiPlugin);
 
@@ -1199,11 +1199,11 @@ void PluginManager::add_plugins_to_menu(TsunamiWindow *win) {
 	hui::Menu *m = win->get_menu();
 
 	add_plugins_in_dir("independent/debug", m->get_sub_menu_by_id("menu_plugins_debug"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
-	add_plugins_in_dir("independent/file-edit", m->get_sub_menu_by_id("menu_plugins_file_edit"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
-	add_plugins_in_dir("independent/file-management", m->get_sub_menu_by_id("menu_plugins_file_management"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
-	add_plugins_in_dir("independent/file-visualization", m->get_sub_menu_by_id("menu_plugins_file_visualization"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("independent/file_edit", m->get_sub_menu_by_id("menu_plugins_file_edit"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("independent/file_management", m->get_sub_menu_by_id("menu_plugins_file_management"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("independent/file_visualization", m->get_sub_menu_by_id("menu_plugins_file_visualization"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("independent/games", m->get_sub_menu_by_id("menu_plugins_games"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
-	add_plugins_in_dir("independent/live-performance", m->get_sub_menu_by_id("menu_plugins_live_performance"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
+	add_plugins_in_dir("independent/live_performance", m->get_sub_menu_by_id("menu_plugins_live_performance"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("independent/practice", m->get_sub_menu_by_id("menu_plugins_practice"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 	add_plugins_in_dir("independent/special", m->get_sub_menu_by_id("menu_plugins_special"), "tsunami", win, [win](const string &name){ win->on_menu_execute_tsunami_plugin(name); });
 }

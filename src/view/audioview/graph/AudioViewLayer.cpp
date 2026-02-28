@@ -161,7 +161,7 @@ color AudioViewLayer::marker_color(const TrackMarker *m) {
 void AudioViewLayer::draw_track_buffers(Painter *c) {
 	view->buffer_painter->set_context(area, vtrack()->audio_mode);
 
-	//auto text_soft4 = color::interpolate(colors.text_soft3, colors.background, 0.3f);
+	//auto text_soft4 = color::mix(colors.text_soft3, colors.background, 0.3f);
 	if (is_playable() and layer->track->has_version_selection()) {
 		auto active_ranges = layer->active_version_ranges();
 		auto inactive_ranges = layer->inactive_version_ranges();
@@ -332,14 +332,14 @@ void AudioViewLayer::draw_marker(Painter *c, const TrackMarker *marker, bool hov
 	w = max(w, x1 - x0);
 
 	color col = theme.text;
-	color col_bg = color::interpolate(theme.blob_bg_hidden, marker_color(marker), 0.6f);
+	color col_bg = color::mix(theme.blob_bg_hidden, marker_color(marker), 0.6f);
 	color col_frame = marker_color(marker);
 	if (sel) {
 		col = theme.text;
-		//col_bg = colors.blob_bg_selected;//color::interpolate(col_bg, colors.selection, 0.6f);
-		//col_frame = colors.blob_bg_selected;//color::interpolate(col_frame, colors.selection, 0.6f);
-		col_bg = color::interpolate(col_bg, theme.blob_bg_selected, 0.8f);
-		col_frame = color::interpolate(col_frame, theme.blob_bg_selected, 0.8f);
+		//col_bg = colors.blob_bg_selected;//color::mix(col_bg, colors.selection, 0.6f);
+		//col_frame = colors.blob_bg_selected;//color::mix(col_frame, colors.selection, 0.6f);
+		col_bg = color::mix(col_bg, theme.blob_bg_selected, 0.8f);
+		col_frame = color::mix(col_frame, theme.blob_bg_selected, 0.8f);
 		//col_frame = colors.selection;
 	}
 	if (hover) {

@@ -31,10 +31,10 @@ Cursor::Cursor(AudioView *_view, bool end) : scenegraph::NodeFree() {
 }
 
 void Cursor::on_draw(Painter* c) {
-	color col = theme.selection_boundary;//color::interpolate(colors.selection_boundary, colors.background_track_selected, 0.2f);
+	color col = theme.selection_boundary;//color::mix(colors.selection_boundary, colors.background_track_selected, 0.2f);
 
 	if (!view_has_focus(view))
-		col = color::interpolate(theme.selection_boundary, theme.background_track_selected, 0.5f);
+		col = color::mix(theme.selection_boundary, theme.background_track_selected, 0.5f);
 
 	if (is_end) {
 		float x = view->cam.sample2screen(pos());

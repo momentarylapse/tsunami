@@ -20,7 +20,7 @@ bool SerialNodeParam::operator == (const SerialNodeParam &param) const {
 }
 
 const Class* SerialNodeParam::get_type_save() const {
-	return type ? type : TypeVoid;
+	return type ? type : common_types._void;
 }
 
 Asm::RegID SerialNodeParam::as_reg() const {
@@ -104,7 +104,7 @@ string SerialNodeParam::str(Serializer *ser) const {
 			else
 				n = var_repr((void*)(int_p)(p + shift), type) + " @" + p2s((void*)(int_p)p);
 		} else if (kind == NodeKind::Function)
-			n = ((Function*)p)->signature(TypeVoid);
+			n = ((Function*)p)->signature(common_types._void);
 		str = "(" + type_name_safe(type) + ") <" + kind2str(kind) + "> " + n;
 		if (shift > 0)
 			str += format(" + shift %d", shift);
@@ -200,7 +200,7 @@ SerialNodeParam param_label(const Class *type, int m) {
 }
 
 SerialNodeParam param_label32(int m) {
-	return param_label(TypeInt32, m);
+	return param_label(common_types.i32, m);
 }
 
 SerialNodeParam param_deref_label(const Class *type, int m) {
@@ -216,11 +216,11 @@ SerialNodeParam param_deref_preg(const Class *type, Asm::RegID reg) {
 }
 
 SerialNodeParam param_lookup(const Class *type, int ref) {
-	return {NodeKind::GlobalLookup, ref, -1, /*type*/TypePointer, 0};
+	return {NodeKind::GlobalLookup, ref, -1, /*type*/common_types.pointer, 0};
 }
 
 SerialNodeParam param_deref_lookup(const Class *type, int ref) {
-	return {NodeKind::DereferenceGlobalLookup, ref, -1, /*type*/TypePointer, 0};
+	return {NodeKind::DereferenceGlobalLookup, ref, -1, /*type*/common_types.pointer, 0};
 }
 
 

@@ -39,7 +39,7 @@ BackendAmd64::~BackendAmd64() {
 }
 
 [[maybe_unused]] static Asm::InstID trafo_inst_float(Asm::InstID inst, const Class *t) {
-	if (t == TypeFloat64) {
+	if (t == common_types.f64) {
 		if (inst == Asm::InstID::FADD)
 			return Asm::InstID::ADDSD;
 		if (inst == Asm::InstID::FSUB)
@@ -75,9 +75,9 @@ void BackendAmd64::implement_return(const SerialNodeParam &p) {
 		if (cur_func->effective_return_type->_return_in_float_registers()) {
 			// if ((config.instruction_set == Asm::INSTRUCTION_SET_AMD64) or (config.compile_os)) ???
 			//		cmd.add_cmd(Asm::InstID::FLD, t);
-			if (cur_func->effective_return_type == TypeFloat32) {
+			if (cur_func->effective_return_type == common_types.f32) {
 				insert_cmd(Asm::InstID::MOVSS, p_xmm0, p);
-			} else if (cur_func->effective_return_type == TypeFloat64) {
+			} else if (cur_func->effective_return_type == common_types.f64) {
 				insert_cmd(Asm::InstID::MOVSD, p_xmm0, p);
 			} else if (cur_func->effective_return_type->size == 8) {
 				// float[2]
@@ -85,15 +85,15 @@ void BackendAmd64::implement_return(const SerialNodeParam &p) {
 			} else if (cur_func->effective_return_type->size == 12) {
 				// float[3]
 				insert_cmd(Asm::InstID::MOVLPS, p_xmm0,
-						param_shift(p, 0, TypeReg64));
+						param_shift(p, 0, common_types.reg64));
 				insert_cmd(Asm::InstID::MOVSS, p_xmm1,
-						param_shift(p, 8, TypeFloat32));
+						param_shift(p, 8, common_types.f32));
 			} else if (cur_func->effective_return_type->size == 16) {
 				// float[4]
 				insert_cmd(Asm::InstID::MOVLPS, p_xmm0,
-						param_shift(p, 0, TypeReg64));
+						param_shift(p, 0, common_types.reg64));
 				insert_cmd(Asm::InstID::MOVLPS, p_xmm1,
-						param_shift(p, 8, TypeReg64));
+						param_shift(p, 8, common_types.reg64));
 			} else {
 				do_error(
 						"...ret xmm "
@@ -118,7 +118,7 @@ void BackendAmd64::implement_return(const SerialNodeParam &p) {
 	}
 	insert_cmd(Asm::InstID::LEAVE);
 	//if (cur_func->effective_return_type->uses_return_by_memory())
-	//	insert_cmd(Asm::InstID::RET, param_imm(TypeReg16, 4));
+	//	insert_cmd(Asm::InstID::RET, param_imm(common_types.reg16, 4));
 	//else
 	insert_cmd(Asm::InstID::RET);
 }
@@ -131,11 +131,11 @@ void BackendAmd64::implement_mov_chunk(const SerialNodeParam &p1, const SerialNo
 	//msg_error("CORRECT MOV " + p1.type->name);
 
 	for (int offset=0; offset<size-7; offset+=8)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt64), param_shift(p2, offset, TypeInt64));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, common_types.i64), param_shift(p2, offset, common_types.i64));
 	for (int offset=8*(size/8); offset<size-3; offset+=4)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt32), param_shift(p2, offset, TypeInt32));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, common_types.i32), param_shift(p2, offset, common_types.i32));
 	for (int offset=4*(size/4); offset<size; offset++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, TypeInt8), param_shift(p2, offset, TypeInt8));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, offset, common_types.i8), param_shift(p2, offset, common_types.i8));
 }
 
 
@@ -143,22 +143,22 @@ void BackendAmd64::function_call_post(int push_size, const Array<SerialNodeParam
 	const Class *type = ret.get_type_save();
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->uses_return_by_memory())) {
+	if ((type != common_types._void) and (!type->uses_return_by_memory())) {
 		if (type->_return_in_float_registers()) {
-			if (type == TypeFloat32) {
+			if (type == common_types.f32) {
 				insert_cmd(Asm::InstID::MOVSS, ret, p_xmm0);
-			} else if (type == TypeFloat64) {
+			} else if (type == common_types.f64) {
 				insert_cmd(Asm::InstID::MOVSD, ret, p_xmm0);
 			} else if (type->size == 8) { // float[2]
 				insert_cmd(Asm::InstID::MOVLPS, ret, p_xmm0);
 			} else if (type->size == 12) { // float[3]
-				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
-				insert_cmd(Asm::InstID::MOVSS, param_shift(ret, 8, TypeFloat32), p_xmm1);
+				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 0, common_types.reg64), p_xmm0);
+				insert_cmd(Asm::InstID::MOVSS, param_shift(ret, 8, common_types.f32), p_xmm1);
 			} else if (type->size == 16) { // float[4]
 				// hmm, weird
-				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 0, TypeReg64), p_xmm0);
-				//add_cmd(Asm::InstID::MOVHPS, param_shift(ret, 8, TypeReg64), p_xmm0);
-				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 8, TypeReg64), p_xmm1);
+				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 0, common_types.reg64), p_xmm0);
+				//add_cmd(Asm::InstID::MOVHPS, param_shift(ret, 8, common_types.reg64), p_xmm0);
+				insert_cmd(Asm::InstID::MOVLPS, param_shift(ret, 8, common_types.reg64), p_xmm1);
 				//add_cmd(Asm::InstID::MOVUPS, ret, p_xmm0);
 			} else {
 				do_error("xmm return ..." + type->long_name());
@@ -186,20 +186,20 @@ void BackendAmd64::add_function_call(Function *f, const Array<SerialNodeParam> &
 	if (f->address != 0) {
 		if (dist_fits_32bit(f->address, module->opcode)) {
 			// 32bit call distance
-			insert_cmd(Asm::InstID::CALL, param_imm(TypeReg32, f->address)); // the actual call
+			insert_cmd(Asm::InstID::CALL, param_imm(common_types.reg32, f->address)); // the actual call
 			// function pointer will be shifted later...(asm translates to RIP-relative)
 		} else {
 			// 64bit call distance
-			insert_cmd(Asm::InstID::MOV, p_rax, param_imm(TypeReg64, f->address));
+			insert_cmd(Asm::InstID::MOV, p_rax, param_imm(common_types.reg64, f->address));
 			insert_cmd(Asm::InstID::CALL, p_rax);
 		}
 	} else if (f->_label >= 0) {
 		if (f->owner() == module->tree) {
 			// 32bit call distance
-			insert_cmd(Asm::InstID::CALL, param_label(TypeInt32, f->_label));
+			insert_cmd(Asm::InstID::CALL, param_label(common_types.i32, f->_label));
 		} else {
 			// 64bit call distance
-			insert_cmd(Asm::InstID::MOV, p_rax, param_label(TypePointer, f->_label));
+			insert_cmd(Asm::InstID::MOV, p_rax, param_label(common_types.pointer, f->_label));
 			insert_cmd(Asm::InstID::CALL, p_rax);
 		}
 	} else {
@@ -224,7 +224,7 @@ void BackendAmd64::add_pointer_call(const SerialNodeParam &fp, const Array<Seria
 }
 
 bool amd64_type_uses_int_register(const Class *t) {
-	return (t == TypeInt32) or (t == TypeInt64) or (t == TypeInt16) or (t == TypeUInt16) or (t == TypeInt8) or (t == TypeUInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == common_types.i32) or (t == common_types.i64) or (t == common_types.i16) or (t == common_types.u16) or (t == common_types.i8) or (t == common_types.u8) or (t == common_types._bool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
@@ -267,7 +267,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 			} else {
 				stack_param.add(p);
 			}
-		} else if ((p.type == TypeFloat32) or (p.type == TypeFloat64)) {
+		} else if ((p.type == common_types.f32) or (p.type == common_types.f64)) {
 			if (xmm_param_counter < max_xmm_params) {
 				xmm_param.add(p);
 				xmm_param_reg.add((Asm::RegID)((int)Asm::RegID::XMM0 + (xmm_param_counter ++)));
@@ -291,9 +291,9 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 		// stack pointer is already low enough to include stack parameters
 		// to compensate the following push's pre-increase rsp
 		if (push_size > 127)
-			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt32, push_size));
+			insert_cmd(Asm::InstID::ADD, param_preg(common_types.pointer, Asm::RegID::RSP), param_imm(common_types.i32, push_size));
 		else if (push_size > 0)
-			insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt8, push_size));
+			insert_cmd(Asm::InstID::ADD, param_preg(common_types.pointer, Asm::RegID::RSP), param_imm(common_types.i8, push_size));
 		//}
 		foreachb (SerialNodeParam &p, stack_param) {
 			insert_cmd(Asm::InstID::MOV, param_preg(p.type, get_reg(Asm::RegRoot::A, p.type->size)), p);
@@ -301,7 +301,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 		}
 		if (config.target.abi == Abi::AMD64_WINDOWS) {
 			push_size -= 32;
-			insert_cmd(Asm::InstID::SUB, param_preg(TypePointer, Asm::RegID::RSP), param_imm(TypeInt8, 32));
+			insert_cmd(Asm::InstID::SUB, param_preg(common_types.pointer, Asm::RegID::RSP), param_imm(common_types.i8, 32));
 		}
 	}
 	max_push_size = max(max_push_size, (int)push_size);
@@ -309,10 +309,10 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 	// xmm0-7
 	foreachib(auto &p, xmm_param, i) {
 		auto reg = xmm_param_reg[i];
-		if (p.type == TypeFloat64)
-			insert_cmd(Asm::InstID::MOVSD, param_preg(TypeReg128, reg), p);
+		if (p.type == common_types.f64)
+			insert_cmd(Asm::InstID::MOVSD, param_preg(common_types.reg128, reg), p);
 		else
-			insert_cmd(Asm::InstID::MOVSS, param_preg(TypeReg128, reg), p);
+			insert_cmd(Asm::InstID::MOVSS, param_preg(common_types.reg128, reg), p);
 	}
 
 	func_param_virts = {};
@@ -330,7 +330,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 			func_param_virts.add(v);
 			int va = cmd.add_virtual_reg(Asm::RegID::EAX);
 			insert_cmd(Asm::InstID::MOV, param_vreg(p.type, va, Asm::RegID::AL), p);
-			insert_cmd(Asm::InstID::MOV, param_vreg(TypeReg32, v), param_vreg(TypeReg32, va));
+			insert_cmd(Asm::InstID::MOV, param_vreg(common_types.reg32, v), param_vreg(common_types.reg32, va));
 		}
 	}
 
@@ -340,7 +340,7 @@ int BackendAmd64::function_call_pre(const Array<SerialNodeParam> &_params, const
 void BackendAmd64::add_function_outro(Function *f) {
 	insert_cmd(Asm::InstID::LEAVE, p_none);
 	if (f->effective_return_type->uses_return_by_memory())
-		insert_cmd(Asm::InstID::RET, param_imm(TypeReg16, 4));
+		insert_cmd(Asm::InstID::RET, param_imm(common_types.reg16, 4));
 	else
 		insert_cmd(Asm::InstID::RET, p_none);
 }
@@ -384,7 +384,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 			} else {
 				stack_param.add(p);
 			}
-		} else if ((p->type == TypeFloat32) or (p->type == TypeFloat64)) {
+		} else if ((p->type == common_types.f32) or (p->type == common_types.f64)) {
 			if (xmm_param_counter < max_xmm_params) {
 				xmm_param.add(p);
 				xmm_param_reg.add((Asm::RegID)((int)Asm::RegID::XMM0 + (xmm_param_counter ++)));
@@ -401,10 +401,10 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 	// xmm0-7
 	foreachib (Variable *p, xmm_param, i){
 		auto reg = xmm_param_reg[i];
-		if (p->type == TypeFloat64)
-			insert_cmd(Asm::InstID::MOVSD, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+		if (p->type == common_types.f64)
+			insert_cmd(Asm::InstID::MOVSD, param_local(p->type, p->_offset), param_preg(common_types.reg128, reg));
 		else
-			insert_cmd(Asm::InstID::MOVSS, param_local(p->type, p->_offset), param_preg(TypeReg128, reg));
+			insert_cmd(Asm::InstID::MOVSS, param_local(p->type, p->_offset), param_preg(common_types.reg128, reg));
 
 
 	}
@@ -420,7 +420,7 @@ void BackendAmd64::add_function_intro_params(Function *f) {
 			// some registers are not 8bit'able
 			int v = cmd.add_virtual_reg(get_reg(root, 4));
 			int va = cmd.add_virtual_reg(Asm::RegID::EAX);
-			insert_cmd(Asm::InstID::MOV, param_vreg(TypeReg32, va), param_vreg(TypeReg32, v));
+			insert_cmd(Asm::InstID::MOV, param_vreg(common_types.reg32, va), param_vreg(common_types.reg32, v));
 			insert_cmd(Asm::InstID::MOV, param_local(p->type, p->_offset), param_vreg(p->type, va, get_reg(Asm::RegRoot::A, p->type->size)));
 			cmd.set_virtual_reg(v, 0, cmd.next_cmd_index-2);
 			cmd.set_virtual_reg(va, cmd.next_cmd_index-2, cmd.next_cmd_index-1);

@@ -40,8 +40,4 @@ string Date::str() const {
 	return this->format("%c");
 }
 
-void Date::__assign__(const Date &d) {
-	*this = d;
-}
-
 

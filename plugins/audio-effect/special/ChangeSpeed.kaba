@@ -57,7 +57,7 @@ class ChangeSpeed extends AudioEffect
 		return nil
 	
 	func override read(out buf: AudioBuffer) -> int
-		for s in source.source
+		for mut s in source.source
 			let CHUNK_SIZE = 2048
 			var chunk: AudioBuffer
 			chunk.resize(CHUNK_SIZE)

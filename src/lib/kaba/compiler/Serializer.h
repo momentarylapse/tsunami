@@ -57,7 +57,8 @@ public:
 	void do_error_link(const string &msg);
 
 	void serialize_function(Function *f);
-	SerialNodeParam serialize_block(Block *block);
+	SerialNodeParam serialize_group(Node* node, Block* block);
+	SerialNodeParam serialize_block(Node* node);
 	SerialNodeParam serialize_node(Node *com, Block *block, int index);
 
 	void simplify_if_statements();
@@ -68,6 +69,8 @@ public:
 	void vr_list_out();
 
 
+	int _try_level = 0;
+	bool is_in_try() const;
 
 	int cur_block_level = 0;
 	struct SerialNodeParamWithLevel {

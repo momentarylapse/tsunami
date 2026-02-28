@@ -95,7 +95,7 @@ class Equalizer extends AudioEffect
 			f.apply(buf)
 		
 		# visualization
-		for g in grid
+		for mut g in grid
 			g.set_buffer(buf)
 
 	func override create_panel() -> xfer[ConfigPanel]

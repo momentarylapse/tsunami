@@ -66,13 +66,15 @@ public:
 // functions
 
 	using FunctionCreateF = std::function<Function*(SyntaxTree*, const Array<const Class*>&, int)>;
+	using ClassCreateF = std::function<Class*(SyntaxTree*, const Array<const Class*>&, int)>;
 	
 	void add_function_template(Function* f_template, const Array<string>& param_names, FunctionCreateF f_create = nullptr);
 	Function* request_function_instance(SyntaxTree *tree, Function *f0, const Array<const Class*> &params, int token_id);
 	Function* request_function_instance_matching(SyntaxTree *tree, Function *f0, const shared_array<Node> &params, int token_id);
 
 // classes
-	Class *add_class_template(SyntaxTree* tree, const string& name, const Array<string>& param_names, TemplateClassInstantiator* instantiator);
+	void add_class_template(Class* c_template, const Array<string>& param_names, ClassCreateF f_create = nullptr);
+	Class *create_class_template(SyntaxTree* tree, const string& name, const Array<string>& param_names, TemplateClassInstantiator* instantiator);
 	const Class *request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int token_id);
 	const Class *request_class_instance(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, int token_id);
 	Class *declare_new_class(SyntaxTree *tree, const Class *c0, const Array<const Class*> &params, int array_size, int token_id);

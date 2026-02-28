@@ -95,7 +95,7 @@ DynamicArray& Value::as_array() const {
 }
 
 int map_size_complex(void *p, const Class *type) {
-	if (type == TypeCString)
+	if (type == common_types.cstring)
 		return strlen((char*)p) + 1;
 	if (type->is_list()) {
 		int size = config.target.dynamic_array_size;
@@ -140,7 +140,7 @@ char *map_into_complex(char *memory, char *locked, long addr_off, char *p, const
 			memcpy(ar_target, ar->data, indirect_size);
 		}
 		return locked;
-	} else if (type == TypeCString) {
+	} else if (type == common_types.cstring) {
 		strcpy(memory, (char*)p);
 		return memory + strlen((char*)p) + 1; // NO RECURSION!!!
 	} else if (type->can_memcpy()) {

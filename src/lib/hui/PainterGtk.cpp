@@ -92,7 +92,7 @@ void Painter::set_color(const color &c) {
 	if (!cr)
 		return;
 	if (color_painter_linear) {
-		auto l = c.lin_to_srgb();
+		auto l = c.linear_to_srgb();
 		cairo_set_source_rgba(cr, l.r, l.g, l.b, l.a);
 	} else {
 		cairo_set_source_rgba(cr, c.r, c.g, c.b, c.a);

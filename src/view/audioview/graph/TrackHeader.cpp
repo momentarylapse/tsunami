@@ -153,7 +153,7 @@ color TrackHeader::color_bg(bool allow_hover) const {
 	color col = track_header_main_color(track, view);
 	if (!view->sel.has(track)) {
 		if ((track->type == SignalType::Group) or track->send_target)
-			col = color::interpolate(col, theme.background, 0.6f);
+			col = color::mix(col, theme.background, 0.6f);
 		else
 			col = theme.blob_bg_hidden;
 	}

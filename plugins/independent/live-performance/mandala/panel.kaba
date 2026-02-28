@@ -310,8 +310,9 @@ Grid grid ''
 					var old: Sample* = nil
 					for s in config.surface_samples[i]
 						old = &s.origin
-					let f = func(ss: Sample*)
-						for _s in ss
+					let f = func(_ss: Sample*)
+						var ss = _ss # FIXME mut workaround
+						for mut _s in ss
 							config.surface_samples[i] = _s.create_ref()
 						else
 							config.surface_samples[i] = nil
@@ -322,8 +323,9 @@ Grid grid ''
 					var old: Sample* = nil
 					for s in config.rim_samples[i]
 						old = &s.origin
-					let f = func(ss: Sample*)
-						for _s in ss
+					let f = func(_ss: Sample*)
+						var ss = _ss # FIXME mut workaround
+						for mut _s in ss
 							config.rim_samples[i] = _s.create_ref()
 						else
 							config.rim_samples[i] = nil

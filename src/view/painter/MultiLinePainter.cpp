@@ -287,7 +287,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 			if (!part->range.overlaps(r))
 				continue;
 			auto rr = part->range and r;
-			p->set_color(color::interpolate(hash_color(part->text.hash()), theme.background, 0.90f));
+			p->set_color(color::mix(hash_color(part->text.hash()), theme.background, 0.90f));
 			float x0, x1;
 			cam->range2screen(rr, x0, x1);
 			p->draw_rect(rect(x0,x1, y0, y1));

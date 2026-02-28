@@ -67,7 +67,6 @@ public:
 
 
 	// package
-	bool used_by_default;
 	Array<const Class*> classes();
 	Array<Variable*> variables();
 	Array<Constant*> constants();

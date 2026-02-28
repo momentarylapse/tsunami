@@ -27,7 +27,7 @@ void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
 		auto cmd_if = add_node_statement(StatementID::If);
 		cmd_if->set_param(0, add_not_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
 
-		auto b = new Block(f, f->block.get());
+		auto b = add_node_block(new Block(f, f->block), common_types._void);
 
 		auto cmd_ret = add_node_statement(StatementID::Return);
 		cmd_ret->set_num_params(1);
@@ -35,7 +35,7 @@ void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
 		b->add(cmd_ret);
 
 		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		f->block_node->add(cmd_if);
 	}
 
 	{
@@ -43,7 +43,7 @@ void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
 		auto cmd_ret = add_node_statement(StatementID::Return);
 		cmd_ret->set_num_params(1);
 		cmd_ret->set_param(0, node_true());
-		f->block->add(cmd_ret);
+		f->block_node->add(cmd_ret);
 	}
 }
 
@@ -60,7 +60,7 @@ void AutoImplementer::implement_product_not_equal(Function *f, const Class *t) {
 		auto cmd_if = add_node_statement(StatementID::If);
 		cmd_if->set_param(0, add_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
 
-		auto b = new Block(f, f->block.get());
+		auto b = add_node_block(new Block(f, f->block), common_types._void);
 
 		auto cmd_ret = add_node_statement(StatementID::Return);
 		cmd_ret->set_num_params(1);
@@ -68,7 +68,7 @@ void AutoImplementer::implement_product_not_equal(Function *f, const Class *t) {
 		b->add(cmd_ret);
 
 		cmd_if->set_param(1, b);
-		f->block->add(cmd_if);
+		f->block_node->add(cmd_if);
 	}
 
 	{
@@ -76,7 +76,7 @@ void AutoImplementer::implement_product_not_equal(Function *f, const Class *t) {
 		auto cmd_ret = add_node_statement(StatementID::Return);
 		cmd_ret->set_num_params(1);
 		cmd_ret->set_param(0, node_true());
-		f->block->add(cmd_ret);
+		f->block_node->add(cmd_ret);
 	}
 }
 
@@ -85,8 +85,8 @@ void AutoImplementer::_implement_functions_for_product(const Class *t) {
 		implement_regular_constructor(prepare_auto_impl(t, cf), t, true);
 	implement_regular_destructor(prepare_auto_impl(t, t->get_destructor()), t); // if exists...
 	implement_regular_assign(prepare_auto_impl(t, t->get_assign()), t); // if exists...
-	implement_product_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::Equal, TypeBool, {t})), t); // if exists...
-	implement_product_not_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::NotEqual, TypeBool, {t})), t); // if exists...
+	implement_product_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::Equal, common_types._bool, {t})), t); // if exists...
+	implement_product_not_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::NotEqual, common_types._bool, {t})), t); // if exists...
 }
 
 
@@ -121,7 +121,7 @@ static int product_class_alignment(const Array<const Class*> &classes) {
 }
 
 Class* TemplateClassInstantiatorProduct::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
-	return create_raw_class(tree, product_class_name(params), TypeProductT, product_class_size(params), product_class_alignment(params), 0, nullptr, params, token_id);
+	return create_raw_class(tree, product_class_name(params), common_types.product_t, product_class_size(params), product_class_alignment(params), 0, nullptr, params, token_id);
 }
 void TemplateClassInstantiatorProduct::add_function_headers(Class* t) {
 	int offset = 0;
@@ -133,11 +133,11 @@ void TemplateClassInstantiatorProduct::add_function_headers(Class* t) {
 
 	AutoImplementer ai(nullptr, t->owner);
 	if (t->needs_constructor())
-		add_func_header(t, Identifier::func::Init, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+		add_func_header(t, Identifier::func::Init, common_types._void, {}, {}, nullptr, Flags::Mutable);
 	if (class_can_fully_construct(t))
 		ai.add_full_constructor(t);
 	if (t->needs_destructor())
-		add_func_header(t, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+		add_func_header(t, Identifier::func::Delete, common_types._void, {}, {}, nullptr, Flags::Mutable);
 
 	bool allow_assign = true;
 	bool allow_equal = true;
@@ -149,13 +149,13 @@ void TemplateClassInstantiatorProduct::add_function_headers(Class* t) {
 	}
 
 	if (allow_assign) {
-		add_func_header(t, Identifier::func::Assign, TypeVoid, {t}, {"other"}, t->get_assign(), Flags::Mutable);
+		add_func_header(t, Identifier::func::Assign, common_types._void, {t}, {"other"}, t->get_assign(), Flags::Mutable);
 		if (t->can_memcpy())
 			t->get_assign()->inline_no = InlineID::ChunkAssign;
 	}
 	if (allow_equal) {
-		add_func_header(t, Identifier::func::Equal, TypeBool, {t}, {"other"}, nullptr, Flags::Pure);
-		add_func_header(t, Identifier::func::NotEqual, TypeBool, {t}, {"other"}, nullptr, Flags::Pure);
+		add_func_header(t, Identifier::func::Equal, common_types._bool, {t}, {"other"}, nullptr, Flags::Pure);
+		add_func_header(t, Identifier::func::NotEqual, common_types._bool, {t}, {"other"}, nullptr, Flags::Pure);
 	}
 }
 

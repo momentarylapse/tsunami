@@ -42,9 +42,31 @@ void TemplateManager::add_function_template(Function *f_template, const Array<st
 	function_templates.add(t);
 }
 
-Class *TemplateManager::add_class_template(SyntaxTree *tree, const string &name, const Array<string> &param_names, TemplateClassInstantiator* instantiator) {
+
+class TemplateClassInstantiatorWrapper : public TemplateClassInstantiator {
+public:
+	TemplateManager::ClassCreateF f_create;
+	TemplateClassInstantiatorWrapper(const TemplateManager::ClassCreateF& _f_create) {
+		f_create = _f_create;
+	}
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override {
+		return f_create(tree, params, array_size);
+	}
+	void add_function_headers(Class* c) override {
+	}
+};
+
+void TemplateManager::add_class_template(Class *c_template, const Array<string> &param_names, ClassCreateF f_create) {
 	if (config.verbose)
-		msg_write("ADD CLASS TEMPLATE " + name);
+		msg_write("ADD CLASS TEMPLATE");
+	auto instantiator = new TemplateClassInstantiatorWrapper(f_create);
+	auto m = new TemplateClassInstanceManager(c_template, param_names, instantiator);
+	class_managers.add(m);
+}
+
+Class *TemplateManager::create_class_template(SyntaxTree *tree, const string &name, const Array<string> &param_names, TemplateClassInstantiator* instantiator) {
+	if (config.verbose)
+		msg_write("CREATE CLASS TEMPLATE " + name);
 	//msg_write("add class template  " + c->long_name());
 	Class *c = new Class(nullptr, name, 0, 1, tree);
 	flags_set(c->flags, Flags::Template);
@@ -73,13 +95,14 @@ void show_node_details(shared<Node> n) {
 
 void show_func_details(Function *f) {
 	msg_write("DETAILS:    " + f->signature() + "  " + p2s(f));
-	show_node_details(f->block.get());
+	show_node_details(f->block_node.get());
 }
 
 Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 	//msg_error("FULL COPY");
 	auto f = f0->create_dummy_clone(f0->name_space);
-	f->block = cp_node(f0->block.get())->as_block();
+	f->block_node = cp_node(f0->block_node.get());
+	f->block = f->block_node->as_block();
 	flags_clear(f->flags, Flags::Unimplemented);
 
 	auto convert = [f] (shared<Node> n) {
@@ -95,8 +118,10 @@ Function *TemplateManager::full_copy(SyntaxTree *tree, Function *f0) {
 		return n;
 	};
 
-	//convert(f->block.get())->as_block();
-	tree->transform_node(f->block.get(), convert);
+	// only convert top level variables (function parameters)
+	// TODO this can be removed after function header realization in Concretifier
+	f->block_node = convert(f->block_node.get());
+	//tree->transform_node(f->block_node.get(), convert);
 
 	//show_func_details(f0);
 	//show_func_details(f);
@@ -186,13 +211,13 @@ Function *TemplateManager::request_function_instance_matching(SyntaxTree *tree, 
 			}
 	};
 
-	if (params.num != f0->abstract_param_types.num)
-		tree->do_error(format("not able to match all template parameters: %d parameters given, %d expected", params.num, f0->abstract_param_types.num), token_id);
+	if (params.num != f0->num_params)
+		tree->do_error(format("not able to match all template parameters: %d parameters given, %d expected", params.num, f0->num_params), token_id);
 
 	for (auto&& [i,p]: enumerate(weak(params))) {
-		if (p->type == TypeUnknown)
+		if (p->type == common_types.unknown)
 			tree->do_error(format("parameter #%d '%s' has undecided type when trying to match template arguments", i+1, f0->var[i]->name), token_id);
-		match_parameter_type(f0->abstract_param_types[i], p->type, set_match_type);
+		match_parameter_type(f0->abstract_param_type(i), p->type, set_match_type);
 	}
 
 	for (auto t: arg_types)
@@ -251,16 +276,14 @@ Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTempla
 		f->name += format("[%s]", type_list_to_str(params));
 
 		// replace in parameters/return type
-		for (int i=0; i<f->num_params; i++) {
-			f->abstract_param_types[i] = node_replace(tree, f->abstract_param_types[i], t.params, params);
-			//f->abstract_param_types[i]->show();
-		}
-		if (f->abstract_return_type)
-			f->abstract_return_type = node_replace(tree, f->abstract_return_type, t.params, params);
+		for (int i=0; i<f->num_params; i++)
+			f->abstract_node->params[2]->set_param(i*3+1, node_replace(tree, f->abstract_param_type(i), t.params, params));
+		if (auto rt = f->abstract_return_type())
+			f->abstract_node->params[1] = node_replace(tree, rt, t.params, params);
 
 		// replace in body
-		for (int i=0; i<f->block->params.num; i++)
-			f->block->params[i] = node_replace(tree, f->block->params[i], t.params, params);
+		for (int i=0; i<f->block_node->params.num; i++)
+			f->block_node->params[i] = node_replace(tree, f->block_node->params[i], t.params, params);
 	}
 
 	// concretify
@@ -273,7 +296,7 @@ Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTempla
 		tree->parser->con.concretify_function_body(f);
 
 		if (config.verbose)
-			f->block->show();
+			f->block_node->show();
 
 		auto __ns = const_cast<Class*>(f0->name_space);
 		__ns->add_function(tree, f, false, false);
@@ -287,30 +310,6 @@ Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTempla
 
 	return f;
 }
-
-
-extern const Class *TypeRawT;
-extern const Class *TypeReferenceT;
-extern const Class *TypeXferT;
-extern const Class *TypeAliasT;
-extern const Class *TypeSharedT;
-extern const Class *TypeSharedNotNullT;
-extern const Class *TypeOwnedT;
-extern const Class *TypeOwnedNotNullT;
-extern const Class *TypeArrayT;
-extern const Class *TypeListT;
-extern const Class *TypeDictT;
-extern const Class *TypeOptionalT;
-extern const Class *TypeProductT;
-extern const Class *TypeFutureT;
-extern const Class *TypePromiseT;
-extern const Class *TypeFutureCoreT;
-extern const Class *TypeCallableFPT;
-extern const Class *TypeCallableBindT;
-
-extern const Class *TypeDynamicArray;
-extern const Class *TypeDictBase;
-extern const Class *TypeCallableBase;
 
 
 TemplateClassInstantiator::TemplateClassInstantiator() = default;
@@ -383,14 +382,14 @@ Function* TemplateClassInstantiator::add_func_header(Class *t, const string &nam
 	f->auto_declared = true;
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
-		f->literal_param_type.add(p);
-		f->block->add_var(param_names[i], p, Flags::None);
-		f->num_params ++;
+		f->add_param(param_names[i], p, Flags::None);
 	}
-	f->default_parameters = def_params;
+	f->abstract_node->params[2]->params.resize(f->num_params * 3);
+	for (auto&& [i,p]: enumerate(def_params))
+		f->abstract_node->params[2]->set_param(i*3+2, p);
 	f->update_parameters_after_parsing();
 	if (config.verbose)
-		msg_write("ADD HEADER " + f->signature(TypeVoid));
+		msg_write("ADD HEADER " + f->signature(common_types._void));
 
 	bool override = cf;
 	t->add_function(t->owner, f, false, override);
@@ -399,63 +398,63 @@ Function* TemplateClassInstantiator::add_func_header(Class *t, const string &nam
 
 
 const Class *TemplateManager::request_pointer(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeRawT, {base}, token_id);
+	return request_class_instance(tree, common_types.raw_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_shared(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeSharedT, {base}, token_id);
+	return request_class_instance(tree, common_types.shared_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_shared_not_null(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeSharedNotNullT, {base}, token_id);
+	return request_class_instance(tree, common_types.shared_not_null_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_owned(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeOwnedT, {base}, token_id);
+	return request_class_instance(tree, common_types.owned_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_owned_not_null(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeOwnedNotNullT, {base}, token_id);
+	return request_class_instance(tree, common_types.owned_not_null_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_xfer(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeXferT, {base}, token_id);
+	return request_class_instance(tree, common_types.xfer_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_alias(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeAliasT, {base}, token_id);
+	return request_class_instance(tree, common_types.alias_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_reference(SyntaxTree *tree, const Class *base, int token_id) {
-	return request_class_instance(tree, TypeReferenceT, {base}, token_id);
+	return request_class_instance(tree, common_types.reference_t, {base}, token_id);
 }
 
 const Class *TemplateManager::request_list(SyntaxTree *tree, const Class *element_type, int token_id) {
-	return request_class_instance(tree, TypeListT, {element_type}, token_id);
+	return request_class_instance(tree, common_types.list_t, {element_type}, token_id);
 }
 
 const Class *TemplateManager::request_array(SyntaxTree *tree, const Class *element_type, int num_elements, int token_id) {
-	return request_class_instance(tree, TypeArrayT, {element_type}, num_elements, token_id);
+	return request_class_instance(tree, common_types.array_t, {element_type}, num_elements, token_id);
 }
 
 const Class *TemplateManager::request_dict(SyntaxTree *tree, const Class *element_type, int token_id) {
-	return request_class_instance(tree, TypeDictT, {element_type}, token_id);
+	return request_class_instance(tree, common_types.dict_t, {element_type}, token_id);
 }
 
 const Class *TemplateManager::request_optional(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_class_instance(tree, TypeOptionalT, {param}, token_id);
+	return request_class_instance(tree, common_types.optional_t, {param}, token_id);
 }
 
 const Class *TemplateManager::request_future(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_class_instance(tree, TypeFutureT, {param}, token_id);
+	return request_class_instance(tree, common_types.future_t, {param}, token_id);
 }
 
 const Class *TemplateManager::request_promise(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_class_instance(tree, TypePromiseT, {param}, token_id);
+	return request_class_instance(tree, common_types.promise_t, {param}, token_id);
 }
 
 const Class *TemplateManager::request_futurecore(SyntaxTree *tree, const Class *param, int token_id) {
-	return request_class_instance(tree, TypeFutureCoreT, {param}, token_id);
+	return request_class_instance(tree, common_types.future_core_t, {param}, token_id);
 }
 
 
@@ -472,7 +471,7 @@ string make_callable_signature(const Array<const Class*> &params, const Class *r
 		signature = "void";
 	if (params.num > 1)
 		signature = "(" + signature + ")";
-	if (params.num == 0 or (params.num == 1 and params[0] == TypeVoid)) {
+	if (params.num == 0 or (params.num == 1 and params[0] == common_types._void)) {
 		signature = "void";
 	}
 	return signature + "->" + class_name_might_need_parantheses(ret);
@@ -485,11 +484,11 @@ const Class *TemplateManager::request_callable_fp(SyntaxTree *tree, const Array<
 	string name = make_callable_signature(param, ret);
 
 	auto params_ret = param;
-	if ((param.num == 1) and (param[0] == TypeVoid))
+	if ((param.num == 1) and (param[0] == common_types._void))
 		params_ret = {};
 	params_ret.add(ret);
 
-	auto ff = request_class_instance(tree, TypeCallableFPT, params_ret, token_id);
+	auto ff = request_class_instance(tree, common_types.callable_fp_t, params_ret, token_id);
 
 	auto c = request_pointer(tree, ff, token_id);
 	const_cast<Class*>(c)->name = name;
@@ -516,11 +515,11 @@ const Class *TemplateManager::request_callable_bind(SyntaxTree *tree, const Arra
 	Array<const Class*> inner_params_ret = params;
 	inner_params_ret.add(ret);
 
-	return request_class_instance(tree, TypeCallableBindT, inner_params_ret, magic, token_id);
+	return request_class_instance(tree, common_types.callable_bind_t, inner_params_ret, magic, token_id);
 }
 
 const Class *TemplateManager::request_product(SyntaxTree *tree, const Array<const Class*> &classes, int token_id) {
-	return request_class_instance(tree, TypeProductT, classes, token_id);
+	return request_class_instance(tree, common_types.product_t, classes, token_id);
 }
 
 void TemplateManager::add_explicit_class_instance(SyntaxTree *tree, const Class* c_instance, const Class* c_template, const Array<const Class*> &params, int array_size) {

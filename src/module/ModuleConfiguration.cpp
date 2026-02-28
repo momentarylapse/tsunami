@@ -67,15 +67,15 @@ void generic_optional_delete(const kaba::Class *c, char *v) {
 }
 
 Any var_to_any(const kaba::Class *c, const char *v) {
-	if (c == kaba::TypeInt32) {
+	if (c == kaba::common_types.i32) {
 		return Any(*(const int*)v);
-	} else if (c == kaba::TypeInt8) {
+	} else if (c == kaba::common_types.i8) {
 		return Any((int)*(const char*)v);
-	} else if (c == kaba::TypeFloat32) {
+	} else if (c == kaba::common_types.f32) {
 		return Any(*(const float*)v);
-	} else if (c == kaba::TypeBool) {
+	} else if (c == kaba::common_types._bool) {
 		return Any(*(const bool*)v);
-	} else if (c == kaba::TypeString) {
+	} else if (c == kaba::common_types.string) {
 		return Any(*(const string*)v);
 	} else if (c->is_array()) {
 		Any r = Any::EmptyList;
@@ -107,7 +107,7 @@ Any var_to_any(const kaba::Class *c, const char *v) {
 		if (auto sr = *(SampleRef**)v)
 			return Any("sample:" + i2h(sr->origin->uid, 4));
 		return Any();
-	} else if (c->is_product() or c == kaba::TypeComplex or c == kaba::TypeVec2 or c == kaba::TypeVec3 or c == kaba::TypeQuaternion or c == kaba::TypeColor) {
+	} else if (c->is_product() or c == kaba::common_types.complex or c == kaba::common_types.vec2 or c == kaba::common_types.vec3 or c == kaba::common_types.quaternion or c == kaba::common_types.color) {
 		// rect ...nope
 		Any r = Any::EmptyList;
 		for (auto &e: c->elements)
@@ -148,15 +148,15 @@ string get_next(const string &var_temp, int &pos) {
 void var_from_string_legacy(const kaba::Class *type, char *v, const string &s, int &pos, Session *session) {
 	if (pos >= s.num)
 		return;
-	if (type == kaba::TypeInt32) {
+	if (type == kaba::common_types.i32) {
 		*(int*)v = get_next(s, pos)._int();
-	} else if (type == kaba::TypeInt8) {
+	} else if (type == kaba::common_types.i8) {
 		*(char*)v = get_next(s, pos)._int();
-	} else if (type == kaba::TypeFloat32) {
+	} else if (type == kaba::common_types.f32) {
 		*(float*)v = get_next(s, pos)._float();
-	} else if (type == kaba::TypeBool) {
+	} else if (type == kaba::common_types._bool) {
 		*(bool*)v = get_next(s, pos)._bool();
-	} else if (type == kaba::TypeString) {
+	} else if (type == kaba::common_types.string) {
 		*(string*)v = get_next(s, pos);
 	} else if (type->is_array()) {
 		auto tel = type->get_array_element();
@@ -210,19 +210,19 @@ int h2i(const string &h) {
 }
 
 void var_from_any(const kaba::Class *type, char *v, const Any &a, Session *session) {
-	if (type == kaba::TypeInt32) {
+	if (type == kaba::common_types.i32) {
 		*(int*)v = a.to_i32();
-	} else if (type == kaba::TypeInt64) {
+	} else if (type == kaba::common_types.i64) {
 		*(int64*)v = a.to_i64();
-	} else if (type == kaba::TypeInt8) {
+	} else if (type == kaba::common_types.i8) {
 		*(char*)v = (char)a.to_i32();
-	} else if (type == kaba::TypeFloat32) {
+	} else if (type == kaba::common_types.f32) {
 		*(float*)v = a.to_f32();
-	} else if (type == kaba::TypeFloat64) {
+	} else if (type == kaba::common_types.f64) {
 		*(double*)v = a.to_f64();
-	} else if (type == kaba::TypeBool) {
+	} else if (type == kaba::common_types._bool) {
 		*(bool*)v = a.to_bool();
-	} else if (type == kaba::TypeString) {
+	} else if (type == kaba::common_types.string) {
 		*(string*)v = a.str();
 	} else if (type->is_array()) {
 		if (!a.is_list())
@@ -349,7 +349,7 @@ string ModuleConfiguration::auto_conf(const string &name) const {
 	if (!ps)
 		return "";
 	for (auto c: weak(ps->base_class->constants)) {
-		if (c->type == kaba::TypeString)
+		if (c->type == kaba::common_types.string)
 			if (ac_name_match(c->name, name))
 				return c->as_string();
 	}

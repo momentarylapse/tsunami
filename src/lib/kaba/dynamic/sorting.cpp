@@ -8,12 +8,6 @@
 #include "../../os/msg.h"
 
 namespace kaba {
-	
-extern const Class *TypeInt32List;
-extern const Class *TypeFloat32List;
-extern const Class *TypeBoolList;
-extern const Class *TypeAny;
-extern const Class *TypePath;
 
 
 
@@ -171,41 +165,41 @@ DynamicArray _cdecl array_sort(DynamicArray &array, const Class *type, const str
 	if (sfunc) {
 		if (!el->is_some_pointer())
 			kaba_raise_exception(new KabaException("function sorting only for pointers"));
-		if (by_type == TypeString)
+		if (by_type == common_types.string)
 			_array_sort_pf<string>(rr, sfunc, stable);
-		else if (by_type == TypePath)
+		else if (by_type == common_types.path)
 			_array_sort_pf<Path>(rr, sfunc, stable);
-		else if (by_type == TypeInt32)
+		else if (by_type == common_types.i32)
 			_array_sort_pf<int>(rr, sfunc, stable);
-		else if (by_type == TypeFloat32)
+		else if (by_type == common_types.f32)
 			_array_sort_pf<float>(rr, sfunc, stable);
-		else if (by_type == TypeBool)
+		else if (by_type == common_types._bool)
 			_array_sort_pf<bool>(rr, sfunc, stable);
 		else
 			kaba_raise_exception(new KabaException("can't sort by function '" + by_type->long_name() + "' yet"));
 	} else if (el->is_some_pointer()) {
-		if (by_type == TypeString)
+		if (by_type == common_types.string)
 			_array_sort_p<string>(rr, offset, stable);
-		else if (by_type == TypePath)
+		else if (by_type == common_types.path)
 			_array_sort_p<Path>(rr, offset, stable);
-		else if (by_type == TypeInt32)
+		else if (by_type == common_types.i32)
 			_array_sort_p<int>(rr, offset, stable);
-		else if (by_type == TypeFloat32)
+		else if (by_type == common_types.f32)
 			_array_sort_p<float>(rr, offset, stable);
-		else if (by_type == TypeBool)
+		else if (by_type == common_types._bool)
 			_array_sort_p<bool>(rr, offset, stable);
 		else
 			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));
 	} else {
-		if (by_type == TypeString)
+		if (by_type == common_types.string)
 			_array_sort<string>(rr, offset, stable);
-		else if (by_type == TypePath)
+		else if (by_type == common_types.path)
 			_array_sort<Path>(rr, offset, stable);
-		else if (by_type == TypeInt32)
+		else if (by_type == common_types.i32)
 			_array_sort<int>(rr, offset, stable);
-		else if (by_type == TypeFloat32)
+		else if (by_type == common_types.f32)
 			_array_sort<float>(rr, offset, stable);
-		else if (by_type == TypeBool)
+		else if (by_type == common_types._bool)
 			_array_sort<bool>(rr, offset, stable);
 		else
 			kaba_raise_exception(new KabaException("can't sort by type '" + by_type->long_name() + "' yet"));

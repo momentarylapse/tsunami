@@ -290,7 +290,7 @@ bool res_load_line(const string &l, Resource &c, bool literally) {
 	// dummy
 	if (tokens[0] == ".")
 		return false;
-	if (tokens[0] == "Separator") {
+	if (tokens[0] == "Separator" and tokens.num == 1) {
 		c.type = tokens[0];
 		return true;
 	}

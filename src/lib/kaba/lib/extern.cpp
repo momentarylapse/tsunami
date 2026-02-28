@@ -18,6 +18,7 @@ namespace kaba {
 
 int get_virtual_index(void *func, const string &tname, const string &name);
 
+extern Context *_secret_lib_context_;
 
 ExternalLinkData::ExternalLinkData(Context *c) {
 	context = c;
@@ -30,17 +31,15 @@ void ExternalLinkData::reset() {
 	class_sizes.clear();
 }
 
-extern const Class *TypeStringAutoCast;
-
 static const string LIB_LINK_PREFIX = "/";
 
 string decode_symbol_name(const string &_name) {
 	string name = _name.replace("lib__", "");
-	return name.replace("@list", "[]").replace("@optional", "?").replace("@@", ".").replace(TypeStringAutoCast->name, "string");//.replace("@", "");
+	return name.replace("@list", "[]").replace("@optional", "?").replace("@@", ".").replace(common_types.string_auto_cast->name, "string");//.replace("@", "");
 }
 
 string class_link_name(const Class *c) {
-	if (c == TypeStringAutoCast)
+	if (c == common_types.string_auto_cast)
 		return "string";
 	if (c->owner->module->is_system_module())
 		return c->long_name();
@@ -71,9 +70,9 @@ Module *link_most_likely_internal_lib_module(Context *context, const string &nam
 	auto names = name.sub_ref(1).replace(":", ".").explode(".");
 
 	for (auto p: weak(context->internal_packages))
-		if (str(p->filename) == names[0])
-			return p;
-	return context->internal_packages[0].get(); // base
+		if (str(p->main_module->filename) == names[0])
+			return p->main_module.get();
+	return context->internal_packages[0]->main_module.get(); // base
 }
 
 // program variables - specific to the surrounding program, can't always be there...
@@ -164,12 +163,19 @@ int ExternalLinkData::process_class_num_virtuals(const string &class_name, int n
 }
 
 
-
-Exporter::Exporter(Context* _ctx, Module* _module) {
+Exporter::Exporter(Context* _ctx, Package* _package) {
 	ctx = _ctx;
-	module = _module;
+	package = _package;
+	secret_lib_context = _secret_lib_context_;
+	x_common_types = &common_types;
 }
 Exporter::~Exporter() = default;
+void Exporter::package_info(const string& name, const string& version) {
+	if (name != package->name)
+		msg_error(format("exporting symbols for wrong package: %s vs %s", name, package->name));
+	if (version != package->version)
+		msg_error(format("exporting symbols for wrong package version: %s vs %s (%s)", version, package->version, name));
+}
 void Exporter::declare_class_size(const string& name, int size) {
 	//msg_write("SIZE:  " + name);
 	ctx->external->declare_class_size(name, size);

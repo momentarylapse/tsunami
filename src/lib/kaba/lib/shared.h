@@ -10,11 +10,10 @@
 
 #include "../../base/pointer.h"
 #include "../kaba.h"
+#include "../syntax/Class.h"
 #include "lib.h"
 
 namespace kaba {
-
-extern const Class* TypeNone;
 
 template<class T>
 class XShared : public shared<T> {
@@ -37,7 +36,7 @@ inline void lib_create_pointer_xfer(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
 
 	add_class(t);
-		add_operator(OperatorID::Assign, TypeVoid, t, t, InlineID::PointerAssign);
+		add_operator(OperatorID::Assign, common_types._void, t, t, InlineID::PointerAssign);
 }
 
 template<class T>
@@ -45,14 +44,14 @@ void lib_create_pointer_shared(const Class *tt, const Class *t_xfer) {
 	auto t = const_cast<Class*>(tt);
 
 	add_class(t);
-		class_add_func(Identifier::func::Init, TypeVoid, &XShared<T>::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &XShared<T>::clear, Flags::Mutable);
-		class_add_func(Identifier::func::SharedClear, TypeVoid, &XShared<T>::clear, Flags::Mutable);
-		class_add_func(Identifier::func::Assign, TypeVoid, &XShared<T>::__assign_raw__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &XShared<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &XShared<T>::clear, Flags::Mutable);
+		class_add_func(Identifier::func::SharedClear, common_types._void, &XShared<T>::clear, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &XShared<T>::__assign_raw__, Flags::Mutable);
 			func_add_param("other", t_xfer);
-		class_add_func(Identifier::func::Assign, TypeVoid, &XShared<T>::__assign_raw__, Flags::Mutable);
-			func_add_param("other", TypeNone);
-		class_add_func(Identifier::func::Assign, TypeVoid, &XShared<T>::__assign__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &XShared<T>::__assign_raw__, Flags::Mutable);
+			func_add_param("other", common_types.none);
+		class_add_func(Identifier::func::Assign, common_types._void, &XShared<T>::__assign__, Flags::Mutable);
 			func_add_param("other", t);
 		class_add_func(Identifier::func::SharedCreate, t, &XShared<T>::create, Flags::Static);
 			func_add_param("p", t_xfer);

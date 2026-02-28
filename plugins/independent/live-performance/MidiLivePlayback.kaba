@@ -23,7 +23,7 @@ class MLPPanel extends ConfigPanel
 		
 			synth_panel = c.synth.create_panel()
 			embed(synth_panel, "grid", 0, 1)
-			for p in synth_panel
+			for mut p in synth_panel
 				p.update()
 		
 		ChooseModule(self, session, Module.Type.SYNTHESIZER, c.synth.name).then(f)

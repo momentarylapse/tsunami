@@ -115,7 +115,7 @@ void PeakMeterDisplay::unconnect() {
 
 color peak_color(float peak, float a = 1) {
 	if (peak <= 1.001f)
-		return color::hsb((1 - pow(peak, 3) * 0.7f) * 0.33f, 0.8f, 0.8f, a);
+		return color::from_hsb((1 - (float)pow(peak, 3) * 0.7f) * 0.33f, 0.8f, 0.8f, a);
 	/*if (peak < 0.5f)
 		return color(1, 0, 0.8f, 0);
 	if (peak < 0.9f)

@@ -26,7 +26,7 @@ void Interpreter::do_error(const string &s) {
 }
 
 void Interpreter::add_function(Function *f, Serializer *ser) {
-	//msg_write("INT: add func " + f->signature(TypeVoid));
+	//msg_write("INT: add func " + f->signature(common_types._void));
 	IFunction ff;
 	ff.f = f;
 	//ff.cmd = new CommandList;
@@ -44,7 +44,7 @@ void Interpreter::run(const string &name) {
 }
 
 void Interpreter::run_function(Function *f, Serializer *ser) {
-	msg_write("RUN..." + f->signature(TypeVoid));
+	msg_write("RUN..." + f->signature(common_types._void));
 	Frame frame;
 	frame.stack.resize(f->_var_size + 64);
 	frame.offset = f->_var_size;
@@ -108,43 +108,43 @@ int Interpreter::run_command(int index, SerialNode &n, Serializer *ser, Frame &f
 		else
 			do_error("movzx...");
 	} else if (n.inst == Asm::InstID::ADD) {
-		if (n.p[0].type == TypeInt32)
+		if (n.p[0].type == common_types.i32)
 			*(int*)get_param(0) = *(int*)get_param(1) + *(int*)get_param(2);
-		else if (n.p[0].type == TypeInt64)
+		else if (n.p[0].type == common_types.i64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) + *(int64*)get_param(2);
-		else if (n.p[0].type == TypeInt8)
+		else if (n.p[0].type == common_types.i8)
 			*(char*)get_param(0) = *(char*)get_param(1) + *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::SUB) {
-		if (n.p[0].type == TypeInt32)
+		if (n.p[0].type == common_types.i32)
 			*(int*)get_param(0) = *(int*)get_param(1) - *(int*)get_param(2);
-		else if (n.p[0].type == TypeInt64)
+		else if (n.p[0].type == common_types.i64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) - *(int64*)get_param(2);
-		else if (n.p[0].type == TypeInt8)
+		else if (n.p[0].type == common_types.i8)
 			*(char*)get_param(0) = *(char*)get_param(1) - *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::IMUL) {
-		if (n.p[0].type == TypeInt32)
+		if (n.p[0].type == common_types.i32)
 			*(int*)get_param(0) = *(int*)get_param(1) * *(int*)get_param(2);
-		else if (n.p[0].type == TypeInt64)
+		else if (n.p[0].type == common_types.i64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) * *(int64*)get_param(2);
-		else if (n.p[0].type == TypeInt8)
+		else if (n.p[0].type == common_types.i8)
 			*(char*)get_param(0) = *(char*)get_param(1) * *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::IDIV) {
-		if (n.p[0].type == TypeInt32)
+		if (n.p[0].type == common_types.i32)
 			*(int*)get_param(0) = *(int*)get_param(1) / *(int*)get_param(2);
-		else if (n.p[0].type == TypeInt64)
+		else if (n.p[0].type == common_types.i64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) / *(int64*)get_param(2);
-		else if (n.p[0].type == TypeInt8)
+		else if (n.p[0].type == common_types.i8)
 			*(char*)get_param(0) = *(char*)get_param(1) / *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::MODULO) {
-		if (n.p[0].type == TypeInt32)
+		if (n.p[0].type == common_types.i32)
 			*(int*)get_param(0) = *(int*)get_param(1) % *(int*)get_param(2);
-		else if (n.p[0].type == TypeInt64)
+		else if (n.p[0].type == common_types.i64)
 			*(int64*)get_param(0) = *(int64*)get_param(1) % *(int64*)get_param(2);
-		else if (n.p[0].type == TypeInt8)
+		else if (n.p[0].type == common_types.i8)
 			*(char*)get_param(0) = *(char*)get_param(1) % *(char*)get_param(2);
 	} else if (n.inst == Asm::InstID::CALL) {
 		auto *f = ((Function*)n.p[1].p);
-		//msg_write("CALL " + f->signature(TypeVoid));
+		//msg_write("CALL " + f->signature(common_types._void));
 		if (f->address != 0) {
 			//msg_write("addr...");
 			//char rrr[64];

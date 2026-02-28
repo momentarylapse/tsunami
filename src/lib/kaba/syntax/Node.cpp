@@ -65,6 +65,8 @@ string kind2str(NodeKind kind) {
 		return "var";
 	if (kind == NodeKind::Block)
 		return "block";
+	if (kind == NodeKind::Group)
+		return "group";
 	if (kind == NodeKind::AddressShift)
 		return "address shift";
 	if (kind == NodeKind::Array)
@@ -99,6 +101,12 @@ string kind2str(NodeKind kind) {
 		return "constructor function";
 	if (kind == NodeKind::Slice)
 		return "slice";
+	if (kind == NodeKind::AbstractRoot)
+		return "root";
+	if (kind == NodeKind::AbstractFunction)
+		return "function def";
+	if (kind == NodeKind::AbstractClass)
+		return "class def";
 	if (kind == NodeKind::VarTemp)
 		return "temp";
 	if (kind == NodeKind::DereferenceVarTemp)
@@ -169,7 +177,7 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::AbstractOperator)
 		return as_abstract_op()->name;
 	if (kind == NodeKind::Block)
-		return (type == TypeVoid) ? "" : t; //p2s(as_block());
+		return (type == common_types._void) ? "" : t; //p2s(as_block());
 	if (kind == NodeKind::AddressShift)
 		return ::str(link_no) + t;
 	if (kind == NodeKind::Array)
@@ -236,8 +244,8 @@ Node::Node(NodeKind _kind, int64 _link_no, const Class *_type, Flags _flags, int
 }
 
 Node::~Node() {
-	if (kind == NodeKind::Block)
-		as_block()->vars.clear();
+	//if (kind == NodeKind::Block)
+	//	as_block()->vars.clear();
 }
 
 bool Node::is_mutable() const {
@@ -260,7 +268,7 @@ bool Node::is_function() const {
 }
 
 Block *Node::as_block() const {
-	return (Block*)this;
+	return (Block*)link_no;
 }
 
 Function *Node::as_func() const {
@@ -359,6 +367,10 @@ void Node::set_param(int index, shared<Node> p) {
 #endif
 }
 
+void Node::add(shared<Node> p) {
+	params.add(p);
+}
+
 shared<Node> Node::shallow_copy() const {
 	auto r = new Node(kind, link_no, type, flags, token_id);
 	r->params = params;
@@ -411,10 +423,10 @@ shared<Node> Node::change_type(const Class *type, int token_id) const {
 // recursive
 shared<Node> cp_node(shared<Node> c, Block *parent_block) {
 	shared<Node> cmd;
-	if (c->kind == NodeKind::Block) {
+	if (c->kind == NodeKind::Block and c->as_block()) {
 		if (!parent_block)
 			parent_block = c->as_block()->parent;
-		cmd = new Block(c->as_block()->function, parent_block, c->type);
+		cmd = add_node_block(new Block(c->as_block()->function, parent_block), c->type);
 		cmd->as_block()->vars = c->as_block()->vars;
 		parent_block = cmd->as_block();
 	} else {
@@ -442,9 +454,9 @@ shared<Node> add_node_const(const Constant *c, int token_id) {
 	return new Node(NodeKind::Constant, (int_p)c, c->type.get(), Flags::None, token_id);
 }
 
-/*shared<Node> add_node_block(Block *b) {
-	return new Node(NodeKind::BLOCK, (int_p)b, TypeVoid);
-}*/
+shared<Node> add_node_block(Block* b, const Class* type, int token_id) {
+	return new Node(NodeKind::Block, (int_p)b, type, Flags::None, token_id);
+}
 
 shared<Node> add_node_statement(StatementID id, int token_id, const Class *type) {
 	auto *s = statement_from_id(id);
@@ -490,11 +502,11 @@ shared<Node> add_node_call(const Function *f, int token_id) {
 }
 
 shared<Node> add_node_func_name(const Function *f, int token_id) {
-	return new Node(NodeKind::Function, (int_p)f, TypeUnknown, Flags::None, token_id);
+	return new Node(NodeKind::Function, (int_p)f, common_types.unknown, Flags::None, token_id);
 }
 
 shared<Node> add_node_class(const Class *c, int token_id) {
-	return new Node(NodeKind::Class, (int_p)c, TypeClassRef, Flags::None, token_id);
+	return new Node(NodeKind::Class, (int_p)c, common_types.class_ref, Flags::None, token_id);
 }
 
 
@@ -553,7 +565,7 @@ shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class 
 }
 
 shared<Node> add_node_slice(shared<Node> start, shared<Node> end) {
-	auto n = new Node(NodeKind::Slice, 0, TypeUnknown);
+	auto n = new Node(NodeKind::Slice, 0, common_types.unknown);
 	n->set_num_params(2);
 	n->set_param(0, start);
 	n->set_param(1, end);
@@ -580,7 +592,7 @@ shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, share
 	return n;
 }
 shared<Node> add_node_token(SyntaxTree* tree, int token_id) {
-	return new Node(NodeKind::AbstractToken, (int_p)tree, TypeUnknown, Flags::None, token_id);
+	return new Node(NodeKind::AbstractToken, (int_p)tree, common_types.unknown, Flags::None, token_id);
 }
 
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {

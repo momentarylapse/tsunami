@@ -9,6 +9,7 @@
 struct vec3;
 struct vec2;
 struct mat4;
+struct mat3;
 struct color;
 
 template <typename T>
@@ -35,3 +36,6 @@ Any vec3_to_any(const vec3& v);
 vec2 any_to_vec2(const Any& a);
 Any vec2_to_any(const vec2& v);
 Any mat4_to_any(const mat4& m);
+mat4 any_to_mat4(const Any& a);
+Any mat3_to_any(const mat3& m);
+mat3 any_to_mat3(const Any& a);

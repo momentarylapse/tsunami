@@ -83,12 +83,12 @@ void TemperamentDialog::on_draw(Painter *p) {
 
 	if (hover >= 0) {
 		if (all_octaves) {
-			color c = color::interpolate(theme.background, theme.capture_marker, 0.1f);
+			color c = color::mix(theme.background, theme.capture_marker, 0.1f);
 			p->set_color(c);
 			for (int i=(hover%12); i<MaxPitch; i+=12)
 				p->draw_rect(rect(pitch2x(i), pitch2x(i+1), 0, h));
 		}
-		color c = color::interpolate(theme.background, theme.capture_marker, 0.2f);
+		color c = color::mix(theme.background, theme.capture_marker, 0.2f);
 		p->set_color(c);
 		p->draw_rect(rect(pitch2x(hover), pitch2x(hover+1), 0, h));
 	}

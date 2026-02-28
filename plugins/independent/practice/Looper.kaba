@@ -74,7 +74,7 @@ class Looper extends TsunamiPlugin
 	
 	func mut on_update()
 		# TODO notifications instead
-		for p in panel
+		for mut p in panel
 			p._update()
 	func mut tab()
 		if mode == 0

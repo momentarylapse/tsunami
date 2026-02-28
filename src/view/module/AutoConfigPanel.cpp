@@ -553,7 +553,7 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 		auto cc = config->auto_conf(e.name);
 		if (cc == "ignore")
 			continue;
-		if (e.type == kaba::TypeFloat32) {
+		if (e.type == kaba::common_types.f32) {
 			if (e.name == "pitch" or (cc.find("pitch") >= 0)) {
 				auto *a = new AutoConfigDataPitch(e.name);
 				a->value = (float*)((char*)config + e.offset);
@@ -567,7 +567,7 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 				a->value = (float*)((char*)config + e.offset);
 				r.add(a);
 			}
-		} else if (e.type == kaba::TypeInt32) {
+		} else if (e.type == kaba::common_types.i32) {
 			if (cc == "sample-format") {
 				auto *a = new AutoConfigDataSampleFormat(e.name);
 				a->value = (int*)((char*)config + e.offset);
@@ -577,11 +577,11 @@ Array<AutoConfigData*> get_auto_conf(ModuleConfiguration *config, Session *sessi
 				a->value = (int*)((char*)config + e.offset);
 				r.add(a);
 			}
-		} else if (e.type == kaba::TypeBool) {
+		} else if (e.type == kaba::common_types._bool) {
 			auto *a = new AutoConfigDataBool(e.name);
 			a->value = (bool*)((char*)config + e.offset);
 			r.add(a);
-		} else if (e.type == kaba::TypeString) {
+		} else if (e.type == kaba::common_types.string) {
 			if (cc.find("choices=") >= 0) {
 				auto *a = new AutoConfigDataStringChoices(e.name);
 				a->value = (string*)((char*)config + e.offset);

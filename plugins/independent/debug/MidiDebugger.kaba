@@ -27,7 +27,7 @@ class MidiDebuggerPanel extends ConfigPanel
 		
 		source_panel = c.source.create_panel()
 		embed(source_panel, "grid", 0, 0)
-		for p in source_panel
+		for mut p in source_panel
 			p.update()
 		
 		runner_id = hui.run_repeated(0.2, on_tick)

@@ -425,7 +425,7 @@ uniform float iVolume;
 		gl.clear_color(Color.RED)
 		gl.set_cull(gl.CullMode.NONE)
 		gl.set_z(false, false)
-		for s in shader
+		for mut s in shader
 			gl.set_shader(&s)
 			s.set_float("iTime", _time)
 			s.set_float("iVolume", volume)

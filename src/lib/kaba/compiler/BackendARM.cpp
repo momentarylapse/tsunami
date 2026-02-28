@@ -21,8 +21,8 @@ namespace Asm{
 
 namespace kaba {
 
-#define reg_s0 param_preg(TypeFloat32, Asm::RegID::S0)
-#define reg_s1 param_preg(TypeFloat32, Asm::RegID::S1)
+#define reg_s0 param_preg(common_types.f32, Asm::RegID::S0)
+#define reg_s1 param_preg(common_types.f32, Asm::RegID::S1)
 #define VREG_ROOT(r) cmd.virtual_reg[r].reg_root
 
 //bool is_typed_function_pointer(const Class *c);
@@ -65,9 +65,9 @@ void BackendARM::implement_mov_chunk(kaba::SerialNode &c, int i, int size) {
 	//msg_error("CORRECT MOV " + p1.type->name);
 
 	for (int j=0; j<size/4; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 4, TypeInt32), param_shift(p2, j * 4, TypeInt32));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, j * 4, common_types.i32), param_shift(p2, j * 4, common_types.i32));
 	for (int j=4*(size/4); j<size; j++)
-		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, TypeInt8), param_shift(p2, j, TypeInt8));
+		insert_cmd(Asm::InstID::MOV, param_shift(p1, j, common_types.i8), param_shift(p2, j, common_types.i8));
 }
 
 static int first_bit(int i) {
@@ -84,9 +84,9 @@ void BackendARM::_immediate_to_register_32(int val, int r) {
 		int b0 = first_bit(val) & 0xfe; // only even bit positions allowed!
 		int mask = 0xff << b0;
 		if (first)
-			insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt32, r), param_imm(TypeInt32, val&mask));
+			insert_cmd(Asm::InstID::MOV, param_vreg(common_types.i32, r), param_imm(common_types.i32, val&mask));
 		else
-			insert_cmd(Asm::InstID::ADD, param_vreg(TypeInt32, r), param_vreg(TypeInt32, r), param_imm(TypeInt32, val&mask));
+			insert_cmd(Asm::InstID::ADD, param_vreg(common_types.i32, r), param_vreg(common_types.i32, r), param_imm(common_types.i32, val&mask));
 		val -= (val & mask);
 		if (val == 0)
 			break;
@@ -95,47 +95,47 @@ void BackendARM::_immediate_to_register_32(int val, int r) {
 }
 
 void BackendARM::_immediate_to_register_8(int val, int r) {
-	insert_cmd(Asm::InstID::MOV, param_vreg(TypeInt32, r), param_imm(TypeInt32, val & 0xff));
+	insert_cmd(Asm::InstID::MOV, param_vreg(common_types.i32, r), param_imm(common_types.i32, val & 0xff));
 }
 
 void BackendARM::_register_to_local_32(int r, int offset) {
-	insert_cmd(Asm::InstID::STR, param_vreg(TypeInt32, r), param_local(TypeInt32, offset));
+	insert_cmd(Asm::InstID::STR, param_vreg(common_types.i32, r), param_local(common_types.i32, offset));
 }
 
 void BackendARM::_register_to_local_8(int r, int offset) {
-	insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, r), param_local(TypeInt8, offset));
+	insert_cmd(Asm::InstID::STRB, param_vreg(common_types.i8, r), param_local(common_types.i8, offset));
 }
 
 void BackendARM::_register_to_global_32(int r, int64 addr) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::STR, param_vreg(TypeInt32, r), param_deref_vreg(TypeInt32, reg));
+	insert_cmd(Asm::InstID::STR, param_vreg(common_types.i32, r), param_deref_vreg(common_types.i32, reg));
 }
 
 void BackendARM::_register_to_global_8(int r, int64 addr) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, r), param_deref_vreg(TypeInt8, reg));
+	insert_cmd(Asm::InstID::STRB, param_vreg(common_types.i8, r), param_deref_vreg(common_types.i8, reg));
 }
 
 void BackendARM::_local_to_register_32(int offset, int r) {
-	insert_cmd(Asm::InstID::LDR, param_vreg(TypeInt32, r), param_local(TypeInt32, offset));
+	insert_cmd(Asm::InstID::LDR, param_vreg(common_types.i32, r), param_local(common_types.i32, offset));
 }
 
 void BackendARM::_local_to_register_8(int offset, int r) {
-	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeInt8, r), param_local(TypeInt8, offset));
+	insert_cmd(Asm::InstID::LDRB, param_vreg(common_types.i8, r), param_local(common_types.i8, offset));
 }
 
 void BackendARM::_global_to_register_32(int64 addr, int r) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::LDR, param_vreg(TypeInt32, r), param_deref_vreg(TypeInt32, reg));
+	insert_cmd(Asm::InstID::LDR, param_vreg(common_types.i32, r), param_deref_vreg(common_types.i32, reg));
 }
 
 void BackendARM::_global_to_register_8(int64 addr, int r) {
 	int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(r));
 	_immediate_to_register_32(addr, reg);
-	insert_cmd(Asm::InstID::LDRB, param_vreg(TypeInt8, r), param_deref_vreg(TypeInt8, reg));
+	insert_cmd(Asm::InstID::LDRB, param_vreg(common_types.i8, r), param_deref_vreg(common_types.i8, reg));
 }
 
 int BackendARM::_to_register_32(const SerialNodeParam &p, int offset, int force_register) {
@@ -160,7 +160,7 @@ int BackendARM::_to_register_32(const SerialNodeParam &p, int offset, int force_
 	} else if (p.kind == NodeKind::DerefereceLocalMemory) {
 		int reg2 = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(reg));
 		_local_to_register_32(p.p + offset, reg2);
-		insert_cmd(Asm::InstID::LDR, param_vreg(TypeInt32, reg), param_deref_vreg(TypeInt32, reg2));
+		insert_cmd(Asm::InstID::LDR, param_vreg(common_types.i32, reg), param_deref_vreg(common_types.i32, reg2));
 	} else if (p.kind == NodeKind::LocalMemory) {
 		_local_to_register_32(p.p + offset, reg);
 	} else if (p.kind == NodeKind::GlobalLookup) {
@@ -195,7 +195,7 @@ void BackendARM::_from_register_32(int reg, const SerialNodeParam &p, int offset
 		// reg2 = mem
 		_local_to_register_32(p.p, reg2);
 		// [reg2] = reg
-		insert_cmd(Asm::InstID::STR, param_vreg(TypeInt32, reg), param_deref_vreg(TypeInt32, reg2));
+		insert_cmd(Asm::InstID::STR, param_vreg(common_types.i32, reg), param_deref_vreg(common_types.i32, reg2));
 	} else {
 		do_error("evil write target..." + kind2str(p.kind));
 	}
@@ -225,7 +225,7 @@ int BackendARM::_to_register_8(const SerialNodeParam &p, int offset, int force_r
 	} else if (p.kind == NodeKind::DerefereceLocalMemory) {
 		int reg2 = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4, VREG_ROOT(reg));
 		_local_to_register_32(p.p + offset, reg2);
-		insert_cmd(Asm::InstID::LDR, param_vreg(TypeInt8, reg), param_deref_vreg(TypeInt8, reg2));
+		insert_cmd(Asm::InstID::LDR, param_vreg(common_types.i8, reg), param_deref_vreg(common_types.i8, reg2));
 	} else if (p.kind == NodeKind::LocalMemory) {
 		_local_to_register_8(p.p + offset, reg);
 	/*} else if (p.kind == NodeKind::GLOBAL_LOOKUP) {
@@ -261,7 +261,7 @@ void BackendARM::_from_register_8(int reg, const SerialNodeParam &p, int offset)
 		// reg2 = mem
 		_local_to_register_32(p.p, reg2);
 		// [reg2] = reg
-		insert_cmd(Asm::InstID::STRB, param_vreg(TypeInt8, reg), param_deref_vreg(TypeInt8, reg2));
+		insert_cmd(Asm::InstID::STRB, param_vreg(common_types.i8, reg), param_deref_vreg(common_types.i8, reg2));
 	} else {
 		do_error("evil write target..." + kind2str(p.kind));
 	}
@@ -273,19 +273,19 @@ int BackendARM::_to_register_float(const SerialNodeParam &p, int offset, int for
 		do_error("explicit register needed for float");
 	int sreg = force_register;//cmd.add_virtual_reg(Asm::RegID::S1);
 	int reg = _to_register_32(p, offset);
-	insert_cmd(Asm::InstID::FMSR, param_vreg(TypeFloat32, sreg), param_vreg(TypeFloat32, reg));
+	insert_cmd(Asm::InstID::FMSR, param_vreg(common_types.f32, sreg), param_vreg(common_types.f32, reg));
 	return sreg;
 }
 
 void BackendARM::_from_register_float(int sreg, const SerialNodeParam &p, int offset) {
 	if (p.kind == NodeKind::VarLocal) {
 		auto var = (Variable*)p.p;
-		insert_cmd(Asm::InstID::FSTS, param_local(TypeFloat32, var->_offset + offset), param_vreg(TypeFloat32, sreg));
+		insert_cmd(Asm::InstID::FSTS, param_local(common_types.f32, var->_offset + offset), param_vreg(common_types.f32, sreg));
 	} else if (p.kind == NodeKind::LocalMemory) {
-		insert_cmd(Asm::InstID::FSTS, param_local(TypeFloat32, p.p + offset), param_vreg(TypeFloat32, sreg));
+		insert_cmd(Asm::InstID::FSTS, param_local(common_types.f32, p.p + offset), param_vreg(common_types.f32, sreg));
 	} else {
 		int reg = find_unused_reg(cmd.next_cmd_index, cmd.next_cmd_index, 4);
-		insert_cmd(Asm::InstID::FMRS, param_vreg(TypeFloat32, reg), param_vreg(TypeFloat32, sreg));
+		insert_cmd(Asm::InstID::FMRS, param_vreg(common_types.f32, reg), param_vreg(common_types.f32, sreg));
 		_from_register_32(reg, p, offset);
 	}
 }
@@ -348,7 +348,7 @@ void BackendARM::correct_implement_commands() {
 				//cmd.set_virtual_reg(reg1, i, cmd.next_cmd_index);
 				_to_register_32(p2, 0, reg2);
 			}
-			insert_cmd(inst, param_vreg(TypeInt32, reg1), param_vreg(TypeInt32, reg1), param_vreg(TypeInt32, reg2));
+			insert_cmd(inst, param_vreg(common_types.i32, reg1), param_vreg(common_types.i32, reg1), param_vreg(common_types.i32, reg2));
 			_from_register_32(reg1, p0, 0);
 
 			i = cmd.next_cmd_index - 1;
@@ -380,7 +380,7 @@ void BackendARM::correct_implement_commands() {
 				_to_register_float(p2, 0, sreg2);
 			}
 
-			insert_cmd(inst, param_vreg(TypeInt32, sreg1), param_vreg(TypeInt32, sreg1), param_vreg(TypeInt32, sreg2));
+			insert_cmd(inst, param_vreg(common_types.i32, sreg1), param_vreg(common_types.i32, sreg1), param_vreg(common_types.i32, sreg2));
 
 			_from_register_float(sreg1, p0, 0);
 
@@ -410,8 +410,8 @@ void BackendARM::correct_implement_commands() {
 			auto inst = c.inst;
 			cmd.remove_cmd(i);
 			int reg = cmd.add_virtual_reg(Asm::RegID::R0);
-			insert_cmd(Asm::InstID::MOV, param_vreg(p0.type, reg), param_imm(TypeBool, 1), p_none);
-			insert_cmd(Asm::InstID::MOV, param_vreg(p0.type, reg), param_imm(TypeBool, 0), p_none);
+			insert_cmd(Asm::InstID::MOV, param_vreg(p0.type, reg), param_imm(common_types._bool, 1), p_none);
+			insert_cmd(Asm::InstID::MOV, param_vreg(p0.type, reg), param_imm(common_types._bool, 0), p_none);
 			if (inst == Asm::InstID::SETZ) { // ==
 				cmd.cmd[cmd.next_cmd_index - 2].cond = Asm::ArmCond::Equal;
 				cmd.cmd[cmd.next_cmd_index - 1].cond = Asm::ArmCond::NotEqual;
@@ -467,7 +467,7 @@ void BackendARM::correct_implement_commands() {
 			i --;
 		} else if (c.inst == Asm::InstID::CALL) {
 
-			if (c.p[1].type == TypeFunctionCodeRef) {
+			if (c.p[1].type == common_types.function_code_ref) {
 				//do_error("indirect call...");
 				auto fp = c.p[1];
 				auto ret = c.p[0];
@@ -491,10 +491,10 @@ void BackendARM::correct_implement_commands() {
 			cmd.next_cmd_target(i);
 			if (stack_max_size > 0) {
 				cmd.next_cmd_target(i ++);
-				insert_cmd(Asm::InstID::ADD, param_preg(TypePointer, Asm::RegID::R13), param_preg(TypePointer, Asm::RegID::R13), param_imm(TypeInt32, stack_max_size));
+				insert_cmd(Asm::InstID::ADD, param_preg(common_types.pointer, Asm::RegID::R13), param_preg(common_types.pointer, Asm::RegID::R13), param_imm(common_types.i32, stack_max_size));
 			}
 			cmd.next_cmd_target(i);
-			insert_cmd(Asm::InstID::LDMIA, param_preg(TypePointer, Asm::RegID::R13), param_imm(TypeInt32, 0xaff0)); // {r4,r5,r6,r7,r8,r9,r10,r11,r13,r15}
+			insert_cmd(Asm::InstID::LDMIA, param_preg(common_types.pointer, Asm::RegID::R13), param_imm(common_types.i32, 0xaff0)); // {r4,r5,r6,r7,r8,r9,r10,r11,r13,r15}
 		} else {
 			do_error("unhandled:  " + c.str(serializer));
 		}
@@ -511,10 +511,10 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 		// TODO: simplify for offset=0
 		auto var = (Variable*)p.p;
 		_immediate_to_register_32(var->_offset, reg);
-		insert_cmd(Asm::InstID::ADD, param_vreg(TypeInt32, reg), param_vreg(TypeInt32, reg), param_preg(TypeInt32, Asm::RegID::R13));
+		insert_cmd(Asm::InstID::ADD, param_vreg(common_types.i32, reg), param_vreg(common_types.i32, reg), param_preg(common_types.i32, Asm::RegID::R13));
 	} else if (p.kind == NodeKind::LocalMemory) {
 		_immediate_to_register_32(p.p, reg);
-		insert_cmd(Asm::InstID::ADD, param_vreg(TypeInt32, reg), param_vreg(TypeInt32, reg), param_preg(TypeInt32, Asm::RegID::R13));
+		insert_cmd(Asm::InstID::ADD, param_vreg(common_types.i32, reg), param_vreg(common_types.i32, reg), param_preg(common_types.i32, Asm::RegID::R13));
 	} else if (p.kind == NodeKind::ConstantByAddress) {
 		_immediate_to_register_32((int_p)((char*)p.p + p.shift), reg);
 	} else {
@@ -540,13 +540,13 @@ int BackendARM::_reference_to_register_32(const SerialNodeParam &p, const Class 
 
 [[maybe_unused]]
 static bool arm_type_uses_int_register(const Class *t) {
-	return (t == TypeInt32) /*or (t == TypeInt64)*/ or (t == TypeInt8) or (t == TypeUInt8) or (t == TypeBool) or t->is_enum() or t->is_some_pointer();
+	return (t == common_types.i32) /*or (t == common_types.i64)*/ or (t == common_types.i8) or (t == common_types.u8) or (t == common_types._bool) or t->is_enum() or t->is_some_pointer();
 }
 
 int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNodeParam &ret, bool is_static) {
 	const Class *type = ret.type;
 	if (!type)
-		type = TypeVoid;
+		type = common_types._void;
 
 	// grow stack (down) for local variables of the calling function
 //	insert_cmd(- cur_func->_VarSize - LocalOffset - 8);
@@ -571,13 +571,13 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	Array<SerialNodeParam> stack_param;
 	Array<SerialNodeParam> float_param;
 	for (SerialNodeParam &p: params) {
-		if ((p.type == TypeInt32) /*or (p.type == TypeInt64)*/ or (p.type == TypeInt8) or (p.type == TypeUInt8) or (p.type == TypeBool) or p.type->is_some_pointer()) {
+		if ((p.type == common_types.i32) /*or (p.type == common_types.i64)*/ or (p.type == common_types.i8) or (p.type == common_types.u8) or (p.type == common_types._bool) or p.type->is_some_pointer()) {
 			if (reg_param.num < max_reg_params) {
 				reg_param.add(p);
 			} else {
 				stack_param.add(p);
 			}
-		} else if (p.type == TypeFloat32 /*or (p.type == TypeFloat64)*/) {
+		} else if (p.type == common_types.f32 /*or (p.type == common_types.f64)*/) {
 			if (float_param.num < 8) {
 				float_param.add(p);
 			} else {
@@ -590,9 +590,9 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	// push parameters onto stack
 /*	push_size = 4 * stack_param.num;
 	if (push_size > 127)
-		insert_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegID::RSP), param_const(TypeInt32, (void*)push_size));
+		insert_cmd(Asm::inst_add, param_reg(common_types.pointer, Asm::RegID::RSP), param_const(common_types.i32, (void*)push_size));
 	else if (push_size > 0)
-		insert_cmd(Asm::inst_add, param_reg(TypePointer, Asm::RegID::RSP), param_const(TypeInt8, (void*)push_size));
+		insert_cmd(Asm::inst_add, param_reg(common_types.pointer, Asm::RegID::RSP), param_const(common_types.i8, (void*)push_size));
 	foreachb(SerialCommandParam &p, stack_param)
 		insert_cmd(Asm::inst_push, p);
 	max_push_size = max(max_push_size, push_size);*/
@@ -600,11 +600,11 @@ int BackendARM::fc_begin(const Array<SerialNodeParam> &_params, const SerialNode
 	// s0-7
 	foreachib(auto &p, float_param, i) {
 		auto reg = Asm::s_reg(i);
-		/*if (p.type == TypeFloat64)
-			insert_cmd(Asm::inst_movsd, param_reg(TypeReg128, reg), p);
+		/*if (p.type == common_types.f64)
+			insert_cmd(Asm::inst_movsd, param_reg(common_types.reg128, reg), p);
 		else*/
 		_to_register_float(p, 0, cmd.add_virtual_reg(reg));
-			//insert_cmd(Asm::InstID::FLDS, param_preg(TypeFloat32, reg), p);
+			//insert_cmd(Asm::InstID::FLDS, param_preg(common_types.f32, reg), p);
 	}
 
 	// return as _very_ first parameter
@@ -635,12 +635,12 @@ void BackendARM::fc_end(int push_size, const Array<SerialNodeParam> &params, con
 		return;
 
 	// return > 4b already got copied to [ret] by the function!
-	if ((type != TypeVoid) and (!type->uses_return_by_memory())) {
-		if (type == TypeFloat32) {
+	if ((type != common_types._void) and (!type->uses_return_by_memory())) {
+		if (type == common_types.f32) {
 			int sreg = cmd.add_virtual_reg(Asm::RegID::S0);
 			_from_register_float(sreg, ret, 0);
-		//else if (type == TypeFloat64)
-			//insert_cmd(Asm::InstID::MOVSD, ret, param_preg(TypeReg128, Asm::RegID::XMM0));
+		//else if (type == common_types.f64)
+			//insert_cmd(Asm::InstID::MOVSD, ret, param_preg(common_types.reg128, Asm::RegID::XMM0));
 		} else if ((type->size == 1) or (type->size == 4)) {
 			int v = cmd.add_virtual_reg(Asm::RegID::R0);
 			_from_register_32(v, ret, 0);
@@ -648,7 +648,7 @@ void BackendARM::fc_end(int push_size, const Array<SerialNodeParam> &params, con
 		} else {
 			do_error("unhandled function value receiving... " + type->long_name());
 			int v = cmd.add_virtual_reg(Asm::RegID::R0);
-			insert_cmd(Asm::InstID::MOV, ret, param_vreg(TypeReg32, v));
+			insert_cmd(Asm::InstID::MOV, ret, param_vreg(common_types.reg32, v));
 			cmd.set_virtual_reg(v, cmd.next_cmd_index - 2, cmd.next_cmd_index - 1);
 		}
 	}
@@ -663,12 +663,12 @@ void BackendARM::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 	int push_size = fc_begin(params, ret, f->is_static());
 
 	if ((f->owner() == module->tree) and (!f->is_extern())) {
-		insert_cmd(Asm::InstID::CALL, param_label(TypePointer, f->_label));
+		insert_cmd(Asm::InstID::CALL, param_label(common_types.pointer, f->_label));
 	} else {
 		if (f->address == 0)
 			module->do_error_link("could not link function " + f->long_name());
 		if (reachable_arm(f->address, this->module->opcode)) {
-			insert_cmd(Asm::InstID::CALL, param_imm(TypePointer, f->address)); // the actual call
+			insert_cmd(Asm::InstID::CALL, param_imm(common_types.pointer, f->address)); // the actual call
 			// function pointer will be shifted later...
 		} else {
 
@@ -676,9 +676,9 @@ void BackendARM::add_function_call(Function *f, const Array<SerialNodeParam> &pa
 			// really find a usable register...
 
 			int v = cmd.add_virtual_reg(Asm::RegID::R4);//find_unused_reg(cmd.next_cmd_index-1, cmd.next_cmd_index-1, 4);
-			_to_register_32(param_lookup(TypePointer, add_global_ref((void*)(int_p)f->address)), 0, v);
-			//insert_cmd(Asm::InstID::MOV, param_vreg(TypePointer, v), param_lookup(TypePointer, add_global_ref(f->address)));
-			insert_cmd(Asm::InstID::CALL, param_vreg(TypePointer, v));
+			_to_register_32(param_lookup(common_types.pointer, add_global_ref((void*)(int_p)f->address)), 0, v);
+			//insert_cmd(Asm::InstID::MOV, param_vreg(common_types.pointer, v), param_lookup(common_types.pointer, add_global_ref(f->address)));
+			insert_cmd(Asm::InstID::CALL, param_vreg(common_types.pointer, v));
 			cmd.set_virtual_reg(v, cmd.next_cmd_index-2, cmd.next_cmd_index-1);
 		}
 	}
@@ -693,7 +693,7 @@ void BackendARM::add_pointer_call(const SerialNodeParam &fp, const Array<SerialN
 	int push_size = fc_begin(params, ret, true);
 
 	int reg = _to_register_32(fp, 0);
-	insert_cmd(Asm::InstID::CALL, param_vreg(TypePointer, reg));
+	insert_cmd(Asm::InstID::CALL, param_vreg(common_types.pointer, reg));
 
 	fc_end(push_size, params, ret);
 }
@@ -723,13 +723,13 @@ void BackendARM::add_function_intro_params(Function *f) {
 	Array<Variable*> stack_param;
 	Array<Variable*> float_param;
 	for (Variable *p: param) {
-		if ((p->type == TypeInt32) or (p->type == TypeInt8) or (p->type == TypeUInt8) or (p->type == TypeBool) or p->type->is_some_pointer()) {
+		if ((p->type == common_types.i32) or (p->type == common_types.i8) or (p->type == common_types.u8) or (p->type == common_types._bool) or p->type->is_some_pointer()) {
 			if (reg_param.num < 4) {
 				reg_param.add(p);
 			} else {
 				stack_param.add(p);
 			}
-		} else if (p->type == TypeFloat32) {
+		} else if (p->type == common_types.f32) {
 			if (float_param.num < 8) {
 				float_param.add(p);
 			} else {
@@ -875,12 +875,12 @@ void BackendARM::assemble_cmd_arm(SerialNode &c) {
 
 void BackendARM::add_function_intro_frame(int stack_alloc_size) {
 	cmd.next_cmd_target(0);
-	cmd.add_cmd(Asm::InstID::STMDB, param_preg(TypePointer, Asm::RegID::R13), param_imm(TypeInt32, 0x6ff0)); // {r4,r5,r6,r7,r8,r9,r10,r11,r13,r14}
+	cmd.add_cmd(Asm::InstID::STMDB, param_preg(common_types.pointer, Asm::RegID::R13), param_imm(common_types.i32, 0x6ff0)); // {r4,r5,r6,r7,r8,r9,r10,r11,r13,r14}
 	if (stack_max_size > 0) {
 		cmd.next_cmd_target(1);
-		cmd.add_cmd(Asm::InstID::MOV, param_preg(TypePointer, Asm::RegID::R11), param_preg(TypePointer, Asm::RegID::R13));
+		cmd.add_cmd(Asm::InstID::MOV, param_preg(common_types.pointer, Asm::RegID::R11), param_preg(common_types.pointer, Asm::RegID::R13));
 		cmd.next_cmd_target(2);
-		cmd.add_cmd(Asm::InstID::SUB, param_preg(TypePointer, Asm::RegID::R13), param_preg(TypePointer, Asm::RegID::R13), param_imm(TypeInt32, stack_max_size));
+		cmd.add_cmd(Asm::InstID::SUB, param_preg(common_types.pointer, Asm::RegID::R13), param_preg(common_types.pointer, Asm::RegID::R13), param_imm(common_types.i32, stack_max_size));
 	}
 }
 

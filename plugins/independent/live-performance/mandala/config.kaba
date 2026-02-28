@@ -102,7 +102,7 @@ class MandalaConfig extends Module.Config
 		return nil
 		
 	func mut save_rim_profile(name: string)
-		for p in get_rim_profile(name)
+		for mut p in get_rim_profile(name)
 			# existing? -> overwrite
 			p.samples = rim_samples
 		else
@@ -112,7 +112,7 @@ class MandalaConfig extends Module.Config
 		current_rim_profile = name
 		
 	func mut save_surface_profile(name: string)
-		for p in get_surface_profile(name)
+		for mut p in get_surface_profile(name)
 			# existing? -> overwrite
 			p.samples = surface_samples
 			p.number_of_zones = number_of_zones

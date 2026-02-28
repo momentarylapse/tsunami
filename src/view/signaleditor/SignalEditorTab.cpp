@@ -226,9 +226,9 @@ color SignalEditorTab::signal_color_base(SignalType type) {
 
 color SignalEditorTab::signal_color(SignalType type, bool hover) {
 	color c = signal_color_base(type);
-	c = color::interpolate(c, theme.text, 0.2f);
-//	c = color::interpolate(c, Gray, 0.6f);
-	//c = color::interpolate(c, colors.background, 0.2f);
+	c = color::mix(c, theme.text, 0.2f);
+//	c = color::mix(c, Gray, 0.6f);
+	//c = color::mix(c, colors.background, 0.2f);
 	if (hover)
 		c = theme.hoverify(c);
 	return c;

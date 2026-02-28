@@ -11,13 +11,7 @@
 #include <lib/math/vec2.h>
 
 namespace kaba {
-	
-extern const Class *TypeInt32List;
-extern const Class *TypeFloat32List;
-extern const Class *TypeBoolList;
-extern const Class *TypeAny;
-extern const Class *TypePath;
-extern const Class *TypeSpecialFunction;
+
 
 	
 	
@@ -25,9 +19,9 @@ extern const Class *TypeSpecialFunction;
 KABA_LINK_GROUP_BEGIN
 
 void var_assign(void *pa, const void *pb, const Class *type) {
-	if ((type == TypeInt32) or (type == TypeFloat32)) {
+	if ((type == common_types.i32) or (type == common_types.f32)) {
 		*(int*)pa = *(int*)pb;
-	} else if ((type == TypeBool) or (type == TypeInt8) or (type == TypeUInt8)) {
+	} else if ((type == common_types._bool) or (type == common_types.i8) or (type == common_types.u8)) {
 		*(int8*)pa = *(int8*)pb;
 	} else if (type->is_pointer_raw()) {
 		*(void**)pa = *(void**)pb;
@@ -54,7 +48,7 @@ void var_init(void *p, const Class *type) {
 }
 
 void array_clear(void *p, const Class *type) {
-	auto *f = type->get_member_func("clear", TypeVoid, {});
+	auto *f = type->get_member_func("clear", common_types._void, {});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not clear an array of type " + type->long_name()));
 	typedef void func_t(void*);
@@ -63,7 +57,7 @@ void array_clear(void *p, const Class *type) {
 }
 
 void array_resize(void *p, const Class *type, int num) {
-	auto *f = type->get_member_func("resize", TypeVoid, {TypeInt32});
+	auto *f = type->get_member_func("resize", common_types._void, {common_types.i32});
 	if (!f)
 		kaba_raise_exception(new KabaException("can not resize an array of type " + type->long_name()));
 	typedef void func_t(void*, int);
@@ -73,12 +67,12 @@ void array_resize(void *p, const Class *type, int num) {
 
 void array_add(DynamicArray &array, void *p, const Class *type) {
 	//msg_write("array add " + type->long_name());
-	if ((type == TypeInt32List) or (type == TypeFloat32List)) {
+	if ((type == common_types.i32_list) or (type == common_types.f32_list)) {
 		array.append_4_single(*(int*)p);
-	} else if (type == TypeBoolList) {
+	} else if (type == common_types.bool_list) {
 		array.append_1_single(*(char*)p);
 	} else {
-		auto *f = type->get_member_func("add", TypeVoid, {type->param[0]});
+		auto *f = type->get_member_func("add", common_types._void, {type->param[0]});
 		if (!f)
 			kaba_raise_exception(new KabaException("can not add to array type " + type->long_name()));
 		typedef void func_t(void*, const void*);
@@ -167,31 +161,31 @@ string callable_repr(const void *p, const Class *type) {
 string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 //	msg_write(type->name);
 	// fixed
-	if (type == TypeInt32) {
+	if (type == common_types.i32) {
 		return str(*reinterpret_cast<const int32*>(p));
-	} else if (type == TypeInt16) {
+	} else if (type == common_types.i16) {
 		return str((int)*reinterpret_cast<const short*>(p));
-	} else if (type == TypeUInt16) {
+	} else if (type == common_types.u16) {
 		return str((int)*reinterpret_cast<const unsigned short*>(p));
-	} else if (type == TypeInt8) {
+	} else if (type == common_types.i8) {
 		return str((int)*reinterpret_cast<const int8*>(p));
-	} if (type == TypeUInt8) {
+	} if (type == common_types.u8) {
 		return format("0x%02x", (int)*reinterpret_cast<const uint8*>(p));
-	} if (type == TypeInt64) {
+	} if (type == common_types.i64) {
 		return str(*reinterpret_cast<const int64*>(p));
-	} else if (type == TypeFloat32) {
+	} else if (type == common_types.f32) {
 		return f2s(*reinterpret_cast<const float*>(p), 6);
-	} else if (type == TypeFloat64) {
+	} else if (type == common_types.f64) {
 		return f642s(*reinterpret_cast<const double*>(p), 6);
-	} else if (type == TypeBool) {
+	} else if (type == common_types._bool) {
 		return b2s(*reinterpret_cast<const bool*>(p));
-	//} else if (type == TypeClass) {
+	//} else if (type == common_types._class) {
 	//	return class_repr(reinterpret_cast<const Class*>(p));
 	} else if (type->is_callable_fp() or type->is_callable_bind()) {
 		return callable_repr(p, type);
-	} else if (type == TypeSpecialFunction) {
+	} else if (type == common_types.special_function) {
 		return format("<special function %s>", reinterpret_cast<const SpecialFunction*>(p)->name);
-	} else if (type == TypeAny) {
+	} else if (type == common_types.any) {
 		if (as_repr)
 			return reinterpret_cast<const Any*>(p)->repr();
 		else
@@ -199,38 +193,38 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 	} else if (type->is_reference()) {
 		auto *pp = *(void**)p;
 		// auto deref?
-		if (type->param[0] == TypeClass)
+		if (type->param[0] == common_types._class)
 			return class_repr(*reinterpret_cast<const Class* const *>(p));
 		if (type->param[0]->is_callable())
 			return var_repr_str(pp, type->param[0], as_repr);
-		if (type->param[0] == TypeFunction)
+		if (type->param[0] == common_types.function)
 			return var_repr_str(pp, type->param[0], as_repr);
 		if (type->param[0]->is_callable())
 			return var_repr_str(pp, type->param[0], as_repr);
-		if (type->param[0] != TypeVoid)
+		if (type->param[0] != common_types._void)
 			return /*"&" +*/ var_repr_str(pp, type->param[0], as_repr);
 		return p2s(pp);
 	} else if (type->is_some_pointer()) {
 		auto *pp = *(void**)p;
 		// auto deref?
-		if (pp and (type->param[0] != TypeVoid))
+		if (pp and (type->param[0] != common_types._void))
 			return /*"&" +*/ var_repr_str(pp, type->param[0], as_repr);
 		if (pp and type->param[0]->is_callable())
 			return var_repr_str(pp, type->param[0], as_repr);
-		if (pp and type->param[0] == TypeFunction)
+		if (pp and type->param[0] == common_types.function)
 			return var_repr_str(pp, type->param[0], as_repr);
 		return p2s(pp);
-	} else if (type == TypeString) { // covered by user code...
+	} else if (type == common_types.string) { // covered by user code...
 		if (as_repr)
 			return reinterpret_cast<const string*>(p)->repr();
 		else
 			return *reinterpret_cast<const string*>(p);
-	} else if (type == TypeCString) {
+	} else if (type == common_types.cstring) {
 		if (as_repr)
 			return string((char*)p).repr();
 		else
 			return string((char*)p);
-	} else if (type == TypePath) { // covered by user code...
+	} else if (type == common_types.path) { // covered by user code...
 		if (as_repr)
 			return reinterpret_cast<const Path*>(p)->str().repr();
 		else
@@ -256,7 +250,7 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 		for (int i=0; i<da->num; i++) {
 			if (i > 0)
 				s += ", ";
-			s += var_repr(((char*)da->data) + i * da->element_size, TypeString);
+			s += var_repr(((char*)da->data) + i * da->element_size, common_types.string);
 			s += ": ";
 			s += var_repr(((char*)da->data) + i * da->element_size + sizeof(string), type->param[0]);
 		}
@@ -275,8 +269,8 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 
 
 	// try user code
-	auto f_str = type->get_member_func(Identifier::func::Str, TypeString, {});
-	auto f_repr = type->get_member_func(Identifier::func::Repr, TypeString, {});
+	auto f_str = type->get_member_func(Identifier::func::Str, common_types.string, {});
+	auto f_repr = type->get_member_func(Identifier::func::Repr, common_types.string, {});
 	auto f = f_str;
 	if ((as_repr and f_repr) or !f_str)
 		f = f_repr;
@@ -311,27 +305,29 @@ string _cdecl var2str(const void *p, const Class *type) {
 }
 
 Any _cdecl dynify(const void *var, const Class *type) {
-	if (type == TypeInt32 or type->is_enum())
+	if (type == common_types.i32 or type->is_enum())
 		return Any(*(int*)var);
-	if (type == TypeInt64)
+	if (type == common_types.i64)
 		return Any(*(int64*)var);
-	if (type == TypeFloat32)
+	if (type == common_types.f32)
 		return Any(*(float*)var);
-	if (type == TypeFloat64)
+	if (type == common_types.f64)
 		return Any(*(double*)var);
-	if (type == TypeBool)
+	if (type == common_types._bool)
 		return Any(*(bool*)var);
-	if (type == TypeString)
+	if (type == common_types.string)
 		return Any(*(string*)var);
-	if (type == TypeVec3)
+	if (type == common_types.path)
+		return Any(str(*(Path*)var));
+	if (type == common_types.vec3)
 		return vec3_to_any(*(vec3*)var);
-	if (type == TypeVec2)
+	if (type == common_types.vec2)
 		return vec2_to_any(*(vec2*)var);
-	if (type == TypeColor)
+	if (type == common_types.color)
 		return color_to_any(*(color*)var);
 	if (type->is_some_pointer())
 		return Any(*(void**)var);
-	if (type == TypeAny)
+	if (type == common_types.any)
 		return *(Any*)var;
 	if (type->is_array()) {
 		Any a = Any::EmptyList;
@@ -369,23 +365,25 @@ Any _cdecl dynify(const void *var, const Class *type) {
 }
 
 void unwrap_any(const Any &aa, void *var, const Class *type) {
-	if (type == TypeInt32) {
+	if (type == common_types.i32) {
 		*(int*)var = aa.to_i32();
-	} else if (type == TypeInt64) {
+	} else if (type == common_types.i64) {
 		*(int64*)var = aa.to_i64();
-	} else if (type == TypeFloat32) {
+	} else if (type == common_types.f32) {
 		*(float*)var = aa.to_f32();
-	} else if (type == TypeFloat64) {
+	} else if (type == common_types.f64) {
 		*(double*)var = aa.to_f64();
-	} else if (type == TypeBool) {
+	} else if (type == common_types._bool) {
 		*(bool*)var = aa.to_bool();
-	} else if (type == TypeString) {
+	} else if (type == common_types.string) {
 		*(string*)var = aa.str();
-	} else if (type == TypeVec3) {
+	} else if (type == common_types.path) {
+		*(Path*)var = aa.str();
+	} else if (type == common_types.vec3) {
 		*(vec3*)var = any_to_vec3(aa);
-	} else if (type == TypeVec2) {
+	} else if (type == common_types.vec2) {
 		*(vec2*)var = any_to_vec2(aa);
-	} else if (type == TypeColor) {
+	} else if (type == common_types.color) {
 		*(color*)var = any_to_color(aa);
 	} else if (type->is_pointer_raw() and aa.is_pointer()) {
 		*(const void**)var = aa.as_pointer();

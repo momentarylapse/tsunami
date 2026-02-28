@@ -46,6 +46,7 @@ namespace Identifier {
 	extern const string Extern;
 	extern const string Selfref;
 	extern const string Ref;
+	extern const string Globalref;
 	extern const string Weak;
 	extern const string Give;
 	extern const string Shared;

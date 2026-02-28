@@ -79,7 +79,7 @@ class SequencerSource extends MidiSource
 		
 	func override read(out midi: MidiEventBuffer) -> i32
 		var beats: Beat[]
-		for s in in_beats.source
+		for mut s in in_beats.source
 			let rr = s.read_beats(beats, midi.samples)
 		
 		var offset = 0

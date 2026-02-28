@@ -12,12 +12,14 @@
 namespace os::app {
 
 	Path filename;
+	Path home_directory;
 	Path directory_dynamic;
 	Path directory_static;
 	Path initial_working_directory;
 	Path install_prefix;
 	Path source_root;
 	bool installed = false;
+	string user_name;
 
 #ifdef OS_WINDOWS
 	void* win_instance = nullptr;
@@ -59,6 +61,15 @@ namespace os::app {
 		win_instance = (void*)GetModuleHandle(nullptr);
 #endif
 
+		// home folder + user
+#if defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW) //defined(__GNUC__) || defined(OS_LINUX)
+		home_directory = getenv("HOME");
+		user_name = getenv("USER");
+#else // OS_WINDOWS
+		home_directory = getenv("USERPROFILE");
+		user_name = getenv("USERNAME");
+#endif
+
 
 		// first, assume a local/non-installed version
 		directory_dynamic = initial_working_directory; //strip_dev_dirs(filename.parent());
@@ -89,7 +100,7 @@ namespace os::app {
 			directory_static = filename.parent().parent() | "Resources";
 		}
 
-		directory_dynamic = format("%s/.%s/", getenv("HOME"), app_name);
+		directory_dynamic = home_directory | format(".%s", app_name);
 		os::fs::create_directory(directory_dynamic);
 #endif
 	}

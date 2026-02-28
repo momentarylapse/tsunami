@@ -78,7 +78,7 @@ class GraphSequencerSource extends MidiSource
 		
 	func override read(out midi: MidiEventBuffer) -> i32
 		var beats: Beat[]
-		for s in in_beats.source
+		for mut s in in_beats.source
 			let rr = s.read_beats(beats, midi.samples)
 		
 		var buf: MidiEventBuffer
@@ -136,7 +136,7 @@ class GraphSequencerPanel extends ConfigPanel
 	var mode = GraphSequencerPanel.Mode.NONE
 	var moving = false
 	
-	func node(_h: Hover?) -> Node*
+	func selfref node(_h: Hover?) -> Node*
 		for h in _h
 			if h.type == Hover.Type.NODE
 				return &c.config.nodes[h.index]
@@ -212,7 +212,7 @@ Grid ? '' vertical
 
 	func mut on_mouse_move()
 		if moving
-			for n in node(selected)
+			for mut n in node(selected)
 				n.pos = unproject(hui.get_event().mouse)
 		else
 			hover = get_hover(hui.get_event().mouse)
@@ -240,7 +240,7 @@ Grid ? '' vertical
 			
 		if mode == Mode.PITCH
 			if k >= hui.KEY_0 and k <= hui.KEY_9
-				for n in node(selected)
+				for mut n in node(selected)
 					if n.pitch >= 10
 						n.pitch = k - hui.KEY_0
 					else

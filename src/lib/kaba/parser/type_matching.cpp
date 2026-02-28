@@ -17,11 +17,6 @@
 
 namespace kaba {
 
-extern const Class *TypeDynamicArray;
-extern const Class *TypeStringAutoCast;
-extern const Class *TypeNone;
-
-
 
 bool type_match_up(const Class *given, const Class *wanted);
 
@@ -63,15 +58,15 @@ bool is_same_kind_of_pointer(const Class *a, const Class *b) {
 // can be re-interpreted as...?
 bool type_match_generic_pointer(const Class *given, const Class *wanted) {
 	// allow any non-owning pointer?
-	if ((wanted == TypePointer) and (given->is_pointer_raw() or given->is_reference()))
+	if ((wanted == common_types.pointer) and (given->is_pointer_raw() or given->is_reference()))
 		return true;
 
 	// any reference
-	if ((wanted == TypeReference) and given->is_reference())
+	if ((wanted == common_types.reference) and given->is_reference())
 		return true;
 
 	// any xfer[..]?
-	if ((wanted->is_pointer_xfer_not_null() and wanted->param[0] == TypeVoid) and given->is_pointer_xfer_not_null())
+	if ((wanted->is_pointer_xfer_not_null() and wanted->param[0] == common_types._void) and given->is_pointer_xfer_not_null())
 		return true;
 
 	return false;
@@ -87,7 +82,7 @@ bool type_match_up(const Class *given, const Class *wanted) {
 		return true;
 
 	// nil  ->  any raw pointer
-	if ((given == TypeNone) and wanted->is_pointer_raw())
+	if ((given == common_types.none) and wanted->is_pointer_raw())
 		return true;
 
 	// compatible pointers (of same or derived class)
@@ -123,10 +118,10 @@ bool type_match_up(const Class *given, const Class *wanted) {
 		if (type_match_up(given->param[0], wanted->param[0]) and (given->param[0]->size == wanted->param[0]->size))
 			return true;
 
-	if (wanted == TypeStringAutoCast and given == TypeString)
+	if (wanted == common_types.string_auto_cast and given == common_types.string)
 		return true;
 
-	if (wanted == TypeDynamic)
+	if (wanted == common_types.dynamic)
 		return true;
 
 	return given->is_derived_from(wanted);
@@ -161,7 +156,7 @@ shared<Node> Concretifier::explicit_cast(shared<Node> node, const Class *wanted)
 		return node;
 	}
 
-	if (wanted == TypeString)
+	if (wanted == common_types.string)
 		return add_converter_str(node, false);
 
 	if (type->get_member_func("__" + wanted->name + "__", wanted, {})) {
@@ -219,7 +214,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 
 		// allow any raw pointer
-		if (given->is_pointer_raw() and wanted == TypePointer) {
+		if (given->is_pointer_raw() and wanted == common_types.pointer) {
 			cd.penalty = 10;
 			return true;
 		}
@@ -271,7 +266,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
-	if (node->kind == NodeKind::ArrayBuilder and given == TypeUnknown) {
+	if (node->kind == NodeKind::ArrayBuilder and given == common_types.unknown) {
 		if (wanted->is_list()) {
 			auto t = wanted->get_array_element();
 			CastingDataSingle cast;
@@ -283,7 +278,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			cd.cast = TypeCastId::ABSTRACT_LIST;
 			return true;
 		}
-		if (wanted == TypeDynamicArray) {
+		if (wanted == common_types.dynamic_array) {
 			cd.cast = TypeCastId::ABSTRACT_LIST;
 			return true;
 		}
@@ -296,7 +291,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			}
 		}
 	}
-	if ((node->kind == NodeKind::Tuple) and (given == TypeUnknown)) {
+	if ((node->kind == NodeKind::Tuple) and (given == common_types.unknown)) {
 		for (auto *f: wanted->get_constructors()) {
 			if (type_match_tuple_as_contructor(node, f, cd.penalty)) {
 				cd.cast = TypeCastId::TUPLE_AS_CONSTRUCTOR;
@@ -317,7 +312,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
-	if (node->kind == NodeKind::DictBuilder and given == TypeUnknown) {
+	if (node->kind == NodeKind::DictBuilder and given == common_types.unknown) {
 		if (wanted->is_dict()) {
 			auto t = wanted->get_array_element();
 			CastingDataSingle cast;
@@ -332,7 +327,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			return true;
 		}
 	}
-	if (wanted->is_callable() and (given == TypeUnknown)) {
+	if (wanted->is_callable() and (given == common_types.unknown)) {
 		if (node->kind == NodeKind::Function) {
 			auto ft = make_effective_class_callable(node);
 			if (type_match_up(ft, wanted)) {
@@ -341,8 +336,8 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 			}
 		}
 	}
-	if (wanted == TypeStringAutoCast) {
-		//Function *cf = given->get_func(Identifier::Func::STR, TypeString, {});
+	if (wanted == common_types.string_auto_cast) {
+		//Function *cf = given->get_func(Identifier::Func::STR, common_types.string, {});
 		//if (cf) {
 			cd.penalty = 50;
 			cd.cast = TypeCastId::OWN_STRING;
@@ -380,7 +375,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, 
 	if (cast.cast == TypeCastId::OWN_STRING)
 		return add_converter_str(node, false);
 	if (cast.cast == TypeCastId::ABSTRACT_LIST) {
-		if (wanted == TypeDynamicArray) // whatever, anything is ok!
+		if (wanted == common_types.dynamic_array) // whatever, anything is ok!
 			return force_concrete_type(node);
 		CastingDataSingle cd2;
 		for (auto&& [i,e]: enumerate(node->params)) {

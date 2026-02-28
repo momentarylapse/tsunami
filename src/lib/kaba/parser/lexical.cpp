@@ -179,6 +179,10 @@ int ExpressionBuffer::next_line_indent() const {
 	return (cur_line + 1)->indent;
 }
 
+bool ExpressionBuffer::next_line_is_indented() const {
+	return next_line_indent() > cur_line->indent;
+}
+
 ExpKind GetKind(char c) {
 	if (is_number(c))
 		return ExpKind::NUMBER;

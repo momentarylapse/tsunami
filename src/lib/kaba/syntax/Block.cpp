@@ -14,9 +14,7 @@
 
 namespace kaba {
 
-Block::Block(Function *f, Block *_parent, const Class *t) :
-	Node(NodeKind::Block, (int_p)this, t)
-{
+Block::Block(Function *f, Block *_parent) {
 	level = 0;
 	function = f;
 	parent = _parent;
@@ -24,32 +22,6 @@ Block::Block(Function *f, Block *_parent, const Class *t) :
 		level = parent->level + 1;
 	_start = _end = nullptr;
 	_label_start = _label_end = -1;
-}
-
-
-void Block::add(shared<Node> c) {
-	if (c)
-		params.add(c);
-}
-
-void Block::set(int index, shared<Node> c) {
-	params[index] = c;
-}
-
-bool Block::is_trust_me() const {
-	if (flags_has(flags, Flags::TrustMe))
-		return true;
-	if (parent)
-		return parent->is_trust_me();
-	return false;
-}
-
-bool Block::is_in_try() const {
-	if (flags_has(flags, Flags::Try))
-		return true;
-	if (parent)
-		return parent->is_in_try();
-	return false;
 }
 
 Variable *Block::add_var(const string &name, const Class *type, Flags flags) {

@@ -315,7 +315,7 @@ void Compiler::align_opcode() {
 }
 
 Function *get_entry_point(SyntaxTree *tree) {
-	if (auto f = tree->base_class->get_func("main", TypeVoid, {}))
+	if (auto f = tree->base_class->get_func("main", common_types._void, {}))
 		return f;
 	auto rmain = tree->global_scope.find("main", -1);
 	if (rmain.num > 0)
@@ -351,7 +351,7 @@ void remap_virtual_tables(Module *s, char *mem, int &offset, char *address, cons
 		t->_vtable_location_target_ = &address[offset];
 		offset += config.target.pointer_size * t->vtable.num;
 		for (Constant *c: weak(s->tree->base_class->constants))
-			if ((c->type == TypePointer) and (c->as_int64() == (int_p)t->vtable.data))
+			if ((c->type == common_types.pointer) and (c->as_int64() == (int_p)t->vtable.data))
 				c->as_int64() = (int_p)t->_vtable_location_target_;
 	}
 
@@ -429,7 +429,7 @@ void Compiler::map_constants_to_opcode() {
 
 void Compiler::map_address_constants_to_opcode() {
 	for (auto f: module->functions()) {
-		tree->transform_block(f->block.get(), [this] (shared<Node> n) {
+		tree->transform_block(f->block_node.get(), [this] (shared<Node> n) {
 			if (n->kind == NodeKind::Address) {
 				//msg_write(format("ADDRESS   %x", n->link_no));
 				memcpy(&module->opcode[module->opcode_size], &n->link_no, config.target.pointer_size);
@@ -512,7 +512,7 @@ void import_includes(Module *s) {
 
 void link_raw_function_pointers(Module *m) {
 	for (auto &c: m->constants())
-		if (c->type == TypeFunctionCodeRef) {
+		if (c->type == common_types.function_code_ref) {
 			auto f = (Function*)(int_p)c->as_int64();
 			c->as_int64() = f->address;
 
@@ -614,7 +614,7 @@ DynamicLibraryImport *get_dynamic_lib(const string &libname, Module *s) {
 void parse_magic_linker_string(SyntaxTree *s) {
 	auto external = s->module->context->external.get();
 	for (auto *c: weak(s->base_class->constants))
-		if (c->name == "KABA_LINK" and c->type == TypeString) {
+		if (c->name == "KABA_LINK" and c->type == common_types.string) {
 			DynamicLibraryImport *d = nullptr;
 			auto xx = c->as_string().explode("\n");
 			for (string &x: xx) {
@@ -839,7 +839,7 @@ void Compiler::assemble_function(int index, Function *f, Asm::InstructionWithPar
 			return;
 
 	if (config.verbose and config.allow_output(f, "ser:0"))
-		f->block->show(TypeVoid);
+		f->block_node->show(common_types._void);
 
 	if (config.target.interpreted) {
 		auto serializer = new Serializer(module, list);

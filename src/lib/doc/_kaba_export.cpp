@@ -5,6 +5,8 @@
 
 
 void export_package_pdf(kaba::Exporter* e) {
+	e->package_info("pdf", "0.3");
+
 	e->declare_class_size("Parser", sizeof(pdf::Parser));
 	e->link_func("Parser.__init__", &kaba::generic_init<pdf::Parser>);
 	e->link_func("Parser.__delete__", &kaba::generic_delete<pdf::Parser>);

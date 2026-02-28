@@ -26,6 +26,8 @@
 
 const float f_m_id[16] = {1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1};
 const mat4 mat4::ID = mat4(f_m_id);
+const float f_m_zero[16] = {0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0};
+const mat4 mat4::ZERO = mat4(f_m_zero);
 
 
 mat4 MatrixMultiply2(const mat4 &m2, const mat4 &m1);

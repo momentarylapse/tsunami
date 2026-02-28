@@ -3,53 +3,36 @@
 
 namespace kaba {
 
-
-extern const Class* TypePath;
-
-const Class* TypeCallback;
-const Class* TypeCallbackString;
-
-const Class* TypeFutureT;
-const Class* TypePromiseT;
-const Class* TypeFutureCoreT;
-
-const Class* TypeVoidFuture;
-const Class* TypeVoidPromise;
-const Class* TypeStringFuture;
-const Class* TypeStringPromise;
-const Class* TypePathFuture;
-const Class* TypeBoolFuture;
-
 void SIAddPackageAsync(Context *c) {
-	add_internal_package(c, "async");
+	add_internal_package(c, "async", "1");
 
-	TypeFutureCoreT = add_class_template("@FutureCore", {"T"}, new TemplateClassInstantiatorFutureCore);
-	TypeFutureT = add_class_template("future", {"T"}, new TemplateClassInstantiatorFuture);
-	TypePromiseT = add_class_template("promise", {"T"}, new TemplateClassInstantiatorPromise);
-
-
-	TypeVoidFuture = add_type("future[void]", sizeof(base::future<void>));
-	TypeVoidPromise = add_type("promise[void]", sizeof(base::promise<void>));
-	TypeStringFuture = add_type("future[string]", sizeof(base::future<string>));
-	TypeStringPromise = add_type("promise[string]", sizeof(base::promise<string>));
-
-	TypePathFuture = add_type("future[Path]", sizeof(base::future<Path>));
-	TypeBoolFuture = add_type("future[bool]", sizeof(base::future<bool>));
-
-	TypeCallback = add_type_func(TypeVoid, {});
-	auto TypeCallbackPath = add_type_func(TypeVoid, {TypePath});
-	TypeCallbackString = add_type_func(TypeVoid, {TypeString});
-	auto TypeCallbackBool = add_type_func(TypeVoid, {TypeBool});
+	common_types.future_core_t = add_class_template("@FutureCore", {"T"}, new TemplateClassInstantiatorFutureCore);
+	common_types.future_t = add_class_template("future", {"T"}, new TemplateClassInstantiatorFuture);
+	common_types.promise_t = add_class_template("promise", {"T"}, new TemplateClassInstantiatorPromise);
 
 
+	common_types.void_future = add_type("future[void]", sizeof(base::future<void>));
+	common_types.void_promise = add_type("promise[void]", sizeof(base::promise<void>));
+	common_types.string_future = add_type("future[string]", sizeof(base::future<string>));
+	common_types.string_promise = add_type("promise[string]", sizeof(base::promise<string>));
 
-	lib_create_future<string>(TypeStringFuture, TypeString, TypeCallbackString);
-	lib_create_future<Path>(TypePathFuture, TypePath, TypeCallbackPath);
-	lib_create_future<bool>(TypeBoolFuture, TypeBool, TypeCallbackBool);
-	lib_create_future<void>(TypeVoidFuture, TypeVoid, TypeCallback);
+	common_types.path_future = add_type("future[Path]", sizeof(base::future<Path>));
+	common_types.bool_future = add_type("future[bool]", sizeof(base::future<bool>));
 
-	lib_create_promise<void>(TypeVoidPromise, TypeVoid, TypeVoidFuture);
-	lib_create_promise<string>(TypeStringPromise, TypeString, TypeStringFuture);
+	common_types.callback = add_type_func(common_types._void, {});
+	auto TypeCallbackPath = add_type_func(common_types._void, {common_types.path});
+	common_types.callback_string = add_type_func(common_types._void, {common_types.string});
+	auto TypeCallbackBool = add_type_func(common_types._void, {common_types._bool});
+
+
+
+	lib_create_future<string>(common_types.string_future, common_types.string, common_types.callback_string);
+	lib_create_future<Path>(common_types.path_future, common_types.path, TypeCallbackPath);
+	lib_create_future<bool>(common_types.bool_future, common_types._bool, TypeCallbackBool);
+	lib_create_future<void>(common_types.void_future, common_types._void, common_types.callback);
+
+	lib_create_promise<void>(common_types.void_promise, common_types._void, common_types.void_future);
+	lib_create_promise<string>(common_types.string_promise, common_types.string, common_types.string_future);
 }
 
 }

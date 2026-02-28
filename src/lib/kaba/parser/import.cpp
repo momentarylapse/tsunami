@@ -70,6 +70,8 @@ Path import_dir_match(const Path &dir0, const string &name) {
 }
 
 Path find_installed_lib_import(const string &name) {
+	//const Path dir = Context::packages_root();
+
 	Path kaba_dir = os::app::directory_dynamic.parent() | "kaba";
 	if (os::app::directory_dynamic.basename()[0] == '.')
 		kaba_dir = os::app::directory_dynamic.parent() | ".kaba";
@@ -101,12 +103,12 @@ Path find_import(Module *s, const string &_name) {
 	return Path::EMPTY;
 }
 
-shared<Module> get_import_module(Parser *parser, const string &name, int token_id) {
+shared<Module> get_import_module(Parser* parser, const string& name, int token_id) {
 
 	// internal packages?
-	for (auto p: parser->context->internal_packages)
-		if (p->filename.str() == name)
-			return p;
+	for (auto p: weak(parser->context->internal_packages))
+		if (p->main_module->filename.str() == name)
+			return p->main_module;
 
 	Path filename = find_import(parser->tree->module, name);
 	if (!filename)

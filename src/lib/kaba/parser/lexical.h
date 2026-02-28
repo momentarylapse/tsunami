@@ -69,6 +69,7 @@ public:
 
 	void reset_walker();
 	int next_line_indent() const;
+	bool next_line_is_indented() const;
 
 	int cur_token() const;
 	int consume_token();

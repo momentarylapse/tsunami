@@ -48,13 +48,13 @@ ControlColorButton::ControlColorButton(const string &title, const string &id) :
 
 color color_gtk_to_user(const color &c) {
 	if (color_button_linear)
-		return c.srgb_to_lin();
+		return c.srgb_to_linear();
 	return c;
 }
 
 color color_user_to_gtk(const color &c) {
 	if (color_button_linear)
-		return c.lin_to_srgb();
+		return c.linear_to_srgb();
 	return c;
 }
 

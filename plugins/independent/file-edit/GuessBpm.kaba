@@ -117,7 +117,7 @@ class CorrelationGrid extends Grid
 		hover_peak = peak_around_mouse()
 		let bpm1 = curve[max(hover_peak-10, 0)].x
 		let bpm0 = curve[min(hover_peak+10, len(curve)-1)].x
-		for d in dlg
+		for mut d in dlg
 			d.create_curve(bpm0, bpm1)
 
 func weight_parable(p: float[], yy: float[]) -> float

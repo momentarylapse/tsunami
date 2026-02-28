@@ -5,6 +5,12 @@
 
 #include "../base/base.h"
 
+enum class ColorSpace {
+	Linear,
+	SRGB,
+	Undefined = -1
+};
+
 struct color {
 	float r,g,b,a;
 	color() {};
@@ -37,8 +43,8 @@ struct color {
 	string _cdecl str() const;
 	string _cdecl hex() const;
 
-	color lin_to_srgb() const;
-	color srgb_to_lin() const;
+	color linear_to_srgb() const;
+	color srgb_to_linear() const;
 
 	void _cdecl get_int_rgb(int *i) const;
 	void _cdecl get_int_argb(int *i) const;
@@ -48,12 +54,13 @@ struct color {
 	float saturation() const;
 
 
-	static color _cdecl create_save(float r, float g, float b, float a);
-	static color _cdecl hsb(float hue, float saturation, float brightness, float a);
-	static color _cdecl interpolate(const color &a, const color &b, float t);
-	static color _cdecl from_int_rgb(int *i);
-	static color _cdecl from_int_argb(int *i);
-	static color _cdecl parse(const string &s);
+	static color create_save(float r, float g, float b, float a);
+	static color from_rgba(float r, float g, float b, float a=1);
+	static color from_hsb(float hue, float saturation, float brightness, float a=1);
+	static color mix(const color &a, const color &b, float t);
+	static color from_int_rgb(int *i);
+	static color from_int_argb(int *i);
+	static color parse(const string &s);
 };
 
 extern const color White;

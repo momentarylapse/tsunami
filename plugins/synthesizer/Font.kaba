@@ -19,7 +19,7 @@ struct MidiFont
 		if name == ""
 			return
 		sub = session.create_child()
-		for s in sub
+		for mut s in sub
 			s.song = new Song(s, DEFAULT_SAMPLE_RATE)
 			song = weak(s.song)
 			let _ = s.storage.load(s.song, os.app_directory_dynamic | "Midi Fonts/{{name}}.nami")
@@ -105,16 +105,16 @@ class FontSynthesizer extends Synthesizer
 	var synth: owned[Synthesizer]
 	func override on_config()
 		synth = font_list.get_synth(session, config.name, config.instrument)
-		for s in synth
+		for mut s in synth
 			s.set_sample_rate(sample_rate)
 			s.on_config()
 	func override render(out buf: AudioBuffer)
-		for s in synth
+		for mut s in synth
 			s.events = events
 			s.render(buf)
 	
 	func override reset_state()
-		for s in synth
+		for mut s in synth
 			s.reset_state()
 
 	func override create_panel() -> xfer[ConfigPanel]

@@ -12,6 +12,7 @@
 #include "../../base/base.h"
 #include "../../base/pointer.h"
 //#include "../lib/common.h"
+#include "Class.h"
 #include "Flags.h"
 
 namespace kaba {
@@ -30,7 +31,6 @@ class SpecialFunction;
 enum class StatementID;
 enum class SpecialFunctionID;
 enum class InlineID;
-extern const Class* TypeVoid;
 
 
 enum class NodeKind {
@@ -51,6 +51,7 @@ enum class NodeKind {
 	CallSpecialFunction, // = len(), sorted() etc
 	SpecialFunctionName, // = len, sorted etc
 	Block,               // = block of commands {...}
+	Group,               // = block without metadata
 	Operator,
 	NamedParameter,
 	// data altering
@@ -78,6 +79,9 @@ enum class NodeKind {
 	ConstructorAsFunction,
 	Slice,               // = A:B or A:B:C
 	// abstract syntax tree
+	AbstractRoot,
+	AbstractClass,
+	AbstractFunction,
 	AbstractToken,
 	AbstractOperator,
 	AbstractElement,
@@ -89,6 +93,9 @@ enum class NodeKind {
 	AbstractTypeOptional,// X?
 	AbstractTypeCallable,// X->Y
 	AbstractVar,         // var x ...
+	AbstractLet,         // let x ...
+	AbstractEnum,
+	AbstractUseClassElement, // 'use' inside class
 	// compilation
 	VarTemp,
 	DereferenceVarTemp,
@@ -116,7 +123,7 @@ public:
 	Flags flags;
 	bool is_mutable() const;
 
-	Node(NodeKind kind, int64 link_no, const Class *type, Flags flags = Flags::Mutable, int token_id = -1);
+	Node(NodeKind kind, int64 link_no, const Class *type, Flags flags = Flags::None, int token_id = -1);
 	/*Node(const Class *c);
 	Node(const Block *b);
 	Node(const Constant *c);*/
@@ -142,6 +149,7 @@ public:
 	void set_param(int index, shared<Node> p);
 	void set_instance(shared<Node> p);
 	void set_type(const Class *type);
+	void add(shared<Node> p);
 	string signature(const Class *ns = nullptr) const;
 	string str(const Class *ns = nullptr) const;
 	void show(const Class *ns = nullptr) const;
@@ -165,15 +173,15 @@ bool node_is_member_function_with_instance(shared<Node> n);
 bool is_type_tuple(const shared<Node> n);
 Array<const Class*> class_tuple_extract_classes(const shared<Node> n);
 
-shared<Node> add_node_statement(StatementID id, int token_id = -1, const Class *type = TypeVoid);//, const shared_array<Node> &params);
-shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id = -1, const Class *type = TypeVoid);
-shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id = -1, const Class *type = TypeVoid);
+shared<Node> add_node_statement(StatementID id, int token_id = -1, const Class *type = common_types._void);//, const shared_array<Node> &params);
+shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id = -1, const Class *type = common_types._void);
+shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id = -1, const Class *type = common_types._void);
 shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id = -1, const shared_array<Node> &params = {}, bool force_non_virtual = false);
 shared<Node> add_node_func_name(const Function *f, int token_id = -1);
 shared<Node> add_node_class(const Class *c, int token_id = -1);
 shared<Node> add_node_call(const Function *f, int token_id = -1);
 shared<Node> add_node_const(const Constant *c, int token_id = -1);
-//shared<Node> add_node_block(Block *b);
+shared<Node> add_node_block(Block *b, const Class *type /*= common_types.unknown*/, int token_id = -1);
 shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
 shared<Node> add_node_global(const Variable *var, int token_id = -1);

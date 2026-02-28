@@ -341,15 +341,15 @@ class MultiLineView extends TsunamiPlugin
 
 	func override on_start()
 		dlg = new MLVDialog(session.win, self)
-		for d in dlg
+		for mut d in dlg
 			session.playback.out_tick >> create_sink(func() d.on_preview_tick())
 			d.show()
 		hui.fly(dlg)
 		
 	func override on_stop()
-		for d in dlg
+		for mut d in dlg
 			d.destroy()
 	
 	func override on_config()
-		for d in dlg
+		for mut d in dlg
 			d.on_config_changed()

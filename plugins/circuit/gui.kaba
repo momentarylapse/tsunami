@@ -48,7 +48,7 @@ Grid root ''
 				Button simulate 'Run' expandx")
 		panel = new EditorPanel(self)
 		embed(panel, "root", 0,0)
-		for t in toolbar(0)
+		for mut t in toolbar(0)
 			t.from_source("
 Toolbar toolbar ''
 	Item new 'New' image=hui:new

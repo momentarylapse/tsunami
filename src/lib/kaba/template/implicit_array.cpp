@@ -21,7 +21,7 @@ void AutoImplementer::implement_array_constructor(Function *f, const Class *t) {
 	if (auto *f_el_init = te->get_default_constructor()) {
 		for (int i=0; i<t->array_length; i++) {
 			// self[i].__init__()
-			f->block->add(add_node_member_call(f_el_init,
+			f->block_node->add(add_node_member_call(f_el_init,
 					self->shift(te->size * i, te)));
 		}
 	} else if (te->needs_constructor()) {
@@ -38,7 +38,7 @@ void AutoImplementer::implement_array_destructor(Function *f, const Class *t) {
 	if (auto *f_el_del = te->get_destructor()) {
 		for (int i=0; i<t->array_length; i++) {
 			// self[i].__delete__()
-			f->block->add(add_node_member_call(f_el_del,
+			f->block_node->add(add_node_member_call(f_el_del,
 					self->shift(te->size * i, te)));
 		}
 	} else if (te->needs_destructor()) {
@@ -56,10 +56,10 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 	// for i=>el in self
 	//    el = other[i]
 
-	auto *v_el = f->block->add_var("el", tree->request_implicit_class_reference(t->get_array_element(), -1));
-	auto *v_i = f->block->add_var("i", TypeInt32);
+	auto v_el = f->block->add_var("el", tree->request_implicit_class_reference(t->get_array_element(), -1));
+	auto v_i = f->block->add_var("i", common_types.i32);
 
-	Block *b = new Block(f, f->block.get());
+	auto b = add_node_block(new Block(f, f->block), common_types._void);
 
 	// other[i]
 	shared<Node> n_other_el = add_node_array(n_other, add_node_local(v_i));
@@ -72,7 +72,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 	n_for->set_param(1, add_node_local(v_i));
 	n_for->set_param(2, n_self);
 	n_for->set_param(3, b);
-	f->block->add(n_for);
+	f->block_node->add(n_for);
 }
 void AutoImplementer::_implement_functions_for_array(const Class *t) {
 	implement_array_constructor(prepare_auto_impl(t, t->get_default_constructor()), t);
@@ -84,20 +84,20 @@ void AutoImplementer::_implement_functions_for_array(const Class *t) {
 
 
 Class* TemplateClassInstantiatorArray::declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
-	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "[" + i2s(array_size) + "]", TypeArrayT, params[0]->size * array_size, params[0]->alignment, array_size, nullptr, params, token_id);
+	return create_raw_class(tree, class_name_might_need_parantheses(params[0]) + "[" + i2s(array_size) + "]", common_types.array_t, params[0]->size * array_size, params[0]->alignment, array_size, nullptr, params, token_id);
 }
 void TemplateClassInstantiatorArray::add_function_headers(Class* c) {
 	if (!class_can_default_construct(c->param[0]))
 		c->owner->do_error(format("can not create an array from type '%s', missing default constructor", c->param[0]->long_name()), c->token_id);
 
 	if (c->param[0]->needs_constructor() and class_can_default_construct(c->param[0]))
-		add_func_header(c, Identifier::func::Init, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+		add_func_header(c, Identifier::func::Init, common_types._void, {}, {}, nullptr, Flags::Mutable);
 	if (c->param[0]->needs_destructor() and class_can_destruct(c->param[0]))
-		add_func_header(c, Identifier::func::Delete, TypeVoid, {}, {}, nullptr, Flags::Mutable);
+		add_func_header(c, Identifier::func::Delete, common_types._void, {}, {}, nullptr, Flags::Mutable);
 	if (class_can_assign(c->param[0]))
-		add_func_header(c, Identifier::func::Assign, TypeVoid, {c}, {"other"}, nullptr, Flags::Mutable);
+		add_func_header(c, Identifier::func::Assign, common_types._void, {c}, {"other"}, nullptr, Flags::Mutable);
 	if (class_can_equal(c->param[0]) and false) // TODO
-		add_func_header(c, Identifier::func::Equal, TypeBool, {c}, {"other"}, nullptr, Flags::Pure);
+		add_func_header(c, Identifier::func::Equal, common_types._bool, {c}, {"other"}, nullptr, Flags::Pure);
 }
 
 

@@ -74,7 +74,7 @@ Grid ? '' vertical
 		allow_blink_number = hui.app_config.get_bool("Plugins/Metronome/AllowBlinkNumber", true)
 		
 		popup_menu = new hui.Menu(&self)
-		for p in popup_menu
+		for mut p in popup_menu
 			p.add_checkable("Blink background", "blink-background")
 			p.add_checkable("Blink number", "blink-number")
 
@@ -82,7 +82,7 @@ Grid ? '' vertical
 		sub_mode.add_checkable("Circle", "mode-circle")
 		sub_mode.add_checkable("Bounce", "mode-bounce")
 		sub_mode.add_checkable("Bounce walk", "mode-bounce-walk")
-		for p in popup_menu
+		for mut p in popup_menu
 			p.add_sub_menu("Animation", "sub-menu-mode", give(sub_mode))
 	
 		event_x("area", "hui:draw", on_draw)
@@ -195,7 +195,7 @@ Grid ? '' vertical
 		redraw("area")
 	
 	func mut on_area_right_button_down()
-		for p in popup_menu
+		for mut p in popup_menu
 			p.check("blink-background", allow_blink_background)
 			p.check("blink-number", allow_blink_number)
 			p.check("mode-circle", mode == AnimationMode.CIRCLE)

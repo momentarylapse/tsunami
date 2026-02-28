@@ -20,6 +20,7 @@ Array<BindingTemplate*> binding_templates;
 Function::Function(const string &_name, const Class *_return_type, const Class *_name_space, Flags _flags) {
 	name = _name;
 	block = new Block(this, nullptr);
+	block_node = add_node_block(block, common_types._void);
 	num_params = 0;
 	mandatory_params = 0;
 	effective_return_type = _return_type;
@@ -35,6 +36,9 @@ Function::Function(const string &_name, const Class *_return_type, const Class *
 	address = 0;
 	address_preprocess = nullptr;
 	_label = -1;
+	abstract_node = new Node(NodeKind::AbstractFunction, 0, common_types.unknown);
+	abstract_node->set_num_params(5);
+	abstract_node->params[2] = new Node(NodeKind::AbstractTypeList, 0, common_types.unknown);
 }
 
 #include "../../base/set.h"
@@ -78,7 +82,7 @@ void Function::show(const string &stage) const {
 		return;
 	auto ns = owner()->base_class;
 	msg_write("[function] " + signature(ns));
-	block->show(ns);
+	block_node->show(ns);
 }
 
 string Function::create_slightly_hidden_name() {
@@ -118,20 +122,20 @@ string Function::signature(const Class *ns) const {
 		r += literal_param_type[i]->cname(ns);
 	}
 	r += ")";
-	if (literal_return_type != TypeVoid)
+	if (literal_return_type != common_types._void)
 		r += " -> " + literal_return_type->cname(ns);
 	return r;
 }
 
-void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
-	blocks.add(block);
+void blocks_add_recursive(Array<Block*> &blocks, Node *block) {
+	blocks.add(block->as_block());
 	for (auto n: weak(block->params)) {
 		if (n->kind == NodeKind::Block)
-			blocks_add_recursive(blocks, n->as_block());
+			blocks_add_recursive(blocks, n);
 		if (n->kind == NodeKind::Statement) {
 			for (auto p: weak(n->params))
 				if (p->kind == NodeKind::Block)
-					blocks_add_recursive(blocks, p->as_block());
+					blocks_add_recursive(blocks, p);
 		}
 	}
 }
@@ -139,15 +143,33 @@ void blocks_add_recursive(Array<Block*> &blocks, Block *block) {
 Array<Block*> Function::all_blocks() {
 	Array<Block*> blocks;
 	if (block)
-		blocks_add_recursive(blocks, block.get());
+		blocks_add_recursive(blocks, block_node.get());
 	return blocks;
+}
+
+shared<Node> Function::abstract_param_type(int n) const {
+	if (!abstract_node->params[2])
+		return nullptr;
+	return abstract_node->params[2]->params[n*3+1];
+}
+
+shared<Node> Function::abstract_default_parameter(int n) const {
+	if (!abstract_node->params[2])
+		return nullptr;
+	if (n < 0 or n*3 >= abstract_node->params[2]->params.num)
+		return nullptr;
+	return abstract_node->params[2]->params[n*3+2];
+}
+
+shared<Node> Function::abstract_return_type() const {
+	return abstract_node->params[1];
 }
 
 
 void Function::update_parameters_after_parsing() {
 	mandatory_params = num_params;
-	for (int i=default_parameters.num-1; i>=0; i--)
-		if (default_parameters[i])
+	for (int i=num_params-1; i>=0; i--)
+		if (abstract_default_parameter(i))
 			mandatory_params = i;
 
 
@@ -180,10 +202,11 @@ void Function::add_self_parameter() {
 		flags_set(_flags, Flags::Ref);
 	block->insert_var(0, Identifier::Self, name_space, _flags);
 	literal_param_type.insert(name_space, 0);
-	abstract_param_types.insert(nullptr, 0);
+	abstract_node->params[2]->params.insert(nullptr, 0);
+	abstract_node->params[2]->params.insert(nullptr, 0);
+	abstract_node->params[2]->params.insert(nullptr, 0);
 	num_params ++;
 	mandatory_params ++;
-	default_parameters.insert(nullptr, 0);
 }
 
 // * NOT added to namespace
@@ -194,10 +217,8 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 	flags_clear(f->flags, Flags::Extern);
 
 	f->num_params = num_params;
-	f->default_parameters = default_parameters;
+	f->abstract_node = cp_node(abstract_node);
 	f->literal_param_type = literal_param_type;
-	f->abstract_param_types = abstract_param_types;
-	f->abstract_return_type = abstract_return_type;
 	for (int i=0; i<num_params; i++) {
 		auto type = var[i]->type;
 		if (is_member() and (i == 0)) { // adapt the "self" parameter

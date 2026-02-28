@@ -8,6 +8,7 @@
 #include "template/template.h"
 #include "compiler/Compiler.h"
 #include "../os/msg.h"
+#include "lib/os/app.h"
 #if HAS_LIB_DL
 #include <dlfcn.h>
 #endif
@@ -17,6 +18,8 @@ namespace kaba {
 VirtualTable* get_vtable(const VirtualBase *p);
 
 Context *default_context = nullptr;
+
+extern Array<shared<Module>> loading_module_stack;
 
 
 Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Module *s) :
@@ -65,8 +68,6 @@ string Exception::message() const {
 }
 
 
-
-
 Path absolute_module_path(const Path &filename) {
 	if (filename.is_relative())
 		return (config.directory | filename).absolute().canonical();
@@ -77,17 +78,48 @@ Path absolute_module_path(const Path &filename) {
 Context::Context() {
 	template_manager = new TemplateManager(this);
 	external = new ExternalLinkData(this);
+
+	f_load_module = [] (Context* ctx, const Path& filename, bool x) {
+		return ctx->load_module(filename, x);
+	};
+	f_create_module_for_source = [] (Context* ctx, const string& source, bool x) {
+		return ctx->create_module_for_source(source, x);
+	};
+	f_execute_single_command = [] (Context* ctx, const string& cmd) {
+		ctx->execute_single_command(cmd);
+	};
+	f_create_new_context = [this] {
+		auto ctx = create();
+		ctx->f_load_module = f_load_module;
+		ctx->f_create_module_for_source = f_create_module_for_source;
+		ctx->f_execute_single_command = f_execute_single_command;
+		ctx->f_create_new_context = f_create_new_context;
+		return ctx;
+	};
 }
 
 Context::~Context() {
     clean_up();
 }
 
-void Context::__delete__() {
-	this->Context::~Context();
+shared<Module> Context::dll_load_module(const Path& filename, bool just_analyse) {
+	return f_load_module(this, filename, just_analyse);
 }
 
-void try_import_dynamic_library_for_module(const Path& dir, Context* ctx, shared<Module> module) {
+shared<Module> Context::dll_create_module_for_source(const string& source, bool just_analyse) {
+	return f_create_module_for_source(this, source, just_analyse);
+}
+
+void Context::dll_execute_single_command(const string& cmd) {
+	f_execute_single_command(this, cmd);
+}
+
+xfer<Context> Context::dll_create_context() const {
+	return f_create_new_context();
+}
+
+void try_import_dynamic_library_for_package(Package* p, Context* ctx) {
+	const Path dir = p->directory;
 #if HAS_LIB_DL
 #ifdef OS_MAC
 	auto files = os::fs::search(dir, "lib*.dylib", "f");
@@ -98,7 +130,7 @@ void try_import_dynamic_library_for_module(const Path& dir, Context* ctx, shared
 #endif
 
 	if (files.num == 1) {
-		Exporter e(ctx, module.get());
+		Exporter e(ctx, p);
 		auto handle = dlopen((dir | files[0]).c_str(), RTLD_NOW|RTLD_LOCAL);
 		typedef void t_f(Exporter*);
 		if (auto f = (t_f*)dlsym(handle, "export_symbols")) {
@@ -112,35 +144,59 @@ void try_import_dynamic_library_for_module(const Path& dir, Context* ctx, shared
 }
 
 // FIXME ...this needs a lot of reworking, sorry...  m(-_-)m
-void try_initiate_package_for_module(const Path& filename, Context* ctx, shared<Module> module) {
-	const auto dir = filename.parent();
+Package* get_package_containing_module(Module* m) {
+	auto ctx = m->context;
+	const auto dir = m->filename.parent();
 
 	// already initialized?
 	for (const auto p: weak(ctx->external_packages))
 		if (p->directory == dir)
-			return;
+			return p;
 
 	// is a package directory?
 	if (!os::fs::exists(dir | ".kaba-package"))
-		return;
+		return nullptr;
 	// TODO check parents...
 
-	Package* p = new Package;
-	p->directory = dir;
-	p->name = dir.basename();
-	ctx->external_packages.add(p);
+	// new package
+	auto package = new Package(dir.basename(), "0", dir);
+	ctx->external_packages.add(package);
 
+	// parse info
+	{
+		auto s = os::fs::read_text(dir | ".kaba-package");
+		for (const auto& l: s.explode("\n"))
+			if (l.head(8) == "version ")
+				package->version = l.sub(8);
+	}
+
+	// package init override?
 	for (const auto& init: ctx->package_inits)
 		if (init.dir == dir) {
-			Exporter exporter(ctx, module.get());
+			Exporter exporter(ctx, package);
 			init.f(&exporter);
+			return package;
 		}
 
-	try_import_dynamic_library_for_module(dir, ctx, module);
+	// dll?
+	try_import_dynamic_library_for_package(package, ctx);
+	return package;
 }
 
+Package::Package(const string& _name, const string& _version, const Path& _directory) {
+	name = _name;
+	version = _version;
+	directory = _directory;
+	directory_dynamic = Context::installation_root() | name;
+	is_installed = (directory == default_directory());
+	is_internal = directory.is_empty();
+}
 
-shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
+Path Package::default_directory() const {
+	return Context::packages_root() | name;
+}
+
+shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
 	//msg_write("loading " + filename.str());
 
 	auto _filename = absolute_module_path(filename);
@@ -151,32 +207,32 @@ shared<Module> Context::load_module(const Path &filename, bool just_analyse) {
 			return ps;
 	
 	// load
-	auto s = create_empty_module(filename);
+	auto module = create_empty_module(filename);
 	if (!just_analyse)
-		try_initiate_package_for_module(_filename, this, s);
-	s->load(filename, just_analyse);
+		get_package_containing_module(module.get());
+	module->load(filename, just_analyse);
 
 	// store module in database
-	public_modules.add(s);
-	return s;
+	public_modules.add(module);
+	return module;
 }
 
-shared<Module> Context::create_module_for_source(const string &buffer, bool just_analyse) {
-    auto s = create_empty_module("<from-source>");
-	s->just_analyse = just_analyse;
-	s->filename = config.default_filename;
-	s->tree->parser = new Parser(s->tree.get());
-	s->tree->default_import();
-	s->tree->parser->parse_buffer(buffer, just_analyse);
+shared<Module> Context::create_module_for_source(const string& source, bool just_analyse) {
+    auto module = create_empty_module("<from-source>");
+	module->just_analyse = just_analyse;
+	module->filename = config.default_filename;
+	module->tree->parser = new Parser(module->tree.get());
+	module->tree->default_import();
+	module->tree->parser->parse_buffer(source, just_analyse);
 
 	if (!just_analyse)
-		Compiler::compile(s.get());
+		Compiler::compile(module.get());
 
-	return s;
+	return module;
 }
 
 shared<Module> Context::create_empty_module(const Path &filename) {
-	shared<Module> s = new Module(this, filename);
+	shared s = new Module(this, filename);
     return s;
 }
 
@@ -197,6 +253,7 @@ void Context::execute_single_command(const string &cmd) {
 	//msg_write("command: " + cmd);
 
     auto s = create_empty_module("<command-line>");
+	loading_module_stack.add(s);
 	auto tree = s->tree.get();
 	tree->default_import();
 	auto parser = new Parser(tree);
@@ -209,40 +266,40 @@ void Context::execute_single_command(const string &cmd) {
 		return;
 	}
 	
-	for (auto p: internal_packages)
-		if (!p->used_by_default)
-			tree->import_data_selective(p->base_class(), nullptr, nullptr, nullptr, str(p->filename), -1);
+	for (auto p: weak(internal_packages))
+		if (!p->auto_import)
+			tree->import_data_selective(p->main_module->base_class(), nullptr, nullptr, nullptr, str(p->main_module->filename), -1);
 
 // analyse syntax
 
 	// create a main() function
-	Function *func = tree->add_function("--command-func--", TypeVoid, tree->base_class, Flags::Static);
+	Function *func = tree->add_function("--command-func--", common_types._void, tree->base_class, Flags::Static);
 	func->_var_size = 0; // set to -1...
 
 	parser->Exp.reset_walker();
 
 	// parse
-	func->block->type = TypeUnknown;
-	parser->parse_abstract_complete_command_into_block(func->block.get());
+	func->block_node->type = common_types.unknown;
+	parser->parse_abstract_complete_command_into_block(func->block_node.get());
 	if (config.verbose) {
 		msg_write("ABSTRACT SINGLE:");
-		func->block->show();
+		func->block_node->show();
 	}
-	parser->con.concretify_node(func->block.get(), func->block.get(), func->name_space);
+	parser->con.concretify_node(func->block_node.get(), func->block, func->name_space);
 
-	if (func->block->params.num == 0)
+	if (func->block_node->params.num == 0)
 		return;
 
-	auto node = func->block->params[0];
+	auto node = func->block_node->params[0];
 	
 	// implicit print(...)?
-	if (node->type != TypeVoid) {
+	if (node->type != common_types._void) {
 		auto n_str = parser->con.add_converter_str(node, true);
 		auto f_print = tree->required_func_global("print");
 
 		auto cmd = add_node_call(f_print);
 		cmd->set_param(0, n_str);
-		func->block->params[0] = cmd;
+		func->block_node->params[0] = cmd;
 	}
 	//for (auto *c: tree->owned_classes)
 	for (int i=0; i<tree->owned_classes.num; i++) // array might change...
@@ -319,5 +376,21 @@ xfer<Context> Context::create() {
 	return c;
 }
 
+Package *Context::get_package(const string &name) const {
+	for (auto p: weak(internal_packages))
+		if (p->name == name)
+			return p;
+	for (auto p: weak(external_packages))
+		if (p->name == name)
+			return p;
+	return nullptr;
+}
 
+Path Context::installation_root() {
+	return os::app::home_directory | ".kaba";
+}
+
+Path Context::packages_root() {
+	return installation_root() | "packages";
+}
 }

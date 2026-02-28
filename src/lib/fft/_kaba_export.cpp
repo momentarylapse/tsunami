@@ -4,6 +4,8 @@
 
 
 void export_package_fft(kaba::Exporter* e) {
+	e->package_info("fft", "1");
+
 	e->link_func("c2c", &fft::c2c);
 	e->link_func("r2c", &fft::r2c);
 	e->link_func("c2r_inv", &fft::c2r_inv);

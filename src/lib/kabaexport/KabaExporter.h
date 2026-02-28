@@ -33,6 +33,7 @@ namespace kaba {
 class Exporter {
 public:
 	virtual ~Exporter() = default;
+	virtual void package_info(const string& name, const string& version) = 0;
 	virtual void declare_class_size(const string& name, int size) = 0;
 	virtual void _declare_class_element(const string& name, int offset) = 0;
 	virtual void link(const string& name, void* p) = 0;

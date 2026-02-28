@@ -46,6 +46,7 @@ namespace Identifier {
 	//const string ACCESSOR = "accessor";
 	const string Selfref = "selfref";
 	const string Ref = "ref";
+	const string Globalref = "globalref";
 	const string Weak = "weak";
 	const string Give = "give";
 	const string Shared = "shared";

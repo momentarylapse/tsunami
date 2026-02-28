@@ -12,22 +12,16 @@
 
 namespace kaba {
 
-extern const Class *TypeVoid;
-
 // {...}-block
-class Block : public Node {
+class Block {
 public:
-	Block(Function *f, Block *parent, const Class *type = TypeVoid);
+	Block(Function *f, Block *parent);
 	Array<Variable*> vars;
 	Function *function;
 	Block *parent;
 	void *_start, *_end; // opcode range
 	int _label_start, _label_end;
 	int level;
-	void add(shared<Node> c);
-	void set(int index, shared<Node> c);
-	bool is_trust_me() const;
-	bool is_in_try() const;
 
 	const Class *name_space() const;
 

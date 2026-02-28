@@ -11,8 +11,6 @@
 namespace kaba {
 	class Class;
 	class SyntaxTree;
-	extern const Class *TypeStringList;
-	extern const Class *TypeDictBase;
 	
 	Array<string> dict_get_keys(const DynamicArray& a);
 
@@ -42,23 +40,23 @@ namespace kaba {
 		auto t = const_cast<Class*>(tt);
 		auto t_element = tt->param[0];
 
-		t->derive_from(TypeDictBase, DeriveFlags::SET_SIZE);
+		t->derive_from(common_types.dict_base, DeriveFlags::SET_SIZE);
 
 		add_class(t);
-			class_add_func(Identifier::func::Init, TypeVoid, &XDict<T>::__init__, Flags::Mutable);
-			class_add_func(Identifier::func::Delete, TypeVoid, &XDict<T>::clear, Flags::Mutable);
-			class_add_func(Identifier::func::Set, TypeVoid, &XDict<T>::__set, Flags::Mutable);
-				func_add_param("key", TypeString);
+			class_add_func(Identifier::func::Init, common_types._void, &XDict<T>::__init__, Flags::Mutable);
+			class_add_func(Identifier::func::Delete, common_types._void, &XDict<T>::clear, Flags::Mutable);
+			class_add_func(Identifier::func::Set, common_types._void, &XDict<T>::__set, Flags::Mutable);
+				func_add_param("key", common_types.string);
 				func_add_param("x", t_element);
 			class_add_func(Identifier::func::Get, get_return, &XDict<T>::get_item, Flags::Ref);
-				func_add_param("key", TypeString);
-			class_add_func("clear", TypeVoid, &XDict<T>::clear, Flags::Mutable);
-			class_add_func(Identifier::func::Contains, TypeBool, &XDict<T>::contains);
-				func_add_param("key", TypeString);
-			class_add_func(Identifier::func::Assign, TypeVoid, &XDict<T>::assign, Flags::Mutable);
+				func_add_param("key", common_types.string);
+			class_add_func("clear", common_types._void, &XDict<T>::clear, Flags::Mutable);
+			class_add_func(Identifier::func::Contains, common_types._bool, &XDict<T>::contains);
+				func_add_param("key", common_types.string);
+			class_add_func(Identifier::func::Assign, common_types._void, &XDict<T>::assign, Flags::Mutable);
 				func_add_param("other", t);
-			class_add_func("keys", TypeStringList, &dict_get_keys, Flags::Pure);
-			class_add_func(Identifier::func::Str, TypeString, &XDict<T>::str);
+			class_add_func("keys", common_types.string_list, &dict_get_keys, Flags::Pure);
+			class_add_func(Identifier::func::Str, common_types.string, &XDict<T>::str);
 	}
 
 

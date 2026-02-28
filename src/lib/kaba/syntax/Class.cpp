@@ -7,6 +7,8 @@
 
 namespace kaba {
 
+CommonTypes common_types;
+
 void remove_enum_labels(const Class *type);
 
 base::set<Class*> _all_classes_;
@@ -100,7 +102,7 @@ bool ns_needed(const Class *ns, const Class *observer_ns) {
 		return false;
 	if (observer_ns and reachable_from(ns, observer_ns))
 		return false;
-	if (ns == ns->owner->module->context->internal_packages[0]->base_class()) // always ignore "base"
+	if (ns == ns->owner->module->context->internal_packages[0]->main_module->base_class()) // always ignore "base"
 		if (ns == ns->owner->base_class)
 			return false;
 	return true;
@@ -125,15 +127,15 @@ bool Class::is_regular() const {
 }
 
 bool Class::is_struct() const {
-	return from_template == TypeStructT;
+	return from_template == common_types.struct_t;
 }
 
 bool Class::is_array() const {
-	return from_template == TypeArrayT;
+	return from_template == common_types.array_t;
 }
 
 bool Class::is_list() const {
-	return from_template == TypeListT;
+	return from_template == common_types.list_t;
 }
 
 bool Class::is_some_pointer() const {
@@ -155,59 +157,59 @@ bool Class::is_some_pointer_not_null() const {
 }
 
 bool Class::is_pointer_raw() const {
-	return from_template == TypeRawT;
+	return from_template == common_types.raw_t;
 }
 
 bool Class::is_pointer_shared() const {
-	return from_template == TypeSharedT;
+	return from_template == common_types.shared_t;
 }
 
 bool Class::is_pointer_shared_not_null() const {
-	return from_template == TypeSharedNotNullT;
+	return from_template == common_types.shared_not_null_t;
 }
 
 bool Class::is_pointer_owned() const {
-	return from_template == TypeOwnedT;
+	return from_template == common_types.owned_t;
 }
 
 bool Class::is_pointer_owned_not_null() const {
-	return from_template == TypeOwnedNotNullT;
+	return from_template == common_types.owned_not_null_t;
 }
 
 bool Class::is_pointer_xfer_not_null() const {
-	return from_template == TypeXferT;
+	return from_template == common_types.xfer_t;
 }
 
 bool Class::is_pointer_alias() const {
-	return from_template == TypeAliasT;
+	return from_template == common_types.alias_t;
 }
 
 bool Class::is_reference() const {
-	return from_template == TypeReferenceT;
+	return from_template == common_types.reference_t;
 }
 
 bool Class::is_enum() const {
-	return from_template == TypeEnumT;
+	return from_template == common_types.enum_t;
 }
 
 bool Class::is_namespace() const {
-	return from_template == TypeNamespaceT;
+	return from_template == common_types.namespace_t;
 }
 
 bool Class::is_interface() const {
-	return from_template == TypeInterfaceT;
+	return from_template == common_types.interface_t;
 }
 
 bool Class::is_dict() const {
-	return from_template == TypeDictT;
+	return from_template == common_types.dict_t;
 }
 
 bool Class::is_product() const {
-	return from_template == TypeProductT;
+	return from_template == common_types.product_t;
 }
 
 bool Class::is_optional() const {
-	return from_template == TypeOptionalT;
+	return from_template == common_types.optional_t;
 }
 
 bool Class::is_callable() const {
@@ -217,11 +219,11 @@ bool Class::is_callable() const {
 }
 
 bool Class::is_callable_fp() const {
-	return from_template == TypeCallableFPT;
+	return from_template == common_types.callable_fp_t;
 }
 
 bool Class::is_callable_bind() const {
-	return from_template == TypeCallableBindT;
+	return from_template == common_types.callable_bind_t;
 }
 
 bool Class::uses_call_by_reference() const {
@@ -403,23 +405,23 @@ Function *Class::get_same_func(const string &_name, Function *ff) const {
 }
 
 Function *Class::get_default_constructor() const {
-	return get_func(Identifier::func::Init, TypeVoid, {nullptr});
+	return get_func(Identifier::func::Init, common_types._void, {nullptr});
 }
 
 Array<Function*> Class::get_constructors() const {
 	Array<Function*> c;
 	for (auto *f: weak(functions))
-		if ((f->name == Identifier::func::Init) and (f->literal_return_type == TypeVoid))
+		if ((f->name == Identifier::func::Init) and (f->literal_return_type == common_types._void))
 			c.add(f);
 	return c;
 }
 
 Function *Class::get_destructor() const {
-	return get_func(Identifier::func::Delete, TypeVoid, {nullptr});
+	return get_func(Identifier::func::Delete, common_types._void, {nullptr});
 }
 
 Function *Class::get_assign() const {
-	return get_func(Identifier::func::Assign, TypeVoid, {nullptr, this});
+	return get_func(Identifier::func::Assign, common_types._void, {nullptr, this});
 }
 
 Function *Class::get_get(const Class *index) const {

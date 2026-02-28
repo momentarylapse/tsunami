@@ -24,6 +24,8 @@ KABA_LINK_GROUP_END
 
 
 void export_package_net(kaba::Exporter* e) {
+	e->package_info("net", "0.2");
+
 	e->declare_class_size("Address", sizeof(net::NetAddress));
 	e->declare_class_element("Address.host", &net::NetAddress::host);
 	e->declare_class_element("Address.port", &net::NetAddress::port);
@@ -32,6 +34,7 @@ void export_package_net(kaba::Exporter* e) {
 
 	e->declare_class_size("Socket", sizeof(net::Socket));
 	e->declare_class_element("Socket.uid", &net::Socket::uid);
+	e->declare_class_element("Socket.handle", &net::Socket::s);
 	e->link_class_func("Socket.__init__", &kaba::generic_init<net::Socket>);
 	e->link_class_func("Socket.__delete__", &kaba::generic_delete<net::Socket>);
 	e->link_class_func("Socket.accept", &net::Socket::accept);

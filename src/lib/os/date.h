@@ -17,7 +17,6 @@ public:
 	int dummy[7];
 	string _cdecl format(const string &f) const;
 	string _cdecl str() const;
-	void __assign__(const Date &d);
 
 	static Date _cdecl now();
 	static Date _cdecl from_unix(int64 t);

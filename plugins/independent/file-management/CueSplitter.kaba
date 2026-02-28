@@ -50,14 +50,14 @@ class CueSplitter extends TsunamiPlugin
 					data.parts.add(Part())
 					cur = &data.parts[len(data.parts)-1]
 				if s.head(11) == "    TITLE \""
-					for c in cur
+					for mut c in cur
 						c.title = s[11:-1]
 						print(c.title)
 				if s.head(10) == "    INDEX "
 					let soff = s[13:]
 					print(soff)
 					let xx = soff.explode(":")
-					for c in cur
+					for mut c in cur
 						c.foffset = 60 * float(xx[0]) + float(xx[1]) + float(xx[2]) * 0.01
 						print(c.foffset)
 			return data

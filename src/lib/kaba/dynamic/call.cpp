@@ -25,8 +25,6 @@ void db_out(const string &s) {
 
 namespace kaba {
 
-extern const Class *TypeCallableBase;
-
 #define CALL_DEBUG_X		0
 
 // call-by-reference dummy
@@ -145,15 +143,15 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	int nrreg = 0;
 	int nsreg = 0;
 	for (int i=0; i<param.num; i++) {
-		if (ptype[i] == TypeInt32 or ptype[i]->is_enum())
+		if (ptype[i] == common_types.i32 or ptype[i]->is_enum())
 			temp[nrreg ++] = *(int*)param[i];
-		else if (ptype[i] == TypeInt8 or ptype[i] == TypeUInt8 or ptype[i] == TypeBool)
+		else if (ptype[i] == common_types.i8 or ptype[i] == common_types.u8 or ptype[i] == common_types._bool)
 			temp[nrreg ++] = *(int8*)param[i];
-		else if (ptype[i] == TypeInt64 or ptype[i]->is_some_pointer())
+		else if (ptype[i] == common_types.i64 or ptype[i]->is_some_pointer())
 			temp[nrreg ++] = *(int64*)param[i];
-		else if (ptype[i] == TypeFloat32)
+		else if (ptype[i] == common_types.f32)
 			temp[N + nsreg ++] = *(int*)param[i]; // float
-		else if (ptype[i] == TypeFloat64)
+		else if (ptype[i] == common_types.f64)
 			temp[N + nsreg ++] = *(int64*)param[i];
 		else if (ptype[i]->uses_return_by_memory())
 			temp[nrreg ++] = (int_p)param[i];
@@ -231,15 +229,15 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	exit(1);*/
 	//msg_write(bytes(&temp, sizeof(temp)).hex());
 
-	if (return_type == TypeInt32 or return_type->is_enum()) {
+	if (return_type == common_types.i32 or return_type->is_enum()) {
 		*(int*)ret = (int)temp[N*2+2];
-	} else if (return_type == TypeInt64 or return_type->is_some_pointer()) {
+	} else if (return_type == common_types.i64 or return_type->is_some_pointer()) {
 		*(int64*)ret = temp[N*2+2];
-	} else if (return_type == TypeInt8 or return_type == TypeUInt8 or return_type == TypeBool) {
+	} else if (return_type == common_types.i8 or return_type == common_types.u8 or return_type == common_types._bool) {
 		*(int8*)ret = (int8)temp[N*2+2];
-	} else if (return_type == TypeFloat64) {
+	} else if (return_type == common_types.f64) {
 		*(int64*)ret = temp[N*3+2];
-	} else if (return_type->_return_in_float_registers() or return_type == TypeFloat64) {
+	} else if (return_type->_return_in_float_registers() or return_type == common_types.f64) {
 		//msg_error("ret in float");
 		for (int i=0; i<return_type->size/4; i++)
 			((int*)ret)[i] = (int)temp[N*3+2+i];
@@ -263,26 +261,41 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 	return call_function_pointer_arm64(ff, ret, param, return_type, ptype);
 #else
 
+	auto is_gpr = [] (const Class* t) -> bool {
+		if (t == common_types.i64 or t->is_pointer_raw())
+			return true;
+		if (t == common_types.i32 or t->is_enum())
+			return true;
+		if (t == common_types.i16 or t == common_types.u16)
+			return true;
+		if (t == common_types.i8 or t == common_types.u8 or t == common_types._bool)
+			return true;
+		return false;
+	};
+
 	if (ptype.num == 0) {
-		if (return_type == TypeVoid) {
+		if (return_type == common_types._void) {
 			call0_void(ff, ret, param);
 			return true;
-		} else if (return_type == TypeInt32) {
+		} else if (return_type == common_types.i32) {
 			call0<int>(ff, ret, param);
 			return true;
-		} else if (return_type == TypeFloat32) {
+		} else if (return_type == common_types.f32) {
 			call0<float>(ff, ret, param);
+			return true;
+		} else if (return_type->is_some_pointer()) {
+			call0<void*>(ff, ret, param);
 			return true;
 		} else if (return_type->uses_return_by_memory()) {
 			call0<CBR>(ff, ret, param);
 			return true;
 		}
 	} else if (ptype.num == 1) {
-		if (return_type == TypeVoid) {
-			if (ptype[0] == TypeInt32) {
-				call1_void_x<int>(ff, ret, param);
+		if (return_type == common_types._void) {
+			if (is_gpr(ptype[0])) {
+				call1_void_x<int64>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeFloat32) {
+			} else if (ptype[0] == common_types.f32) {
 				call1_void_x<float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
@@ -306,70 +319,67 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 #endif
 				return true;
 			}
-		} else if (return_type == TypeInt32) {
-			if (ptype[0] == TypeInt32 or ptype[0]->is_enum()) {
-				call1<int,int>(ff, ret, param);
+		} else if (return_type == common_types.i32) {
+			if (is_gpr(ptype[0])) {
+				call1<int,int64>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeInt8) {
-				call1<int,char>(ff, ret, param);
-				return true;
-			} else if (ptype[0] == TypeFloat32) {
+			} else if (ptype[0] == common_types.f32) {
 				call1<int,float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
 				call1<int,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeInt64) {
-			if (ptype[0] == TypeInt32) {
-				call1<int64,int>(ff, ret, param);
+		} else if (return_type == common_types.i64) {
+			if (is_gpr(ptype[0])) {
+				call1<int64,int64>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeBool or return_type == TypeInt8) {
-			if (ptype[0] == TypeInt32) {
-				call1<char,int>(ff, ret, param);
+		} else if (return_type == common_types._bool or return_type == common_types.i8) {
+			if (is_gpr(ptype[0])) {
+				call1<char,int64>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeFloat32) {
+			} else if (ptype[0] == common_types.f32) {
 				call1<char,float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
 				call1<char,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeFloat32) {
-			if (ptype[0] == TypeInt32) {
-				call1<float,int>(ff, ret, param);
+		} else if (return_type == common_types.f32) {
+			if (is_gpr(ptype[0])) {
+				call1<float,int64>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeFloat32) {
+			} else if (ptype[0] == common_types.f32) {
 				call1<float,float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->uses_call_by_reference()) {
 				call1<float,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeFloat64) {
-			if (ptype[0] == TypeFloat32) {
+		} else if (return_type == common_types.f64) {
+			if (ptype[0] == common_types.f32) {
 				call1<double,float>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeFloat64) {
+			} else if (ptype[0] == common_types.f64) {
 				call1<double,double>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeVec3) {
+		} else if (return_type == common_types.vec3) {
 			if (ptype[0]->uses_call_by_reference()) {
 				call1<vec3,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeQuaternion) {
+		} else if (return_type == common_types.quaternion) {
 			if (ptype[0]->uses_call_by_reference()) {
 				call1<vec4,CBR>(ff, ret, param);
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
-			if (ptype[0] == TypeInt32) {
-				call1<CBR,int>(ff, ret, param);
+			if (is_gpr(ptype[0])) {
+				call1<CBR,int64>(ff, ret, param);
 				return true;
-			} else if (ptype[0] == TypeFloat32) {
+			} else if (ptype[0] == common_types.f32) {
 				call1<CBR,float>(ff, ret, param);
 				return true;
 			} else if (ptype[0]->is_pointer_raw()) {
@@ -381,37 +391,37 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			}
 		}
 	} else if (ptype.num == 2) {
-		if (return_type == TypeInt32) {
-			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
-				call2<int,int,int>(ff, ret, param);
+		if (return_type == common_types.i32) {
+			if (is_gpr(ptype[0]) and is_gpr(ptype[1])) {
+				call2<int,int64,int64>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
-				call2<int,CBR,int>(ff, ret, param);
+			if (ptype[0]->uses_call_by_reference() and is_gpr(ptype[1])) {
+				call2<int,CBR,int64>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+			if (ptype[0]->uses_call_by_reference() and (ptype[1] == common_types.f32)) {
 				call2<int,CBR,float>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1]->uses_call_by_reference())) {
+			if (ptype[0]->uses_call_by_reference() and (ptype[1]->uses_call_by_reference())) {
 				call2<int,CBR,CBR>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeBool) {
-			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
-				call2<bool,int,int>(ff, ret, param);
+		} else if (return_type == common_types._bool) {
+			if (is_gpr(ptype[0]) and is_gpr(ptype[1])) {
+				call2<bool,int64,int64>(ff, ret, param);
 				return true;
 			}
 			if (ptype[0]->is_some_pointer() and ptype[1]->is_some_pointer()) {
 				call2<bool,void*,void*>(ff, ret, param);
 				return true;
 			}
-			/*if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
+			/*if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == common_types.i32)) {
 				call2<bool,CBR,int>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == common_types.f32)) {
 				call2<bool,CBR,float>(ff, ret, param);
 				return true;
 			}
@@ -419,79 +429,76 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call2<bool,CBR,CBR>(ff, ret, param);
 				return true;
 			}*/
-		} else if (return_type == TypeFloat32) {
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
+		} else if (return_type == common_types.f32) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32)) {
 				call2<float,float,float>(ff, ret, param);
 				return true;
 			}
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == common_types.f32)) {
 				call2<float,CBR,float>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeInt64) {
-			if ((ptype[0] == TypeInt64) and (ptype[1] == TypeInt64)) {
+		} else if (return_type == common_types.i64) {
+			if (is_gpr(ptype[0]) and is_gpr(ptype[1])) {
 				call2<int64,int64,int64>(ff, ret, param);
 				return true;
-			} else if ((ptype[0] == TypeInt64) and (ptype[1] == TypeInt32)) {
-				call2<int64,int64,int>(ff, ret, param);
-				return true;
 			}
-		} else if (return_type == TypeComplex) {
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
+		} else if (return_type == common_types.complex) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32)) {
 				call2<vec2,float,float>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == TypeQuaternion) {
-			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+		} else if (return_type == common_types.quaternion) {
+			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == common_types.f32)) {
 				call2<vec4,CBR,float>(ff, ret, param);
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
-			if ((ptype[0] == TypeInt32) and (ptype[1] == TypeInt32)) {
-				call2<CBR,int,int>(ff, ret, param);
+			if (is_gpr(ptype[0]) and is_gpr(ptype[1])) {
+				call2<CBR,int64,int64>(ff, ret, param);
 				return true;
-			} else if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32)) {
+			} else if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32)) {
 				call2<CBR,float,float>(ff, ret, param);
 				return true;
-			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeInt32)) {
-				call2<CBR,CBR,int>(ff, ret, param);
+			} else if (ptype[0]->uses_call_by_reference() and is_gpr(ptype[1])) {
+				call2<CBR,CBR,int64>(ff, ret, param);
 				return true;
-			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == TypeFloat32)) {
+			} else if (ptype[0]->uses_call_by_reference() and (ptype[1] == common_types.f32)) {
 				call2<CBR,CBR,float>(ff, ret, param);
 				return true;
-			} else if ((ptype[0]->uses_call_by_reference()) and (ptype[1]->uses_call_by_reference())) {
+			} else if (ptype[0]->uses_call_by_reference() and (ptype[1]->uses_call_by_reference())) {
 				call2<CBR,CBR,CBR>(ff, ret, param);
 				return true;
 			}
 		}
 	} else if (ptype.num == 3) {
-		if (return_type == TypeVec3) {
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32)) {
+		if (return_type == common_types.vec3) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32)) {
 				call3<vec3,float,float,float>(ff, ret, param);
 				return true;
 			}
 		}
 		/*if (f->return_type->uses_return_by_memory()) {
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32)) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32)) {
 				((void(*)(void*, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2]);
 				return true;
 			}
 		}*/
 	} else if (ptype.num == 4) {
-		if (return_type == TypeVoid) {
-			if ((ptype[0] == TypeVec3) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+		if (return_type == common_types._void) {
+			if ((ptype[0] == common_types.vec3) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
 				((void(*)(void*, float, float, float))ff)(param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;
 			}
 		}
 		if (return_type->_return_in_float_registers() and (return_type->size == 16)) { // rect, color, plane, quaternion
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
 				call4<vec4,float,float,float,float>(ff, ret, param);
 				return true;
 			}
 		}
 		/*if (f->return_type->uses_return_by_memory()) {
-			if ((ptype[0] == TypeFloat32) and (ptype[1] == TypeFloat32) and (ptype[2] == TypeFloat32) and (ptype[3] == TypeFloat32)) {
+			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
 				((void(*)(void*, float, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
 				return true;
 			}
@@ -549,12 +556,12 @@ bool call_member_function(Function *f, void *instance, void *ret, const Array<vo
 }
 
 void *callable_get_func_pointer(void *c) {
-	return object_get_virtual_func_pointer(c, TypeCallableBase->get_call());
+	return object_get_virtual_func_pointer(c, common_types.callable_base->get_call());
 }
 
 bool call_callable(void *c, void *ret, const Array<void*> &_param, const Class *return_type, const Array<const Class*> &_ptype) {
 	auto ptype = _ptype;
-	ptype.insert(TypeCallableBase, 0);
+	ptype.insert(common_types.callable_base, 0);
 	auto param = _param;
 	param.insert(c, 0);
 	return call_function_pointer(callable_get_func_pointer(c), ret, param, return_type, ptype);

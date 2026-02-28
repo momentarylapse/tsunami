@@ -89,7 +89,6 @@ void Module::set_variable(const string &name, void *data) {
 Module::Module(Context *c, const Path &_filename) {
     context = c;
 	filename = _filename;
-	used_by_default = false;
 
 	show_compiler_stats = !config.compile_silently;
 

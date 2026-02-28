@@ -72,7 +72,7 @@ color hash_color(int h) {
 
 color MidiPainter::pitch_color(int pitch) {
 	return PITCH_COLORS[pitch % 12];
-	//return color::hsb((float)(pitch % 12) / 12.0f, 0.6f, 1, 1);
+	//return color::from_hsb((float)(pitch % 12) / 12.0f, 0.6f, 1, 1);
 }
 
 
@@ -362,7 +362,7 @@ void MidiPainter::draw_low_detail_dummy_part(Painter *c, const Range &r, const M
 			continue;
 		color col = local_theme.pitch[i];
 		if (!is_playable)
-			col = color::interpolate(col, local_theme.text_soft3, 0.8f);
+			col = color::mix(col, local_theme.text_soft3, 0.8f);
 		col.a = (float)count[i] / (float)notes.num;
 		c->set_color(col);
 		float y0 = area.y2 - i*area.height()/12;

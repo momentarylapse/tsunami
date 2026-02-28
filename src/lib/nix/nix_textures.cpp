@@ -220,12 +220,16 @@ void Texture::set_options(const string &options) const {
 	}
 }
 
-void Texture::write(const Image &image) {
+void Texture::write(const Image& image) {
+	write_with_color_space(image, image.color_space);
+}
+
+void Texture::write_with_color_space(const Image& image, ColorSpace color_space) {
 	if (image.error)
 		return;
 
 	if (type == Type::NONE)
-		_create_2d(image.width, image.height, GL_RGBA8);//GL_SRGB8_ALPHA8);
+		_create_2d(image.width, image.height, color_space == ColorSpace::SRGB ? GL_SRGB8_ALPHA8 : GL_RGBA8);
 
 	if (width != image.width or height != image.height) {
 		//msg_write("texture resize..." + filename.str());

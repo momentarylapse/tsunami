@@ -27,11 +27,6 @@ template<> inline string str(const int8& c) {
 
 namespace kaba {
 
-extern const Class *TypeAny;
-extern const Class *TypeDynamicArray;
-extern const Class *TypePath;
-extern const Class *TypeVoid;
-
 template<class T>
 struct is_shared {
 	static constexpr bool v = false;
@@ -274,33 +269,33 @@ public:
 template<class T, bool allow_str = true>
 void lib_create_list(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
-	t->derive_from(TypeDynamicArray, DeriveFlags::SET_SIZE);
+	t->derive_from(common_types.dynamic_array, DeriveFlags::SET_SIZE);
 	auto t_element = t->param[0];
 
 	add_class(t);
-		class_add_func(Identifier::func::Init, TypeVoid, &XList<T>::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &XList<T>::clear, Flags::Mutable);
-		class_add_func("clear", TypeVoid, &XList<T>::clear, Flags::Mutable);
-		class_add_func("add", TypeVoid, &XList<T>::__add, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &XList<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &XList<T>::clear, Flags::Mutable);
+		class_add_func("clear", common_types._void, &XList<T>::clear, Flags::Mutable);
+		class_add_func("add", common_types._void, &XList<T>::__add, Flags::Mutable);
 			func_add_param("x", t_element);
-		class_add_func("insert", TypeVoid, &XList<T>::__insert, Flags::Mutable);
+		class_add_func("insert", common_types._void, &XList<T>::__insert, Flags::Mutable);
 			func_add_param("x", t_element);
-			func_add_param("index", TypeInt32);
-		/*class_add_func(Identifier::Func::CONTAINS, TypeBool, &XList<T>::__contains__);
+			func_add_param("index", common_types.i32);
+		/*class_add_func(Identifier::Func::CONTAINS, common_types._bool, &XList<T>::__contains__);
 			func_add_param("x", t_element);
-		class_add_func(Identifier::Func::ASSIGN, TypeVoid, &XList<T>::assign);
+		class_add_func(Identifier::Func::ASSIGN, common_types._void, &XList<T>::assign);
 			func_add_param("other", t);*/
-		class_add_func("remove", TypeVoid, &XList<T>::erase, Flags::Mutable);
-			func_add_param("index", TypeInt32);
-		class_add_func("resize", TypeVoid, &XList<T>::resize, Flags::Mutable);
-			func_add_param("num", TypeInt32);
+		class_add_func("remove", common_types._void, &XList<T>::erase, Flags::Mutable);
+			func_add_param("index", common_types.i32);
+		class_add_func("resize", common_types._void, &XList<T>::resize, Flags::Mutable);
+			func_add_param("num", common_types.i32);
 		if constexpr (allow_str)
-			class_add_func(Identifier::func::Str, TypeString, &XList<T>::str, Flags::Pure);
+			class_add_func(Identifier::func::Str, common_types.string, &XList<T>::str, Flags::Pure);
 
-		add_operator(OperatorID::Assign, TypeVoid, t, t, InlineID::None, &XList<T>::assign);
-		add_operator(OperatorID::In, TypeBool, t, t_element, InlineID::None, &XList<T>::__contains__);
+		add_operator(OperatorID::Assign, common_types._void, t, t, InlineID::None, &XList<T>::assign);
+		add_operator(OperatorID::In, common_types._bool, t, t_element, InlineID::None, &XList<T>::__contains__);
 		add_operator(OperatorID::BitOr, t, t, t, InlineID::None, &XList<T>::__add__);
-		//add_operator(OperatorID::BIT_OR_ASSIGN, TypeVoid, t, t, InlineID::NONE, &XList<T>::__adds__);
+		//add_operator(OperatorID::BIT_OR_ASSIGN, common_types._void, t, t, InlineID::NONE, &XList<T>::__adds__);
 
 	// TODO: ==, !=, +, +=
 }

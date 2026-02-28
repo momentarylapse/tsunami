@@ -14,7 +14,7 @@
 namespace kaba {
 
 TempVar::TempVar() {
-	type = TypeUnknown;
+	type = common_types.unknown;
 	first = last = -1;
 	usage_count = 0;
 	mapped = false;
@@ -58,7 +58,7 @@ void CommandList::use_virtual_reg(int v, int first, int last) {
 
 
 SerialNodeParam CommandList::_add_temp(const Class *t) {
-	if (t == TypeVoid)
+	if (t == common_types._void)
 		return p_none;
 
 	//msg_write("add temp " + t->name + " " + b2s(add_constructor));

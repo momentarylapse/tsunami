@@ -284,27 +284,27 @@ public:
 };
 
 
-template <class T>
+template<class T>
 using shared_array = Array<shared<T>>;
 
 
-template <class T>
-const Array<T*> &weak(const shared_array<T> &a) {
+template<class T>
+const Array<T*>& weak(const shared_array<T>& a) {
 	return *(const Array<T*>*)&a;
 }
 
 template <class T>
-Array<T*> &weak(shared_array<T> &a) {
+Array<T*>& weak(shared_array<T>& a) {
 	return *(Array<T*>*)&a;
 }
 
-template <class T>
-const Array<T*> &weak(const owned_array<T> &a) {
+template<class T>
+const Array<T*>& weak(const owned_array<T>& a) {
 	return *(const Array<T*>*)&a;
 }
 
-template <class T>
-Array<T*> &weak(owned_array<T> &a) {
+template<class T>
+Array<T*>& weak(owned_array<T>& a) {
 	return *(Array<T*>*)&a;
 }
 

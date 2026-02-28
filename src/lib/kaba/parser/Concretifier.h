@@ -92,6 +92,7 @@ public:
 	shared<Node> concretify_statement_raise(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_lambda(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_match(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_statement_trust_me(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_special_function_call(shared<Node> node, SpecialFunction *s, Block *block, const Class *ns);
 	shared<Node> concretify_special_function_str(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_special_function_repr(shared<Node> node, Block *block, const Class *ns);
@@ -176,6 +177,10 @@ public:
 	Parser *parser;
 	AutoImplementer *auto_implementer;
 	int for_index_count = 0;
+	int _try_level = 0;
+	int _trust_me_level = 0;
+	bool is_in_try() const;
+	bool is_in_trust_me() const;
 };
 
 }

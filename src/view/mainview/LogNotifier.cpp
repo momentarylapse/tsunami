@@ -54,13 +54,13 @@ public:
 		color c = theme.background_overlay;
 		if (message.type == Log::Type::Error) {
 			header = "Error";
-			c = color::interpolate(theme.background, Red, 0.3f);
+			c = color::mix(theme.background, Red, 0.3f);
 		} else if (message.type == Log::Type::Question) {
 			header = "Question";
-			c = color::interpolate(theme.background, Orange, 0.3f);
+			c = color::mix(theme.background, Orange, 0.3f);
 		} else {
 			header = "Info";
-			//c = color::interpolate(theme.background, Orange, 0.3f);
+			//c = color::mix(theme.background, Orange, 0.3f);
 		}
 
 		// multi-line -> header/msg

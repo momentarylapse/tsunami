@@ -69,8 +69,9 @@ class SamplePanel extends ConfigPanel
 		var old: Sample* = nil
 		for s in sc.samples[n]
 			old = &s.origin
-		let f = func(ss: Sample*)
-			for _s in ss
+		let f = func(_ss: Sample*)
+			var ss = _ss # FIXME mut workaround...
+			for mut _s in ss
 				sc.samples[n] = _s.create_ref()
 			else
 				sc.samples[n] = nil

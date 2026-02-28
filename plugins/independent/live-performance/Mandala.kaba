@@ -36,7 +36,7 @@ class Mandala extends TsunamiPlugin
 	
 	# when the config was changed
 	func override on_config()
-		for s in synth
+		for mut s in synth
 			# configure synth with our samples
 			s.config.samples.clear()
 			s.config.samples.resize(128)
@@ -49,7 +49,7 @@ class Mandala extends TsunamiPlugin
 				if i < len(config.rim_samples)
 					s.config.samples[p] = config.rim_samples[i]
 			s.changed()
-		for s in source
+		for mut s in source
 			s.set_device(config.device)
 		
 	

@@ -76,7 +76,7 @@ public:
 	owned<PresetManager> presets;
 
 
-	shared<kaba::Module> package;
+	shared<kaba::Module> internal_module;
 	kaba::Class *get_class(const string &name);
 
 	void set_favorite(Session *session, ModuleCategory type, const string &name, bool favorite);

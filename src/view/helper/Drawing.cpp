@@ -22,7 +22,7 @@ color color_heat_map(float f) {
 
 	for (int i=0; i<4; i++)
 		if (f <= stop[i + 1])
-			return color::interpolate(c[i], c[i+1], (f - stop[i]) / (stop[i+1] - stop[i]));
+			return color::mix(c[i], c[i+1], (f - stop[i]) / (stop[i+1] - stop[i]));
 	return c[4];
 }
 

@@ -27,6 +27,7 @@ public:
 
 	int width, height;
 	mutable Mode mode;
+	ColorSpace color_space; // just a hint for in
 	Array<unsigned int> data;
 	bool alpha_used;
 	bool error;

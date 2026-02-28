@@ -5,6 +5,8 @@
 #include "conversion.h"
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
+#include <lib/math/mat3.h>
+#include <lib/math/mat4.h>
 #if __has_include(<lib/image/color.h>)
 #include <lib/image/color.h>
 
@@ -60,6 +62,29 @@ Any vec2_to_any(const vec2& v) {
 Any mat4_to_any(const mat4& m) {
 	Any a = Any::EmptyList;
 	for (int i=0; i<16; i++)
-		a.list_set(i, Any(((float*)&m)[i]));
+		a.list_set(i, Any(m.e[i]));
 	return a;
+}
+
+mat4 any_to_mat4(const Any& a) {
+	const auto list = any_to_float_list<float>(a);
+	mat4 m = mat4::ZERO;
+	for (int i=0; i<min(16, list.num); i++)
+		m.e[i] = list[i];
+	return m;
+}
+
+Any mat3_to_any(const mat3& m) {
+	Any a = Any::EmptyList;
+	for (int i=0; i<9; i++)
+		a.list_set(i, Any(m.e[i]));
+	return a;
+}
+
+mat3 any_to_mat3(const Any& a) {
+	const auto list = any_to_float_list<float>(a);
+	mat3 m = mat3::ZERO;
+	for (int i=0; i<min(9, list.num); i++)
+		m.e[i] = list[i];
+	return m;
 }

@@ -26,12 +26,12 @@ class SineSource extends AudioSource
 		source = CreateMidiSource(session, "Tone")
 		synth = CreateSynthesizer(session, "")
 		#dyn({"pitch":config.pitch, "volume":config.volume})
-		for s in source
+		for mut s in source
 			s.config_from_string(Module.VERSION_LEGACY, "({{config.pitch}} {{config.volume}})")
 			for ss in synth
 				s.output >> ss.input
 
-	func override read(out buf: AudioBuffer) -> int
-		for s in synth
+	func override read(out buf: AudioBuffer) -> i32
+		for mut s in synth
 			return s.port_out[0].read_audio(buf)
 		return 0

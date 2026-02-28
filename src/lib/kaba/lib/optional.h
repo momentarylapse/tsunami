@@ -18,8 +18,6 @@
 
 namespace kaba {
 
-	extern const Class *TypeNone;
-
 
 
 KABA_LINK_GROUP_BEGIN
@@ -71,24 +69,24 @@ void lib_create_optional(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
 
 	add_class(t);
-		class_add_func(Identifier::func::Init, TypeVoid, &XOptional<T>::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Init, TypeVoid, &XOptional<T>::__init_raw__, Flags::AutoCast | Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init_raw__, Flags::AutoCast | Flags::Mutable);
 			func_add_param("x", tt->param[0]);
-		class_add_func(Identifier::func::Init, TypeVoid, &XOptional<T>::__init_nil__, Flags::AutoCast | Flags::Mutable);
-			func_add_param("x", TypeNone);
-		class_add_func(Identifier::func::Delete, TypeVoid, &XOptional<T>::__delete__, Flags::Mutable);
-		class_add_func(Identifier::func::OptionalHasValue, TypeBool, &XOptional<T>::has_value, Flags::Pure);
-		class_add_func("__bool__", TypeBool, &XOptional<T>::has_value, Flags::Pure);
+		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init_nil__, Flags::AutoCast | Flags::Mutable);
+			func_add_param("x", common_types.none);
+		class_add_func(Identifier::func::Delete, common_types._void, &XOptional<T>::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::OptionalHasValue, common_types._bool, &XOptional<T>::has_value, Flags::Pure);
+		class_add_func("__bool__", common_types._bool, &XOptional<T>::has_value, Flags::Pure);
 		class_add_func("_value", tt->param[0], &XOptional<T>::_value, Flags::Ref | Flags::RaisesExceptions);
 
-		class_add_func(Identifier::func::Assign, TypeVoid, &XOptional<T>::__assign__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &XOptional<T>::__assign__, Flags::Mutable);
 			func_add_param("x", tt);
-		class_add_func(Identifier::func::Assign, TypeVoid, &XOptional<T>::__assign_raw__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &XOptional<T>::__assign_raw__, Flags::Mutable);
 			func_add_param("x", tt->param[0]);
-		class_add_func(Identifier::func::Assign, TypeVoid, &XOptional<T>::__assign_nil__, Flags::Mutable);
-			func_add_param("x", TypeNone);
+		class_add_func(Identifier::func::Assign, common_types._void, &XOptional<T>::__assign_nil__, Flags::Mutable);
+			func_add_param("x", common_types.none);
 
-		class_add_func(Identifier::func::Equal, TypeBool, &XOptional<T>::__equal__);
+		class_add_func(Identifier::func::Equal, common_types._bool, &XOptional<T>::__equal__);
 			func_add_param("other", tt);
 }
 

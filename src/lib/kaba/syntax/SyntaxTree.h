@@ -114,11 +114,11 @@ public:
 	shared<Node> conv_func_inline(shared<Node> n);
 
 	void transform(std::function<shared<Node>(shared<Node>)> F);
-	static void transform_block(Block *block, std::function<shared<Node>(shared<Node>)> F);
+	static void transform_block(Node *block, std::function<shared<Node>(shared<Node>)> F);
 	static shared<Node> transform_node(shared<Node> n, std::function<shared<Node>(shared<Node>)> F);
 
 	void transformb(std::function<shared<Node>(shared<Node>, Block*)> F);
-	static void transformb_block(Block *block, std::function<shared<Node>(shared<Node>, Block*)> F);
+	static void transformb_block(Node *block, std::function<shared<Node>(shared<Node>, Block*)> F);
 	static shared<Node> transformb_node(shared<Node> n, Block *b, std::function<shared<Node>(shared<Node>, Block*)> F);
 
 	// data creation
@@ -165,6 +165,7 @@ public:
 	owned_array<KabaException> raised_exceptions;
 
 	shared<Function> root_of_all_evil;
+	shared<Node> root_node;
 
 	Module *module;
 	owned<Parser> parser;

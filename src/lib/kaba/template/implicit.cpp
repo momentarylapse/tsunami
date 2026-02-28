@@ -12,8 +12,6 @@ namespace kaba {
 
 const int FULL_CONSTRUCTOR_MAX_PARAMS = 8;
 
-extern const Class* TypeNoValueError;
-
 
 AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 	parser = p;
@@ -22,19 +20,19 @@ AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 }
 
 shared<Node> AutoImplementer::node_false() {
-	auto c = tree->add_constant(TypeBool);
+	auto c = tree->add_constant(common_types._bool);
 	c->as_int() = 0;
 	return add_node_const(c);
 }
 
 shared<Node> AutoImplementer::node_true() {
-	auto c = tree->add_constant(TypeBool);
+	auto c = tree->add_constant(common_types._bool);
 	c->as_int() = 1;
 	return add_node_const(c);
 }
 
 shared<Node> AutoImplementer::node_nil() {
-	auto c = tree->add_constant(TypePointer);
+	auto c = tree->add_constant(common_types.pointer);
 	c->as_int64() = 0;
 	return add_node_const(c);
 }
@@ -74,15 +72,15 @@ shared<Node> AutoImplementer::node_if_else(shared<Node> n_test, shared<Node> n_t
 }
 
 shared<Node> AutoImplementer::node_raise_no_value() {
-	auto f_ex = TypeNoValueError->get_default_constructor();
+	auto f_ex = common_types.no_value_error->get_default_constructor();
 	auto cmd_call_ex = add_node_call(f_ex, -1);
 	cmd_call_ex->set_num_params(1);
-	cmd_call_ex->set_param(0, new Node(NodeKind::Placeholder, 0, TypeVoid));
+	cmd_call_ex->set_param(0, new Node(NodeKind::Placeholder, 0, common_types._void));
 
 	auto cmd_new = add_node_statement(StatementID::New);
 	cmd_new->set_num_params(1);
 	cmd_new->set_param(0, cmd_call_ex);
-	cmd_new->type = TypeExceptionXfer;
+	cmd_new->type = common_types.exception_xfer;
 
 	auto cmd_raise = add_node_call(tree->required_func_global("raise"));
 	cmd_raise->set_param(0, cmd_new);
@@ -108,13 +106,13 @@ shared<Node> AutoImplementer::db_print_p2s_node(shared<Node> node) {
 }
 
 shared<Node> AutoImplementer::db_print_label(const string &s) {
-	auto c = tree->add_constant(TypeString);
+	auto c = tree->add_constant(common_types.string);
 	c->as_string() = s;
 	return db_print_node(add_node_const(c));
 }
 
 shared<Node> AutoImplementer::db_print_label_node(const string &s, shared<Node> node) {
-	auto c = tree->add_constant(TypeString);
+	auto c = tree->add_constant(common_types.string);
 	c->as_string() = s;
 
 	auto ff = tree->required_func_global("print");
@@ -182,11 +180,14 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 		f->literal_param_type.add(p);
 		f->block->add_var(param_names[i], p, Flags::None);
 		f->num_params ++;
+		f->abstract_node->params[2]->params.resize(f->num_params * 3);
 	}
-	f->default_parameters = def_params;
+	for (auto&& [i, p]: enumerate(def_params))
+		f->abstract_node->params[2]->set_param(i*3+2, p);
+
 	f->update_parameters_after_parsing();
 	if (config.verbose)
-		msg_write("ADD HEADER " + f->signature(TypeVoid));
+		msg_write("ADD HEADER " + f->signature(common_types._void));
 
 	bool override = cf;
 	t->add_function(tree, f, false, override);
@@ -225,7 +226,10 @@ void AutoImplementer::redefine_inherited_constructors(Class *t) {
 	for (auto *pcc: t->parent->get_constructors()) {
 		auto c = t->get_same_func(Identifier::func::Init, pcc);
 		if (needs_new(c)) {
-			add_func_header(t, Identifier::func::Init, TypeVoid, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::Mutable, pcc->default_parameters);
+			shared_array<Node> def_params;
+			for (int i=0; i<pcc->num_params; i++)
+				def_params.add(pcc->abstract_default_parameter(i));
+			add_func_header(t, Identifier::func::Init, common_types._void, pcc->literal_param_type, class_func_param_names(pcc), c, Flags::Mutable, def_params);
 		}
 	}
 }
@@ -239,7 +243,7 @@ void AutoImplementer::add_full_constructor(Class *t) {
 			types.add(e.type);
 		}
 	}
-	auto f = add_func_header(t, Identifier::func::Init, TypeVoid, types, names, nullptr, Flags::Mutable);
+	auto f = add_func_header(t, Identifier::func::Init, common_types._void, types, names, nullptr, Flags::Mutable);
 	flags_set(f->flags, Flags::__InitFillAllParams);
 }
 
@@ -309,7 +313,7 @@ bool class_can_elements_assign(const Class *t) {
 bool class_can_equal(const Class *t) {
 	if (t->is_pointer_raw() or t->is_reference())
 		return true;
-	if (t->get_member_func(Identifier::func::Equal, TypeBool, {t}))
+	if (t->get_member_func(Identifier::func::Equal, common_types._bool, {t}))
 		return true;
 	return false;
 }

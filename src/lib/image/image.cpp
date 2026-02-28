@@ -15,10 +15,11 @@ Image::Image() {
 	width = height = 0;
 	error = false;
 	mode = Mode::RGBA;
+	color_space = ColorSpace::SRGB;
 	alpha_used = false;
 }
 
-Image::Image(int _width, int _height, const color &c) {
+Image::Image(int _width, int _height, const color &c) : Image() {
 	create(_width, _height, c);
 }
 
@@ -99,6 +100,7 @@ void Image::create(int _width, int _height, const color &c) {
 	width = _width;
 	height = _height;
 	mode = Mode::RGBA;
+	color_space = ColorSpace::SRGB;
 	error = false;
 	alpha_used = (c.a != 1.0f);
 	
@@ -210,7 +212,7 @@ void Image::draw_pixel(int x, int y, const color &c) {
 	} else if (c.a <= 0){
 	} else {
 		color c0 = get_pixel(x, y);
-		set_pixel(x, y, color::interpolate(c0, c, c.a));
+		set_pixel(x, y, color::mix(c0, c, c.a));
 	}
 }
 

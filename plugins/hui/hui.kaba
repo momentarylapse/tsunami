@@ -99,7 +99,7 @@ class Window extends Panel
 	func extern mut show()
 	func extern mut hide()
 	func extern mut set_menu(menu: xfer[Menu])
-	func extern mut toolbar(index: i32) -> Toolbar*
+	func extern mut selfref toolbar(index: i32) -> Toolbar*
 	func extern mut set_maximized(max: bool)
 	func extern is_maximized() -> bool
 	func extern is_minimized() -> bool
@@ -190,6 +190,22 @@ class Event
 	var column: i32
 #	func __delete__()
 	
+
+
+struct Resource
+	var type: string
+	var id: string
+	var title: string
+	var tooltip: string
+	var options: string[]
+	var x, y: i32
+	var children: Resource[]
+	#void reset()
+	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
+	func extern show(indent: i32)
+	func extern str(indent: i32) -> string
+	
+func extern parse_resource(buffer: string, literally: bool) -> Resource
 
 # key ids (int)
 # enum... FIXME

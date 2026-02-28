@@ -78,9 +78,9 @@ color col_inter(const color a, const color &b, float t) {
 
 ColorScheme ColorScheme::disabled() const {
 	ColorScheme c = *this;
-	c.text = color::interpolate(text, background, 0.3f);
-	c.selection = color::interpolate(selection, background, pow(0.3f, gamma));
-	c.hover = color::interpolate(hover, background, 0.3f);
+	c.text = color::mix(text, background, 0.3f);
+	c.selection = color::mix(selection, background, pow(0.3f, gamma));
+	c.hover = color::mix(hover, background, 0.3f);
 	c.auto_generate();
 	return c;
 }
@@ -99,19 +99,19 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 		high_contrast_b = White;
 	}
 
-	//background_track_selected = color::interpolate(background, selection*1.5f, 0.17f);
-	//background_track = color::interpolate(background, background_track_selected, 0.5f);
+	//background_track_selected = color::mix(background, selection*1.5f, 0.17f);
+	//background_track = color::mix(background, background_track_selected, 0.5f);
 	background_track_selected = col_inter(background, selection*1.2f, 0.10f);
 	background_track_selection = col_inter(background, selection*1.2f, 0.4f);
 	background_track = background;
 
 	selection_bars = selection;
 	selection_bars.a = pow(0.13f, gamma);
-	selection_bars_hover = color::interpolate(selection_bars, hover, 0.5f);
+	selection_bars_hover = color::mix(selection_bars, hover, 0.5f);
 	selection_internal = selection;
 	selection_internal.a = pow(0.1f, gamma);
 	selection_boundary = selection;
-	selection_boundary_hover = color::interpolate(selection, hover, 0.6f);
+	selection_boundary_hover = color::mix(selection, hover, 0.6f);
 	preview_marker = color(1, 0, 0.7f, 0);
 	preview_marker_internal = color(0.25f, 0, 0.7f, 0);
 	capture_marker = color(1, 0.7f, 0, 0);
@@ -128,19 +128,19 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 	sample = text_soft2;
 	sample_selected = selection;
 
-	background_overlay = color::interpolate(background, text_soft3, 0.1f);
+	background_overlay = color::mix(background, text_soft3, 0.1f);
 	background_overlay.a = 0.8f;
 	
 
-	blob_bg_hidden = color::interpolate(color::interpolate(selection, text_soft3, 0.6f), background_track_selected, 0.8f);
-	blob_bg = color::interpolate(color::interpolate(selection, text_soft2, 0.5f), background_track_selected, 0.6f);
-	blob_bg_selected = color::interpolate(color::interpolate(selection, text_soft2, 0.4f), background_track_selected, 0.3f);
+	blob_bg_hidden = color::mix(color::mix(selection, text_soft3, 0.6f), background_track_selected, 0.8f);
+	blob_bg = color::mix(color::mix(selection, text_soft2, 0.5f), background_track_selected, 0.6f);
+	blob_bg_selected = color::mix(color::mix(selection, text_soft2, 0.4f), background_track_selected, 0.3f);
 	blob_text = White;
-	blob_text_soft = color::interpolate(blob_text, Gray, _is_dark ? 0.25f : 0.07f);
-	color col_base_alt = color::interpolate(selection, Green, 0.8f);
-	blob_bg_alt_hidden = color::interpolate(color::interpolate(col_base_alt, text_soft3, 0.6f), background_track_selected, 0.8f);
-	blob_bg_alt = color::interpolate(color::interpolate(col_base_alt, text_soft2, 0.5f), background_track_selected, 0.6f);
-	blob_bg_alt_selected = color::interpolate(color::interpolate(col_base_alt, text_soft2, 0.4f), background_track_selected, 0.3f);
+	blob_text_soft = color::mix(blob_text, Gray, _is_dark ? 0.25f : 0.07f);
+	color col_base_alt = color::mix(selection, Green, 0.8f);
+	blob_bg_alt_hidden = color::mix(color::mix(col_base_alt, text_soft3, 0.6f), background_track_selected, 0.8f);
+	blob_bg_alt = color::mix(color::mix(col_base_alt, text_soft2, 0.5f), background_track_selected, 0.6f);
+	blob_bg_alt_selected = color::mix(color::mix(col_base_alt, text_soft2, 0.4f), background_track_selected, 0.3f);
 	
 	//selection_internal = blob_bg_selected;
 	//grid_selected = blob_bg_selected;
@@ -153,9 +153,9 @@ void ColorScheme::auto_generate(bool keep_soft_text) {
 
 	for (int i=0; i<12; i++) {
 		pitch[i] = PITCH_COLORS[i];
-		pitch_text[i] = color::interpolate(pitch[i], text, 0.2f);
-		pitch_soft1[i] = color::interpolate(pitch[i], background, _is_dark ? 0.5f : 0.3f);
-		pitch_soft2[i] = color::interpolate(pitch[i], background, _is_dark ? 0.75f : 0.5f);
+		pitch_text[i] = color::mix(pitch[i], text, 0.2f);
+		pitch_soft1[i] = color::mix(pitch[i], background, _is_dark ? 0.5f : 0.3f);
+		pitch_soft2[i] = color::mix(pitch[i], background, _is_dark ? 0.75f : 0.5f);
 	}
 }
 
@@ -164,12 +164,12 @@ color ColorScheme::pitch_color(int p) const {
 }
 
 color ColorScheme::neon(int p) const {
-	return color::interpolate(NEON_COLORS[p % 6], text_soft2, 0.25f);
+	return color::mix(NEON_COLORS[p % 6], text_soft2, 0.25f);
 }
 
 color ColorScheme::hoverify(const color &c) const {
 	return col_inter(c, hover, 0.15f);
-	return color::interpolate(c, hover, 0.1f);
+	return color::mix(c, hover, 0.1f);
 }
 
 ColorSchemeBright::ColorSchemeBright() {

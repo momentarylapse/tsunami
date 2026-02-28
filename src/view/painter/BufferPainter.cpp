@@ -177,7 +177,7 @@ void BufferPainter::draw_peaks(Painter *c, AudioBuffer &b, int offset) {
 
 		// no peaks yet? -> show dummy
 		if (p.peaks.num <= l) {
-			c->set_color(color::interpolate(col1, Red, 0.3f));
+			c->set_color(color::mix(col1, Red, 0.3f));
 			float x0 = (offset - view_pos_rel) * view->cam.pixels_per_sample;
 			c->draw_rect(rect(x0, x0 + b.length * view->cam.pixels_per_sample, area.y1, area.y1 + h));
 			c->set_antialiasing(false);
@@ -234,7 +234,7 @@ void BufferPainter::draw_spectrum(Painter *c, AudioBuffer &b, int offset) {
 	auto &p = db->acquire(b, AudioViewMode::Spectrum);
 	if (!p.has_spectrum()) {
 		// no spectrum yet? -> show dummy
-		c->set_color(color::interpolate(col1, Red, 0.3f));
+		c->set_color(color::mix(col1, Red, 0.3f));
 		c->draw_rect(rect(x1, x2, area.y1, area.y2));
 	} else {
 		p.image.draw(c, rect(x1, x2, area.y1, area.y2));
@@ -259,8 +259,8 @@ void BufferPainter::set_context(const rect &_area, AudioViewMode _mode) {
 
 void BufferPainter::set_color(const color &fg, const color &bg) {
 	col1 = fg;
-	col2 = color::interpolate(fg, bg, 0.8f);
-	col2sel = col2;//color::interpolate(fg, bg, 0.3f);
+	col2 = color::mix(fg, bg, 0.8f);
+	col2sel = col2;//color::mix(fg, bg, 0.3f);
 }
 
 void BufferPainter::set_clip(const Range &r) {

@@ -29,8 +29,8 @@ void SignalEditorBackground::on_draw(Painter *p) {
 	p->draw_rect(area);
 	p->set_line_width(0.7f);
 
-	const color col1 = color::interpolate(theme.background, theme.grid, 0.5f);
-	const color col2 = color::interpolate(theme.background, theme.grid, 0.2f);
+	const color col1 = color::mix(theme.background, theme.grid, 0.5f);
+	const color col2 = color::mix(theme.background, theme.grid, 0.2f);
 
 	float D = MODULE_GRID;
 	int i0 = floorf(area.x1 / D);

@@ -48,6 +48,7 @@ struct mat4 {
 	mat4 _cdecl transpose() const;
 
 	static const mat4 ID;
+	static const mat4 ZERO;
 
 	// creation
 	static mat4 _cdecl translation(const vec3 &v);

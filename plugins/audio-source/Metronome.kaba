@@ -35,14 +35,14 @@ class Metronome extends AudioSource
 				s.output >> ss.input
 
 	func override read(out buf: AudioBuffer) -> int
-		for s in synth
+		for mut s in synth
 			return s.read_audio(0, buf)
 		return 0
 			
 	func override on_config()
 		if not weak(source)
 			create_stuff()
-		for s in source
+		for mut s in source
 			s.config.volume = config.volume
 			s.set_beats(config.beats, 1)
 			s.set_bpm(config.bpm)
@@ -50,7 +50,7 @@ class Metronome extends AudioSource
 	func override reset_state()
 		if not weak(source)
 			create_stuff()
-		for s in synth
+		for mut s in synth
 			s.reset_state()
-		for s in source
+		for mut s in source
 			s.reset_state()

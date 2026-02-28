@@ -4,7 +4,7 @@ use tsunami.*
 class SingleSamples extends AudioEffect
 	
 	func override read(out buf: AudioBuffer) -> int
-		for s in source.source
+		for mut s in source.source
 			for i in 0:len(buf)
 				var r = s.read_audio(buf[i:i+1])
 				if r < 0

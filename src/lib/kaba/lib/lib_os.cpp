@@ -20,22 +20,6 @@ struct vec3;
 namespace kaba {
 
 
-extern const Class *TypeDate;
-extern const Class *TypeStringList;
-const Class *TypePath;
-const Class *TypePathList;
-//const Class *TypeStreamP;
-//const Class *TypeStreamShared;
-
-extern const Class* TypeCallback;
-extern const Class* TypeCallbackString;
-
-extern const Class *TypeStringList;
-extern const Class *TypeAny;
-extern const Class *TypeAnyDict;
-const Class *TypeOsConfiguration;
-
-
 Any _os_config_get(Configuration &c, const string &key) {
 	return c.get(key, Any());
 }
@@ -202,6 +186,10 @@ string _cdecl kaba_shell_execute(const string &cmd, bool verbose) {
 
 KABA_LINK_GROUP_END
 
+void kaba_os_exit(int status) {
+	exit(status);
+}
+
 class KabaPath : public Path {
 public:
 	Path cat_p(const Path &p) const {
@@ -222,53 +210,53 @@ public:
 };
 
 void SIAddPackageOSPath(Context *c) {
-	add_internal_package(c, "os");
+	add_internal_package(c, "os", "1");
 
-	TypePath = add_type("Path", config.target.dynamic_array_size);
+	common_types.path = add_type("Path", config.target.dynamic_array_size);
 
-	add_class(TypePath);
-		class_add_element_x("_s", TypeString, 0);
-		class_add_func(Identifier::func::Init, TypeVoid, &Path::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Init, TypeVoid, &Path::__init_ext__, Flags::AutoCast | Flags::Mutable);
-			func_add_param("p", TypeString);
-		class_add_func(Identifier::func::Delete, TypeVoid, &Path::__delete__, Flags::Mutable);
-		class_add_func("absolute", TypePath, &Path::absolute);
-		class_add_func("dirname", TypeString, &Path::dirname, Flags::Pure);
-		class_add_func("basename", TypeString, &Path::basename, Flags::Pure);
-		class_add_func("basename_no_ext", TypeString, &Path::basename_no_ext, Flags::Pure);
-		class_add_func("extension", TypeString, &Path::extension, Flags::Pure);
-		class_add_func("canonical", TypePath, &Path::canonical, Flags::Pure);
-		class_add_func(Identifier::func::Str, TypeString, &Path::str, Flags::Pure);
-		class_add_func(Identifier::func::Repr, TypeString, &Path::repr, Flags::Pure);
-		class_add_func("is_empty", TypeBool, &Path::is_empty, Flags::Pure);
-		class_add_func("is_relative", TypeBool, &Path::is_relative, Flags::Pure);
-		class_add_func("is_absolute", TypeBool, &Path::is_absolute, Flags::Pure);
-		class_add_func("__bool__", TypeBool, &KabaPath::__bool__, Flags::Pure);
-		class_add_func("parent", TypePath, &Path::parent, Flags::Pure);
-		class_add_func("compare", TypeInt32, &Path::compare, Flags::Pure);
-			func_add_param("p", TypePath);
-		class_add_func("relative_to", TypePath, &Path::relative_to, Flags::Pure);
-			func_add_param("p", TypePath);
-		class_add_const("EMPTY", TypePath, &Path::EMPTY);
-		class_add_func("@from_str", TypePath, &KabaPath::from_str, Flags::Static | Flags::Pure);
-			func_add_param("p", TypeString);
-		add_operator(OperatorID::Assign, TypeVoid, TypePath, TypePath, InlineID::None, &Path::operator =);
-		add_operator(OperatorID::Equal, TypeBool, TypePath, TypePath, InlineID::None, &Path::operator ==);
-		add_operator(OperatorID::NotEqual, TypeBool, TypePath, TypePath, InlineID::None, &Path::operator !=);
-		add_operator(OperatorID::Smaller, TypeBool, TypePath, TypePath, InlineID::None, &Path::operator <);
-		add_operator(OperatorID::Greater, TypeBool, TypePath, TypePath, InlineID::None, &Path::operator >);
-		add_operator(OperatorID::BitOr, TypePath, TypePath, TypePath, InlineID::None, &KabaPath::cat_p);
-		add_operator(OperatorID::BitOr, TypePath, TypePath, TypeString, InlineID::None, &KabaPath::cat_s);
-		add_operator(OperatorID::In, TypeBool, TypePath, TypePath, InlineID::None, &KabaPath::__contains__);
+	add_class(common_types.path);
+		class_add_element_x("_s", common_types.string, 0);
+		class_add_func(Identifier::func::Init, common_types._void, &Path::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &Path::__init_ext__, Flags::AutoCast | Flags::Mutable);
+			func_add_param("p", common_types.string);
+		class_add_func(Identifier::func::Delete, common_types._void, &Path::__delete__, Flags::Mutable);
+		class_add_func("absolute", common_types.path, &Path::absolute);
+		class_add_func("dirname", common_types.string, &Path::dirname, Flags::Pure);
+		class_add_func("basename", common_types.string, &Path::basename, Flags::Pure);
+		class_add_func("basename_no_ext", common_types.string, &Path::basename_no_ext, Flags::Pure);
+		class_add_func("extension", common_types.string, &Path::extension, Flags::Pure);
+		class_add_func("canonical", common_types.path, &Path::canonical, Flags::Pure);
+		class_add_func(Identifier::func::Str, common_types.string, &Path::str, Flags::Pure);
+		class_add_func(Identifier::func::Repr, common_types.string, &Path::repr, Flags::Pure);
+		class_add_func("is_empty", common_types._bool, &Path::is_empty, Flags::Pure);
+		class_add_func("is_relative", common_types._bool, &Path::is_relative, Flags::Pure);
+		class_add_func("is_absolute", common_types._bool, &Path::is_absolute, Flags::Pure);
+		class_add_func("__bool__", common_types._bool, &KabaPath::__bool__, Flags::Pure);
+		class_add_func("parent", common_types.path, &Path::parent, Flags::Pure);
+		class_add_func("compare", common_types.i32, &Path::compare, Flags::Pure);
+			func_add_param("p", common_types.path);
+		class_add_func("relative_to", common_types.path, &Path::relative_to, Flags::Pure);
+			func_add_param("p", common_types.path);
+		class_add_const("EMPTY", common_types.path, &Path::EMPTY);
+		class_add_func("@from_str", common_types.path, &KabaPath::from_str, Flags::Static | Flags::Pure);
+			func_add_param("p", common_types.string);
+		add_operator(OperatorID::Assign, common_types._void, common_types.path, common_types.path, InlineID::None, &Path::operator =);
+		add_operator(OperatorID::Equal, common_types._bool, common_types.path, common_types.path, InlineID::None, &Path::operator ==);
+		add_operator(OperatorID::NotEqual, common_types._bool, common_types.path, common_types.path, InlineID::None, &Path::operator !=);
+		add_operator(OperatorID::Smaller, common_types._bool, common_types.path, common_types.path, InlineID::None, &Path::operator <);
+		add_operator(OperatorID::Greater, common_types._bool, common_types.path, common_types.path, InlineID::None, &Path::operator >);
+		add_operator(OperatorID::BitOr, common_types.path, common_types.path, common_types.path, InlineID::None, &KabaPath::cat_p);
+		add_operator(OperatorID::BitOr, common_types.path, common_types.path, common_types.string, InlineID::None, &KabaPath::cat_s);
+		add_operator(OperatorID::In, common_types._bool, common_types.path, common_types.path, InlineID::None, &KabaPath::__contains__);
 
 
-	// AFTER TypePath!
-	TypePathList = add_type_list(TypePath);
+	// AFTER common_types.path!
+	common_types.path_list = add_type_list(common_types.path);
 
-	add_class(TypePath);
-		class_add_func("all_parents", TypePathList, &Path::all_parents, Flags::Pure);
+	add_class(common_types.path);
+		class_add_func("all_parents", common_types.path_list, &Path::all_parents, Flags::Pure);
 
-	lib_create_list<Path>(TypePathList);
+	lib_create_list<Path>(common_types.path_list);
 }
 
 
@@ -300,7 +288,7 @@ public:
 };
 
 void SIAddPackageOS(Context *c) {
-	add_internal_package(c, "os");
+	add_internal_package(c, "os", "(ignored)");
 
 	auto TypeStream = add_type("Stream", sizeof(Stream));
 	auto TypeStreamXfer = add_type_p_xfer(TypeStream);
@@ -308,57 +296,60 @@ void SIAddPackageOS(Context *c) {
 	auto TypeFileStreamXfer = add_type_p_xfer(TypeFileStream);
 	auto TypeFileStreamSharedNN = add_type_p_shared_not_null(TypeFileStream);
 	auto TypeFilesystem = add_type("fs", 0);
-	const_cast<Class*>(TypeFilesystem)->from_template = TypeNamespaceT;
+	const_cast<Class*>(TypeFilesystem)->from_template = common_types.namespace_t;
 	auto TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
-	TypeOsConfiguration = add_type("Configuration", sizeof(Configuration));
+	common_types.os_configuration = add_type("Configuration", sizeof(Configuration));
 	auto TypeTerminal = add_type("terminal", 0);
+	const_cast<Class*>(TypeTerminal)->from_template = common_types.namespace_t;
+	auto TypeApp = add_type("app", 0);
+	const_cast<Class*>(TypeApp)->from_template = common_types.namespace_t;
 
-	auto TypeCallbackStringList = add_type_func(TypeVoid, {TypeStringList});
+	auto TypeCallbackStringList = add_type_func(common_types._void, {common_types.string_list});
 
 	lib_create_pointer_xfer(TypeStreamXfer);
 	lib_create_pointer_xfer(TypeFileStreamXfer);
 	lib_create_pointer_shared<KabaFileStream>(TypeFileStreamSharedNN, TypeFileStreamXfer);
 
 	add_class(TypeStream);
-		class_add_element(Identifier::SharedCount, TypeInt32, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
-		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaFileStream::__delete__);
-		class_add_func(Identifier::func::Delete, TypeVoid, &KabaFileStream::__delete__, Flags::Mutable);
+		class_add_element(Identifier::SharedCount, common_types.i32, evil_member_offset(os::fs::FileStream, _pointer_ref_counter));
+		//class_add_func_virtual(Identifier::Func::DELETE, common_types._void, &KabaFileStream::__delete__);
+		class_add_func(Identifier::func::Delete, common_types._void, &KabaFileStream::__delete__, Flags::Mutable);
 
-		class_add_func("read", TypeBytes, &KabaStream::_read_size, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("size", TypeInt32);
-		class_add_func("read", TypeInt32, &KabaStream::_read_bytes, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("s", TypeBytes);
-		class_add_func("write", TypeInt32, &KabaStream::_write, Flags::RaisesExceptions | Flags::Mutable);
-		//class_add_func_virtual("write", TypeInt32, &FileStream::write);
-			func_add_param("s", TypeBytes);
+		class_add_func("read", common_types.bytes, &KabaStream::_read_size, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("size", common_types.i32);
+		class_add_func("read", common_types.i32, &KabaStream::_read_bytes, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("s", common_types.bytes);
+		class_add_func("write", common_types.i32, &KabaStream::_write, Flags::RaisesExceptions | Flags::Mutable);
+		//class_add_func_virtual("write", common_types.i32, &FileStream::write);
+			func_add_param("s", common_types.bytes);
 
-		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_bool, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("b", TypeBool);
-		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_int, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("i", TypeInt32);
-		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_float, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("x", TypeFloat32);
-		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_vector, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("v", TypeVec3);
-		class_add_func("__lshift__", TypeVoid, &KabaStream::_write_str, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("s", TypeString);
-		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_bool, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("b", TypeBool, Flags::Out);
-		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_int, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("i", TypeInt32, Flags::Out);
-		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_float, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("x", TypeFloat32, Flags::Out);
-		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_vector, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("v", TypeVec3, Flags::Out);
-		class_add_func("__rshift__", TypeVoid, &KabaStream::_read_str, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("s", TypeString, Flags::Out);
+		class_add_func("__lshift__", common_types._void, &KabaStream::_write_bool, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("b", common_types._bool);
+		class_add_func("__lshift__", common_types._void, &KabaStream::_write_int, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("i", common_types.i32);
+		class_add_func("__lshift__", common_types._void, &KabaStream::_write_float, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("x", common_types.f32);
+		class_add_func("__lshift__", common_types._void, &KabaStream::_write_vector, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("v", common_types.vec3);
+		class_add_func("__lshift__", common_types._void, &KabaStream::_write_str, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("s", common_types.string);
+		class_add_func("__rshift__", common_types._void, &KabaStream::_read_bool, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("b", common_types._bool, Flags::Out);
+		class_add_func("__rshift__", common_types._void, &KabaStream::_read_int, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("i", common_types.i32, Flags::Out);
+		class_add_func("__rshift__", common_types._void, &KabaStream::_read_float, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("x", common_types.f32, Flags::Out);
+		class_add_func("__rshift__", common_types._void, &KabaStream::_read_vector, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("v", common_types.vec3, Flags::Out);
+		class_add_func("__rshift__", common_types._void, &KabaStream::_read_str, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("s", common_types.string, Flags::Out);
 
 		// FIXME &FileStream::_pointer_ref_counter does not work here
 		// we get a base-class-pointer... \(O_O)/
-		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &Stream::__delete__);
-		//class_add_func_virtual("write", TypeVoid, Stream::write);
-		//class_add_element(Identifier::SHARED_COUNT, TypeInt32, &Stream::_pointer_ref_counter);
+		//class_add_func_virtual(Identifier::Func::DELETE, common_types._void, &Stream::__delete__);
+		//class_add_func_virtual("write", common_types._void, Stream::write);
+		//class_add_element(Identifier::SHARED_COUNT, common_types.i32, &Stream::_pointer_ref_counter);
 		//const_cast<Class*>(TypeStream)->elements.back().offset = offsetof(Stream, _pointer_ref_counter);
 		class_set_vtable(KabaStream);
 
@@ -367,18 +358,18 @@ void SIAddPackageOS(Context *c) {
 
 	add_class(TypeFileStream);
 		class_derive_from(TypeStream);
-		//class_add_func_virtual(Identifier::Func::DELETE, TypeVoid, &KabaFileStream::__delete__, Flags::OVERRIDE);
-		class_add_func(Identifier::func::Delete, TypeVoid, &KabaFileStream::__delete__, Flags::Override | Flags::Mutable);
+		//class_add_func_virtual(Identifier::Func::DELETE, common_types._void, &KabaFileStream::__delete__, Flags::OVERRIDE);
+		class_add_func(Identifier::func::Delete, common_types._void, &KabaFileStream::__delete__, Flags::Override | Flags::Mutable);
 		//class_add_func("getCDate", TypeDate, &File::GetDateCreation);
-		class_add_func("mtime", TypeDate, &os::fs::FileStream::mtime);
+		class_add_func("mtime", common_types.date, &os::fs::FileStream::mtime);
 		//class_add_func("getADate", TypeDate, &FileStream::GetDateAccess);
-		class_add_func("size", TypeInt32, &KabaFileStream::size32);
-		class_add_func("pos", TypeInt32, &KabaFileStream::_pos);//os::fs::FileStream::get_pos);
-		class_add_func("set_pos", TypeVoid, &KabaFileStream::_set_pos, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("pos", TypeInt32);
-		class_add_func("seek", TypeVoid, &KabaFileStream::_seek, Flags::RaisesExceptions | Flags::Mutable);
-			func_add_param("delta", TypeInt32);
-		class_add_func("is_end", TypeBool, &KabaFileStream::is_end);
+		class_add_func("size", common_types.i32, &KabaFileStream::size32);
+		class_add_func("pos", common_types.i32, &KabaFileStream::_pos);//os::fs::FileStream::get_pos);
+		class_add_func("set_pos", common_types._void, &KabaFileStream::_set_pos, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("pos", common_types.i32);
+		class_add_func("seek", common_types._void, &KabaFileStream::_seek, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param("delta", common_types.i32);
+		class_add_func("is_end", common_types._bool, &KabaFileStream::is_end);
 		{
 			os::fs::FileStream my_instance(-1, Stream::Mode::NONE);
 			class_link_vtable(*(void***)&my_instance);
@@ -386,154 +377,166 @@ void SIAddPackageOS(Context *c) {
 
 
 	add_class(TypeFileError);
-		class_derive_from(TypeException);
-		class_add_func(Identifier::func::Init, TypeVoid, &KabaFileError::__init__, Flags::Mutable);
-		class_add_func_virtual(Identifier::func::Delete, TypeVoid, &KabaFileError::__delete__, Flags::Override | Flags::Mutable);
+		class_derive_from(common_types.exception);
+		class_add_func(Identifier::func::Init, common_types._void, &KabaFileError::__init__, Flags::Mutable);
+		class_add_func_virtual(Identifier::func::Delete, common_types._void, &KabaFileError::__delete__, Flags::Override | Flags::Mutable);
 		class_set_vtable(KabaFileError);
 
 
 	add_class(TypeCommandLineParser);
-		class_add_func(Identifier::func::Init, TypeVoid, &KabaCommandLineParser::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &KabaCommandLineParser::__delete__, Flags::Mutable);
-		class_add_func("info", TypeVoid, &CommandLineParser::info, Flags::Mutable);
-			func_add_param("cmd", TypeString);
-			func_add_param("i", TypeString);
-		class_add_func("show", TypeVoid, &CommandLineParser::show);
-		class_add_func("parse", TypeVoid, &KabaCommandLineParser::parse1);
-			func_add_param("arg", TypeStringList);
-		class_add_func("option", TypeVoid, &KabaCommandLineParser::option1, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("comment", TypeString);
-			func_add_param("f", TypeCallback);
-		class_add_func("option", TypeVoid, &KabaCommandLineParser::option2, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("p", TypeString);
-			func_add_param("comment", TypeString);
-			func_add_param("f", TypeCallbackString);
-		class_add_func("cmd", TypeVoid, &KabaCommandLineParser::cmd1, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("p", TypeString);
-			func_add_param("comment", TypeString);
+		class_add_func(Identifier::func::Init, common_types._void, &KabaCommandLineParser::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &KabaCommandLineParser::__delete__, Flags::Mutable);
+		class_add_func("info", common_types._void, &CommandLineParser::info, Flags::Mutable);
+			func_add_param("cmd", common_types.string);
+			func_add_param("i", common_types.string);
+		class_add_func("show", common_types._void, &CommandLineParser::show);
+		class_add_func("parse", common_types._void, &KabaCommandLineParser::parse1);
+			func_add_param("arg", common_types.string_list);
+		class_add_func("option", common_types._void, &KabaCommandLineParser::option1, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("comment", common_types.string);
+			func_add_param("f", common_types.callback);
+		class_add_func("option", common_types._void, &KabaCommandLineParser::option2, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("p", common_types.string);
+			func_add_param("comment", common_types.string);
+			func_add_param("f", common_types.callback_string);
+		class_add_func("cmd", common_types._void, &KabaCommandLineParser::cmd1, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("p", common_types.string);
+			func_add_param("comment", common_types.string);
 			func_add_param("f", TypeCallbackStringList);
 
 
-	add_class(TypeOsConfiguration);
-		class_add_element("dict", TypeAnyDict, &Configuration::map);
-		class_add_func(Identifier::func::Init, TypeVoid, &Configuration::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, TypeVoid, &Configuration::__del__, Flags::Mutable);
-		class_add_func("load", TypeBool, &Configuration::load, Flags::Mutable);
-			func_add_param("path", TypePath);
-		class_add_func("save", TypeVoid, &Configuration::save);
-			func_add_param("path", TypePath);
-		class_add_func(Identifier::func::Set, TypeVoid, &Configuration::set_int, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("value", TypeInt32);
-		class_add_func(Identifier::func::Set, TypeVoid, &Configuration::set_float, Flags::Mutable); // FIXME: operator preference...
-			func_add_param("name", TypeString);
-			func_add_param("value", TypeFloat32);
-		class_add_func(Identifier::func::Set, TypeVoid, &Configuration::set_bool, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("value", TypeBool);
-		class_add_func(Identifier::func::Set, TypeVoid, &Configuration::set_str, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("value", TypeString);
-		class_add_func(Identifier::func::Set, TypeVoid, &Configuration::set, Flags::Mutable);
-			func_add_param("name", TypeString);
-			func_add_param("value", TypeAny);
-		class_add_func("get_int", TypeInt32, &Configuration::get_int);
-			func_add_param("name", TypeString);
-			func_add_param("default", TypeInt32);
-		class_add_func("get_float", TypeFloat32, &Configuration::get_float);
-			func_add_param("name", TypeString);
-			func_add_param("default", TypeFloat32);
-		class_add_func("get_bool", TypeBool, &Configuration::get_bool);
-			func_add_param("name", TypeString);
-			func_add_param("default", TypeBool);
-		class_add_func("get_str", TypeString, &Configuration::get_str);
-			func_add_param("name", TypeString);
-			func_add_param("default", TypeString);
-		class_add_func(Identifier::func::Get, TypeAny, &_os_config_get);
-			func_add_param("name", TypeString);
-		class_add_func("keys", TypeStringList, &Configuration::keys);
+	add_class(common_types.os_configuration);
+		class_add_element("dict", common_types.any_dict, &Configuration::map);
+		class_add_func(Identifier::func::Init, common_types._void, &Configuration::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &Configuration::__del__, Flags::Mutable);
+		class_add_func("load", common_types._bool, &Configuration::load, Flags::Mutable);
+			func_add_param("path", common_types.path);
+		class_add_func("save", common_types._void, &Configuration::save);
+			func_add_param("path", common_types.path);
+		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set_int, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("value", common_types.i32);
+		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set_float, Flags::Mutable); // FIXME: operator preference...
+			func_add_param("name", common_types.string);
+			func_add_param("value", common_types.f32);
+		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set_bool, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("value", common_types._bool);
+		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set_str, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("value", common_types.string);
+		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set, Flags::Mutable);
+			func_add_param("name", common_types.string);
+			func_add_param("value", common_types.any);
+		class_add_func("get_int", common_types.i32, &Configuration::get_int);
+			func_add_param("name", common_types.string);
+			func_add_param("default", common_types.i32);
+		class_add_func("get_float", common_types.f32, &Configuration::get_float);
+			func_add_param("name", common_types.string);
+			func_add_param("default", common_types.f32);
+		class_add_func("get_bool", common_types._bool, &Configuration::get_bool);
+			func_add_param("name", common_types.string);
+			func_add_param("default", common_types._bool);
+		class_add_func("get_str", common_types.string, &Configuration::get_str);
+			func_add_param("name", common_types.string);
+			func_add_param("default", common_types.string);
+		class_add_func(Identifier::func::Get, common_types.any, &_os_config_get);
+			func_add_param("name", common_types.string);
+		class_add_func("keys", common_types.string_list, &Configuration::keys);
 
 
 	// file access
 	add_class(TypeFilesystem);
 		class_add_func("open", TypeFileStreamXfer, &kaba_file_open, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-			func_add_param("mode", TypeString);
-		class_add_func("read", TypeBytes, &kaba_file_read, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-		class_add_func("read_text", TypeString, &kaba_file_read_text, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-		class_add_func("write", TypeVoid, &kaba_file_write, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-			func_add_param("buffer", TypeBytes);
-		class_add_func("write_text", TypeVoid, &kaba_file_write_text, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-			func_add_param("buffer", TypeString);
-		class_add_func("exists", TypeBool, &os::fs::exists, Flags::Static);
-			func_add_param("filename", TypePath);
-		class_add_func("size", TypeInt64, &os::fs::size, Flags::Static);
-			func_add_param("filename", TypePath);
-		class_add_func("mtime", TypeDate, &os::fs::mtime, Flags::Static);
-			func_add_param("filename", TypePath);
-		class_add_func("is_directory", TypeBool, &os::fs::is_directory, Flags::Static);
-			func_add_param("filename", TypePath);
-		class_add_func("hash", TypeString, &kaba_file_hash, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-			func_add_param("type", TypeString);
-		class_add_func("move", TypeVoid, &kaba_file_move, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("source", TypePath);
-			func_add_param("dest", TypePath);
-		class_add_func("rename", TypeVoid, &kaba_file_rename, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("source", TypePath);
-			func_add_param("dest", TypePath);
-		class_add_func("copy", TypeVoid, &kaba_file_copy, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("source", TypePath);
-			func_add_param("dest", TypePath);
-		class_add_func("delete", TypeVoid, &kaba_file_delete, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("filename", TypePath);
-		class_add_func("search", TypePathList, &os::fs::search, Flags::Static);
-			func_add_param("dir", TypePath);
-			func_add_param("filter", TypeString);
-			func_add_param("options", TypeString);
-		class_add_func("create_directory", TypeVoid, &kaba_dir_create, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("dir", TypePath);
-		class_add_func("delete_directory", TypeVoid, &kaba_dir_delete, Flags::Static | Flags::RaisesExceptions);
-			func_add_param("dir", TypePath);
-		class_add_func("current_directory", TypePath, &os::fs::current_directory, Flags::Static);
-		class_add_func("set_current_directory", TypeVoid, &os::fs::set_current_directory, Flags::Static);
-			func_add_param("dir", TypePath);
+			func_add_param("filename", common_types.path);
+			func_add_param("mode", common_types.string);
+		class_add_func("read", common_types.bytes, &kaba_file_read, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+		class_add_func("read_text", common_types.string, &kaba_file_read_text, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+		class_add_func("write", common_types._void, &kaba_file_write, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+			func_add_param("buffer", common_types.bytes);
+		class_add_func("write_text", common_types._void, &kaba_file_write_text, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+			func_add_param("buffer", common_types.string);
+		class_add_func("exists", common_types._bool, &os::fs::exists, Flags::Static);
+			func_add_param("filename", common_types.path);
+		class_add_func("size", common_types.i64, &os::fs::size, Flags::Static);
+			func_add_param("filename", common_types.path);
+		class_add_func("mtime", common_types.date, &os::fs::mtime, Flags::Static);
+			func_add_param("filename", common_types.path);
+		class_add_func("is_directory", common_types._bool, &os::fs::is_directory, Flags::Static);
+			func_add_param("filename", common_types.path);
+		class_add_func("hash", common_types.string, &kaba_file_hash, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+			func_add_param("type", common_types.string);
+		class_add_func("move", common_types._void, &kaba_file_move, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("source", common_types.path);
+			func_add_param("dest", common_types.path);
+		class_add_func("rename", common_types._void, &kaba_file_rename, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("source", common_types.path);
+			func_add_param("dest", common_types.path);
+		class_add_func("copy", common_types._void, &kaba_file_copy, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("source", common_types.path);
+			func_add_param("dest", common_types.path);
+		class_add_func("delete", common_types._void, &kaba_file_delete, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("filename", common_types.path);
+		class_add_func("search", common_types.path_list, &os::fs::search, Flags::Static);
+			func_add_param("dir", common_types.path);
+			func_add_param("filter", common_types.string);
+			func_add_param("options", common_types.string);
+		class_add_func("create_directory", common_types._void, &kaba_dir_create, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("dir", common_types.path);
+		class_add_func("delete_directory", common_types._void, &kaba_dir_delete, Flags::Static | Flags::RaisesExceptions);
+			func_add_param("dir", common_types.path);
+		class_add_func("current_directory", common_types.path, &os::fs::current_directory, Flags::Static);
+		class_add_func("set_current_directory", common_types._void, &os::fs::set_current_directory, Flags::Static);
+			func_add_param("dir", common_types.path);
+		class_add_const("home_directory", common_types.path, &os::app::home_directory);
 		
 		if (!_kaba_stdin)
 			_kaba_stdin = new os::fs::FileStream(0, Stream::Mode::TEXT);
 		add_ext_var("stdin", TypeFileStreamSharedNN, &_kaba_stdin);
-	
+
+
 	add_class(TypeTerminal);
-		class_add_const("RED", TypeString, &os::terminal::RED);
-		class_add_const("GREEN", TypeString, &os::terminal::GREEN);
-		class_add_const("BLUE", TypeString, &os::terminal::BLUE);
-		class_add_const("YELLOW", TypeString, &os::terminal::YELLOW);
-		class_add_const("ORANGE", TypeString, &os::terminal::ORANGE);
-		class_add_const("CYAN", TypeString, &os::terminal::CYAN);
-		class_add_const("MAGENTA", TypeString, &os::terminal::MAGENTA);
-		class_add_const("GRAY", TypeString, &os::terminal::GRAY);
-		class_add_const("DARK_GRAY", TypeString, &os::terminal::DARK_GRAY);
-		class_add_const("BOLD", TypeString, &os::terminal::BOLD);
-		class_add_const("END", TypeString, &os::terminal::END);
+		class_add_const("RED", common_types.string, &os::terminal::RED);
+		class_add_const("GREEN", common_types.string, &os::terminal::GREEN);
+		class_add_const("BLUE", common_types.string, &os::terminal::BLUE);
+		class_add_const("YELLOW", common_types.string, &os::terminal::YELLOW);
+		class_add_const("ORANGE", common_types.string, &os::terminal::ORANGE);
+		class_add_const("CYAN", common_types.string, &os::terminal::CYAN);
+		class_add_const("MAGENTA", common_types.string, &os::terminal::MAGENTA);
+		class_add_const("GRAY", common_types.string, &os::terminal::GRAY);
+		class_add_const("DARK_GRAY", common_types.string, &os::terminal::DARK_GRAY);
+		class_add_const("BOLD", common_types.string, &os::terminal::BOLD);
+		class_add_const("END", common_types.string, &os::terminal::END);
+
+
+	add_class(TypeApp);
+		class_add_const("directory_dynamic", common_types.path, &os::app::directory_dynamic);
+		class_add_const("directory_static", common_types.path, &os::app::directory_static);
+		class_add_const("user_name", common_types.string, &os::app::user_name);
+
 
 	// system
-	add_func("shell_execute", TypeString, &kaba_shell_execute, Flags::Static | Flags::RaisesExceptions);
-		func_add_param("cmd", TypeString);
-		func_add_param_def("verbose", TypeBool, false);
+	add_func("shell_execute", common_types.string, &kaba_shell_execute, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("cmd", common_types.string);
+		func_add_param_def("verbose", common_types._bool, false);
+
+	add_func("exit", common_types._void, &kaba_os_exit, Flags::Static);
+		func_add_param("status", common_types.i32);
 
 
-	add_ext_var("app_directory_dynamic", TypePath, &os::app::directory_dynamic);
-	add_ext_var("app_directory_static", TypePath, &os::app::directory_static);
+	add_ext_var("app_directory_dynamic", common_types.path, &os::app::directory_dynamic);
+	add_ext_var("app_directory_static", common_types.path, &os::app::directory_static);
 
 
-	add_type_cast(50, TypeString, TypePath, "os.Path.@from_str");
+	add_type_cast(50, common_types.string, common_types.path, "os.Path.@from_str");
 }
 
 };

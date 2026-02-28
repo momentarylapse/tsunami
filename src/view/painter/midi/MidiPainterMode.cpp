@@ -16,13 +16,13 @@ void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState sta
 		col = colors.text_soft3;
 
 	if (state & MidiNoteState::REFERENCE)
-		col = color::interpolate(col, colors.background_track, 0.65f);
+		col = color::mix(col, colors.background_track, 0.65f);
 	if (state & MidiNoteState::SELECTED)
 		col = colors.text;//::interpolate(col, colors.selection, 0.5f);
 	if (state & MidiNoteState::HOVER)
-		col = color::interpolate(col, colors.hover, 0.5f);
+		col = color::mix(col, colors.hover, 0.5f);
 
-	col_shadow = color::interpolate(col, colors.background_track, 0.5f);
+	col_shadow = color::mix(col, colors.background_track, 0.5f);
 	//col_shadow = col;
 	//col_shadow.a = 0.5f;
 }

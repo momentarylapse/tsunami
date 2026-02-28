@@ -44,8 +44,8 @@ enum class Flags {
 	Noauto = 1 << 17,
 	Noframe = 1 << 18,
 	Macro = 1 << 19,
-	TrustMe = 1 << 20,
-	Try = 1 << 21,
+	Globalref = 1 << 20,
+	//Try = 1 << 21,
 	CompileTime = 1 << 22,
 
 	AutoImport = 1<<24,

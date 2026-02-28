@@ -65,6 +65,7 @@ void _dummy() {}
 
 
 void export_package_hui(kaba::Exporter* e) {
+	e->package_info("hui", "6");
 
 	e->declare_class_size("Menu", sizeof(hui::Menu));
 	e->link_class_func("Menu.__init__", &hui::Menu::__init__);

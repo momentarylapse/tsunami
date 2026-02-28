@@ -239,6 +239,8 @@ void init_app() {
 }
 
 void PluginManager::export_kaba_package_tsunami(kaba::Exporter* ext) {
+	ext->package_info("tsunami", "0.3");
+
 	// api definition
 	ext->link("tsunami", &Tsunami::instance);
 	ext->link("theme", &theme);

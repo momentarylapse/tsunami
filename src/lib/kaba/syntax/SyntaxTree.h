@@ -122,10 +122,10 @@ public:
 	static shared<Node> transformb_node(shared<Node> n, Block *b, std::function<shared<Node>(shared<Node>, Block*)> F);
 
 	// data creation
-	Constant *add_constant(const Class *type, Class *name_space = nullptr);
-	Constant *add_constant_int(int value);
-	Constant *add_constant_pointer(const Class *type, const void *value);
-	Function *add_function(const string &name, const Class *type, const Class *name_space, Flags flags);
+	Constant* add_constant(const Class* type, int token_id, Class* name_space = nullptr);
+	Constant* add_constant_int(int value, int token_id = -1);
+	Constant* add_constant_pointer(const Class* type, const void* value, int token_id = -1);
+	Function* add_function(const string &name, const Class *type, const Class *name_space, Flags flags);
 
 	// node
 	shared<Node> make_fake_constructor(const Class *t, const Class *param_type, int token_id = -1);

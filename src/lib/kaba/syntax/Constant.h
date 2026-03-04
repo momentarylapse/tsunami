@@ -50,13 +50,14 @@ public:
 // for any type of constant used in the module
 class Constant : public Sharable<Value> {
 public:
-	Constant(const Class *type, SyntaxTree *owner);
+	Constant(const Class* type, SyntaxTree* owner, int token_id);
 	string name;
 	string str() const;
-	void *address_compiler;
-	void *address_runtime;
+	void* address_compiler;
+	void* address_runtime;
 	bool used;
-	SyntaxTree *owner;
+	SyntaxTree* owner;
+	int token_id;
 	
 	void init(const Class *type);
 	void set(const Value &v);

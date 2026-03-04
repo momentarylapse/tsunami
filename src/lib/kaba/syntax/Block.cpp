@@ -24,14 +24,14 @@ Block::Block(Function *f, Block *_parent) {
 	_label_start = _label_end = -1;
 }
 
-Variable *Block::add_var(const string &name, const Class *type, Flags flags) {
-	return insert_var(function->var.num, name, type, flags);
+Variable *Block::add_var(const string &name, const Class *type, int token_id, Flags flags) {
+	return insert_var(function->var.num, name, type, token_id, flags);
 }
 
-Variable *Block::insert_var(int index, const string &name, const Class *type, Flags flags) {
+Variable *Block::insert_var(int index, const string &name, const Class *type, int token_id, Flags flags) {
 	if (get_var(name))
 		function->owner()->do_error(format("variable '%s' already declared in this context", name));
-	Variable *v = new Variable(name, type);
+	Variable *v = new Variable(name, type, nullptr, token_id);
 	v->flags = flags;
 	function->var.insert(v, index);
 	vars.add(v);

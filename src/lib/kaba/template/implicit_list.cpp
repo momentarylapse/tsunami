@@ -63,8 +63,8 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 		// for i=>el in self
 		//    el = other[i]
 
-		auto v_el = f->block->add_var("el", tree->type_ref(t_el));
-		auto v_i = f->block->add_var("i", common_types.i32);
+		auto v_el = f->block->add_var("el", tree->type_ref(t_el), -1);
+		auto v_i = f->block->add_var("i", common_types.i32, -1);
 
 		auto b = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -91,8 +91,8 @@ void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 // delete...
 	if (auto f_del = te->get_destructor()) {
 
-		auto *var_i = f->block->add_var("i", common_types.i32);
-		auto *var_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
+		auto *var_i = f->block->add_var("i", common_types.i32, -1);
+		auto *var_el = f->block->add_var("el", tree->type_ref(t->get_array_element()), -1);
 
 		auto b = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -122,8 +122,8 @@ void AutoImplementer::implement_list_resize(Function *f, const Class *t) {
 	if (!f)
 		return;
 	auto te = t->get_array_element();
-	auto *var = f->block->add_var("i", common_types.i32);
-	f->block->add_var("num_old", common_types.i32);
+	auto *var = f->block->add_var("i", common_types.i32, -1);
+	f->block->add_var("num_old", common_types.i32, -1);
 
 	auto num = add_node_local(f->__get_var("num"));
 
@@ -266,8 +266,8 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		// for i=>e in self
 		//     if e != other[i]
 		//         return false
-		auto v_el = f->block->add_var("el", tree->type_ref(t->get_array_element()));
-		auto v_i = f->block->add_var("i", common_types.i32);
+		auto v_el = f->block->add_var("el", tree->type_ref(t->get_array_element()), -1);
+		auto v_i = f->block->add_var("i", common_types.i32, -1);
 
 		auto b = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -308,7 +308,7 @@ void AutoImplementer::implement_list_give(Function *f, const Class *t) {
 	auto t_xfer = tree->request_implicit_class_xfer(t_el->param[0], -1);
 	auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
 	auto self = add_node_local(f->__get_var(Identifier::Self));
-	auto temp = add_node_local(f->block->add_var("temp", t_xfer_list));
+	auto temp = add_node_local(f->block->add_var("temp", t_xfer_list, -1));
 
 	{
 		// memcpy(temp, self)

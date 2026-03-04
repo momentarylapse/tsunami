@@ -163,10 +163,11 @@ string Value::str() const {
 	return var_repr(value.data, type.get());
 }
 
-Constant::Constant(const Class *_type, SyntaxTree *_owner) {
+Constant::Constant(const Class* _type, SyntaxTree* _owner, int _token_id) {
 	Value::init(_type);
 	name = "-none-";
 	owner = _owner;
+	token_id = _token_id;
 	used = false;
 	address_compiler = address_runtime = p();
 }

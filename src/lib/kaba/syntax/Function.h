@@ -68,7 +68,7 @@ public:
 	int64 address;
 	void *address_preprocess;
 	int _label;
-	Variable *add_param(const string &name, const Class *type, Flags flags);
+	Variable *add_param(const string &name, const Class *type, int token_id, Flags flags);
 	void set_return_type(const Class *type);
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();

@@ -530,7 +530,7 @@ void class_link_vtable(void *p) {
 //------------------------------------------------------------------------------------------------//
 
 void class_add_const(const string &name, const Class *type, const void *value) {
-	Constant *c = cur_package_module->tree->add_constant(type, cur_class);
+	Constant *c = cur_package_module->tree->add_constant(type, -1, cur_class);
 	c->name = name;
 
 	// enums can't be referenced...
@@ -554,9 +554,10 @@ void add_const(const string &name, const Class *type, const void *value) {
 
 
 void add_ext_var(const string &name, const Class *type, void *var) {
-	auto *v = new Variable(name, type);
+	auto ns = cur_package_module->tree->base_class;
+	auto *v = new Variable(name, type, ns, -1);
 	flags_set(v->flags, Flags::Extern); // prevent initialization when importing
-	cur_package_module->tree->base_class->static_variables.add(v);
+	ns->static_variables.add(v);
 	if (config.allow_std_lib)
 		v->memory = var;
 };
@@ -580,7 +581,7 @@ void func_set_inline(InlineID index) {
 void func_add_param(const string &name, const Class *type, Flags flags) {
 	if (cur_func) {
 		// FIXME: use call-by-reference type?
-		Variable *v = new Variable(name, type);
+		Variable *v = new Variable(name, type, nullptr, -1);
 		v->flags = flags;
 		cur_func->var.add(v);
 		cur_func->literal_param_type.add(type);
@@ -593,7 +594,7 @@ void func_add_param(const string &name, const Class *type, Flags flags) {
 void func_add_param_def_x(const string &name, const Class *type, const void *p, Flags flags) {
 	if (cur_func) {
 		// FIXME: use call-by-reference type?
-		Variable *v = new Variable(name, type);
+		Variable *v = new Variable(name, type, nullptr, -1);
 		v->flags = flags;
 		cur_func->var.add(v);
 		cur_func->literal_param_type.add(type);
@@ -601,7 +602,7 @@ void func_add_param_def_x(const string &name, const Class *type, const void *p, 
 		//cur_func->mandatory_params = cur_func->num_params;
 		cur_func->abstract_node->params[2]->params.resize(cur_func->num_params*3);
 
-		Constant *c = cur_package_module->tree->add_constant(type, cur_class);
+		Constant *c = cur_package_module->tree->add_constant(type, -1, cur_class);
 		if (type == common_types.i32)
 			c->as_int() = *(int*)p;
 		if (type == common_types.f32)

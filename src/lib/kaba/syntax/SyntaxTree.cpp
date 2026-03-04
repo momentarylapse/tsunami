@@ -201,22 +201,22 @@ void SyntaxTree::create_asm_meta_info() {
 
 
 
-Constant *SyntaxTree::add_constant(const Class *type, Class *name_space) {
+Constant *SyntaxTree::add_constant(const Class* type, int token_id, Class* name_space) {
 	if (!name_space)
 		name_space = base_class;
-	auto *c = new Constant(type, this);
+	auto *c = new Constant(type, this, token_id);
 	name_space->constants.add(c);
 	return c;
 }
 
-Constant *SyntaxTree::add_constant_int(int value) {
-	auto *c = add_constant(common_types.i32);
+Constant *SyntaxTree::add_constant_int(int value, int token_id) {
+	auto *c = add_constant(common_types.i32, token_id);
 	c->as_int() = value;
 	return c;
 }
 
-Constant *SyntaxTree::add_constant_pointer(const Class *type, const void *value) {
-	auto *c = add_constant(type);
+Constant *SyntaxTree::add_constant_pointer(const Class *type, const void *value, int token_id) {
+	auto *c = add_constant(type, token_id);
 	c->as_int64() = (int_p)value;
 	return c;
 }
@@ -958,7 +958,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// temp var
 		auto *f = b->function;
-		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		vv->explicitly_constructed = true;
 		auto dummy = add_node_local(vv);
 		
@@ -984,7 +984,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// temp var
 		auto *f = b->function;
-		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		auto array = add_node_local(vv);
 
 		auto bb = add_node_block(new Block(f, b), common_types._void);
@@ -1003,7 +1003,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// temp var
 		auto *f = b->function;
-		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type);
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		auto array = add_node_local(vv);
 
 		auto bb = add_node_block(new Block(f, b), common_types._void);
@@ -1064,7 +1064,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// array needs execution?
 		if (node_is_executable(array)) {
 			// -> assign into variable before the loop
-			auto *v = b->add_var(b->function->create_slightly_hidden_name(), array->type);
+			auto *v = b->add_var(b->function->create_slightly_hidden_name(), array->type, n->token_id);
 
 			auto assign = parser->con.link_operator_id(OperatorID::Assign, add_node_local(v), array);
 			_transform_insert_before_.add(assign);
@@ -1079,7 +1079,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		if (array->type->is_dict()) {
 			static int for_index_count = 0;
 			string index_name = format("-for_dict_index_%d-", for_index_count++);
-			index = add_node_local(b->add_var(index_name, common_types.i32));
+			index = add_node_local(b->add_var(index_name, common_types.i32, n->token_id));
 		}
 
 
@@ -1150,7 +1150,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 		// temp var
 		auto *f = b->function;
-		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->params[0]->type);
+		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
 		auto temp = add_node_local(vv);
 
 		auto bb = add_node_block(new Block(f, b), common_types._void);
@@ -1178,7 +1178,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 
 	} else if ((n->kind == NodeKind::Statement) and (n->as_statement()->id == StatementID::Match)) {
 
-		auto *vv = b->add_var(b->function->create_slightly_hidden_name(), n->params[0]->type);
+		auto *vv = b->add_var(b->function->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
 		auto temp = add_node_local(vv);
 
 		auto bb = add_node_block(new Block(b->function, b), common_types._void);
@@ -1223,7 +1223,7 @@ shared<Node> SyntaxTree::conv_break_down_high_level(shared<Node> n, Block *b) {
 		for (int i=0; i<f->num_params; i++)
 			if (f->literal_param_type[i] == common_types.dynamic) {
 				msg_error("conv dyn!");
-				auto c = add_constant(common_types.class_ref);
+				auto c = add_constant(common_types.class_ref, n->token_id);
 				c->as_int64() = (int64)(int_p)n->params[i]->type;
 				n->params.insert(add_node_const(c), i+1);
 				n->show(base_class);

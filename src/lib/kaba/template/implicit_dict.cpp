@@ -37,8 +37,8 @@ void AutoImplementer::implement_dict_clear(Function *f, const Class *t) {
 
 // delete...
 
-	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1));
-	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1));
+	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
+	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
 	auto b = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -80,8 +80,8 @@ void AutoImplementer::implement_dict_assign(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::Self));
 	auto other = add_node_local(f->__get_var("other"));
 
-	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1));
-	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1));
+	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
+	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
 
 	{
@@ -117,8 +117,8 @@ void AutoImplementer::implement_dict_get(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::Self));
 	auto in_key = add_node_local(f->__get_var("key"));
 
-	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1));
-	auto var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1));
+	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
+	auto var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
 	auto b_loop = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -177,8 +177,8 @@ void AutoImplementer::implement_dict_set(Function *f, const Class *t) {
 
 // delete...
 
-	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1));
-	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1));
+	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
+	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
 	auto b_loop = add_node_block(new Block(f, f->block), common_types._void);
 
@@ -235,8 +235,8 @@ void AutoImplementer::implement_dict_contains(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::Self));
 	auto in_key = add_node_local(f->__get_var("key"));
 
-	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1));
-	auto var_val = f->block->add_var("v", common_types.reference);
+	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
+	auto var_val = f->block->add_var("v", common_types.reference, -1);
 
 	auto b_loop = add_node_block(new Block(f, f->block), common_types._void);
 

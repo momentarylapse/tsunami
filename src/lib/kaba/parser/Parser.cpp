@@ -161,7 +161,7 @@ shared<Node> Parser::apply_format(shared<Node> n, const string &fmt) {
 	auto f = n->type->get_member_func(Identifier::func::Format, common_types.string, {common_types.string});
 	if (!f)
 		do_error(format("format string: no '%s.%s(string)' function found", n->type->long_name(), Identifier::func::Format), n);
-	auto *c = tree->add_constant(common_types.string);
+	auto *c = tree->add_constant(common_types.string, n->token_id);
 	c->as_string() = fmt;
 	auto nf = add_node_call(f, n->token_id);
 	nf->set_instance(n);
@@ -182,7 +182,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v, int token_i
 		// constant part before the next {{insert}}
 		int pe = (p0 < 0) ? s.num : p0;
 		if (pe > pos) {
-			auto *c = tree->add_constant(common_types.string);
+			auto *c = tree->add_constant(common_types.string, token_id);
 			c->as_string() = s.sub(pos, pe);
 			parts.add(add_node_const(c, token_id));
 		}
@@ -249,7 +249,7 @@ shared<Node> Parser::try_parse_format_string(Block *block, Value &v, int token_i
 	
 	// empty???
 	if (parts.num == 0) {
-		auto c = tree->add_constant(common_types.string);
+		auto c = tree->add_constant(common_types.string, token_id);
 		return add_node_const(c, token_id);
 	}
 	
@@ -402,7 +402,7 @@ void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 
 	for (int i=0; i<node->params.num/3; i++) {
 
-		auto *c = tree->add_constant(_class, _class);
+		auto *c = tree->add_constant(_class, node->params[i*3+1]->token_id, _class);
 		c->name = node->params[i*3+1]->as_token();
 
 		// explicit value
@@ -453,7 +453,7 @@ void parser_class_add_element(Parser *p, Class *_class, const string &name, cons
 
 	// add element
 	if (flags_has(flags, Flags::Static)) {
-		auto v = new Variable(name, type);
+		auto v = new Variable(name, type, _class, token_id);
 		flags_set(v->flags, flags);
 		_class->static_variables.add(v);
 	} else {
@@ -713,7 +713,7 @@ void Parser::realize_named_const(shared<Node> node, Class *name_space, Block *bl
 	auto cv = eval_to_const(node->params[2], block, type);
 	Constant *c_value = cv->as_const();
 
-	auto *c = tree->add_constant(c_value->type.get(), name_space);
+	auto *c = tree->add_constant(c_value->type.get(), node->token_id, name_space);
 	c->set(*c_value);
 	c->name = node->params[0]->as_token();
 }
@@ -798,7 +798,8 @@ Function *Parser::realize_function_header(shared<Node> node, const Class *defaul
 	// parameter list
 	if (auto pnode = node->params[2]) {
 		for (int i=0; i<pnode->params.num/3; i++) {
-			[[maybe_unused]] auto v = f->add_param(pnode->params[i*3]->as_token(), common_types.unknown, pnode->params[i*3]->flags);
+			auto p = pnode->params[i*3];
+			[[maybe_unused]] auto v = f->add_param(p->as_token(), common_types.unknown, p->token_id, p->flags);
 		}
 	}
 

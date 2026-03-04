@@ -26,8 +26,8 @@ public:
 	const Class *name_space() const;
 
 	Variable *get_var(const string &name) const;
-	Variable *add_var(const string &name, const Class *type, Flags flags = Flags::Mutable);
-	Variable *insert_var(int index, const string &name, const Class *type, Flags flags = Flags::Mutable);
+	Variable *add_var(const string &name, const Class *type, int token_id, Flags flags = Flags::Mutable);
+	Variable *insert_var(int index, const string &name, const Class *type, int token_id, Flags flags = Flags::Mutable);
 };
 
 

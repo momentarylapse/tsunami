@@ -20,25 +20,25 @@ AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 }
 
 shared<Node> AutoImplementer::node_false() {
-	auto c = tree->add_constant(common_types._bool);
+	auto c = tree->add_constant(common_types._bool, -1);
 	c->as_int() = 0;
 	return add_node_const(c);
 }
 
 shared<Node> AutoImplementer::node_true() {
-	auto c = tree->add_constant(common_types._bool);
+	auto c = tree->add_constant(common_types._bool, -1);
 	c->as_int() = 1;
 	return add_node_const(c);
 }
 
 shared<Node> AutoImplementer::node_nil() {
-	auto c = tree->add_constant(common_types.pointer);
+	auto c = tree->add_constant(common_types.pointer, -1);
 	c->as_int64() = 0;
 	return add_node_const(c);
 }
 
 shared<Node> AutoImplementer::const_int(int i) {
-	return add_node_const(tree->add_constant_int(i));
+	return add_node_const(tree->add_constant_int(i, -1));
 }
 
 shared<Node> AutoImplementer::node_not(shared<kaba::Node> n) {
@@ -106,13 +106,13 @@ shared<Node> AutoImplementer::db_print_p2s_node(shared<Node> node) {
 }
 
 shared<Node> AutoImplementer::db_print_label(const string &s) {
-	auto c = tree->add_constant(common_types.string);
+	auto c = tree->add_constant(common_types.string, -1);
 	c->as_string() = s;
 	return db_print_node(add_node_const(c));
 }
 
 shared<Node> AutoImplementer::db_print_label_node(const string &s, shared<Node> node) {
-	auto c = tree->add_constant(common_types.string);
+	auto c = tree->add_constant(common_types.string, -1);
 	c->as_string() = s;
 
 	auto ff = tree->required_func_global("print");
@@ -178,7 +178,7 @@ Function *AutoImplementer::add_func_header(Class *t, const string &name, const C
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
 		f->literal_param_type.add(p);
-		f->block->add_var(param_names[i], p, Flags::None);
+		f->block->add_var(param_names[i], p, -1, Flags::None);
 		f->num_params ++;
 		f->abstract_node->params[2]->params.resize(f->num_params * 3);
 	}

@@ -143,7 +143,7 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 
 void AutoImplementer::implement_shared_create(Function *f, const Class *t) {
 	auto p = add_node_local(f->__get_var("p"));
-	auto r = add_node_local(f->block->add_var("r", t));
+	auto r = add_node_local(f->block->add_var("r", t, -1));
 
 
 	// r = p
@@ -264,7 +264,7 @@ void AutoImplementer::implement_owned_clear(Function *f, const Class *t) {
 
 void AutoImplementer::implement_owned_give(Function *f, const Class *t) {
 	auto self = add_node_local(f->__get_var(Identifier::Self));
-	auto r = add_node_local(f->block->add_var("r", common_types.pointer));
+	auto r = add_node_local(f->block->add_var("r", common_types.pointer, -1));
 
 	// let r = self.p
 	{

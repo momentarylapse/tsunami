@@ -82,6 +82,12 @@ int ExpressionBuffer::token_line_offset(int id) const {
 	return -1;
 }
 
+int ExpressionBuffer::token_offset(int id) const {
+	if (auto l = token_logical_line(id))
+		return l->offset + l->tokens[id - l->first_token_id].pos;
+	return -1;
+}
+
 int ExpressionBuffer::token_index_in_line(int id) const {
 	if (auto l = token_logical_line(id))
 		return id - l->first_token_id;
@@ -250,6 +256,7 @@ void ExpressionBuffer::analyse(SyntaxTree *ps, const string &_source) {
 	for (int i=0;true;i++) {
 		//exp_add_line(&Exp);
 		cur_line->physical_line = i;
+		cur_line->offset = (int)((int_p)buf - (int_p)source.data);
 		if (analyse_line(buf, cur_line, i))
 			break;
 		buf += cur_line->length + 1;

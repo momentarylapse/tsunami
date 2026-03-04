@@ -18,14 +18,16 @@ enum class Flags;
 
 class Variable : public Sharable<base::Empty> {
 public:
-	Variable(const string &name, const Class *type);
+	Variable(const string& name, const Class* type, const Class* ns, int token_id);
 	~Variable();
-	const Class *type; // for creating instances
+	const Class* type; // for creating instances
 	string name;
+	const Class* ns; // null for local variables
+	int token_id;
 	string long_name(const Class *ns) const;
 	string cname(const Class *ns, const Class *ns_obs) const;
 	int64 _offset; // for compilation
-	void *memory;
+	void* memory;
 	bool memory_owner;
 	Flags flags;
 	bool is_extern() const;

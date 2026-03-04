@@ -93,8 +93,8 @@ Variable *Function::__get_var(const string &name) const {
 	return block->get_var(name);
 }
 
-Variable *Function::add_param(const string &name, const Class *type, Flags flags) {
-	auto v = block->insert_var(num_params, name, type);
+Variable *Function::add_param(const string &name, const Class *type, int token_id, Flags flags) {
+	auto v = block->insert_var(num_params, name, type, token_id);
 	if (flags_has(flags, Flags::Out))
 		flags_set(v->flags, Flags::Out);
 	else
@@ -181,7 +181,7 @@ void Function::update_parameters_after_parsing() {
 	// return by memory
 	if (literal_return_type->uses_return_by_memory())
 		//if (!__get_var(Identifier::RETURN_VAR))
-			block->add_var(Identifier::ReturnVar, owner()->type_ref(literal_return_type));
+			block->add_var(Identifier::ReturnVar, owner()->type_ref(literal_return_type), -1);
 
 	// class function
 	if (is_member()) {
@@ -200,7 +200,7 @@ void Function::add_self_parameter() {
 		flags_set(_flags, Flags::Out | Flags::Mutable);
 	if (flags_has(flags, Flags::Ref))
 		flags_set(_flags, Flags::Ref);
-	block->insert_var(0, Identifier::Self, name_space, _flags);
+	block->insert_var(0, Identifier::Self, name_space, -1, _flags);
 	literal_param_type.insert(name_space, 0);
 	abstract_node->params[2]->params.insert(nullptr, 0);
 	abstract_node->params[2]->params.insert(nullptr, 0);
@@ -225,7 +225,7 @@ Function *Function::create_dummy_clone(const Class *_name_space) const {
 			type = _name_space;
 			f->literal_param_type[0] = type;
 		}
-		f->block->add_var(var[i]->name, var[i]->type);
+		f->block->add_var(var[i]->name, var[i]->type, var[i]->token_id);
 		f->var[i]->flags = var[i]->flags;
 	}
 

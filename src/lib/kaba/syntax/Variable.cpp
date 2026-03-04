@@ -13,9 +13,11 @@ namespace kaba {
 
 string namespacify_rel(const string &name, const Class *name_space, const Class *observer_ns);
 
-Variable::Variable(const string &_name, const Class *_type) {
+Variable::Variable(const string& _name, const Class* _type, const Class* _ns, int _token_id) {
 	name = _name;
 	type = _type;
+	ns = _ns;
+	token_id = _token_id;
 	_offset = 0;
 	flags = Flags::Mutable;
 	explicitly_constructed = false;
@@ -29,12 +31,12 @@ Variable::~Variable() {
 		free(memory);
 }
 
-string Variable::long_name(const Class *ns) const {
-	return namespacify_rel(name, ns, nullptr);
+string Variable::long_name(const Class *_ns) const {
+	return namespacify_rel(name, _ns, nullptr);
 }
 
-string Variable::cname(const Class *ns, const Class *ns_obs) const {
-	return namespacify_rel(name, ns, ns_obs);
+string Variable::cname(const Class *_ns, const Class *ns_obs) const {
+	return namespacify_rel(name, _ns, ns_obs);
 }
 
 bool Variable::is_mutable() const {

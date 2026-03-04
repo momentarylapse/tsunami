@@ -21,7 +21,7 @@ public:
 	};
 
 	struct Line {
-		int physical_line, length, indent;
+		int physical_line, offset, length, indent;
 		Array<Token> tokens;
 		Array<int> token_ids;
 		int first_token_id;
@@ -40,6 +40,7 @@ public:
 	int token_physical_line_no(int id) const;
 	int token_line_offset(int id) const;
 	int token_index_in_line(int id) const;
+	int token_offset(int id) const;
 
 	void clear();
 	bool empty() const;

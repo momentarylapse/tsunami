@@ -60,7 +60,7 @@ shared<Node> eval_function_call(SyntaxTree *tree, shared<Node> c, Function *f) {
 	temp.init(f->literal_return_type);
 	if (!call_function(f, temp.p(), p))
 		return c;
-	auto r = add_node_const(tree->add_constant(f->literal_return_type));
+	auto r = add_node_const(tree->add_constant(f->literal_return_type, c->token_id));
 	r->as_const()->set(temp);
 	db_out(">>>  " + r->str(tree->base_class));
 	return r;
@@ -152,7 +152,7 @@ shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Functio
 	p[0] = temp.p();
 	if (!call_function(f, nullptr, p))
 		return c;
-	auto r = add_node_const(tree->add_constant(t));
+	auto r = add_node_const(tree->add_constant(t, c->token_id));
 	r->as_const()->set(temp);
 	db_out(">>>  " + r->str(tree->base_class));
 	return r;
@@ -173,7 +173,7 @@ shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
 shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 	if (c->kind == NodeKind::DynamicArray) {
 		if (all_params_are_const(c)) {
-			auto cr = add_node_const(add_constant(c->type));
+			auto cr = add_node_const(add_constant(c->type, c->token_id));
 			DynamicArray *da = &c->params[0]->as_const()->as_array();
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)da->data + index * da->element_size, c->type);
@@ -182,14 +182,14 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 	} else if (c->kind == NodeKind::Array) {
 		// hmmm, not existing, I guess....
 		if (all_params_are_const(c)) {
-			auto cr = add_node_const(add_constant(c->type));
+			auto cr = add_node_const(add_constant(c->type, c->token_id));
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)c->params[0]->as_const()->p() + index * c->type->size, c->type);
 			return cr;
 		}
 	} else if (c->kind == NodeKind::ArrayBuilder) {
 		if (all_params_are_const(c)) {
-			auto c_array = add_node_const(add_constant(c->type));
+			auto c_array = add_node_const(add_constant(c->type, c->token_id));
 			DynamicArray &da = c_array->as_const()->as_array();
 			rec_resize(&da, c->params.num, c->type);
 			for (int i=0; i<c->params.num; i++)

@@ -56,8 +56,8 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 	// for i=>el in self
 	//    el = other[i]
 
-	auto v_el = f->block->add_var("el", tree->request_implicit_class_reference(t->get_array_element(), -1));
-	auto v_i = f->block->add_var("i", common_types.i32);
+	auto v_el = f->block->add_var("el", tree->request_implicit_class_reference(t->get_array_element(), -1), -1);
+	auto v_i = f->block->add_var("i", common_types.i32, -1);
 
 	auto b = add_node_block(new Block(f, f->block), common_types._void);
 

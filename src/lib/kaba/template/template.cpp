@@ -382,7 +382,7 @@ Function* TemplateClassInstantiator::add_func_header(Class *t, const string &nam
 	f->auto_declared = true;
 	f->token_id = t->token_id;
 	for (auto&& [i,p]: enumerate(param_types)) {
-		f->add_param(param_names[i], p, Flags::None);
+		f->add_param(param_names[i], p, t->token_id, Flags::None);
 	}
 	f->abstract_node->params[2]->params.resize(f->num_params * 3);
 	for (auto&& [i,p]: enumerate(def_params))

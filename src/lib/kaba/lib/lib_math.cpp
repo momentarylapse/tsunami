@@ -43,6 +43,10 @@ namespace kaba {
 // we're always using math types
 #define type_p(p)			p
 
+template<class T>
+T kaba_abs(T v) {
+	return abs<T>(v);
+}
 
 template<class T>
 class VectorList : public Array<T> {
@@ -940,7 +944,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("i", common_types.i32);
 		func_add_param("min", common_types.i32);
 		func_add_param("max", common_types.i32);
-	add_func("abs", common_types.i32, &abs<int>, Flags::Static | Flags::Pure);
+	add_func("abs", common_types.i32, &kaba_abs<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", common_types.i32);
 	add_func("sign", common_types.i32, &sign<int>, Flags::Static | Flags::Pure);
 		func_add_param("i", common_types.i32);
@@ -960,7 +964,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("i", common_types.i64);
 		func_add_param("min", common_types.i64);
 		func_add_param("max", common_types.i64);
-	add_func("abs", common_types.i64, &abs<int64>, Flags::Static | Flags::Pure);
+	add_func("abs", common_types.i64, &kaba_abs<int64>, Flags::Static | Flags::Pure);
 		func_add_param("i", common_types.i64);
 	add_func("sign", common_types.i64, &sign<int64>, Flags::Static | Flags::Pure);
 		func_add_param("i", common_types.i64);
@@ -1010,7 +1014,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("f", common_types.f32);
 		func_add_param("min", common_types.f32);
 		func_add_param("max", common_types.f32);
-	add_func("abs", common_types.f32, &abs<float>, Flags::Static | Flags::Pure);
+	add_func("abs", common_types.f32, &kaba_abs<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", common_types.f32);
 	add_func("sign", common_types.f32, &sign<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", common_types.f32);
@@ -1052,7 +1056,7 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("f", common_types.f64);
 		func_add_param("min", common_types.f64);
 		func_add_param("max", common_types.f64);
-	add_func("abs", common_types.f64, &abs<double>, Flags::Static | Flags::Pure);
+	add_func("abs", common_types.f64, &kaba_abs<double>, Flags::Static | Flags::Pure);
 		func_add_param("f", common_types.f64);
 	add_func("sign", common_types.f64, &sign<double>, Flags::Static | Flags::Pure);
 		func_add_param("f", common_types.f64);

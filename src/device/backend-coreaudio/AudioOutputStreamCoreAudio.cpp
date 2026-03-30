@@ -67,17 +67,17 @@ AudioOutputStreamCoreAudio::AudioOutputStreamCoreAudio(Session *session, Device 
 		session->e(format("CoreAudio: Error setting callback: %d", (int)err));
 
 	AudioStreamBasicDescription asbd = {
+		.mSampleRate = (double)dev_sample_rate,
 		.mFormatID = kAudioFormatLinearPCM,
 		.mFormatFlags = 0
 			| kAudioFormatFlagIsFloat
 			| kAudioFormatFlagIsPacked,
 		//	| kAudioFormatFlagIsNonInterleaved,
-		.mSampleRate = (double)dev_sample_rate,
-		.mBitsPerChannel = 32,
-		.mChannelsPerFrame = 2,
+		.mBytesPerPacket = 8,
 		.mFramesPerPacket = 1,
 		.mBytesPerFrame = 8,
-		.mBytesPerPacket = 8,
+		.mChannelsPerFrame = 2,
+		.mBitsPerChannel = 32,
 	};
 
 	err = AudioUnitSetProperty(tone_unit, kAudioUnitProperty_StreamFormat,

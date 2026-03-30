@@ -11,12 +11,14 @@
 #include <lib/image/color.h>
 
 color any_to_color(const Any& a) {
+	if (a.is_string())
+		return color::parse(str(a));
 	const auto list = any_to_float_list<float>(a);
 	// rgb-a  :P
 	if (list.num >= 4)
-		return color(list[3], list[0], list[1], list[2]);
+		return color::from_rgba(list[0], list[1], list[2], list[3]);
 	if (list.num >= 3)
-		return color(1, list[0], list[1], list[2]);
+		return color::from_rgba(list[0], list[1], list[2], 1);
 	return Black;
 }
 

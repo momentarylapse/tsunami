@@ -16,6 +16,7 @@
 #include "../../any/any.h"
 #include "../../base/callable.h"
 #include "../../base/iter.h"
+#include "../../os/app.h"
 #include "../../os/msg.h"
 
 
@@ -487,7 +488,7 @@ int get_virtual_index(void *func, const string &tname, const string &name) {
 		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(p2s(pp));
 		msg_write(Asm::disassemble(func, 16));
-		exit(1);
+		os::app::exit(1);
 	} else if (config.native_target.abi == Abi::AMD64_WINDOWS) {
 		msg_error("class_add_func_virtual(" + tname + "." + name + "):  can't read virtual index");
 		msg_write(Asm::disassemble(func, 16));
@@ -623,7 +624,7 @@ void add_type_cast(int penalty, const Class *source, const Class *dest, const st
 		}
 	if (!c.f){
 		msg_error("add_type_cast: " + string(cmd) + " not found");
-		exit(1);
+		os::app::exit(1);
 	}
 	c.source = source;
 	c.dest = dest;

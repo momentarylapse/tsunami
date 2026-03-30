@@ -278,6 +278,12 @@ int Texture::channels() const {
 	return 4;
 }
 
+ColorSpace Texture::color_space() const {
+	if ((internal_format == GL_SRGB8) or (internal_format == GL_SRGB8_ALPHA8))
+		return ColorSpace::SRGB;
+	return ColorSpace::Linear;
+}
+
 void Texture::write_float(const DynamicArray &data) {
 	int ch = channels();
 	int size_expected = width * height * depth * ch * (int)sizeof(float);

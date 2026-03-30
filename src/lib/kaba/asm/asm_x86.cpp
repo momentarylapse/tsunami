@@ -7,6 +7,7 @@
 
 #include "../../base/base.h"
 #include "../../base/iter.h"
+#include "../../os/app.h"
 #include "../../os/msg.h"
 #include "asm.h"
 #include "internal.h"
@@ -189,7 +190,7 @@ bool _get_inst_param_(int param, InstructionParamFuzzy &ip) {
 	}
 	msg_error("asm: unknown instparam (call Michi!)");
 	msg_write(param);
-	exit(0);
+	os::app::exit(0);
 	return false;
 }
 

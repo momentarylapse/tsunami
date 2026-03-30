@@ -55,6 +55,7 @@ public:
 	void _cdecl unload();
 
 	int channels() const;
+	ColorSpace color_space() const;
 
 
 protected:

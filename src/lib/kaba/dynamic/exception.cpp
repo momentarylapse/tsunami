@@ -7,6 +7,7 @@
 
 #include "exception.h"
 #include "../kaba.h"
+#include "../../os/app.h"
 #include "../../os/msg.h"
 #include "../../base/iter.h"
 #include <stdlib.h>
@@ -239,7 +240,7 @@ void just_die(KabaException *kaba_exception, const Array<StackFrameInfo> &trace)
 		if (!r.f or r.f->name != "@die")
 			msg_write(r.str());
 
-	exit(1);
+	os::app::exit(1);
 }
 
 void clean_up_block(Block *b, const StackFrameInfo& r) {
@@ -283,7 +284,7 @@ void relink_return(void *rip, void *rbp, void *rsp) {
 //	printf("rbp=%p\n", rbp2);
 #endif
 
-	exit(0);
+	os::app::exit(0);
 }
 
 Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
@@ -430,7 +431,7 @@ StackFrameInfo get_current_stack_frame() {
 #else
 
 	msg_error("exception - reading stack frame not implemented for this architecture");
-	exit(1);
+	os::app::exit(1);
 
 #endif
 
@@ -482,7 +483,7 @@ void relink_return(const StackFrameInfo& frame) {
 		: : "r" (frame.rbp), "r" (frame.rsp), "r" (frame.rip) : );
 #endif
 	msg_error("catching exceptions not implemented on this architecture");
-	exit(1);
+	os::app::exit(1);
 }
 
 void kaba_raise_exception(KabaException *kaba_exception) {
@@ -548,7 +549,7 @@ Array<StackFrameInfo> get_stack_trace(const StackFrameInfo& frame) {
 void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 	msg_error("exception handling not working on this architecture...");
 	msg_write(kaba_exception->message());
-	exit(1);
+	os::app::exit(1);
 }
 
 #endif

@@ -143,6 +143,16 @@ string Element::value(const string &key, const string &def) const {
 	return def;
 }
 
+bool Element::has_value(const string &key) const {
+	for (auto &a: attributes)
+		if (a.key == key)
+			return true;
+	for (auto &e: elements)
+		if (e.tag == key)
+			return true;
+	return false;
+}
+
 Error Parser::load(const Path &filename) {
 	auto *f = os::fs::open(filename, "rb");
 

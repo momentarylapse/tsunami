@@ -59,6 +59,7 @@ public:
 
 
 	void concretify_all_params(shared<Node> &node, Block *block, const Class *ns);
+	shared<Node> type_to_value(shared<Node> node);
 
 	shared<Node> concretify_node(shared<Node> node, Block *block, const Class *ns);
 	shared_array<Node> concretify_node_multi(shared<Node> node, Block *block, const Class *ns);

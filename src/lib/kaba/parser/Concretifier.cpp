@@ -376,7 +376,13 @@ void Concretifier::concretify_all_params(shared<Node> &node, Block *block, const
 		if (node->params[p]->type == common_types.unknown) {
 			node->params[p] = concretify_node(node->params[p], block, ns);
 		}
-};
+}
+
+shared<Node> Concretifier::type_to_value(shared<Node> node) {
+	if (node->kind == NodeKind::Class)
+		return add_node_const(tree->add_constant_pointer(common_types.class_ref, node->as_class()));
+	return node;
+}
 
 shared<Node> apply_macro(Concretifier *con, Function* f, shared<Node> node, shared_array<Node>& params, Block *block, const Class *ns) {
 	if (f->num_params != params.num)
@@ -1436,8 +1442,7 @@ shared<Node> Concretifier::concretify_statement_match(shared<Node> node, Block *
 			has_default = true;
 		} else {
 			// TODO find a better place for this conversion
-			if (node->params[1+i*2]->kind == NodeKind::Class)
-				node->params[1+i*2] = add_node_const(tree->add_constant_pointer(common_types.class_ref, node->params[1+i*2]->as_class()));
+			node->params[1+i*2] = type_to_value(node->params[1+i*2]);
 
 			const auto case_type = node->params[1+i*2]->type;
 			if (node->params[1+i*2]->kind != NodeKind::Constant)
@@ -1791,6 +1796,8 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 		return node;
 	} else if (node->kind == NodeKind::ArrayBuilder) {
 		concretify_all_params(node, block, ns);
+		for (int i=0; i<node->params.num; i++)
+			node->params[i] = type_to_value(node->params[i]);
 		// NOT specifying the type
 		return node;
 	} else if (node->kind == NodeKind::DictBuilder) {
@@ -1801,6 +1808,8 @@ shared<Node> Concretifier::concretify_node(shared<Node> node, Block *block, cons
 			if (node->params[p]->kind != NodeKind::Constant)
 				do_error("key needs to be a compile-time constant", node->params[p]);
 		}
+		for (int i=0; i<node->params.num; i++)
+			node->params[i] = type_to_value(node->params[i]);
 		// NOT specifying the type
 		return node;
 	} else if (node->kind == NodeKind::Function) {

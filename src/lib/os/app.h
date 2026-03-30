@@ -6,6 +6,7 @@
 namespace os::app {
 
 	void detect(const Array<string> &arg, const string &app_name);
+	void exit(int code);
 
 	extern Path filename;          // executable
 	extern Path home_directory;    // (i.e. ~/)

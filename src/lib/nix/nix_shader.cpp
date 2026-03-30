@@ -66,9 +66,9 @@ Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 			has_fragment = true;
 		} else if (tag == "ComputeShader") {
 			p.type = GL_COMPUTE_SHADER;
-		} else if (tag == "TesselationControlShader") {
+		} else if (tag == "TessellationControlShader") {
 			p.type = GL_TESS_CONTROL_SHADER;
-		} else if (tag == "TesselationEvaluationShader") {
+		} else if (tag == "TessellationEvaluationShader") {
 			p.type = GL_TESS_EVALUATION_SHADER;
 		} else if (tag == "GeometryShader") {
 			p.type = GL_GEOMETRY_SHADER;

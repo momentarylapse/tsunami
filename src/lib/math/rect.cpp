@@ -114,3 +114,16 @@ rect rect::operator||(const rect &r) const {
 	o.y2 = max(y2, r.y2);
 	return o;
 }
+
+void rect::operator+=(const vec2& d) {
+	x1 += d.x;
+	x2 += d.x;
+	y1 += d.y;
+	y2 += d.y;
+}
+
+rect rect::operator+(const vec2 &d) const {
+	rect o = *this;
+	o += d;
+	return o;
+}

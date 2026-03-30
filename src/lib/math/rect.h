@@ -32,6 +32,9 @@ struct rect {
 	rect operator&&(const rect &r) const;
 	rect operator||(const rect &r) const;
 
+	void operator+=(const vec2& d);
+	rect operator+(const vec2& d) const;
+
 	static const rect ID;
 	static const rect ID_SYM;
 	static const rect EMPTY;

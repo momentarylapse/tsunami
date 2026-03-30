@@ -226,7 +226,7 @@ bool call_function_pointer_arm64(void *ff, void *ret, const Array<void*> &param,
 	/*msg_write("ok");
 	msg_write(temp[N*2+2]);
 	msg_write(f2s(*(float*)&temp[N*2+3], 3));
-	exit(1);*/
+	os::app::exit(1);*/
 	//msg_write(bytes(&temp, sizeof(temp)).hex());
 
 	if (return_type == common_types.i32 or return_type->is_enum()) {

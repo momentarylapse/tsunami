@@ -187,7 +187,7 @@ string _cdecl kaba_shell_execute(const string &cmd, bool verbose) {
 KABA_LINK_GROUP_END
 
 void kaba_os_exit(int status) {
-	exit(status);
+	os::app::exit(status);
 }
 
 class KabaPath : public Path {

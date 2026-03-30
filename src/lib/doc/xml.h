@@ -44,6 +44,7 @@ struct Element : Tag {
 	Element witha(const string &key, const string &value);
 	Element* find(const string &tag);
 	string value(const string &key, const string &def = "") const;
+	bool has_value(const string &key) const;
 };
 
 class Parser {

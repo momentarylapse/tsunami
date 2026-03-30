@@ -42,7 +42,7 @@ protected:
 struct base_sink {
 	friend struct base_source;
 	friend struct internal_node_data;
-	~base_sink();
+	virtual ~base_sink(); // because xsink<> adds members
 protected:
 	void remove_source(base_source* source);
 	VirtualBase* node;

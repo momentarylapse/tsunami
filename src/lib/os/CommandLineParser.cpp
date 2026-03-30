@@ -164,7 +164,7 @@ void CommandLineParser::parse(const Array<string> &_arg) {
 					if (o.parameter.num > 0) {
 						if (_arg.num <= i + 1) {
 							msg_error("parameter '" + o.parameter + "' expected after " + o.name);
-							exit(1);
+							os::app::exit(1);
 						}
 						o.callback_param(_arg[i+1]);
 						i ++;
@@ -176,7 +176,7 @@ void CommandLineParser::parse(const Array<string> &_arg) {
 			}
 			if (!found) {
 				msg_error("unknown option " + _arg[i]);
-				exit(1);
+				os::app::exit(1);
 			}
 		} else {
 			// rest

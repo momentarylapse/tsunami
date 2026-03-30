@@ -4,6 +4,7 @@
 #include "macros.h"
 #include "array.h"
 #include "strings.h"
+#include <exception>
 
 #ifdef max
 #undef max
@@ -54,7 +55,7 @@ public:
 
 
 // strings.cpp
-class Exception : public VirtualBase {
+class Exception : public std::exception {
 public:
 	Exception(){}
 	explicit Exception(const string &msg){ text = msg; }

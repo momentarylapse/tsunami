@@ -11,7 +11,7 @@
 
 namespace kaba {
 
-string Version = "0.20.22.0";
+string Version = "0.20.22.1";
 
 //#define ScriptDebug
 

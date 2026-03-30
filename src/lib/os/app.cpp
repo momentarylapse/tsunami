@@ -105,6 +105,10 @@ namespace os::app {
 #endif
 	}
 
+	void exit(int code) {
+		std::exit(code);
+	}
+
 
 
 

@@ -1,6 +1,6 @@
 #include "hui.h"
 #include "config.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 #include "../base/callable.h"
 
 
@@ -64,8 +64,8 @@ namespace hui{
 void _dummy() {}
 
 
-void export_package_hui(kaba::Exporter* e) {
-	e->package_info("hui", "6");
+void export_package_hui(kaba::IExporter* e) {
+	e->package_info("hui", "7");
 
 	e->declare_class_size("Menu", sizeof(hui::Menu));
 	e->link_class_func("Menu.__init__", &hui::Menu::__init__);

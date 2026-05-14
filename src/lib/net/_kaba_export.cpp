@@ -1,6 +1,6 @@
 #include "../base/base.h"
 #include "net.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 #include "../os/msg.h"
 
 KABA_LINK_GROUP_BEGIN
@@ -23,8 +23,8 @@ xfer<net::Socket> __socket_create_udp__(int port) {
 KABA_LINK_GROUP_END
 
 
-void export_package_net(kaba::Exporter* e) {
-	e->package_info("net", "0.2");
+void export_package_net(kaba::IExporter* e) {
+	e->package_info("net", "0.3");
 
 	e->declare_class_size("Address", sizeof(net::NetAddress));
 	e->declare_class_element("Address.host", &net::NetAddress::host);

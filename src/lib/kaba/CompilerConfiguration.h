@@ -87,8 +87,6 @@ public:
 	int64 code_origin = 0;
 
 	int function_address_offset = 0;
-
-	Path default_filename; // for create_for_source()
 };
 
 extern CompilerConfiguration config;

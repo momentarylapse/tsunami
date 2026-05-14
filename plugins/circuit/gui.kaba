@@ -1,7 +1,7 @@
 use os.*
 use hui
-use circuit.*
-use panel.*
+use .circuit.*
+use .panel.*
 
 class EditorPanel extends CircuitPanel
 	var ed: CircuitEditor&

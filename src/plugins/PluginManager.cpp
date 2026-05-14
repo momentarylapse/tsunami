@@ -108,9 +108,10 @@ PluginManager::PluginManager() {
 
 	find_plugins();
 
-	internal_module = kaba::default_context->create_empty_module("<tsunami-internal>");
-	//kaba::default_context->internal_packages.add(internal_module);
-	kaba::default_context->public_modules.add(internal_module.get());
+	auto ctx = reinterpret_cast<kaba::Context*>(kaba::default_context);
+	internal_module = ctx->create_empty_module("<tsunami-internal>");
+	//ctx->internal_packages.add(internal_module);
+	ctx->public_modules.add(internal_module.get());
 
 	auto *type_dev = internal_module->tree->create_new_class("Device", nullptr, 0, 0, nullptr, {}, internal_module->tree->base_class, -1);
 	internal_module->tree->get_pointer(type_dev);
@@ -210,9 +211,10 @@ void PluginManager::link_app_data() {
 //	kaba::Exporter exporter(kaba::default_context, nullptr);
 //	export_kaba_package_tsunami(&exporter);
 
-	kaba::default_context->register_package_init("hui", this->plugin_dir_static() | "hui", &export_package_hui);
-	kaba::default_context->register_package_init("fft", this->plugin_dir_static() | "fft", &export_package_fft);
-	kaba::default_context->register_package_init("tsunami", this->plugin_dir_static() | "tsunami", &PluginManager::export_kaba_package_tsunami);
+	auto ctx = reinterpret_cast<kaba::Context*>(kaba::default_context);
+	ctx->register_package_init("hui", this->plugin_dir_static() | "hui", &export_package_hui);
+	ctx->register_package_init("fft", this->plugin_dir_static() | "fft", &export_package_fft);
+	ctx->register_package_init("tsunami", this->plugin_dir_static() | "tsunami", &PluginManager::export_kaba_package_tsunami);
 }
 
 void init_app() {

@@ -743,9 +743,15 @@ void Parser::realize_class_variable_declaration(shared<Node> node, const Class *
 		//if (nodes.num != 1)
 		//	do_error(format("'var' declaration with '=' only allowed with a single variable name, %d given", names.num));
 
+		auto ff = ns->get_member_func(Identifier::func::AutoInit, common_types._void, {});
+		if (!ff) {
+			ff = new Function(Identifier::func::AutoInit, common_types._void, ns, Flags::Mutable);
+			ff->update_parameters_after_parsing();
+			cc->add_function(tree, ff);
+		}
 
 		//auto cv = eval_to_const(node->params[2], block, type);
-		value = con.force_concrete_type(con.concretify_node(node->params[2], block, ns));
+		value = con.force_concrete_type(con.concretify_node(node->params[2], ff->block, ns));
 		if (!type)
 			type = value->type;
 	}

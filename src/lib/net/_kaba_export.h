@@ -1,6 +1,6 @@
 namespace kaba {
-	class Exporter;
+	class IExporter;
 }
 
-void export_package_net(kaba::Exporter* e);
+void export_package_net(kaba::IExporter* e);
 

@@ -7,7 +7,8 @@
 
 #pragma once
 
-#include "../../base/base.h"
+#include <lib/base/base.h>
+#include <lib/kapi/KabaExporter.h>
 
 namespace kaba {
 	struct CommonTypes;
@@ -15,24 +16,6 @@ namespace kaba {
 	class Module;
 
 class Context;
-
-
-template<typename T>
-void* mf(T tmf) {
-	union {
-		T f;
-		struct {
-			int_p a;
-			int_p b;
-		};
-	} pp;
-	pp.a = 0;
-	pp.b = 0;
-	pp.f = tmf;
-
-	// on ARM the "virtual bit" is in <b>, on x86 it is in <a>
-	return (void*)(pp.a | (pp.b & 1));
-}
 
 class ExternalLinkData {
 public:
@@ -89,7 +72,7 @@ public:
 };
 
 
-class Exporter {
+class Exporter : public IExporter {
 public:
 	Context* ctx;
 	Package* package;
@@ -99,33 +82,12 @@ public:
 	CommonTypes* x_common_types;
 
 	Exporter(Context* ctx, Package* package);
-	virtual ~Exporter();
-	virtual void package_info(const string& name, const string& version);
-	virtual void declare_class_size(const string& name, int size);
-	virtual void _declare_class_element(const string& name, int offset);
-	virtual void link(const string& name, void* p);
-	virtual void _link_virtual(const string& name, void* p, void* instance);
-
-	template<typename T>
-	void link_class_func(const string& name, T pointer) {
-		link(name, mf(pointer));
-	}
-	template<class T>
-	void declare_class_element(const string& name, T pointer) {
-		_declare_class_element(name, *(int*)(void*)&pointer);
-	}
-	template<class T>
-	void declare_enum(const string& name, T value) {
-		_declare_class_element(name, (int)value);
-	}
-	template <typename R, typename ...Args>
-	void link_func(const string& name, R (*func)(Args...)) {
-		link(name, (void*)func);
-	}
-	template<class T>
-	void link_virtual(const string& name, T pointer, void* instance) {
-		_link_virtual(name, mf(pointer), instance);
-	}
+	~Exporter() override;
+	void package_info(const string& name, const string& version) override;
+	void declare_class_size(const string& name, int size) override;
+	void _declare_class_element(const string& name, int offset) override;
+	void link(const string& name, void* p) override;
+	void _link_virtual(const string& name, void* p, void* instance) override;
 };
 
 

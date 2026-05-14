@@ -43,18 +43,12 @@ enum class ErrorID {
 	NULL_POINTER
 };
 
-void _cdecl kaba_raise_exception(KabaException *kaba_exception);
+void kaba_raise_exception(KabaException* kaba_exception);
+KabaException* create_kaba_exception(const string& message);
 void kaba_die(KabaException* e);
 void kaba_assert(bool b);
 
 
-
-#define KABA_EXCEPTION_WRAPPER(CODE) \
-try{ \
-	CODE; \
-}catch(::Exception &e){ \
-	kaba::kaba_raise_exception(new kaba::KabaException(e.message())); \
-}
 
 #define KABA_EXCEPTION_WRAPPER2(CODE,EXCLASS) \
 try{ \

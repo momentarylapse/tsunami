@@ -56,6 +56,8 @@ string ExpressionBuffer::get_token(int id) const {
 }
 
 ExpressionBuffer::Line *ExpressionBuffer::token_logical_line(int id) const {
+	if (id < 0 or lines.num == 0 or id > lines.back().last_token_id)
+		return nullptr;
 	int i0 = 0;
 	int i1 = lines.num - 1;
 	while (i0 < i1) {

@@ -12,7 +12,10 @@
 #include "../kaba/kaba.h"
 #define HAS_KABA
 #endif
+#if __has_include("../os/msg.h")
 #include "../os/msg.h"
+#define HAS_MSG
+#endif
 #include "../base/algo.h"
 
 
@@ -82,13 +85,17 @@ namespace obs {
 base_source::base_source(VirtualBase* _node, const string& _name, int) {
 	node = _node;
 	name = _name;
+#ifdef HAS_MSG
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("add  %s . %s", get_obs_name(node), name));
+#endif
 }
 
 base_source::~base_source() {
+#ifdef HAS_MSG
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("del  %s . %s", get_obs_name(node), name));
+#endif
 	auto _sinks = connected_sinks;
 	for (auto s: _sinks)
 		unsubscribe(*s);
@@ -97,24 +104,30 @@ base_source::~base_source() {
 #if 0
 void source::notify() const {
 	for (auto s: connected_sinks) {
+#ifdef HAS_MSG
 		if constexpr (NODE_DEBUG_LEVEL >= 2)
 			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
+#endif
 		s->callback();
 	}
 }
 #endif
 
 
-void base_source::_notify() const {
+void base_source::_debug_notify() const {
+#ifdef HAS_MSG
 	if constexpr (NODE_DEBUG_LEVEL >= 2) {
 		for (const base_sink* s: connected_sinks)
 			msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));
 	}
+#endif
 }
 
 void base_source::_subscribe(base_sink& sink) {
+#ifdef HAS_MSG
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("subs  %s . %s  >  %s", get_obs_name(node), name, get_obs_name(sink.node)));
+#endif
 	connected_sinks.add(&sink);
 	sink.connected_sources.add(this);
 }
@@ -154,8 +167,10 @@ void sink::init(VirtualBase* n, Callback c) {
 #endif
 
 base_sink::~base_sink() {
+#ifdef HAS_MSG
 	if constexpr (NODE_DEBUG_LEVEL >= 2)
 		msg_write(format("del  %s  (sink)", get_obs_name(node)));
+#endif
 	auto _connected_sources = connected_sources;
 	for (auto s: _connected_sources)
 		s->unsubscribe(*this);

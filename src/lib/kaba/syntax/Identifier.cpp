@@ -135,6 +135,7 @@ namespace Identifier {
 		const string Contains = "__contains__";
 		const string Format = "format";
 		const string OptionalHasValue = "has_value";
+		const string AutoInit = ":autoinit:"; // internal
 	}
 }
 

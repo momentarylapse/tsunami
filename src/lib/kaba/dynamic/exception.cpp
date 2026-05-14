@@ -98,7 +98,7 @@ StackFrameInfo get_func_from_rip(void *rip) {
 	r.offset = 1000000;
 
 	// compiled functions
-	for (auto s: default_context->public_modules) {
+	for (auto s: reinterpret_cast<Context*>(default_context)->public_modules) {
 		if ((rip < s->opcode) or (rip > &s->opcode[s->opcode_size]))
 			continue;
 		func_from_rip_test_module(r, s, rip, false);
@@ -107,7 +107,7 @@ StackFrameInfo get_func_from_rip(void *rip) {
 		return r;
 
 	// externally linked...
-	for (auto p: default_context->internal_packages) {
+	for (auto p: reinterpret_cast<Context*>(default_context)->internal_packages) {
 		func_from_rip_test_module(r, p->main_module, rip, true);
 	}
 	return r;
@@ -213,8 +213,8 @@ const Class* get_type(void *p) {
 	if (!p)
 		return common_types.unknown;
 	void *vtable = *(void**)p;
-	auto modules = default_context->public_modules;
-	for (auto p: weak(default_context->internal_packages))
+	auto modules = reinterpret_cast<Context*>(default_context)->public_modules;
+	for (auto p: weak(reinterpret_cast<Context*>(default_context)->internal_packages))
 		modules.add(p->main_module);
 	for (auto s: modules) {
 		auto *r = _get_type(p, vtable, s->tree->base_class);
@@ -555,6 +555,9 @@ void _cdecl kaba_raise_exception(KabaException *kaba_exception) {
 #endif
 
 
+KabaException* create_kaba_exception(const string& message) {
+	return new KabaException(message);
+}
 
 
 void kaba_die(KabaException* e) {

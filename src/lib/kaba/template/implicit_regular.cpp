@@ -119,7 +119,23 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 	// auto initializers
 	for (auto &init: t->initializers) {
 		auto &e = t->elements[init.element];
-		f->block_node->add(add_assign(f, "auto init", n_self->shift(e.offset, e.type), init.value));
+		// replace "self" with current function's "self"
+		init.value = tree->transform_node(init.value, [&n_self] (shared<Node> n) {
+			if (n->kind == NodeKind::VarLocal and n->as_local()->name == Identifier::Self)
+				return n_self;
+			return n;
+		});
+		if (init.value->kind == NodeKind::ConstructorAsFunction) {
+			// skip assignment and init in-place...
+			// FIXME skip default init + make more universal
+			auto nn = init.value;
+			nn->kind = NodeKind::CallFunction;
+			nn->set_param(0, n_self->shift(e.offset, e.type));
+			nn->type = common_types._void;
+			f->block_node->add(nn);
+		} else {
+			f->block_node->add(add_assign(f, "auto init", n_self->shift(e.offset, e.type), init.value));
+		}
 	}
 
 	if (flags_has(t->flags, Flags::Shared)) {
@@ -219,7 +235,7 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 	if (t->parent) {
 		auto p = n_self->change_type(t->parent);
 		auto o = n_other->change_type(t->parent);
-		f->block_node->add(add_assign(f, "", "missing parent default constructor", p, o));
+		f->block_node->add(add_assign(f, "", "missing parent assign operator", p, o));
 	}
 
 	// call child assignment

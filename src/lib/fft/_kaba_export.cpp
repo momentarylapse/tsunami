@@ -1,10 +1,10 @@
 #include "../base/base.h"
 #include "fft.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 
 
-void export_package_fft(kaba::Exporter* e) {
-	e->package_info("fft", "1");
+void export_package_fft(kaba::IExporter* e) {
+	e->package_info("fft", "2");
 
 	e->link_func("c2c", &fft::c2c);
 	e->link_func("r2c", &fft::r2c);

@@ -22,7 +22,7 @@ public:
 	}
 
 	shared<Module> __create_from_source__(const string &source, bool just_analyse) {
-		KABA_EXCEPTION_WRAPPER( return create_module_for_source(source, just_analyse); );
+		KABA_EXCEPTION_WRAPPER( return create_module_for_source(source, "<from-source>", just_analyse); );
 		return nullptr;
 	}
 

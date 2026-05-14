@@ -190,16 +190,6 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, mf(func));
 }
 
-template<class T>
-void generic_init(T* t) {
-	new(t) T;
-}
-
-template<class T>
-void generic_delete(T* t) {
-	t->~T();
-}
-
 #define CREATE_GENERIC_IMPLACE_OPERATOR(NAME, OP) \
 template<class T, class O = const T&> \
 void generic_##NAME(T& a, O b) { \
@@ -227,45 +217,10 @@ void generic_assign(T& a, O b) {
 	a = b;
 }*/
 
-template<class T>
-class generic_virtual : public T {
-public:
-	~generic_virtual() = default;
-	void __delete__() {
-		this->~generic_virtual();
-	}
-};
-
-template<class T, class... Args>
-void generic_init_ext(T* me, Args... args) {
-	new(me) T(args...);
-}
-
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \
 	class_link_vtable(*(void***)&my_instance);}
 
-
-
-#if defined(COMPILER_GCC)
-#define KABA_LINK_GROUP_BEGIN _Pragma("GCC push_options") \
-_Pragma("GCC optimize(\"no-omit-frame-pointer\")") \
-_Pragma("GCC optimize(\"no-inline\")") \
-_Pragma("GCC optimize(\"0\")")
-#elif defined(COMPILER_CLANG)
-#define KABA_LINK_GROUP_BEGIN _Pragma("clang attribute push (__attribute((noinline)), apply_to = function)")
-#else
-#define KABA_LINK_GROUP_BEGIN
-#endif
-
-
-#if defined(COMPILER_GCC)
-#define KABA_LINK_GROUP_END _Pragma("GCC pop_options")
-#elif defined(COMPILER_CLANG)
-#define KABA_LINK_GROUP_END _Pragma("clang attribute pop")
-#else
-#define KABA_LINK_GROUP_END
-#endif
 
 
 

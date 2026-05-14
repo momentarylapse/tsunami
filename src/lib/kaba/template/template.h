@@ -126,7 +126,8 @@ private:
 
 	Function *full_copy(SyntaxTree *tree, Function *f0);
 	shared<Node> node_replace(SyntaxTree *tree, shared<Node> n, const Array<string> &names, const Array<const Class*> &params);
-	Function *instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id);
+	Function *instantiate_function_abstract(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id);
+	void concretify_function_body(SyntaxTree *tree, Function* f, int token_id);
 	//const Class *instantiate_class(SyntaxTree *tree, ClassTemplate &t, const Array<const Class*> &params, int array_size, int token_id);
 
 	void match_parameter_type(shared<Node> p, const Class *t, std::function<void(const string&, const Class*)> f);

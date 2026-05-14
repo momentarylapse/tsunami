@@ -32,7 +32,7 @@ struct base_source {
 protected:
 	void _subscribe(base_sink& sink);
 	void remove_sink(base_sink* sink);
-	void _notify() const;
+	void _debug_notify() const;
 	VirtualBase* node;
 	string name;
 	//mutable
@@ -66,7 +66,7 @@ struct xsource : base_source {
 	}
 
 	void notify(T... t) const {
-		_notify();
+		_debug_notify();
 		for (const base_sink* s: connected_sinks) {
 			//if constexpr (NODE_DEBUG_LEVEL >= 2)
 			//	msg_write(format("send  %s  ---%s--->>  %s", get_obs_name(node), name, get_obs_name(s->node)));

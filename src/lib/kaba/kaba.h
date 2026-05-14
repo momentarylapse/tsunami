@@ -6,8 +6,7 @@
 |                                                                              |
 | last updated: 2009.10.04 (c) by MichiSoft TM                                 |
 \*----------------------------------------------------------------------------*/
-#if !defined(KABA_H__INCLUDED_)
-#define KABA_H__INCLUDED_
+#pragma once
 
 namespace kaba {
 	class Module;
@@ -16,6 +15,7 @@ namespace kaba {
 #include "../base/base.h"
 #include "../base/pointer.h"
 #include "../os/path.h"
+#include "../kapi/kapi.h"
 #include "Context.h"
 #include "Module.h"
 #include "lib/lib.h"
@@ -28,5 +28,3 @@ extern string Version;
 string var2str(const void *p, const Class *type);
 
 };
-
-#endif

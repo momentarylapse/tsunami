@@ -141,9 +141,10 @@ Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function 
 	
 	// new
 	FunctionInstance ii;
-	ii.f = instantiate_function(tree, t, params, token_id);
+	ii.f = instantiate_function_abstract(tree, t, params, token_id);
 	ii.params = params;
 	t.instances.add(ii);
+	concretify_function_body(tree, ii.f, token_id);
 	return ii.f;
 }
 
@@ -263,7 +264,7 @@ shared<Node> TemplateManager::node_replace(SyntaxTree *tree, shared<Node> n, con
 	});
 }
 
-Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id) {
+Function *TemplateManager::instantiate_function_abstract(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id) {
 	if (config.verbose)
 		msg_write("INSTANTIATE TEMPLATE");
 	Function *f0 = t.func;
@@ -286,17 +287,12 @@ Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTempla
 			f->block_node->params[i] = node_replace(tree, f->block_node->params[i], t.params, params);
 	}
 
-	// concretify
+	// (partially) concretify
 	try {
 
 		tree->parser->con.concretify_function_header(f);
 
 		f->update_parameters_after_parsing();
-
-		tree->parser->con.concretify_function_body(f);
-
-		if (config.verbose)
-			f->block_node->show();
 
 		auto __ns = const_cast<Class*>(f0->name_space);
 		__ns->add_function(tree, f, false, false);
@@ -309,6 +305,20 @@ Function *TemplateManager::instantiate_function(SyntaxTree *tree, FunctionTempla
 	}
 
 	return f;
+}
+
+void TemplateManager::concretify_function_body(SyntaxTree *tree, Function *f, int token_id) {
+
+	try {
+		tree->parser->con.concretify_function_body(f);
+
+		if (config.verbose)
+			f->block_node->show();
+
+	} catch (kaba::Exception &e) {
+		//msg_write(e.message());
+		tree->do_error(format("failed to instantiate template %s: %s", f->name, e.message()), token_id);
+	}
 }
 
 

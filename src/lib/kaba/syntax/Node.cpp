@@ -596,7 +596,7 @@ shared<Node> add_node_token(SyntaxTree* tree, int token_id) {
 }
 
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
-	for (auto op: weak(default_context->global_operators))
+	for (auto op: weak(reinterpret_cast<Context*>(default_context)->global_operators))
 		if (op->f->inline_no == inline_index)
 			return add_node_operator(op, p1, p2, token_id, override_type);
 

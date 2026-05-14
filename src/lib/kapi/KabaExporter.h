@@ -1,16 +1,40 @@
 #pragma once
 
 #include "../base/base.h"
+
 #if __has_include("../kaba/lib/extern.h")
-#include "../kaba/lib/extern.h"
-#include "../kaba/lib/lib.h"
-#include "../kaba/dynamic/exception.h"
-
+#define KABA_EXCEPTION_WRAPPER(CODE) \
+try{ \
+	CODE; \
+}catch(::Exception &e){ \
+	kaba::kaba_raise_exception(kaba::create_kaba_exception(e.message())); \
+}
 #else
+#define KABA_EXCEPTION_WRAPPER(CODE) CODE
+#endif
 
+
+
+#if defined(COMPILER_GCC)
+#define KABA_LINK_GROUP_BEGIN _Pragma("GCC push_options") \
+_Pragma("GCC optimize(\"no-omit-frame-pointer\")") \
+_Pragma("GCC optimize(\"no-inline\")") \
+_Pragma("GCC optimize(\"0\")")
+#elif defined(COMPILER_CLANG)
+#define KABA_LINK_GROUP_BEGIN _Pragma("clang attribute push (__attribute((noinline)), apply_to = function)")
+#else
 #define KABA_LINK_GROUP_BEGIN
+#endif
+
+
+#if defined(COMPILER_GCC)
+#define KABA_LINK_GROUP_END _Pragma("GCC pop_options")
+#elif defined(COMPILER_CLANG)
+#define KABA_LINK_GROUP_END _Pragma("clang attribute pop")
+#else
 #define KABA_LINK_GROUP_END
-#define KABA_EXCEPTION_WRAPPER(x) x
+#endif
+
 
 template<typename T>
 void* mf(T tmf) {
@@ -30,9 +54,15 @@ void* mf(T tmf) {
 }
 
 namespace kaba {
-class Exporter {
+
+class KabaException;
+
+KabaException* create_kaba_exception(const string& message);
+void kaba_raise_exception(KabaException* e);
+
+class IExporter {
 public:
-	virtual ~Exporter() = default;
+	virtual ~IExporter() = default;
 	virtual void package_info(const string& name, const string& version) = 0;
 	virtual void declare_class_size(const string& name, int size) = 0;
 	virtual void _declare_class_element(const string& name, int offset) = 0;
@@ -90,6 +120,6 @@ void generic_init_ext(T* me, Args... args) {
 }
 }
 
-#endif
+//#endif
 
 

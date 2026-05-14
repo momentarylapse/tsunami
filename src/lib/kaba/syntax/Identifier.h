@@ -135,6 +135,7 @@ namespace Identifier {
 		extern const string Contains;
 		extern const string Format;
 		extern const string OptionalHasValue;
+		extern const string AutoInit;
 	}
 }
 

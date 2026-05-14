@@ -7,8 +7,6 @@
 
 namespace kaba {
 
-CommonTypes common_types;
-
 void remove_enum_labels(const Class *type);
 
 base::set<Class*> _all_classes_;
@@ -645,6 +643,8 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 	// inheritance of functions
 	for (auto *f: weak(parent->functions)) {
 		if (f->name == Identifier::func::Assign)
+			continue;
+		if (f->name == Identifier::func::AutoInit)
 			continue;
 		Function *ff = f;
 		if (f->name == Identifier::func::Init) {

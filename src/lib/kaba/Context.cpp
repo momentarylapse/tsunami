@@ -1,14 +1,16 @@
 #include "Context.h"
 #include "kaba.h"
 #include "Interpreter.h"
-#include "../os/file.h"
-#include "../os/filesystem.h"
 #include "parser/Parser.h"
 #include "parser/Concretifier.h"
 #include "template/template.h"
 #include "compiler/Compiler.h"
-#include "../os/msg.h"
-#include "lib/os/app.h"
+#include "dynamic/dynamic.h"
+#include <lib/os/msg.h>
+#include <lib/os/app.h>
+#include <lib/os/file.h>
+#include <lib/os/filesystem.h>
+#include <lib/any/any.h>
 #if HAS_LIB_DL
 #include <dlfcn.h>
 #endif
@@ -16,8 +18,6 @@
 namespace kaba {
 
 VirtualTable* get_vtable(const VirtualBase *p);
-
-Context *default_context = nullptr;
 
 extern Array<shared<Module>> loading_module_stack;
 
@@ -78,44 +78,14 @@ Path absolute_module_path(const Path &filename) {
 Context::Context() {
 	template_manager = new TemplateManager(this);
 	external = new ExternalLinkData(this);
-
-	f_load_module = [] (Context* ctx, const Path& filename, bool x) {
-		return ctx->load_module(filename, x);
-	};
-	f_create_module_for_source = [] (Context* ctx, const string& source, bool x) {
-		return ctx->create_module_for_source(source, x);
-	};
-	f_execute_single_command = [] (Context* ctx, const string& cmd) {
-		ctx->execute_single_command(cmd);
-	};
-	f_create_new_context = [this] {
-		auto ctx = create();
-		ctx->f_load_module = f_load_module;
-		ctx->f_create_module_for_source = f_create_module_for_source;
-		ctx->f_execute_single_command = f_execute_single_command;
-		ctx->f_create_new_context = f_create_new_context;
-		return ctx;
-	};
 }
 
 Context::~Context() {
-    clean_up();
+    Context::clean_up();
 }
 
-shared<Module> Context::dll_load_module(const Path& filename, bool just_analyse) {
-	return f_load_module(this, filename, just_analyse);
-}
-
-shared<Module> Context::dll_create_module_for_source(const string& source, bool just_analyse) {
-	return f_create_module_for_source(this, source, just_analyse);
-}
-
-void Context::dll_execute_single_command(const string& cmd) {
-	f_execute_single_command(this, cmd);
-}
-
-xfer<Context> Context::dll_create_context() const {
-	return f_create_new_context();
+xfer<Context> Context::create_new_context() const {
+	return create();
 }
 
 void try_import_dynamic_library_for_package(Package* p, Context* ctx) {
@@ -217,10 +187,10 @@ shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
 	return module;
 }
 
-shared<Module> Context::create_module_for_source(const string& source, bool just_analyse) {
-    auto module = create_empty_module("<from-source>");
+shared<Module> Context::create_module_for_source(const string& source, const Path& filename, bool just_analyse) {
+    auto module = create_empty_module(filename);
 	module->just_analyse = just_analyse;
-	module->filename = config.default_filename;
+	module->filename = filename;
 	module->tree->parser = new Parser(module->tree.get());
 	module->tree->default_import();
 	module->tree->parser->parse_buffer(source, just_analyse);
@@ -392,5 +362,27 @@ Path Context::installation_root() {
 
 Path Context::packages_root() {
 	return installation_root() | "packages";
+}
+
+string Context::type_name(const Class* c) const {
+	if (c)
+		return c->name;
+	return "<null>";
+}
+
+Any Context::dynify(const void* p, const Class* type) const {
+	return kaba::dynify(p, type);
+}
+
+void Context::unwrap_any(const Any& aa, void* var, const Class* type) const {
+	return kaba::unwrap_any(aa, var, type);
+}
+
+void make_context_public(IExporter* _e) {
+	auto e = reinterpret_cast<Exporter*>(_e);
+	// restore/duplicate global state
+	default_context = e->ctx;
+	_secret_lib_context_ = e->secret_lib_context;
+	common_types = *e->x_common_types;
 }
 }

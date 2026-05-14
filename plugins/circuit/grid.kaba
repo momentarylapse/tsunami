@@ -1,4 +1,4 @@
-use circuit64.*
+use .circuit64.*
 
 func simulate(N: i32)
 	print("------")

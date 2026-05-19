@@ -15,6 +15,7 @@ namespace Identifier {
 	extern const string Class;
 	extern const string Struct;
 	extern const string Interface;
+	extern const string Trait;
 	extern const string Func;
 	extern const string Macro;
 	extern const string Super;
@@ -135,7 +136,7 @@ namespace Identifier {
 		extern const string Contains;
 		extern const string Format;
 		extern const string OptionalHasValue;
-		extern const string AutoInit;
+		extern const string AutoInitContext;
 	}
 }
 

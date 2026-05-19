@@ -4,6 +4,21 @@
 #include <lib/kapi/KabaExporter.h>
 #include <cstdio>
 
+class Sink;
+
+class InternalNodeData : public obs::internal_node_data {
+public:
+	obs::sink* create_temp_sink0(VirtualBase* node, Callable<void()>& f) {
+		auto s = new obs::sink(node, [&f] { f(); });
+		add_temp_sink(s);
+		return s;
+	}
+	obs::xsink<int&>* create_temp_xsink0(VirtualBase* node, Callable<void(void*)>& f) {
+		auto s = new obs::xsink<int&>(node, [&f] (int& p) { f(&p); });
+		add_temp_sink(s);
+		return s;
+	}
+};
 
 class Source : public obs::source {
 public:
@@ -24,8 +39,9 @@ static void subscribe(Source* source, Sink* sink) {
 	*source >> *sink;
 }
 
-
-class XPSource : public obs::xsource<void*> {
+// generic source/sink for call-by-reference types
+// NOTE void* does not work! (std::function is not compatible between * and &...)
+class XPSource : public obs::xsource<int&> {
 public:
 	void __init__(VirtualBase* node, obs::internal_node_data* ind, const string& name) {
 		new(this) obs::base_source(node, name, 0);
@@ -33,14 +49,13 @@ public:
 	}
 };
 
-class XPSink : public obs::xsink<void*> {
+class XPSink : public obs::xsink<int&> {
 public:
 	void __init_p__(VirtualBase* node, Callable<void(void*)>& f) {
 		//printf("init_p\n");
-		//f(nullptr);
-		new(this) obs::xsink<void*>(node, [&f] (void* p) {
-			//printf("XXXX %p\n", p);
-			f(p);
+		new(this) obs::xsink<int&>(node, [&f] (int& p) {
+			//printf("XXXX %p\n", &p);
+			f(&p);
 		});
 	}
 };
@@ -53,11 +68,16 @@ static void xpsubscribe(XPSource* source, XPSink* sink) {
 
 
 void export_package_obs(kaba::IExporter* e) {
-	e->package_info("obs", "0.1");
+	e->package_info("obs", "0.5");
 
 	e->declare_class_size("InternalNodeData", sizeof(obs::internal_node_data));
 	e->link_class_func("InternalNodeData.__init__", &kaba::generic_init<obs::internal_node_data>);
 	e->link_class_func("InternalNodeData.__delete__", &kaba::generic_delete<obs::internal_node_data>);
+	e->link_class_func("InternalNodeData.cleanup_temp_sinks", &obs::internal_node_data::cleanup_temp_sinks);
+	e->link_class_func("InternalNodeData.add_temp_sink", &obs::internal_node_data::add_temp_sink);
+	e->link_class_func("InternalNodeData.create_temp_sink0", &InternalNodeData::create_temp_sink0);
+	e->link_class_func("InternalNodeData.create_temp_xsink0", &InternalNodeData::create_temp_xsink0);
+	e->link_class_func("InternalNodeData.unsubscribe", &obs::internal_node_data::unsubscribe);
 
 	e->declare_class_size("Source", sizeof(Source));
 	e->link_class_func("Source.__init__", &Source::__init__);

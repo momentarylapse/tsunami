@@ -574,7 +574,7 @@ shared<Node> add_node_slice(shared<Node> start, shared<Node> end) {
 
 shared<Node> make_constructor_static(shared<Node> n, const string &name) {
 	for (auto *f: weak(n->type->functions))
-		if (f->name == name) {
+		if (f->name == name and f->num_params+1 == n->params.num) {
 			auto nn = add_node_call(f, n->token_id);
 			for (int i=0; i<n->params.num-1; i++)
 				nn->set_param(i, n->params[i+1]);

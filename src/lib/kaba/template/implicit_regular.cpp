@@ -15,7 +15,7 @@ namespace kaba {
 void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 	if (t->is_struct()) {
 		// force to have:
-		if (!flags_has(t->flags, Flags::Noauto)) {
+		if (!t->has_trait(common_types.noauto_trait)) {
 			if (t->parent) {
 				if (has_user_constructors(t)) {
 					// don't inherit constructors!
@@ -71,7 +71,7 @@ void AutoImplementer::_add_missing_function_headers_for_regular(Class *t) {
 					if (can_fully_construct(t))
 						add_full_constructor(t);*/
 			}
-			if (needs_new(t->get_destructor()) and !flags_has(t->flags, Flags::Noauto))
+			if (needs_new(t->get_destructor()) and !t->has_trait(common_types.noauto_trait))
 				add_func_header(t, Identifier::func::Delete, common_types._void, {}, {}, t->get_destructor(), Flags::Mutable);
 		}
 
@@ -136,15 +136,6 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 		} else {
 			f->block_node->add(add_assign(f, "auto init", n_self->shift(e.offset, e.type), init.value));
 		}
-	}
-
-	if (flags_has(t->flags, Flags::Shared)) {
-		for (auto &e: t->elements)
-			if (e.name == Identifier::SharedCount and e.type == common_types.i32) {
-				f->block_node->add(add_node_operator_by_inline(InlineID::Int32Assign,
-						n_self->shift(e.offset, e.type),
-						add_node_const(tree->add_constant_int(0))));
-			}
 	}
 }
 

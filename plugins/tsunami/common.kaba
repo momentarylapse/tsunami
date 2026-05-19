@@ -14,13 +14,6 @@ func extern db2amp(db: f32) -> f32
 func extern amp2db(amp: f32) -> f32
 
 
-class obs
-	class source
-		func extern __rshift__(s: sink)
-	
-	class sink
-
-
 struct Range
 	var offset, length: i32
 	func extern start() -> i32

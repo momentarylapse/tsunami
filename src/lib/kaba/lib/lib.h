@@ -190,33 +190,6 @@ void add_operator(OperatorID primitive_op, const Class *return_type, const Class
 	add_operator_x(primitive_op, return_type, param_type1, param_type2, inline_index, mf(func));
 }
 
-#define CREATE_GENERIC_IMPLACE_OPERATOR(NAME, OP) \
-template<class T, class O = const T&> \
-void generic_##NAME(T& a, O b) { \
-	a OP b; \
-}
-
-#define CREATE_GENERIC_OPERATOR(NAME, OP) \
-template<class T, class O = const T&> \
-T generic_##NAME(const T& a, O b) { \
-	return a OP b; \
-}
-
-CREATE_GENERIC_IMPLACE_OPERATOR(assign, =)
-CREATE_GENERIC_OPERATOR(add, +)
-CREATE_GENERIC_IMPLACE_OPERATOR(iadd, +=)
-CREATE_GENERIC_OPERATOR(sub, -)
-CREATE_GENERIC_IMPLACE_OPERATOR(isub, -=)
-CREATE_GENERIC_OPERATOR(mul, *)
-CREATE_GENERIC_IMPLACE_OPERATOR(imul, *=)
-CREATE_GENERIC_OPERATOR(div, /)
-CREATE_GENERIC_IMPLACE_OPERATOR(idiv, /=)
-
-/*template<class T, class O = const T&>
-void generic_assign(T& a, O b) {
-	a = b;
-}*/
-
 #define class_set_vtable(TYPE) \
 	{TYPE my_instance; \
 	class_link_vtable(*(void***)&my_instance);}

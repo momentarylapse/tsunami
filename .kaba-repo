@@ -1,2 +1,6 @@
 package plugins/tsunami
+package plugins/circuit forward
+package plugins/fft forward
+package plugins/hui forward
+package plugins/obs forward
 

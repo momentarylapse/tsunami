@@ -114,6 +114,8 @@ void SIAddPackageImage(Context *c) {
 		class_add_func_virtual("draw_str", common_types._void, &Painter::draw_str);
 			func_add_param("p", common_types.vec2);
 			func_add_param("str", common_types.string);
+		class_add_func_virtual("get_str_size", common_types.vec2, &Painter::get_str_size);
+			func_add_param("str", common_types.string);
 		class_add_func_virtual("get_str_width", common_types.f32, &Painter::get_str_width);
 			func_add_param("str", common_types.string);
 		class_add_func_virtual("draw_image", common_types._void, &Painter::draw_image);

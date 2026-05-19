@@ -1248,10 +1248,10 @@ shared<Node> AbstractParser::parse_abstract_enum() {
 	return node;
 }
 
-// [METACLASS, NAME, PARENT, TEMPLATEPARAM] + flags
+// [METACLASS, NAME, PARENT, TEMPLATEPARAM, TRAITS] + flags
 shared<Node> AbstractParser::parse_abstract_class_header() {
 	auto node = new Node(NodeKind::AbstractClass, 0, common_types.unknown, Flags::None, Exp.cur_token());
-	node->set_num_params(4);
+	node->set_num_params(5);
 
 	// metaclass
 	node->set_param(0, parse_abstract_token()); // class/struct/interface
@@ -1277,16 +1277,20 @@ shared<Node> AbstractParser::parse_abstract_class_header() {
 		expect_identifier("]", "']' expected after template parameter");
 	}
 
-	// parent class / interface
+	// parent class
 	if (try_consume(Identifier::Extends))
 		node->set_param(2, parse_abstract_type());
-	else if (try_consume(Identifier::Implements))
-		node->set_param(2, parse_abstract_type());
 
-	// as shared|@noauto
-	Flags explicit_flags = Flags::None;
-	if (try_consume(Identifier::As))
-		flags_set(node->flags, parse_flags(explicit_flags));
+	// traits
+	if (try_consume(Identifier::Implements) or try_consume(Identifier::As)) {
+		auto list = new Node(NodeKind::AbstractTypeList, 0, common_types.unknown, Flags::None, Exp.cur_token());
+		while (true) {
+			list->add(parse_abstract_type());
+			if (!try_consume(","))
+				break;
+		}
+		node->set_param(4, list);
+	}
 
 	expect_new_line();
 
@@ -1309,7 +1313,7 @@ shared<Node> AbstractParser::parse_abstract_class() {
 
 		if (Exp.cur == Identifier::Enum) {
 			node->add(parse_abstract_enum());
-		} else if ((Exp.cur == Identifier::Class) or (Exp.cur == Identifier::Struct) or (Exp.cur == Identifier::Interface) or (Exp.cur == Identifier::Namespace)) {
+		} else if ((Exp.cur == Identifier::Class) or (Exp.cur == Identifier::Struct) or (Exp.cur == Identifier::Interface) or (Exp.cur == Identifier::Namespace) or (Exp.cur == Identifier::Trait)) {
 			auto n = parse_abstract_class();
 			node->add(n);
 		} else if (Exp.cur == Identifier::Func) {
@@ -1519,8 +1523,6 @@ Flags AbstractParser::parse_flags(Flags initial) {
 			flags_set(flags, Flags::RaisesExceptions);
 		} else if (Exp.cur == Identifier::Pure) {
 			flags_set(flags, Flags::Pure);
-		} else if (Exp.cur == Identifier::Noauto) {
-			flags_set(flags, Flags::Noauto);
 		} else if (Exp.cur == Identifier::Noframe) {
 			flags_set(flags, Flags::Noframe);
 		} else {
@@ -1550,7 +1552,7 @@ shared<Node> AbstractParser::parse_abstract_top_level() {
 			node->add(parse_abstract_enum());
 
 		// class
-		} else if ((Exp.cur == Identifier::Class) or (Exp.cur == Identifier::Struct) or (Exp.cur == Identifier::Interface) or (Exp.cur == Identifier::Namespace)) {
+		} else if ((Exp.cur == Identifier::Class) or (Exp.cur == Identifier::Struct) or (Exp.cur == Identifier::Interface) or (Exp.cur == Identifier::Namespace) or (Exp.cur == Identifier::Trait)) {
 			node->add(parse_abstract_class());
 
 		// func

@@ -127,7 +127,7 @@ void TemplateClassInstantiatorProduct::add_function_headers(Class* t) {
 	int offset = 0;
 	for (auto&& [i,cc]: enumerate(t->param)) {
 		offset = mem_align(offset, cc->alignment);
-		t->elements.add(ClassElement(format("e%d", i), cc, offset));
+		t->elements.add(ClassElement(format("e%d", i), cc, offset, -1));
 		offset += cc->size;
 	}
 

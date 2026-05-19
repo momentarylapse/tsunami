@@ -31,7 +31,7 @@ struct ColorScheme as @noauto
 
 
 class SceneGraph
-	class Node as shared
+	class Node as Sharable
 		var area: Rect
 
 

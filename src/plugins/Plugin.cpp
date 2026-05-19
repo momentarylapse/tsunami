@@ -53,7 +53,7 @@ void Plugin::recompile(Session *session) {
 
 	// load + compile
 	try {
-		module = kaba::default_context->load_module(filename);
+		module = kaba::default_context->load_module(filename, false);
 	} catch(kaba::Exception &e) {
 		error_message = e.message();
 		session->e(get_error());

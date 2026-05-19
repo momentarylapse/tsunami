@@ -31,11 +31,11 @@ void AutoImplementerFutureCore::complete_type(Class *t) {
 	add_missing_function_headers(t);
 	auto t_callback = tree->request_implicit_class_callable_fp({t->param[0]}, common_types._void, -1);
 	auto t_callback_fail = tree->request_implicit_class_callable_fp({}, common_types._void, -1);
-	t->elements.add(ClassElement(Identifier::SharedCount, common_types.i32, 0));
-	t->elements.add(ClassElement("cb_success", t_callback, 4));
-	t->elements.add(ClassElement("cb_fail", t_callback_fail, 4 + config.target.pointer_size));
-	t->elements.add(ClassElement("state", common_types.i32, 4 + config.target.pointer_size * 2));
-	t->elements.add(ClassElement("result", t->param[0], 8 + config.target.pointer_size * 2));
+	t->elements.add(ClassElement(Identifier::SharedCount, common_types.i32, 0, -1));
+	t->elements.add(ClassElement("cb_success", t_callback, 4, -1));
+	t->elements.add(ClassElement("cb_fail", t_callback_fail, 4 + config.target.pointer_size, -1));
+	t->elements.add(ClassElement("state", common_types.i32, 4 + config.target.pointer_size * 2, -1));
+	t->elements.add(ClassElement("result", t->param[0], 8 + config.target.pointer_size * 2, -1));
 }
 
 

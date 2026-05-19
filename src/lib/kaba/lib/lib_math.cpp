@@ -563,6 +563,8 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("size", common_types.vec2, &rect::size, Flags::Pure);
 		class_add_func("inside", common_types._bool, &rect::inside, Flags::Pure);
 			func_add_param("p", common_types.vec2);
+		class_add_func("grow", common_types.rect, &rect::grow, Flags::Pure);
+			func_add_param("d", common_types.f32);
 		class_add_func(Identifier::func::Str, common_types.string, &rect::str, Flags::Pure);
 		class_add_func("_create", common_types.rect, &KabaRect::set, Flags::Static | Flags::Pure);
 			func_set_inline(InlineID::RectSet);
@@ -570,17 +572,17 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("x2", common_types.f32);
 			func_add_param("y1", common_types.f32);
 			func_add_param("y2", common_types.f32);
-		/*class_add_func("_create", common_types.rect, &KabaRect::set2, Flags::Static | Flags::Pure);
+		class_add_func("_create", common_types.rect, &KabaRect::set2, Flags::Static | Flags::Pure);
 			func_add_param("p00", common_types.vec2);
-			func_add_param("p11", common_types.vec2);*/
+			func_add_param("p11", common_types.vec2);
 		class_add_func(Identifier::func::Init, common_types._void, &generic_init_ext<rect, float, float, float, float>, Flags::Mutable);
 			func_add_param("x1", common_types.f32);
 			func_add_param("x2", common_types.f32);
 			func_add_param("y1", common_types.f32);
 			func_add_param("y2", common_types.f32);
-		/*class_add_func(Identifier::func::Init, common_types._void, &KabaRect::init2, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init_ext<rect, vec2, vec2>, Flags::Mutable);
 			func_add_param("p00", common_types.vec2);
-			func_add_param("p11", common_types.vec2);*/
+			func_add_param("p11", common_types.vec2);
 		add_operator(OperatorID::Assign, common_types._void, common_types.rect, common_types.rect, InlineID::ChunkAssign, &generic_assign<rect>);
 		add_operator(OperatorID::Equal, common_types._bool, common_types.rect, common_types.rect, InlineID::ChunkEqual, &rect::operator==);
 		add_operator(OperatorID::NotEqual, common_types._bool, common_types.rect, common_types.rect, InlineID::ChunkNotEqual, &rect::operator!=);

@@ -151,6 +151,7 @@ void SIAddPackageKaba(Context *c) {
 		class_add_element("from_template", TypeClassP, &Class::from_template);
 		class_add_element("parent", TypeClassP, &Class::parent);
 		class_add_element("param", TypeClassRefList, &Class::param);
+		class_add_element("traits", TypeClassRefList, &Class::traits);
 		class_add_element("namespace", TypeClassP, &Class::name_space);
 		class_add_element("elements", TypeClassElementList, &Class::elements);
 		class_add_element("functions", TypeFunctionRefList, &Class::functions);
@@ -169,8 +170,11 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("is_enum", common_types._bool, &Class::is_enum, Flags::Pure);
 		class_add_func("is_namespace", common_types._bool, &Class::is_namespace, Flags::Pure);
 		class_add_func("is_interface", common_types._bool, &Class::is_interface, Flags::Pure);
+		class_add_func("is_trait", common_types._bool, &Class::is_trait, Flags::Pure);
 		class_add_func("is_struct", common_types._bool, &Class::is_struct, Flags::Pure);
 		class_add_func("is_template", common_types._bool, &Class::is_template, Flags::Pure);
+		class_add_func("has_trait", common_types._bool, &Class::has_trait, Flags::Pure);
+			func_add_param("trait", TypeClassP);
 		class_add_func("get_func", TypeFunctionP, &Class::get_func, Flags::Pure); // selfref
 			func_add_param("name", common_types.string);
 			func_add_param("return_type", TypeClassP);

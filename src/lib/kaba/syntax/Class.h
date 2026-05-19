@@ -23,8 +23,9 @@ public:
 	const Class *type;
 	int64 offset;
 	bool allow_indirect_use;
+	int token_id;
 	ClassElement();
-	ClassElement(const string &name, const Class *type, int64 offset);
+	ClassElement(const string &name, const Class *type, int64 offset, int token_id);
 	string signature(bool include_class) const;
 	bool hidden() const;
 	string str() const;
@@ -45,6 +46,7 @@ enum class DeriveFlags {
 	SET_SIZE = 1,
 	COPY_VTABLE = 2,
 	KEEP_CONSTRUCTORS = 4,
+	COPY_FLAGS = 8,
 };
 DeriveFlags operator|(DeriveFlags a, DeriveFlags b);
 
@@ -81,12 +83,14 @@ public:
 	bool is_enum() const;
 	bool is_namespace() const;
 	bool is_interface() const;
+	bool is_trait() const;
 	bool is_product() const;
 	bool is_optional() const;
 	bool is_callable() const;
 	bool is_callable_fp() const;
 	bool is_callable_bind() const;
 	bool is_template() const;
+	bool has_trait(const Class* trait) const;
 	bool fully_parsed() const;
 
 	Array<ClassElement> elements;
@@ -98,6 +102,7 @@ public:
 	base::map<string, const Class*> type_aliases;
 
 	const Class *parent; // derived from
+	Array<const Class*> traits;
 	Array<const Class*> param; // for pointers/arrays etc
 	const Class *name_space;
 	SyntaxTree *owner; // to share and be able to delete...

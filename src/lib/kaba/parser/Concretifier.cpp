@@ -1356,7 +1356,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 
 // --- no captures?
 	if (captured_variables.num == 0) {
-		f->update_parameters_after_parsing();
+		f->update_parameters_after_realizing();
 		return add_node_func_name(f);
 	}
 
@@ -1410,7 +1410,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		tree->transform_block(f->block_node.get(), replace_local);
 	}
 
-	f->update_parameters_after_parsing();
+	f->update_parameters_after_realizing();
 
 	auto inner_lambda = wrap_function_into_callable(f, node->token_id);
 
@@ -2248,6 +2248,7 @@ void Concretifier::concretify_function_header(Function *f) {
 		f->set_return_type(concretify_as_type(rt, block, f->name_space));
 	}
 	f->literal_param_type.resize(f->num_params);
+	f->param_default_values.resize(f->num_params);
 	for (int i=0; i<f->num_params; i++) {
 		auto at = f->abstract_param_type(i);
 		// type might be null!
@@ -2268,12 +2269,14 @@ void Concretifier::concretify_function_header(Function *f) {
 				v->type = t;
 				f->literal_param_type[i] = t;
 			}
-			f->abstract_node->params[2]->params[i*3+2] = dp;
+			f->param_default_values[i] = dp;
 		}
 	}
 	flags_clear(f->flags, Flags::Template);
 
 	check_function_signature_legal(this, f);
+
+	f->update_parameters_after_realizing();
 }
 
 bool calling_super_init(Function *f) {
@@ -2412,8 +2415,8 @@ shared<Node> Concretifier::try_to_match_apply_params(const shared_array<Node> &l
 			}
 			for (int i=0; i<f->num_params; i++)
 				if (!params[i]) {
-					if (i >= f->mandatory_params and f->abstract_default_parameter(i)) {
-						params[i] = f->abstract_default_parameter(i);
+					if (i >= f->mandatory_params and i < f->param_default_values.num and f->param_default_values[i]) {
+						params[i] = f->param_default_values[i];
 					} else {
 						return {ParamMapResult::Code::ErrorTooFew, f->mandatory_params};
 					}
@@ -2902,8 +2905,8 @@ shared<Node> Concretifier::apply_params_with_cast(shared<Node> operand, const sh
 	// default values
 	if (operand->is_function()) {
 		auto f = operand->as_func();
-		for (int p=params.num+offset; p<f->num_params; p++) {
-			r->set_param(p, f->abstract_default_parameter(p));
+		for (int p=params.num+offset; p<f->param_default_values.num; p++) {
+			r->set_param(p, f->param_default_values[p]);
 		}
 	}
 	return r;

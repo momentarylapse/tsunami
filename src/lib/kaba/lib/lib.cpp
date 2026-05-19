@@ -384,7 +384,7 @@ Class *add_class(const Class *root_type) {
 }
 
 void class_add_element_x(const string &name, const Class *type, int offset, Flags flag) {
-	cur_class->elements.add(ClassElement(name, type, offset));
+	cur_class->elements.add(ClassElement(name, type, offset, -1));
 	cur_class->alignment = max(cur_class->alignment, type->alignment);
 }
 
@@ -588,7 +588,7 @@ void func_add_param(const string &name, const Class *type, Flags flags) {
 		cur_func->literal_param_type.add(type);
 		cur_func->num_params ++;
 		cur_func->mandatory_params = cur_func->num_params;
-		cur_func->abstract_node->params[2]->params.resize(cur_func->num_params*3);
+		cur_func->param_default_values.resize(cur_func->num_params);
 	}
 }
 
@@ -601,14 +601,14 @@ void func_add_param_def_x(const string &name, const Class *type, const void *p, 
 		cur_func->literal_param_type.add(type);
 		cur_func->num_params ++;
 		//cur_func->mandatory_params = cur_func->num_params;
-		cur_func->abstract_node->params[2]->params.resize(cur_func->num_params*3);
+		cur_func->param_default_values.resize(cur_func->num_params);
 
 		Constant *c = cur_package_module->tree->add_constant(type, -1, cur_class);
 		if (type == common_types.i32)
 			c->as_int() = *(int*)p;
 		if (type == common_types.f32)
 			c->as_float() = *(float*)p;
-		cur_func->abstract_node->params[2]->set_param(cur_func->num_params*3-1, add_node_const(c));
+		cur_func->param_default_values[cur_func->num_params-1] = add_node_const(c);
 	}
 }
 

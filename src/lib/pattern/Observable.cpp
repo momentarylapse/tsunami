@@ -207,6 +207,10 @@ void internal_node_data::cleanup_temp_sinks() {
 		}
 }
 
+void internal_node_data::add_temp_sink(base_sink* sink) {
+	temp_sinks.add(sink);
+}
+
 void internal_node_data::unsubscribe(VirtualBase *observer) {
 	for (auto s: sources)
 		s->unsubscribe(observer);

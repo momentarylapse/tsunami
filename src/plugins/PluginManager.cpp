@@ -82,6 +82,7 @@
 #include <lib/os/app.h>
 #include <lib/os/filesystem.h>
 #include <lib/fft/_kaba_export.h>
+#include <lib/pattern/_kaba_export.h>
 #include <lib/kaba/dynamic/exception.h>
 #include <lib/kaba/lib/future.h>
 #include <lib/kaba/lib/lib.h>
@@ -214,6 +215,7 @@ void PluginManager::link_app_data() {
 	auto ctx = reinterpret_cast<kaba::Context*>(kaba::default_context);
 	ctx->register_package_init("hui", this->plugin_dir_static() | "hui", &export_package_hui);
 	ctx->register_package_init("fft", this->plugin_dir_static() | "fft", &export_package_fft);
+	ctx->register_package_init("obs", this->plugin_dir_static() | "obs", &export_package_obs);
 	ctx->register_package_init("tsunami", this->plugin_dir_static() | "tsunami", &PluginManager::export_kaba_package_tsunami);
 }
 
@@ -240,7 +242,7 @@ void init_app() {
 	Session::GLOBAL->plugin_manager = t->plugin_manager.get();
 }
 
-void PluginManager::export_kaba_package_tsunami(kaba::Exporter* ext) {
+void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 	ext->package_info("tsunami", "0.3");
 
 	// api definition

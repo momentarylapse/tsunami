@@ -2,10 +2,11 @@ use .common.*
 use .midi.*
 use .beats.*
 use hui
+use obs
 use kaba
 
 # requires FIXME
-class Session extends Object as shared
+class Session extends Object as Sharable
 	var id: int
 	#var win: TsunamiWindow*
 	var win: hui.Window&
@@ -34,11 +35,11 @@ class ConfigPanel extends hui.Panel
 	func extern virtual mut update()
 	func extern virtual mut set_large(large: bool)
 	func extern changed()
-	func extern mut create_sink(f: void->void) -> obs.sink&
+	func extern mut create_sink(f: void->void) -> obs.Sink&
 	var c: Module&
 
 
-class Module extends Object as shared
+class Module extends Object as Sharable
 
 	enum Command
 		START
@@ -79,18 +80,18 @@ class Module extends Object as shared
 	var name: string
 	var session: Session&
 	var port_out: OutPort&[]
-	var out_changed: obs.source
-	var out_state_changed: obs.source
-	var out_play_end_of_stream: obs.source
-	var out_read_end_of_stream: obs.source
-	var out_tick: obs.source
+	var out_changed: obs.Source
+	var out_state_changed: obs.Source
+	var out_play_end_of_stream: obs.Source
+	var out_read_end_of_stream: obs.Source
+	var out_tick: obs.Source
 	func extern __init__(type: Type, sub_type: string)
 	func extern override __delete__()
 	func extern mut reset_config()
 	func extern virtual mut reset_state()
 	func extern mut changed()
 	func extern virtual mut command(cmd: Command, param: i64) -> i64?
-	func extern mut create_sink(f: void->void) -> obs.sink&
+	func extern mut create_sink(f: void->void) -> obs.Sink&
 	func extern mut unsubscribe(handler: Object)
 	func extern copy() -> xfer[Module]
 	

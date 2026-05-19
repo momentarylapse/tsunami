@@ -1,0 +1,68 @@
+class InternalNodeData
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut add_temp_sink(s: xfer[void])
+	func extern mut create_temp_sink0(node: void&, f: void->void) -> Sink&
+	func extern mut create_temp_xsink0(node: void&, s: void&->void) -> XPSink&
+	func extern mut cleanup_temp_sinks()
+	func extern mut unsubscribe(node: void&)
+
+
+trait Node
+	var ind: InternalNodeData
+	func mut unsubscribe(observer: void&)
+		ind.unsubscribe(observer)
+	func mut create_sink(f: void->void) -> Sink&
+		return ind.create_temp_sink0(&self, f)
+#		var sink = new Sink()
+#		sink.__init2__(&self, f)
+#		var s = weak(sink)
+#		ind.add_temp_sink(give(sink))
+#		return s
+	func mut create_data_sink[X](f: X->void) -> obs.XSink[X]&
+		return ind.create_temp_xsink0(&self, f as (void&->void)) as obs.XSink[X]&
+
+
+# pure events, no data
+class Source
+	# TODO trait parameter in kaba...
+	# func extern mut __init__(node: Node&, name: string)
+	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
+	func extern mut notify()
+	func mut __rshift__(out sink: Sink)
+		subscribe(self, sink)
+
+class Sink
+	func __init__()
+	func extern mut __init2__(node: void&, f: void->void)
+
+
+
+# internal...
+class XPSource
+	func extern mut __init__(node: void&, ind: InternalNodeData&, name: string)
+	func extern mut _notify(p: void&)
+
+class XPSink
+	func __init__()
+	func extern mut __init0__(node: void&, f: void&->void)
+
+
+
+# only works with call-by-reference data...
+class XSource[X] extends XPSource
+	func mut notify(x: X)
+		_notify(&x)
+	func mut __rshift__(out sink: XSink[X])
+		xsubscribe[X](self, sink)
+
+class XSink[X] extends XPSink
+	func mut __init2__(node: void&, f: X->void)
+		__init0__(node, f as (void&->void))
+
+
+func extern subscribe(source: Source, sink: Sink)
+func extern xpsubscribe(source: XPSource, sink: XPSink)
+func xsubscribe[X](source: XSource[X], sink: XSink[X])
+	xpsubscribe(source, sink)
+

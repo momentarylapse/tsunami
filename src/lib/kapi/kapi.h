@@ -2,6 +2,7 @@
 
 #include <lib/base/base.h>
 #include <lib/base/pointer.h>
+#include <functional>
 
 class Path;
 class Any;
@@ -12,11 +13,13 @@ class Module;
 class Context;
 class Class;
 struct Package;
+class IExporter;
 
 class IContext {
 public:
-	virtual shared<Module> load_module(const Path& filename, bool just_analyse = false) = 0;
-	virtual shared<Module> create_module_for_source(const string& source, const Path& filename, bool just_analyse = false) = 0;
+	virtual ~IContext() = default;
+	virtual shared<Module> load_module(const Path& filename, bool just_analyse) = 0;
+	virtual shared<Module> create_module_for_source(const string& source, const Path& filename, bool just_analyse) = 0;
 	virtual xfer<Context> create_new_context() const = 0;
 	virtual void execute_single_command(const string& cmd) = 0;
 	virtual void clean_up() = 0;
@@ -25,6 +28,15 @@ public:
 	virtual string type_name(const Class* c) const = 0;
 	virtual Any dynify(const void* p, const Class* type) const = 0;
 	virtual void unwrap_any(const Any &aa, void *var, const Class *type) const = 0;
+	virtual void register_package_init(const string& name, const Path& dir, std::function<void(IExporter*)> f) = 0;
+	virtual Array<string> list_keywords() const = 0;
+	virtual Array<string> list_modifiers() const = 0;
+	virtual Array<string> list_special_functions() const = 0;
+	virtual Array<string> list_operator_functions() const = 0;
+
+	shared_array<Module> public_modules;
+	shared_array<Package> internal_packages;
+	owned_array<Package> external_packages;
 };
 
 extern IContext* default_context;
@@ -130,6 +142,7 @@ struct CommonTypes {
 	const Class* struct_t;
 	const Class* interface_t;
 	const Class* namespace_t;
+	const Class* trait_t;
 
 
 	const Class* image;
@@ -154,6 +167,9 @@ struct CommonTypes {
 	const Class* string_promise;
 	const Class* path_future;
 	const Class* bool_future;
+
+	const Class* sharable_trait;
+	const Class* noauto_trait;
 };
 extern CommonTypes common_types;
 }

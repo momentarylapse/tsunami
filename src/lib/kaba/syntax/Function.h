@@ -44,6 +44,7 @@ public:
 	// local variables
 	shared_array<Variable> var;
 	Array<const Class*> literal_param_type;
+	shared_array<Node> param_default_values;
 	const Class *name_space;
 	const Class *effective_return_type;
 	const Class *literal_return_type;
@@ -72,7 +73,7 @@ public:
 	void set_return_type(const Class *type);
 	Variable *__get_var(const string &name) const;
 	string create_slightly_hidden_name();
-	void update_parameters_after_parsing();
+	void update_parameters_after_realizing();
 	void add_self_parameter();
 	string signature(const Class *ns = nullptr) const;
 	Array<Block*> all_blocks();

@@ -4,6 +4,7 @@ use .streams.*
 use .song.*
 use async.*
 use os
+use obs
 use kaba
 
 
@@ -11,9 +12,9 @@ class Playback
 	var renderer: shared![SongRenderer]
 	var signal_chain: shared![SignalChain]
 	var output_stream: shared![AudioOutput]
-	var out_changed: obs.source
-	var out_state_changed: obs.source
-	var out_tick: obs.source
+	var out_changed: obs.Source
+	var out_state_changed: obs.Source
+	var out_tick: obs.Source
 	func extern mut unsubscribe(handler: Object)
 	func extern mut prepare(r: Range, allow_loop: bool)
 	func extern mut play()

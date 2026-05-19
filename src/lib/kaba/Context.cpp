@@ -321,7 +321,7 @@ const Class *Context::get_dynamic_type(const VirtualBase *p) const {
 	return nullptr;
 }
 
-void Context::register_package_init(const string& name, const Path& dir, std::function<void(Exporter*)> f) {
+void Context::register_package_init(const string& name, const Path& dir, std::function<void(IExporter*)> f) {
 	package_inits.add({name, dir.absolute(), f});
 }
 
@@ -376,6 +376,127 @@ Any Context::dynify(const void* p, const Class* type) const {
 
 void Context::unwrap_any(const Any& aa, void* var, const Class* type) const {
 	return kaba::unwrap_any(aa, var, type);
+}
+
+Array<string> Context::list_keywords() const {
+	return {
+		Identifier::Enum,
+		Identifier::Class,
+		Identifier::Struct,
+		Identifier::Interface,
+		Identifier::Trait,
+		Identifier::Func,
+		Identifier::Macro,
+		Identifier::Extends,
+		Identifier::Use,
+		Identifier::Asm,
+		Identifier::Import,
+		Identifier::If,
+		Identifier::Else,
+		Identifier::While,
+		Identifier::For,
+		Identifier::In,
+		Identifier::Match,
+		Identifier::Return,
+		Identifier::Break,
+		Identifier::Continue,
+		Identifier::Not,
+		Identifier::And,
+		Identifier::Or,
+		Identifier::New,
+		Identifier::Delete,
+		Identifier::Const,
+		Identifier::Self,
+		Identifier::Super,
+		Identifier::Namespace,
+		Identifier::Raise,
+		Identifier::Try,
+		Identifier::Except,
+		Identifier::Pass,
+		Identifier::Let,
+		Identifier::Var,
+		Identifier::Lambda,
+		Identifier::RawFunctionPointer,
+		Identifier::TrustMe,
+		Identifier::Is,
+		Identifier::As};
+}
+
+Array<string> Context::list_modifiers() const {
+	return {
+		Identifier::Virtual,
+		Identifier::Override,
+		Identifier::Static,
+		Identifier::Pure,
+		Identifier::Mutable,
+		Identifier::Selfref,
+		Identifier::Ref,
+		Identifier::Globalref,
+		Identifier::Out,
+		Identifier::Shared,
+		Identifier::Owned,
+		Identifier::Xfer,
+		Identifier::RawPointer,
+		Identifier::Future,
+		Identifier::Extern
+	};
+}
+
+Array<string> Context::list_special_functions() const {
+	return {
+		Identifier::Dyn,
+		Identifier::Weak,
+		Identifier::Give,
+		Identifier::Len,
+		Identifier::Sizeof,
+		Identifier::Str,
+		Identifier::Typeof,
+		Identifier::Sort,
+		Identifier::Filter
+	};
+}
+
+Array<string> Context::list_operator_functions() const {
+	return {
+		Identifier::func::Init,
+		Identifier::func::Delete,
+		Identifier::func::DeleteOverride,
+		Identifier::func::Assign,
+		Identifier::func::Contains,
+		Identifier::func::Str,
+		Identifier::func::Repr,
+		Identifier::func::Set,
+		Identifier::func::Get,
+		Identifier::func::Subarray,
+		Identifier::func::Add,
+		Identifier::func::AddAssign,
+		Identifier::func::Subtract,
+		Identifier::func::SubtractAssign,
+		Identifier::func::Multiply,
+		Identifier::func::MultiplyAssign,
+		Identifier::func::Divide,
+		Identifier::func::DivideAssign,
+		Identifier::func::Smaller,
+		Identifier::func::SmallerEqual,
+		Identifier::func::Greater,
+		Identifier::func::GreaterEqual,
+		Identifier::func::Equal,
+		Identifier::func::NotEqual,
+		Identifier::func::Modulo,
+		Identifier::func::Increase,
+		Identifier::func::Decrease,
+		Identifier::func::Exponent,
+		Identifier::func::ShiftLeft,
+		Identifier::func::ShiftRight,
+		Identifier::func::And,
+		Identifier::func::Or,
+		Identifier::func::Not,
+		Identifier::func::Negative,
+		Identifier::func::BitAnd,
+		Identifier::func::BitOr,
+		Identifier::func::MapsTo,
+		Identifier::func::Call
+	};
 }
 
 void make_context_public(IExporter* _e) {

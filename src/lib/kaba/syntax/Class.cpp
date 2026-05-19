@@ -15,13 +15,15 @@ ClassElement::ClassElement() {
 	offset = 0;
 	type = nullptr;
 	allow_indirect_use = false;
+	token_id = -1;
 }
 
-ClassElement::ClassElement(const string &_name, const Class *_type, int64 _offset) {
+ClassElement::ClassElement(const string &_name, const Class *_type, int64 _offset, int _token_id) {
 	name = _name;
 	offset = _offset;
 	type = _type;
 	allow_indirect_use = false;
+	token_id = _token_id;
 }
 
 string ClassElement::signature(bool include_class) const {
@@ -83,6 +85,10 @@ bool Class::_return_in_float_registers() const {
 
 bool Class::is_template() const {
 	return flags_has(flags, Flags::Template);
+}
+
+bool Class::has_trait(const Class* trait) const {
+	return traits.find(trait) >= 0;
 }
 
 bool reachable_from(const Class *ns, const Class *observer_ns) {
@@ -198,6 +204,10 @@ bool Class::is_interface() const {
 	return from_template == common_types.interface_t;
 }
 
+bool Class::is_trait() const {
+	return from_template == common_types.trait_t;
+}
+
 bool Class::is_dict() const {
 	return from_template == common_types.dict_t;
 }
@@ -285,7 +295,7 @@ const Class *Class::get_array_element() const {
 
 // hmmm, very vague concept...
 bool Class::needs_constructor() const {
-	if (!uses_call_by_reference() or flags_has(flags, Flags::Noauto)) // int/float/pointer etc
+	if (!uses_call_by_reference() or has_trait(common_types.noauto_trait)) // int/float/pointer etc
 		return false;
 	if (is_list() or is_dict() or is_optional())
 		return true;
@@ -644,7 +654,7 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 	for (auto *f: weak(parent->functions)) {
 		if (f->name == Identifier::func::Assign)
 			continue;
-		if (f->name == Identifier::func::AutoInit)
+		if (f->name == Identifier::func::AutoInitContext)
 			continue;
 		Function *ff = f;
 		if (f->name == Identifier::func::Init) {
@@ -676,6 +686,9 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 	vtable = parent->vtable;
 	_vtable_location_compiler_ = vtable.data;
 	_vtable_location_target_ = vtable.data;
+
+	if (derive_flags & DeriveFlags::COPY_FLAGS)
+		flags = parent->flags;
 }
 
 void *Class::create_instance() const {

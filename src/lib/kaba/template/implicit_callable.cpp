@@ -207,7 +207,7 @@ Class* TemplateClassInstantiatorCallableBind::declare_new_instance(SyntaxTree *t
 			if ((array_size & ((1 << i) << 16)))
 				b = tree->request_implicit_class_reference(b, token_id);
 			offset = mem_align(offset, b->alignment);
-			auto el = ClassElement(format("capture%d", i), b, offset);
+			auto el = ClassElement(format("capture%d", i), b, offset, -1);
 			offset += b->size;
 			t->elements.add(el);
 		}

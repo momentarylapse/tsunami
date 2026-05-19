@@ -14,6 +14,7 @@ namespace Identifier {
 	const string Class = "class";
 	const string Struct = "struct";
 	const string Interface = "interface";
+	const string Trait = "trait";
 	const string Func = "func";
 	const string Macro = "macro";
 	const string Super = "super";
@@ -135,7 +136,7 @@ namespace Identifier {
 		const string Contains = "__contains__";
 		const string Format = "format";
 		const string OptionalHasValue = "has_value";
-		const string AutoInit = ":autoinit:"; // internal
+		const string AutoInitContext = ":autoinit:"; // internal context for parsing member initializers
 	}
 }
 

@@ -7,7 +7,7 @@ use .modules.*
 
 
 
-struct TrackMarker as shared
+struct TrackMarker as Sharable
 	func __init__(r: Range, t: string)
 		range = r
 		text = t
@@ -16,7 +16,7 @@ struct TrackMarker as shared
 	var fx: shared![AudioEffect][]
 
 
-class Sample extends Object as shared # TODO
+class Sample extends Object as Sharable # TODO
 	var name: string
 	var type: int
 	var buf: owned![AudioBuffer]
@@ -31,13 +31,13 @@ class Sample extends Object as shared # TODO
 	func extern mut set_value(key: string, value: string)
 
 
-class SampleRef as shared
+class SampleRef as Sharable
 	var origin: Sample&
 	func extern __init__(sam: Sample&)
 	func extern virtual __delete__()
 
 
-class TrackLayer extends Object as shared
+class TrackLayer extends Object as Sharable
 	var type: SignalType
 	var track: Track&
 	var buffers: AudioBuffer[]
@@ -61,7 +61,7 @@ class TrackLayer extends Object as shared
 	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)
 
 
-class Track as shared
+class Track as Sharable
 	var type: SignalType
 	var name: string
 	var layers: shared![TrackLayer][]
@@ -96,7 +96,7 @@ class Track as shared
 struct Tag
 	var key, value: string
 
-class Song extends Object as shared
+class Song extends Object as Sharable
 	var filename: os.Path
 	var tags: Tag[]
 	var sample_rate: int

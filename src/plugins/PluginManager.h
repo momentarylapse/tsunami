@@ -5,12 +5,11 @@
  *      Author: michi
  */
 
-#ifndef PLUGINMANAGER_H_
-#define PLUGINMANAGER_H_
+#pragma once
 
-#include "../lib/kaba/kaba.h"
-#include "../lib/base/optional.h"
-#include "../lib/base/future.h"
+#include <lib/kaba/kaba.h>
+#include <lib/base/optional.h>
+#include <lib/base/future.h>
 
 
 namespace hui {
@@ -19,6 +18,7 @@ namespace hui {
 	class Menu;
 }
 namespace kaba {
+	class IExporter;
 	class Module;
 	class Class;
 }
@@ -43,7 +43,7 @@ public:
 	Path plugin_dir_local();
 
 	void link_app_data();
-	static void export_kaba_package_tsunami(kaba::Exporter* e);
+	static void export_kaba_package_tsunami(kaba::IExporter* e);
 	void find_plugins();
 	void add_plugins_to_menu(TsunamiWindow *win);
 
@@ -90,5 +90,3 @@ private:
 };
 
 }
-
-#endif /* PLUGINMANAGER_H_ */

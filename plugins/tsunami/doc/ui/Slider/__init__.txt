@@ -1,0 +1,5 @@
+description = ""
+param:id_edit = ""
+param:id_slider = ""
+param:on_update = ""
+param:panel = ""

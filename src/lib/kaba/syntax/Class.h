@@ -17,8 +17,7 @@ class Node;
 enum class Flags;
 
 
-class ClassElement {
-public:
+struct ClassElement {
 	string name;
 	const Class *type;
 	int64 offset;
@@ -31,10 +30,8 @@ public:
 	string str() const;
 };
 
-class ClassInitializers {
-public:
+struct ClassInitializers {
 	int element;
-	//shared<Constant> value;
 	shared<Node> value;
 };
 

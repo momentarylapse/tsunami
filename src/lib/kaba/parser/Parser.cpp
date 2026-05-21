@@ -549,6 +549,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 	// traits
 	if (node->params[4])
 		for (auto& p: node->params[4]->params) {
+			int num_elements_before = _class->elements.num;
 			auto trait = con.concretify_as_type(p, tree->root_of_all_evil->block, _namespace); // force
 			if (!trait->fully_parsed()) {
 				do_error(format("trait class '%s' not defined or nor fully parsed yet", trait->long_name()), p);
@@ -565,7 +566,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 
 				for (const auto& init: trait->initializers)
 					if (init.element == i)
-						_class->initializers.add(init);
+						_class->initializers.add({init.element + num_elements_before, init.value});
 			}
 
 			for (auto f: weak(trait->functions)) {

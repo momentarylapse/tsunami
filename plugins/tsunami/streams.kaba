@@ -1,7 +1,7 @@
 use .common.*
 use .modules.*
 
-class Device
+class extern Device
 	enum Type
 		AUDIO_OUTPUT
 		AUDIO_INPUT
@@ -16,7 +16,7 @@ class Device
 	func extern get_name() -> string
 
 
-class AudioOutput extends Module
+class extern AudioOutput extends Module
 	var input: Module.InPort
 	
 	func extern __init__(session: Session)
@@ -29,7 +29,7 @@ class AudioOutput extends Module
 	func extern samples_played() -> i64?
 
 
-class AudioInput extends Module
+class extern AudioInput extends Module
 	var output: Module.OutPort
 #	var current_buffer: RingBuffer
 #	var buffer: AudioBuffer
@@ -43,7 +43,7 @@ class AudioInput extends Module
 	func extern samples_recorded() -> i32
 
 
-class MidiInput extends Module
+class extern MidiInput extends Module
 	var output: Module.OutPort
 
 	func extern __init__(session: Session)

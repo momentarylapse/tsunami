@@ -1,7 +1,7 @@
 
 let DEFAULT_SAMPLE_RATE = 44100
 
-enum SignalType
+enum extern SignalType
 	AUDIO
 	TIME
 	MIDI
@@ -14,7 +14,7 @@ func extern db2amp(db: f32) -> f32
 func extern amp2db(amp: f32) -> f32
 
 
-struct Range
+struct extern Range
 	var offset, length: i32
 	func extern start() -> i32
 	func extern end() -> i32
@@ -32,7 +32,7 @@ func RangeTo(start: i32, end: i32) -> Range
 	return Range(start, end - start)
 
 
-struct AudioBuffer
+struct extern AudioBuffer
 	var offset, length: i32
 	var channels: i32
 	#var l, r: float[]
@@ -62,7 +62,7 @@ struct AudioBuffer
 			c[1] = c[0]
 
 
-struct RingBuffer as @noauto
+struct extern RingBuffer as @noauto
 	enum PeekMode
 		FORWARD_REF
 		FORWARD_COPY_WRAP

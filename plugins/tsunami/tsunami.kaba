@@ -27,11 +27,11 @@ use kaba
 use os
 
 
-struct TrackRenderBuffer
+struct extern TrackRenderBuffer
 	var dummy: int
 
 
-class override Session
+class extern override Session
 	var override song: shared![Song]
 	var override view: AudioView&
 	var override storage: Storage&
@@ -44,7 +44,7 @@ class override Session
 	func extern mut load_signal_chain(filename: os.Path) -> shared[SignalChain]
 	func extern mut remove_signal_chain(chain: SignalChain*)
 
-class Tsunami
+class extern Tsunami
 	var clipboard: Clipboard&
 #	var device_manager: DeviceManager&
 
@@ -61,7 +61,7 @@ func extern init_app()
 #	int layer
 #	Range range
 
-class TsunamiPlugin extends Module
+class extern TsunamiPlugin extends Module
 	func extern __init__()
 	func extern override __delete__()
 	func extern virtual mut on_start()

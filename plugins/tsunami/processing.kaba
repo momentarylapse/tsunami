@@ -3,8 +3,8 @@ use .common.*
 func extern interpolate_buffer(in: AudioBuffer, out _out: AudioBuffer, method: i32)
 
 
-class BufferPitchShift
-	class Operator
+class extern BufferPitchShift
+	class extern Operator
 		func extern __init__()
 		func extern __delete__()
 		func extern reset(length_factor: f32, mode: i32, pitch_factor: f32)

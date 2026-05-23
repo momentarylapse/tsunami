@@ -78,7 +78,7 @@ void _dummy_func() {}
 
 
 void export_package_gl(kaba::IExporter* e) {
-	e->package_info("gl", "0.4");
+	e->package_info("gl", "0.5");
 
 	e->declare_class_size("Context", sizeof(nix::Context));
 	e->declare_class_element("Context.gl_version", &nix::Context::gl_version);

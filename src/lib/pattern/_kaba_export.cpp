@@ -68,7 +68,7 @@ static void xpsubscribe(XPSource* source, XPSink* sink) {
 
 
 void export_package_obs(kaba::IExporter* e) {
-	e->package_info("obs", "0.5");
+	e->package_info("obs", "0.6");
 
 	e->declare_class_size("InternalNodeData", sizeof(obs::internal_node_data));
 	e->link_class_func("InternalNodeData.__init__", &kaba::generic_init<obs::internal_node_data>);

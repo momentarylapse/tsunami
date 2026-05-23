@@ -1,4 +1,4 @@
-class InternalNodeData
+class extern InternalNodeData
 	func extern mut __init__()
 	func extern mut __delete__()
 	func extern mut add_temp_sink(s: xfer[void])
@@ -24,7 +24,7 @@ trait Node
 
 
 # pure events, no data
-class Source
+class extern Source
 	# TODO trait parameter in kaba...
 	# func extern mut __init__(node: Node&, name: string)
 	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
@@ -32,18 +32,18 @@ class Source
 	func mut __rshift__(out sink: Sink)
 		subscribe(self, sink)
 
-class Sink
+class extern Sink
 	func __init__()
 	func extern mut __init2__(node: void&, f: void->void)
 
 
 
 # internal...
-class XPSource
+class extern XPSource
 	func extern mut __init__(node: void&, ind: InternalNodeData&, name: string)
 	func extern mut _notify(p: void&)
 
-class XPSink
+class extern XPSink
 	func __init__()
 	func extern mut __init0__(node: void&, f: void&->void)
 

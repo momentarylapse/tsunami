@@ -6,7 +6,7 @@ use obs
 use kaba
 
 # requires FIXME
-class Session extends Object as Sharable
+class extern Session extends Object as Sharable
 	var id: int
 	#var win: TsunamiWindow*
 	var win: hui.Window&
@@ -29,7 +29,7 @@ class Session extends Object as Sharable
 
 
 
-class ConfigPanel extends hui.Panel
+class extern ConfigPanel extends hui.Panel
 	func extern __init__(c: Module)
 	func extern override __delete__()
 	func extern virtual mut update()
@@ -39,7 +39,7 @@ class ConfigPanel extends hui.Panel
 	var c: Module&
 
 
-class Module extends Object as Sharable
+class extern Module extends Object as Sharable
 
 	enum Command
 		START
@@ -99,7 +99,7 @@ class Module extends Object as Sharable
 	func extern virtual mut read_midi(port: i32, out midi: MidiEventBuffer) -> i32
 	func extern virtual mut read_beats(port: i32, out beats: Beat[], samples: i32) -> i32
 	
-	class OutPort
+	class extern OutPort
 		var type: SignalType
 		var name: string
 		#func extern __init__()
@@ -113,7 +113,7 @@ class Module extends Object as Sharable
 		func extern mut read_midi(out midi: MidiEventBuffer) -> i32
 		func extern mut read_beats(out beats: Beat[], samples: i32) -> i32
 	
-	class InPort
+	class extern InPort
 		var type: SignalType
 		var name: string
 		var source: Module.OutPort*
@@ -122,7 +122,7 @@ class Module extends Object as Sharable
 		func extern mut _init_beats(m: Module&, name: string)
 		func extern mut disconnect()
 		
-	class Config
+	class extern Config
 		func extern __init__()
 		func extern virtual __delete__()
 		func extern virtual mut reset()
@@ -142,7 +142,7 @@ class Module extends Object as Sharable
 	let VERSION_LEGACY = -2
 
 
-class AudioEffect extends Module
+class extern AudioEffect extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
 	var apply_to_whole_buffer: bool
@@ -155,7 +155,7 @@ class AudioEffect extends Module
 	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
 
 
-class MidiEffect extends Module
+class extern MidiEffect extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
 	func extern __init__()
@@ -164,7 +164,7 @@ class MidiEffect extends Module
 	func extern override mut read_midi(port: i32, out midi: MidiEventBuffer) -> i32
 
 
-class AudioVisualizer extends Module
+class extern AudioVisualizer extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
 	var chunk_size: i32
@@ -180,7 +180,7 @@ class AudioVisualizer extends Module
 
 # general "interface"
 
-class AudioSource extends Module
+class extern AudioSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
@@ -188,12 +188,12 @@ class AudioSource extends Module
 	func extern override mut read_audio(port: i32, out buf: AudioBuffer) -> i32
 
 
-struct MidiProduceData
+struct extern MidiProduceData
 	var bar: Bar*
 	var beat_no: int
 
 
-class MidiSource extends Module
+class extern MidiSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
@@ -209,7 +209,7 @@ class MidiSource extends Module
 	#extern void set_beat_source(BeatPort *source)
 
 
-class MidiEventStreamer extends MidiSource
+class extern MidiEventStreamer extends MidiSource
 	func extern override __init__()
 	func extern override read(out midi: MidiEventBuffer) -> i32
 	func extern override reset_state()
@@ -221,7 +221,7 @@ class MidiEventStreamer extends MidiSource
 	var midi: MidiEventBuffer
 
 
-class PitchDetector extends MidiSource
+class extern PitchDetector extends MidiSource
 	var input: Module.InPort
 	var frequency, volume: f32
 	var pitch: i32
@@ -231,7 +231,7 @@ class PitchDetector extends MidiSource
 	func extern virtual mut process(out midi: MidiEventBuffer, buf: AudioBuffer)
 
 
-class PitchRenderer
+class extern PitchRenderer
 	func extern __init__(synth: Synthesizer, pitch: i32)
 	func extern virtual __delete__()
 	func extern virtual mut render(out buf: AudioBuffer) -> bool
@@ -244,7 +244,7 @@ class PitchRenderer
 	var synth: Synthesizer&
 
 
-class Synthesizer extends Module
+class extern Synthesizer extends Module
 	var output: Module.OutPort
 	var input: Module.InPort
 	var sample_rate: i32
@@ -267,14 +267,14 @@ class Synthesizer extends Module
 	func extern mut set_instrument(i: Instrument)
 
 
-class DummySynthesizer extends Synthesizer
+class extern DummySynthesizer extends Synthesizer
 	func extern override __init__()
 	#extern overwrite void __delete__()
 	func extern override mut render(out buf: AudioBuffer)
 	func extern override mut create_pitch_renderer(pitch: i32) -> xfer[PitchRenderer]
 
 
-struct EnvelopeADSR
+struct extern EnvelopeADSR
 	func extern __init__()
 	func extern mut set(t_attack: f32, t_decay: f32, sustain: f32, t_release: f32, sample_rate: i32)
 	func extern mut set2(initial: f32, peak: f32)
@@ -286,7 +286,7 @@ struct EnvelopeADSR
 	var just_killed: bool
 
 
-class BeatSource extends Module
+class extern BeatSource extends Module
 	var output: Module.OutPort
 	func extern __init__()
 	func extern override __delete__()
@@ -298,7 +298,7 @@ class BeatSource extends Module
 	func extern virtual beat_fraction() -> f32
 
 
-class BeatMidifier extends MidiSource
+class extern BeatMidifier extends MidiSource
 	func extern override __init__()
 	#extern override void __delete__()
 	func extern override mut read(out midi: MidiEventBuffer) -> i32
@@ -306,7 +306,7 @@ class BeatMidifier extends MidiSource
 	var volume: f32
 
 
-class AudioAccumulator extends Module
+class extern AudioAccumulator extends Module
 	func extern __init__()
 	var output: Module.OutPort
 	var input: Module.InPort
@@ -314,7 +314,7 @@ class AudioAccumulator extends Module
 	var buffer: AudioBuffer
 
 
-class MidiAccumulator extends Module
+class extern MidiAccumulator extends Module
 	func extern __init__()
 	var output: Module.OutPort
 	var input: Module.InPort

@@ -1,12 +1,12 @@
 use .common.*
 
 
-#struct BarPattern
+#struct extern BarPattern
 #	int length
 #	int divisor
 #	int[] beats
 
-struct Bar as Sharable
+struct extern Bar as Sharable
 	var beats: i32[]
 	var divisor: i32
 	var total_sub_beats: i32
@@ -25,7 +25,7 @@ struct Bar as Sharable
 		STRETCH_AND_SCALE_AUDIO
 
 
-struct Beat
+struct extern Beat
 	var offset: i32
 	var bar_index = 0
 	var bar_no = 0
@@ -55,7 +55,7 @@ struct Beat
 		return bar_no
 		
 
-struct BarCollection extends shared![Bar][]
+struct extern BarCollection extends shared![Bar][]
 	func extern selfref get_bars(r: Range) -> Bar&[]
 	func extern selfref get_beats(r: Range, include_hidden: bool, sub_beat_partition: i32?) -> Beat[]
 	func extern get_next_beat(pos: i32) -> i32

@@ -7,7 +7,7 @@ use .modules.*
 
 
 
-struct TrackMarker as Sharable
+struct extern TrackMarker as Sharable
 	func __init__(r: Range, t: string)
 		range = r
 		text = t
@@ -16,7 +16,7 @@ struct TrackMarker as Sharable
 	var fx: shared![AudioEffect][]
 
 
-class Sample extends Object as Sharable # TODO
+class extern Sample extends Object as Sharable # TODO
 	var name: string
 	var type: int
 	var buf: owned![AudioBuffer]
@@ -31,13 +31,13 @@ class Sample extends Object as Sharable # TODO
 	func extern mut set_value(key: string, value: string)
 
 
-class SampleRef as Sharable
+class extern SampleRef as Sharable
 	var origin: Sample&
 	func extern __init__(sam: Sample&)
 	func extern virtual __delete__()
 
 
-class TrackLayer extends Object as Sharable
+class extern TrackLayer extends Object as Sharable
 	var type: SignalType
 	var track: Track&
 	var buffers: AudioBuffer[]
@@ -61,7 +61,7 @@ class TrackLayer extends Object as Sharable
 	func extern mut edit_marker(marker: TrackMarker*, range: Range, text: string)
 
 
-class Track as Sharable
+class extern Track as Sharable
 	var type: SignalType
 	var name: string
 	var layers: shared![TrackLayer][]
@@ -93,10 +93,10 @@ class Track as Sharable
 	func extern mut set_effect_wetness(effect: AudioEffect&, enabled: bool)
 	func extern mut set_synthesizer(synth: shared![Synthesizer])
 
-struct Tag
+struct extern Tag
 	var key, value: string
 
-class Song extends Object as Sharable
+class extern Song extends Object as Sharable
 	var filename: os.Path
 	var tags: Tag[]
 	var sample_rate: int
@@ -137,7 +137,7 @@ class Song extends Object as Sharable
 	func extern get_time_str_long(t: int) -> string
 
 
-struct SongSelection
+struct extern SongSelection
 	var range_raw: Range
 	func extern range() -> Range
 	func extern has_track(t: Track) -> bool

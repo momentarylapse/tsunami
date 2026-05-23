@@ -10,7 +10,7 @@ use .streams.*
 let NUM_PEAK_LEVELS = 24
 
 
-struct ColorScheme as @noauto
+struct extern ColorScheme as @noauto
 	var background: Color
 	var background_track: Color
 	var background_track_selected: Color
@@ -31,12 +31,12 @@ struct ColorScheme as @noauto
 
 
 class SceneGraph
-	class Node as Sharable
+	class extern Node as Sharable
 		var area: Rect
 
 
-class AudioView extends Object
-	class ViewPort
+class extern AudioView extends Object
+	class extern ViewPort
 		func extern __init__()
 		func extern range() -> Range
 		func extern mut set_range(r: Range)
@@ -46,7 +46,7 @@ class AudioView extends Object
 		func extern screen2sample(s: f32) -> f32
 		var area: Rect
 	
-	class Layer extends SceneGraph.Node
+	class extern Layer extends SceneGraph.Node
 		var layer: TrackLayer&
 		
 	var sel: SongSelection
@@ -59,7 +59,7 @@ class AudioView extends Object
 
 
 
-class Slider extends Object
+class extern Slider extends Object
 	func extern __init__(panel: hui.Panel, id_slider: string, id_edit: string, on_update: void->void)
 	func extern override __delete__()
 	func extern get() -> f32
@@ -69,25 +69,25 @@ class Slider extends Object
 	func extern set_scale(factor: f32)
 	func extern enable(enabled: bool)
 
-class DeviceSelector extends Object
+class extern DeviceSelector extends Object
 	func extern __init__(panel: hui.Panel, id: string, session: Session, type: Device.Type, on_update: void->void)
 	func override __delete__()
 	func extern get() -> Device*
 	func extern mut set(dev: Device*)
 
 
-#class Progress
+#class extern Progress
 #	extern void __init__(string title, Window *parent)
 #	virtual extern void __delete__()
 #	extern void set(string msg, f32 progress)
-class ProgressX
+class extern ProgressX
 	func extern __init__(title: string, parent: hui.Window)
 	func extern virtual __delete__()
 	func extern mut set(msg: string, progress: f32)
 	func extern mut cancel()
 	func extern is_cancelled() -> bool
 
-class Clipboard
+class extern Clipboard
 	var temp: Song&
 	func extern has_data() -> bool
 	func extern mut prepare_layer_map(view: AudioView, out sources: TrackLayer&[], out targets: TrackLayer&[]) -> bool
@@ -101,10 +101,10 @@ enum MidiMode
 	DONT_CARE
 
 
-struct HoverData
+struct extern HoverData
 	
 
-class MidiPainter
+class extern MidiPainter
 	#extern void __init__(AudioView* view)
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, hover: HoverData*, colors: ColorScheme)
 	func extern mut set_context(area: Rect, i: Instrument, playable: bool, mode: MidiMode)
@@ -113,12 +113,12 @@ class MidiPainter
 	var cam: AudioView.ViewPort&
 
 
-class GridColors
+class extern GridColors
 	var bg, bg_sel: Color
 	var fg, fg_sel: Color
 
 
-class GridPainter
+class extern GridPainter
 	func extern __init__(song: Song, cam: AudioView.ViewPort, sel: SongSelection*, colors: ColorScheme)
 	func extern mut set_context(area: Rect, col: GridColors)
 	func extern mut draw_empty_background(p: hui.Painter)
@@ -128,7 +128,7 @@ class GridPainter
 	func extern mut draw_time_numbers(p: hui.Painter)
 
 
-class MultiLinePainter
+class extern MultiLinePainter
 	func extern __init__(song: Song, c: ColorScheme)
 	func extern __delete__()
 	func extern mut set_context(conf: Any, page_width: f32, avg_samples_per_line: f32)

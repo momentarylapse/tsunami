@@ -3,11 +3,11 @@ use os
 use async.*
 
 
-class Painter extends image.Painter as @noauto
+class extern Painter extends image.Painter as @noauto
 	func extern override __delete__()
 
 
-class Menu
+class extern Menu
 	func extern mut __init__(p: Panel*)
 	func extern mut popup(p: Panel*)
 	func extern mut add(name: string, id: string)
@@ -19,12 +19,12 @@ class Menu
 	func extern mut check(id: string, enabled: bool)
 
 
-class Toolbar extends Object
+class extern Toolbar extends Object
 	func extern mut set_by_id(id: string)
 	func extern mut from_source(source: string)
 
 
-class Panel extends Object as shared
+class extern Panel extends Object as shared
 	var win: Window*
 	func extern override __init__()
 	func extern mut __init__(parent: Panel*, id: string)
@@ -91,7 +91,7 @@ class Panel extends Object as shared
 	func extern mut remove_event_handler(uid: i32)
 
 
-class Window extends Panel
+class extern Window extends Panel
 	func extern mut __init__(title: string, width: i32, height: i32)
 	func extern override __delete__()
 #	func extern mut run()
@@ -135,12 +135,12 @@ class Window extends Panel
 	func extern virtual mut on_draw(p: Painter)
 
 
-class GlWindow extends Window
+class extern GlWindow extends Window
 	func extern override __init__(title: string, width: i32, height: i32)
 	func extern override __delete__()
 
 
-class Dialog extends Window
+class extern Dialog extends Window
 	func extern mut __init__(title: string, width: i32, height: i32, parent: Window*, allow_parent: bool)
 	func extern override __delete__()
 
@@ -173,7 +173,7 @@ class clipboard
 	func static extern copy(text: string)
 
 
-class Event
+class extern Event
 	var id: string
 	var message: string
 	var mouse: vec2
@@ -192,7 +192,7 @@ class Event
 	
 
 
-struct Resource
+struct extern Resource
 	var type: string
 	var id: string
 	var title: string

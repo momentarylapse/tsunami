@@ -3,7 +3,7 @@ use .common.*
 let MAX_PITCH = 128
 
 
-struct MidiNote as Sharable
+struct extern MidiNote as Sharable
 	var range: Range
 	var pitch: f32
 	var volume: f32
@@ -21,7 +21,7 @@ struct MidiNote as Sharable
 	func extern copy(offset: i32) -> xfer[MidiNote]
 
 
-struct MidiEvent
+struct extern MidiEvent
 	var pos: i32
 	var pitch: f32
 	var volume: f32
@@ -41,7 +41,7 @@ struct MidiEvent
 		return "({{pos}}, {{pitch}}, {{volume}})"
 
 
-struct MidiEventBuffer extends MidiEvent[]
+struct extern MidiEventBuffer extends MidiEvent[]
 	var samples: i32
 	func extern override __init__()
 	func extern get_notes(r: Range) -> MidiNoteBuffer
@@ -53,7 +53,7 @@ struct MidiEventBuffer extends MidiEvent[]
 	func extern mut add_metronome_click(pos: i32, level: i32, volume: f32)
 
 
-struct MidiNoteBuffer extends shared![MidiNote][]
+struct extern MidiNoteBuffer extends shared![MidiNote][]
 	var samples: i32
 	func extern override __init__()
 	func extern override __delete__()
@@ -63,7 +63,7 @@ struct MidiNoteBuffer extends shared![MidiNote][]
 	func extern get_range() -> Range
 
 
-struct Instrument
+struct extern Instrument
 	var type: i32
 	var string_pitch: i32[]
 	func __init__()

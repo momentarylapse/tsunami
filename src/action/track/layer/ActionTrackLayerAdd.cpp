@@ -18,7 +18,7 @@ ActionTrackLayerAdd::ActionTrackLayerAdd(Track *t, shared<TrackLayer> l) {
 	layer = l;
 }
 
-void* ActionTrackLayerAdd::execute(Data* d) {
+void* ActionTrackLayerAdd::execute(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.add(layer);
@@ -28,7 +28,7 @@ void* ActionTrackLayerAdd::execute(Data* d) {
 	return layer.get();
 }
 
-void ActionTrackLayerAdd::undo(Data* d) {
+void ActionTrackLayerAdd::undo(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	layer->fake_death();

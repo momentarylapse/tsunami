@@ -7,22 +7,22 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/audio/AudioBuffer.h"
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrackEditBuffer : public Action {
+class ActionTrackEditBuffer : public history::Action {
 public:
 	ActionTrackEditBuffer(TrackLayer *l, const Range &_range);
 
 	string name() const override { return ":##:edit buffer"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
-	void redo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
+	void redo(history::Data *d) override;
 
 private:
 	TrackLayer *layer;

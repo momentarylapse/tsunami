@@ -17,7 +17,7 @@ ActionTrackDeleteMidiEffect::ActionTrackDeleteMidiEffect(Track *t, int _index) {
 	effect = t->midi_fx[index];
 }
 
-void *ActionTrackDeleteMidiEffect::execute(Data *d) {
+void *ActionTrackDeleteMidiEffect::execute(history::Data* d) {
 	assert(index >= 0);
 	assert(index < track->midi_fx.num);
 
@@ -28,7 +28,7 @@ void *ActionTrackDeleteMidiEffect::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackDeleteMidiEffect::undo(Data *d) {
+void ActionTrackDeleteMidiEffect::undo(history::Data* d) {
 	assert(index >= 0);
 	assert(index <= track->midi_fx.num);
 

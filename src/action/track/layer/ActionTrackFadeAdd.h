@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/CrossFade.h"
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrackFadeAdd : public Action {
+class ActionTrackFadeAdd : public history::Action {
 public:
 	ActionTrackFadeAdd(TrackLayer *l, int position, CrossFade::Mode mode, int samples);
 
 	string name() const override { return ":##:add fade"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	TrackLayer *layer;
 	CrossFade fade;

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/Range.h"
 
 namespace tsunami {
@@ -15,14 +15,14 @@ namespace tsunami {
 class TrackLayer;
 class TrackMarker;
 
-class ActionTrackEditMarker: public Action {
+class ActionTrackEditMarker: public history::Action {
 public:
 	ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m, const Range &range, const string &text);
 
 	string name() const override { return ":##:edit marker"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	const TrackLayer *layer;

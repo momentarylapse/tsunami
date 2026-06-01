@@ -20,7 +20,7 @@
 #include "format/FormatSoundFont2.h"
 #include "format/FormatGuitarPro.h"
 #include "format/FormatNami.h"
-#include "../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../Tsunami.h"
 #include "../Session.h"
 #include "../lib/base/iter.h"

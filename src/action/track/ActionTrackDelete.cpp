@@ -22,7 +22,7 @@ ActionTrackDelete::ActionTrackDelete(Track *_track) {
 	track = _track;
 }
 
-void ActionTrackDelete::build(Data *d) {
+void* ActionTrackDelete::compose(history::Data* d) {
 
 	// delete buffers
 	for (auto *l: weak(track->layers)) {
@@ -40,6 +40,7 @@ void ActionTrackDelete::build(Data *d) {
 
 	// delete the track itself
 	add_sub_action(new ActionTrack__DeleteEmpty(track), d);
+	return nullptr;
 }
 
 }

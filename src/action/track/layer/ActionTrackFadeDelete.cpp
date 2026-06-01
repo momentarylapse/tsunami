@@ -15,14 +15,14 @@ ActionTrackFadeDelete::ActionTrackFadeDelete(TrackLayer* l, int _index) {
 	index = _index;
 }
 
-void* ActionTrackFadeDelete::execute(Data* d) {
+void* ActionTrackFadeDelete::execute(history::Data* d) {
 	fade = layer->fades[index];
 	layer->fades.erase(index);
 
 	return nullptr;
 }
 
-void ActionTrackFadeDelete::undo(Data* d) {
+void ActionTrackFadeDelete::undo(history::Data* d) {
 	layer->fades.insert(fade, index);
 }
 

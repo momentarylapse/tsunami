@@ -30,7 +30,7 @@ ActionTrackAddSample::ActionTrackAddSample(TrackLayer *l, int _pos, shared<Sampl
 	ref->owner = l->song();
 }
 
-void ActionTrackAddSample::undo(Data *d) {
+void ActionTrackAddSample::undo(history::Data* d) {
 	assert(layer->samples.num > 0);
 	layer->samples.pop();
 	ref->fake_death();
@@ -40,7 +40,7 @@ void ActionTrackAddSample::undo(Data *d) {
 
 
 
-void *ActionTrackAddSample::execute(Data *d) {
+void *ActionTrackAddSample::execute(history::Data* d) {
 	sample->ref();
 
 	layer->samples.add(ref);

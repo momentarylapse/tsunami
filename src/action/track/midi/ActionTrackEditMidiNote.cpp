@@ -20,7 +20,7 @@ ActionTrackEditMidiNote::ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote>
 	layer = l;
 }
 
-void* ActionTrackEditMidiNote::execute(Data* d) {
+void* ActionTrackEditMidiNote::execute(history::Data* d) {
 	std::swap(note->pitch, note2->pitch);
 	std::swap(note->volume, note2->volume);
 	std::swap(note->range, note2->range);
@@ -32,7 +32,7 @@ void* ActionTrackEditMidiNote::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackEditMidiNote::undo(Data* d) {
+void ActionTrackEditMidiNote::undo(history::Data* d) {
 	execute(d);
 }
 

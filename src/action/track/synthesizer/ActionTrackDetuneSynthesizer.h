@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/midi/Temperament.h"
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackDetuneSynthesizer: public Action {
+class ActionTrackDetuneSynthesizer: public history::Action {
 public:
 	ActionTrackDetuneSynthesizer(Track *t, const Temperament &temperament);
 
 	string name() const override { return ":##:detune synthesizer"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	Track *track;

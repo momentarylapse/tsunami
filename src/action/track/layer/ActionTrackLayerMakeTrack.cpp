@@ -17,20 +17,20 @@
 
 namespace tsunami {
 
-class ActionLayerMoveData : public Action {
+class ActionLayerMoveData : public history::Action {
 public:
 	ActionLayerMoveData(TrackLayer *_origin, TrackLayer *_dest) {
 		origin = _origin;
 		dest = _dest;
 	}
-	void *execute(Data *d) override {
+	void* execute(history::Data* d) override {
 		origin->buffers.exchange(dest->buffers);
 		origin->midi.exchange(dest->midi);
 		origin->samples.exchange(dest->samples);
 		std::swap(origin, dest);
 		return nullptr;
 	}
-	void undo(Data *d) override {
+	void undo(history::Data* d) override {
 		execute(d);
 	}
 	TrackLayer *origin, *dest;
@@ -52,7 +52,7 @@ ActionTrackLayerMakeTrack::ActionTrackLayerMakeTrack(TrackLayer *_layer) {
 	layer = _layer;
 }
 
-void ActionTrackLayerMakeTrack::build(Data *d) {
+void* ActionTrackLayerMakeTrack::compose(history::Data* d) {
 	Track *orig = layer->track;
 	Track *t = new Track(orig->song, effective_type(layer->track), (Synthesizer*)orig->synth->copy());
 	t->layers.add(new TrackLayer(t));
@@ -62,6 +62,7 @@ void ActionTrackLayerMakeTrack::build(Data *d) {
 	add_sub_action(new ActionTrackAdd(t, orig->get_index() + 1), d);
 	add_sub_action(new ActionLayerMoveData(layer, t->layers[0].get()), d);
 	add_sub_action(new ActionTrackLayerDelete(layer->track, get_layer_index(layer)), d);
+	return nullptr;
 }
 
 }

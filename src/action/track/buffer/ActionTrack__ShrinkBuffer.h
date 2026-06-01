@@ -8,19 +8,19 @@
 #ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SHRINKBUFFER_H_
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__SHRINKBUFFER_H_
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/audio/AudioBuffer.h"
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrack__ShrinkBuffer : public Action {
+class ActionTrack__ShrinkBuffer : public history::Action {
 public:
 	ActionTrack__ShrinkBuffer(TrackLayer *l, int _index, int _length);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

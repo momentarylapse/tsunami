@@ -6,19 +6,28 @@
  */
 
 #include "Data.h"
-#include "../action/ActionManager.h"
-#include "../lib/threads/Mutex.h"
 
-namespace tsunami {
+namespace history {
 
-Data::Data(Session *_session) {
+Data::Data(int _type) {
+	type = _type;
 	action_manager = new ActionManager(this);
-	session = _session;
-	binary_file_format = true;
 	file_time = 0;
 }
 
+Data::~Data() {
+	delete action_manager;
+}
 
+
+
+void Data::begin_action_group(const string &name) {
+	action_manager->begin_group(name);
+}
+
+void Data::end_action_group() {
+	action_manager->end_group();
+}
 
 bool Data::redo() {
 	return action_manager->redo();
@@ -28,18 +37,17 @@ bool Data::undo() {
 	return action_manager->undo();
 }
 
+bool Data::undoable() const {
+	return action_manager->undoable();
+}
+
+bool Data::redoable() const {
+	return action_manager->redoable();
+}
 
 
 void *Data::execute(Action *a) {
 	return action_manager->execute(a);
-}
-
-void Data::begin_action_group(const string &name) {
-	action_manager->group_begin(name);
-}
-
-void Data::end_action_group() {
-	action_manager->group_end();
 }
 
 
@@ -63,6 +71,7 @@ bool Data::try_lock() {
 void Data::unlock() {
 	mtx.unlock();
 }
+
 void Data::lock_shared() {
 	mtx.lock_shared();
 }
@@ -76,5 +85,4 @@ void Data::unlock_shared() {
 }
 
 }
-
 

@@ -18,7 +18,7 @@ ActionTrack__DeleteEmpty::ActionTrack__DeleteEmpty(shared<Track> _track) {
 	track = _track;
 }
 
-void *ActionTrack__DeleteEmpty::execute(Data *d) {
+void *ActionTrack__DeleteEmpty::execute(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < a->tracks.num);
 	Track *t = a->tracks[index].get();
@@ -46,7 +46,7 @@ void *ActionTrack__DeleteEmpty::execute(Data *d) {
 
 
 
-void ActionTrack__DeleteEmpty::undo(Data *d) {
+void ActionTrack__DeleteEmpty::undo(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	a->tracks.insert(track, index);
 	a->out_track_list_changed.notify();

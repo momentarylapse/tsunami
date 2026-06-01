@@ -8,7 +8,7 @@
 #ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ADDBUFFER_H_
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ADDBUFFER_H_
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 #include "../../../data/Track.h"
 
 namespace tsunami {
@@ -17,12 +17,12 @@ namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrack__AddBuffer : public Action {
+class ActionTrack__AddBuffer : public history::Action {
 public:
 	ActionTrack__AddBuffer(TrackLayer *l, int index, const Range &r);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

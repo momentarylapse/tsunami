@@ -17,14 +17,14 @@ ActionTrackAddAudioEffect::ActionTrackAddAudioEffect(Track *t, shared<AudioEffec
 	effect = _effect;
 }
 
-void *ActionTrackAddAudioEffect::execute(Data *d) {
+void *ActionTrackAddAudioEffect::execute(history::Data* d) {
 	track->fx.add(effect);
 	track->out_effect_list_changed.notify();
 
 	return nullptr;
 }
 
-void ActionTrackAddAudioEffect::undo(Data *d) {
+void ActionTrackAddAudioEffect::undo(history::Data* d) {
 	effect->fake_death();
 	track->fx.pop();
 	track->out_effect_list_changed.notify();

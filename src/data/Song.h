@@ -8,7 +8,7 @@
 #ifndef SRC_DATA_SONG_H_
 #define SRC_DATA_SONG_H_
 
-#include "Data.h"
+#include <lib/history/Data.h>
 #include "rhythm/BarCollection.h"
 #include "../lib/base/base.h"
 #include "../lib/base/pointer.h"
@@ -17,7 +17,7 @@
 
 namespace tsunami {
 
-class Data;
+class Session;
 class AudioEffect;
 class MidiEffect;
 class Track;
@@ -41,16 +41,17 @@ public:
 	bool valid() const;
 };
 
-class Song : public Data {
+class Song : public history::Data {
 public:
 	Song(Session *session, int sample_rate);
-	virtual ~Song();
+	~Song() override;
 
-	void _cdecl __init__(Session *session, int sample_rate);
-	void _cdecl __delete__() override;
+	Range range();
+	Range range_no_bars();
 
-	Range _cdecl range();
-	Range _cdecl range_no_bars();
+	struct BarScaleInfo {
+		int index, old_length, new_length;
+	};
 
 	obs::source out_new{this, "new"};
 	obs::source out_track_list_changed{this, "track-list-changed"};
@@ -59,7 +60,7 @@ public:
 	//obs::source out_edit_layer{this, "edit-layer"};
 	obs::source out_channels_changed{this, "channels-changed"};
 	obs::source out_edit_bars{this, "edit-bars"};
-	obs::source out_scale_bars{this, "scale-bars"};
+	obs::xsource<BarScaleInfo> out_scale_bars{this, "scale-bars"};
 	obs::source out_enable_fx{this, "enable-fx"};
 
 
@@ -115,6 +116,7 @@ public:
 	Sample* _cdecl get_sample_by_uid(int uid);
 
 // data
+	Session *session;
 	Array<Tag> tags;
 	int sample_rate;
 	SampleFormat default_format;

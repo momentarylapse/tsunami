@@ -20,7 +20,7 @@
 #include "../../module/SignalChain.h"
 #include "../../module/synthesizer/Synthesizer.h"
 #include "../../lib/os/time.h"
-#include "../../action/Action.h"
+#include <lib/history/Action.h>
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/Track.h"
@@ -74,7 +74,7 @@ MidiNote *make_note(const Range &r, int pitch, int clef_pos, NoteModifier mod, f
 	return n;
 }
 
-class ActionTrackMoveNotes: public Action {
+class ActionTrackMoveNotes: public history::Action {
 public:
 	ActionTrackMoveNotes(TrackLayer *l, const SongSelection &sel) {
 		layer = l;
@@ -85,7 +85,7 @@ public:
 
 	string name() const override { return ":##:move notes"; }
 
-	void *execute(Data *d) override {
+	void* execute(history::Data* d) override {
 		for (auto &d: notes) {
 			d.note->range.offset = d.pos_old + doffset;
 			d.note->pitch = d.pitch_old + dpitch;
@@ -97,7 +97,7 @@ public:
 		layer->track->out_changed.notify();
 		return nullptr;
 	}
-	void undo(Data *d) override{
+	void undo(history::Data* d) override{
 		for (auto &d: notes) {
 			d.note->range.offset = d.pos_old;
 			d.note->pitch = d.pitch_old;
@@ -108,14 +108,14 @@ public:
 	}
 
 	// continuous editing
-	void abort(Data *d) {
+	void abort(history::Data* d) {
 		undo(d);
 	}
-	void abort_and_notify(Data *d) {
+	void abort_and_notify(history::Data* d) {
 		abort(d);
 		d->out_changed.notify();
 	}
-	void set_param_and_notify(Data *d, int _doffset, float _dpitch, int _dstring) {
+	void set_param_and_notify(history::Data* d, int _doffset, float _dpitch, int _dstring) {
 		doffset = _doffset;
 		dpitch = _dpitch;
 		dstring = _dstring;
@@ -123,7 +123,7 @@ public:
 		d->out_changed.notify();
 	}
 
-	bool is_trivial() override {
+	bool is_trivial() const override {
 		return (doffset == 0) and (dpitch == 0);
 	}
 
@@ -155,7 +155,7 @@ Range selected_midi_range(TrackLayer *l, const SongSelection &sel) {
 	return r;
 }
 
-class ActionTrackScaleNotes: public Action {
+class ActionTrackScaleNotes: public history::Action {
 public:
 	ActionTrackScaleNotes(TrackLayer *l, const SongSelection &sel) {
 		layer = l;
@@ -167,34 +167,34 @@ public:
 
 	string name() const override { return ":##:scale notes"; }
 
-	void *execute(Data *d) override {
+	void* execute(history::Data* d) override {
 		for (auto &d: notes) {
 			d.note->range = d.range_old.scale_rel(range0, range);
 		}
 		layer->track->out_changed.notify();
 		return nullptr;
 	}
-	void undo(Data *d) override{
+	void undo(history::Data* d) override{
 		for (auto &d: notes)
 			d.note->range = d.range_old;
 		layer->track->out_changed.notify();
 	}
 
 	// continuous editing
-	void abort(Data *d) {
+	void abort(history::Data* d) {
 		undo(d);
 	}
-	void abort_and_notify(Data *d) {
+	void abort_and_notify(history::Data* d) {
 		abort(d);
 		d->out_changed.notify();
 	}
-	void set_param_and_notify(Data *d, const Range &r) {
+	void set_param_and_notify(history::Data* d, const Range &r) {
 		range = r;
 		execute(d);
 		d->out_changed.notify();
 	}
 
-	bool is_trivial() override {
+	bool is_trivial() const override {
 		return range == range0;
 	}
 

@@ -8,16 +8,16 @@
 #ifndef SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_
 #define SRC_ACTION_LAYER_ACTIONLAYERMOVE_H_
 
-/*#include "../Action.h"
+/*#include <lib/history/Action.h>
 
 namespace tsunami {
 
-class ActionLayerMove : public Action {
+class ActionLayerMove : public history::Action {
 public:
 	ActionLayerMove(int source, int target);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	virtual void* execute(history::Data* d);
+	virtual void undo(history::Data* d);
 
 	int source, target;
 };

@@ -17,7 +17,7 @@ ActionBar__Delete::ActionBar__Delete(int _index) {
 	bar = nullptr;
 }
 
-void *ActionBar__Delete::execute(Data *d) {
+void *ActionBar__Delete::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < s->bars.num);
@@ -25,19 +25,19 @@ void *ActionBar__Delete::execute(Data *d) {
 	bar = s->bars[index];
 	s->bars.erase(index);
 	s->bars._update_offsets();
-	s->out_edit_bars.notify();
+	s->out_edit_bars();
 
 	return nullptr;
 }
 
-void ActionBar__Delete::undo(Data *d) {
+void ActionBar__Delete::undo(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index <= s->bars.num);
 
 	s->bars.insert(bar, index);
 	s->bars._update_offsets();
-	s->out_edit_bars.notify();
+	s->out_edit_bars();
 }
 
 }

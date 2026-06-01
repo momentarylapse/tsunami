@@ -17,24 +17,24 @@ ActionBar__Add::ActionBar__Add(int _index, Bar *_bar) {
 	bar = _bar;
 }
 
-void *ActionBar__Add::execute(Data *d) {
+void *ActionBar__Add::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index <= s->bars.num);
 
 	s->bars.insert(bar, index);
 	s->bars._update_offsets();
-	s->out_edit_bars.notify();
+	s->out_edit_bars();
 
 	return nullptr;
 }
 
-void ActionBar__Add::undo(Data *d) {
+void ActionBar__Add::undo(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->bars.erase(index);
 	s->bars._update_offsets();
-	s->out_edit_bars.notify();
+	s->out_edit_bars();
 }
 
 }

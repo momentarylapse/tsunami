@@ -18,7 +18,7 @@ ActionTrack__GrowBuffer::ActionTrack__GrowBuffer(TrackLayer *l, int _index, int 
 	old_length = 0;
 }
 
-void *ActionTrack__GrowBuffer::execute(Data *d) {
+void *ActionTrack__GrowBuffer::execute(history::Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	old_length = b.length;
 	b.resize(new_length);
@@ -28,7 +28,7 @@ void *ActionTrack__GrowBuffer::execute(Data *d) {
 
 
 
-void ActionTrack__GrowBuffer::undo(Data *d) {
+void ActionTrack__GrowBuffer::undo(history::Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	b.resize(old_length);
 }

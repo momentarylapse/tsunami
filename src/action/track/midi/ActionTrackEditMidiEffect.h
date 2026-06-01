@@ -7,22 +7,22 @@
 
 #pragma once
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
 class Track;
 class MidiEffect;
 
-class ActionTrackEditMidiEffect: public ActionMergable<string> {
+class ActionTrackEditMidiEffect: public history::MergableValueAction<string> {
 public:
 	ActionTrackEditMidiEffect(MidiEffect *fx);
 
 	string name() const override { return ":##:edit midi fx"; }
 
-	void *execute(Data *d) override;
-	void redo(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void redo(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
 

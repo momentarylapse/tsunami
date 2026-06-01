@@ -21,7 +21,7 @@ ActionSongChangeAllTrackVolumes::ActionSongChangeAllTrackVolumes(Song *s, Track 
 			track_volumes.add({t, t->volume});
 }
 
-void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
+void *ActionSongChangeAllTrackVolumes::execute(history::Data *d) {
 	float factor = new_value / old_value;
 
 	for (auto &tv: track_volumes) {
@@ -32,7 +32,7 @@ void *ActionSongChangeAllTrackVolumes::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionSongChangeAllTrackVolumes::undo(Data *d) {
+void ActionSongChangeAllTrackVolumes::undo(history::Data *d) {
 	for (auto &tv: track_volumes) {
 		tv.track->volume = tv.old_volume;
 		tv.track->out_changed.notify();

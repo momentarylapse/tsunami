@@ -7,19 +7,19 @@
 
 #pragma once
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackLayerDelete : public ActionGroup {
+class ActionTrackLayerDelete : public history::ActionGroup {
 public:
 	ActionTrackLayerDelete(Track *t, int index);
 
 	string name() const override { return ":##:delete layer"; }
 
-	void build(Data *d) override;
+	void* compose(history::Data* d) override;
 
 	Track *track;
 	int index;

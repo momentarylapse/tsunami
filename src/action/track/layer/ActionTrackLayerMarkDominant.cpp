@@ -22,7 +22,7 @@ ActionTrackLayerActivateVersion::ActionTrackLayerActivateVersion(TrackLayer *l, 
 	activate = _activate;
 }
 
-void ActionTrackLayerActivateVersion::del_fades_in_range(const Range &r, Data *d) {
+void ActionTrackLayerActivateVersion::del_fades_in_range(const Range &r, history::Data *d) {
 	foreachib (auto &f, layer->fades, i)
 		if (r.overlaps(f.range()))
 			add_sub_action(new ActionTrackFadeDelete(layer, i), d);
@@ -69,7 +69,7 @@ Range grow_reasonable(TrackLayer *l, const Range &r) {
 }
 
 
-void ActionTrackLayerActivateVersion::build(Data *d) {
+void* ActionTrackLayerActivateVersion::compose(history::Data* d) {
 	Range rr = grow_reasonable(layer, range);
 	bool active_before = is_active_at(rr.start());
 	bool active_after = is_active_at(rr.end());
@@ -85,6 +85,7 @@ void ActionTrackLayerActivateVersion::build(Data *d) {
 		if (active_after)
 			add_sub_action(new ActionTrackFadeAdd(layer, range.end(), CrossFade::Inward, SAMPLES), d);
 	}
+	return nullptr;
 }
 
 
@@ -95,11 +96,12 @@ ActionTrackLayerMarkDominant::ActionTrackLayerMarkDominant(Track *_track, const 
 	track = _track;
 }
 
-void ActionTrackLayerMarkDominant::build(Data *d) {
+void* ActionTrackLayerMarkDominant::compose(history::Data* d) {
 	for (TrackLayer *l: weak(track->layers)) {
 		bool activate = (layers.find(l) >= 0);
 		add_sub_action(new ActionTrackLayerActivateVersion(l, range, activate), d);
 	}
+	return nullptr;
 }
 
 }

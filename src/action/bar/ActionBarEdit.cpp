@@ -29,7 +29,7 @@ ActionBarEdit::ActionBarEdit(int _index, const BarPattern &b, BarEditMode _mode)
 	mode = _mode;
 }
 
-void ActionBarEdit::build(Data *d) {
+void* ActionBarEdit::compose(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	Range r = Range(s->bar_offset(index), s->bars[index]->length);
 
@@ -87,6 +87,7 @@ void ActionBarEdit::build(Data *d) {
 
 		add_sub_action(new Action__ScaleData(r, length), d);
 	}
+	return nullptr;
 }
 
 }

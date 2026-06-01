@@ -8,17 +8,17 @@
 #ifndef ACTIONTRACKINSERTSAMPLE_H_
 #define ACTIONTRACKINSERTSAMPLE_H_
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrackInsertSample : public ActionGroup {
+class ActionTrackInsertSample : public history::ActionGroup {
 public:
 	ActionTrackInsertSample(TrackLayer *layer, int index);
 
-	void build(Data *d) override;
+	void* compose(history::Data* d) override;
 
 	TrackLayer *layer;
 	int index;

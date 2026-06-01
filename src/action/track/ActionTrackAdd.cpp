@@ -18,7 +18,7 @@ ActionTrackAdd::ActionTrackAdd(Track *t, int _index) {
 	index = _index;
 }
 
-void ActionTrackAdd::undo(Data *d) {
+void ActionTrackAdd::undo(history::Data* d) {
 	Song *s = dynamic_cast<Song*>(d);
 	s->tracks.erase(index);
 
@@ -31,7 +31,7 @@ void ActionTrackAdd::undo(Data *d) {
 
 
 
-void *ActionTrackAdd::execute(Data *d) {
+void *ActionTrackAdd::execute(history::Data* d) {
 	Song *s = dynamic_cast<Song*>(d);
 	track->song = s;
 

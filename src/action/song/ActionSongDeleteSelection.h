@@ -8,19 +8,19 @@
 #pragma once
 
 #include "../../data/Song.h"
-#include "../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class SongSelection;
 
-class ActionSongDeleteSelection : public ActionGroup {
+class ActionSongDeleteSelection : public history::ActionGroup {
 public:
 	ActionSongDeleteSelection(const SongSelection &sel);
 
 	string name() const override { return ":##:delete selection"; }
 
-	void build(Data *d) override;
+	void* compose(history::Data* d) override;
 	void delete_buffers_from_track_layer(Song *s, Track *t, TrackLayer *l, const SongSelection &sel);
 
 	const SongSelection &sel;

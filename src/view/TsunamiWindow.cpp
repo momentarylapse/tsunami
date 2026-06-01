@@ -43,7 +43,7 @@
 #include "../data/Track.h"
 #include "../data/TrackLayer.h"
 #include "../data/audio/AudioBuffer.h"
-#include "../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../command/song/Export.h"
 #include "../command/Unsorted.h"
 #include "../module/audio/AudioEffect.h"

@@ -7,20 +7,20 @@
 
 #pragma once
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackEditVolume : public ActionMergable<float> {
+class ActionTrackEditVolume : public history::MergableValueAction<float> {
 public:
 	ActionTrackEditVolume(Track *t, float volume);
 
 	string name() const override { return ":##:set volume"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
 

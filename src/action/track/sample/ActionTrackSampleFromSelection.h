@@ -8,18 +8,18 @@
 #ifndef ACTIONTRACKSAMPLEFROMSELECTION_H_
 #define ACTIONTRACKSAMPLEFROMSELECTION_H_
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class SongSelection;
 class TrackLayer;
 
-class ActionTrackSampleFromSelection : public ActionGroup {
+class ActionTrackSampleFromSelection : public history::ActionGroup {
 public:
 	ActionTrackSampleFromSelection(const SongSelection &sel, bool auto_delete);
 
-	void build(Data *d) override;
+	void* compose(history::Data* d) override;
 
 private:
 	void CreateSamplesFromLayerAudio(TrackLayer *l);

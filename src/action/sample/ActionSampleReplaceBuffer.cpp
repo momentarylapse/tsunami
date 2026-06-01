@@ -16,13 +16,13 @@ ActionSampleReplaceBuffer::ActionSampleReplaceBuffer(shared<Sample> s, AudioBuff
 	buf = _buf;
 }
 
-void* ActionSampleReplaceBuffer::execute(Data* d) {
+void* ActionSampleReplaceBuffer::execute(history::Data* d) {
 	std::swap(sample->buf, buf);
 	sample->out_changed_by_action.notify();
 	return sample.get();
 }
 
-void ActionSampleReplaceBuffer::undo(Data* d) {
+void ActionSampleReplaceBuffer::undo(history::Data* d) {
 	execute(d);
 }
 

@@ -7,18 +7,18 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Curve;
 
-class ActionTrackCurveAddPoint : public Action {
+class ActionTrackCurveAddPoint : public history::Action {
 public:
 	ActionTrackCurveAddPoint(shared<Curve> curve, int pos, float value);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 private:
 	shared<Curve> curve;
 	int index;

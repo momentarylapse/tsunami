@@ -18,19 +18,19 @@ ActionTrackEditSynthesizer::ActionTrackEditSynthesizer(Track *t) {
 	new_value = t->synth->config_to_string();
 }
 
-void *ActionTrackEditSynthesizer::execute(Data *d) {
+void *ActionTrackEditSynthesizer::execute(history::Data* d) {
 	track->synth->_config_latest_history = new_value;
 	track->synth->out_changed.notify();
 	return nullptr;
 }
 
-void ActionTrackEditSynthesizer::redo(Data *d) {
+void ActionTrackEditSynthesizer::redo(history::Data* d) {
 	track->synth->_config_latest_history = new_value;
 	track->synth->config_from_string(Module::VersionNumber::Latest, new_value);
 	track->synth->out_changed.notify();
 }
 
-void ActionTrackEditSynthesizer::undo(Data *d) {
+void ActionTrackEditSynthesizer::undo(history::Data* d) {
 	track->synth->_config_latest_history = old_value;
 	track->synth->config_from_string(Module::VersionNumber::Latest, old_value);
 	track->synth->out_changed.notify();

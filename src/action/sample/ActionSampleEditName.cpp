@@ -17,14 +17,14 @@ ActionSampleEditName::ActionSampleEditName(shared<Sample> s, const string &name)
 	old_value = s->name;
 }
 
-void *ActionSampleEditName::execute(Data *d) {
+void *ActionSampleEditName::execute(history::Data *d) {
 	sample->name = new_value;
 	sample->out_changed_by_action.notify();
 
 	return nullptr;
 }
 
-void ActionSampleEditName::undo(Data *d) {
+void ActionSampleEditName::undo(history::Data *d) {
 	sample->name = old_value;
 	sample->out_changed_by_action.notify();
 }

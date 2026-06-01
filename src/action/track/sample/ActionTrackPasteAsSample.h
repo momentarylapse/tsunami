@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKPASTEASSAMPLE_H_
 #define ACTIONTRACKPASTEASSAMPLE_H_
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
@@ -18,13 +18,12 @@ class AudioBuffer;
 class MidiNoteBuffer;
 class Sample;
 
-class ActionTrackPasteAsSample : public ActionGroup {
+class ActionTrackPasteAsSample : public history::ActionGroup {
 public:
 	ActionTrackPasteAsSample(TrackLayer *t, int pos, const AudioBuffer &buf, bool auto_delete);
 	ActionTrackPasteAsSample(TrackLayer *t, int pos, const MidiNoteBuffer &midi, bool auto_delete);
 
-	void build(Data *d) override;
-	void *execute_return(Data *d) override;
+	void* compose(history::Data* d) override;
 
 	TrackLayer *layer;
 	int pos;

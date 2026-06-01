@@ -24,7 +24,7 @@ ActionTrackCurveAddPoint::ActionTrackCurveAddPoint(shared<Curve> _curve, int _po
 		}
 }
 
-void* ActionTrackCurveAddPoint::execute(Data* d) {
+void* ActionTrackCurveAddPoint::execute(history::Data* d) {
 	Curve::Point p;
 	p.pos = pos;
 	p.value = value;
@@ -33,7 +33,7 @@ void* ActionTrackCurveAddPoint::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackCurveAddPoint::undo(Data* d) {
+void ActionTrackCurveAddPoint::undo(history::Data* d) {
 	curve->points.erase(index);
 }
 

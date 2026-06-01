@@ -8,17 +8,17 @@
 #ifndef ACTIONTRACKDELETESAMPLE_H_
 #define ACTIONTRACKDELETESAMPLE_H_
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class SampleRef;
 
-class ActionTrackDeleteSample : public ActionGroup {
+class ActionTrackDeleteSample : public history::ActionGroup {
 public:
 	ActionTrackDeleteSample(shared<SampleRef> ref);
 
-	void build(Data *d) override;
+	void* compose(history::Data* d) override;
 
 private:
 	shared<SampleRef> ref;

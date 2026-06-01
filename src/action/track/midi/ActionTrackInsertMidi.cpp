@@ -21,7 +21,7 @@ ActionTrackInsertMidi::ActionTrackInsertMidi(TrackLayer *l, int _offset, const M
 }
 
 
-void *ActionTrackInsertMidi::execute(Data *d) {
+void *ActionTrackInsertMidi::execute(history::Data* d) {
 	inserted_at.clear();
 
 	foreachb(MidiNote *n, weak(midi)) {
@@ -40,7 +40,7 @@ void *ActionTrackInsertMidi::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackInsertMidi::undo(Data *d) {
+void ActionTrackInsertMidi::undo(history::Data* d) {
 	foreachb(int i, inserted_at)
 		layer->midi.erase(i);
 

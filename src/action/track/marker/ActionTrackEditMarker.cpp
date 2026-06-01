@@ -19,7 +19,7 @@ ActionTrackEditMarker::ActionTrackEditMarker(const TrackLayer *l, TrackMarker *m
 	text = _text;
 }
 
-void *ActionTrackEditMarker::execute(Data *d) {
+void *ActionTrackEditMarker::execute(history::Data* d) {
 	std::swap(marker->text, text);
 	std::swap(marker->range, range);
 
@@ -27,7 +27,7 @@ void *ActionTrackEditMarker::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackEditMarker::undo(Data *d) {
+void ActionTrackEditMarker::undo(history::Data* d) {
 	execute(d);
 }
 

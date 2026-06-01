@@ -21,7 +21,7 @@ ActionTrackLayer__Delete::ActionTrackLayer__Delete(Track *t, int _index) {
 	layer = t->layers[index];
 }
 
-void* ActionTrackLayer__Delete::execute(Data* d) {
+void* ActionTrackLayer__Delete::execute(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < track->layers.num);
@@ -36,7 +36,7 @@ void* ActionTrackLayer__Delete::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackLayer__Delete::undo(Data* d) {
+void ActionTrackLayer__Delete::undo(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	track->layers.insert(layer, index);

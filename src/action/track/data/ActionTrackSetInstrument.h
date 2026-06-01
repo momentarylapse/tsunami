@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 #include "../../../data/midi/Instrument.h"
 
 namespace tsunami {
@@ -15,17 +15,17 @@ namespace tsunami {
 class Track;
 class MidiNote;
 
-class ActionTrackSetInstrument: public ActionMergable<Instrument> {
+class ActionTrackSetInstrument: public history::MergableValueAction<Instrument> {
 public:
 	ActionTrackSetInstrument(Track *t, const Instrument &instrument);
 
 	string name() const override { return ":##:set instrument"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
-	bool absorb(ActionMergableBase *a) override;
+	bool absorb(Action *a) override;
 
 private:
 	Track *track;

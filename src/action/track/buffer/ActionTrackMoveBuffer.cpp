@@ -19,14 +19,14 @@ ActionTrackMoveBuffer::ActionTrackMoveBuffer(TrackLayer *l, int _index, int _shi
 }
 
 
-void ActionTrackMoveBuffer::undo(Data *d) {
+void ActionTrackMoveBuffer::undo(history::Data* d) {
 	AudioBuffer &b = layer->buffers[index];
 	b.offset -= shift;
 }
 
 
 
-void *ActionTrackMoveBuffer::execute(Data *d) {
+void *ActionTrackMoveBuffer::execute(history::Data* d) {
 	assert(index > 0);
 	assert(index < layer->buffers.num);
 	AudioBuffer &b = layer->buffers[index];

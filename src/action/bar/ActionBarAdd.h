@@ -8,7 +8,7 @@
 #ifndef ACTIONSONGBARADD_H_
 #define ACTIONSONGBARADD_H_
 
-#include "../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
@@ -16,11 +16,11 @@ class BarPattern;
 class Bar;
 enum class BarEditMode;
 
-class ActionBarAdd : public ActionGroup {
+class ActionBarAdd : public history::ActionGroup {
 public:
 	ActionBarAdd(int index, const BarPattern &pattern, BarEditMode mode);
 
-	void build(Data *d) override;
+	void* compose(history::Data *d) override;
 
 	int index;
 	Bar *bar;

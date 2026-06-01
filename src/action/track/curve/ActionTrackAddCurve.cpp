@@ -17,14 +17,14 @@ ActionTrackAddCurve::ActionTrackAddCurve(Track *t, shared<Curve> _curve, int _in
 	index = _index;
 }
 
-void* ActionTrackAddCurve::execute(Data* d) {
+void* ActionTrackAddCurve::execute(history::Data* d) {
 	track->curves.insert(curve, index);
 	track->out_curve_list_changed.notify();
 
 	return curve.get();
 }
 
-void ActionTrackAddCurve::undo(Data* d) {
+void ActionTrackAddCurve::undo(history::Data* d) {
 	curve->fake_death();
 	track->curves.erase(index);
 

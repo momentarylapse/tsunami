@@ -8,18 +8,18 @@
 #ifndef SRC_ACTION_BAR_ACTIONBAR__ADD_H_
 #define SRC_ACTION_BAR_ACTIONBAR__ADD_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Bar;
 
-class ActionBar__Add: public Action {
+class ActionBar__Add: public history::Action {
 public:
 	ActionBar__Add(int index, Bar *bar);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	int index;

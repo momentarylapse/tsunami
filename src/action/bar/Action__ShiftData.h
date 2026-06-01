@@ -8,19 +8,19 @@
 #ifndef SRC_ACTION_BAR_ACTION__SHIFTDATA_H_
 #define SRC_ACTION_BAR_ACTION__SHIFTDATA_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Song;
 enum class BarEditMode;
 
-class Action__ShiftData: public Action {
+class Action__ShiftData: public history::Action {
 public:
 	Action__ShiftData(int offset, int shift, BarEditMode mode);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	void do_shift(Song *s, int delta);
 

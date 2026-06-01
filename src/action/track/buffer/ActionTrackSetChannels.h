@@ -7,16 +7,16 @@
 
 #pragma once
 
-#include "../../ActionGroup.h"
+#include <lib/history/ActionGroup.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackSetChannels : public ActionGroup {
+class ActionTrackSetChannels : public history::ActionGroup {
 public:
 	ActionTrackSetChannels(Track *t, int channels);
-	void build(Data *d) override;
+	void* compose(history::Data *d) override;
 
 	string name() const override { return ":##:set channels"; }
 

@@ -17,14 +17,14 @@ ActionTrackCurveEditPoint::ActionTrackCurveEditPoint(shared<Curve> _curve, int _
 	new_value.value = _value;
 }
 
-void* ActionTrackCurveEditPoint::execute(Data* d) {
+void* ActionTrackCurveEditPoint::execute(history::Data* d) {
 	old_value = curve->points[index];
 	curve->points[index] = new_value;
 
 	return nullptr;
 }
 
-void ActionTrackCurveEditPoint::undo(Data* d) {
+void ActionTrackCurveEditPoint::undo(history::Data* d) {
 	curve->points[index] = old_value;
 }
 

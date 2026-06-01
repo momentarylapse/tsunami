@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
@@ -16,14 +16,14 @@ class MidiNote;
 class Range;
 enum class NoteModifier;
 
-class ActionTrackEditMidiNote : public Action {
+class ActionTrackEditMidiNote : public history::Action {
 public:
 	ActionTrackEditMidiNote(TrackLayer *l, shared<MidiNote> n, const Range &range, float pitch, float volume, int stringno, int flags);
 
 	string name() const override { return ":##:edit midi"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

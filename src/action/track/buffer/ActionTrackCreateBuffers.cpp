@@ -21,7 +21,7 @@ ActionTrackCreateBuffers::ActionTrackCreateBuffers(TrackLayer *l, const Range &_
 	r = _r;
 }
 
-void ActionTrackCreateBuffers::build(Data *d) {
+void* ActionTrackCreateBuffers::compose(history::Data* d) {
 	// is <pos> inside a buffer?
 	// last buffer before <pos>?
 	int n_pos = -1;
@@ -62,6 +62,8 @@ void ActionTrackCreateBuffers::build(Data *d) {
 
 	// return subarray (as reference...)
 	//buf.set_as_ref(*b, pos - b->offset, length);
+
+	return nullptr;
 }
 
 }

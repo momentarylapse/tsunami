@@ -7,19 +7,19 @@
 
 #pragma once
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 #include "../../../data/Curve.h"
 
 namespace tsunami {
 
 //class Curve;
 
-class ActionTrackCurveEditPoint : public ActionMergable<Curve::Point> {
+class ActionTrackCurveEditPoint : public history::MergableValueAction<Curve::Point> {
 public:
 	ActionTrackCurveEditPoint(shared<Curve> curve, int index, int pos, float value);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 	bool mergable(Action *a) override;
 private:
 	shared<Curve> curve;

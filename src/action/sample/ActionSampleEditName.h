@@ -8,20 +8,20 @@
 #ifndef ACTIONSAMPLEEDITNAME_H_
 #define ACTIONSAMPLEEDITNAME_H_
 
-#include "../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
 class Sample;
 
-class ActionSampleEditName : public ActionMergable<string> {
+class ActionSampleEditName : public history::MergableValueAction<string> {
 public:
 	ActionSampleEditName(shared<Sample> s, const string &name);
 
 	string name() const override { return ":##:change sample name"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
 

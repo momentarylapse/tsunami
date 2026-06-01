@@ -62,7 +62,7 @@ void AbstractParser::expect_new_line_with_indent() {
 }
 
 void AbstractParser::expect_identifier(const string &identifier, const string &error_msg, bool consume) {
-	if (Exp.cur != identifier)
+	if (Exp.end_of_line() or Exp.cur != identifier)
 		do_error_exp(error_msg);
 	if (consume)
 		Exp.next();
@@ -336,6 +336,7 @@ shared_array<Node> AbstractParser::parse_abstract_call_parameters() {
 
 	bool has_named = false;
 	while (true) {
+		expect_no_new_line();
 
 		// find parameter
 		if (Exp.peek_next() == "=") {
@@ -739,6 +740,7 @@ shared<Node> AbstractParser::parse_abstract_statement_match() {
 		// result
 		shared<Node> result;
 		if (Exp.end_of_line()) {
+			expect_new_line_with_indent();
 			Exp.next_line();
 			// indented block
 			result = parse_abstract_block();
@@ -1054,6 +1056,7 @@ shared<Node> AbstractParser::parse_abstract_statement_lambda() {
 
 	// lambda body
 	if (Exp.end_of_line()) {
+		expect_new_line_with_indent();
 		// indented block
 		Exp.next_line();
 		n->set_param(4, parse_abstract_block());

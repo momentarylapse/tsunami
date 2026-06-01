@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackEditSynthesizer: public ActionMergable<string> {
+class ActionTrackEditSynthesizer: public history::MergableValueAction<string> {
 public:
 	ActionTrackEditSynthesizer(Track *t);
 
 	string name() const override { return ":##:edit synthesizer"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
-	void redo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
+	void redo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
 

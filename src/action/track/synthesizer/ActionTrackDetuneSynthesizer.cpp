@@ -18,7 +18,7 @@ ActionTrackDetuneSynthesizer::ActionTrackDetuneSynthesizer(Track *t, const Tempe
 	temperament = _temp;
 }
 
-void *ActionTrackDetuneSynthesizer::execute(Data *d) {
+void *ActionTrackDetuneSynthesizer::execute(history::Data* d) {
 	std::swap(track->synth->temperament, temperament);
 	track->synth->update_delta_phi();
 
@@ -27,7 +27,7 @@ void *ActionTrackDetuneSynthesizer::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackDetuneSynthesizer::undo(Data *d) {
+void ActionTrackDetuneSynthesizer::undo(history::Data* d) {
 	execute(d);
 }
 

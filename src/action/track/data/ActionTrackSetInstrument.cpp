@@ -28,7 +28,7 @@ ActionTrackSetInstrument::ActionTrackSetInstrument(Track* t, const Instrument &i
 
 }
 
-void* ActionTrackSetInstrument::execute(Data* d) {
+void* ActionTrackSetInstrument::execute(history::Data* d) {
 	track->instrument = new_value;
 	for (auto *l: weak(track->layers))
 		l->midi.reset_clef();
@@ -41,7 +41,7 @@ void* ActionTrackSetInstrument::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackSetInstrument::undo(Data* d) {
+void ActionTrackSetInstrument::undo(history::Data* d) {
 	track->instrument = old_value;
 	for (auto l: track->layers)
 		l->midi.reset_clef();
@@ -59,7 +59,7 @@ bool ActionTrackSetInstrument::mergable(Action* a) {
 	return (aa->track == track);
 }
 
-bool ActionTrackSetInstrument::absorb(ActionMergableBase* a) {
+bool ActionTrackSetInstrument::absorb(Action* a) {
 	if (!mergable(a))
 		return false;
 	auto* aa = dynamic_cast<ActionTrackSetInstrument*>(a);

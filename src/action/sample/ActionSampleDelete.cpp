@@ -18,7 +18,7 @@ ActionSampleDelete::ActionSampleDelete(shared<Sample> s) {
 	index = -1;
 }
 
-void *ActionSampleDelete::execute(Data *d) {
+void *ActionSampleDelete::execute(history::Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(sample->ref_count == 0);
 	index = weak(a->samples).find(sample.get());
@@ -32,7 +32,7 @@ void *ActionSampleDelete::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionSampleDelete::undo(Data *d) {
+void ActionSampleDelete::undo(history::Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	sample->set_owner(a);
 	a->samples.insert(sample, index);

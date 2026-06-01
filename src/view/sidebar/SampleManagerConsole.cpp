@@ -11,7 +11,7 @@
 #include "../dialog/SampleScaleDialog.h"
 #include "../helper/SamplePreviewPlayer.h"
 #include "../ColorScheme.h"
-#include "../../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/TrackLayer.h"

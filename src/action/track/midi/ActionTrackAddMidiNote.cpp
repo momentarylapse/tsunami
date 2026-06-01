@@ -23,14 +23,14 @@ ActionTrackAddMidiNote::ActionTrackAddMidiNote(TrackLayer* l, shared<MidiNote> n
 			insert_index = i + 1;
 }
 
-void* ActionTrackAddMidiNote::execute(Data* d) {
+void* ActionTrackAddMidiNote::execute(history::Data* d) {
 	layer->midi.insert(note, insert_index);
 	layer->out_changed.notify();
 
 	return note.get();
 }
 
-void ActionTrackAddMidiNote::undo(Data* d) {
+void ActionTrackAddMidiNote::undo(history::Data* d) {
 	layer->midi.erase(insert_index);
 	layer->out_changed.notify();
 }

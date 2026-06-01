@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 class AudioEffect;
 
-class ActionTrackAddAudioEffect: public Action {
+class ActionTrackAddAudioEffect: public history::Action {
 public:
 	ActionTrackAddAudioEffect(Track *t, shared<AudioEffect> effect);
 
 	string name() const override { return ":##:add fx"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<AudioEffect> effect;

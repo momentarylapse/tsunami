@@ -101,8 +101,8 @@ void ExpressionBuffer::next() {
 
 	if (_cur_exp < cur_line->tokens.num)
 		cur = cur_line->tokens[_cur_exp].name;
-	//else
-	//	cur = "<eol>";
+	else
+		cur = "<eol>";
 }
 
 string ExpressionBuffer::consume() {

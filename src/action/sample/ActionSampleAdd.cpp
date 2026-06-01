@@ -18,7 +18,7 @@ ActionSampleAdd::ActionSampleAdd(shared<Sample> s) {
 	sample = s;
 }
 
-void *ActionSampleAdd::execute(Data *d) {
+void *ActionSampleAdd::execute(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	sample->set_owner(a);
 	a->samples.add(sample);
@@ -26,7 +26,7 @@ void *ActionSampleAdd::execute(Data *d) {
 	return sample.get();
 }
 
-void ActionSampleAdd::undo(Data *d) {
+void ActionSampleAdd::undo(history::Data* d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(sample->ref_count == 0);
 	sample->fake_death();

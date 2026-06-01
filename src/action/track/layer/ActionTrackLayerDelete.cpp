@@ -21,7 +21,7 @@ ActionTrackLayerDelete::ActionTrackLayerDelete(Track *t, int _index) {
 	index = _index;
 }
 
-void ActionTrackLayerDelete::build(Data *d) {
+void* ActionTrackLayerDelete::compose(history::Data* d) {
 	TrackLayer *l = track->layers[index].get();
 	for (int i=l->buffers.num-1; i>=0; i--)
 		add_sub_action(new ActionTrack__DeleteBuffer(l, i), d);
@@ -29,6 +29,7 @@ void ActionTrackLayerDelete::build(Data *d) {
 	add_sub_action(new ActionTrackLayer__Delete(track, index), d);
 	for (int i=l->fades.num-1; i>=0; i--)
 		add_sub_action(new ActionTrackFadeDelete(l, i), d);
+	return nullptr;
 }
 
 }

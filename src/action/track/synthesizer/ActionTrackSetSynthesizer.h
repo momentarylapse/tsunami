@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 class Synthesizer;
 
-class ActionTrackSetSynthesizer : public Action {
+class ActionTrackSetSynthesizer : public history::Action {
 public:
 	ActionTrackSetSynthesizer(Track *t, shared<Synthesizer> synth);
 
 	string name() const override { return ":##:set synthesizer"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	Track *track;

@@ -7,7 +7,7 @@
 
 #include "ActionTrackEditBuffer.h"
 #include <assert.h>
-#include "../../ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../../../data/TrackLayer.h"
 #include "../../../data/Song.h"
 #include "../../../data/audio/AudioBuffer.h"
@@ -35,7 +35,7 @@ ActionTrackEditBuffer::ActionTrackEditBuffer(TrackLayer *l, const Range &_range)
 
 
 
-void ActionTrackEditBuffer::undo(Data *d) {
+void ActionTrackEditBuffer::undo(history::Data *d) {
 	layer->buffers[index]._data_was_changed();
 
 	AudioBuffer b;
@@ -43,11 +43,11 @@ void ActionTrackEditBuffer::undo(Data *d) {
 	box.swap_value(b);
 }
 
-void ActionTrackEditBuffer::redo(Data *d) {
+void ActionTrackEditBuffer::redo(history::Data *d) {
 	undo(d);
 }
 
-void *ActionTrackEditBuffer::execute(Data *d) {
+void *ActionTrackEditBuffer::execute(history::Data *d) {
 	layer->buffers[index]._data_was_changed();
 
 	// nothing to do...

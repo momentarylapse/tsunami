@@ -9,18 +9,18 @@
 #define ACTIONTAGDEDIT_H_
 
 #include "../../data/Song.h"
-#include "../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
-class ActionTagEdit : public ActionMergable<string> {
+class ActionTagEdit : public history::MergableValueAction<string> {
 public:
 	ActionTagEdit(int index, const Tag& tag);
 
 	string name() const override { return ":##:edit tag"; }
 
-	void* execute(Data* d) override;
-	void undo(Data* d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action* a) override;
 

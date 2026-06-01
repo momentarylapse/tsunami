@@ -8,18 +8,18 @@
 #ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ABSORBBUFFER_H_
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__ABSORBBUFFER_H_
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrack__AbsorbBuffer : public Action {
+class ActionTrack__AbsorbBuffer : public history::Action {
 public:
 	ActionTrack__AbsorbBuffer(TrackLayer *l, int dest, int src);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

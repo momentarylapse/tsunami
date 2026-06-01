@@ -18,7 +18,7 @@ ActionTagDelete::ActionTagDelete(int _index) {
 ActionTagDelete::~ActionTagDelete() {
 }
 
-void *ActionTagDelete::execute(Data *d) {
+void *ActionTagDelete::execute(history::Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < a->tags.num);
@@ -29,7 +29,7 @@ void *ActionTagDelete::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTagDelete::undo(Data *d) {
+void ActionTagDelete::undo(history::Data *d) {
 	Song *a = dynamic_cast<Song*>(d);
 
 	a->tags.insert(old_tag, index);

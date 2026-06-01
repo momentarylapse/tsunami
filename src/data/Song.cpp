@@ -12,7 +12,7 @@
 #include "Sample.h"
 #include "SongSelection.h"
 #include "rhythm/Bar.h"
-#include "../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../action/bar/ActionBarAdd.h"
 #include "../action/bar/ActionBarDelete.h"
 #include "../action/bar/ActionBarEdit.h"
@@ -50,21 +50,14 @@ int get_track_index(Track *t) {
 Song::Error::Error(const string &_message) : Exception(_message) {
 }
 
-Song::Song(Session *session, int _sample_rate) :
-	Data(session)
+Song::Song(Session* _session, int _sample_rate) :
+	Data(-1)
 {
 	//msg_write("  new Song " + p2s(this));
+	session = _session;
 	sample_rate = _sample_rate;
 	default_format = SampleFormat::Int16;
 	compression = 0;
-}
-
-void Song::__init__(Session *session, int _sample_rate) {
-	new(this) Song(session, _sample_rate);
-}
-
-void Song::__delete__() {
-	this->Song::~Song();
 }
 
 
@@ -267,14 +260,14 @@ void Song::insert_selected_samples(const SongSelection &sel) {
 }
 
 void Song::delete_selected_samples(const SongSelection &sel) {
-	action_manager->group_begin(":##:delete selected samples");
+	action_manager->begin_group(":##:delete selected samples");
 	for (Track *t: weak(tracks))
 		for (TrackLayer *l: weak(t->layers)) {
 			for (int j=l->samples.num-1; j>=0; j--)
 				if (sel.has(l->samples[j].get()))
 					l->delete_sample_ref(l->samples[j].get());
 		}
-	action_manager->group_end();
+	action_manager->end_group();
 }
 
 void Song::delete_track(Track *track) {

@@ -20,7 +20,7 @@ ActionTrackEditSample::ActionTrackEditSample(shared<SampleRef> _ref, float volum
 	new_value.mute = mute;
 }
 
-void *ActionTrackEditSample::execute(Data *d) {
+void *ActionTrackEditSample::execute(history::Data* d) {
 	//Song *a = dynamic_cast<Song*>(d);
 
 	ref->volume = new_value.volume;
@@ -30,7 +30,7 @@ void *ActionTrackEditSample::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackEditSample::undo(Data *d) {
+void ActionTrackEditSample::undo(history::Data* d) {
 	//Song *a = dynamic_cast<Song*>(d);
 
 	ref->volume = old_value.volume;

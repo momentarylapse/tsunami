@@ -15,7 +15,7 @@ ActionTrackEditMuted::ActionTrackEditMuted(Track *t, bool _muted) {
 	muted = _muted;
 }
 
-void *ActionTrackEditMuted::execute(Data *d) {
+void *ActionTrackEditMuted::execute(history::Data *d) {
 	bool temp = muted;
 	muted = track->muted;
 	track->muted = temp;
@@ -24,7 +24,7 @@ void *ActionTrackEditMuted::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackEditMuted::undo(Data *d) {
+void ActionTrackEditMuted::undo(history::Data *d) {
 	execute(d);
 }
 

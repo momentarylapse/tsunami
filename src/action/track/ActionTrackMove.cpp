@@ -15,7 +15,7 @@ ActionTrackMove::ActionTrackMove(Track *track, int _target) {
 	target = _target;
 }
 
-void *ActionTrackMove::execute(Data *d) {
+void *ActionTrackMove::execute(history::Data* d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	weak(s->tracks).move(origin, target);
@@ -24,7 +24,7 @@ void *ActionTrackMove::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackMove::undo(Data *d) {
+void ActionTrackMove::undo(history::Data* d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	weak(s->tracks).move(target, origin);

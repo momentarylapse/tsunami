@@ -24,7 +24,7 @@ Action__ShiftData::Action__ShiftData(int _offset, int _shift, BarEditMode _mode)
 	mode = _mode;
 }
 
-void *Action__ShiftData::execute(Data *d) {
+void *Action__ShiftData::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_shift(s, shift);
@@ -32,7 +32,7 @@ void *Action__ShiftData::execute(Data *d) {
 	return nullptr;
 }
 
-void Action__ShiftData::undo(Data *d) {
+void Action__ShiftData::undo(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	offset += shift;

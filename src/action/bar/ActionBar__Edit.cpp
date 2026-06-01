@@ -22,7 +22,7 @@ ActionBar__Edit::ActionBar__Edit(int _index, int _length, Array<int> &_beats, in
 	beats = _beats;
 }
 
-void *ActionBar__Edit::execute(Data *d) {
+void *ActionBar__Edit::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0);
 	assert(index < s->bars.num);
@@ -36,15 +36,14 @@ void *ActionBar__Edit::execute(Data *d) {
 	s->bars._update_offsets();
 
 
-	s->x_message_data = {index, length, bar->length};
-	s->out_scale_bars.notify();
+	s->out_scale_bars({index, length, bar->length});
 
-	s->out_edit_bars.notify();
+	s->out_edit_bars();
 
 	return nullptr;
 }
 
-void ActionBar__Edit::undo(Data *d) {
+void ActionBar__Edit::undo(history::Data *d) {
 	execute(d);
 }
 

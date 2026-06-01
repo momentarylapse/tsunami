@@ -31,7 +31,7 @@ ActionBarDelete::ActionBarDelete(int _index, bool _affect_data) {
 	affect_data = _affect_data;
 }
 
-void ActionBarDelete::build(Data *d) {
+void* ActionBarDelete::compose(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	assert(index >= 0 and index < s->bars.num);
 
@@ -82,6 +82,7 @@ void ActionBarDelete::build(Data *d) {
 
 		add_sub_action(new Action__ShiftData(r.end(), - r.length, BarEditMode::Stretch), d);
 	}
+	return nullptr;
 }
 
 }

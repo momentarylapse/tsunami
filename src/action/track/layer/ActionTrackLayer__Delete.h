@@ -8,19 +8,19 @@
 #ifndef SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_
 #define SRC_ACTION_TRACK_LAYER_ACTIONTRACKLAYER__DELETE_H_
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 class TrackLayer;
 
-class ActionTrackLayer__Delete : public Action {
+class ActionTrackLayer__Delete : public history::Action {
 public:
 	ActionTrackLayer__Delete(Track *t, int index);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 private:
 	Track *track;
 	int index;

@@ -14,7 +14,7 @@
 #include "../../data/Track.h"
 #include "../../data/rhythm/Bar.h"
 #include "../../module/synthesizer/Synthesizer.h"
-#include "../../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../../plugins/PluginManager.h"
 #include "../../plugins/PresetManager.h"
 #include "../../Tsunami.h"

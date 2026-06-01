@@ -17,7 +17,7 @@ ActionTrackSetAudioEffectEnabledWetness::ActionTrackSetAudioEffectEnabledWetness
 	wetness = _wetness;
 }
 
-void *ActionTrackSetAudioEffectEnabledWetness::execute(Data *d) {
+void *ActionTrackSetAudioEffectEnabledWetness::execute(history::Data* d) {
 	std::swap(fx->enabled, enabled);
 	std::swap(fx->wetness, wetness);
 	fx->out_changed.notify();
@@ -26,7 +26,7 @@ void *ActionTrackSetAudioEffectEnabledWetness::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackSetAudioEffectEnabledWetness::undo(Data *d) {
+void ActionTrackSetAudioEffectEnabledWetness::undo(history::Data* d) {
 	execute(d);
 }
 

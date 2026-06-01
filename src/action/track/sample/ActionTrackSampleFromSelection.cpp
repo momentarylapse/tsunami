@@ -23,7 +23,7 @@ ActionTrackSampleFromSelection::ActionTrackSampleFromSelection(const SongSelecti
 	auto_delete = _auto_delete;
 }
 
-void ActionTrackSampleFromSelection::build(Data *d) {
+void* ActionTrackSampleFromSelection::compose(history::Data* d) {
 	Song *s = dynamic_cast<Song*>(d);
 	for (TrackLayer *l: s->layers())
 		if (sel.has(l)) {
@@ -32,6 +32,7 @@ void ActionTrackSampleFromSelection::build(Data *d) {
 			else if (l->type == SignalType::Midi)
 				CreateSamplesFromLayerMidi(l);
 		}
+	return nullptr;
 }
 
 void ActionTrackSampleFromSelection::CreateSamplesFromLayerAudio(TrackLayer *l) {

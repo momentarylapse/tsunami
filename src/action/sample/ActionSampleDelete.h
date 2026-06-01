@@ -8,20 +8,20 @@
 #ifndef ACTIONSAMPLEDELETE_H_
 #define ACTIONSAMPLEDELETE_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Sample;
 
-class ActionSampleDelete : public Action {
+class ActionSampleDelete : public history::Action {
 public:
 	explicit ActionSampleDelete(shared<Sample> s);
 
 	string name() const override { return ":##:delete sample"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<Sample> sample;

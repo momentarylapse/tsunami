@@ -17,7 +17,7 @@ ActionTrackDeleteMarker::ActionTrackDeleteMarker(shared<TrackLayer> l, int _inde
 	index = _index;
 }
 
-void *ActionTrackDeleteMarker::execute(Data *d) {
+void *ActionTrackDeleteMarker::execute(history::Data* d) {
 	assert(index >= 0);
 	assert(index < layer->markers.num);
 
@@ -29,7 +29,7 @@ void *ActionTrackDeleteMarker::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackDeleteMarker::undo(Data *d) {
+void ActionTrackDeleteMarker::undo(history::Data* d) {
 	layer->markers.insert(marker.get(), index);
 	layer->out_changed.notify();
 }

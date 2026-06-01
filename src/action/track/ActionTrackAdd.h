@@ -7,20 +7,20 @@
 
 #pragma once
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackAdd : public Action {
+class ActionTrackAdd : public history::Action {
 public:
 	ActionTrackAdd(Track *t, int index);
 
 	string name() const override { return ":##:add track"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<Track> track;

@@ -808,8 +808,8 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 		ext->declare_class_element("Song.bars", &Song::bars);
 		ext->declare_class_element("Song.secret_data", &Song::secret_data);
 		ext->declare_class_element("Song." + kaba::Identifier::SharedCount, &Song::_pointer_ref_counter);
-		ext->link_class_func("Song.__init__", &Song::__init__);
-		ext->link_virtual("Song.__delete__", &Song::__delete__, &af);
+		ext->link_class_func("Song.__init__", &kaba::generic_init_ext<Song, Session*, int>);
+		ext->link_virtual("Song.__delete__", &kaba::generic_virtual<Song>::__delete__, &af);
 		ext->link_class_func("Song.add_track", &Song::add_track);
 		ext->link_class_func("Song.delete_track", &Song::delete_track);
 		ext->link_class_func("Song.range", &Song::range);

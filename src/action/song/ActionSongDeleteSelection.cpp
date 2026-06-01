@@ -24,7 +24,7 @@ ActionSongDeleteSelection::ActionSongDeleteSelection(const SongSelection &_sel) 
 {
 }
 
-void ActionSongDeleteSelection::build(Data *d) {
+void* ActionSongDeleteSelection::compose(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	for (auto t: weak(s->tracks)) {
 
@@ -49,6 +49,7 @@ void ActionSongDeleteSelection::build(Data *d) {
 					add_sub_action(new ActionTrackDeleteSample(l->samples[i]), d);
 		}
 	}
+	return nullptr;
 }
 
 void ActionSongDeleteSelection::delete_buffers_from_track_layer(Song* a, Track *t, TrackLayer *l, const SongSelection &sel) {

@@ -17,14 +17,14 @@ ActionTrackAddMidiEffect::ActionTrackAddMidiEffect(Track *t, shared<MidiEffect> 
 	effect = _effect;
 }
 
-void *ActionTrackAddMidiEffect::execute(Data *d) {
+void *ActionTrackAddMidiEffect::execute(history::Data* d) {
 	track->midi_fx.add(effect);
 	track->out_midi_effect_list_changed.notify();
 
 	return nullptr;
 }
 
-void ActionTrackAddMidiEffect::undo(Data *d) {
+void ActionTrackAddMidiEffect::undo(history::Data* d) {
 	assert(track->midi_fx.num > 0);
 	track->midi_fx.pop();
 	effect->fake_death();

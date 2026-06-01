@@ -10,7 +10,7 @@
 #include "../../data/base.h"
 #include "../../data/Song.h"
 #include "../../data/rhythm/Bar.h"
-#include "../../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../../stuff/SessionManager.h"
 #include "../../lib/hui/config.h"
 #include "../../lib/hui/language.h"

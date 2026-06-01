@@ -29,7 +29,7 @@ ActionBarAdd::ActionBarAdd(int _index, const BarPattern &pattern, BarEditMode _m
 	mode = _mode;
 }
 
-void ActionBarAdd::build(Data *d) {
+void* ActionBarAdd::compose(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 	add_sub_action(new ActionBar__Add(index, bar), d);
 
@@ -64,6 +64,7 @@ void ActionBarAdd::build(Data *d) {
 			}
 		}
 	}
+	return nullptr;
 }
 
 }

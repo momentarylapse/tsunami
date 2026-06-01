@@ -19,14 +19,14 @@ ActionTrack__BufferSetChannels::ActionTrack__BufferSetChannels(TrackLayer *_laye
 		temp = layer->buffers[index].c[0];
 }
 
-void *ActionTrack__BufferSetChannels::execute(Data *d) {
+void *ActionTrack__BufferSetChannels::execute(history::Data *d) {
 	layer->buffers[index].c[1].exchange(temp);
 	std::swap(layer->buffers[index].channels, channels);
 	layer->buffers[index]._data_was_changed();
 	return nullptr;
 }
 
-void ActionTrack__BufferSetChannels::undo(Data *d) {
+void ActionTrack__BufferSetChannels::undo(history::Data *d) {
 	execute(d);
 }
 

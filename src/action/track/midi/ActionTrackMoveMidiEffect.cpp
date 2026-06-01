@@ -16,13 +16,13 @@ ActionTrackMoveMidiEffect::ActionTrackMoveMidiEffect(Track* t, int _source, int 
 	target = _target;
 }
 
-void* ActionTrackMoveMidiEffect::execute(Data* d) {
+void* ActionTrackMoveMidiEffect::execute(history::Data* d) {
 	weak(track->midi_fx).move(source, target);
 	track->out_changed.notify();
 	return nullptr;
 }
 
-void ActionTrackMoveMidiEffect::undo(Data* d) {
+void ActionTrackMoveMidiEffect::undo(history::Data* d) {
 	weak(track->midi_fx).move(target, source);
 	track->out_changed.notify();
 }

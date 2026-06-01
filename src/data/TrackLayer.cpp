@@ -166,14 +166,14 @@ void TrackLayer::get_buffers(AudioBuffer &buf, const Range &r) {
 	read_buffers(buf, r, true);
 }
 
-Action *TrackLayer::edit_buffers(AudioBuffer &buf, const Range &r) {
+history::Action *TrackLayer::edit_buffers(AudioBuffer &buf, const Range &r) {
 	get_buffers(buf, r);
 	if (track->song->history_enabled())
 		return new ActionTrackEditBuffer(this, r);
-	return NULL;
+	return nullptr;
 }
 
-void TrackLayer::edit_buffers_finish(Action *a) {
+void TrackLayer::edit_buffers_finish(history::Action *a) {
 	if (a)
 		track->song->execute(a);
 }

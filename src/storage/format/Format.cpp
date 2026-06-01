@@ -12,7 +12,7 @@
 #include "../../data/Track.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/audio/AudioBuffer.h"
-#include "../../action/ActionManager.h"
+#include <lib/history/ActionManager.h>
 #include "../../module/audio/SongRenderer.h"
 
 namespace tsunami {

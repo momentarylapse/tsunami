@@ -8,20 +8,20 @@
 #pragma once
 
 #include "../../../module/midi/MidiEffect.h"
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrackDeleteMidiEffect: public Action {
+class ActionTrackDeleteMidiEffect: public history::Action {
 public:
 	ActionTrackDeleteMidiEffect(Track *t, int index);
 
 	string name() const override { return ":##:delete midi fx"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<MidiEffect> effect;

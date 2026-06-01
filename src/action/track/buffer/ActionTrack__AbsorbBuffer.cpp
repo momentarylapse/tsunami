@@ -20,7 +20,7 @@ ActionTrack__AbsorbBuffer::ActionTrack__AbsorbBuffer(TrackLayer *l, int _dest, i
 	dest_old_length = 0;
 }
 
-void *ActionTrack__AbsorbBuffer::execute(Data *d) {
+void *ActionTrack__AbsorbBuffer::execute(history::Data *d) {
 	AudioBuffer &b_src  = layer->buffers[src];
 	AudioBuffer &b_dest = layer->buffers[dest];
 	dest_old_length = b_dest.length;
@@ -39,7 +39,7 @@ void *ActionTrack__AbsorbBuffer::execute(Data *d) {
 
 
 
-void ActionTrack__AbsorbBuffer::undo(Data *d) {
+void ActionTrack__AbsorbBuffer::undo(history::Data *d) {
 	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, src);
 	AudioBuffer &b_src  = layer->buffers[src];

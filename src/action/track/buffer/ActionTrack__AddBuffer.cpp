@@ -18,14 +18,14 @@ ActionTrack__AddBuffer::ActionTrack__AddBuffer(TrackLayer *l, int _index, const 
 	range = r;
 }
 
-void ActionTrack__AddBuffer::undo(Data *d) {
+void ActionTrack__AddBuffer::undo(history::Data *d) {
 	// should be zeroes at this point...
 	layer->buffers.erase(index);
 }
 
 
 
-void *ActionTrack__AddBuffer::execute(Data *d) {
+void *ActionTrack__AddBuffer::execute(history::Data *d) {
 	AudioBuffer dummy(0, layer->channels);
 	layer->buffers.insert(dummy, index);
 

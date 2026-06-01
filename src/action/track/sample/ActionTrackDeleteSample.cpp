@@ -14,7 +14,7 @@
 
 namespace tsunami {
 
-class ActionTrack__DeleteSample : public Action {
+class ActionTrack__DeleteSample : public history::Action {
 private:
 	TrackLayer *layer;
 	int index;
@@ -24,7 +24,7 @@ public:
 		layer = _ref->layer;
 		index = _ref->get_index();
 	}
-	void *execute(Data* d) override {
+	void* execute(history::Data* d) override {
 		ref = layer->samples[index];
 		ref->origin->unref();
 		ref->owner = nullptr;
@@ -34,7 +34,7 @@ public:
 
 		return nullptr;
 	}
-	void undo(Data* d) override {
+	void undo(history::Data* d) override {
 		layer->samples.insert(ref, index);
 		ref->origin->ref();
 		ref->owner = layer->song();
@@ -45,13 +45,14 @@ ActionTrackDeleteSample::ActionTrackDeleteSample(shared<SampleRef> _ref) {
 	ref = _ref;
 }
 
-void ActionTrackDeleteSample::build(Data *d) {
+void* ActionTrackDeleteSample::compose(history::Data* d) {
 	auto sample = ref->origin;
 
 	add_sub_action(new ActionTrack__DeleteSample(ref), d);
 
 	if (sample->auto_delete and (sample->ref_count == 0))
 		add_sub_action(new ActionSampleDelete(sample), d);
+	return nullptr;
 }
 
 }

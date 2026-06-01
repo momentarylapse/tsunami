@@ -15,7 +15,7 @@ ActionSongSetDefaultFormat::ActionSongSetDefaultFormat(SampleFormat _format, int
 	compression = _compression;
 }
 
-void *ActionSongSetDefaultFormat::execute(Data *d) {
+void *ActionSongSetDefaultFormat::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	SampleFormat t1 = s->default_format;
@@ -29,7 +29,7 @@ void *ActionSongSetDefaultFormat::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionSongSetDefaultFormat::undo(Data *d) {
+void ActionSongSetDefaultFormat::undo(history::Data *d) {
 	execute(d);
 }
 

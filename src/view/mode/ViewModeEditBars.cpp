@@ -7,7 +7,7 @@
 #include "../MouseDelayPlanner.h"
 #include "../TsunamiWindow.h"
 #include "../ColorScheme.h"
-#include "../../action/Action.h"
+#include <lib/history/Action.h>
 #include "../../data/base.h"
 #include "../../data/TrackLayer.h"
 #include "../../data/Song.h"
@@ -18,7 +18,7 @@
 
 namespace tsunami {
 
-class ActionSongMoveBarGap : public Action {
+class ActionSongMoveBarGap : public history::Action {
 	public:
 	ActionSongMoveBarGap(Song *s, int i) {
 		index = i;
@@ -26,30 +26,30 @@ class ActionSongMoveBarGap : public Action {
 		if (index < s->bars.num)
 			pos1 = s->bars[index]->range().end();
 	}
-	void set_param_and_notify(Data *d, int _param) {
+	void set_param_and_notify(history::Data* d, int _param) {
 		pos = _param;
 		execute(d);
 		d->out_changed.notify();
 	}
-	void _set(Data *d, int p) {
+	void _set(history::Data* d, int p) {
 		auto s = dynamic_cast<Song*>(d);
 		auto b = weak(s->bars)[index - 1];
 		b->length = p - b->offset;
 		if (index < s->bars.num)
 			s->bars[index]->length = pos1 - p;
 	}
-	void *execute(Data *d) override {
+	void* execute(history::Data* d) override {
 		_set(d, pos);
 		return nullptr;
 	}
-	void undo(Data *d) override {
+	void undo(history::Data* d) override {
 		_set(d, pos0);
 	}
-	void abort_and_notify(Data *d) {
+	void abort_and_notify(history::Data* d) {
 		undo(d);
 		d->out_changed.notify();
 	}
-	bool is_trivial() override {
+	bool is_trivial() const override {
 		return (pos == pos0);
 	}
 	int index;

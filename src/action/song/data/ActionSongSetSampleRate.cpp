@@ -15,7 +15,7 @@ ActionSongSetSampleRate::ActionSongSetSampleRate(Song *s, int _sample_rate) {
 	old_value = s->sample_rate;
 }
 
-void *ActionSongSetSampleRate::execute(Data *d) {
+void *ActionSongSetSampleRate::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->sample_rate = new_value;
@@ -23,7 +23,7 @@ void *ActionSongSetSampleRate::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionSongSetSampleRate::undo(Data *d) {
+void ActionSongSetSampleRate::undo(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	s->sample_rate = old_value;

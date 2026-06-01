@@ -270,17 +270,17 @@ AudioView::AudioView(Session *_session) :
 		on_song_new();
 	});
 	//song->subscribe(this, [this]{ on_song_finished_loading(); }, song->MESSAGE_FINISHED_LOADING);
-	auto apply_bar_scale = [this](int i) {
-		auto b = song->bars[song->x_message_data.i[0]].get();
+	auto apply_bar_scale = [this](int i, const Song::BarScaleInfo& bsi) {
+		auto b = song->bars[bsi.index].get();
 		if (i <= b->offset)
 			return i;
-		if (i >= b->offset + song->x_message_data.i[1])
-			return i - song->x_message_data.i[1] + song->x_message_data.i[2];
-		return b->offset + (int)((float)(i - b->offset) * (float)song->x_message_data.i[2] / (float)song->x_message_data.i[1]);
+		if (i >= b->offset + bsi.old_length)
+			return i - bsi.old_length + bsi.new_length;
+		return b->offset + (int)((float)(i - b->offset) * (float)bsi.new_length / (float)bsi.old_length);
 	};
-	song->out_scale_bars >> create_sink([this, apply_bar_scale] {
-		sel.range_raw.set_start(apply_bar_scale(sel.range_raw.start()));
-		sel.range_raw.set_end(apply_bar_scale(sel.range_raw.end()));
+	song->out_scale_bars >> create_data_sink<Song::BarScaleInfo>([this, apply_bar_scale] (const Song::BarScaleInfo& bsi) {
+		sel.range_raw.set_start(apply_bar_scale(sel.range_raw.start(), bsi));
+		sel.range_raw.set_end(apply_bar_scale(sel.range_raw.end(), bsi));
 		update_selection();
 	});
 	song->out_finished_loading >> create_sink([this] {

@@ -19,19 +19,19 @@ ActionTrackEditAudioEffect::ActionTrackEditAudioEffect(AudioEffect *_fx) {
 	new_value = fx->config_to_string();
 }
 
-void *ActionTrackEditAudioEffect::execute(Data *d) {
+void *ActionTrackEditAudioEffect::execute(history::Data* d) {
 	fx->_config_latest_history = new_value;
 	fx->out_changed.notify();
 	return nullptr;
 }
 
-void ActionTrackEditAudioEffect::redo(Data *d) {
+void ActionTrackEditAudioEffect::redo(history::Data* d) {
 	fx->_config_latest_history = new_value;
 	fx->config_from_string(Module::VersionNumber::Latest, new_value);
 	fx->out_changed.notify();
 }
 
-void ActionTrackEditAudioEffect::undo(Data *d) {
+void ActionTrackEditAudioEffect::undo(history::Data* d) {
 	fx->_config_latest_history = old_value;
 	fx->config_from_string(Module::VersionNumber::Latest, old_value);
 	fx->out_changed.notify();

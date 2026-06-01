@@ -16,13 +16,13 @@ ActionTrackMoveAudioEffect::ActionTrackMoveAudioEffect(Track* t, int _source, in
 	target = _target;
 }
 
-void* ActionTrackMoveAudioEffect::execute(Data* d) {
+void* ActionTrackMoveAudioEffect::execute(history::Data* d) {
 	weak(track->fx).move(source, target);
 	track->out_changed.notify();
 	return nullptr;
 }
 
-void ActionTrackMoveAudioEffect::undo(Data* d) {
+void ActionTrackMoveAudioEffect::undo(history::Data* d) {
 	weak(track->fx).move(target, source);
 	track->out_changed.notify();
 }

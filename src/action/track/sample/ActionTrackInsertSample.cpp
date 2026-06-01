@@ -23,7 +23,7 @@ ActionTrackInsertSample::ActionTrackInsertSample(TrackLayer *l, int _index) {
 	index = _index;
 }
 
-void ActionTrackInsertSample::build(Data *d) {
+void* ActionTrackInsertSample::compose(history::Data* d) {
 	SampleRef *ref = layer->samples[index].get();
 
 	if (layer->type == SignalType::Audio) {
@@ -49,6 +49,7 @@ void ActionTrackInsertSample::build(Data *d) {
 
 	// delete sub
 	add_sub_action(new ActionTrackDeleteSample(ref), d);
+	return nullptr;
 }
 
 }

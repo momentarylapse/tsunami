@@ -16,7 +16,7 @@ ActionTrackFadeAdd::ActionTrackFadeAdd(TrackLayer* l, int position, CrossFade::M
 	index = 0;
 }
 
-void* ActionTrackFadeAdd::execute(Data* d) {
+void* ActionTrackFadeAdd::execute(history::Data* d) {
 	for (int i=0; i<layer->fades.num; i++)
 		if (layer->fades[i].position < fade.position){
 			index = i + 1;
@@ -26,7 +26,7 @@ void* ActionTrackFadeAdd::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackFadeAdd::undo(Data* d) {
+void ActionTrackFadeAdd::undo(history::Data* d) {
 	layer->fades.erase(index);
 }
 

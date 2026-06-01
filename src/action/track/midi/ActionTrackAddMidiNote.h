@@ -7,21 +7,21 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class TrackLayer;
 class MidiNote;
 
-class ActionTrackAddMidiNote : public Action {
+class ActionTrackAddMidiNote : public history::Action {
 public:
 	ActionTrackAddMidiNote(TrackLayer *l, shared<MidiNote> n);
 
 	string name() const override { return ":##:add midi"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

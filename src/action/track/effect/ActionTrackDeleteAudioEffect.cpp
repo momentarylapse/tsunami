@@ -18,7 +18,7 @@ ActionTrackDeleteEffect::ActionTrackDeleteEffect(Track *t, int _index) {
 	index = _index;
 }
 
-void *ActionTrackDeleteEffect::execute(Data *d) {
+void *ActionTrackDeleteEffect::execute(history::Data* d) {
 	assert(index >= 0);
 
 	assert(index < track->fx.num);
@@ -31,7 +31,7 @@ void *ActionTrackDeleteEffect::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackDeleteEffect::undo(Data *d) {
+void ActionTrackDeleteEffect::undo(history::Data* d) {
 	assert(index >= 0);
 
 	assert(index <= track->fx.num);

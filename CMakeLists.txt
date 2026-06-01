@@ -387,10 +387,6 @@ add_library(moduletsunami SHARED
 	src/action/track/ActionTrackAdd.cpp
 	src/action/track/ActionTrackDelete.cpp
 	src/action/track/ActionTrackMove.cpp
-	src/action/Action.cpp
-	src/action/ActionGroup.cpp
-	src/action/ActionManager.cpp
-	src/action/ActionMergable.cpp
 	src/command/song/Diff.cpp
 	src/command/song/Export.cpp
 	src/command/song/Show.cpp
@@ -411,7 +407,6 @@ add_library(moduletsunami SHARED
 	src/data/base.cpp
 	src/data/CrossFade.cpp
 	src/data/Curve.cpp
-	src/data/Data.cpp
 	src/data/Range.cpp
 	src/data/Sample.cpp
 	src/data/SampleRef.cpp
@@ -454,6 +449,11 @@ add_library(moduletsunami SHARED
 	src/lib/doc/xml.cpp
 	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
+	src/lib/history/Action.cpp
+	src/lib/history/ActionGroup.cpp
+	src/lib/history/ActionManager.cpp
+	src/lib/history/Data.cpp
+	src/lib/history/MergableAction.cpp
 	src/lib/hui/Controls/Control.cpp
 	src/lib/hui/Controls/ControlButtonGtk.cpp
 	src/lib/hui/Controls/ControlCheckBoxGtk.cpp
@@ -947,10 +947,6 @@ add_executable(tsunami WIN32
 	src/action/track/ActionTrackAdd.cpp
 	src/action/track/ActionTrackDelete.cpp
 	src/action/track/ActionTrackMove.cpp
-	src/action/Action.cpp
-	src/action/ActionGroup.cpp
-	src/action/ActionManager.cpp
-	src/action/ActionMergable.cpp
 	src/command/song/Diff.cpp
 	src/command/song/Export.cpp
 	src/command/song/Show.cpp
@@ -971,7 +967,6 @@ add_executable(tsunami WIN32
 	src/data/base.cpp
 	src/data/CrossFade.cpp
 	src/data/Curve.cpp
-	src/data/Data.cpp
 	src/data/Range.cpp
 	src/data/Sample.cpp
 	src/data/SampleRef.cpp
@@ -1014,6 +1009,11 @@ add_executable(tsunami WIN32
 	src/lib/doc/xml.cpp
 	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
+	src/lib/history/Action.cpp
+	src/lib/history/ActionGroup.cpp
+	src/lib/history/ActionManager.cpp
+	src/lib/history/Data.cpp
+	src/lib/history/MergableAction.cpp
 	src/lib/hui/Controls/Control.cpp
 	src/lib/hui/Controls/ControlButtonGtk.cpp
 	src/lib/hui/Controls/ControlCheckBoxGtk.cpp

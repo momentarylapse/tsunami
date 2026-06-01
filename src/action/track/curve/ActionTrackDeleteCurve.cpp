@@ -16,7 +16,7 @@ ActionTrackDeleteCurve::ActionTrackDeleteCurve(Track *t, int _index) {
 	index = _index;
 }
 
-void* ActionTrackDeleteCurve::execute(Data* d) {
+void* ActionTrackDeleteCurve::execute(history::Data* d) {
 	curve = track->curves[index];
 	curve->fake_death();
 	track->curves.erase(index);
@@ -26,7 +26,7 @@ void* ActionTrackDeleteCurve::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackDeleteCurve::undo(Data* d) {
+void ActionTrackDeleteCurve::undo(history::Data* d) {
 	track->curves.insert(curve, index);
 	track->out_curve_list_changed.notify();
 }

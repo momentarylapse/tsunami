@@ -8,41 +8,45 @@
 #pragma once
 
 #include "Action.h"
-#include "../lib/base/base.h"
-#include "../lib/pattern/Observable.h"
-#include "../data/Data.h"
+#include "Data.h"
+#include <lib/pattern/Observable.h>
+#include <lib/base/pointer.h>
 
-//class Mutex;
 namespace os {
 	class Timer;
 }
 
-namespace tsunami {
+namespace history {
 
 class Data;
 class Action;
 class ActionGroup;
 
 class ActionManager : public obs::Node<VirtualBase> {
-	//friend class Data;
+	friend class Action;
 public:
-	ActionManager(Data *_data);
-	virtual ~ActionManager();
+	explicit ActionManager(Data *_data);
+	~ActionManager() override;
 
 	obs::source out_do_action{this, "do-action"};
 	obs::source out_undo_action{this, "undo-action"};
 	obs::source out_redo_action{this, "redo-action"};
+	obs::xsource<string> out_failed{this, "failed"};
+	obs::source out_saved{this, "saved"};
 
 	void reset();
 	void enable(bool enabled);
 	bool is_enabled();
 
-	void *execute(Action *a);
+	void* execute(xfer<Action> a);
 	bool undo();
 	bool redo();
 
-	void group_begin(const string &name);
-	void group_end();
+	void begin_group(const string& name);
+	void end_group();
+
+	bool preview(Action* a);
+	void clear_preview();
 
 	bool undoable();
 	bool redoable();
@@ -55,8 +59,8 @@ private:
 	void _truncate_future_history();
 	bool _try_merge_into_head(Action *a);
 	void _add_to_history(Action *a);
-	Data *data;
-	owned_array<Action> action;
+	Data* data;
+	owned_array<Action> history;
 	int cur_pos;
 	int save_pos;
 
@@ -75,6 +79,9 @@ private:
 	int cur_group_level;
 	owned<ActionGroup> cur_group;
 	Action *prev_action = nullptr;
+
+	// preview
+	Action* _preview;
 
 	// for merging
 	owned<os::Timer> timer;

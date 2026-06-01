@@ -9,19 +9,19 @@
 #define ACTIONTAGDELETE_H_
 
 #include "../../data/Song.h"
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
-class ActionTagDelete : public Action {
+class ActionTagDelete : public history::Action {
 public:
 	explicit ActionTagDelete(int index);
 	~ActionTagDelete() override;
 
 	string name() const override { return ":##:delete tag"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	int index;

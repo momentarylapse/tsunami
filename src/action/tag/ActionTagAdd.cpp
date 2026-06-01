@@ -18,7 +18,7 @@ ActionTagAdd::~ActionTagAdd()
 {
 }
 
-void *ActionTagAdd::execute(Data *d)
+void *ActionTagAdd::execute(history::Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
@@ -27,7 +27,7 @@ void *ActionTagAdd::execute(Data *d)
 	return nullptr;
 }
 
-void ActionTagAdd::undo(Data *d)
+void ActionTagAdd::undo(history::Data *d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 

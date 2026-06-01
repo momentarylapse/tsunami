@@ -20,7 +20,7 @@ ActionTrack__SplitBuffer::ActionTrack__SplitBuffer(shared<TrackLayer> l, int _in
 
 
 
-void ActionTrack__SplitBuffer::undo(Data *d) {
+void ActionTrack__SplitBuffer::undo(history::Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 	AudioBuffer &b2 = layer->buffers[index + 1];
 
@@ -34,7 +34,7 @@ void ActionTrack__SplitBuffer::undo(Data *d) {
 
 
 
-void *ActionTrack__SplitBuffer::execute(Data *d) {
+void *ActionTrack__SplitBuffer::execute(history::Data *d) {
 	assert(offset > 0);
 	assert(offset < layer->buffers[index].length);
 

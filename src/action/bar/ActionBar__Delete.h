@@ -8,18 +8,18 @@
 #ifndef SRC_ACTION_BAR_ACTIONBAR__DELETE_H_
 #define SRC_ACTION_BAR_ACTIONBAR__DELETE_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Bar;
 
-class ActionBar__Delete: public Action {
+class ActionBar__Delete: public history::Action {
 public:
 	ActionBar__Delete(int index);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<Bar> bar;

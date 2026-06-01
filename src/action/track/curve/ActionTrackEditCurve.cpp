@@ -20,7 +20,7 @@ ActionTrackEditCurve::ActionTrackEditCurve(Track *t, shared<Curve> _curve, const
 	type = _type;
 }
 
-void* ActionTrackEditCurve::execute(Data* d) {
+void* ActionTrackEditCurve::execute(history::Data* d) {
 	std::swap(name, curve->name);
 	std::swap(min, curve->min);
 	std::swap(max, curve->max);
@@ -30,7 +30,7 @@ void* ActionTrackEditCurve::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackEditCurve::undo(Data* d) {
+void ActionTrackEditCurve::undo(history::Data* d) {
 	execute(d);
 }
 

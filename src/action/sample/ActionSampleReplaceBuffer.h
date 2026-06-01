@@ -8,19 +8,19 @@
 #ifndef SRC_ACTION_SAMPLE_ACTIONSAMPLEREPLACEBUFFER_H_
 #define SRC_ACTION_SAMPLE_ACTIONSAMPLEREPLACEBUFFER_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class AudioBuffer;
 class Sample;
 
-class ActionSampleReplaceBuffer : public Action {
+class ActionSampleReplaceBuffer : public history::Action {
 public:
 	ActionSampleReplaceBuffer(shared<Sample> s, AudioBuffer *buf);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<Sample> sample;

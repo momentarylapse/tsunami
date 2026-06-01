@@ -16,14 +16,14 @@ ActionTrackEditVolume::ActionTrackEditVolume(Track *t, float _volume) {
 	new_value = _volume;
 }
 
-void *ActionTrackEditVolume::execute(Data *d) {
+void *ActionTrackEditVolume::execute(history::Data* d) {
 	track->volume = new_value;
 	track->out_changed.notify();
 
 	return nullptr;
 }
 
-void ActionTrackEditVolume::undo(Data *d) {
+void ActionTrackEditVolume::undo(history::Data* d) {
 	track->volume = old_value;
 	track->out_changed.notify();
 }

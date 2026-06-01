@@ -16,13 +16,13 @@ ActionTrackAddMarker::ActionTrackAddMarker(TrackLayer *l, const shared<TrackMark
 	marker = const_cast<TrackMarker*>(m.get());
 }
 
-void *ActionTrackAddMarker::execute(Data *d) {
+void *ActionTrackAddMarker::execute(history::Data* d) {
 	layer->markers.add(marker.get());
 	layer->out_changed.notify();
 	return marker.get();
 }
 
-void ActionTrackAddMarker::undo(Data *d) {
+void ActionTrackAddMarker::undo(history::Data* d) {
 	layer->markers.pop();
 	//marker->fake_death();
 	layer->out_changed.notify();

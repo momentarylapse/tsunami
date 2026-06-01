@@ -17,12 +17,12 @@ ActionTrackSetSynthesizer::ActionTrackSetSynthesizer(Track *t, shared<Synthesize
 	synth = _synth;
 }
 
-void ActionTrackSetSynthesizer::undo(Data *d) {
+void ActionTrackSetSynthesizer::undo(history::Data* d) {
 	execute(d);
 }
 
 
-void *ActionTrackSetSynthesizer::execute(Data *d) {
+void *ActionTrackSetSynthesizer::execute(history::Data* d) {
 	track->synth->fake_death();
 	std::swap(synth, track->synth);
 	track->synth->set_instrument(track->instrument);

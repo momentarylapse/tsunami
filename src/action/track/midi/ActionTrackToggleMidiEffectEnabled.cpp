@@ -15,7 +15,7 @@ ActionTrackToggleMidiEffectEnabled::ActionTrackToggleMidiEffectEnabled(MidiEffec
 	fx = _fx;
 }
 
-void *ActionTrackToggleMidiEffectEnabled::execute(Data *d) {
+void *ActionTrackToggleMidiEffectEnabled::execute(history::Data* d) {
 	fx->enabled = !fx->enabled;
 	fx->out_changed.notify();
 	((Song*)d)->out_enable_fx.notify();
@@ -23,7 +23,7 @@ void *ActionTrackToggleMidiEffectEnabled::execute(Data *d) {
 	return nullptr;
 }
 
-void ActionTrackToggleMidiEffectEnabled::undo(Data *d) {
+void ActionTrackToggleMidiEffectEnabled::undo(history::Data* d) {
 	execute(d);
 }
 

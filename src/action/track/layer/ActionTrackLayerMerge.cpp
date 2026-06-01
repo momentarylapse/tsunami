@@ -23,7 +23,7 @@ ActionTrackLayerMerge::ActionTrackLayerMerge(Track *t) {
 }
 
 
-void ActionTrackLayerMerge::build(Data *d) {
+void* ActionTrackLayerMerge::compose(history::Data* d) {
 	TrackLayer *lnew = new TrackLayer(track);
 
 	Range r = track->range();
@@ -44,6 +44,7 @@ void ActionTrackLayerMerge::build(Data *d) {
 
 	for (int i=track->layers.num-2; i>=0; i--)
 		add_sub_action(new ActionTrackLayerDelete(track, i), d);
+	return nullptr;
 }
 
 }

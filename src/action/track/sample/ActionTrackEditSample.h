@@ -8,7 +8,7 @@
 #ifndef ACTIONTRACKEDITSAMPLE_H_
 #define ACTIONTRACKEDITSAMPLE_H_
 
-#include "../../ActionMergable.h"
+#include <lib/history/MergableAction.h>
 
 namespace tsunami {
 
@@ -20,12 +20,12 @@ struct EditSampleRefData {
 	bool mute;
 };
 
-class ActionTrackEditSample : public ActionMergable<EditSampleRefData> {
+class ActionTrackEditSample : public history::MergableValueAction<EditSampleRefData> {
 public:
 	ActionTrackEditSample(shared<SampleRef> ref, float volume, bool mute);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 	bool mergable(Action *a) override;
 

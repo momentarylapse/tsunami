@@ -18,7 +18,7 @@ ActionTrack__DeleteBuffer::ActionTrack__DeleteBuffer(TrackLayer *l, int _index) 
 
 
 
-void ActionTrack__DeleteBuffer::undo(Data *d) {
+void ActionTrack__DeleteBuffer::undo(history::Data *d) {
 	// restore
 	layer->buffers.insert(buf, index);
 
@@ -28,7 +28,7 @@ void ActionTrack__DeleteBuffer::undo(Data *d) {
 
 
 
-void *ActionTrack__DeleteBuffer::execute(Data *d) {
+void *ActionTrack__DeleteBuffer::execute(history::Data *d) {
 	AudioBuffer &b = layer->buffers[index];
 
 	assert(index >= 0 and index < layer->buffers.num);

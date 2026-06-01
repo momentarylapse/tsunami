@@ -8,19 +8,19 @@
 #ifndef SRC_ACTION_BAR_ACTION__SCALEDATA_H_
 #define SRC_ACTION_BAR_ACTION__SCALEDATA_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 #include "../../data/Range.h"
 
 namespace tsunami {
 
 class Song;
 
-class Action__ScaleData: public Action {
+class Action__ScaleData: public history::Action {
 public:
 	Action__ScaleData(const Range &source, int new_size);
 
-	virtual void *execute(Data *d);
-	virtual void undo(Data *d);
+	virtual void* execute(history::Data* d);
+	virtual void undo(history::Data* d);
 
 	void do_scale(Song *s, const Range &r, int resize);
 

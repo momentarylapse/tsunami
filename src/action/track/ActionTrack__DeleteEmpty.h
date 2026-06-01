@@ -8,18 +8,18 @@
 #ifndef SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_
 #define SRC_ACTION_TRACK_ACTIONTRACK__DELETEEMPTY_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class Track;
 
-class ActionTrack__DeleteEmpty: public Action {
+class ActionTrack__DeleteEmpty: public history::Action {
 public:
 	ActionTrack__DeleteEmpty(shared<Track> track);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	int index;

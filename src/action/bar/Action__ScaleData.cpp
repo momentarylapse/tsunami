@@ -22,7 +22,7 @@ Action__ScaleData::Action__ScaleData(const Range &_source, int _new_size) {
 	new_size = _new_size;
 }
 
-void *Action__ScaleData::execute(Data *d) {
+void *Action__ScaleData::execute(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_scale(s, source, new_size);
@@ -30,7 +30,7 @@ void *Action__ScaleData::execute(Data *d) {
 	return nullptr;
 }
 
-void Action__ScaleData::undo(Data *d) {
+void Action__ScaleData::undo(history::Data *d) {
 	Song *s = dynamic_cast<Song*>(d);
 
 	do_scale(s, Range(source.offset, new_size), source.length);

@@ -16,14 +16,14 @@ ActionTrackEditName::ActionTrackEditName(Track *t, const string &_name) {
 	new_value = _name;
 }
 
-void *ActionTrackEditName::execute(Data *d) {
+void *ActionTrackEditName::execute(history::Data* d) {
 	track->name = new_value;
 	track->out_changed.notify();
 
 	return nullptr;
 }
 
-void ActionTrackEditName::undo(Data *d) {
+void ActionTrackEditName::undo(history::Data* d) {
 	track->name = old_value;
 	track->out_changed.notify();
 }

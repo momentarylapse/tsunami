@@ -8,18 +8,18 @@
 #ifndef SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__GROWBUFFER_H_
 #define SRC_ACTION_TRACK_BUFFER_ACTIONTRACK__GROWBUFFER_H_
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
 class TrackLayer;
 
-class ActionTrack__GrowBuffer : public Action {
+class ActionTrack__GrowBuffer : public history::Action {
 public:
 	ActionTrack__GrowBuffer(TrackLayer *l, int _index, int _new_length);
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	TrackLayer *layer;

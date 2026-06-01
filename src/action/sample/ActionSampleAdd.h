@@ -8,7 +8,7 @@
 #ifndef ACTIONSAMPLEADD_H_
 #define ACTIONSAMPLEADD_H_
 
-#include "../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
@@ -16,14 +16,14 @@ class AudioBuffer;
 class MidiNoteBuffer;
 class Sample;
 
-class ActionSampleAdd : public Action {
+class ActionSampleAdd : public history::Action {
 public:
 	explicit ActionSampleAdd(shared<Sample> s);
 
 	string name() const override { return ":##:add sample"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<Sample> sample;

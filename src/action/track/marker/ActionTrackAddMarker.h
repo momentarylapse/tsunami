@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include "../../Action.h"
+#include <lib/history/Action.h>
 
 namespace tsunami {
 
@@ -15,14 +15,14 @@ class TrackLayer;
 class TrackMarker;
 class Range;
 
-class ActionTrackAddMarker: public Action {
+class ActionTrackAddMarker: public history::Action {
 public:
 	ActionTrackAddMarker(TrackLayer *l, const shared<TrackMarker> marker);
 
 	string name() const override { return ":##:add marker"; }
 
-	void *execute(Data *d) override;
-	void undo(Data *d) override;
+	void* execute(history::Data* d) override;
+	void undo(history::Data* d) override;
 
 private:
 	shared<TrackMarker> marker;

@@ -16,6 +16,10 @@
 #include "../lib/pattern/Observable.h"
 
 
+namespace history {
+	class Action;
+}
+
 namespace tsunami {
 
 class AudioBuffer;
@@ -25,7 +29,6 @@ class Sample;
 class Track;
 class CrossFade;
 class TrackMarker;
-class Action;
 enum class SignalType;
 
 
@@ -43,8 +46,8 @@ public:
 
 	// actions
 	void _cdecl get_buffers(AudioBuffer &buf, const Range &r);
-	Action _cdecl *edit_buffers(AudioBuffer &buf, const Range &r);
-	void _cdecl edit_buffers_finish(Action *a);
+	history::Action _cdecl *edit_buffers(AudioBuffer &buf, const Range &r);
+	void _cdecl edit_buffers_finish(history::Action *a);
 
 	void _cdecl insert_midi_data(int offset, const MidiNoteBuffer &midi);
 	void _cdecl add_midi_note(shared<MidiNote> n);

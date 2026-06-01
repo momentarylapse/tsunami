@@ -18,7 +18,7 @@ ActionLayerMove::ActionLayerMove(int _source, int _target)
 }
 
 
-void* ActionLayerMove::execute(Data* d)
+void* ActionLayerMove::execute(history::Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 
@@ -29,7 +29,7 @@ void* ActionLayerMove::execute(Data* d)
 	return NULL;
 }
 
-void ActionLayerMove::undo(Data* d)
+void ActionLayerMove::undo(history::Data* d)
 {
 	Song *a = dynamic_cast<Song*>(d);
 

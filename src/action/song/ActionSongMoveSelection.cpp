@@ -44,7 +44,7 @@ ActionSongMoveSelection::ActionSongMoveSelection(Song *a, const SongSelection &s
 
 
 
-void *ActionSongMoveSelection::execute(Data *d) {
+void *ActionSongMoveSelection::execute(history::Data* d) {
 	for (auto &d: samples)
 		d.sample->pos = d.pos_old + param;
 	for (auto &d: notes)
@@ -60,13 +60,13 @@ void *ActionSongMoveSelection::execute(Data *d) {
 
 
 
-void ActionSongMoveSelection::abort(Data *d) {
+void ActionSongMoveSelection::abort(history::Data* d) {
 	undo(d);
 }
 
 
 
-void ActionSongMoveSelection::undo(Data *d) {
+void ActionSongMoveSelection::undo(history::Data* d) {
 	for (auto &d: samples)
 		d.sample->pos = d.pos_old;
 	for (auto &d: notes)
@@ -81,18 +81,18 @@ void ActionSongMoveSelection::undo(Data *d) {
 
 
 
-void ActionSongMoveSelection::set_param_and_notify(Data *d, int _param) {
+void ActionSongMoveSelection::set_param_and_notify(history::Data* d, int _param) {
 	param = _param;
 	execute(d);
 	d->out_changed.notify();
 }
 
-void ActionSongMoveSelection::abort_and_notify(Data *d) {
+void ActionSongMoveSelection::abort_and_notify(history::Data* d) {
 	abort(d);
 	d->out_changed.notify();
 }
 
-bool ActionSongMoveSelection::is_trivial() {
+bool ActionSongMoveSelection::is_trivial() const {
 	return (param == 0);
 }
 

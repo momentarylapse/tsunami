@@ -34,7 +34,7 @@ ActionTrackPasteAsSample::ActionTrackPasteAsSample(TrackLayer *l, int _pos, cons
 	auto_delete = _auto_delete;
 }
 
-void ActionTrackPasteAsSample::build(Data *d) {
+void* ActionTrackPasteAsSample::compose(history::Data* d) {
 	if (buf) {
 		sample = new Sample("-paste-", *buf);
 	} else {
@@ -43,9 +43,6 @@ void ActionTrackPasteAsSample::build(Data *d) {
 	sample->auto_delete = auto_delete;
 	add_sub_action(new ActionSampleAdd(sample), d);
 	add_sub_action(new ActionTrackAddSample(layer, pos, sample), d);
-}
-
-void *ActionTrackPasteAsSample::execute_return(Data *d) {
 	return sample;
 }
 

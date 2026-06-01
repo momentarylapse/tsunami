@@ -17,7 +17,7 @@ ActionTrackCurveDeletePoint::ActionTrackCurveDeletePoint(shared<Curve> _curve, i
 	value = 0;
 }
 
-void* ActionTrackCurveDeletePoint::execute(Data* d) {
+void* ActionTrackCurveDeletePoint::execute(history::Data* d) {
 	pos = curve->points[index].pos;
 	value = curve->points[index].value;
 	curve->points.erase(index);
@@ -25,7 +25,7 @@ void* ActionTrackCurveDeletePoint::execute(Data* d) {
 	return nullptr;
 }
 
-void ActionTrackCurveDeletePoint::undo(Data* d) {
+void ActionTrackCurveDeletePoint::undo(history::Data* d) {
 	Curve::Point p;
 	p.pos = pos;
 	p.value = value;

@@ -22,14 +22,6 @@ Configuration::Configuration() {
 Configuration::~Configuration() {
 }
 
-void Configuration::__init__() {
-	new(this) Configuration;
-}
-
-void Configuration::__del__() {
-	this->~Configuration();
-}
-
 void Configuration::set(const string& name, const Any& val) {
 	map.set(name, val);
 	changed = true;
@@ -114,11 +106,11 @@ bool Configuration::has(const string& name) const {
 }*/
 
 bool Configuration::load(const Path &filename) {
+	clear();
 	if (!os::fs::exists(filename))
 		return false;
 	try {
 		auto f = os::fs::open(filename, "rt");
-		map.clear();
 
 		string t = f->read_str();
 		if (t == "// NumConfigs") {
@@ -244,6 +236,11 @@ void Configuration::save(const Path &filename) {
 	} catch(Exception &e) {
 		msg_error(e.message());
 	}
+}
+
+void Configuration::clear() {
+	comments.clear();
+	map.clear();
 }
 
 Array<string> Configuration::keys() const {

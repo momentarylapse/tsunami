@@ -67,7 +67,7 @@ void add_internal_package(Context* c, const string& name, const string& version,
 		}
 
 	// new
-	shared p = new Package(name, version, Path::EMPTY);
+	shared p = new Package(name, version, Path::EMPTY, c);
 	p->auto_import = flags_has(flags, Flags::AutoImport);
 	shared s = c->create_empty_module(name);
 	s->tree->base_class->name = name;

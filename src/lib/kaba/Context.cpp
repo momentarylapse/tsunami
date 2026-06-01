@@ -76,6 +76,7 @@ Path absolute_module_path(const Path &filename) {
 }
 
 Context::Context() {
+	_installation_root = os::app::home_directory | ".kaba";
 	template_manager = new TemplateManager(this);
 	external = new ExternalLinkData(this);
 }
@@ -129,7 +130,7 @@ Package* get_package_containing_module(Module* m) {
 	// TODO check parents...
 
 	// new package
-	auto package = new Package(dir.basename(), "0", dir);
+	auto package = new Package(dir.basename(), "0", dir, m->context);
 	ctx->external_packages.add(package);
 
 	// parse info
@@ -153,17 +154,17 @@ Package* get_package_containing_module(Module* m) {
 	return package;
 }
 
-Package::Package(const string& _name, const string& _version, const Path& _directory) {
+Package::Package(const string& _name, const string& _version, const Path& _directory, Context* ctx) {
 	name = _name;
 	version = _version;
 	directory = _directory;
-	directory_dynamic = Context::installation_root() | name;
-	is_installed = (directory == default_directory());
+	directory_dynamic = ctx->installation_root() | name;
+	is_installed = (directory == default_directory(ctx));
 	is_internal = directory.is_empty();
 }
 
-Path Package::default_directory() const {
-	return Context::packages_root() | name;
+Path Package::default_directory(Context* ctx) const {
+	return ctx->packages_root() | name;
 }
 
 shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
@@ -356,12 +357,16 @@ Package *Context::get_package(const string &name) const {
 	return nullptr;
 }
 
-Path Context::installation_root() {
-	return os::app::home_directory | ".kaba";
+Path Context::installation_root() const {
+	return _installation_root;
 }
 
-Path Context::packages_root() {
+Path Context::packages_root() const {
 	return installation_root() | "packages";
+}
+
+void Context::set_installation_root(const Path &dir) {
+	_installation_root = dir;
 }
 
 string Context::type_name(const Class* c) const {
@@ -505,5 +510,11 @@ void make_context_public(IExporter* _e) {
 	default_context = e->ctx;
 	_secret_lib_context_ = e->secret_lib_context;
 	common_types = *e->x_common_types;
+}
+
+Path guess_environment_path() {
+	if (auto p = os::app::get_env("KABA_ENVIRONMENT_PATH"))
+		return p.value();
+	return os::app::home_directory | ".kaba";
 }
 }

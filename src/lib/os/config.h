@@ -21,8 +21,6 @@ class Configuration {
 public:
 	Configuration();
 	~Configuration();
-	void __init__();
-	void __del__();
 
 	void set_int(const string &name, int val);
 	void set_float(const string &name, float val);
@@ -39,6 +37,7 @@ public:
 	bool has(const string &name) const;
 	bool load(const Path &filename);
 	void save(const Path &filename);
+	void clear();
 
 	Array<string> keys() const;
 

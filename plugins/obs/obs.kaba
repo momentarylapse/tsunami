@@ -29,6 +29,8 @@ class extern Source
 	# func extern mut __init__(node: Node&, name: string)
 	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
 	func extern mut notify()
+	func mut call()
+		notify()
 	func mut __rshift__(out sink: Sink)
 		subscribe(self, sink)
 
@@ -52,6 +54,8 @@ class extern XPSink
 # only works with call-by-reference data...
 class XSource[X] extends XPSource
 	func mut notify(x: X)
+		_notify(&x)
+	func mut call(x: X)
 		_notify(&x)
 	func mut __rshift__(out sink: XSink[X])
 		xsubscribe[X](self, sink)

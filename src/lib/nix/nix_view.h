@@ -34,7 +34,7 @@ void _cdecl set_view_matrix(const mat4 &view_mat);
 
 void _cdecl set_viewport(const rect &area);
 
-void _cdecl set_scissor(const rect &r);
+void _cdecl set_scissor(const rect &r, const rect& all);
 
 void _cdecl screen_shot_to_image(Image &image);
 

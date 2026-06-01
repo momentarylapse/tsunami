@@ -91,7 +91,7 @@ Path find_installed_package_import(Context* ctx, string& package_name, const str
 				return fn;
 
 	// system wide install
-	if (auto fn = check_package_dir(Context::packages_root() | package_name, name))
+	if (auto fn = check_package_dir(ctx->packages_root() | package_name, name))
 		return fn;
 
 	return Path::EMPTY;

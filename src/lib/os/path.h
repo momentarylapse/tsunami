@@ -18,10 +18,6 @@ public:
 	Path(const string &s);
 	Path(const char *s);
 
-	void __init__();
-	void __init_ext__(const string &s);
-	void __delete__();
-
 	void operator=(const Path &p);
 	void operator|=(const Path &p);
 	Path operator|(const Path &p) const;

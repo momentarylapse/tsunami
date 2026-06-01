@@ -63,6 +63,16 @@ public:
 	}
 };
 
+class ModuleX : public Module {
+public:
+	void *match_function_x(const string& name, const Class* ret, const Array<const Class*>& _params) {
+		Array<string> params;
+		for (auto p: _params)
+			params.add(p->name);
+		return match_function(name, ret->name, params);
+	}
+};
+
 extern Array<shared<Module>> loading_module_stack;
 Package* get_package_containing_module(Module* m);
 
@@ -73,6 +83,14 @@ Module* get_current_module() {
 Package* get_current_package() {
 	auto m = get_current_module();
 	return get_package_containing_module(m);
+}
+
+Path get_installation_root() {
+	return default_context->installation_root();
+}
+
+Path get_packages_root() {
+	return default_context->packages_root();
 }
 
 void SIAddPackageKaba(Context *c) {
@@ -92,6 +110,7 @@ void SIAddPackageKaba(Context *c) {
 	common_types.function_ref = add_type_ref(common_types.function);
 	auto TypeFunctionRefList = add_type_list(common_types.function_ref);
 	common_types.function_code = add_type  ("code", 32); // whatever
+	auto TypeCodeP = add_type_p_raw(common_types.function_code);
 	common_types.function_code_ref = add_type_ref(common_types.function_code);
 	common_types.special_function = add_type  ("SpecialFunction", sizeof(SpecialFunction));
 	//TypeSpecialFunctionP = add_type_p(TypeSpecialFunction);
@@ -222,6 +241,7 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeConstant);
 		class_add_element("name", common_types.string, &Constant::name);
 		class_add_element("type", common_types.class_ref, &Constant::type);
+		class_add_func("as_int", common_types.i32_ref, &Constant::as_int);
 
 	add_class(TypePackage);
 		class_add_element("name", common_types.string, &Package::name);
@@ -243,6 +263,14 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("base_class", common_types.class_ref, &Module::base_class, Flags::Pure);
 		//class_add_func("delete", common_types._void, &remove_module, Flags::STATIC);
 		//	func_add_param("script", TypeModule);
+		class_add_func("match_function", TypeCodeP, &ModuleX::match_function_x);
+			func_add_param("name", common_types.string);
+			func_add_param("ret", common_types.class_ref);
+			func_add_param("params", TypeClassRefList);
+		class_add_func("match_function", TypeCodeP, &Module::match_function);
+			func_add_param("name", common_types.string);
+			func_add_param("ret", common_types.string);
+			func_add_param("params", common_types.string_list);
 	
 	add_class(TypeStatement);
 		class_add_element("name", common_types.string, &Statement::name);
@@ -269,6 +297,8 @@ void SIAddPackageKaba(Context *c) {
 		class_add_func("get_dynamic_type", TypeClassP, &Context::get_dynamic_type, Flags::Pure);
 			func_add_param("p", common_types.pointer);
 		class_add_func("create", TypeContextXfer, &Context::create, Flags::Static);
+		class_add_func_virtual("installation_root", common_types.path, &Context::installation_root);
+		class_add_func_virtual("packages_root", common_types.path, &Context::packages_root);
 
 	add_func("disassemble", common_types.string, &Asm::disassemble, Flags::Static | Flags::Pure);
 		func_add_param("p", common_types.pointer);
@@ -282,8 +312,8 @@ void SIAddPackageKaba(Context *c) {
 
 	add_func("this_module", TypeModuleRef, &get_current_module, Flags::Static | Flags::Pure);
 	add_func("this_package", TypePackageP, &get_current_package, Flags::Static | Flags::Pure);
-	add_func("install_root", common_types.path, &Context::installation_root, Flags::Static | Flags::Pure);
-	add_func("packages_root", common_types.path, &Context::packages_root, Flags::Static | Flags::Pure);
+	add_func("install_root", common_types.path, &get_installation_root, Flags::Static | Flags::Pure);
+	add_func("packages_root", common_types.path, &get_packages_root, Flags::Static | Flags::Pure);
 
 	add_ext_var("default_context", TypeContextRef, (void*)&default_context);
 	add_ext_var("statements", TypeStatementRefList, (void*)&Statements);

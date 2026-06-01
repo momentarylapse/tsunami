@@ -18,8 +18,6 @@
 
 namespace nix {
 
-FrameBuffer *cur_framebuffer = nullptr;
-
 
 FrameBuffer::FrameBuffer() : FrameBuffer(0, 0, 0) {
 	glCreateFramebuffers(1, &frame_buffer);
@@ -147,7 +145,6 @@ void FrameBuffer::read(Image &image) const {
 
 void bind_frame_buffer(FrameBuffer *fb) {
 	glBindFramebuffer(GL_FRAMEBUFFER, fb->frame_buffer);
-	cur_framebuffer = fb;
 
 	set_viewport(fb->area());
 

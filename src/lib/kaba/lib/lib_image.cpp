@@ -74,6 +74,7 @@ void SIAddPackageImage(Context *c) {
 		class_add_func_virtual(Identifier::func::Delete, common_types._void, &ImagePainter::__delete__, Flags::Mutable | Flags::Override);
 	//class_add_func_virtual("end", common_types._void, &HuiPainter::end));
 		class_add_func_virtual("area", common_types.rect, &Painter::area);
+		class_add_func_virtual("clip", common_types.rect, &Painter::clip);
 		class_add_func_virtual("set_color", common_types._void, &Painter::set_color); // Flags::MUTABLE ...nope... let's allow const references for now...
 			func_add_param("c", common_types.color);
 		class_add_func_virtual("set_line_width", common_types._void, &Painter::set_line_width);

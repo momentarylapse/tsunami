@@ -17,7 +17,7 @@ namespace nix {
 const int TYPE_LAYOUT = -41;
 const int TYPE_MODULE = -42;
 
-bool default_shader_bindings = true;
+bool default_shader_bindings = false;
 
 
 

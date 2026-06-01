@@ -98,12 +98,12 @@ void remove_enum_labels(const Class *type) {
 }
 string find_enum_label(const Class *type, int value) {
 	// explicit labels
-	for (auto &l: all_enum_labels)
+	for (const auto &l: all_enum_labels)
 		if (l.type == type and l.value == value)
 			return l.label;
 
 	// const names
-	for (auto c: type->constants)
+	for (const auto c: weak(type->constants))
 		if (c->type == type and c->as_int() == value)
 			return c->name;
 
@@ -387,6 +387,11 @@ void unwrap_any(const Any &aa, void *var, const Class *type) {
 		*(color*)var = any_to_color(aa);
 	} else if (type->is_pointer_raw() and aa.is_pointer()) {
 		*(const void**)var = aa.as_pointer();
+	} else if (type->is_enum()) {
+		if (aa.is_int())
+			*(int*)var = aa.to_i32();
+		else if (aa.is_string())
+			*(int*)var = enum_parse(aa.as_string(), type);
 	} else if (type->is_list() and aa.is_list()) {
 		auto *t_el = type->get_array_element();
 		auto *a = (DynamicArray*)var;

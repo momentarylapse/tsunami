@@ -32,18 +32,6 @@ Path::Path(const string &_s) {
 
 Path::Path(const char *_s) : Path(string(_s)) {}
 
-void Path::__init__() {
-	new(this) Path();
-}
-
-void Path::__init_ext__(const string &s) {
-	new(this) Path(s);
-}
-
-void Path::__delete__() {
-	this->~Path();
-}
-
 void Path::operator =(const Path &p) {
 	s = p.s;
 }

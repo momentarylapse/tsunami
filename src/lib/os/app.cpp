@@ -25,6 +25,12 @@ namespace os::app {
 	void* win_instance = nullptr;
 #endif
 
+	base::optional<string> get_env(const string& name) {
+		if (auto r = std::getenv(name.c_str()))
+			return string(r);
+		return base::None;
+	}
+
 	//   filename -> executable file
 	//   directory_dynamic ->
 	//      NONINSTALLED:  binary dir

@@ -565,6 +565,9 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("p", common_types.vec2);
 		class_add_func("grow", common_types.rect, &rect::grow, Flags::Pure);
 			func_add_param("d", common_types.f32);
+		class_add_func("canonical", common_types.rect, &rect::canonical, Flags::Pure);
+		class_add_func("overlaps", common_types._bool, &rect::overlaps, Flags::Pure);
+			func_add_param("o", common_types.rect);
 		class_add_func(Identifier::func::Str, common_types.string, &rect::str, Flags::Pure);
 		class_add_func("_create", common_types.rect, &KabaRect::set, Flags::Static | Flags::Pure);
 			func_set_inline(InlineID::RectSet);
@@ -596,7 +599,7 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("min", common_types.vec3);
 			func_add_param("max", common_types.vec3);
 		class_add_func("size", common_types.vec3, &Box::size, Flags::Pure);
-			class_add_func("center", common_types.vec3, &Box::center, Flags::Pure);
+		class_add_func("center", common_types.vec3, &Box::center, Flags::Pure);
 		class_add_func("is_inside", common_types._bool, &Box::is_inside, Flags::Pure);
 			func_add_param("p", common_types.vec3);
 		class_add_func("to_relative", common_types.vec3, &Box::to_relative, Flags::Pure);
@@ -607,6 +610,10 @@ void SIAddPackageMath(Context *c) {
 		class_add_const("ID",  TypeBox, &Box::ID);
 		class_add_const("ID_SYM",  TypeBox, &Box::ID_SYM);
 		add_operator(OperatorID::Assign, common_types._void, TypeBox, TypeBox, InlineID::ChunkAssign, &generic_assign<Box>);
+		add_operator(OperatorID::Equal, common_types._bool, TypeBox, TypeBox, InlineID::ChunkEqual, &Box::operator==);
+		add_operator(OperatorID::NotEqual, common_types._bool, TypeBox, TypeBox, InlineID::ChunkNotEqual, &Box::operator!=);
+		add_operator(OperatorID::Or, TypeBox, TypeBox, TypeBox, InlineID::None, &Box::operator||);
+		add_operator(OperatorID::And, TypeBox, TypeBox, TypeBox, InlineID::None, &Box::operator&&);
 
 
 	add_class(common_types.color);
@@ -1005,9 +1012,17 @@ void SIAddPackageMath(Context *c) {
 		func_add_param("x", common_types.f32);
 	add_func("log", common_types.f32, &logf, Flags::Static | Flags::Pure);
 		func_add_param("x", common_types.f32);
+	add_func("log10", common_types.f32, &log10f, Flags::Static | Flags::Pure);
+		func_add_param("x", common_types.f32);
 	add_func("pow", common_types.f32, &powf, Flags::Static | Flags::Pure);
 		func_add_param("x", common_types.f32);
 		func_add_param("exp", common_types.f32);
+	add_func("round", common_types.f32, &roundf, Flags::Static | Flags::Pure);
+		func_add_param("x", common_types.f32);
+	add_func("floor", common_types.f32, &floorf, Flags::Static | Flags::Pure);
+		func_add_param("x", common_types.f32);
+	add_func("ceil", common_types.f32, &ceilf, Flags::Static | Flags::Pure);
+		func_add_param("x", common_types.f32);
 	add_func("clamp", common_types.f32, &clamp<float>, Flags::Static | Flags::Pure);
 		func_add_param("f", common_types.f32);
 		func_add_param("min", common_types.f32);

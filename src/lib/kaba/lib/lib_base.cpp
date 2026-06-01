@@ -442,6 +442,7 @@ void SIAddPackageBase(Context *c) {
 	common_types.pointer_list = add_type_list(common_types.pointer);
 	common_types.bool_list    = add_type_list(common_types._bool);
 	common_types.i32_p      = add_type_p_raw(common_types.i32);
+	common_types.i32_ref    = add_type_ref(common_types.i32);
 	common_types.i32_optional = add_type_optional(common_types.i32);
 	common_types.f32_optional = add_type_optional(common_types.f32);
 	common_types.i32_list   = add_type_list(common_types.i32);

@@ -42,7 +42,7 @@ struct LinkerException : Exception{};
 struct LinkerException : Exception{};*/
 
 struct Package : Sharable<base::Empty> {
-	Package(const string& name, const string& version, const Path& directory);
+	Package(const string& name, const string& version, const Path& directory, Context* ctx);
 	string name;
 	string version;
 	Path directory;
@@ -52,7 +52,7 @@ struct Package : Sharable<base::Empty> {
 	owned<ExternalLinkData> external;
 	shared<Module> main_module;
 	bool auto_import = false;
-	Path default_directory() const;
+	Path default_directory(Context* ctx) const;
 };
 
 class Context : public IContext {
@@ -62,6 +62,8 @@ public:
 	owned<ExternalLinkData> external;
 
 	shared_array<Operator> global_operators;
+
+	Path _installation_root;
 
 	struct PackageInit {
 		string name;
@@ -101,10 +103,12 @@ public:
 	Array<string> list_operator_functions() const override;
 
 	static xfer<Context> create();
-	static Path installation_root();
-	static Path packages_root();
+	Path installation_root() const override;
+	Path packages_root() const override;
+	void set_installation_root(const Path& dir) override;
 };
 
 void make_context_public(IExporter* e);
+Path guess_environment_path();
 
 }

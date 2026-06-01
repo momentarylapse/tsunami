@@ -10,6 +10,7 @@
 #include "../../config.h"
 #include "lib.h"
 #include "list.h"
+#include "optional.h"
 #include "shared.h"
 #include "../dynamic/exception.h"
 #include "../../base/callable.h"
@@ -209,6 +210,9 @@ public:
 	}
 };
 
+bool op_int_eq(int, int);
+bool op_int_neq(int, int);
+
 void SIAddPackageOSPath(Context *c) {
 	add_internal_package(c, "os", "1");
 
@@ -216,10 +220,10 @@ void SIAddPackageOSPath(Context *c) {
 
 	add_class(common_types.path);
 		class_add_element_x("_s", common_types.string, 0);
-		class_add_func(Identifier::func::Init, common_types._void, &Path::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Init, common_types._void, &Path::__init_ext__, Flags::AutoCast | Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &kaba::generic_init<Path>, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &kaba::generic_init_ext<Path, const string&>, Flags::AutoCast | Flags::Mutable);
 			func_add_param("p", common_types.string);
-		class_add_func(Identifier::func::Delete, common_types._void, &Path::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &kaba::generic_delete<Path>, Flags::Mutable);
 		class_add_func("absolute", common_types.path, &Path::absolute);
 		class_add_func("dirname", common_types.string, &Path::dirname, Flags::Pure);
 		class_add_func("basename", common_types.string, &Path::basename, Flags::Pure);
@@ -266,12 +270,6 @@ char _el_off_data[1024];
 
 class KabaCommandLineParser : CommandLineParser {
 public:
-	void __init__() {
-		new(this) CommandLineParser;
-	}
-	void __delete__() {
-		CommandLineParser::~CommandLineParser();
-	}
 	void option1(const string &name, const string &comment, Callable<void()> &cb) {
 		option(name, comment, [&cb] { cb(); });
 	}
@@ -300,10 +298,14 @@ void SIAddPackageOS(Context *c) {
 	auto TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
 	common_types.os_configuration = add_type("Configuration", sizeof(Configuration));
+	auto TypeSystemType = add_type_enum("SystemType");
 	auto TypeTerminal = add_type("terminal", 0);
 	const_cast<Class*>(TypeTerminal)->from_template = common_types.namespace_t;
 	auto TypeApp = add_type("app", 0);
 	const_cast<Class*>(TypeApp)->from_template = common_types.namespace_t;
+
+	auto TypeStringOptional = add_type_optional(common_types.string);
+	lib_create_optional<string>(TypeStringOptional);
 
 	auto TypeCallbackStringList = add_type_func(common_types._void, {common_types.string_list});
 
@@ -384,8 +386,8 @@ void SIAddPackageOS(Context *c) {
 
 
 	add_class(TypeCommandLineParser);
-		class_add_func(Identifier::func::Init, common_types._void, &KabaCommandLineParser::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, common_types._void, &KabaCommandLineParser::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &kaba::generic_init<CommandLineParser>, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &kaba::generic_delete<CommandLineParser>, Flags::Mutable);
 		class_add_func("info", common_types._void, &CommandLineParser::info, Flags::Mutable);
 			func_add_param("cmd", common_types.string);
 			func_add_param("i", common_types.string);
@@ -410,12 +412,13 @@ void SIAddPackageOS(Context *c) {
 
 	add_class(common_types.os_configuration);
 		class_add_element("dict", common_types.any_dict, &Configuration::map);
-		class_add_func(Identifier::func::Init, common_types._void, &Configuration::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, common_types._void, &Configuration::__del__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &kaba::generic_init<Configuration>, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &kaba::generic_delete<Configuration>, Flags::Mutable);
 		class_add_func("load", common_types._bool, &Configuration::load, Flags::Mutable);
 			func_add_param("path", common_types.path);
 		class_add_func("save", common_types._void, &Configuration::save);
 			func_add_param("path", common_types.path);
+		class_add_func("clear", common_types._void, &Configuration::clear);
 		class_add_func(Identifier::func::Set, common_types._void, &Configuration::set_int, Flags::Mutable);
 			func_add_param("name", common_types.string);
 			func_add_param("value", common_types.i32);
@@ -446,6 +449,7 @@ void SIAddPackageOS(Context *c) {
 		class_add_func(Identifier::func::Get, common_types.any, &_os_config_get);
 			func_add_param("name", common_types.string);
 		class_add_func("keys", common_types.string_list, &Configuration::keys);
+		add_operator(OperatorID::Assign, common_types._void, common_types.os_configuration, common_types.os_configuration, InlineID::None, &Configuration::operator=);
 
 
 	// file access
@@ -503,6 +507,22 @@ void SIAddPackageOS(Context *c) {
 		add_ext_var("stdin", TypeFileStreamSharedNN, &_kaba_stdin);
 
 
+	enum class SystemType {
+		Unknown,
+		Linux,
+		Windows,
+		Mac
+	};
+
+	add_class(TypeSystemType);
+		class_add_enum("UNKNOWN", TypeSystemType, SystemType::Unknown);
+		class_add_enum("LINUX", TypeSystemType, SystemType::Linux);
+		class_add_enum("WINDOWS", TypeSystemType, SystemType::Windows);
+		class_add_enum("MAC", TypeSystemType, SystemType::Mac);
+		add_operator(OperatorID::Equal, common_types._bool, TypeSystemType, TypeSystemType, InlineID::Int32Equal, &op_int_eq);
+		add_operator(OperatorID::NotEqual, common_types._bool, TypeSystemType, TypeSystemType, InlineID::Int32NotEqual, &op_int_neq);
+
+
 	add_class(TypeTerminal);
 		class_add_const("RED", common_types.string, &os::terminal::RED);
 		class_add_const("GREEN", common_types.string, &os::terminal::GREEN);
@@ -531,9 +551,25 @@ void SIAddPackageOS(Context *c) {
 	add_func("exit", common_types._void, &kaba_os_exit, Flags::Static);
 		func_add_param("status", common_types.i32);
 
+	add_func("get_env", TypeStringOptional, &os::app::get_env, Flags::Static);
+		func_add_param("var", common_types.string);
+
 
 	add_ext_var("app_directory_dynamic", common_types.path, &os::app::directory_dynamic);
 	add_ext_var("app_directory_static", common_types.path, &os::app::directory_static);
+
+
+	SystemType system_type = SystemType::Unknown;
+#ifdef OS_LINUX
+	system_type = SystemType::Linux;
+#endif
+#ifdef OS_WINDOWS
+	system_type = SystemType::Windows;
+#endif
+#ifdef OS_MAC
+	system_type = SystemType::Mac;
+#endif
+	add_const("system_type", TypeSystemType, (void*)(int_p)system_type);
 
 
 	add_type_cast(50, common_types.string, common_types.path, "os.Path.@from_str");

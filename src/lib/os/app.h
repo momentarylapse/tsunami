@@ -2,11 +2,13 @@
 #define LIB_OS_APP_H
 
 #include "path.h"
+#include <lib/base/optional.h>
 
 namespace os::app {
 
 	void detect(const Array<string> &arg, const string &app_name);
 	void exit(int code);
+	base::optional<string> get_env(const string &name);
 
 	extern Path filename;          // executable
 	extern Path home_directory;    // (i.e. ~/)

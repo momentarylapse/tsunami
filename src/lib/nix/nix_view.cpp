@@ -44,8 +44,6 @@ namespace hui {
 
 namespace nix {
 
-extern FrameBuffer *cur_framebuffer;
-
 
 mat4 view_matrix, projection_matrix;
 mat4 model_matrix, model_view_projection_matrix;
@@ -133,10 +131,10 @@ void set_view_matrix(const mat4 &m) {
 
 
 
-void set_scissor(const rect &r) {
+void set_scissor(const rect &r, const rect& all) {
 	if (r.width() > 0) {
 		glEnable(GL_SCISSOR_TEST);
-		glScissor((int)r.x1, cur_framebuffer->height - (int)r.y2, (int)r.width(), (int)r.height());
+		glScissor((int)r.x1, (int)all.height() - (int)r.y2, (int)r.width(), (int)r.height());
 	} else {
 		glDisable(GL_SCISSOR_TEST);
 	}
@@ -163,7 +161,6 @@ void start_frame_hui(Context *gl, hui::Event* e) {
 	gl->default_framebuffer->frame_buffer = fb;
 	gl->default_framebuffer->width = e->column;
 	gl->default_framebuffer->height = e->row;
-	cur_framebuffer = gl->default_framebuffer;
 	set_viewport(gl->default_framebuffer->area());
 }
 
@@ -184,7 +181,6 @@ void start_frame_glfw(Context *gl, void *win) {
 	glfwGetFramebufferSize(window, &w, &h);
 	gl->default_framebuffer->width = w;
 	gl->default_framebuffer->height = h;
-	cur_framebuffer = gl->default_framebuffer;
 
 	set_viewport(gl->default_framebuffer->area());
 }

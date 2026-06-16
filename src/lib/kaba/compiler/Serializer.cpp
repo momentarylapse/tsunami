@@ -2,10 +2,11 @@
 #include "Serializer.h"
 #include "Compiler.h"
 #include "../dynamic/exception.h"
-#include "../../os/msg.h"
-#include "../../base/algo.h"
-#include "../../base/iter.h"
 #include "../template/implicit.h"
+#include <lib/os/msg.h>
+#include <lib/base/algo.h>
+#include <lib/base/iter.h>
+#include <lib/base/sort.h>
 
 
 namespace kaba {
@@ -1263,14 +1264,14 @@ void Serializer::insert_constructors_block(Block *b) {
 }
 
 void Serializer::insert_destructors_block(Block *b, bool recursive) {
-	for (auto *v: b->vars) {
+	for (auto *v: base::reverse(b->vars)) {
 		SerialNodeParam p = param_local(v->type, v->_offset);
 		add_cmd_destructor(p);
 	}
 }
 
 void Serializer::insert_destructors_temp() {
-	for (auto &[p, l]: inserted_temp)
+	for (auto& [p, l]: base::reverse(inserted_temp))
 		if (l >= cur_block_level) {
 			add_cmd_destructor(p);
 		}

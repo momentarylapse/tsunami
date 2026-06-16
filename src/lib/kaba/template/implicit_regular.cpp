@@ -8,7 +8,8 @@
 #include "../kaba.h"
 #include "implicit.h"
 #include "../parser/Parser.h"
-#include "../../base/iter.h"
+#include <lib/base/iter.h>
+#include <lib/base/sort.h>
 
 namespace kaba {
 
@@ -191,10 +192,7 @@ void AutoImplementer::implement_regular_destructor(Function *f, const Class *t) 
 
 	// call child destructors
 	int i0 = t->parent ? t->parent->elements.num : 0;
-	for (auto&& [i,e]: enumerate(t->elements)) {
-		if (i < i0)
-			continue;
-
+	for (const auto& e: base::reverse(t->elements.sub_ref(i0))) {
 		// self.el.__delete__()
 		if (auto f_des = e.type->get_destructor()) {
 			f->block_node->add(add_node_member_call(f_des,

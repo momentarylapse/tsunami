@@ -31,6 +31,8 @@ public:
 	int compare(const Path &p) const;
 
 	string str() const;
+	string str_unix() const;
+	string str_windows() const;
 	string repr() const;
 	const char *c_str() const;
 	bool is_relative() const;

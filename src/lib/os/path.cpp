@@ -103,10 +103,18 @@ Path::operator bool() const {
 // accepts windows and linux paths ("/" and "\\")
 string Path::str() const {
 #if defined(OS_WINDOWS) || defined(OS_MINGW)
-	return s.replace("/", "\\");
+	return str_windows();
 #else
-	return s.replace("\\", "/");
+	return str_unix();
 #endif
+}
+
+string Path::str_windows() const {
+	return s.replace("/", "\\");
+}
+
+string Path::str_unix() const {
+	return s.replace("\\", "/");
 }
 
 string Path::repr() const {

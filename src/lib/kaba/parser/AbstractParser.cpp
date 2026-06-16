@@ -1208,7 +1208,7 @@ shared<Node> AbstractParser::parse_abstract_enum() {
 
 	auto node = new Node(NodeKind::AbstractEnum, 0, common_types.unknown);
 	node->token_id = Exp.cur_token();
-	node->set_num_params(1);
+	node->set_num_params(2);
 
 	// extern?
 	node->flags = parse_flags(node->flags);
@@ -1216,9 +1216,16 @@ shared<Node> AbstractParser::parse_abstract_enum() {
 	// class name
 	node->set_param(0, parse_abstract_token());
 
-	// as shared|@noauto
-	if (try_consume(Identifier::As))
-		node->flags = parse_flags();
+	// traits (as @noauto)
+	if (try_consume(Identifier::As)) {
+		auto list = new Node(NodeKind::AbstractTypeList, 0, common_types.unknown, Flags::None, Exp.cur_token());
+		while (true) {
+			list->add(parse_abstract_type());
+			if (!try_consume(","))
+				break;
+		}
+		node->set_param(1, list);
+	}
 
 	expect_new_line_with_indent();
 	Exp.next_line();

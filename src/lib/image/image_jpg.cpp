@@ -188,30 +188,30 @@ void jpg_decode_huffman(int ac,int dc,unsigned char *&b,int &bit_off,int &prev,i
 	//msg_write("zzz2");
 }
 
-static const float ww = 1.0f / sqrt(2.0f);
-static const float cc = cos(pi / 8.0f);
-static const float ss = sin(pi / 8.0f);
-static const float cc1 = cos(pi / 16.0f);
-static const float cc3 = cos(pi / 16.0f * 3);
-static const float cc5 = cos(pi / 16.0f * 5);
-static const float cc7 = cos(pi / 16.0f * 7);
+static const float ww = 1.0f / sqrtf(2.0f);
+static const float cc2 = cosf(pi / 8.0f);
+static const float ss2 = sinf(pi / 8.0f);
+static const float cc1 = cosf(pi / 16.0f);
+static const float cc3 = cosf(pi / 16.0f * 3);
+static const float cc5 = cosf(pi / 16.0f * 5);
+static const float cc7 = cosf(pi / 16.0f * 7);
 
 inline void _fast_cosine_trafo_(
 	float &in_0, float &in_1, float &in_2, float &in_3, float &in_4, float &in_5, float &in_6, float &in_7,
 	float &out_0, float &out_1, float &out_2, float &out_3, float &out_4, float &out_5, float &out_6, float &out_7)
 {
-	float c2_p_s6 = cc * in_2 + ss * in_6;
-	float s2_m_c6 = ss * in_2 - cc * in_6;
+	float c2_p_s6 = cc2 * in_2 + ss2 * in_6;
+	float s2_m_c6 = ss2 * in_2 - cc2 * in_6;
 	float w0_p_w4 = ww * (in_0 + in_4);
 	float w0_m_w4 = ww * (in_0 - in_4);
 	float E0 = w0_p_w4 + c2_p_s6;
 	float E1 = w0_m_w4 + s2_m_c6;
 	float E2 = w0_m_w4 - s2_m_c6;
 	float E3 = w0_p_w4 - c2_p_s6;
-	float c3 = cc * in_3;
-	float s3 = ss * in_3;
-	float c7 = cc * in_7;
-	float s7 = ss * in_7;
+	float c3 = cc2 * in_3;
+	float s3 = ss2 * in_3;
+	float c7 = cc2 * in_7;
+	float s7 = ss2 * in_7;
 	float c3_p_s7 = c3 + s7;
 	float c3_m_s7 = c3 - s7;
 	float s3_m_c7 = s3 - c7;
@@ -227,14 +227,14 @@ inline void _fast_cosine_trafo_(
 	float G1 = w5 + c3_m_s7;
 	float G2 = -w5 + c3_m_s7;
 	float G3 = -w5 + s3_p_c7;
-	out_0 = E0 + cc1 * F0 + cc7 * G0;
-	out_1 = E1 + cc3 * F1 + cc5 * G1;
-	out_2 = E2 + cc5 * F2 + cc3 * G2;
-	out_3 = E3 + cc7 * F3 + cc1 * G3;
-	out_4 = E3 - cc7 * F3 + cc1 * G0;
-	out_5 = E2 - cc5 * F2 + cc3 * G1;
-	out_6 = E1 - cc3 * F1 + cc5 * G2;
-	out_7 = E0 - cc1 * F0 + cc7 * G3;
+	out_0 = E0 + cc1 * F0 - cc7 * G0;
+	out_1 = E1 + cc3 * F1 - cc5 * G1;
+	out_2 = E2 + cc5 * F2 - cc3 * G2;
+	out_3 = E3 + cc7 * F3 - cc1 * G3;
+	out_4 = E3 - cc7 * F3 + cc1 * G3;
+	out_5 = E2 - cc5 * F2 + cc3 * G2;
+	out_6 = E1 - cc3 * F1 + cc5 * G1;
+	out_7 = E0 - cc1 * F0 + cc7 * G0;
 }
 
 inline void jpg_cosine_retransform(int *coeff_in,int q,float *coeff_out)
@@ -383,7 +383,7 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 
 	for (int i=0;i<8;i++)
 		for (int j=0;j<8;j++)
-			jpg_cos_table[i][j] = (float)cos( (2*i+1)*j*pi/16.0f ) * ((j == 0) ? 1.0f / sqrt(2.0f) : 1.0f);
+			jpg_cos_table[i][j] = cosf( (float)(2*i+1)*(float)j*pi/16.0f ) * ((j == 0) ? 1.0f / sqrtf(2.0f) : 1.0f);
 
 	// read data
 	int bit_off=0;

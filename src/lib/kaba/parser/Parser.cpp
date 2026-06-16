@@ -395,6 +395,13 @@ void Parser::parse_import() {
 void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 	auto _class = tree->create_new_class(node->params[0]->as_token(), common_types.enum_t, sizeof(int), -1, nullptr, {}, _namespace, node->token_id);
 	_class->flags = node->flags;
+	if (node->params[1]) {
+		// as @noauto
+		if (node->params[1]->params[0]->kind == NodeKind::AbstractToken and node->params[1]->params[0]->as_token() == "@noauto")
+			_class->traits.add(common_types.noauto_trait);
+		else
+			do_error("only 'as @noauto' allowed as trait for enum", node->params[1]);
+	}
 
 	context->template_manager->request_class_instance(tree, common_types.enum_t, {_class}, node->token_id);
 
@@ -402,12 +409,12 @@ void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 
 	for (int i=0; i<node->params.num/3; i++) {
 
-		auto *c = tree->add_constant(_class, node->params[i*3+1]->token_id, _class);
-		c->name = node->params[i*3+1]->as_token();
+		auto *c = tree->add_constant(_class, node->params[i*3+2]->token_id, _class);
+		c->name = node->params[i*3+2]->as_token();
 
 		// explicit value
-		if (node->params[i*3+2]) {
-			auto cv = eval_to_const(node->params[i*3+2], tree->root_of_all_evil->block, common_types.i32);
+		if (node->params[i*3+3]) {
+			auto cv = eval_to_const(node->params[i*3+3], tree->root_of_all_evil->block, common_types.i32);
 			next_value = cv->as_const()->as_int();
 		} else if (flags_has(_class->flags, Flags::Extern)) {
 			// linked from host program?
@@ -415,8 +422,8 @@ void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 		}
 		c->as_int() = (next_value ++);
 
-		if (node->params[i*3+3]) {
-			auto cn = eval_to_const(node->params[i*3+3], tree->root_of_all_evil->block, common_types.string);
+		if (node->params[i*3+4]) {
+			auto cn = eval_to_const(node->params[i*3+4], tree->root_of_all_evil->block, common_types.string);
 			auto label = cn->as_const()->as_string();
 			add_enum_label(_class, c->as_int(), label);
 		}

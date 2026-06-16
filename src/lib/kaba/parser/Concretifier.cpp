@@ -827,8 +827,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_optional(shared<Node>
 		flags_clear(var_p->flags, Flags::Mutable);
 
 	if (is_temporary) {
-		if (node->is_mutable()) // should be filtered out by const container... but eh
-			do_error("can not take a mutable reference to a temporary value", node);
+		// mutable temporaries are allowed... for example return of selfref/globalref functions
 
 		// store in temp variable
 		static int nnn = 0;

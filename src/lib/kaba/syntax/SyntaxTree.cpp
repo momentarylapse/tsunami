@@ -35,8 +35,11 @@ shared_array<Node> Scope::find(const string &name, int token_id) const {
 }
 
 bool Scope::add_class(const string &name, const Class *c) {
-	if (find(name, -1).num > 0)
+	for (const auto& x: find(name, -1)) {
+		if (x->kind == NodeKind::Class and x->as_class() == c)
+			return true;
 		return false;
+	}
 	entries.add(Entry{name, NodeKind::Class, c});
 	return true;
 }

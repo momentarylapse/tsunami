@@ -35,10 +35,11 @@ jobs:
             c_compiler: cl
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         # make sure we have the tags, for cmake/git versioning
         fetch-depth: 0
+        fetch-tags: true
 
     - name: Set reusable strings
       id: strings
@@ -46,12 +47,12 @@ jobs:
       run: |
         echo "build-output-exe=${{ github.workspace }}/build/tsunami" >> "$GITHUB_OUTPUT"
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-        
+
     - name: Install Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev portaudio19-dev #libpipewire-0.3-dev libspa-0.2-dev
-      
+        sudo apt-get install -y cmake ninja-build clang build-essential libgtk-4-dev libogg-dev libvorbis-dev libflac-dev libfftw3-dev libpulse-dev libasound-dev libgl-dev libunwind-dev portaudio19-dev #libpipewire-0.3-dev libspa-0.2-dev
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -75,4 +76,4 @@ jobs:
 #        recipe: "./AppImageBuilder.yml"
 #      env:
 #        UPDATE_INFO: gh-releases-zsync|momentarylapse|tsunami|latest|*x86_64.AppImage.zsync
-            
+

@@ -29,7 +29,7 @@ public:
 	void undo(history::Data* d) override;
 
 	// continuous editing
-	virtual void abort(history::Data *d);
+	void abort(history::Data *d) override;
 	virtual void abort_and_notify(history::Data *d);
 	virtual void set_param_and_notify(history::Data *d, int _param);
 

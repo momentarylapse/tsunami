@@ -108,7 +108,7 @@ public:
 	}
 
 	// continuous editing
-	void abort(history::Data* d) {
+	void abort(history::Data* d) override {
 		undo(d);
 	}
 	void abort_and_notify(history::Data* d) {
@@ -181,7 +181,7 @@ public:
 	}
 
 	// continuous editing
-	void abort(history::Data* d) {
+	void abort(history::Data* d) override {
 		undo(d);
 	}
 	void abort_and_notify(history::Data* d) {

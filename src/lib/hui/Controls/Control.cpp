@@ -11,6 +11,7 @@
 #include "../Painter.h"
 #include "../../os/msg.h"
 #include "../../image/color.h"
+#include <lib/layout/Resource.h>
 
 #include <gtk/gtk.h>
 
@@ -219,25 +220,6 @@ Panel::SizeGroup *get_size_group(Panel *panel, const string &name, int mode) {
 			GTK_STYLE_PROVIDER_PRIORITY_USER);
 }*/
 
-Array<std::pair<string, string>> parse_options(const string &options) {
-	Array<std::pair<string, string>> r;
-
-	auto a = options.explode(",");
-
-	for (string &aa: a) {
-		int eq = aa.find("=");
-		string op, val;
-		if (eq < 0) {
-			op = aa.replace("-", "");
-		} else {
-			op = aa.head(eq).replace("-", "");
-			val = aa.tail(aa.num - eq - 1);
-		}
-		r.add(std::make_pair(op, val));
-	}
-	return r;
-}
-
 bool val_is_positive(const string &val, bool def) {
 	if (val == "no" or val == "false")
 		return false;
@@ -254,8 +236,8 @@ void Control::set_options(const string &options) {
 	auto ops = parse_options(options);
 
 	for (auto x: ops) {
-		auto op = x.first;
-		auto val = x.second;
+		auto op = x.key;
+		auto val = x.value;
 
 		if (op == "expandx") {
 			gtk_widget_set_hexpand(widget, val_is_positive(val, true));

@@ -10,15 +10,17 @@
 #include "../Menu.h"
 #include "../Resource.h"
 #include "../../os/msg.h"
+#include <lib/layout/Resource.h>
 
 #include <gtk/gtk.h>
+
 
 namespace hui
 {
 
 void *get_gtk_image(const string &image, IconSize size); // -> hui_menu_gtk.cpp
 
-xfer<Menu> _create_res_menu_(const string &ns, Resource *res, Panel *p); // -> Resource.cpp
+xfer<Menu> _create_res_menu_(const string &ns, const layout::Resource *res, Panel *p); // -> Resource.cpp
 
 //void OnGtkMenuButtonPress(GtkWidget *widget, gpointer data)
 //{	reinterpret_cast<Control*>(data)->notify("hui:click");	}
@@ -83,7 +85,7 @@ void ControlMenuButton::__set_option(const string &op, const string &value) {
 	} else if (op == "menu") {
 		set_menu(create_resource_menu(value, panel));
 	} else if (op == "menusource") {
-		auto res = parse_resource(value, panel);
+		auto res = layout::parse_resource(value, panel);
 		set_menu(_create_res_menu_("source", &res, panel));
 	} else if (op == "arrow") {
 #if GTK_CHECK_VERSION(4,0,0)

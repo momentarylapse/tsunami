@@ -189,22 +189,25 @@ class extern Event
 	var row: i32
 	var column: i32
 #	func __delete__()
-	
 
+
+struct Option
+	var key, value: string
 
 struct extern Resource
 	var type: string
 	var id: string
 	var title: string
-	var tooltip: string
-	var options: string[]
+	var options: Option[]
 	var x, y: i32
 	var children: Resource[]
 	#void reset()
 	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
 	func extern show(indent: i32)
+	func extern _options_str() -> string
+	func extern value(key: string, fallback="") -> string
 	func extern str(indent: i32) -> string
-	
+
 func extern parse_resource(buffer: string, literally: bool) -> Resource
 
 # key ids (int)

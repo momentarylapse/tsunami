@@ -24,6 +24,7 @@
 #include "hui.h"
 #include "internal.h"
 #include "../os/msg.h"
+#include <lib/layout/Resource.h>
 #ifdef HUI_API_GTK
 
 #ifndef OS_WINDOWS
@@ -359,14 +360,14 @@ void Panel::add_menu_button(const string &title, int x, int y, const string &id)
 void Panel::embed_dialog(const string &id, int x, int y) {
 	spacing = 5;
 
-	Resource *res = get_resource(id);
+	auto *res = get_resource(id);
 	if (!res)
 		return;
 	if (res->type != "Dialog")
 		return;
 	if (res->children.num == 0)
 		return;
-	Resource rr = res->children[0];
+	auto rr = res->children[0];
 	rr.x = x;
 	rr.y = y;
 

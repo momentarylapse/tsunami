@@ -10,7 +10,8 @@
 #include "hui.h"
 #include "internal.h"
 #include "Toolbar.h"
-#include "../os/msg.h"
+#include <lib/os/msg.h>
+#include <lib/layout/Resource.h>
 
 
 namespace hui {
@@ -49,7 +50,7 @@ void Window::__init_ext__(const string& title, int width, int height) {
 
 // resource constructor
 Window::Window(const string &id, Window *parent) : Panel(id, nullptr) {
-	Resource *res = get_resource(id);
+	auto res = get_resource(id);
 	if (!res) {
 		msg_error("Window: undefined resource id: " + id);
 		return;

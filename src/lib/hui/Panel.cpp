@@ -12,6 +12,7 @@
 #include "internal.h"
 #include "../image/color.h"
 #include "../os/msg.h"
+#include <lib/layout/Resource.h>
 
 #include <gtk/gtk.h>
 
@@ -294,39 +295,39 @@ void Panel::add_control(const string &type, const string &title, int x, int y, c
 		msg_error("unknown hui control: " + type);
 }
 
-void Panel::_add_control(const string &ns, Resource &cmd, const string &parent_id) {
+void Panel::_add_control(const string &ns, const layout::Resource &cmd, const string &parent_id) {
 	//msg_write(format("%d:  %d / %d",j,(cmd->type & 1023),(cmd->type >> 10)).c_str(),4);
 	set_target(parent_id);
 	add_control(cmd.type, get_language_r(ns, cmd),
 				cmd.x, cmd.y,
 				cmd.id);
 
-	for (string &o: cmd.options)
-		set_options(cmd.id, o);
+	for (const auto &o: cmd.options)
+		set_options(cmd.id, o.str());
 
 	enable(cmd.id, cmd.enabled());
 	if (cmd.has("hidden"))
 		hide_control(cmd.id, true);
 
-	if (cmd.image().num > 0)
-		set_image(cmd.id, cmd.image());
+	if (cmd.has("image"))
+		set_image(cmd.id, cmd.value("image"));
 
 
-	string tooltip = get_language_t(ns, cmd.id, cmd.tooltip);
+	string tooltip = get_language_t(ns, cmd.id, cmd.value("tooltip"));
 	if (tooltip.num > 0)
 		set_tooltip(cmd.id, tooltip);
 
-	for (Resource &c: cmd.children)
+	for (const auto &c: cmd.children)
 		_add_control(ns, c, cmd.id);
 }
 
 void Panel::from_resource(const string &id) {
-	Resource *res = get_resource(id);
+	auto res = get_resource(id);
 	if (res)
 		set_from_resource(res);
 }
 
-void Panel::set_from_resource(Resource *res) {
+void Panel::set_from_resource(const layout::Resource *res) {
 	if (!res)
 		return;
 
@@ -337,7 +338,7 @@ void Panel::set_from_resource(Resource *res) {
 	// directly change window?
 	if (panel_is_window and res_is_window) {
 		for (auto &o: res->options)
-			win->__set_options(o);
+			win->__set_options(o.str());
 
 		// title
 		win->set_title(get_language(res->id, res->id));
@@ -381,16 +382,16 @@ void Panel::set_from_resource(Resource *res) {
 }
 
 void Panel::from_source(const string &buffer) {
-	Resource res = parse_resource(buffer);
+	auto res = layout::parse_resource(buffer);
 	set_from_resource(&res);
 }
 
 
-void Panel::embed_resource(Resource &c, const string &parent_id, int x, int y) {
+void Panel::embed_resource(const layout::Resource &c, const string &parent_id, int x, int y) {
 	_embed_resource(c.id, c, parent_id, x, y);
 }
 
-void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_id, int x, int y) {
+void Panel::_embed_resource(const string &ns, const layout::Resource &c, const string &parent_id, int x, int y) {
 	//_addControl(main_id, c, parent_id);
 
 	set_target(parent_id);
@@ -398,23 +399,23 @@ void Panel::_embed_resource(const string &ns, Resource &c, const string &parent_
 	//if (c.options.num > 0)
 	//	title = "!" + implode(c.options, ",") + "\\" + title;
 	add_control(c.type, title, x, y, c.id);
-	for (string &o: c.options)
-		set_options(c.id, o);
+	for (const auto &o: c.options)
+		set_options(c.id, o.str());
 
 	enable(c.id, c.enabled());
-	if (c.image().num > 0)
-		set_image(c.id, c.image());
+	if (c.has("image"))
+		set_image(c.id, c.value("image"));
 
-	string tooltip = get_language_t(ns, c.id, c.tooltip);
+	string tooltip = get_language_t(ns, c.id, c.value("tooltip"));
 	if (tooltip.num > 0)
 		set_tooltip(c.id, tooltip);
 
-	for (Resource &child : c.children)
+	for (const auto &child : c.children)
 		_embed_resource(ns, child, c.id, child.x, child.y);
 }
 
 void Panel::embed_source(const string &buffer, const string &parent_id, int x, int y) {
-	Resource res = parse_resource(buffer);
+	auto res = layout::parse_resource(buffer);
 	embed_resource(res, parent_id, x, y);
 }
 

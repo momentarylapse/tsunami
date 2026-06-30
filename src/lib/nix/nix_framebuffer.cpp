@@ -119,7 +119,7 @@ void FrameBuffer::_check() {
 }
 
 rect FrameBuffer::area() const {
-	return rect(0, width, 0, height);
+	return rect(0, (float)width, 0, (float)height);
 }
 
 bool FrameBuffer::is_srgb() const {

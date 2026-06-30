@@ -39,6 +39,9 @@ class Path;
 	extern Path de_sys_str_f(const char *str);
 #endif
 
+namespace layout {
+	struct Resource;
+}
 
 
 namespace hui {
@@ -46,8 +49,6 @@ namespace hui {
 
 extern string get_lang(const string &ns, const string &id, const string &text, bool allow_keys=false);
 extern const char *get_lang_sys(const string &id, const string &text, bool allow_keys=false);
-
-class Resource;
 
 
 // language
@@ -57,7 +58,7 @@ void _cdecl set_language(const string &language);
 extern bool _using_language_;
 
 string _cdecl get_language(const string &ns, const string &id);
-string _cdecl get_language_r(const string &ns, Resource &cmd);
+string _cdecl get_language_r(const string &ns, const layout::Resource &cmd);
 string _cdecl get_language_t(const string &ns, const string &id, const string &tooltip);
 string _cdecl get_language_s(const string &str);
 #define L(ns, id)	hui::get_language(ns, id)

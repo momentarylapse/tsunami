@@ -10,7 +10,7 @@
 
 #include "nix.h"
 #include "nix_common.h"
-#include "../math/vec2.h"
+#include <lib/math/vec2.h>
 #if __has_include("../hui/hui.h")
 #include "../hui/hui.h"
 #define NIX_USE_HUI 1
@@ -63,7 +63,7 @@ void set_viewport(const rect &area) {
 	target_height = max((int)area.height(), 1);
 
 	//glViewport(area.x1, cur_framebuffer->height - area.height() + area.y1, area.width(), area.height());
-	glViewport(area.x1, area.y1, area.width(), area.height());
+	glViewport((int)area.x1, (int)area.y1, (int)area.width(), (int)area.height());
 }
 
 void set_model_matrix(const mat4 &mat) {
@@ -126,6 +126,7 @@ void set_projection_matrix(const mat4 &m) {
 
 void set_view_matrix(const mat4 &m) {
 	view_matrix = m;
+	model_view_projection_matrix = projection_matrix * view_matrix * model_matrix;
 }
 
 

@@ -11,12 +11,20 @@ struct Box {
 	bool is_inside(const vec3& p) const;
 	vec3 to_relative(const vec3& p) const;
 	vec3 to_absolute(const vec3& p) const;
+	vec3 clamp(const vec3& p) const;
+	vec3 loop(const vec3& p) const;
 	string str() const;
 
 	bool operator==(const Box& o) const;
 	bool operator!=(const Box& o) const;
 	Box operator||(const Box& b) const;
 	Box operator&&(const Box& b) const;
+	Box operator+(const vec3& d) const;
+	Box operator-(const vec3& d) const;
+	Box operator*(float scale) const;
+	void operator+=(const vec3& d);
+	void operator-=(const vec3& d);
+	void operator*=(float scale);
 
 	static const Box EMPTY;
 	static const Box ID;

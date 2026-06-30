@@ -7,6 +7,7 @@
 #include "../base/iter.h"
 #include "../os/time.h"
 #include "../os/msg.h"
+#include <lib/layout/Resource.h>
 #ifdef HUI_API_GTK
 
 #include <gtk/gtk.h>
@@ -790,8 +791,8 @@ void Window::set_fullscreen(bool fullscreen) {
 void Window::__set_options(const string &options) {
 	auto r = parse_options(options);
 	for (auto x: r) {
-		auto op = x.first;
-		auto val = x.second;
+		auto op = x.key;
+		auto val = x.value;
 
 		if (op == "resizable") {
 			gtk_window_set_resizable(GTK_WINDOW(window), val_is_positive(val, true));

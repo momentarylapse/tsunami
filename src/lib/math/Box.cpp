@@ -21,9 +21,9 @@ Box Box::canonical() const {
 }
 
 bool Box::is_inside(const vec3& p) const {
-	if (p.x < min.x || p.y < min.y || p.z < min.z)
+	if (p.x < min.x or p.y < min.y or p.z < min.z)
 		return false;
-	if (p.x > max.x || p.y > max.y || p.z > max.z)
+	if (p.x > max.x or p.y > max.y or p.z > max.z)
 		return false;
 	return true;
 	//return p.between(min, max); // WTF is that implementation?!?
@@ -37,7 +37,15 @@ vec3 Box::to_absolute(const vec3& p) const {
 vec3 Box::to_relative(const vec3& p) const {
 	const vec3 s = size();
 	const vec3 q = p - min;
-	return vec3(q.x / s.x, q.y / s.y, q.z / s.z);
+	return {q.x / s.x, q.y / s.y, q.z / s.z};
+}
+
+vec3 Box::clamp(const vec3 &p) const {
+	return {::clamp(p.x, min.x, max.x), ::clamp(p.y, min.y, max.y), ::clamp(p.z, min.z, max.z)};
+}
+
+vec3 Box::loop(const vec3 &p) const {
+	return {::loop(p.x, min.x, max.x), ::loop(p.y, min.y, max.y), ::loop(p.z, min.z, max.z)};
 }
 
 string Box::str() const {
@@ -66,5 +74,30 @@ Box Box::operator&&(const Box& b) const {
 	return r;
 }
 
+Box Box::operator+(const vec3& d) const {
+	return {min + d, max + d};
+}
 
+Box Box::operator-(const vec3& d) const {
+	return {min - d, max - d};
+}
+
+Box Box::operator*(float scale) const {
+	return {min * scale, max * scale};
+}
+
+void Box::operator+=(const vec3 &d) {
+	min += d;
+	max += d;
+}
+
+void Box::operator-=(const vec3 &d) {
+	min -= d;
+	max -= d;
+}
+
+void Box::operator*=(float scale) {
+	min *= scale;
+	max *= scale;
+}
 

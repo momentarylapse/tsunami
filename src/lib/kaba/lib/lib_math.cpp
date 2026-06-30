@@ -297,7 +297,7 @@ void SIAddPackageMath(Context *c) {
 	common_types.vec3 = add_type("vec3", sizeof(vec3));
 	common_types.vec3_list = add_type_list(common_types.vec3);
 	common_types.rect = add_type("Rect", sizeof(rect));
-	auto TypeBox = add_type("Box", sizeof(Box));
+	common_types.box = add_type("Box", sizeof(Box));
 	common_types.mat4 = add_type("mat4", sizeof(mat4));
 	common_types.quaternion = add_type("Quaternion", sizeof(quaternion));
 	common_types.plane = add_type("Plane", sizeof(plane));
@@ -591,7 +591,7 @@ void SIAddPackageMath(Context *c) {
 		add_operator(OperatorID::NotEqual, common_types._bool, common_types.rect, common_types.rect, InlineID::ChunkNotEqual, &rect::operator!=);
 
 
-	add_class(TypeBox);
+	add_class(common_types.box);
 		class_add_element("min", common_types.vec3, &Box::min);
 		class_add_element("max", common_types.vec3, &Box::max);
 		class_add_func(Identifier::func::Init, common_types._void, &generic_init<Box>, Flags::Mutable);
@@ -606,14 +606,24 @@ void SIAddPackageMath(Context *c) {
 			func_add_param("p", common_types.vec3);
 		class_add_func("to_absolute", common_types.vec3, &Box::to_absolute, Flags::Pure);
 			func_add_param("p", common_types.vec3);
+		class_add_func("clamp", common_types.vec3, &Box::clamp, Flags::Pure);
+			func_add_param("p", common_types.vec3);
+		class_add_func("loop", common_types.vec3, &Box::loop, Flags::Pure);
+			func_add_param("p", common_types.vec3);
 		class_add_func(Identifier::func::Str, common_types.string, &Box::str, Flags::Pure);
-		class_add_const("ID",  TypeBox, &Box::ID);
-		class_add_const("ID_SYM",  TypeBox, &Box::ID_SYM);
-		add_operator(OperatorID::Assign, common_types._void, TypeBox, TypeBox, InlineID::ChunkAssign, &generic_assign<Box>);
-		add_operator(OperatorID::Equal, common_types._bool, TypeBox, TypeBox, InlineID::ChunkEqual, &Box::operator==);
-		add_operator(OperatorID::NotEqual, common_types._bool, TypeBox, TypeBox, InlineID::ChunkNotEqual, &Box::operator!=);
-		add_operator(OperatorID::Or, TypeBox, TypeBox, TypeBox, InlineID::None, &Box::operator||);
-		add_operator(OperatorID::And, TypeBox, TypeBox, TypeBox, InlineID::None, &Box::operator&&);
+		class_add_const("ID",  common_types.box, &Box::ID);
+		class_add_const("ID_SYM",  common_types.box, &Box::ID_SYM);
+		add_operator(OperatorID::Assign, common_types._void, common_types.box, common_types.box, InlineID::ChunkAssign, &generic_assign<Box>);
+		add_operator(OperatorID::Equal, common_types._bool, common_types.box, common_types.box, InlineID::ChunkEqual, &Box::operator==);
+		add_operator(OperatorID::NotEqual, common_types._bool, common_types.box, common_types.box, InlineID::ChunkNotEqual, &Box::operator!=);
+		add_operator(OperatorID::Or, common_types.box, common_types.box, common_types.box, InlineID::None, &Box::operator||);
+		add_operator(OperatorID::And, common_types.box, common_types.box, common_types.box, InlineID::None, &Box::operator&&);
+		add_operator(OperatorID::Add, common_types.box, common_types.box, common_types.vec3, InlineID::None, &Box::operator+);
+		add_operator(OperatorID::Subtract, common_types.box, common_types.box, common_types.vec3, InlineID::None, &Box::operator-);
+		add_operator(OperatorID::Multiply, common_types.box, common_types.box, common_types.f32, InlineID::None, &Box::operator*);
+		add_operator(OperatorID::AddAssign, common_types._void, common_types.box, common_types.vec3, InlineID::None, &Box::operator+=);
+		add_operator(OperatorID::SubtractAssign, common_types._void, common_types.box, common_types.vec3, InlineID::None, &Box::operator-=);
+		add_operator(OperatorID::MultiplyAssign, common_types._void, common_types.box, common_types.f32, InlineID::None, &Box::operator*=);
 
 
 	add_class(common_types.color);
@@ -865,7 +875,7 @@ void SIAddPackageMath(Context *c) {
 
 	add_class(TypeRandom);
 		class_add_func(Identifier::func::Init, common_types._void, &generic_init<Random>, Flags::Mutable);
-		class_add_func(Identifier::func::Assign, common_types._void, &Random::__assign__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &generic_assign<Random>, Flags::Mutable);
 			func_add_param("o", TypeRandom);
 		//class_add_element("n", TypeRandom, 0);
 		class_add_func("seed", common_types._void, &Random::seed, Flags::Mutable);
@@ -882,6 +892,8 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("in_ball", common_types.vec3, &Random::in_ball, Flags::Mutable);
 			func_add_param("r", common_types.f32);
 		class_add_func("dir", common_types.vec3, &Random::dir, Flags::Mutable);
+		class_add_func("in_box", common_types.vec3, &Random::in_box, Flags::Mutable);
+			func_add_param("b", common_types.box);
 
 
 	add_class(TypeFloatInterpolator);

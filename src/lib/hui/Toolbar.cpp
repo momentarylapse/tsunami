@@ -15,6 +15,7 @@
 #include "Controls/ToolItemSeparator.h"
 #include "Controls/ToolItemToggleButton.h"
 #include "../os/msg.h"
+#include <lib/layout/Resource.h>
 
 #include <gtk/gtk.h>
 
@@ -22,7 +23,7 @@ namespace hui
 {
 
 //void control_delete_rec(Control *c);
-Menu *_create_res_menu_(const string &ns, Resource *res, Panel *p);
+Menu *_create_res_menu_(const string &ns, const layout::Resource *res, Panel *p);
 
 
 // add a default button
@@ -67,7 +68,7 @@ void Toolbar::reset() {
 
 // create and apply a toolbar bar resource id
 void Toolbar::set_by_id(const string &id) {
-	Resource *res = get_resource(id);
+	auto *res = get_resource(id);
 	if (!res) {
 		msg_error("Toolbar.SetByID  :~~(");
 		return;
@@ -75,45 +76,45 @@ void Toolbar::set_by_id(const string &id) {
 	from_resource(res);
 }
 
-void Toolbar::from_resource(Resource *res) {
+void Toolbar::from_resource(const layout::Resource *res) {
 	reset();
 	id = res->id;
 	//Configure(res->b_param[0], res->b_param[1]);
-	for (Resource &cmd: res->children) {
+	for (const auto &cmd: res->children) {
 		string title = get_lang(id, cmd.id, cmd.title, false);
-		string tooltip = get_language_t(id, cmd.id, cmd.tooltip);
+		string tooltip = get_language_t(id, cmd.id, cmd.value("tooltip"));
 		if (tooltip.num == 0)
 			tooltip = title;
 
 		if (cmd.type == "Item") {
-			if (sa_contains(cmd.options, "checkable"))
-				add_checkable(title, cmd.image(), cmd.id);
+			if (cmd.has("checkable"))
+				add_checkable(title, cmd.value("image"), cmd.id);
 			else
-				add(title, cmd.image(), cmd.id);
+				add(title, cmd.value("image"), cmd.id);
 			items.back()->set_tooltip(tooltip);
 		} else if (cmd.type == "Separator") {
 			add_separator();
 		} else if (cmd.type == "Menu") {
 			bool ok = false;
-			for (string &o: cmd.options)
-				if (o.find("menu=") == 0) {
-					add_menu_by_id(title, cmd.image(), o.sub(5), cmd.id);
-					items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
+			for (const auto &o: cmd.options)
+				if (o.key == "menu=") {
+					add_menu_by_id(title, cmd.value("image"), o.value, cmd.id);
+					items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.value("tooltip")));
 					ok = true;
 				}
 			if ((!ok) and (cmd.children.num > 0)) {
-				add_menu(title, cmd.image(), _create_res_menu_(id, &cmd, win), cmd.id);
-				items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.tooltip));
+				add_menu(title, cmd.value("image"), _create_res_menu_(id, &cmd, win), cmd.id);
+				items.back()->set_tooltip(get_language_t(id, cmd.id, cmd.value("tooltip")));
 			}
 		}
 		for (auto &o: cmd.options)
-			items.back()->set_options(o);
+			items.back()->set_options(o.str());
 	}
 	enable(true);
 }
 
 void Toolbar::from_source(const string &source) {
-	Resource res = parse_resource(source);
+	auto res = layout::parse_resource(source);
 	from_resource(&res);
 }
 

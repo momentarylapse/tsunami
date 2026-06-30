@@ -11,6 +11,10 @@
 
 class Path;
 
+namespace layout {
+	struct Resource;
+}
+
 namespace hui {
 
 	class Panel;
@@ -25,31 +29,9 @@ Menu *_cdecl create_resource_menu(const string &id, Panel *panel);
 
 
 
-class Resource {
-public:
-	string type;
-	string id;
-	string title;
-	string tooltip;
-	Array<string> options;
-	int x, y;
-	Array<Resource> children;
-	Resource();
-	Resource* get_node(const string &id) const;
-	bool enabled();
-	string image();
-	bool has(const string &key);
-	string value(const string &key, const string &fallback = "");
-	void show(int indent = 0);
-	string to_string(int indent = 0);
-};
-
-Resource parse_resource(const string &buffer, bool literal = false);
-
-
 // resources
 void _cdecl load_resource(const Path &filename);
-Resource *get_resource(const string &id);
+layout::Resource *get_resource(const string &id);
 
 };
 

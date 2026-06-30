@@ -597,6 +597,9 @@ add_library(moduletsunami SHARED
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
 	src/lib/kapi/kapi.cpp
+	src/lib/layout/Grid.cpp
+	src/lib/layout/Node.cpp
+	src/lib/layout/Resource.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
@@ -1157,6 +1160,9 @@ add_executable(tsunami WIN32
 	src/lib/kaba/kaba.cpp
 	src/lib/kaba/Module.cpp
 	src/lib/kapi/kapi.cpp
+	src/lib/layout/Grid.cpp
+	src/lib/layout/Node.cpp
+	src/lib/layout/Resource.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp

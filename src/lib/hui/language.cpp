@@ -1,6 +1,7 @@
 #include "hui.h"
 #include "internal.h"
 #include "../os/msg.h"
+#include <lib/layout/Resource.h>
 
 // character set....
 #ifdef OS_WINDOWS
@@ -118,10 +119,10 @@ string get_language(const string &ns, const string &id) {
 	return "";
 }
 
-string get_language_r(const string &ns, Resource &cmd) {
+string get_language_r(const string &ns, const layout::Resource &cmd) {
 	string pre;
 	if (cmd.options.num > 0)
-		pre = "!" + implode(cmd.options, ",") + "\\";
+		pre = "!" + cmd._options_str() + "\\";
 
 	if ((!_using_language_) or (cmd.id.num == 0))
 		return pre + cmd.title;
@@ -130,7 +131,7 @@ string get_language_r(const string &ns, Resource &cmd) {
 
 	if (cmd.options.num > 0) {
 		if (cmd.title.head(1) == "!")
-			return "!" + implode(cmd.options, ",") + "," + cmd.title.sub(1);
+			return "!" + cmd._options_str() + "," + cmd.title.sub(1);
 		else
 			return pre + cmd.title;
 	}

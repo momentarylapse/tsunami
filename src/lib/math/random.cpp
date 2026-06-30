@@ -1,5 +1,6 @@
 #include "random.h"
 #include "vec3.h"
+#include "Box.h"
 #include "../os/date.h"
 #include <cmath>
 
@@ -12,10 +13,6 @@ Random::Random() {
 	c = 0;
 	auto d = Date::now();
 	seed(d.format("%c") + i2s(d.milli_second));
-}
-
-void Random::__assign__(Random *other) {
-	*this = *other;
 }
 
 // TODO: more possible seeds
@@ -98,4 +95,8 @@ vec3 Random::dir() {
 	if (l != 0)
 		return v / l;
 	return vec3::EZ;
+}
+
+vec3 Random::in_box(const Box& b) {
+	return b.to_absolute(vec3(uniform01(), uniform01(), uniform01()));
 }

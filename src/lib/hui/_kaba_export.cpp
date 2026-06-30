@@ -1,7 +1,8 @@
 #include "hui.h"
 #include "config.h"
-#include "../kapi/KabaExporter.h"
-#include "../base/callable.h"
+#include <lib/kapi/KabaExporter.h>
+#include <lib/base/callable.h>
+#include <lib/layout/Resource.h>
 
 
 #define KABA_EXPORT_HUI
@@ -65,7 +66,7 @@ void _dummy() {}
 
 
 void export_package_hui(kaba::IExporter* e) {
-	e->package_info("hui", "8");
+	e->package_info("hui", "9");
 
 	e->declare_class_size("Menu", sizeof(hui::Menu));
 	e->link_class_func("Menu.__init__", &hui::Menu::__init__);
@@ -246,11 +247,13 @@ void export_package_hui(kaba::IExporter* e) {
 	e->declare_class_element("Event.row", &hui::Event::row);
 	e->declare_class_element("Event.column", &hui::Event::column);
 
-	e->declare_class_size("Resource", sizeof(hui::Resource));
-	e->link_class_func("Resource.show", &hui::Resource::show);
-	e->link_class_func("Resource.str", &hui::Resource::to_string);
+	e->declare_class_size("Resource", sizeof(layout::Resource));
+	e->link_class_func("Resource.show", &layout::Resource::show);
+	e->link_class_func("Resource.str", &layout::Resource::to_string);
+	e->link_class_func("Resource._options_str", &layout::Resource::_options_str);
+	e->link_class_func("Resource.value", &layout::Resource::value);
 
-	e->link_func("parse_resource", &hui::parse_resource);
+	e->link_func("parse_resource", &layout::parse_resource);
 
 #if 0
 	// key ids (int)

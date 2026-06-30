@@ -193,12 +193,12 @@ public:
 	shared() {
 		_p = nullptr;
 	}
-	shared(T *p) {
+	shared(T* p) {
 		pdb(format("+shared %s", p2s(p)));
 		if (p)
 			_p = (T*)p->_pointer_ref();
 	}
-	shared(const shared<T> &o) {
+	shared(const shared<T>& o) {
 		pdb(format("+shared/s %s", p2s(o._p)));
 		if (o)
 			_p = (T*)o._p->_pointer_ref();
@@ -208,10 +208,10 @@ public:
 		clear();
 	}
 
-	T *get() const {
+	T* get() const {
 		return _p;
 	}
-	void set(T *p) {
+	void set(T* p) {
 		pdb(format("shared  set %s", p2s(p)));
 		if (p == _p)
 			return;
@@ -240,23 +240,23 @@ public:
 	}
 
 
-	T &operator *() {
+	T& operator *() {
 		return *_p;
 	}
-	const T &operator *() const {
+	const T& operator *() const {
 		return *_p;
 	}
-	T *operator ->() {
+	T* operator ->() {
 		return _p;
 	}
-	const T *operator ->() const {
+	const T* operator ->() const {
 		return _p;
 	}
 	void operator=(const shared<T> o) {
 		pdb(format("shared/s = %s", p2s(o._p)));
 		set(o._p);
 	}
-	void operator=(T *o) {
+	void operator=(T* o) {
 		pdb(format("shared/p = %s", p2s(o)));
 		set(o);
 	}
@@ -266,16 +266,16 @@ public:
 	bool operator!=(const shared<T> o) const {
 		return _p != o._p;
 	}*/
-	bool operator==(const T *o) const {
+	bool operator==(const T* o) const {
 		return _p == o;
 	}
-	bool operator!=(const T *o) const {
+	bool operator!=(const T* o) const {
 		return _p != o;
 	}
-	friend bool operator==(const T *o, const shared<T> &m) {
+	friend bool operator==(const T* o, const shared<T>& m) {
 		return m._p == o;
 	}
-	friend bool operator!=(const T *o, const shared<T> &m) {
+	friend bool operator!=(const T* o, const shared<T>& m) {
 		return m._p != o;
 	}
 	explicit operator bool() const {
@@ -293,7 +293,7 @@ const Array<T*>& weak(const shared_array<T>& a) {
 	return *(const Array<T*>*)&a;
 }
 
-template <class T>
+template<class T>
 Array<T*>& weak(shared_array<T>& a) {
 	return *(Array<T*>*)&a;
 }
@@ -308,6 +308,17 @@ Array<T*>& weak(owned_array<T>& a) {
 	return *(Array<T*>*)&a;
 }
 
+
+
+template<class A, class T>
+const Array<const A*>& weak_as(const shared_array<T>& a) {
+	return *(const Array<const A*>*)&a;
+}
+
+template<class A, class T>
+Array<A*>& weak_as(shared_array<T>& a) {
+	return *(Array<A*>*)&a;
+}
 
 
 #endif /* SRC_LIB_BASE_POINTER_H_ */

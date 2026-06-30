@@ -175,6 +175,7 @@ struct CommonTypes {
 	const Class* noauto_trait;
 
 	const Class* i32_ref;
+	const Class* box;
 };
 extern CommonTypes common_types;
 }

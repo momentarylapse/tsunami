@@ -24,12 +24,14 @@ typedef struct _GSimpleActionGroup GSimpleActionGroup;
 
 //class Painter;
 struct rect;
+namespace layout {
+	struct Resource;
+}
 
 namespace hui
 {
 
 class Menu;
-class Resource;
 //class Painter;
 class Event;
 class EventListener;
@@ -50,7 +52,7 @@ public:
 	void activate(const string &control_id);
 	bool is_active(const string &control_id);
 	void from_resource(const string &id);
-	void set_from_resource(Resource *res);
+	void set_from_resource(const layout::Resource *res);
 	void from_source(const string &source);
 
 	void show();
@@ -73,7 +75,7 @@ public:
 	// creating controls
 
 	void add_control(const string &type, const string &title, int x, int y, const string &id);
-	void _add_control(const string &ns, Resource &cmd, const string &parent_id);
+	void _add_control(const string &ns, const layout::Resource &cmd, const string &parent_id);
 	void add_button(const string &title, int x, int y,const string &id);
 	void add_def_button(const string &title, int x, int y, const string &id);
 	void add_color_button(const string &title, int x, int y, const string &id);
@@ -105,8 +107,8 @@ public:
 
 	void embed_dialog(const string &id, int x, int y);
 	void embed_source(const string &source, const string &parent_id, int x, int y);
-	void embed_resource(Resource &c, const string &parent_id, int x, int y);
-	void _embed_resource(const string &ns, Resource &c, const string &parent_id, int x, int y);
+	void embed_resource(const layout::Resource &c, const string &parent_id, int x, int y);
+	void _embed_resource(const string &ns, const layout::Resource &c, const string &parent_id, int x, int y);
 	void embed(shared<Panel> panel, const string &parent_id, int x, int y);
 	void unembed(Panel *p);
 

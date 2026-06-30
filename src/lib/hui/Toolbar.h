@@ -14,12 +14,15 @@
 
 //#include <gtk/gtk.h>
 
+namespace layout {
+	struct Resource;
+}
+
 namespace hui
 {
 
 class Menu;
 class Window;
-class Resource;
 
 class Toolbar : public Sharable<base::Empty> {
 public:
@@ -43,7 +46,7 @@ public:
 	void _cdecl reset();
 	void _cdecl set_by_id(const string &id);
 	void _cdecl from_source(const string &source);
-	void _cdecl from_resource(Resource *r);
+	void _cdecl from_resource(const layout::Resource *r);
 	void _cdecl set_options(const string &options);
 
 	void _add(shared<Control> c);

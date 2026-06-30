@@ -16,6 +16,10 @@
 #include <functional>
 
 
+namespace layout {
+	struct Option;
+}
+
 typedef struct _GtkWidget GtkWidget;
 
 namespace hui
@@ -32,7 +36,7 @@ string get_option_from_title(const string &title);
 bool option_has(const string &options, const string &key);
 string option_value(const string &options, const string &key);
 bool val_is_positive(const string &val, bool def = false);
-Array<std::pair<string, string>> parse_options(const string &options);
+Array<layout::Option> parse_options(const string &options);
 
 class Control : public Sharable<EventHandler> {
 public:

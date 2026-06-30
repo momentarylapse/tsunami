@@ -442,10 +442,7 @@ add_library(moduletsunami SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
-	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
-	src/lib/doc/pdf.cpp
-	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
 	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
@@ -642,6 +639,9 @@ add_library(moduletsunami SHARED
 	src/lib/os/time.cpp
 	src/lib/pattern/_kaba_export.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/pdf/_kaba_export.cpp
+	src/lib/pdf/pdf.cpp
+	src/lib/pdf/ttf.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -1005,10 +1005,7 @@ add_executable(tsunami WIN32
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
-	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
-	src/lib/doc/pdf.cpp
-	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
 	src/lib/fft/_kaba_export.cpp
 	src/lib/fft/fft.cpp
@@ -1205,6 +1202,9 @@ add_executable(tsunami WIN32
 	src/lib/os/time.cpp
 	src/lib/pattern/_kaba_export.cpp
 	src/lib/pattern/Observable.cpp
+	src/lib/pdf/_kaba_export.cpp
+	src/lib/pdf/pdf.cpp
+	src/lib/pdf/ttf.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp

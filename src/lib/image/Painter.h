@@ -52,7 +52,7 @@ public:
 	int width = 0;
 	int height = 0;
 	float font_size = 12;
-	float ui_scale = 1; // screen fractional scaling
+	vec2 ui_scale = {1, 1}; // screen fractional scaling
 	bool contiguous = true;
 	virtual rect area() const; // ImagePainter.cpp...
 	virtual rect clip() const = 0;

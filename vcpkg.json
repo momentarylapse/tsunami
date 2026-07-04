@@ -5,6 +5,7 @@
     "libogg",
     "libvorbis",
     "opengl",
+    "pkgconf",
     "portaudio",
     "zlib"
   ]

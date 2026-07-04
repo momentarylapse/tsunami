@@ -198,7 +198,7 @@ void Shader::update(const string &source) {
 			m.source = p.source;
 			m.meta = meta;
 			ctx->shader_modules.add(m);
-			msg_write("new module '" + m.meta.name + "'");
+			//msg_write("new module '" + m.meta.name + "'");
 			return;
 		} else if (p.type == TYPE_LAYOUT) {
 			meta = parse_meta(p.source);

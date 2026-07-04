@@ -24,7 +24,7 @@ public:
 	void correct() override;
 	void do_mapping() override;
 	void assemble() override;
-	void correct_implement_commands();
+	virtual void correct_implement_commands();
 	void implement_mov_chunk(kaba::SerialNode &c, int i, int size);
 
 

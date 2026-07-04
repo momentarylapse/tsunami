@@ -61,17 +61,28 @@ public:
 	float min_width_user, min_height_user;
 	SizeMode size_mode_x, size_mode_y;
 	vec2 align = vec2(0.5f, 0.5f); // (0,0)=top-left (1,1)=bottom-right
-	vec2 greed_factor = vec2(1, 1); // if expanding...
+	vec2 greed_factor = vec2(1, 1); // if expanding... (only compared against direct siblings!)
 	bool visible = true;
+	bool ignore_hover = false;
 	rect padding; // space "inside", around children/content
 	rect margin; // space "outside"
 
-	virtual vec2 get_greed_factor() const;
 	virtual vec2 get_content_min_size() const; // excluding padding/margin
-	vec2 get_effective_min_size() const; // including padding/margin
+	vec2 effective_min_size() const; // including padding/margin
+	SizeMode effective_size_mode_x() const;
+	SizeMode effective_size_mode_y() const;
+	SizeMode most_aggressive_child_size_mode_x() const;
+	SizeMode most_aggressive_child_size_mode_y() const;
 
 	virtual void negotiate_content_area(const rect& available); // excluding padding/margin
 	void negotiate_outer_area(const rect& available); // including padding/margin
 };
+
+Node* get_hover(Node* top, const vec2& p);
+
+template<class T>
+T* get_hover_as(Node* top, const vec2& p) {
+	return reinterpret_cast<T*>(get_hover(top, p));
+}
 
 }

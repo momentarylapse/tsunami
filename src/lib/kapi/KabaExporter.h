@@ -132,7 +132,7 @@ template<class T>
 class generic_virtual : public T {
 public:
 	void __delete__() {
-		this->~T();
+		this->~generic_virtual<T>();
 	}
 };
 

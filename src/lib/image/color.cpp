@@ -47,6 +47,23 @@ color color::parse(const string &s) {
 			c.b = (float)(unsigned char)bb[2] / 255.0f;
 		if (bb.num >= 4)
 			c.a = (float)(unsigned char)bb[3] / 255.0f;
+	} else if (s.head(1)[0] >= 'a' and s.head(1)[0] <= 'z') {
+		if (s == "black")
+			return Black;
+		if (s == "blue")
+			return Blue;
+		if (s == "gray")
+			return Gray;
+		if (s == "green")
+			return Green;
+		if (s == "orange")
+			return Orange;
+		if (s == "red")
+			return Red;
+		if (s == "white")
+			return White;
+		if (s == "yellow")
+			return Yellow;
 	} else {
 		auto xx = s.replace("(", "").replace(")", "").replace("[", "").replace("]", "").replace(" ", ",").replace(",,", ",").explode(",");
 		if (xx.num > 0)

@@ -11,8 +11,6 @@
 namespace kaba {
 	class Class;
 	class SyntaxTree;
-	
-	Array<string> dict_get_keys(const DynamicArray& a);
 
 
 	template<class T>
@@ -21,9 +19,6 @@ namespace kaba {
 		void __init__() {
 			new(this) base::map<string, T>();
 		}
-		void assign(XDict<T> &o) {
-			*this = o;
-		}
 		void __set(const string &k, const typename base::xparam<T>::t v) {
 			this->set(k, v);
 		}
@@ -31,6 +26,12 @@ namespace kaba {
 			if (this->contains(k))
 				return &(*this)[k];
 			return nullptr;
+		}
+		Array<string> keys() {
+			Array<string> r;
+			for (const auto& [k, v] : *this)
+				r.add(k);
+			return r;
 		}
 	};
 
@@ -53,9 +54,9 @@ namespace kaba {
 			class_add_func("clear", common_types._void, &XDict<T>::clear, Flags::Mutable);
 			class_add_func(Identifier::func::Contains, common_types._bool, &XDict<T>::contains);
 				func_add_param("key", common_types.string);
-			class_add_func(Identifier::func::Assign, common_types._void, &XDict<T>::assign, Flags::Mutable);
+			class_add_func(Identifier::func::Assign, common_types._void, &generic_assign<XDict<T>>, Flags::Mutable);
 				func_add_param("other", t);
-			class_add_func("keys", common_types.string_list, &dict_get_keys, Flags::Pure);
+			class_add_func("keys", common_types.string_list, &XDict<T>::keys, Flags::Pure);
 			class_add_func(Identifier::func::Str, common_types.string, &XDict<T>::str);
 	}
 

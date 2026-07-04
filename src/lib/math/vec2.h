@@ -8,8 +8,12 @@
 
 #pragma once
 
-
 #include "math.h"
+
+#ifdef min
+#undef min
+#undef max
+#endif
 
 struct vec2 {
 	float x, y;

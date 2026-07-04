@@ -8,10 +8,9 @@
 #include "../kaba.h"
 #include "implicit.h"
 #include "../parser/Parser.h"
+#include "../lib/dict.h"
 
 namespace kaba {
-
-Array<string> dict_get_keys(const DynamicArray& a);
 
 static shared<Node> sa_num(shared<Node> node) {
 	return node->shift(config.target.pointer_size, common_types.i32);
@@ -311,7 +310,7 @@ void TemplateClassInstantiatorDict::add_function_headers(Class* c) {
 	add_func_header(c, Identifier::func::Contains, common_types._bool, {common_types.string}, {"key"}, nullptr, Flags::Pure);
 
 	add_class(c);
-		class_add_func("keys", common_types.string_list, &dict_get_keys, Flags::Pure);
+		class_add_func("keys", common_types.string_list, &XDict<int>::keys, Flags::Pure); // happens to work for generic types :p
 
 	[[maybe_unused]] auto t_row = c->owner->create_new_class_no_check("Row", nullptr, dict_row_size(t_value), 0, nullptr, {}, c, -1);
 }

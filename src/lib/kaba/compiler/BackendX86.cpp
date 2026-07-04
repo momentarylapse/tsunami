@@ -318,7 +318,16 @@ void BackendX86::correct_implement_commands() {
 			insert_cmd(inst, r, param_vreg(common_types.i8, vecx, Asm::RegID::CL));
 		} else if (x86helper::inst_is_arithmetic(c.inst)) {
 			if (c.p[2].kind == NodeKind::None) {
-				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]); // cmd.cmd.add(c);
+				if (c.p[1].kind == NodeKind::Immediate and c.p[1].p == 1) {
+					if (c.inst ==  Asm::InstID::ADD) {
+						insert_cmd(Asm::InstID::INC, c.p[0]);
+						continue;
+					} else if (c.inst ==  Asm::InstID::SUB) {
+						insert_cmd(Asm::InstID::DEC, c.p[0]);
+						continue;
+					}
+				}
+				insert_cmd(c.inst, c.p[0], c.p[1], c.p[2]);
 				continue;
 			}
 			auto inst = c.inst;

@@ -923,7 +923,7 @@ void Compiler::compile_functions(char *oc, int &ocs) {
 
 	// assemble into opcode
 	try {
-//		list->optimize(oc, ocs);
+		list->optimize(oc, ocs);
 		list->compile(oc, ocs);
 	} catch(Asm::Exception &e) {
 		list->show();

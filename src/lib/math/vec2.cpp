@@ -150,3 +150,8 @@ vec2 vec2::bary_centric(const vec2 &P, const vec2 &A, const vec2 &B, const vec2 
 }
 
 
+string ivec2::str() const {
+	return format("(%d, %d)", i, j);
+}
+
+

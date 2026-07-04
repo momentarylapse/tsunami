@@ -36,7 +36,7 @@ if(GTK4_OR_GTK3_FOUND)
 		message(WARNING "Choice for GTK4_OR_GTK3 invalid, using ${GTK4_OR_GTK3} instead")
 	endif()
 else()
-	message(SEND_ERROR "Neither gtk4 or gtk3 found") #  or/nor..
+	message(SEND_ERROR "Neither gtk4 nor gtk3 found")
 	set(GTK4_OR_GTK3 "")
 endif()
 if(GTK4_OR_GTK3 STREQUAL "gtk4")
@@ -279,12 +279,12 @@ endif()
 # lib: gl (optional)
 set(LIB_GL_ENABLED true CACHE BOOL "Use gl library?")
 find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+if(OPENGL_FOUND AND NOT APPLE)
 else()
 	set(LIB_GL_ENABLED false CACHE BOOL "gl library not found" FORCE)
 endif()
 if(${LIB_GL_ENABLED})
-	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND DEPS OpenGL::GL)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
 else()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=0)
@@ -642,6 +642,7 @@ add_library(moduletsunami SHARED
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
 	src/lib/pdf/ttf.cpp
+	src/lib/threads/_kaba_export.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -1205,6 +1206,7 @@ add_executable(tsunami WIN32
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
 	src/lib/pdf/ttf.cpp
+	src/lib/threads/_kaba_export.cpp
 	src/lib/threads/Mutex.cpp
 	src/lib/threads/Thread.cpp
 	src/lib/threads/ThreadedWork.cpp
@@ -1470,7 +1472,7 @@ endif()
 set(RESOURCE_DESTINATION share/tsunami)
 
 # binaries
-install(TARGETS tsunami DESTINATION bin)	
+install(TARGETS tsunami DESTINATION bin)
 
 # resources
 install(DIRECTORY "static/icons" DESTINATION ${RESOURCE_DESTINATION})

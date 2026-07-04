@@ -273,6 +273,14 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 		return false;
 	};
 
+	auto is_vec4 = [](const Class* t) -> bool {
+		return (t == common_types.quaternion or t == common_types.color or t == common_types.rect or t == common_types.plane);
+	};
+
+	auto is_vec2 = [](const Class* t) -> bool {
+		return (t == common_types.vec2 or t == common_types.complex);
+	};
+
 	if (ptype.num == 0) {
 		if (return_type == common_types._void) {
 			call0_void(ff, ret, param);
@@ -367,12 +375,20 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 			}
 		} else if (return_type == common_types.vec3) {
 			if (ptype[0]->uses_call_by_reference()) {
-				call1<vec3,CBR>(ff, ret, param);
+#ifdef OS_WINDOWS
+				call1<CBR, CBR>(ff, ret, param);
+#else
+				call1<vec3, CBR>(ff, ret, param);
+#endif
 				return true;
 			}
-		} else if (return_type == common_types.quaternion) {
+		} else if (is_vec4(return_type)) {
 			if (ptype[0]->uses_call_by_reference()) {
-				call1<vec4,CBR>(ff, ret, param);
+#ifdef OS_WINDOWS
+				call1<CBR, CBR>(ff, ret, param);
+#else
+				call1<vec4, CBR>(ff, ret, param);
+#endif
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
@@ -443,14 +459,22 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				call2<int64,int64,int64>(ff, ret, param);
 				return true;
 			}
-		} else if (return_type == common_types.complex) {
+		} else if (is_vec2(return_type)) {
 			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32)) {
-				call2<vec2,float,float>(ff, ret, param);
+#ifdef OS_WINDOWS
+				call2<CBR,float,float>(ff, ret, param);
+#else
+				call2<vec2, float, float>(ff, ret, param);
+#endif
 				return true;
 			}
-		} else if (return_type == common_types.quaternion) {
+		} else if (is_vec4(return_type)) {
 			if ((ptype[0]->uses_call_by_reference()) and (ptype[1] == common_types.f32)) {
-				call2<vec4,CBR,float>(ff, ret, param);
+#ifdef OS_WINDOWS
+				call2<CBR, CBR, float>(ff, ret, param);
+#else
+				call2<vec4, CBR, float>(ff, ret, param);
+#endif
 				return true;
 			}
 		} else if (return_type->uses_return_by_memory()) {
@@ -474,16 +498,14 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 	} else if (ptype.num == 3) {
 		if (return_type == common_types.vec3) {
 			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32)) {
+#ifdef OS_WINDOWS
+				call3<CBR, float, float, float>(ff, ret, param);
+#else
 				call3<vec3,float,float,float>(ff, ret, param);
+#endif
 				return true;
 			}
 		}
-		/*if (f->return_type->uses_return_by_memory()) {
-			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32)) {
-				((void(*)(void*, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2]);
-				return true;
-			}
-		}*/
 	} else if (ptype.num == 4) {
 		if (return_type == common_types._void) {
 			if ((ptype[0] == common_types.vec3) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
@@ -491,18 +513,16 @@ bool call_function_pointer(void *ff, void *ret, const Array<void*> &param, const
 				return true;
 			}
 		}
-		if (return_type->_return_in_float_registers() and (return_type->size == 16)) { // rect, color, plane, quaternion
+		if (is_vec4(return_type)) {
 			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
+#ifdef OS_WINDOWS
+				call4<CBR, float, float, float, float>(ff, ret, param);
+#else
 				call4<vec4,float,float,float,float>(ff, ret, param);
+#endif
 				return true;
 			}
 		}
-		/*if (f->return_type->uses_return_by_memory()) {
-			if ((ptype[0] == common_types.f32) and (ptype[1] == common_types.f32) and (ptype[2] == common_types.f32) and (ptype[3] == common_types.f32)) {
-				((void(*)(void*, float, float, float, float))ff)(ret, *(float*)param[0], *(float*)param[1], *(float*)param[2], *(float*)param[3]);
-				return true;
-			}
-		}*/
 	}
 	db_out(".... NOPE");
 	return false;

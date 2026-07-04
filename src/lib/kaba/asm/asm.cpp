@@ -1,5 +1,6 @@
-#include "../../base/base.h"
-#include "../../os/msg.h"
+#include <lib/base/base.h>
+#include <lib/base/iter.h>
+#include <lib/os/msg.h>
 #include "asm.h"
 #include "internal.h"
 #include <stdio.h>
@@ -581,7 +582,7 @@ void InstructionWithParamsList::add2(InstID inst, const InstructionParam &p1, co
 void InstructionWithParamsList::show() {
 	msg_write("--------------");
 	state.reset(this);
-	foreachi(Asm::InstructionWithParams &i, *this, n) {
+	for (auto&& [n, i]: enumerate(*this)) {
 		for (Label &l: label)
 			if (l.inst_no == n)
 				msg_write("    " + l.name + ":");
@@ -602,7 +603,7 @@ int InstructionWithParamsList::create_label(const string &name) {
 }
 
 int InstructionWithParamsList::_find_label(const string &name) {
-	foreachi (Label &l, label, i)
+	for (const auto& [i, l]: enumerate(label))
 		if (l.name == name)
 			return i;
 	return -1;
@@ -1556,14 +1557,14 @@ static bool is_jump(InstID id) {
 	return false;
 }
 
-void InstructionWithParamsList::shrink_jumps(void *oc, int ocs) {
+void InstructionWithParamsList::_shrink_jumps(void *oc, int ocs) {
 	// first pass compilation (we need real jump distances)
 	int _ocs = ocs;
 	compile(oc, _ocs);
 	wanted_label.clear();
 
 	// try shrinking
-	foreachi(InstructionWithParams &iwp, *this, i) {
+	for (auto&& [i, iwp]: enumerate(*this)) {
 		if (is_jump(iwp.inst)) {
 			if (iwp.p[0].is_label) {
 				int target = label[(int)iwp.p[0].value].inst_no;
@@ -1586,8 +1587,9 @@ void InstructionWithParamsList::shrink_jumps(void *oc, int ocs) {
 }
 
 void InstructionWithParamsList::optimize(void *oc, int ocs) {
-	if ((instruction_set.set == InstructionSet::X86) or (instruction_set.set == InstructionSet::AMD64))
-		shrink_jumps(oc, ocs);
+	if ((instruction_set.set == InstructionSet::X86) or (instruction_set.set == InstructionSet::AMD64)) {
+		_shrink_jumps(oc, ocs);
+	}
 }
 
 void InstructionWithParamsList::compile(void *oc, int &ocs) {

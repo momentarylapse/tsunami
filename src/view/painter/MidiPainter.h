@@ -90,6 +90,7 @@ public:
 	const ColorScheme &local_theme;
 	rect area;
 	bool is_playable;
+	bool allow_colors;
 	int shift;
 	bool as_reference;
 	bool allow_shadows;

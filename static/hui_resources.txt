@@ -645,7 +645,7 @@ expandx
 0
 CheckBox
 scale-audio
-margin-left=30
+marginleft=30
 1
 0
 0
@@ -2520,7 +2520,7 @@ vertical,expandy
 3
 ListView
 layers
-format=tTC,select-single,reorderable
+format=tTC,selectsingle,reorderable
 0
 0
 0
@@ -3767,7 +3767,7 @@ hidden
 1
 ListView
 reference_tracks
-height=200,noexpandy,nobar,select-multi
+height=200,noexpandy,nobar,selectmulti
 0
 0
 0
@@ -3857,8 +3857,8 @@ expandx,border=0
 0
 2
 Separator
-
-
+?
+horizontal
 0
 0
 0
@@ -4981,10 +4981,10 @@ Grid
 
 0
 0
-12
+17
 Label
 l-color
-
+right,disabled
 0
 0
 0
@@ -4996,7 +4996,7 @@ theme
 0
 Label
 l-line-height
-
+right,disabled
 0
 1
 0
@@ -5008,7 +5008,7 @@ line-height
 0
 Label
 l-line-space
-
+right,disabled
 0
 2
 0
@@ -5020,7 +5020,7 @@ range=0:10:0.01
 0
 Label
 l-track-space
-
+right,disabled
 0
 3
 0
@@ -5032,7 +5032,7 @@ range=0:10:0.01
 0
 Label
 l-horizontal-scale
-
+right,disabled
 0
 4
 0
@@ -5048,16 +5048,52 @@ percent
 2
 4
 0
-CheckBox
-allow-shadows
-
+Label
+l-shadows
+right,disabled
 0
 5
 0
+CheckBox
+allow-shadows
+
+1
+5
+0
+Label
+l-part-colors
+right,disabled
+0
+6
+0
+CheckBox
+part-colors
+
+1
+6
+0
+Label
+l-note-colors
+right,disabled
+0
+7
+0
+CheckBox
+note-colors
+
+1
+7
+0
+Group
+g-tracks
+
+1
+0
+1
 Grid
 tracks
 
-1
+0
 0
 0
 Grid
@@ -7174,7 +7210,7 @@ Grid
 3
 Label
 question
-margin-top=8,margin-bottom=8
+margintop=8,marginbottom=8
 0
 0
 0
@@ -7241,7 +7277,7 @@ Grid
 2
 Label
 question
-margin-top=8,margin-bottom=8
+margintop=8,marginbottom=8
 0
 0
 0
@@ -7290,7 +7326,7 @@ Grid
 2
 Label
 question
-margin-top=8,margin-bottom=8
+margintop=8,marginbottom=8
 0
 0
 0
@@ -7363,7 +7399,7 @@ Grid
 2
 Label
 question
-margin-top=8,margin-bottom=8
+margintop=8,marginbottom=8
 0
 0
 0
@@ -7606,7 +7642,7 @@ image=hui:ok,important
 # Resource
 Dialog
 sample-manager-dialog
-width=400,height=400,allow-parent
+width=400,height=400,allowparent
 0
 0
 1
@@ -7618,7 +7654,7 @@ vertical
 2
 ListView
 sample-list
-format=Titm,select-multi,nobar
+format=Titm,selectmulti,nobar
 0
 0
 0
@@ -8128,7 +8164,7 @@ right,disabled
 0
 SpinButton
 scroll_speed
---range=0.1:20:0.1
+range=0.1:20:0.1
 1
 3
 0
@@ -8212,7 +8248,7 @@ right,disabled
 0
 SpinButton
 prebuffer_size
---range=0:1000000:1
+range=0:1000000:1
 1
 2
 0
@@ -8224,7 +8260,7 @@ right,disabled
 0
 SpinButton
 suck_size
---range=0:1000000:1
+range=0:1000000:1
 1
 3
 0
@@ -8334,7 +8370,7 @@ format=m,nobar,expandy,expandx
 # Resource
 Dialog
 signal-chain-panel
-width=400,height=400,allow-parent
+width=400,height=400,allowparent
 0
 0
 1
@@ -9390,7 +9426,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-816
+822
 # Text
 /bars-add
 Add bars...
@@ -10986,7 +11022,10 @@ pause_edit_dialog/t_duration
 Duration
 
 pdf-export-config-dialog/allow-shadows
-Shadows
+
+Show note duration of longer notes as a line
+pdf-export-config-dialog/g-tracks
+Tracks
 
 pdf-export-config-dialog/l-color
 Theme
@@ -11000,12 +11039,27 @@ Line height
 pdf-export-config-dialog/l-line-space
 Line space
 
+pdf-export-config-dialog/l-note-colors
+Note colors
+
+pdf-export-config-dialog/l-part-colors
+Part colors
+
+pdf-export-config-dialog/l-shadows
+Shadows
+
 pdf-export-config-dialog/l-track-space
 Track space
 
+pdf-export-config-dialog/note-colors
+
+Show note pitches as rainbow colors?
 pdf-export-config-dialog/ok
 Export
 
+pdf-export-config-dialog/part-colors
+
+Colorful part markers
 pdf-export-config-dialog/pdf-export-config-dialog
 Pdf Export
 

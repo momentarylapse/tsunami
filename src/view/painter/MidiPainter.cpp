@@ -51,6 +51,7 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	instrument = nullptr;
 	clef = nullptr;
 	is_playable = true;
+	allow_colors = true;
 	as_reference = false;
 	allow_shadows = true;
 	force_shadows = false;

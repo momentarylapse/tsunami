@@ -4,24 +4,32 @@ Dialog pdf-export-config-dialog "Pdf Export" width=1200 height=800 headerbar res
 			DrawingArea area "" expandx expandy mainwindowcontrol
 			Grid ? "" vertical width=120
 				Grid ? ""
-					Label l-color "Theme"
+					Label l-color "Theme" right disabled
 					ComboBox theme ""
 					---|
-					Label l-line-height 'Line height'
+					Label l-line-height 'Line height' right disabled
 					SpinButton line-height ""
 					---|
-					Label l-line-space 'Line space'
+					Label l-line-space 'Line space' right disabled
 					SpinButton line-space "" range=0:10:0.01
 					---|
-					Label l-track-space 'Track space'
+					Label l-track-space 'Track space' right disabled
 					SpinButton track-space "" range=0:10:0.01
 					---|
-					Label l-horizontal-scale 'Horizontal scale'
+					Label l-horizontal-scale 'Horizontal scale' right disabled
 					SpinButton horizontal-scale "" range=1:500:1
 					Label /percent "%"
 					---|
-					CheckBox allow-shadows 'Shadows'
-				Grid tracks ""
+					Label l-shadows 'Shadows' right disabled
+					CheckBox allow-shadows '' tooltip='Show note duration of longer notes as a line'
+					---|
+					Label l-part-colors 'Part colors' right disabled
+					CheckBox part-colors '' tooltip='Colorful part markers'
+					---|
+					Label l-note-colors 'Note colors' right disabled
+					CheckBox note-colors '' tooltip='Show note pitches as rainbow colors?'
+				Group g-tracks "Tracks"
+					Grid tracks ""
 		Grid ? "" buttonbar
 			Button /cancel "Cancel" image=hui:cancel
 			---|

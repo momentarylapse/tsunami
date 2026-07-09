@@ -52,7 +52,14 @@ class MLVDialog extends hui.Dialog
 					Label l-x-scale 'Horizontal scale'
 					SpinButton x-scale '{{x_scale}}' range=0.01:10:0.01
 					---|
-					CheckBox allow-shadows 'Shadows'
+					Label ? 'Shadows'
+					CheckBox allow-shadows ''
+					---|
+					Label ? 'Part colors'
+					CheckBox part-colors ''
+					---|
+					Label ? 'Note colors'
+					CheckBox note-colors ''
 				---|
 				ListView tracks 'Track\\Classical\\TAB' format=tCC")
 		set_target(":header:")
@@ -66,11 +73,8 @@ class MLVDialog extends hui.Dialog
 
 		#var me = &self
 		event("config", on_config)#lambda(me: MyDialog) me.hide_control("config-grid", false))
-		event("line-height", on_update)
-		event("line-space", on_update)
-		event("track-space", on_update)
-		event("x-scale", on_update)
-		event("allow-shadows", on_update)
+		for eid in ["line-height", "line-space", "track-space", "x-scale", "allow-shadows", "part-colors", "note-colors"]
+			let _ = event(eid, on_update)
 		event("play", on_play)
 		event_x("tracks", "hui:change", on_update)
 		event_x("area", "hui:left-button-down", on_click)
@@ -146,6 +150,8 @@ class MLVDialog extends hui.Dialog
 		track_space = get_float("track-space")
 		x_scale = get_float("x-scale")
 		allow_shadows = is_checked("allow-shadows")
+		part_colors = is_checked("part-colors")
+		note_colors = is_checked("note-colors")
 		track_mode.resize(len(session.song.tracks) * 2)
 		for i=>t in weak(session.song.tracks)
 			track_mode[i * 2    ] = (get_cell("tracks", i, 1) == "true")
@@ -159,6 +165,8 @@ class MLVDialog extends hui.Dialog
 		set_float("track-space", track_space)
 		set_float("x-scale", x_scale)
 		check("allow-shadows", allow_shadows)
+		check("part-colors", part_colors)
+		check("note-colors", note_colors)
 		if len(track_mode) > 0
 			for i=>t in weak(session.song.tracks)
 				if i*2 < len(track_mode)
@@ -257,7 +265,8 @@ class MLVDialog extends hui.Dialog
 			"allow-shadows": allow_shadows,
 			"antialiasing": true,
 			"collapse-midi": true,
-			"part-colors": true}))
+			"part-colors": part_colors,
+			"note-colors": note_colors}))
 		var y0 = 10.0 - y_offset
 		var offset = 0
 		let dy = mlp.get_line_dy()
@@ -324,6 +333,8 @@ class MultiLineView extends TsunamiPlugin
 		track_mode: bool[]
 		y_offset = 0.0
 		allow_shadows = true
+		part_colors = true
+		note_colors = true
 		window_size: (int,int)
 		show_window = true
 		func override reset()
@@ -335,6 +346,8 @@ class MultiLineView extends TsunamiPlugin
 			track_mode.clear()
 			y_offset = 0.0
 			allow_shadows = true
+			part_colors = true
+			note_colors = true
 			window_size = [800,600]
 			show_window = true
 	var config: Config

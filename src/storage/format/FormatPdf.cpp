@@ -44,7 +44,11 @@ bool FormatPdf::get_parameters(StorageOperationData *od, bool save) {
 	if (!od->parameters.has("track-space"))
 		od->parameters.dict_set("track-space", 0.4f * 20);
 	if (!od->parameters.has("allow-shadows"))
-		od->parameters.dict_set("allow-shadows", true);
+		od->parameters.dict_set("allow-shadows", false);
+	if (!od->parameters.has("part-colors"))
+		od->parameters.dict_set("part-colors", false);
+	if (!od->parameters.has("note-colors"))
+		od->parameters.dict_set("note-colors", true);
 	if (!od->parameters.has("min-font-size"))
 		od->parameters.dict_set("min-font-size", 6.0f);
 

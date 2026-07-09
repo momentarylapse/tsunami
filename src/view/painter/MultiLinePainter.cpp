@@ -62,6 +62,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 	mp->set_min_font_size(min_font_size);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
+	mp->allow_colors = allow_note_colors;
 	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
@@ -106,6 +107,7 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 	mp->set_size_data(true, line_height / 75);//0.66f);
 	mp->set_key_changes(get_key_changes(t->layers[0].get()));
 	mp->set_quality(200, antialiasing);
+	mp->allow_colors = allow_note_colors;
 	mp->allow_shadows = allow_shadows;
 
 	p->set_antialiasing(antialiasing);
@@ -263,6 +265,8 @@ void MultiLinePainter::set(const Any &conf) {
 		min_font_size = conf["min-font-size"].to_f32();
 	if (conf.has("part-colors"))
 		allow_part_colors = conf["part-colors"].to_bool();
+	if (conf.has("note-colors"))
+		allow_note_colors = conf["note-colors"].to_bool();
 	update_scales();
 }
 

@@ -64,7 +64,7 @@ void MidiPainterModeLinear::draw_note(Painter *c, const MidiNote &n, MidiNoteSta
     [[maybe_unused]] float rr = mp->rr;
 
 	color col, col_shadow;
-	get_col(col, col_shadow, &n, state, mp->is_playable, local_theme);
+	get_col(col, col_shadow, &n, state, mp->is_playable, mp->allow_colors, local_theme);
 
 	float shadow_len = (x2 - x1) - shadow_offset*2 - shadow_hole;
 

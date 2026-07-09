@@ -133,7 +133,7 @@ Array<QuantizedNote> quantize_all_notes_in_bar(MidiNoteBuffer &bnotes, Bar *b, M
 
 
 		color col_shadow;
-		get_col(d.col, col_shadow, n, note_state(n, mp->as_reference, mp->sel, mp->hover), mp->is_playable, mp->local_theme);
+		get_col(d.col, col_shadow, n, note_state(n, mp->as_reference, mp->sel, mp->hover), mp->is_playable, mp->allow_colors, mp->local_theme);
 
 		// prevent double notes
 		if (ndata.num > 0)

@@ -8,7 +8,7 @@
 #ifndef SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_
 #define SRC_VIEW_PAINTER_MIDI_MIDIPAINTERMODE_H_
 
-#include "../../../lib/base/base.h"
+#include <lib/base/base.h>
 
 struct color;
 class Painter;
@@ -39,7 +39,7 @@ inline MidiNoteState operator|(MidiNoteState a, MidiNoteState b) {
 	return (MidiNoteState)((int)a | (int)b);
 }
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors);
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, bool allow_color, const ColorScheme &colors);
 MidiNoteState note_state(MidiNote *n, bool as_reference, SongSelection *sel, HoverData *hover);
 void draw_shadow(Painter *c, float x1, float x2, float y, float rr, const color &col);
 

@@ -42,8 +42,8 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 		string id_classic = format("classical-%d", i);
 		string id_tab = format("tab-%d", i);
 		add_label(t->nice_name(), 0, i, "");
-		add_check_box("Classical", 1, i, id_classic);
-		add_check_box("TAB", 2, i, id_tab);
+		add_check_box("!expandx\\Classical", 1, i, id_classic);
+		add_check_box("!expandx\\TAB", 2, i, id_tab);
 		check(id_classic, true);
 		check(id_tab, t->instrument.string_pitch.allocated > 0);
 		enable(id_tab, t->instrument.string_pitch.allocated > 0);
@@ -58,6 +58,8 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	set_float("border", od->parameters["border"].to_f32());
 	set_float("horizontal-scale", od->parameters["horizontal-scale"].to_f32() * 100);
 	check("allow-shadows", od->parameters["allow-shadows"].to_bool());
+	check("part-colors", od->parameters["part-colors"].to_bool());
+	check("note-colors", od->parameters["note-colors"].to_bool());
 
 	update_params();
 
@@ -69,6 +71,8 @@ PdfConfigDialog::PdfConfigDialog(StorageOperationData *_od, hui::Window *parent)
 	event("track-height", [this] { update_params(); });
 	event("horizontal-scale", [this] { update_params(); });
 	event("allow-shadows", [this] { update_params(); });
+	event("part-colors", [this] { update_params(); });
+	event("note-colors", [this] { update_params(); });
 	event("hui:close", [this] { on_close(); });
 	event("cancel", [this] { on_close(); });
 	event("ok", [this] { on_ok(); });
@@ -105,6 +109,8 @@ void PdfConfigDialog::update_params() {
 	//od->parameters.dict_set("border", get_float("border"));
 	od->parameters.dict_set("horizontal-scale", get_float("horizontal-scale") / 100);
 	od->parameters.dict_set("allow-shadows", is_checked("allow-shadows"));
+	od->parameters.dict_set("part-colors", is_checked("part-colors"));
+	od->parameters.dict_set("note-colors", is_checked("note-colors"));
 
 	od->parameters.dict_set("theme", get_int("theme"));
 

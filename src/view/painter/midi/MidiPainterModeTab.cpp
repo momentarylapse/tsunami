@@ -66,7 +66,7 @@ void MidiPainterModeTab::draw_note(Painter *c, const MidiNote *n, MidiNoteState 
 	n->y = y;
 
 	color col, col_shadow;
-	get_col(col, col_shadow, n, state, mp->is_playable, local_theme);
+	get_col(col, col_shadow, n, state, mp->is_playable, mp->allow_colors, local_theme);
 
 	float x = (x1 + x2) / 2;
 	float font_size = rr * 1.8f;

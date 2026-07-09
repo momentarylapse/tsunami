@@ -9,9 +9,11 @@
 
 namespace tsunami {
 
-void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, const ColorScheme &colors) {
-	if (playable)
+void get_col(color &col, color &col_shadow, const MidiNote *n, MidiNoteState state, bool playable, bool allow_color, const ColorScheme &colors) {
+	if (playable and allow_color)
 		col = colors.pitch_text[(int)n->pitch % 12];
+	else if (playable)
+		col = colors.text_soft1;
 	else
 		col = colors.text_soft3;
 

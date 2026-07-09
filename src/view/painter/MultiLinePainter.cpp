@@ -199,11 +199,20 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 		}
 
 		// part?
-		if (auto *m = get_bar_part(song, b->offset)) {
-			p->set_color(colors.text);
-			const float x = x1 * 0.75f + x2 * 0.25f;
+		if (auto m = get_bar_part(song, b->offset)) {
 			p->set_font_size(line_height / 3);
-			p->draw_str({x - d*3, y-d*6}, m->nice_text());
+			vec2 pos = {min(x1 + d*17, x2-d*3), y-d*6};
+
+			if (allow_part_colors) {
+				p->set_color(color::mix(hash_color(m->text.hash()), colors.background, 0.40f));
+				const auto size = p->get_str_size(m->nice_text());
+				p->set_roundness(d*4);
+				p->draw_rect(rect(pos, pos + size).grow(d*2.5));
+				p->set_roundness(0);
+			}
+
+			p->set_color(colors.text);
+			p->draw_str(pos, m->nice_text());
 		}
 	}
 }
@@ -264,21 +273,40 @@ void MultiLinePainter::update_scales() {
 }
 
 float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const Range &r, float scale) {
-	p->set_line_width(line_height / 100);
 
 	cam->pos = r.offset;
 	cam->pixels_per_sample = (double)cam->area.width() / (double)r.length;
 
 	if (allow_part_colors) {
-		float y1 = y0 + get_line_dy() - track_space*2 - line_space;
+		const float lw = line_height / 4;
+		p->set_line_width(lw);
+		const float y1 = y0 + get_line_dy() - track_space*2 - line_space;
+		const float dx = line_height / 6;
+		const float dy1 = line_height / 6;
+		const float dy2 = line_height / 2;
 		for (auto part: song->get_parts()) {
-			if (!part->range.overlaps(r))
-				continue;
-			auto rr = part->range and r;
-			p->set_color(color::mix(hash_color(part->text.hash()), colors.background, 0.90f));
-			float x0, x1;
-			cam->range2screen(rr, x0, x1);
-			p->draw_rect(rect(x0,x1, y0, y1));
+			if (r.is_inside(part->range.offset + 100)) {
+				p->set_color(color::mix(hash_color(part->text.hash()), colors.background, 0.40f));
+				float x = cam->sample2screen_f((float)part->range.offset) + lw/2;
+				p->draw_lines({
+					{x + dx, y0 + dy1},
+					{x + dx * 0.3f, y0 + dy1 + dy2 * 0.4f},
+					{x, y0 + dy1 + dy2},
+					{x, y1 - dy1 - dy2},
+					{x + dx * 0.3f, y1 - dy1 - dy2 * 0.4f},
+					{x + dx, y1 - dy1}});
+			}
+			if (r.is_inside(part->range.end() - 100)) {
+				p->set_color(color::mix(hash_color(part->text.hash()), colors.background, 0.40f));
+				float x = cam->sample2screen_f((float)part->range.end()) - lw/2;
+				p->draw_lines({
+					{x - dx, y0 + dy1},
+					{x - dx * 0.3f, y0 + dy1 + dy2 * 0.4f},
+					{x, y0 + dy1 + dy2},
+					{x, y1 - dy1 - dy2},
+					{x - dx * 0.3f, y1 - dy1 - dy2 * 0.4f},
+					{x - dx, y1 - dy1}});
+			}
 		}
 	}
 

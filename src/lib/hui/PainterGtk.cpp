@@ -216,10 +216,14 @@ vec2 Painter::get_str_size(const string &str) {
 		return {0,0};
 	pango_cairo_update_layout(cr, layout);
 	pango_layout_set_text(layout, (char*)str.data, str.num);
-	int w, h;
+
+	PangoRectangle r;
+	pango_layout_get_pixel_extents(layout, &r, nullptr);
+	return {(float)r.width, (float)r.height};
+	/*int w, h;
 	pango_layout_get_size(layout, &w, &h);
 
-	return {(float)w / 1000.0f, (float)h / 1000.0f};
+	return {(float)w / 1000.0f, (float)h / 1000.0f};*/
 }
 
 void Painter::draw_rect(const rect &r) {

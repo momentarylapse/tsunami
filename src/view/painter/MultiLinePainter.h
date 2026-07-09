@@ -17,8 +17,9 @@ class Any;
 struct vec2;
 
 namespace tsunami {
+	class GridPainter;
 
-class Song;
+	class Song;
 class Track;
 class MidiPainter;
 class ColorScheme;
@@ -29,27 +30,25 @@ class HoverData;
 
 class MultiLinePainter {
 public:
-	MultiLinePainter(Song *s, const ColorScheme &c);
-	virtual ~MultiLinePainter();
-
-	void __init__(Song *s, const ColorScheme &c);
-	void __delete__();
+	MultiLinePainter(Song* s, const ColorScheme& c);
+	~MultiLinePainter();
 
 	struct TrackData {
-		Track *track;
+		Track* track;
 		bool allow_classical, allow_tab;
 	};
 	Array<TrackData> track_data;
-	void set_context(const Any &conf, float page_width, float avg_samples_per_line);
-	void set(const Any &conf);
+	void set_context(const Any& conf, float page_width, float avg_samples_per_line);
+	void set(const Any& conf);
 	void update_scales();
 
 
+	owned<GridPainter> grid_painter;
 	owned<MidiPainter> mp;
 	owned<ViewPort> cam;
-	const ColorScheme &colors;
-	SongSelection *sel;
-	HoverData *hover;
+	const ColorScheme& colors;
+	SongSelection* sel;
+	HoverData* hover;
 
 	float page_width = 1200;
 	float border = 25;

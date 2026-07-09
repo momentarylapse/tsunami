@@ -24,12 +24,8 @@ public:
 	AudioBuffer(int length, int channels);
 	~AudioBuffer() = default;
 
-	void __init__();
-	void __delete__();
-
 	void operator=(const AudioBuffer &b);
 	void operator=(AudioBuffer &&b) noexcept;
-	void __assign__(const AudioBuffer &other) { *this = other; }
 
 	int offset, length;
 	int channels;

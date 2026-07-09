@@ -986,7 +986,7 @@ void ViewModeEditMidi::set_note_length_and_partition(int length, int partition) 
 
 void ViewModeEditMidi::draw_layer_background(Painter *c, AudioViewLayer *l) {
 	if (editing(l)) {
-		view->grid_painter->set_context(l->area, l->grid_colors());
+		view->grid_painter->set_context(l->area, l->grid_colors(), 1);
 		view->grid_painter->draw_empty_background(c);
 		view->grid_painter->draw_whatever(c, sub_beat_partition);
 

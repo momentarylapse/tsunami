@@ -83,14 +83,6 @@ AudioBuffer::AudioBuffer(AudioBuffer &&b)  noexcept {
 	b.version = -1;
 }
 
-void AudioBuffer::__init__() {
-	new(this) AudioBuffer;
-}
-
-void AudioBuffer::__delete__() {
-	this->AudioBuffer::~AudioBuffer();
-}
-
 void AudioBuffer::operator=(const AudioBuffer &b) {
 	clear();
 	if (uid < 0)

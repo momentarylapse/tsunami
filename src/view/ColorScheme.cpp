@@ -66,8 +66,8 @@ float color_brightness(const color &c) {
 	return (c.r + c.g + c.b) / 3;
 }
 
-color col_inter(const color a, const color &b, float t) {
-	float e = 0.7f;
+color col_inter(const color& a, const color &b, float t) {
+	float e = 0.9f;
 	color c;
 	c.a = 1;//(1-t) * a.a + t * b.a;
 	c.r = pow((1-t) * pow(a.r, e) + t * pow(b.r, e), 1/e);

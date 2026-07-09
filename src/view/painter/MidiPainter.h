@@ -57,7 +57,6 @@ class MidiPainter {
 	friend class MidiPainterModeLinear;
 public:
 	MidiPainter(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors);
-	void __init__(Song *song, ViewPort *cam, SongSelection *sel, HoverData *hover, const ColorScheme &colors);
 
 
 	static color pitch_color(int pitch);

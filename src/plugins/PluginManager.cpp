@@ -499,10 +499,10 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 	//kaba::_declare_class_element("AudioBuffer.l", _offsetof(AudioBuffer, c[0]));
 	//kaba::_declare_class_element("AudioBuffer.r", _offsetof(AudioBuffer, c[1]));
 	ext->declare_class_element("AudioBuffer.version", &AudioBuffer::version);
-	ext->link_class_func("AudioBuffer.__init__", &AudioBuffer::__init__);
-	ext->link_class_func("AudioBuffer.__delete__", &AudioBuffer::__delete__);
+	ext->link_class_func("AudioBuffer.__init__", &kaba::generic_init<AudioBuffer>);
+	ext->link_class_func("AudioBuffer.__delete__", &kaba::generic_delete<AudioBuffer>);
 	ext->link_class_func("AudioBuffer.clear", &AudioBuffer::clear);
-	ext->link_class_func("AudioBuffer.__assign__", &AudioBuffer::__assign__);
+	ext->link_class_func("AudioBuffer.__assign__", &kaba::generic_assign<AudioBuffer>);
 	ext->link_class_func("AudioBuffer.range", &AudioBuffer::range);
 	ext->link_class_func("AudioBuffer.resize", &AudioBuffer::resize);
 	ext->link_class_func("AudioBuffer.set_channels", &AudioBuffer::set_channels);
@@ -514,8 +514,8 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 
 
 	ext->declare_class_size("RingBuffer", sizeof(RingBuffer));
-	ext->link_class_func("RingBuffer.__init__", &RingBuffer::__init__);
-	ext->link_class_func("RingBuffer.__delete__", &RingBuffer::__delete__);
+	ext->link_class_func("RingBuffer.__init__", &kaba::generic_init_ext<RingBuffer, int>);
+	ext->link_class_func("RingBuffer.__delete__", &kaba::generic_delete<RingBuffer>);
 	ext->link_class_func("RingBuffer.available", &RingBuffer::available);
 	ext->link_class_func("RingBuffer.read", &RingBuffer::read);
 	ext->link_class_func("RingBuffer.write", &RingBuffer::write);
@@ -1023,7 +1023,8 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 
 	ext->declare_class_size("MidiPainter", sizeof(MidiPainter));
 	ext->declare_class_element("MidiPainter.cam", &MidiPainter::cam);
-	ext->link_class_func("MidiPainter.__init__", &MidiPainter::__init__);
+	ext->link_class_func("MidiPainter.__init__", &kaba::generic_init_ext<MidiPainter, Song*, ViewPort*, SongSelection*, HoverData*, const ColorScheme&>);
+	ext->link_class_func("MidiPainter.__delete__", &kaba::generic_delete<MidiPainter>);
 	ext->link_class_func("MidiPainter.set_context", &MidiPainter::set_context);
 	ext->link_class_func("MidiPainter.draw", &MidiPainter::draw);
 	ext->link_class_func("MidiPainter.draw_background", &MidiPainter::draw_background);
@@ -1031,7 +1032,7 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 
 
 	ext->declare_class_size("GridPainter", sizeof(GridPainter));
-	ext->link_class_func("GridPainter.__init__", &GridPainter::__init__);
+	ext->link_class_func("GridPainter.__init__", &kaba::generic_init_ext<GridPainter, Song*, ViewPort*, SongSelection*, ColorScheme&>);
 	ext->link_class_func("GridPainter.set_context", &GridPainter::set_context);
 	ext->link_class_func("GridPainter.draw_empty_background", &GridPainter::draw_empty_background);
 	ext->link_class_func("GridPainter.draw_bars", &GridPainter::draw_bars);
@@ -1040,8 +1041,8 @@ void PluginManager::export_kaba_package_tsunami(kaba::IExporter* ext) {
 	ext->link_class_func("GridPainter.draw_time_numbers", &GridPainter::draw_time_numbers);
 
 	ext->declare_class_size("MultiLinePainter", sizeof(MultiLinePainter));
-	ext->link_class_func("MultiLinePainter.__init__", &MultiLinePainter::__init__);
-	ext->link_class_func("MultiLinePainter.__delete__", &MultiLinePainter::__delete__);
+	ext->link_class_func("MultiLinePainter.__init__", &kaba::generic_init_ext<MultiLinePainter, Song*, const ColorScheme&>);
+	ext->link_class_func("MultiLinePainter.__delete__", &kaba::generic_delete<MultiLinePainter>);
 	ext->link_class_func("MultiLinePainter.set_context", &MultiLinePainter::set_context);
 	ext->link_class_func("MultiLinePainter.set", &MultiLinePainter::set);
 	ext->link_class_func("MultiLinePainter.draw_next_line", &MultiLinePainter::draw_next_line);

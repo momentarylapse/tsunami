@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-color col_inter(const color a, const color &b, float t);
+color col_inter(const color& a, const color &b, float t);
 
 BasicGridPainter::BasicGridPainter() {
 	horizontal = true;
@@ -20,9 +20,10 @@ BasicGridPainter::BasicGridPainter() {
 }
 
 
-void BasicGridPainter::set_context(const rect &_area, const GridColors &c) {
+void BasicGridPainter::set_context(const rect& _area, const GridColors& c, float _line_width) {
 	area = _area;
 	colors = c;
+	line_width = _line_width;
 }
 
 void BasicGridPainter::plan_linear(float v0, float v1, float min_dist) {
@@ -87,7 +88,7 @@ void BasicGridPainter::draw(Painter *p) {
 	color col[8];
 	for (int k=0; k<3; k++)
 		col[k] = col_inter(colors.bg, colors.fg, weights[k] * 0.8f);
-	p->set_line_width(0.7f);
+	p->set_line_width(line_width * 0.7f);
 
 	if (horizontal) {
 		for (auto &t: ticks) {
@@ -100,7 +101,7 @@ void BasicGridPainter::draw(Painter *p) {
 			p->draw_line({area.x1, t.x}, {area.x2, t.x});
 		}
 	}
-	p->set_line_width(1);
+	p->set_line_width(line_width);
 }
 
 

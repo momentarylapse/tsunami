@@ -7,23 +7,25 @@
 
 #include "MultiLinePainter.h"
 #include "MidiPainter.h"
+#include "GridPainter.h"
 #include "../audioview/ViewPort.h"
 #include "../ColorScheme.h"
 #include "../HoverData.h"
-#include "../../data/base.h"
-#include "../../data/Song.h"
-#include "../../data/Track.h"
-#include "../../data/TrackLayer.h"
-#include "../../data/TrackMarker.h"
-#include "../../data/rhythm/Bar.h"
-#include "../../data/rhythm/Beat.h"
-#include "../../data/midi/Clef.h"
-#include "../../data/SongSelection.h"
-#include "../../lib/image/Painter.h"
-#include "../../lib/math/rect.h"
-#include "../../lib/math/vec2.h"
-#include "../../lib/os/msg.h"
-#include <math.h>
+#include <data/base.h>
+#include <data/Song.h>
+#include <data/Track.h>
+#include <data/TrackLayer.h>
+#include <data/TrackMarker.h>
+#include <data/rhythm/Bar.h>
+#include <data/rhythm/Beat.h>
+#include <data/midi/Clef.h>
+#include <data/SongSelection.h>
+#include <lib/image/Painter.h>
+#include <lib/math/rect.h>
+#include <lib/math/vec2.h>
+#include <cmath>
+
+#include "layout/Grid.h"
 
 namespace tsunami {
 
@@ -41,21 +43,12 @@ MultiLinePainter::MultiLinePainter(Song *s, const ColorScheme &c) :
 	sel = new SongSelection;
 	hover = new HoverData;
 	mp = new MidiPainter(song, cam.get(), sel, hover, c);
+	grid_painter = new GridPainter(song, cam.get(), sel, colors);
 
 	pdf_bpm = 0;
 }
 
-MultiLinePainter::~MultiLinePainter() {
-}
-
-
-void MultiLinePainter::__init__(Song *s, const ColorScheme &c) {
-	new (this) MultiLinePainter(s, c);
-}
-
-void MultiLinePainter::__delete__() {
-	this->MultiLinePainter::~MultiLinePainter();
-}
+MultiLinePainter::~MultiLinePainter() = default;
 
 
 float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
@@ -82,6 +75,7 @@ float MultiLinePainter::draw_track_classical(Painter *p, float x0, float w, floa
 
 	// clef lines
 	p->set_color(colors.text_soft1);
+	p->set_line_width(line_height / 100);
 	for (int i=0; i<10; i+=2) {
 		float y = mp->clef_pos_to_screen(i);
 		p->draw_line(vec2(x0, y), vec2(x0 + w, y));
@@ -141,16 +135,17 @@ float MultiLinePainter::draw_track_tab(Painter *p, float x0, float w, float y0, 
 
 void MultiLinePainter::draw_track_markers(Painter *p, float x0, float w, float y0, const Range &r, Track *t, float scale) {
 	float y = y0;
+	p->set_line_width(line_height / 100);
+	p->set_color(colors.text_soft1);
+	p->set_font_size(line_height / 5);
 	const float d = line_height / 20;
 	for (auto l: weak(t->layers))
 		for (auto m: weak(l->markers))
 			if (r.is_inside(m->range.start())) {
 				float x = cam->sample2screen(m->range.start());
-				p->set_color(colors.text_soft1);
 				p->draw_line({x - d*4, y - d*13}, {x - d*4, y - d*7});
 				p->draw_line({x - d*4, y - d*13}, {x + d*4, y - d*13});
 				p->draw_line({x - d*4, y - d*7},  {x + d*4, y - d*7});
-				p->set_font_size(line_height / 5);
 				p->draw_str({x - d*3, y-d*12}, m->nice_text());
 			}
 }
@@ -166,29 +161,22 @@ TrackMarker* get_bar_part(Song *s, int offset) {
 }
 
 void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float h, const Range &r) {
-	auto beats = song->bars.get_beats(Range(r.offset, r.length + 1), true);
-	for (auto b: beats) {
-		float x = cam->sample2screen(b.range.offset);
-		if (b.level == 0) {
-			p->set_color(colors.text_soft1);
-			p->set_line_width(line_height / 50);
-		} else {
-			p->set_color(colors.text_soft3);
-			p->set_line_width(line_height / 100);
-		}
-		p->draw_line({x, y}, {x, y + h});
-	}
-	p->set_line_width(line_height / 100);
+	GridColors gc;
+	gc.fg = colors.text_soft1;
+	gc.bg = colors.background_track;
+	grid_painter->set_context({x0, x0+w, y, y+h}, gc, line_height / 100);
+	grid_painter->draw_bars(p);
 }
 
 void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, float h, const Range &r) {
 	auto bars = song->bars.get_bars(Range(r.offset, r.length - 50));
 	p->set_antialiasing(antialiasing);
+	p->set_line_width(line_height / 100);
 	const float d = line_height / 20;
 	for (auto b: bars){
 		float x1, x2;
 		cam->range2screen(b->range(), x1, x2);
-		double bpm = b->bpm(song->sample_rate);
+		const double bpm = b->bpm((float)song->sample_rate);
 		string s;
 		if (b->beats != pdf_pattern) {
 			pdf_pattern = b->beats;
@@ -213,7 +201,7 @@ void MultiLinePainter::draw_bar_markers(Painter *p, float x0, float w, float y, 
 		// part?
 		if (auto *m = get_bar_part(song, b->offset)) {
 			p->set_color(colors.text);
-			float x = x1 * 0.75f + x2 * 0.25f;
+			const float x = x1 * 0.75f + x2 * 0.25f;
 			p->set_font_size(line_height / 3);
 			p->draw_str({x - d*3, y-d*6}, m->nice_text());
 		}
@@ -287,7 +275,7 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 			if (!part->range.overlaps(r))
 				continue;
 			auto rr = part->range and r;
-			p->set_color(color::mix(hash_color(part->text.hash()), theme.background, 0.90f));
+			p->set_color(color::mix(hash_color(part->text.hash()), colors.background, 0.90f));
 			float x0, x1;
 			cam->range2screen(rr, x0, x1);
 			p->draw_rect(rect(x0,x1, y0, y1));
@@ -330,7 +318,6 @@ float MultiLinePainter::draw_line(Painter *p, float x0, float w, float y0, const
 	float sy1 = line_data.back().y1;
 	p->draw_lines({{x0, sy0 - d*3}, {x0 - d*1.5f, sy0-d}, {x0 - d*1.5f, sy1+d}, {x0, sy1 + d*3}});
 	p->draw_line({x0 + w + d*1.5f, sy0}, {x0 + w + d*1.5f, sy1});
-	p->set_line_width(line_height / 100);
 
 	return y0;
 }
@@ -340,6 +327,7 @@ float MultiLinePainter::draw_next_line(Painter *p, int &offset, const vec2 &pos)
 	float scale = w / line_samples;
 	Range r = Range(offset, line_samples);
 
+	p->set_line_width(line_height / 100);
 	float y0 = draw_line(p, pos.x + border, w, pos.y, r, scale);
 	y0 += line_space;
 

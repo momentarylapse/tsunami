@@ -145,7 +145,7 @@ void TimeScale::on_draw(Painter* c) {
 	g.fg = g.fg_sel = theme.grid;
 
 	auto *gp = view->grid_painter.get();
-	gp->set_context(area, g);
+	gp->set_context(area, g, 1);
 	gp->draw_empty_background(c);
 	gp->draw_time(c);
 

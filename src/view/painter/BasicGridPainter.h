@@ -32,7 +32,7 @@ public:
 	BasicGridPainter();
 
 
-	void set_context(const rect &area, const GridColors &c);
+	void set_context(const rect &area, const GridColors &c, float line_width);
 
 	struct Tick {
 		float x, v;
@@ -55,6 +55,7 @@ public:
 	rect area;
 	double min_grid_dist;
 	GridColors colors;
+	float line_width;
 };
 
 }

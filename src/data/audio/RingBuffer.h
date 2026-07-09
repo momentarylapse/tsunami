@@ -18,9 +18,6 @@ public:
 	explicit RingBuffer(int size);
 	~RingBuffer();
 
-	void __init__(int size);
-	void __delete__();
-
 	// internal
 	void _move_read_pos(int delta);
 	void _move_write_pos(int delta);

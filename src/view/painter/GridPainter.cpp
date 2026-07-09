@@ -20,10 +20,10 @@
 
 namespace tsunami {
 
-color col_inter(const color a, const color &b, float t);
+color col_inter(const color& a, const color &b, float t);
 
 
-GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, ColorScheme &_scheme) :
+GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, const ColorScheme &_scheme) :
 	 local_theme(_scheme) {
 	sel = _sel;
 	if (!sel)
@@ -31,10 +31,6 @@ GridPainter::GridPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Color
 	get_hover_bar = [] { return nullptr; };
 	cam = _cam;
 	song = _song;
-}
-
-void GridPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, ColorScheme &_scheme) {
-	new(this) GridPainter(_song, _cam, _sel, _scheme);
 }
 
 
@@ -132,6 +128,7 @@ void GridPainter::draw_bars(Painter *c, const base::optional<int>& beat_partitio
 		return (song->bars[i+1]->is_pause());
 	};
 
+	c->set_line_width(line_width);
 	auto bars = song->bars.get_bars(Range::to(s0, s1));
 	for (auto&& [i,b]: enumerate(bars)) {
 		if (b->is_pause())
@@ -139,14 +136,14 @@ void GridPainter::draw_bars(Painter *c, const base::optional<int>& beat_partitio
 		float xx = cam->sample2screen(b->range().offset);
 
 		float dx_bar = cam->dsample2screen(b->range().length);
-		float dx_beat = dx_bar / b->beats.num;
+		float dx_beat = dx_bar / (float)b->beats.num;
 		float f1 = dx_bar / 50.0f;
 		if ((b->index_text % 5) == 0)
 			f1 *= 5;
 		if ((b->index_text % 25) == 0)
 			f1 *= 5;
 		f1 = min(1.0f, f1);
-		float f2 = min(1.0f, dx_beat / 25.0f);
+		float f2 = min(1.0f, dx_beat / 22.0f);
 
 		if (f1 >= 0.1f) {
 			if (sel->range().is_inside(b->range().offset))
@@ -168,8 +165,8 @@ void GridPainter::draw_bars(Painter *c, const base::optional<int>& beat_partitio
 		}
 
 		if (f2 >= 0.1f) {
-			color c1 = col_inter(colors.bg, colors.fg, f2*0.5f);
-			color c1s = col_inter(colors.bg_sel, colors.fg_sel, f2*0.5f);
+			color c1 = col_inter(colors.bg, colors.fg, f2*0.25f);
+			color c1s = col_inter(colors.bg_sel, colors.fg_sel, f2*0.25f);
 			color c2 = col_inter(colors.bg, c1, 0.6f);
 			color c2s = col_inter(colors.bg_sel, c1s, 0.6f);
 
@@ -242,7 +239,7 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 			s = b->format_beats();
 			prev = *b;
 		}
-		if (fabs(prev_bpm - bpm) > 1.5f) {
+		if (fabsf(prev_bpm - bpm) > 1.5f) {
 			s += format(u8" \u2669=%.0f", bpm);
 			prev_bpm = bpm;
 		}
@@ -265,7 +262,6 @@ void GridPainter::draw_bar_numbers(Painter *c) {
 	}
 	c->set_font("", local_theme.FONT_SIZE, false, false);
 	//c->setLineDash(no_dash, 0);
-	c->set_line_width(local_theme.LINE_WIDTH);
 }
 
 void GridPainter::draw_whatever(Painter *c, const base::optional<int>& beat_partition) {

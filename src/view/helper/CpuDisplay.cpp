@@ -146,7 +146,7 @@ void CpuDisplay::draw_background(Painter* p) {
 
 	BasicGridPainter grid;
 	GridColors gc = {col_bg, Black, theme.grid, Black};
-	grid.set_context(area, gc);
+	grid.set_context(area, gc, 1);
 
 	// horizontal time grid
 	grid.plan_linear(-area.width(), 0, 20);

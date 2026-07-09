@@ -24,8 +24,7 @@ class Bar;
 
 class GridPainter : public BasicGridPainter {
 public:
-	GridPainter(Song *song, ViewPort *cam, SongSelection *sel, ColorScheme &colors);
-	void __init__(Song *song, ViewPort *cam, SongSelection *sel, ColorScheme &colors);
+	GridPainter(Song *song, ViewPort *cam, SongSelection *sel, const ColorScheme &colors);
 
 	void draw_empty_background(Painter *c);
 	void draw_time(Painter *c);
@@ -38,7 +37,7 @@ public:
 	ViewPort *cam;
 	Song *song;
 	SongSelection *sel;
-	ColorScheme &local_theme;
+	const ColorScheme &local_theme;
 };
 
 }

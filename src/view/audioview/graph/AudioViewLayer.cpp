@@ -472,7 +472,7 @@ void AudioViewLayer::on_draw(Painter *c) {
 	Track *t = layer->track;
 
 	if (layer->type == SignalType::Beats) {
-		view->grid_painter->set_context(area, grid_colors());
+		view->grid_painter->set_context(area, grid_colors(), 1);
 		if (t->song->bars.num > 0)
 			view->grid_painter->draw_bar_numbers(c);
 	}

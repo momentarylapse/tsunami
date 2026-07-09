@@ -61,11 +61,6 @@ MidiPainter::MidiPainter(Song *_song, ViewPort *_cam, SongSelection *_sel, Hover
 	set_quality(1.0f, true);
 }
 
-
-void MidiPainter::__init__(Song *_song, ViewPort *_cam, SongSelection *_sel, HoverData *_hover, const ColorScheme &_colors) {
-	new(this) MidiPainter(_song, _cam, _sel, _hover, _colors);
-}
-
 color hash_color(int h) {
 	return PITCH_COLORS[((h) & 0x0fffffff) % 12];
 }

@@ -112,7 +112,7 @@ void PdfConfigDialog::update_params() {
 }
 
 void PdfConfigDialog::_on_mouse_wheel() {
-	float dy = hui::get_event()->scroll.y * hui::config.get_float("View.MouseWheelSpeed", 1.0f) * (5000.0f / area_width);
+	float dy = hui::get_event()->scroll.y * hui::config.get_float("View.MouseWheelSpeed", 1.0f) * (17000.0f / area_width);
 	preview_offset_y = max(preview_offset_y + dy, 0.0f);
 	redraw("area");
 }

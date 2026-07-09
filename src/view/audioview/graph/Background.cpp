@@ -108,7 +108,7 @@ void Background::on_draw(Painter* c) {
 		g.bg = g.bg_sel = theme.background;
 		g.fg = g.fg_sel = theme.grid;
 		c->draw_rect(rr);
-		view->grid_painter->set_context(rr, g);
+		view->grid_painter->set_context(rr, g, 1);
 		if (view->song->bars.num > 0)
 			view->grid_painter->draw_bars(c);
 		else

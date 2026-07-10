@@ -9,7 +9,7 @@
 #define SRC_VIEW_VIEWPORT_H_
 
 #include "../../lib/math/rect.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

@@ -4,7 +4,7 @@
 #include <lib/base/base.h>
 #include <lib/base/pointer.h>
 #include <lib/os/path.h>
-#include <lib/pattern/Observable.h>
+#include <lib/obs/Observable.h>
 #include "Action.h"
 #include "ActionManager.h"
 #include <shared_mutex>

@@ -9,7 +9,7 @@
 #define SRC_DATA_CURVE_H_
 
 #include "../lib/base/pointer.h"
-#include "../lib/pattern/Observable.h"
+#include "../lib/obs/Observable.h"
 
 namespace kaba {
 	class Class;

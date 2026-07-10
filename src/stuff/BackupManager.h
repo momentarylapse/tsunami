@@ -10,7 +10,7 @@
 
 #include "../lib/base/base.h"
 #include "../lib/os/path.h"
-#include "../lib/pattern/Observable.h"
+#include "../lib/obs/Observable.h"
 
 namespace os::fs {
 	class FileStream;

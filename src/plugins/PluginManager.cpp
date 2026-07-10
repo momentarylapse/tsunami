@@ -75,14 +75,14 @@
 #include "../view/painter/MultiLinePainter.h"
 #include "../view/TsunamiWindow.h"
 #include <lib/base/callable.h>
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include <lib/hui/Menu.h>
 #include <lib/hui/language.h>
 #include <lib/hui/_kaba_export.h>
 #include <lib/os/app.h>
 #include <lib/os/filesystem.h>
 #include <lib/fft/_kaba_export.h>
-#include <lib/pattern/_kaba_export.h>
+#include <lib/obs/_kaba_export.h>
 #include <lib/kaba/dynamic/exception.h>
 #include <lib/kaba/lib/future.h>
 #include <lib/kaba/lib/lib.h>

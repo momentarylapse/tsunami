@@ -10,7 +10,7 @@
 
 #include "midi/MidiData.h"
 #include "../lib/base/pointer.h"
-#include "../lib/pattern/Observable.h"
+#include "../lib/obs/Observable.h"
 #include "audio/AudioBuffer.h"
 
 namespace tsunami {

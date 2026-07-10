@@ -9,7 +9,7 @@
 #define SRC_VIEW_MODULE_CONFIGPANEL_H_
 
 #include "../../lib/hui/Panel.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

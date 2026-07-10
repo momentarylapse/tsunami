@@ -16,7 +16,7 @@
 #include <lib/os/filesystem.h>
 #include <lib/os/file.h>
 #include <lib/doc/xml.h>
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include "../data/base.h"
 #include "../data/Track.h"
 #include "../data/Song.h"

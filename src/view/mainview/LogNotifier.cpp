@@ -11,7 +11,7 @@
 #include "../helper/Drawing.h"
 #include "../TsunamiWindow.h"
 #include <Session.h>
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include <lib/image/Painter.h>
 #include <cmath>
 

@@ -9,7 +9,7 @@
 #define SRC_VIEW_HELPER_PEAKTHREAD_H_
 
 #include "../../lib/threads/Thread.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

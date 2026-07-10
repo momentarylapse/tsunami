@@ -9,7 +9,7 @@
 #include "../../Session.h"
 #include "../../data/Song.h"
 #include "LogConsole.h"
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include <lib/hui/hui.h>
 
 namespace tsunami {

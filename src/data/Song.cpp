@@ -34,7 +34,7 @@
 #include <module/synthesizer/DummySynthesizer.h>
 #include <module/audio/AudioEffect.h>
 #include <module/midi/MidiEffect.h>
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include <lib/threads/Mutex.h>
 #include <lib/hui/language.h>
 #include <cassert>

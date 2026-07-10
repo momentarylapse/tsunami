@@ -9,7 +9,7 @@
 #define SRC_STUFF_PERFORMANCEMONITOR_H_
 
 #include "../lib/base/base.h"
-#include "../lib/pattern/Observable.h"
+#include "../lib/obs/Observable.h"
 
 namespace tsunami {
 

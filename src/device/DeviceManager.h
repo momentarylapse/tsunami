@@ -9,7 +9,7 @@
 #define SRC_DEVICE_DEVICEMANAGER_H_
 
 #include <lib/base/base.h>
-#include <lib/pattern/Observable.h>
+#include <lib/obs/Observable.h>
 
 namespace tsunami {
 

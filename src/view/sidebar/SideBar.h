@@ -11,7 +11,7 @@
 #include "../../lib/base/pointer.h"
 #include "../../lib/base/future.h"
 #include "../../lib/hui/Panel.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

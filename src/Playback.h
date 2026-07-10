@@ -9,7 +9,7 @@
 #define SRC_PLAYBACK_H_
 
 #include "lib/base/pointer.h"
-#include "lib/pattern/Observable.h"
+#include "lib/obs/Observable.h"
 
 namespace tsunami {
 

@@ -5,9 +5,8 @@
 #ifndef TSUNAMI_MAINVIEW_H
 #define TSUNAMI_MAINVIEW_H
 
-#include "base/pointer.h"
-#include "pattern/Observable.h"
-#include "math/vec2.h"
+#include <lib/base/pointer.h>
+#include <lib/obs/Observable.h>
 
 struct rect;
 class Painter;

@@ -8,7 +8,7 @@
 #include "Session.h"
 #include "EditModes.h"
 #include "Playback.h"
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include "stuff/SessionManager.h"
 #include "storage/Storage.h"
 #include "plugins/TsunamiPlugin.h"

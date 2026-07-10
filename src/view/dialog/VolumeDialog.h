@@ -9,7 +9,7 @@
 #define SRC_VIEW_DIALOG_VOLUMEDIALOG_H_
 
 #include "../../lib/hui/Window.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

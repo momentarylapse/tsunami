@@ -10,7 +10,7 @@
 
 #include "../../lib/base/pointer.h"
 #include "../../lib/os/time.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace hui {
 	class Window;

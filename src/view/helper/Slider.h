@@ -9,7 +9,7 @@
 #define SLIDER_H_
 
 #include "../../lib/base/callable.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace hui {
 	class Panel;

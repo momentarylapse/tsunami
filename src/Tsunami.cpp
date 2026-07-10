@@ -20,7 +20,7 @@
 #include "Session.h"
 #include "EditModes.h"
 #include "storage/Storage.h"
-#include <lib/pattern/Log.h>
+#include <lib/obs/Log.h>
 #include "stuff/Clipboard.h"
 #include "stuff/PerformanceMonitor.h"
 #include "stuff/BackupManager.h"

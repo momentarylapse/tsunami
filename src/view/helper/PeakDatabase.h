@@ -11,7 +11,7 @@
 #include "../../lib/base/base.h"
 #include "../../lib/base/pointer.h"
 #include "../../lib/base/map.h"
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 #include "../../lib/threads/util.h"
 #include "../../lib/image/image.h"
 #include "../../data/audio/AudioBuffer.h"

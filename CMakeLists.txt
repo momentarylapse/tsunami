@@ -625,6 +625,9 @@ add_library(moduletsunami SHARED
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/obs/_kaba_export.cpp
+	src/lib/obs/Log.cpp
+	src/lib/obs/Observable.cpp
 	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
@@ -637,9 +640,6 @@ add_library(moduletsunami SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
-	src/lib/pattern/_kaba_export.cpp
-	src/lib/pattern/Log.cpp
-	src/lib/pattern/Observable.cpp
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
 	src/lib/pdf/ttf.cpp
@@ -1189,6 +1189,9 @@ add_executable(tsunami WIN32
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/obs/_kaba_export.cpp
+	src/lib/obs/Log.cpp
+	src/lib/obs/Observable.cpp
 	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
@@ -1201,9 +1204,6 @@ add_executable(tsunami WIN32
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
-	src/lib/pattern/_kaba_export.cpp
-	src/lib/pattern/Log.cpp
-	src/lib/pattern/Observable.cpp
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
 	src/lib/pdf/ttf.cpp

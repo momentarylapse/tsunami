@@ -5,7 +5,7 @@
 #ifndef TSUNAMI_DEVICECONTEXT_H
 #define TSUNAMI_DEVICECONTEXT_H
 
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 
 namespace tsunami {
 

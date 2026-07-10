@@ -8,7 +8,7 @@
 #ifndef SRC_STUFF_SESSIONMANAGER_H_
 #define SRC_STUFF_SESSIONMANAGER_H_
 
-#include "../lib/pattern/Observable.h"
+#include "../lib/obs/Observable.h"
 #include "../lib/base/pointer.h"
 #include "../lib/base/map.h"
 #include "../lib/base/optional.h"

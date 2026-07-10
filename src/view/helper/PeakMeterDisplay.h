@@ -8,7 +8,7 @@
 #ifndef PEAKMETERDISPLAY_H_
 #define PEAKMETERDISPLAY_H_
 
-#include "../../lib/pattern/Observable.h"
+#include "../../lib/obs/Observable.h"
 #include "graph/Node.h"
 
 namespace hui {

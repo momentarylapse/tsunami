@@ -9,7 +9,7 @@
 
 #include "Action.h"
 #include "Data.h"
-#include <lib/pattern/Observable.h>
+#include <lib/obs/Observable.h>
 #include <lib/base/pointer.h>
 
 namespace os {

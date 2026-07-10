@@ -52,10 +52,10 @@ public:
 		string msg = message.text;
 		float alpha = clamp(message.ttl / 2.0f, 0.0f, 1.0f);
 		color c = theme.background_overlay;
-		if (message.type == Log::Type::Error) {
+		if (message.type == LogHub::Type::Error) {
 			header = "Error";
 			c = color::mix(theme.background, Red, 0.3f);
-		} else if (message.type == Log::Type::Question) {
+		} else if (message.type == LogHub::Type::Question) {
 			header = "Question";
 			c = color::mix(theme.background, Orange, 0.3f);
 		} else {
@@ -100,12 +100,12 @@ public:
 	Session *session;
 	struct Message {
 		string text;
-		Log::Type type;
+		LogHub::Type type;
 		Array<string> responses;
 		float ttl = -1;
 	};
 	Message message;
-	void add_message(const Log::Message& m) {
+	void add_message(const LogHub::Message& m) {
 		message.text = m.text;
 		message.ttl = 10;
 		message.type = m.type;
@@ -126,17 +126,17 @@ LogNotifier::LogNotifier(Session *_session) : scenegraph::NodeFree() {
 	info_box = new LogInfoBox(session);
 	add_child(info_box);
 
-	session->log->out_add_message >> create_sink([this] {
-		auto m = session->log->latest(session);
-		if (m.type == Log::Type::Status)
+	session->log_source->hub->out_add_message >> create_sink([this] {
+		auto m = session->log_source->hub->latest(session->log_source.get());
+		if (m.type == LogHub::Type::Status)
 			set_status(m.text);
-		else if (m.type == Log::Type::Error or m.type == Log::Type::Question)
+		else if (m.type == LogHub::Type::Error or m.type == LogHub::Type::Question)
 			info_box->add_message(m);
 	});
 }
 
 LogNotifier::~LogNotifier() {
-	session->log->unsubscribe(this);
+	session->log_source->hub->unsubscribe(this);
 }
 
 void LogNotifier::on_draw(Painter* p) {

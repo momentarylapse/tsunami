@@ -48,13 +48,13 @@ const string EditMode::ScaleMarker = "scale-marker";
 const string EditMode::Curves = "curves";
 
 
-Session::Session(Log *_log, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
+Session::Session(xfer<LogSource> _log_source, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
 	view = nullptr;
 	main_view = nullptr;
 	_kaba_win = nullptr;
 	storage = new Storage(this);
 
-	log = _log;
+	log_source = _log_source;
 	device_manager = _device_manager;
 	plugin_manager = _plugin_manager;
 	session_manager = _session_manager;
@@ -90,32 +90,31 @@ void Session::set_win(TsunamiWindow *_win) {
 }
 
 Session *Session::create_child() {
-	auto *child = new Session(log, device_manager, plugin_manager, session_manager, perf_mon);
-	return child;
+	return new Session(log_source->hub->create_source(), device_manager, plugin_manager, session_manager, perf_mon);
 }
 
 void Session::i(const string &message) {
-	log->info(this, message);
+	log_source->info(message);
 }
 
 void Session::debug(const string &cat, const string &message) {
-	log->debug(this, cat + ": " + message);
+	log_source->debug(cat + ": " + message);
 }
 
 void Session::w(const string &message) {
-	log->warn(this, message);
+	log_source->warn(message);
 }
 
 void Session::e(const string &message) {
-	log->error(this, message);
+	log_source->error(message);
 }
 
 void Session::q(const string &message, const Array<string> &responses) {
-	log->question(this, message, responses);
+	log_source->question(message, responses);
 }
 
 void Session::status(const string &message) {
-	log->status(this, message);
+	log_source->status(message);
 }
 
 shared<TsunamiPlugin> Session::execute_tsunami_plugin(const string &name, const Array<string> &args) {

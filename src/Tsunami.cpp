@@ -54,12 +54,6 @@ bool ugly_hack_slow = false;
 Tsunami::Tsunami() :
 	hui::Application("tsunami", "English", hui::Flags::NO_ERROR_HANDLER)
 {
-	device_manager = nullptr;
-	log = nullptr;
-	clipboard = nullptr;
-	plugin_manager = nullptr;
-	perf_mon = nullptr;
-
 	set_property("name", AppName);
 	set_property("version", AppVersion);
 	set_property("comment", _("The friendly audio workstation"));
@@ -96,9 +90,9 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 
 	perf_mon = new PerformanceMonitor;
 
-	log = new Log;
+	log_hub = new LogHub;
 
-	Session::GLOBAL = new Session(log.get(), nullptr, nullptr, session_manager.get(), perf_mon.get());
+	Session::GLOBAL = new Session(log_hub->create_broadcaster(), nullptr, nullptr, session_manager.get(), perf_mon.get());
 
 	clipboard = new Clipboard;
 
@@ -210,10 +204,10 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 		}
 		delete song;
 	});
-	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [&flags] (const Array<string> &a) {
+	p.cmd("diff", "FILE1 FILE2", "compare 2 files", [this, &flags] (const Array<string> &a) {
 		Session *session = Session::GLOBAL;
 		session->storage->allow_gui = false;
-		session->log->allow_console_output = false;
+		log_hub->allow_console_output = false;
 		Song* song1 = new Song(session, DEFAULT_SAMPLE_RATE);
 		Song* song2 = new Song(session, DEFAULT_SAMPLE_RATE);
 		session->song = song1;

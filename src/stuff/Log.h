@@ -13,20 +13,29 @@
 
 namespace tsunami {
 
-class Session;
+class LogHub;
 
-class Log : public obs::Node<VirtualBase> {
+class LogSource {
 public:
-	Log();
+	explicit LogSource(LogHub *hub);
+	~LogSource();
+	void error(const string &message);
+	void warn(const string &message);
+	void info(const string &message);
+	void debug(const string &message);
+	void question(const string &message, const Array<string> &responses);
+	void status(const string &message);
+	LogHub* hub;
+	bool broadcasting;
+};
+
+class LogHub : public obs::Node<VirtualBase> {
+	friend class LogSource;
+public:
+	LogHub();
+	~LogHub() override;
 
 	obs::source out_add_message{this, "add-message"};
-
-	void error(Session *session, const string &message);
-	void warn(Session *session, const string &message);
-	void info(Session *session, const string &message);
-	void debug(Session *session, const string &message);
-	void question(Session *session, const string &message, const Array<string> &responses);
-	void status(Session *session, const string &message);
 
 	enum class Type {
 		Error,
@@ -38,21 +47,24 @@ public:
 	};
 
 	struct Message {
-		Session *session;
+		LogSource* source;
 		Type type;
 		string text;
 		Array<string> responses;
 		bool operator==(const Message &o) const;
 	};
 
-	Array<Message> all(Session *session);
-	Message latest(Session *session);
+	Array<Message> all(LogSource* source);
+	Message latest(LogSource* source);
 
 	bool allow_debug;
 	bool allow_console_output;
 
+	LogSource* create_broadcaster();
+	LogSource* create_source();
+
 private:
-	void add_message(Session *session, Type type, const string &message, const Array<string> &responses);
+	void add_message(LogSource* source, Type type, const string &message, const Array<string> &responses);
 	Array<Message> messages;
 	Array<Message> blocked;
 };

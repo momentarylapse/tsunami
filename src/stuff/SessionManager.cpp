@@ -16,6 +16,8 @@
 #include <lib/os/filesystem.h>
 #include <lib/os/file.h>
 #include <lib/doc/xml.h>
+
+#include "Log.h"
 #include "../data/base.h"
 #include "../data/Track.h"
 #include "../data/Song.h"
@@ -147,7 +149,7 @@ void SessionManager::load_session_map_legacy() {
 
 Session *SessionManager::spawn_new_session() {
 	auto t = Tsunami::instance;
-	Session *session = new Session(t->log.get(), t->device_manager.get(), t->plugin_manager.get(), this, t->perf_mon.get());
+	Session *session = new Session(t->log_hub->create_source(), t->device_manager.get(), t->plugin_manager.get(), this, t->perf_mon.get());
 
 	session->song = new Song(session, DEFAULT_SAMPLE_RATE);
 

@@ -20,7 +20,7 @@ string title_filename(const Path &filename);
 LogConsole::LogConsole(Session *session, BottomBar *bar) :
 	BottomBar::Console(_("Messages"), "log-console", session, bar)
 {
-	log = session->log;
+	source = session->log_source.get();
 	messages_loaded = 0;
 
 	from_resource("log_console");
@@ -30,32 +30,30 @@ LogConsole::LogConsole(Session *session, BottomBar *bar) :
 }
 
 LogConsole::~LogConsole() {
-	log->unsubscribe(this);
+	source->hub->unsubscribe(this);
 }
 
-void console_add_message(LogConsole *lc, Log::Message &m) {
+void console_add_message(LogConsole *lc, LogHub::Message &m) {
 	hui::separator = "§§";
 	string text = m.text;
 	string source;
-	if (m.session == Session::GLOBAL)
-		source = "global";
-	else
-		source = title_filename(m.session->song->filename);
+	if (m.source->broadcasting)
+		source = "[global]";
 
 	auto wrap_source = [] (const string &s) {
-		return "<span alpha=\"50%%\">[" + s + "]</span>";
+		return "<span alpha=\"50%%\">" + s + "</span>";
 	};
 
-	if (m.type == Log::Type::Error) {
+	if (m.type == LogHub::Type::Error) {
 		lc->add_string("log_list", format("%s  <span foreground=\"red\">َ<b>Error: %s</b></span>", wrap_source(source), text));
 		//lc->blink();
-	} else if (m.type == Log::Type::Warning) {
+	} else if (m.type == LogHub::Type::Warning) {
 		lc->add_string("log_list", format("%s  <span foreground=\"orange\">َ<b>Warning:</b> %s</span>", wrap_source(source), text));
-	} else if (m.type == Log::Type::Question) {
+	} else if (m.type == LogHub::Type::Question) {
 		lc->add_string("log_list", format("%s  <b>Question:</b> %s", wrap_source(source), text));
-	} else if (m.type == Log::Type::Debug) {
+	} else if (m.type == LogHub::Type::Debug) {
 		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
-	} else if (m.type == Log::Type::Status) {
+	} else if (m.type == LogHub::Type::Status) {
 	} else {
 		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}
@@ -63,19 +61,19 @@ void console_add_message(LogConsole *lc, Log::Message &m) {
 }
 
 void LogConsole::reload() {
-	log->unsubscribe(this);
+	source->hub->unsubscribe(this);
 
 	reset("log_list");
-	auto messages = log->all(session);
+	auto messages = source->hub->all(source);
 	for (auto &m: messages)
 		console_add_message(this, m);
 	messages_loaded = messages.num;
 
-	log->out_add_message >> create_sink([this]{ on_log_add(); });
+	source->hub->out_add_message >> create_sink([this]{ on_log_add(); });
 }
 
 void LogConsole::on_log_add() {
-	auto messages = log->all(session);
+	auto messages = source->hub->all(source);
 	for (auto &m: messages.sub_ref(messages_loaded))
 		console_add_message(this, m);
 	messages_loaded = messages.num;

@@ -12,18 +12,19 @@
 
 namespace tsunami {
 
-class Log;
+class LogHub;
+class LogSource;
 
 class LogConsole: public BottomBar::Console {
 public:
-	LogConsole(Session *session, BottomBar *bar);
+	LogConsole(Session* session, BottomBar* bar);
 	~LogConsole() override;
 
 	void reload();
 
 	void on_log_add();
 
-	Log *log;
+	LogSource* source;
 	int messages_loaded;
 };
 

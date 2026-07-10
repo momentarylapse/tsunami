@@ -8,9 +8,9 @@
 #ifndef SRC_SESSION_H_
 #define SRC_SESSION_H_
 
-#include "lib/base/base.h"
-#include "lib/base/pointer.h"
-#include "lib/pattern/Observable.h"
+#include <lib/base/base.h>
+#include <lib/base/pointer.h>
+#include <lib/pattern/Observable.h>
 
 namespace hui {
 	class Window;
@@ -20,7 +20,7 @@ class Path;
 namespace tsunami {
 
 class TsunamiWindow;
-class Log;
+class LogSource;
 class Song;
 class Storage;
 class AudioView;
@@ -41,7 +41,7 @@ struct SessionPersistenceData;
 // representing one instance/window
 class Session : public Sharable<obs::Node<VirtualBase>> {
 public:
-	Session(Log* log, DeviceManager* device_manager, PluginManager* plugin_manager, SessionManager* session_manager, PerformanceMonitor* perf_mon);
+	Session(xfer<LogSource> log, DeviceManager* device_manager, PluginManager* plugin_manager, SessionManager* session_manager, PerformanceMonitor* perf_mon);
 	~Session() override;
 
 	obs::source out_mode_changed{this, "mode-changed"};
@@ -59,6 +59,7 @@ public:
 	void prepare_end();
 
 	int id;
+	owned<LogSource> log_source;
 	owned<TsunamiWindow> win;
 	hui::Window* _kaba_win;
 	shared<Song> song;
@@ -90,7 +91,6 @@ public:
 	void set_mode(const string& mode);
 
 	// global
-	Log* log;
 	DeviceManager* device_manager;
 	PluginManager* plugin_manager;
 	SessionManager* session_manager;

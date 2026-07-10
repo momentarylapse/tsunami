@@ -30,6 +30,7 @@ public:
 	friend class MidiInput;
 
 	obs::xsource<string> out_message{this, "message"};
+	obs::xsource<string> out_error{this, "error"};
 	// general database entries
 	obs::xsource<Device*> out_add_device{this, "add-device"};
 	obs::xsource<Device*> out_remove_device{this, "remove-device"};

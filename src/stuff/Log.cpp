@@ -6,88 +6,108 @@
  */
 
 #include "Log.h"
-#include "../lib/hui/Callback.h"
-#include "../lib/hui/config.h"
-#include "../lib/os/msg.h"
-#include "../Session.h"
+#if __has_include(<lib/hui/hui.h>)
+#define HAS_HUI 1
+#include <lib/hui/Callback.h>
+#include <lib/hui/config.h>
+#endif
+#include <lib/os/msg.h>
 
 namespace os {
 	extern bool is_main_thread();
 }
 
 namespace tsunami {
+LogSource::LogSource(LogHub* _hub) {
+	hub = _hub;
+	broadcasting = false;
+}
 
-Log::Log() {
+// TODO remove messages...?
+LogSource::~LogSource() = default;
+
+void LogSource::error(const string &message) {
+	hub->add_message(this, LogHub::Type::Error, message, {});
+}
+
+void LogSource::warn(const string &message) {
+	hub->add_message(this, LogHub::Type::Warning, message, {});
+}
+
+void LogSource::info(const string &message) {
+	hub->add_message(this, LogHub::Type::Info, message, {});
+}
+
+void LogSource::debug(const string &message) {
+	if (hub->allow_debug)
+		hub->add_message(this, LogHub::Type::Debug, message, {});
+}
+
+void LogSource::question(const string &message, const Array<string> &responses) {
+	hub->add_message(this, LogHub::Type::Question, message, responses);
+}
+
+void LogSource::status(const string &message) {
+	hub->add_message(this, LogHub::Type::Status, message, {});
+}
+
+LogHub::LogHub() {
+	allow_debug = false;
+#ifdef HAS_HUI
 	allow_debug = hui::config.get_bool("Log.Debug", false);
+#endif
 	allow_console_output = true;
 }
 
+LogHub::~LogHub() = default;
 
-void Log::error(Session *session, const string &message) {
-	add_message(session, Type::Error, message, {});
+LogSource* LogHub::create_source() {
+	return new LogSource(this);
+}
+
+LogSource* LogHub::create_broadcaster() {
+	auto s = new LogSource(this);
+	s->broadcasting = true;
+	return s;
 }
 
 
-void Log::warn(Session *session, const string &message) {
-	add_message(session, Type::Warning, message, {});
-}
-
-
-void Log::info(Session *session, const string &message) {
-	add_message(session, Type::Info, message, {});
-}
-
-
-void Log::debug(Session *session, const string &message) {
-	if (allow_debug)
-		add_message(session, Type::Debug, message, {});
-}
-
-
-void Log::question(Session *session, const string &message, const Array<string> &responses) {
-	add_message(session, Type::Question, message, responses);
-}
-
-
-void Log::status(Session *session, const string &message) {
-	add_message(session, Type::Status, message, {});
-}
-
-
-Array<Log::Message> Log::all(Session *session) {
-	Array<Log::Message> r;
+Array<LogHub::Message> LogHub::all(LogSource* source) {
+	Array<Message> r;
 	for (auto &m: messages)
-		if ((m.session == session) or (m.session == Session::GLOBAL))
+		if ((m.source == source) or m.source->broadcasting)
 			r.add(m);
 	return r;
 }
 
 
-Log::Message Log::latest(Session *session) {
+LogHub::Message LogHub::latest(LogSource* source) {
 	for (int i=messages.num-1; i>=0; i--)
-		if ((messages[i].session == session) or (messages[i].session == Session::GLOBAL))
+		if ((messages[i].source == source) or messages[i].source->broadcasting)
 			return messages[i];
-	return Message();
+	return {};
 }
 
-bool Log::Message::operator==(const Log::Message &o) const {
-	return (session == o.session) and (type == o.type) and (text == o.text);
+bool LogHub::Message::operator==(const LogHub::Message &o) const {
+	return (source == o.source) and (type == o.type) and (text == o.text);
 }
 
 
-void Log::add_message(Session *session, Type type, const string &message, const Array<string> &responses) {
+void LogHub::add_message(LogSource* source, Type type, const string &message, const Array<string> &responses) {
 
 	// make sure messages are handled in the gui thread...
 	if (!os::is_main_thread()) {
-		hui::run_in_gui_thread([this, session, type, _message = message, _responses = responses] {
-			add_message(session, type, _message, _responses);
+#ifdef HAS_HUI
+		hui::run_in_gui_thread([this, source, type, _message = message, _responses = responses] {
+			add_message(source, type, _message, _responses);
 		});
+#endif
 		return;
 	}
 
 
 
-	Message m = {session, type, message, responses};
+	Message m = {source, type, message, responses};
 	for (auto &b: blocked)
 		if (m == b)
 			return;
@@ -98,9 +118,11 @@ void Log::add_message(Session *session, Type type, const string &message, const 
 			count ++;
 			if (count > 8) {
 				blocked.add(m);
-				hui::run_later(0.1f, [this, session, message] {
-					warn(session, format("message blocked: '%s'", message));
+#ifdef HAS_HUI
+				hui::run_later(0.1f, [source, message] {
+					source->warn(format("message blocked: '%s'", message));
 				});
+#endif
 				return;
 			}
 		}

@@ -228,9 +228,9 @@ void init_app() {
 
 	t->perf_mon = new PerformanceMonitor;
 
-	t->log = new Log;
+	t->log_hub = new LogHub;
 
-	Session::GLOBAL = new Session(t->log.get(), nullptr, nullptr, t->session_manager.get(), t->perf_mon.get());
+	Session::GLOBAL = new Session(t->log_hub->create_broadcaster(), nullptr, nullptr, t->session_manager.get(), t->perf_mon.get());
 
 	t->clipboard = new Clipboard;
 

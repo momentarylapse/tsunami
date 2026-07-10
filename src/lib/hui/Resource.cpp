@@ -167,7 +167,7 @@ Window *create_resource_dialog(const string &id, Window *root) {
 			t->set_by_id(toolbar_id);
 
 	// controls
-	for (const auto cmd: res->children)
+	for (const auto& cmd: res->children)
 		dlg->_add_control(id, cmd, "");
 
 	return dlg;

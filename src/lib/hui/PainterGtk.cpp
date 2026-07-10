@@ -197,9 +197,11 @@ void Painter::draw_str(const vec2 &p, const string &str) {
 	if (!cr)
 		return;
 	pango_cairo_update_layout(cr, layout);
+	pango_layout_set_text(layout, "M", 1);
+	PangoRectangle rr;
+	pango_layout_get_pixel_extents(layout, &rr, nullptr);
+	cairo_move_to(cr, p.x, p.y - (float)rr.y);
 	pango_layout_set_text(layout, (char*)str.data, str.num);
-	float dy = (float)pango_layout_get_baseline(layout) / 1000.0f;
-	cairo_move_to(cr, p.x, p.y - dy + font_size);
 
 	if (mode_fill) {
 		pango_cairo_show_layout(cr, layout);

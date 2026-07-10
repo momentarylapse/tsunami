@@ -46,7 +46,6 @@ bool Resource::enabled() const {
 }
 
 string Resource::value(const string &key, const string &fallback) const {
-	int n = key.num + 1;
 	for (const auto& o: options)
 		if (o.key == key)
 			return o.value;

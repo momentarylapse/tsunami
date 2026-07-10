@@ -33,8 +33,10 @@ void draw_str_centered(Painter* c, const vec2& pos, const string& str) {
 
 rect get_boxed_str_rect(Painter *c, const vec2 &pos, const string &str) {
 	vec2 size = c->get_str_size(str);
-	size.y -= c->font_size * 1.0f; // ?!?
-	return rect(pos.x-theme.CORNER_RADIUS, pos.x + size.x + theme.CORNER_RADIUS, pos.y-theme.CORNER_RADIUS, pos.y + size.y + theme.CORNER_RADIUS);
+	size.x += c->font_size * 0.1f; // ?!?
+	size.y -= c->font_size * 0.1f; // ?!?
+	float r = theme.CORNER_RADIUS;
+	return rect(pos.x - r, pos.x + size.x + r, pos.y - r, pos.y + size.y + r);
 }
 
 void draw_boxed_str(Painter *c, const vec2 &pos, const string &str, const color &col_text, const color &col_bg, TextAlign align) {

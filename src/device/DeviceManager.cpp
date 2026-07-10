@@ -15,10 +15,10 @@
 #include "backend-coremidi/DeviceContextCoreMidi.h"
 #include "Device.h"
 #include "../Session.h"
-#include "../lib/any/any.h"
-#include "../lib/hui/Callback.h"
-#include "../lib/hui/language.h"
-#include "../lib/hui/config.h"
+#include <lib/any/any.h>
+#include <lib/hui/Callback.h>
+#include <lib/hui/language.h>
+#include <lib/hui/config.h>
 
 namespace tsunami {
 
@@ -261,10 +261,10 @@ void DeviceManager::init() {
 
 	audio_api = select_api(hui::config.get_str("Devices.AudioApi", suggest_default_audio_api()), 1);
 	string audio_api_name = find_api_description(audio_api).name;
-	session->i(_("audio library selected: ") + audio_api_name);
+	out_message(_("audio library selected: ") + audio_api_name);
 	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", suggest_default_midi_api()), 2);
 	string midi_api_name = find_api_description(midi_api).name;
-	session->i(_("midi library selected: ") + midi_api_name);
+	out_message(_("midi library selected: ") + midi_api_name);
 
 	hui::config.set_str("Devices.AudioApi", audio_api_name);
 	hui::config.set_str("Devices.MidiApi", midi_api_name);

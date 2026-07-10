@@ -6,9 +6,8 @@
  */
 
 #include "Device.h"
-
-#include "../lib/any/any.h"
-#include "../lib/hui/language.h"
+#include <lib/any/any.h>
+#include <lib/hui/language.h>
 
 namespace tsunami {
 

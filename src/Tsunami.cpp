@@ -156,6 +156,9 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 			Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
+			device_manager->out_message >> Session::GLOBAL->create_data_sink<string>([] (const string& m) {
+				Session::GLOBAL->i(m);
+			});
 			device_manager->init();
 			auto session = session_manager->spawn_new_session();
 

@@ -8,7 +8,7 @@
 #ifndef SRC_DEVICE_DEVICE_H_
 #define SRC_DEVICE_DEVICE_H_
 
-#include "../lib/base/base.h"
+#include <lib/base/base.h>
 
 class Any;
 

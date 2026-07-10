@@ -1,11 +1,9 @@
 #include "DeviceSelector.h"
-
-#include <os/msg.h>
-
 #include "../../Session.h"
 #include "../../device/Device.h"
 #include "../../device/DeviceManager.h"
-#include "../../lib/hui/Panel.h"
+#include <lib/os/msg.h>
+#include <lib/hui/Panel.h>
 
 namespace tsunami {
 

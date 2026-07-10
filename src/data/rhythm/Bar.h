@@ -8,8 +8,8 @@
 #ifndef SRC_DATA_RHYTHM_BAR_H_
 #define SRC_DATA_RHYTHM_BAR_H_
 
-#include <base/optional.h>
-#include <base/pointer.h>
+#include <lib/base/optional.h>
+#include <lib/base/pointer.h>
 #include "../Range.h"
 
 

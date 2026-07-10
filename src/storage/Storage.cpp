@@ -20,17 +20,8 @@
 #include "format/FormatSoundFont2.h"
 #include "format/FormatGuitarPro.h"
 #include "format/FormatNami.h"
-#include <lib/history/ActionManager.h>
 #include "../Tsunami.h"
 #include "../Session.h"
-#include "../lib/base/iter.h"
-#include "../lib/base/algo.h"
-#include "../lib/base/sort.h"
-#include "../lib/os/date.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/hui/config.h"
-#include "../lib/hui/language.h"
-#include "../lib/hui/common_dlg.h"
 #include "../view/helper/Progress.h"
 #include "../view/TsunamiWindow.h"
 #include "../data/base.h"
@@ -40,7 +31,16 @@
 #include "../data/audio/AudioBuffer.h"
 #include "../data/SongSelection.h"
 #include "../module/audio/BufferStreamer.h"
-#include "os/app.h"
+#include <lib/base/iter.h>
+#include <lib/base/algo.h>
+#include <lib/base/sort.h>
+#include <lib/history/ActionManager.h>
+#include <lib/os/date.h>
+#include <lib/os/filesystem.h>
+#include <lib/hui/config.h>
+#include <lib/hui/language.h>
+#include <lib/hui/common_dlg.h>
+#include <lib/os/app.h>
 
 namespace tsunami {
 

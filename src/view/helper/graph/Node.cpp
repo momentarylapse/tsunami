@@ -6,13 +6,11 @@
  */
 
 #include "Node.h"
-
-#include <base/sort.h>
-
 #include "SceneGraph.h"
-#include "../../../stuff/PerformanceMonitor.h"
-#include "../../../lib/image/Painter.h"
-#include "../../../lib/image/color.h"
+#include <stuff/PerformanceMonitor.h>
+#include <lib/base/sort.h>
+#include <lib/image/Painter.h>
+#include <lib/image/color.h>
 
 
 using namespace tsunami;

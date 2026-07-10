@@ -25,8 +25,6 @@
 #include <lib/math/vec2.h>
 #include <cmath>
 
-#include "layout/Grid.h"
-
 namespace tsunami {
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l);

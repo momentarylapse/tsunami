@@ -8,11 +8,10 @@
 #include "MidiInputStreamAlsa.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
+#include <lib/obs/Log.h>
 
 #include <alsa/asoundlib.h>
 
-#include "obs/Log.h"
 
 namespace tsunami {
 

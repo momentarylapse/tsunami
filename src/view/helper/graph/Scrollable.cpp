@@ -6,12 +6,10 @@
  */
 
 #include "Scrollable.h"
-
-#include <image/Painter.h>
-
 #include "ScrollBar.h"
-#include "../../../stuff/PerformanceMonitor.h"
-#include "../../../lib/hui/Event.h"
+#include <stuff/PerformanceMonitor.h>
+#include <lib/image/Painter.h>
+#include <lib/hui/Event.h>
 
 namespace scenegraph {
 void sort_nodes_up(Array<Node*> &nodes);

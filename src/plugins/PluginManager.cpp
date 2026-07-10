@@ -86,8 +86,7 @@
 #include <lib/kaba/dynamic/exception.h>
 #include <lib/kaba/lib/future.h>
 #include <lib/kaba/lib/lib.h>
-
-#include "os/msg.h"
+#include <lib/os/msg.h>
 
 
 namespace hui {

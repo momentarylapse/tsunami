@@ -1,4 +1,3 @@
-#include <hui/Callback.h>
 #if HAS_LIB_COREAUDIO
 
 //#include <CoreServices/CoreServices.h>
@@ -9,6 +8,7 @@
 #include "AudioOutputStreamCoreAudio.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
+#include <lib/hui/Callback.h>
 #include <lib/obs/Log.h>
 
 

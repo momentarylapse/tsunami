@@ -6,11 +6,9 @@
  */
 
 #include "BackupManager.h"
-
-#include <base/algo.h>
-
-#include "../Tsunami.h"
-#include "../Session.h"
+#include <Tsunami.h>
+#include <Session.h>
+#include <lib/base/algo.h>
 #include <lib/hui/config.h>
 #include <lib/hui/language.h>
 #include <lib/os/app.h>

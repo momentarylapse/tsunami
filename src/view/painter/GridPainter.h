@@ -8,10 +8,9 @@
 #ifndef SRC_VIEW_PAINTER_GRIDPAINTER_H_
 #define SRC_VIEW_PAINTER_GRIDPAINTER_H_
 
-#include <functional>
-#include <base/optional.h>
-
 #include "BasicGridPainter.h"
+#include <lib/base/optional.h>
+#include <functional>
 
 namespace tsunami {
 

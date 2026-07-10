@@ -6,9 +6,6 @@
  */
 
 #include "SignalEditorModule.h"
-
-#include <os/msg.h>
-
 #include "SignalEditorTab.h"
 #include "SignalEditorPort.h"
 #include "SignalEditorBackground.h"
@@ -22,8 +19,9 @@
 #include "../../module/port/Port.h"
 #include "../../data/base.h"
 #include "../../Session.h"
-#include "../../lib/base/iter.h"
-#include "../../lib/image/Painter.h"
+#include <lib/base/iter.h>
+#include <lib/image/Painter.h>
+#include <lib/os/msg.h>
 #include <cmath>
 
 namespace tsunami {

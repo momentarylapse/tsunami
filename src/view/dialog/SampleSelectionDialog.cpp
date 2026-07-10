@@ -6,17 +6,15 @@
  */
 
 #include "SampleSelectionDialog.h"
-
-#include <os/msg.h>
-
 #include "../../storage/Storage.h"
 #include "../../data/Song.h"
 #include "../../data/Sample.h"
 #include "../../Session.h"
-#include "../../lib/base/iter.h"
-#include "../../lib/hui/language.h"
-#include "../../lib/hui/hui.h"
-#include "../../lib/hui/Menu.h"
+#include <lib/os/msg.h>
+#include <lib/base/iter.h>
+#include <lib/hui/language.h>
+#include <lib/hui/hui.h>
+#include <lib/hui/Menu.h>
 #include "../helper/SamplePreviewPlayer.h"
 
 namespace tsunami {

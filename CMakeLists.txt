@@ -860,7 +860,6 @@ if (NOT WIN32)
 endif()
 target_include_directories(moduletsunami PUBLIC src/)
 target_include_directories(moduletsunami PUBLIC src)
-target_include_directories(moduletsunami PUBLIC src/lib)
 set_target_properties(moduletsunami PROPERTIES EXCLUDE_FROM_ALL TRUE)
 
 
@@ -1420,7 +1419,6 @@ target_compile_definitions(tsunami PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="$
 target_link_libraries(tsunami PUBLIC ${DEPS})
 target_include_directories(tsunami PUBLIC src/)
 target_include_directories(tsunami PUBLIC src)
-target_include_directories(tsunami PUBLIC src/lib)
 
 
 #=======================================================================================

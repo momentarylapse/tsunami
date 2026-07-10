@@ -8,10 +8,12 @@
 #include "DeviceContextAlsa.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../data/midi/MidiData.h"
-#include "../../Session.h"
-#include "../../lib/hui/language.h"
+#include <data/midi/MidiData.h>
+#include <lib/hui/language.h>
+#include <lib/obs/Log.h>
+
 #include <alsa/asoundlib.h>
+
 
 namespace tsunami {
 
@@ -21,7 +23,7 @@ MidiInputStreamAlsa::MidiInputStreamAlsa(Session *session, Device *device, MidiI
 	                                    SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 	                                    SND_SEQ_PORT_TYPE_APPLICATION);
 	if (shared_data.portid < 0) {
-		session->e(string("Error creating sequencer port: ") + snd_strerror(shared_data.portid));
+		log_source->error(string("Error creating sequencer port: ") + snd_strerror(shared_data.portid));
 		error = true;
 	}
 }
@@ -32,7 +34,7 @@ MidiInputStreamAlsa::~MidiInputStreamAlsa() {
 
 bool MidiInputStreamAlsa::start() {
 	if (!DeviceContextAlsa::instance->alsa_midi_handle){
-		session->e(_("no alsa midi handler"));
+		log_source->error(_("no alsa midi handler"));
 		return false;
 	}
 	return true;
@@ -60,7 +62,7 @@ bool MidiInputStreamAlsa::update_device(Device* device) {
 	snd_seq_port_subscribe_set_dest(subs, &dest);
 	int r = snd_seq_subscribe_port(DeviceContextAlsa::instance->alsa_midi_handle, subs);
 	if (r != 0) {
-		session->e(string("Error connecting to midi port: ") + snd_strerror(r));
+		log_source->error(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
 		subs = nullptr;
 	}
@@ -78,7 +80,7 @@ bool MidiInputStreamAlsa::unconnect() {
 		return true;
 	int r = snd_seq_unsubscribe_port(DeviceContextAlsa::instance->alsa_midi_handle, subs);
 	if (r != 0)
-		session->e(_("Error unconnecting from midi port: ") + snd_strerror(r));
+		log_source->error(_("Error unconnecting from midi port: ") + snd_strerror(r));
 	snd_seq_port_subscribe_free(subs);
 	subs = nullptr;
 	return r == 0;

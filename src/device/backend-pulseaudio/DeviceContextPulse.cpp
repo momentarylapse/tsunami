@@ -9,12 +9,11 @@
 #include "AudioOutputStreamPulse.h"
 #include "../Device.h"
 #include "../DeviceManager.h"
-#include "../../Session.h"
-#include "../../lib/hui/Callback.h"
+#include <lib/hui/Callback.h>
+#include <lib/obs/Log.h>
 
 #include <pulse/pulseaudio.h>
 
-#include "obs/Log.h"
 
 namespace tsunami {
 

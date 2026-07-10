@@ -3,7 +3,7 @@
 //
 
 #include "MidiInputStream.h"
-#include "../../Session.h"
+#include <Session.h>
 
 namespace tsunami {
 

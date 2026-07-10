@@ -59,7 +59,6 @@
 #include "../stuff/Clipboard.h"
 #include "../stuff/BackupManager.h"
 #include "../stuff/SessionManager.h"
-#include "../stuff/Log.h"
 #include "../stuff/PerformanceMonitor.h"
 #include "../view/audioview/AudioView.h"
 #include "../view/ColorScheme.h"
@@ -76,6 +75,7 @@
 #include "../view/painter/MultiLinePainter.h"
 #include "../view/TsunamiWindow.h"
 #include <lib/base/callable.h>
+#include <lib/pattern/Log.h>
 #include <lib/hui/Menu.h>
 #include <lib/hui/language.h>
 #include <lib/hui/_kaba_export.h>
@@ -228,7 +228,7 @@ void init_app() {
 
 	t->perf_mon = new PerformanceMonitor;
 
-	t->log_hub = new LogHub;
+	t->log_hub = new obs::LogHub;
 
 	Session::GLOBAL = new Session(t->log_hub->create_broadcaster(), nullptr, nullptr, t->session_manager.get(), t->perf_mon.get());
 

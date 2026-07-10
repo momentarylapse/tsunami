@@ -11,6 +11,10 @@
 #include <lib/base/pointer.h>
 #include <lib/hui/Application.h>
 
+namespace obs {
+	class LogHub;
+}
+
 namespace tsunami {
 
 extern const string AppName;
@@ -20,7 +24,6 @@ extern const string AppVersion;
 class Song;
 class PluginManager;
 class Slider;
-class LogHub;
 class AudioInput;
 class DeviceManager;
 class AudioView;
@@ -44,7 +47,7 @@ public:
 	hui::AppStatus handle_arguments(const Array<string> &arg);
 	void load_key_codes();
 
-	owned<LogHub> log_hub;
+	owned<obs::LogHub> log_hub;
 	owned<BackupManager> backup_manager;
 	owned<SessionManager> session_manager;
 	owned<DeviceManager> device_manager;

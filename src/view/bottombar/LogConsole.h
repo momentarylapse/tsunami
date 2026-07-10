@@ -10,10 +10,11 @@
 
 #include "BottomBar.h"
 
-namespace tsunami {
+namespace obs {
+	class LogSource;
+}
 
-class LogHub;
-class LogSource;
+namespace tsunami {
 
 class LogConsole: public BottomBar::Console {
 public:
@@ -24,7 +25,7 @@ public:
 
 	void on_log_add();
 
-	LogSource* source;
+	obs::LogSource* source;
 	int messages_loaded;
 };
 

@@ -8,7 +8,7 @@
 #include "Session.h"
 #include "EditModes.h"
 #include "Playback.h"
-#include "stuff/Log.h"
+#include <lib/pattern/Log.h>
 #include "stuff/SessionManager.h"
 #include "storage/Storage.h"
 #include "plugins/TsunamiPlugin.h"
@@ -48,7 +48,7 @@ const string EditMode::ScaleMarker = "scale-marker";
 const string EditMode::Curves = "curves";
 
 
-Session::Session(xfer<LogSource> _log_source, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
+Session::Session(xfer<obs::LogSource> _log_source, DeviceManager *_device_manager, PluginManager *_plugin_manager, SessionManager *_session_manager, PerformanceMonitor *_perf_mon) {
 	view = nullptr;
 	main_view = nullptr;
 	_kaba_win = nullptr;

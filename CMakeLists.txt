@@ -638,6 +638,7 @@ add_library(moduletsunami SHARED
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/_kaba_export.cpp
+	src/lib/pattern/Log.cpp
 	src/lib/pattern/Observable.cpp
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
@@ -711,7 +712,6 @@ add_library(moduletsunami SHARED
 	src/stuff/BackupManager.cpp
 	src/stuff/Clipboard.cpp
 	src/stuff/ErrorHandler.cpp
-	src/stuff/Log.cpp
 	src/stuff/PerformanceMonitor.cpp
 	src/stuff/SessionManager.cpp
 	src/test/TestAudioBuffer.cpp
@@ -1202,6 +1202,7 @@ add_executable(tsunami WIN32
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
 	src/lib/pattern/_kaba_export.cpp
+	src/lib/pattern/Log.cpp
 	src/lib/pattern/Observable.cpp
 	src/lib/pdf/_kaba_export.cpp
 	src/lib/pdf/pdf.cpp
@@ -1275,7 +1276,6 @@ add_executable(tsunami WIN32
 	src/stuff/BackupManager.cpp
 	src/stuff/Clipboard.cpp
 	src/stuff/ErrorHandler.cpp
-	src/stuff/Log.cpp
 	src/stuff/PerformanceMonitor.cpp
 	src/stuff/SessionManager.cpp
 	src/test/TestAudioBuffer.cpp

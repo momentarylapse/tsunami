@@ -31,13 +31,13 @@
 #include "../action/track/ActionTrackDelete.h"
 #include "../action/track/sample/ActionTrackInsertSample.h"
 #include "../action/track/sample/ActionTrackSampleFromSelection.h"
-#include "../module/synthesizer/DummySynthesizer.h"
-#include "../module/audio/AudioEffect.h"
-#include "../module/midi/MidiEffect.h"
-#include "../stuff/Log.h"
-#include "../lib/threads/Mutex.h"
-#include "../lib/hui/language.h"
-#include <assert.h>
+#include <module/synthesizer/DummySynthesizer.h>
+#include <module/audio/AudioEffect.h>
+#include <module/midi/MidiEffect.h>
+#include <lib/pattern/Log.h>
+#include <lib/threads/Mutex.h>
+#include <lib/hui/language.h>
+#include <cassert>
 
 namespace tsunami {
 

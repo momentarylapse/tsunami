@@ -54,15 +54,12 @@
 #include "../plugins/PluginManager.h"
 #include "../plugins/TsunamiPlugin.h"
 #include "../storage/Storage.h"
-#include "../stuff/Log.h"
 #include "../stuff/Clipboard.h"
 #include "../stuff/BackupManager.h"
 #include "../stuff/SessionManager.h"
-#include "../lib/hui/hui.h"
-#include "../lib/hui/config.h"
-#include "../lib/os/date.h"
-#include "../lib/os/filesystem.h"
-#include "../lib/os/msg.h"
+#include <lib/hui/hui.h>
+#include <lib/hui/config.h>
+#include <lib/os/msg.h>
 
 namespace tsunami {
 

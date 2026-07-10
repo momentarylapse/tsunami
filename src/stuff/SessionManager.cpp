@@ -16,8 +16,7 @@
 #include <lib/os/filesystem.h>
 #include <lib/os/file.h>
 #include <lib/doc/xml.h>
-
-#include "Log.h"
+#include <lib/pattern/Log.h>
 #include "../data/base.h"
 #include "../data/Track.h"
 #include "../data/Song.h"
@@ -34,7 +33,6 @@
 #include "../Playback.h"
 #include "../view/mainview/MainView.h"
 #include "../view/signaleditor/SignalEditorTab.h"
-#include "os/app.h"
 
 namespace tsunami {
 

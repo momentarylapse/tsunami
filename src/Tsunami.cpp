@@ -20,7 +20,7 @@
 #include "Session.h"
 #include "EditModes.h"
 #include "storage/Storage.h"
-#include "stuff/Log.h"
+#include <lib/pattern/Log.h>
 #include "stuff/Clipboard.h"
 #include "stuff/PerformanceMonitor.h"
 #include "stuff/BackupManager.h"
@@ -90,7 +90,7 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 
 	perf_mon = new PerformanceMonitor;
 
-	log_hub = new LogHub;
+	log_hub = new obs::LogHub;
 
 	Session::GLOBAL = new Session(log_hub->create_broadcaster(), nullptr, nullptr, session_manager.get(), perf_mon.get());
 

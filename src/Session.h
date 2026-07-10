@@ -15,12 +15,14 @@
 namespace hui {
 	class Window;
 }
+namespace obs {
+	class LogSource;
+}
 class Path;
 
 namespace tsunami {
 
 class TsunamiWindow;
-class LogSource;
 class Song;
 class Storage;
 class AudioView;
@@ -41,7 +43,7 @@ struct SessionPersistenceData;
 // representing one instance/window
 class Session : public Sharable<obs::Node<VirtualBase>> {
 public:
-	Session(xfer<LogSource> log, DeviceManager* device_manager, PluginManager* plugin_manager, SessionManager* session_manager, PerformanceMonitor* perf_mon);
+	Session(xfer<obs::LogSource> log, DeviceManager* device_manager, PluginManager* plugin_manager, SessionManager* session_manager, PerformanceMonitor* perf_mon);
 	~Session() override;
 
 	obs::source out_mode_changed{this, "mode-changed"};
@@ -59,7 +61,7 @@ public:
 	void prepare_end();
 
 	int id;
-	owned<LogSource> log_source;
+	owned<obs::LogSource> log_source;
 	owned<TsunamiWindow> win;
 	hui::Window* _kaba_win;
 	shared<Song> song;

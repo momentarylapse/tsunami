@@ -7,10 +7,10 @@
 
 #include "BottomBar.h"
 #include "../../Session.h"
-#include "../../stuff/Log.h"
 #include "../../data/Song.h"
 #include "LogConsole.h"
-#include "../../lib/hui/hui.h"
+#include <lib/pattern/Log.h>
+#include <lib/hui/hui.h>
 
 namespace tsunami {
 
@@ -33,7 +33,7 @@ LogConsole::~LogConsole() {
 	source->hub->unsubscribe(this);
 }
 
-void console_add_message(LogConsole *lc, LogHub::Message &m) {
+void console_add_message(LogConsole *lc, obs::LogHub::Message &m) {
 	hui::separator = "§§";
 	string text = m.text;
 	string source;
@@ -44,16 +44,16 @@ void console_add_message(LogConsole *lc, LogHub::Message &m) {
 		return "<span alpha=\"50%%\">" + s + "</span>";
 	};
 
-	if (m.type == LogHub::Type::Error) {
+	if (m.type == obs::MessageType::Error) {
 		lc->add_string("log_list", format("%s  <span foreground=\"red\">َ<b>Error: %s</b></span>", wrap_source(source), text));
 		//lc->blink();
-	} else if (m.type == LogHub::Type::Warning) {
+	} else if (m.type == obs::MessageType::Warning) {
 		lc->add_string("log_list", format("%s  <span foreground=\"orange\">َ<b>Warning:</b> %s</span>", wrap_source(source), text));
-	} else if (m.type == LogHub::Type::Question) {
+	} else if (m.type == obs::MessageType::Question) {
 		lc->add_string("log_list", format("%s  <b>Question:</b> %s", wrap_source(source), text));
-	} else if (m.type == LogHub::Type::Debug) {
+	} else if (m.type == obs::MessageType::Debug) {
 		lc->add_string("log_list", format("%s  <span alpha=\"50%%\">َDebug: %s</span>", wrap_source(source), text));
-	} else if (m.type == LogHub::Type::Status) {
+	} else if (m.type == obs::MessageType::Status) {
 	} else {
 		lc->add_string("log_list", format("%s  %s", wrap_source(source), text));
 	}

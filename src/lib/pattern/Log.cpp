@@ -17,7 +17,7 @@ namespace os {
 	extern bool is_main_thread();
 }
 
-namespace tsunami {
+namespace obs {
 LogSource::LogSource(LogHub* _hub) {
 	hub = _hub;
 	broadcasting = false;
@@ -27,28 +27,28 @@ LogSource::LogSource(LogHub* _hub) {
 LogSource::~LogSource() = default;
 
 void LogSource::error(const string &message) {
-	hub->add_message(this, LogHub::Type::Error, message, {});
+	hub->add_message(this, MessageType::Error, message, {});
 }
 
 void LogSource::warn(const string &message) {
-	hub->add_message(this, LogHub::Type::Warning, message, {});
+	hub->add_message(this, MessageType::Warning, message, {});
 }
 
 void LogSource::info(const string &message) {
-	hub->add_message(this, LogHub::Type::Info, message, {});
+	hub->add_message(this, MessageType::Info, message, {});
 }
 
 void LogSource::debug(const string &message) {
 	if (hub->allow_debug)
-		hub->add_message(this, LogHub::Type::Debug, message, {});
+		hub->add_message(this, MessageType::Debug, message, {});
 }
 
 void LogSource::question(const string &message, const Array<string> &responses) {
-	hub->add_message(this, LogHub::Type::Question, message, responses);
+	hub->add_message(this, MessageType::Question, message, responses);
 }
 
 void LogSource::status(const string &message) {
-	hub->add_message(this, LogHub::Type::Status, message, {});
+	hub->add_message(this, MessageType::Status, message, {});
 }
 
 LogHub::LogHub() {
@@ -93,7 +93,7 @@ bool LogHub::Message::operator==(const LogHub::Message &o) const {
 }
 
 
-void LogHub::add_message(LogSource* source, Type type, const string &message, const Array<string> &responses) {
+void LogHub::add_message(LogSource* source, MessageType type, const string &message, const Array<string> &responses) {
 
 	// make sure messages are handled in the gui thread...
 	if (!os::is_main_thread()) {
@@ -114,7 +114,7 @@ void LogHub::add_message(LogSource* source, Type type, const string &message, co
 
 	int count = 0;
 	for (auto &mm: messages.sub_ref(max(messages.num - 40, 0)))
-		if (m == mm and m.type != Type::Status) {
+		if (m == mm and m.type != MessageType::Status) {
 			count ++;
 			if (count > 8) {
 				blocked.add(m);
@@ -130,14 +130,14 @@ void LogHub::add_message(LogSource* source, Type type, const string &message, co
 	messages.add(m);
 
 	if (allow_console_output) {
-		if (type == Type::Error) {
+		if (type == MessageType::Error) {
 			msg_error(message);
-		} else if (type == Type::Warning) {
+		} else if (type == MessageType::Warning) {
 			msg_write(message);
-		} else if (type == Type::Question) {
-		} else if (type == Type::Debug) {
+		} else if (type == MessageType::Question) {
+		} else if (type == MessageType::Debug) {
 			msg_write(message);
-		} else if (type == Type::Status) {
+		} else if (type == MessageType::Status) {
 		} else {
 			msg_write(message);
 		}

@@ -5,13 +5,12 @@
  *      Author: michi
  */
 
-#ifndef SRC_STUFF_LOG_H_
-#define SRC_STUFF_LOG_H_
+#pragma once
 
-#include "../lib/base/base.h"
-#include "../lib/pattern/Observable.h"
+#include <lib/base/base.h>
+#include "Observable.h"
 
-namespace tsunami {
+namespace obs {
 
 class LogHub;
 
@@ -29,26 +28,26 @@ public:
 	bool broadcasting;
 };
 
-class LogHub : public obs::Node<VirtualBase> {
+enum class MessageType {
+	Error,
+	Warning,
+	Question,
+	Info,
+	Debug,
+	Status
+};
+
+class LogHub : public Node<VirtualBase> {
 	friend class LogSource;
 public:
 	LogHub();
 	~LogHub() override;
 
-	obs::source out_add_message{this, "add-message"};
-
-	enum class Type {
-		Error,
-		Warning,
-		Question,
-		Info,
-		Debug,
-		Status
-	};
+	source out_add_message{this, "add-message"};
 
 	struct Message {
 		LogSource* source;
-		Type type;
+		MessageType type;
 		string text;
 		Array<string> responses;
 		bool operator==(const Message &o) const;
@@ -64,11 +63,9 @@ public:
 	LogSource* create_source();
 
 private:
-	void add_message(LogSource* source, Type type, const string &message, const Array<string> &responses);
+	void add_message(LogSource* source, MessageType type, const string &message, const Array<string> &responses);
 	Array<Message> messages;
 	Array<Message> blocked;
 };
 
 }
-
-#endif /* SRC_STUFF_LOG_H_ */

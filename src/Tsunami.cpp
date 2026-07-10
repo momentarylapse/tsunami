@@ -96,16 +96,8 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 
 	clipboard = new Clipboard;
 
-	device_manager = new DeviceManager(Session::GLOBAL);
+	device_manager = new DeviceManager(Session::GLOBAL->log_source.get(), Session::GLOBAL);
 	Session::GLOBAL->device_manager = device_manager.get();
-	device_manager->out_device_plugged_in >> Session::GLOBAL->create_data_sink<Device*>([this] (const Device* d) {
-		//if (!device_manager->initial_discovery)
-			Session::GLOBAL->status(_("device plugged in: ") + d->get_name());
-	});
-	device_manager->out_device_plugged_in >> Session::GLOBAL->create_data_sink<Device*>([this] (const Device* d) {
-		//if (!device_manager->initial_discovery)
-			Session::GLOBAL->status(_("device plugged out: ") + d->get_name());
-	});
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;
@@ -150,9 +142,6 @@ hui::AppStatus Tsunami::handle_arguments(const Array<string> &args) {
 			Session::GLOBAL->i(format("%s %s \"%s\"", AppName, AppVersion, AppNickname));
 			Session::GLOBAL->i(_("  ...don't worry. Everything will be fine!"));
 
-			device_manager->out_message >> Session::GLOBAL->create_data_sink<string>([] (const string& m) {
-				Session::GLOBAL->i(m);
-			});
 			device_manager->init();
 			auto session = session_manager->spawn_new_session();
 

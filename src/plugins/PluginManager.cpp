@@ -234,7 +234,7 @@ void init_app() {
 
 	t->clipboard = new Clipboard;
 
-	t->device_manager = new DeviceManager(Session::GLOBAL);
+	t->device_manager = new DeviceManager(Session::GLOBAL->log_source.get(), Session::GLOBAL);
 	Session::GLOBAL->device_manager = t->device_manager.get();
 
 	// create (link) PluginManager after all other components are ready

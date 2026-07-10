@@ -14,11 +14,11 @@
 #include "backend-coreaudio/DeviceContextCoreAudio.h"
 #include "backend-coremidi/DeviceContextCoreMidi.h"
 #include "Device.h"
-#include "../Session.h"
 #include <lib/any/any.h>
 #include <lib/hui/Callback.h>
 #include <lib/hui/language.h>
 #include <lib/hui/config.h>
+#include <lib/obs/Log.h>
 
 namespace tsunami {
 
@@ -104,9 +104,10 @@ DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType a
 }
 
 
-DeviceManager::DeviceManager(Session *_session) {
+DeviceManager::DeviceManager(obs::LogSource* _log_source, Session *_session) {
 	initialized = false;
 
+	log_source = _log_source;
 	session = _session;
 
 	audio_api = ApiType::Dummy;
@@ -188,8 +189,12 @@ void DeviceManager::update_devices(bool initial_discovery) {
 	for (auto d: all_devices()) {
 		if (d->present and !present_old.contains(d)) {
 			out_device_plugged_in(d);
+			if (!initial_discovery)
+				log_source->status(_("device plugged in: ") + d->get_name());
 		} else if (!d->present and present_old.contains(d)) {
 			out_device_plugged_out(d);
+			if (!initial_discovery)
+				log_source->status(_("device plugged out: ") + d->get_name());
 		}
 	}
 
@@ -261,10 +266,10 @@ void DeviceManager::init() {
 
 	audio_api = select_api(hui::config.get_str("Devices.AudioApi", suggest_default_audio_api()), 1);
 	string audio_api_name = find_api_description(audio_api).name;
-	out_message(_("audio library selected: ") + audio_api_name);
+	log_source->info(_("audio library selected: ") + audio_api_name);
 	midi_api = (ApiType)select_api(hui::config.get_str("Devices.MidiApi", suggest_default_midi_api()), 2);
 	string midi_api_name = find_api_description(midi_api).name;
-	out_message(_("midi library selected: ") + midi_api_name);
+	log_source->info(_("midi library selected: ") + midi_api_name);
 
 	hui::config.set_str("Devices.AudioApi", audio_api_name);
 	hui::config.set_str("Devices.MidiApi", midi_api_name);

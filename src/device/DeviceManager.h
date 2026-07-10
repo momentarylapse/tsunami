@@ -11,6 +11,10 @@
 #include <lib/base/base.h>
 #include <lib/obs/Observable.h>
 
+namespace obs {
+	class LogSource;
+}
+
 namespace tsunami {
 
 class AudioOutput;
@@ -29,8 +33,6 @@ public:
 	friend class AudioInput;
 	friend class MidiInput;
 
-	obs::xsource<string> out_message{this, "message"};
-	obs::xsource<string> out_error{this, "error"};
 	// general database entries
 	obs::xsource<Device*> out_add_device{this, "add-device"};
 	obs::xsource<Device*> out_remove_device{this, "remove-device"};
@@ -38,10 +40,11 @@ public:
 	obs::xsource<Device*> out_device_plugged_in{this, "device-plugged-in"};
 	obs::xsource<Device*> out_device_plugged_out{this, "device-plugged-out"};
 
-	explicit DeviceManager(Session *session);
+	explicit DeviceManager(obs::LogSource* log_source, Session *session);
 	~DeviceManager() override;
 
 	Session *session;
+	obs::LogSource* log_source;
 
 	void init();
 	void kill_library();

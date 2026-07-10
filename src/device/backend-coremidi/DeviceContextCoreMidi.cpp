@@ -7,8 +7,7 @@
 #include "MidiInputStreamCoreMidi.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
-#include "../../lib/os/msg.h"
+#include <lib/os/msg.h>
 
 
 namespace tsunami {
@@ -22,7 +21,7 @@ void on_coremidi_notify(const MIDINotification *message, void* refCon) {
 		ctx->out_request_update();
 }
 
-DeviceContextCoreMidi::DeviceContextCoreMidi(Session* session) : DeviceContext(session) {
+DeviceContextCoreMidi::DeviceContextCoreMidi(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
 
 	CFStringRef name = CFStringCreateWithCString(kCFAllocatorDefault, "tsunami", kCFStringEncodingMacRoman);
@@ -33,12 +32,12 @@ DeviceContextCoreMidi::DeviceContextCoreMidi(Session* session) : DeviceContext(s
 
 DeviceContextCoreMidi::~DeviceContextCoreMidi() = default;
 
-bool DeviceContextCoreMidi::init(Session* session) {
+bool DeviceContextCoreMidi::init() {
 	return true;
 }
 
 
-void DeviceContextCoreMidi::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextCoreMidi::update_device(bool serious) {
 	if (!fully_initialized)
 		return;
 

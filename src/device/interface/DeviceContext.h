@@ -7,6 +7,10 @@
 
 #include "../../lib/obs/Observable.h"
 
+namespace obs {
+	class LogSource;
+}
+
 namespace tsunami {
 
 class AudioInputStream;
@@ -18,21 +22,21 @@ class Session;
 
 class DeviceContext : public obs::Node<VirtualBase> {
 public:
-	explicit DeviceContext(Session* session);
+	explicit DeviceContext(DeviceManager* device_manager);
 
 	obs::source out_request_update{this, "request-update"};
 	obs::xsource<Device> out_device_found{this, "device-found"};
 
-	virtual bool init(Session* session) = 0;
-
-	virtual void update_device(DeviceManager* device_manager, bool serious) = 0;
+	virtual bool init() = 0;
+	virtual void update_device(bool serious) = 0;
 
 	// will return dummy objects, if not possible
 	virtual AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data);
 	virtual AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data);
 	virtual MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data);
 
-	//Session* session;
+	DeviceManager* device_manager;
+	obs::LogSource* log_source;
 	bool fully_initialized = false;
 };
 

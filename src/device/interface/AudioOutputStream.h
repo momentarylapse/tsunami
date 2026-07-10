@@ -12,6 +12,10 @@
 #include <atomic>
 #include <functional>
 
+namespace obs {
+	class LogSource;
+}
+
 namespace tsunami {
 
 class Session;
@@ -53,6 +57,7 @@ public:
 	virtual base::optional<int64> estimate_samples_played() = 0;
 
 	Session *session;
+	obs::LogSource* log_source;
 	DeviceManager *device_manager;
 
 	static const int DEFAULT_PREBUFFER_SIZE;

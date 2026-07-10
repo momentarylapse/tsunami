@@ -9,31 +9,32 @@
 #include "AudioOutputStreamPort.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
-#include "../../lib/hui/language.h"
+#include <lib/hui/language.h>
+#include <lib/obs/Log.h>
 
 #include <portaudio.h>
+
 
 namespace tsunami {
 
 DeviceContextPort* DeviceContextPort::instance;
 
-DeviceContextPort::DeviceContextPort(Session* session) : DeviceContext(session) {
+DeviceContextPort::DeviceContextPort(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
 }
 
 DeviceContextPort::~DeviceContextPort() {
 	PaError err = Pa_Terminate();
-	_test_error(err, Session::GLOBAL, "Pa_Terminate");
+	_test_error(err, log_source, "Pa_Terminate");
 }
 
-bool DeviceContextPort::init(Session* session) {
+bool DeviceContextPort::init() {
 	PaError err = Pa_Initialize();
-	_test_error(err, session, "Pa_Initialize");
+	_test_error(err, log_source, "Pa_Initialize");
 	if (err != paNoError)
 		return false;
 
-	session->i(_("please note, that portaudio does not support refreshing the device list after program launch"));
+	log_source->info(_("please note, that portaudio does not support refreshing the device list after program launch"));
 	return true;
 }
 
@@ -66,7 +67,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	}
 }
 
-void DeviceContextPort::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextPort::update_device(bool serious) {
 	if (!fully_initialized)
 		return;
 	for (Device *d: device_manager->output_devices)
@@ -84,9 +85,9 @@ void DeviceContextPort::update_device(DeviceManager* device_manager, bool seriou
 		_portaudio_add_dev(device_manager, DeviceType::AudioInput, i);
 	}
 }
-bool DeviceContextPort::_test_error(PaError err, Session *session, const string &msg) {
+bool DeviceContextPort::_test_error(PaError err, obs::LogSource* log_source, const string &msg) {
 	if (err != paNoError) {
-		session->e(msg + ": " + Pa_GetErrorText(err));
+		log_source->error(msg + ": " + Pa_GetErrorText(err));
 		return true;
 	}
 	return false;

@@ -8,7 +8,7 @@
 #include "AudioInputStreamPipewire.h"
 #include "AudioOutputStreamPipewire.h"
 #include "../Device.h"
-#include "../../lib/hui/Callback.h"
+#include <lib/hui/Callback.h>
 
 #include <pipewire/pipewire.h>
 
@@ -17,7 +17,7 @@ namespace tsunami {
 DeviceContextPipewire* DeviceContextPipewire::instance = nullptr;
 
 
-DeviceContextPipewire::DeviceContextPipewire(Session* session) : DeviceContext(session) {
+DeviceContextPipewire::DeviceContextPipewire(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
 }
 
@@ -80,7 +80,7 @@ static const struct pw_registry_events registry_events = {
 
 
 
-bool DeviceContextPipewire::init(Session* session) {
+bool DeviceContextPipewire::init() {
 	pw_init(nullptr, nullptr);
 
 
@@ -123,7 +123,7 @@ void DeviceContextPipewire::unlock() {
 	pw_thread_loop_unlock(loop);
 }
 
-void DeviceContextPipewire::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextPipewire::update_device(bool serious) {
 }
 
 AudioOutputStream* DeviceContextPipewire::create_audio_output_stream(Session *session, Device *device, void* shared_data) {

@@ -6,11 +6,13 @@
 #include "MidiInputStream.h"
 #include "AudioInputStream.h"
 #include "AudioOutputStream.h"
+#include "../DeviceManager.h"
 
 namespace tsunami {
 
-DeviceContext::DeviceContext(Session *_session) {
-	//session = _session;
+DeviceContext::DeviceContext(DeviceManager* _device_manager) {
+	device_manager = _device_manager;
+	log_source = device_manager->log_source;
 }
 
 class AudioOutputStreamDummy : public AudioOutputStream {

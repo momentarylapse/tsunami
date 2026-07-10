@@ -160,7 +160,7 @@ base::optional<int64> AudioOutputStreamPulse::estimate_samples_played() {
 void AudioOutputStreamPulse::_pulse_flush_op() {
 	if (operation) {
 		DeviceContextPulse::instance->lock();
-		DeviceContextPulse::wait_op(session, operation);
+		DeviceContextPulse::wait_op(session->log_source.get(), operation);
 		DeviceContextPulse::instance->unlock();
 	}
 	operation = nullptr;

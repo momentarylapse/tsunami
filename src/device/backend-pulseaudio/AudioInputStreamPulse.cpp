@@ -9,7 +9,8 @@
 #include "../DeviceManager.h"
 #include "../Device.h"
 #include "../../Session.h"
-#include <stdio.h>
+#include <lib/obs/Log.h>
+#include <cstdio>
 
 #include <pulse/pulseaudio.h>
 
@@ -47,7 +48,7 @@ AudioInputStreamPulse::AudioInputStreamPulse(Session *session, Device *device, S
 
 	if (!DeviceContextPulse::instance->wait_stream_ready(pulse_stream)) {
 		DeviceContextPulse::instance->unlock();
-		session->e("pulse_wait_stream_ready");
+		log_source->error("pulse_wait_stream_ready");
 		return;
 	}
 	DeviceContextPulse::instance->unlock();
@@ -79,7 +80,7 @@ void AudioInputStreamPulse::pause() {
 	pa_operation *op = pa_stream_cork(pulse_stream, true, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
-	DeviceContextPulse::wait_op(session, op);
+	DeviceContextPulse::wait_op(log_source, op);
 	DeviceContextPulse::instance->unlock();
 }
 
@@ -90,7 +91,7 @@ void AudioInputStreamPulse::unpause() {
 	pa_operation *op = pa_stream_cork(pulse_stream, false, &pulse_stream_success_callback, this);
 	if (!op)
 		_pulse_test_error("pa_stream_cork");
-	DeviceContextPulse::wait_op(session, op);
+	DeviceContextPulse::wait_op(log_source, op);
 	DeviceContextPulse::instance->unlock();
 }
 
@@ -161,7 +162,7 @@ void AudioInputStreamPulse::pulse_input_notify_callback(pa_stream *p, void *user
 bool AudioInputStreamPulse::_pulse_test_error(const char *msg) {
 	int e = pa_context_errno(DeviceContextPulse::instance->pulse_context);
 	if (e != 0)
-		session->e(format("%s (input): %s", msg, pa_strerror(e)));
+		log_source->error(format("%s (input): %s", msg, pa_strerror(e)));
 	return (e != 0);
 }
 

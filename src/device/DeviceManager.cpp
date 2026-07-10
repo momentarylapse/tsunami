@@ -68,39 +68,39 @@ Any devs2any(const Array<Device*>& devices) {
 }
 
 
-DeviceContext* create_backend_context(Session* session, DeviceManager::ApiType api) {
+DeviceContext* create_backend_context(DeviceManager* device_manager, DeviceManager::ApiType api) {
 #if HAS_LIB_COREAUDIO
 	if (api == DeviceManager::ApiType::Coreaudio)
-		return new DeviceContextCoreAudio(session);
+		return new DeviceContextCoreAudio(device_manager);
 #endif
 #if HAS_LIB_PULSEAUDIO
 	if (api == DeviceManager::ApiType::Pulseaudio)
-		return new DeviceContextPulse(session);
+		return new DeviceContextPulse(device_manager);
 #endif
 #if HAS_LIB_PORTAUDIO
 	if (api == DeviceManager::ApiType::Portaudio)
-		return new DeviceContextPort(session);
+		return new DeviceContextPort(device_manager);
 #endif
 #if HAS_LIB_COREMIDI
 	if (api == DeviceManager::ApiType::Coremidi)
-		return new DeviceContextCoreMidi(session);
+		return new DeviceContextCoreMidi(device_manager);
 #endif
 #if HAS_LIB_PIPEWIRE
 	if (api == DeviceManager::ApiType::Pipewire)
-		return new DeviceContextPipewire(session);
+		return new DeviceContextPipewire(device_manager);
 #endif
 #if HAS_LIB_ALSA
 	if (api == DeviceManager::ApiType::Alsa)
-		return new DeviceContextAlsa(session);
+		return new DeviceContextAlsa(device_manager);
 #endif
 
 	class DeviceContextDummy : public DeviceContext {
 	public:
-		DeviceContextDummy(Session* session) : DeviceContext(session) {}
-		bool init(Session* session) override { return true; }
-		void update_device(DeviceManager* device_manager, bool serious) override {}
+		DeviceContextDummy(DeviceManager* device_manager) : DeviceContext(device_manager) {}
+		bool init() override { return true; }
+		void update_device(bool serious) override {}
 	};
-	return new DeviceContextDummy(session);
+	return new DeviceContextDummy(device_manager);
 }
 
 
@@ -181,9 +181,9 @@ void DeviceManager::update_devices(bool initial_discovery) {
 		d->present = false;
 	}
 
-	audio_context->update_device(this, initial_discovery);
+	audio_context->update_device(initial_discovery);
 	if (midi_context)
-		midi_context->update_device(this, initial_discovery);
+		midi_context->update_device(initial_discovery);
 
 
 	for (auto d: all_devices()) {
@@ -294,15 +294,15 @@ void DeviceManager::init() {
 			d->present = true;
 			set_device_config(d);
 		});
-		ctx->fully_initialized = ctx->init(session);
+		ctx->fully_initialized = ctx->init();
 	};
 
 	// audio
-	audio_context = create_backend_context(session, audio_api);
+	audio_context = create_backend_context(this, audio_api);
 	init_context(audio_context);
 
 	// midi
-	midi_context = create_backend_context(session, midi_api);
+	midi_context = create_backend_context(this, midi_api);
 	init_context(midi_context);
 
 	update_devices(true);
@@ -312,8 +312,8 @@ void DeviceManager::init() {
 	// only updating alsa makes sense...
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
 	if (midi_api == ApiType::Alsa)
-		hui_rep_id = hui::run_repeated(2.0f, [this] {
-			DeviceContextAlsa::instance->update_device(this, true);
+		hui_rep_id = hui::run_repeated(2.0f, [] {
+			DeviceContextAlsa::instance->update_device(true);
 		});
 #endif
 

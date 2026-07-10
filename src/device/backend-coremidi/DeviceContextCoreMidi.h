@@ -9,11 +9,11 @@ namespace tsunami {
 
 class DeviceContextCoreMidi : public DeviceContext {
 public:
-	DeviceContextCoreMidi(Session* session);
-	~DeviceContextCoreMidi();
+	explicit DeviceContextCoreMidi(DeviceManager* device_manager);
+	~DeviceContextCoreMidi() override;
 
-	bool init(Session* session) override;
-	void update_device(DeviceManager* device_manager, bool serious) override;
+	bool init() override;
+	void update_device(bool serious) override;
 
 	MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) override;
 

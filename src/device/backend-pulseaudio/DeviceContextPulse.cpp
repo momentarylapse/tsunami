@@ -14,13 +14,15 @@
 
 #include <pulse/pulseaudio.h>
 
+#include "obs/Log.h"
+
 namespace tsunami {
 
 DeviceContextPulse* DeviceContextPulse::instance = nullptr;
 
 
 // inside lock() ... unlock()
-void DeviceContextPulse::wait_op(Session *session, pa_operation *op) {
+void DeviceContextPulse::wait_op(obs::LogSource* log_source, pa_operation *op) {
 	if (!op)
 		return;
 	//printf("-w-\n");
@@ -38,19 +40,19 @@ void DeviceContextPulse::wait_op(Session *session, pa_operation *op) {
 	//printf("%d\n", status);
 	if (status != PA_OPERATION_DONE) {
 		if (status == PA_OPERATION_RUNNING)
-			session->e("pulse_wait_op() failed: still running");
+			log_source->error("pulse_wait_op() failed: still running");
 		else if (status == PA_OPERATION_CANCELLED)
-			session->e("pulse_wait_op() failed: cancelled");
+			log_source->error("pulse_wait_op() failed: cancelled");
 		else
-			session->e("pulse_wait_op() failed: ???");
+			log_source->error("pulse_wait_op() failed: ???");
 	}
 	pa_operation_unref(op);
 	//printf("-o-\n");
 }
 
-void DeviceContextPulse::ignore_op(Session *session, pa_operation *op) {
+void DeviceContextPulse::ignore_op(obs::LogSource* log_source, pa_operation *op) {
 	if (!op) {
-		session->e("pulse_ignore_op:  op=nil");
+		log_source->error("pulse_ignore_op:  op=nil");
 		return;
 	}
 	pa_operation_unref(op);
@@ -71,7 +73,7 @@ void pulse_subscription_callback(pa_context *c, pa_subscription_event_type_t t, 
 }
 
 
-DeviceContextPulse::DeviceContextPulse(Session* session) : DeviceContext(session) {
+DeviceContextPulse::DeviceContextPulse(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
 }
 
@@ -94,21 +96,21 @@ DeviceContextPulse::~DeviceContextPulse() {
 	//_test_error(session, "pa_threaded_mainloop_free");
 }
 
-bool DeviceContextPulse::init(Session* session) {
+bool DeviceContextPulse::init() {
 	pulse_mainloop = pa_threaded_mainloop_new();
 	if (!pulse_mainloop) {
-		session->e("pa_threaded_mainloop_new failed");
+		log_source->error("pa_threaded_mainloop_new failed");
 		return false;
 	}
 
 	pa_mainloop_api *mainloop_api = pa_threaded_mainloop_get_api(pulse_mainloop);
 	if (!mainloop_api) {
-		session->e("pa_threaded_mainloop_get_api failed");
+		log_source->error("pa_threaded_mainloop_get_api failed");
 		return false;
 	}
 
 	pulse_context = pa_context_new(mainloop_api, "tsunami");
-	if (_test_error(session, "pa_context_new"))
+	if (_test_error(log_source, "pa_context_new"))
 		return false;
 
 	pa_context_set_state_callback(pulse_context, &DeviceContextPulse::state_callback, this);
@@ -116,27 +118,27 @@ bool DeviceContextPulse::init(Session* session) {
 	lock();
 
 	pa_threaded_mainloop_start(pulse_mainloop);
-	if (_test_error(session, "pa_threaded_mainloop_start")) {
+	if (_test_error(log_source, "pa_threaded_mainloop_start")) {
 		unlock();
 		return false;
 	}
 
 	pa_context_connect(pulse_context, nullptr, PA_CONTEXT_NOAUTOSPAWN, nullptr);
-	if (_test_error(session, "pa_context_connect")) {
+	if (_test_error(log_source, "pa_context_connect")) {
 		unlock();
 		return false;
 	}
 
 	if (!wait_context_ready()) {
-		session->e("pulse audio context does not turn 'ready'");
+		log_source->error("pulse audio context does not turn 'ready'");
 		unlock();
 		return false;
 	}
 
 	pa_context_set_subscribe_callback(pulse_context, &pulse_subscription_callback, this);
-	_test_error(session, "pa_context_set_subscribe_callback");
+	_test_error(log_source, "pa_context_set_subscribe_callback");
 	pa_context_subscribe(pulse_context, (pa_subscription_mask_t)(PA_SUBSCRIPTION_MASK_SINK | PA_SUBSCRIPTION_MASK_SOURCE), nullptr, this);
-	_test_error(session, "pa_context_subscribe");
+	_test_error(log_source, "pa_context_subscribe");
 
 	unlock();
 	return true;
@@ -158,10 +160,9 @@ void DeviceContextPulse::unlock() {
 }
 
 
-void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextPulse::update_device(bool serious) {
 	if (!fully_initialized)
 		return;
-	Session* session = device_manager->session;
 
 	for (Device *d: device_manager->output_devices)
 		d->present = false;
@@ -178,8 +179,8 @@ void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serio
 
 	pa_operation *op = pa_context_get_sink_info_list(pulse_context, &DeviceContextPulse::sink_info_callback, this);
 	if (!op)
-		_test_error(session, "pa_context_get_sink_info_list");
-	wait_op(session, op);
+		_test_error(log_source, "pa_context_get_sink_info_list");
+	wait_op(log_source, op);
 
 	// system default
 	def = device_manager->get_device_create(DeviceType::AudioInput, "");
@@ -189,8 +190,8 @@ void DeviceContextPulse::update_device(DeviceManager* device_manager, bool serio
 
 	op = pa_context_get_source_info_list(pulse_context, &DeviceContextPulse::source_info_callback, this);
 	if (!op)
-		_test_error(session, "pa_context_get_source_info_list");
-	wait_op(session, op);
+		_test_error(log_source, "pa_context_get_source_info_list");
+	wait_op(log_source, op);
 
 	unlock();
 }
@@ -282,10 +283,10 @@ void DeviceContextPulse::state_callback(pa_context* context, void* userdata) {
 	pa_threaded_mainloop_signal(ctx->pulse_mainloop, 0);
 }
 
-bool DeviceContextPulse::_test_error(Session *session, const string &msg) {
+bool DeviceContextPulse::_test_error(obs::LogSource* log_source, const string &msg) {
 	int e = pa_context_errno(pulse_context);
 	if (e != 0)
-		session->e(msg + ": " + pa_strerror(e));
+		log_source->error(msg + ": " + pa_strerror(e));
 	return (e != 0);
 }
 

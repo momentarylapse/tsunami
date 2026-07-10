@@ -9,6 +9,10 @@
 
 #include "../interface/DeviceContext.h"
 
+namespace obs {
+	class LogSource;
+}
+
 struct string;
 
 struct pa_context;
@@ -22,11 +26,11 @@ namespace tsunami {
 
 class DeviceContextPulse : public DeviceContext {
 public:
-	DeviceContextPulse(Session* session);
-	~DeviceContextPulse();
+	explicit DeviceContextPulse(DeviceManager* device_manager);
+	~DeviceContextPulse() override;
 
-	bool init(Session* session) override;
-	void update_device(DeviceManager* device_manager, bool serious) override;
+	bool init() override;
+	void update_device(bool serious) override;
 	AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data) override;
 	AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data) override;
 
@@ -35,7 +39,7 @@ public:
 
 	pa_context *pulse_context = nullptr;
 	pa_threaded_mainloop *pulse_mainloop = nullptr;
-	bool _test_error(Session *session, const string &msg);
+	bool _test_error(obs::LogSource* log_source, const string &msg);
 	bool wait_context_ready();
 	void _update_devices();
 
@@ -43,8 +47,8 @@ public:
 	static void source_info_callback(pa_context *c, const pa_source_info *i, int eol, void *userdata);
 	static void state_callback(pa_context* context, void* userdata);
 
-	static void wait_op(Session *session, pa_operation *op);
-	static void ignore_op(Session *session, pa_operation *op);
+	static void wait_op(obs::LogSource* log_source, pa_operation *op);
+	static void ignore_op(obs::LogSource* log_source, pa_operation *op);
 	bool wait_stream_ready(pa_stream *s);
 
 	static DeviceContextPulse* instance;

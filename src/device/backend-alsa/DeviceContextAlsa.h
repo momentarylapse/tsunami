@@ -15,11 +15,11 @@ namespace tsunami {
 
 class DeviceContextAlsa : public DeviceContext {
 public:
-	DeviceContextAlsa(Session* session);
-	~DeviceContextAlsa();
+	explicit DeviceContextAlsa(DeviceManager* device_manager);
+	~DeviceContextAlsa() override;
 
-	bool init(Session* session) override;
-	void update_device(DeviceManager* device_manager, bool serious) override;
+	bool init() override;
+	void update_device(bool serious) override;
 	MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) override;
 
 	_snd_seq *alsa_midi_handle = nullptr;

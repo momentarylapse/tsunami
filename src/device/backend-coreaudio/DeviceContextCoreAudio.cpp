@@ -9,7 +9,7 @@
 #include "AudioOutputStreamCoreAudio.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
+#include <lib/obs/Log.h>
 
 
 //	https://developer.apple.com/library/archive/documentation/MusicAudio/Conceptual/CoreAudioOverview/ARoadmaptoCommonTasks/ARoadmaptoCommonTasks.html#//apple_ref/doc/uid/TP40003577-CH6-SW1
@@ -20,9 +20,9 @@ namespace tsunami {
 
 DeviceContextCoreAudio* DeviceContextCoreAudio::instance;
 
-DeviceContextCoreAudio::DeviceContextCoreAudio(Session* session) : DeviceContext(session) {
+DeviceContextCoreAudio::DeviceContextCoreAudio(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
-    session->w("CoreAudio backend is still experimental!\nIf you encounter any problems, please use portaudio instead.");
+    log_source->warn("CoreAudio backend is still experimental!\nIf you encounter any problems, please use portaudio instead.");
 }
 
 DeviceContextCoreAudio::~DeviceContextCoreAudio() = default;
@@ -35,7 +35,7 @@ OSStatus on_coreaudio_devices_changed(AudioObjectID id, UInt32 num_addresses, co
 	return 0;
 }
 
-bool DeviceContextCoreAudio::init(Session* session) {
+bool DeviceContextCoreAudio::init() {
 	AudioObjectPropertyAddress theAddress0 = {
 		kAudioHardwarePropertyDevices,
 		kAudioObjectPropertyScopeGlobal,
@@ -54,7 +54,7 @@ AudioInputStream* DeviceContextCoreAudio::create_audio_input_stream(Session *ses
 }
 
 
-void DeviceContextCoreAudio::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextCoreAudio::update_device(bool serious) {
 	if (!fully_initialized)
 		return;
 

@@ -8,8 +8,9 @@
 #include "AudioOutputStreamPort.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
-#include "../../lib/hui/config.h"
+#include <Session.h>
+#include <lib/hui/config.h>
+#include <lib/obs/Log.h>
 #include <portaudio.h>
 
 namespace tsunami {
@@ -88,7 +89,7 @@ int AudioOutputStreamPort::portaudio_stream_request_callback(const void *inputBu
 
 bool AudioOutputStreamPort::_portaudio_test_error(PaError err, const char *msg) {
 	if (err != paNoError) {
-		session->e(format("AudioOutput: %s: %s", msg, Pa_GetErrorText(err)));
+		log_source->error(format("AudioOutput: %s: %s", msg, Pa_GetErrorText(err)));
 		return true;
 	}
 	return false;

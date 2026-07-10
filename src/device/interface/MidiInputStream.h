@@ -7,6 +7,10 @@
 
 #include "../../data/midi/MidiEventRingBuffer.h"
 
+namespace obs {
+	class LogSource;
+}
+
 namespace tsunami {
 
 class Session;
@@ -37,6 +41,7 @@ public:
 	virtual base::optional<int64> estimate_samples_captured() = 0;*/
 
 	Session *session;
+	obs::LogSource* log_source;
 	DeviceManager *device_manager;
 
 	bool error = false;

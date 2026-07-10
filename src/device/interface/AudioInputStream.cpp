@@ -16,6 +16,7 @@ AudioInputStream::SharedData::SharedData() :
 AudioInputStream::AudioInputStream(Session *_session, SharedData &_shared_data)
 		: shared_data(_shared_data) {
 	session = _session;
+	log_source = session->log_source.get();
 
 	device_manager = session->device_manager;
 }

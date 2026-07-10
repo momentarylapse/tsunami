@@ -12,11 +12,13 @@
 
 #include <alsa/asoundlib.h>
 
+#include "obs/Log.h"
+
 namespace tsunami {
 
 DeviceContextAlsa* DeviceContextAlsa::instance;
 
-DeviceContextAlsa::DeviceContextAlsa(Session* session) : DeviceContext(session) {
+DeviceContextAlsa::DeviceContextAlsa(DeviceManager* device_manager) : DeviceContext(device_manager) {
 	instance = this;
 }
 
@@ -25,10 +27,10 @@ DeviceContextAlsa::~DeviceContextAlsa() {
 		snd_seq_close(alsa_midi_handle);
 }
 
-bool DeviceContextAlsa::init(Session* session) {
+bool DeviceContextAlsa::init() {
 	int r = snd_seq_open(&alsa_midi_handle, "hw", SND_SEQ_OPEN_DUPLEX, SND_SEQ_NONBLOCK);
 	if (r < 0) {
-		session->e(string("Error opening ALSA sequencer: ") + snd_strerror(r));
+		log_source->error(string("Error opening ALSA sequencer: ") + snd_strerror(r));
 		return false;
 	}
 
@@ -37,7 +39,7 @@ bool DeviceContextAlsa::init(Session* session) {
 }
 
 
-void DeviceContextAlsa::update_device(DeviceManager* device_manager, bool serious) {
+void DeviceContextAlsa::update_device(bool serious) {
 	if (!alsa_midi_handle)
 		return;
 

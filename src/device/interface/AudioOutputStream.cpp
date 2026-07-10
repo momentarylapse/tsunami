@@ -80,6 +80,7 @@ AudioOutputStream::AudioOutputStream(Session *_session, SharedData& _shared_data
 	: shared_data(_shared_data)
 {
 	session = _session;
+	log_source = session->log_source.get();
 
 	//prebuffer_size = hui::config.get_int("Output.BufferSize", DEFAULT_PREBUFFER_SIZE);
 

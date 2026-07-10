@@ -7,10 +7,12 @@
 #include "AudioInputStreamPort.h"
 #include "../DeviceManager.h"
 #include "../Device.h"
-#include "../../Session.h"
-#include "../../lib/hui/Callback.h"
-#include "../../lib/hui/config.h"
+#include <Session.h>
+#include <lib/hui/Callback.h>
+#include <lib/hui/config.h>
+#include <lib/obs/Log.h>
 #include <portaudio.h>
+
 
 namespace tsunami {
 
@@ -25,12 +27,12 @@ AudioInputStreamPort::AudioInputStreamPort(Session *session, Device *device, Aud
 	/*paFramesPerBufferUnspecified*/
 
 	if (device->is_default()) {
-		session->i(format("open def stream %d  %d", _sample_rate, num_channels));
+		log_source->info(format("open def stream %d  %d", _sample_rate, num_channels));
 		PaError err = Pa_OpenDefaultStream(&portaudio_stream, num_channels, 0, paFloat32, _sample_rate, chunk_size,
 		                                   &portaudio_stream_request_callback, this);
 		_portaudio_test_error(err, "Pa_OpenDefaultStream");
 	} else {
-		session->i(format("open stream %d  %d    %d", _sample_rate, num_channels, device->index_in_lib));
+		log_source->info(format("open stream %d  %d    %d", _sample_rate, num_channels, device->index_in_lib));
 		PaStreamParameters params{};
 		params.channelCount = num_channels;
 		params.sampleFormat = paFloat32;
@@ -86,14 +88,14 @@ int AudioInputStreamPort::portaudio_stream_request_callback(const void *inputBuf
 		stream->handle_input(in, (int)frames);
 	} else {
 		hui::run_in_gui_thread([stream] {
-			stream->session->w("stream callback error");
+			stream->log_source->warn("stream callback error");
 		});
 	}
 	return 0;
 }
 bool AudioInputStreamPort::_portaudio_test_error(PaError err, const char *msg) {
 	if (err != paNoError) {
-		session->e(format("%s: (input): %s", msg, Pa_GetErrorText(err)));
+		log_source->error(format("%s: (input): %s", msg, Pa_GetErrorText(err)));
 		return true;
 	}
 	return false;

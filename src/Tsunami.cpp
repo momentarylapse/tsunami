@@ -29,6 +29,7 @@
 #include "plugins/PluginManager.h"
 #include "plugins/TsunamiPlugin.h"
 #include "device/DeviceManager.h"
+#include "device/Device.h"
 #include "command/song/Diff.h"
 #include "command/song/Show.h"
 #include "test/TestRingBuffer.h"
@@ -103,6 +104,14 @@ hui::AppStatus Tsunami::on_startup_before_gui_init(const Array<string> &arg) {
 
 	device_manager = new DeviceManager(Session::GLOBAL);
 	Session::GLOBAL->device_manager = device_manager.get();
+	device_manager->out_device_plugged_in >> Session::GLOBAL->create_data_sink<Device*>([this] (const Device* d) {
+		//if (!device_manager->initial_discovery)
+			Session::GLOBAL->status(_("device plugged in: ") + d->get_name());
+	});
+	device_manager->out_device_plugged_in >> Session::GLOBAL->create_data_sink<Device*>([this] (const Device* d) {
+		//if (!device_manager->initial_discovery)
+			Session::GLOBAL->status(_("device plugged out: ") + d->get_name());
+	});
 
 	// create (link) PluginManager after all other components are ready
 	plugin_manager = new PluginManager;

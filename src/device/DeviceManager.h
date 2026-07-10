@@ -8,8 +8,8 @@
 #ifndef SRC_DEVICE_DEVICEMANAGER_H_
 #define SRC_DEVICE_DEVICEMANAGER_H_
 
-#include "../lib/pattern/Observable.h"
-#include "../lib/base/base.h"
+#include <lib/base/base.h>
+#include <lib/pattern/Observable.h>
 
 namespace tsunami {
 

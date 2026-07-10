@@ -188,12 +188,8 @@ void DeviceManager::update_devices(bool initial_discovery) {
 	for (auto d: all_devices()) {
 		if (d->present and !present_old.contains(d)) {
 			out_device_plugged_in(d);
-			if (!initial_discovery)
-				session->status(_("device plugged in: ") + d->get_name());
 		} else if (!d->present and present_old.contains(d)) {
 			out_device_plugged_out(d);
-			if (!initial_discovery)
-				session->status(_("device plugged out: ") + d->get_name());
 		}
 	}
 

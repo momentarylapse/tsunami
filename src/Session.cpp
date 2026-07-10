@@ -14,6 +14,7 @@
 #include "plugins/TsunamiPlugin.h"
 #include "data/base.h"
 #include "data/Song.h"
+#include "device/DeviceManager.h"
 #include "module/SignalChain.h"
 #include "view/audioview/AudioView.h"
 #include "view/bottombar/BottomBar.h"

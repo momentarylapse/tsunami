@@ -336,9 +336,9 @@ Array<string> parse_comma_sep_list(Parser *p) {
 }
 
 Function* Parser::realize_lambda(shared<Node> node, Class* name_space) {
-	auto f = realize_function_header(node->params[1], common_types.unknown, name_space);
+	auto f = realize_function_header(node->params[0], common_types.unknown, name_space);
 
-	f->block_node = node->params[1]->params[4];
+	f->block_node = node->params[0]->params[4];
 	f->block_node->link_no = (int_p)f->block;
 
 	node->set_param(0, add_node_func_name(f));
@@ -582,7 +582,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 			for (auto f: weak(trait->functions)) {
 				if (f->name == Identifier::func::Init or f->name == Identifier::func::AutoInitContext or f->name == Identifier::func::Delete)
 					continue;
-				realize_function(cp_node(f->abstract_node), _class);
+				realize_function(cp_node(f->abstract_node), common_types._void, _class);
 			}
 		}
 
@@ -611,7 +611,7 @@ Class* Parser::realize_class(shared<Node> node, Class* name_space, const string&
 			if (!realize_class(n, _class))
 				sub_class_ids.add(i); // try again later...
 		} else if (n->kind == NodeKind::AbstractFunction) {
-			realize_function(n, _class);
+			realize_function(n, common_types._void, _class);
 		} else if (n->kind == NodeKind::AbstractLet) {
 			realize_named_const(n, _class, tree->root_of_all_evil->block);
 		} else if (n->kind == NodeKind::AbstractVar) {
@@ -860,8 +860,8 @@ void Parser::post_process_function_header(Function *f, const Array<string> &temp
 	}
 }
 
-void Parser::realize_function(shared<Node> node, Class* name_space) {
-	auto f = realize_function_header(node, common_types._void, name_space);
+Function* Parser::realize_function(shared<Node> node, const Class* default_type, Class* name_space) {
+	auto f = realize_function_header(node, default_type, name_space);
 	if (node->params[4]) {
 		f->block_node = cp_node(node->params[4]);
 		f->block_node->link_no = (int_p)f->block;
@@ -873,6 +873,7 @@ void Parser::realize_function(shared<Node> node, Class* name_space) {
 	}
 
 	functions_to_concretify.add(f);
+	return f;
 }
 
 void Parser::prerealize_all_class_names_in_block(shared<Node> node, Class *ns) {
@@ -920,7 +921,7 @@ void Parser::realize_tree(shared<Node> node) {
 		} else if (n->kind == NodeKind::AbstractClass) {
 			realize_class(n, tree->base_class);
 		} else if (n->kind == NodeKind::AbstractFunction) {
-			realize_function(n, tree->base_class);
+			realize_function(n, common_types._void, tree->base_class);
 		} else if (n->kind == NodeKind::AbstractLet) {
 			realize_named_const(n, tree->base_class, tree->root_of_all_evil->block);
 		} else if (n->kind == NodeKind::AbstractVar) {

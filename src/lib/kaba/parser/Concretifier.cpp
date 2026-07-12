@@ -692,7 +692,8 @@ shared<Node> Concretifier::concretify_statement_return(shared<Node> node, Block 
 	} else {
 		if (node->params.num == 0)
 			do_error("return value expected", node);
-		node->params[0] = check_param_link(node->params[0], block->function->literal_return_type, Identifier::Return);
+		if (block->function->literal_return_type != common_types.unknown)
+			node->params[0] = check_param_link(node->params[0], block->function->literal_return_type, Identifier::Return);
 	}
 	node->type = common_types._void;
 	return node;
@@ -1580,7 +1581,7 @@ shared<Node> Concretifier::concretify_operator(shared<Node> node, Block *block, 
 		// well... we're abusing that we will always get the FIRST 2 pipe elements!!!
 		return build_function_pipe(node->params[0], node->params[1], block, ns, node->token_id);
 	} else if (op_no->id == OperatorID::MapsTo) {
-		return build_lambda_new(node->params[0], node->params[1], block, ns, node->token_id);
+		return build_lambda_template(node->params[0], node->params[1], block, ns, node->token_id);
 	}
 	concretify_all_params(node, block, ns);
 
@@ -2343,6 +2344,17 @@ void Concretifier::concretify_function_body(Function *f) {
 	// auto implement destructor?
 	if (f->name == Identifier::func::Delete)
 		auto_implementer->implement_regular_destructor(f, f->name_space);
+
+	if (f->literal_return_type == common_types.unknown) {
+		// guess return type
+		f->set_return_type(common_types._void);
+		SyntaxTree::transform_node(f->block_node, [f] (shared<Node> n) {
+			if (n->kind == NodeKind::Statement and n->as_statement()->id == StatementID::Return) {
+				f->set_return_type(n->params[0]->type);
+			}
+			return n;
+		});
+	}
 }
 
 Array<const Class*> Concretifier::type_list_from_nodes(const shared_array<Node> &nn) {
@@ -2751,25 +2763,35 @@ shared<Node> Concretifier::build_function_pipe(const shared<Node> &abs_input, co
 }
 
 
-shared<Node> Concretifier::build_lambda_new(const shared<Node> &param, const shared<Node> &expression, Block *block, const Class *ns, int token_id) {
+shared<Node> Concretifier::build_lambda_template(const shared<Node>& param, const shared<Node>& expression, Block *block, const Class* ns, int token_id) {
 
 	static int lambda_count = 0;
 	string name = format(":lambda-evil-%d:", lambda_count ++);
-	Function *f = tree->add_function(name, common_types.unknown, tree->base_class, Flags::Static);
 
-	//f->abstract_param_types.add();
-	[[maybe_unused]] auto v = f->add_param(param->as_token(), common_types.i32, param->token_id, Flags::None);
-	parser->post_process_function_header(f, {}, tree->base_class, Flags::Static);
+	auto node = new Node(NodeKind::AbstractFunction, 0, common_types.unknown, Flags::Static | Flags::Template, token_id);
+	node->set_num_params(5);
 
-	// body
-	f->block_node->add(expression);
+	node->set_param(1, add_node_class(common_types.unknown));
 
-	// statement wrapper
-	auto node = add_node_statement(StatementID::Lambda, f->token_id, common_types.unknown);
-	node->set_num_params(1);
-	node->set_param(0, add_node_func_name(f));
+	auto pnode = new Node(NodeKind::AbstractTypeList, 0, common_types.unknown);
+	pnode->set_num_params(3);
+	pnode->params[0] = param;
+	pnode->params[1] = add_node_token(tree, ExpressionBuffer::TOKEN_X);
+	node->set_param(2, pnode);
 
-	return concretify_statement_lambda(node, block, ns);
+	auto tnode = new Node(NodeKind::AbstractTypeList, 0, common_types.unknown);
+	tnode->params = {add_node_token(tree, ExpressionBuffer::TOKEN_X)};
+	node->set_param(3, tnode);
+
+	auto _block = add_node_block(nullptr, common_types.unknown);
+	auto ret = add_node_statement(StatementID::Return, -1, common_types.unknown);
+	ret->set_num_params(1);
+	ret->set_param(0, expression);
+	_block->add(ret);
+	node->set_param(4, _block);
+
+	auto f = parser->realize_function(node, common_types.unknown, tree->base_class);
+	return add_node_func_name(f);
 }
 
 // when calling ...(...)

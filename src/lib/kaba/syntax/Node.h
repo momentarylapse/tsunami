@@ -81,7 +81,7 @@ enum class NodeKind {
 	// abstract syntax tree
 	AbstractRoot,
 	AbstractClass,
-	AbstractFunction,
+	AbstractFunction,   // [NAME?, RETURN?, PARAMS:[NAME,TYPE?,DEFAULT?]?, [TEMPLATEARGS]?, BLOCK]
 	AbstractToken,
 	AbstractOperator,
 	AbstractElement,

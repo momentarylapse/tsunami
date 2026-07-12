@@ -85,6 +85,8 @@ public:
 	shared<Module> create_empty_module(const Path& filename);
 	//void remove_module(Module *s);
 
+	Array<string> additional_import_packages;
+
 	void execute_single_command(const string& cmd) override;
 	xfer<Context> create_new_context() const override;
 

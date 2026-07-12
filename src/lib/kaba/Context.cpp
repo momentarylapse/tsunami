@@ -11,6 +11,8 @@
 #include <lib/os/file.h>
 #include <lib/os/filesystem.h>
 #include <lib/any/any.h>
+
+#include "parser/import.h"
 #if HAS_LIB_DL
 #include <dlfcn.h>
 #endif
@@ -230,6 +232,12 @@ void Context::execute_single_command(const string &cmd) {
 	auto parser = new Parser(tree);
 	tree->parser = parser;
 
+
+	for (const auto& name: additional_import_packages) {
+		auto source = resolve_import_source(parser, {name}, -1);
+		tree->import_data_selective(source._class, source.func, source.var, source._const, name, -1);
+	}
+
 // find expressions
 	parser->Exp.analyse(tree, cmd);
 	if (parser->Exp.empty()) {
@@ -256,6 +264,7 @@ void Context::execute_single_command(const string &cmd) {
 		msg_write("ABSTRACT SINGLE:");
 		func->block_node->show();
 	}
+	parser->realize_tree(func->block_node.get());
 	parser->con.concretify_node(func->block_node.get(), func->block, func->name_space);
 
 	if (func->block_node->params.num == 0)

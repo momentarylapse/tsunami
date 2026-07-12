@@ -329,10 +329,28 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	}
 	if (wanted->is_callable() and (given == common_types.unknown)) {
 		if (node->kind == NodeKind::Function) {
-			auto ft = make_effective_class_callable(node);
-			if (type_match_up(ft, wanted)) {
-				cd.cast = TypeCastId::FUNCTION_AS_CALLABLE;
-				return true;
+			auto f = node->as_func();
+			if (f->is_template()) {
+				// TODO better matching... this only works for very simple templates :(
+				if (wanted->param[0]->param.num == 2) {
+					auto t0 = wanted->param[0]->param[0];
+					try {
+						auto ff = context->template_manager->request_function_instance(tree, f, {t0}, node->token_id);
+						auto ft = make_effective_class_callable(add_node_func_name(ff, node->token_id));
+						if (type_match_up(ft, wanted)) {
+							cd.cast = TypeCastId::FUNCTION_AS_CALLABLE;
+							cd.f = ff;
+							return true;
+						}
+					} catch (...) {
+					}
+				}
+			} else {
+				auto ft = make_effective_class_callable(node);
+				if (type_match_up(ft, wanted)) {
+					cd.cast = TypeCastId::FUNCTION_AS_CALLABLE;
+					return true;
+				}
 			}
 		}
 	}
@@ -408,6 +426,9 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, 
 		return node;
 	}
 	if (cast.cast == TypeCastId::FUNCTION_AS_CALLABLE) {
+		// replace with cast.f, because template instantiation might have happened!
+		if (cast.f)
+			node = add_node_func_name(cast.f, node->token_id);
 		return force_concrete_type(node);
 	}
 

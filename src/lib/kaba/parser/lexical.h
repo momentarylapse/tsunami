@@ -34,6 +34,8 @@ public:
 	string dummy;
 	SyntaxTree *syntax;
 
+	static constexpr int TOKEN_X = -666;
+
 
 	string get_token(int id) const;
 	Line *token_logical_line(int id) const;

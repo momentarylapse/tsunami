@@ -1068,8 +1068,8 @@ shared<Node> AbstractParser::parse_abstract_statement_lambda() {
 	}
 
 	auto node = add_node_statement(StatementID::Lambda, n->token_id, common_types.unknown);
-	node->set_num_params(2);
-	node->set_param(1, n);
+	node->set_num_params(1);
+	node->set_param(0, n);
 
 	return node;
 }
@@ -1425,7 +1425,6 @@ shared<Node> AbstractParser::parse_abstract_class_use_statement() {
 	return node;
 }
 
-// [NAME?, RETURN?, [PARAMS]?, [TEMPLATEARGS]?, BLOCK]
 shared<Node> AbstractParser::parse_abstract_function_header(Flags flags0) {
 	auto node = new Node(NodeKind::AbstractFunction, 0, common_types.unknown, flags0);
 	node->token_id = Exp.cur_token();

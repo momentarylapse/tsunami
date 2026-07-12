@@ -3,11 +3,13 @@
 //
 
 #include "conversion.h"
+#if __has_include(<lib/math/math.h>)
 #include <lib/math/vec2.h>
 #include <lib/math/vec3.h>
 #include <lib/math/mat3.h>
 #include <lib/math/mat4.h>
 #if __has_include(<lib/image/color.h>)
+#define HAS_IMAGE
 #include <lib/image/color.h>
 
 color any_to_color(const Any& a) {
@@ -90,3 +92,4 @@ mat3 any_to_mat3(const Any& a) {
 		m.e[i] = list[i];
 	return m;
 }
+#endif

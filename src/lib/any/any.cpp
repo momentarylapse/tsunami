@@ -1,6 +1,9 @@
 #include "any.h"
-#include "../base/map.h"
-#include "../os/msg.h"
+#include <lib/base/map.h>
+#if __has_include(<lib/os/msg.h>)
+#define HAS_MSG 1
+#include <lib/os/msg.h>
+#endif
 
 
 string f642s_clean(double f, int dez);
@@ -16,6 +19,12 @@ bool Any::allow_simple_output = true;
 
 //#define any_db(m)	msg_write(m)
 #define any_db(m)
+
+static void error_out(const string& s) {
+#ifdef HAS_MSG
+	msg_error(s);
+#endif
+}
 
 
 static string type_name(Any::Type t) {
@@ -113,7 +122,7 @@ void Any::create_type(Type _type) {
 		data = new Dict;
 	} else if (is_empty()) {
 	} else {
-		msg_error("can not create " + type_name(type));
+		error_out("can not create " + type_name(type));
 	}
 }
 
@@ -145,7 +154,7 @@ void Any::clear() {
 	else if (is_pointer())
 		delete &as_pointer();
 	else if (!is_empty())
-		msg_error("any.clear(): " + type_name(type));
+		error_out("any.clear(): " + type_name(type));
 	type = Type::None;
 	data = nullptr;
 }
@@ -410,7 +419,7 @@ void Any::operator = (const Any &a) {
 			clear();
 		} else {
 			clear();
-			msg_error("any = any: " + type_name(a.type));
+			error_out("any = any: " + type_name(a.type));
 		}
 	}
 }
@@ -513,25 +522,25 @@ int Any::length() const {
 
 Any &Any::operator[] (int index) {
 	if (!is_list())
-		msg_error("only allowed for arrays: " + type_name(type));
+		error_out("only allowed for arrays: " + type_name(type));
 	return as_list()[index];
 }
 
 const Any &Any::operator[] (int index) const {
 	if (!is_list())
-		msg_error("only allowed for arrays: " + type_name(type));
+		error_out("only allowed for arrays: " + type_name(type));
 	return as_list()[index];
 }
 
 Any &Any::back() const {
 	if (!is_list())
-		msg_error("only allowed for arrays: " + type_name(type));
+		error_out("only allowed for arrays: " + type_name(type));
 	return as_list().back();
 }
 
 const Any &Any::operator[] (const string &key) const {
 	if (!is_dict())
-		msg_error("only allowed for maps: " + type_name(type));
+		error_out("only allowed for maps: " + type_name(type));
 	return as_dict()[key];
 }
 
@@ -539,7 +548,7 @@ Any &Any::operator[] (const string &key) {
 	if (is_empty())
 		create_type(Type::Dict);
 	if (!is_dict())
-		msg_error("only allowed for maps: " + type_name(type));
+		error_out("only allowed for maps: " + type_name(type));
 	if (!as_dict().contains(key))
 		as_dict().set(key, Any());
 	return as_dict()[key];

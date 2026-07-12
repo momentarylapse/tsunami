@@ -11,11 +11,15 @@
 #include <lib/hui/Callback.h>
 #include <lib/hui/config.h>
 #endif
+// TODO also xhui
+#if __has_include(<lib/os/msg.h>)
+#define HAS_OS 1
 #include <lib/os/msg.h>
 
 namespace os {
 	extern bool is_main_thread();
 }
+#endif
 
 namespace obs {
 LogSource::LogSource(LogHub* _hub) {
@@ -96,14 +100,14 @@ bool LogHub::Message::operator==(const LogHub::Message &o) const {
 void LogHub::add_message(LogSource* source, MessageType type, const string &message, const Array<string> &responses) {
 
 	// make sure messages are handled in the gui thread...
-	if (!os::is_main_thread()) {
 #ifdef HAS_HUI
+	if (!os::is_main_thread()) {
 		hui::run_in_gui_thread([this, source, type, _message = message, _responses = responses] {
 			add_message(source, type, _message, _responses);
 		});
-#endif
 		return;
 	}
+#endif
 
 
 
@@ -129,6 +133,7 @@ void LogHub::add_message(LogSource* source, MessageType type, const string &mess
 
 	messages.add(m);
 
+#ifdef HAS_OS
 	if (allow_console_output) {
 		if (type == MessageType::Error) {
 			msg_error(message);
@@ -142,6 +147,7 @@ void LogHub::add_message(LogSource* source, MessageType type, const string &mess
 			msg_write(message);
 		}
 	}
+#endif
 
 	out_add_message.notify();
 }

@@ -49,8 +49,8 @@ public:
 	Class *realize_class_header(shared<Node>, Class* _namespace, int64& var_offset0, const string& name_overwrite = "");
 	void post_process_newly_parsed_class(Class *c, int size);
 	void skip_parse_class();
-	Function *realize_function_header(shared<Node> node, const Class *default_type, Class *name_space);
-	void realize_function(shared<Node> node, Class* name_space);
+	Function *realize_function_header(shared<Node> node, const Class* default_type, Class* name_space);
+	Function* realize_function(shared<Node> node, const Class* default_type, Class* name_space);
 	void post_process_function_header(Function *f, const Array<string> &template_param_names, Class *name_space, Flags flags);
 	Function* realize_lambda(shared<Node> node, Class* name_space);
 	void realize_class_variable_declaration(shared<Node> node, const Class *ns, Block *block, int64 &_offset, Flags flags0 = Flags::None);

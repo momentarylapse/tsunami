@@ -142,6 +142,20 @@ void generic_init_ext(T* me, Args... args) {
 }
 }
 
+
+#define KABA_PACKAGE_EXPORT_BEGIN \
+extern "C" {
+#define KABA_PACKAGE_EXPORT \
+__attribute__ ((visibility ("default")))
+
+#define KABA_PACKAGE_EXPORT_END \
+} \
+namespace os::app { \
+int main(const Array<string>&) { \
+	return 0; \
+} \
+}
+
 //#endif
 
 

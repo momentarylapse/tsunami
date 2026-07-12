@@ -36,6 +36,7 @@ public:
 	virtual Path installation_root() const = 0;
 	virtual Path packages_root() const = 0;
 	virtual void set_installation_root(const Path& dir) = 0;
+	virtual void* get_global_symbol(const string& package, const string& name) = 0;
 
 	shared_array<Module> public_modules;
 	shared_array<Package> internal_packages;

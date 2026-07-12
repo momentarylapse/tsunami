@@ -112,28 +112,32 @@ void try_import_dynamic_library_for_package(Package* p, Context* ctx) {
 			msg_error(format("found dynamic library %s, but no 'export_symbols()'", dir | files[0]));
 		//	s->do_error_link("can't load symbol '" + name + "' from library " + libname);
 		}
+		typedef void* t_f2(const string&);
+		if (auto f = (t_f2*)dlsym(handle, "export_globals")) {
+			p->get_global_symbol = f;
+		}
 	}
 #endif
 }
 
-// FIXME ...this needs a lot of reworking, sorry...  m(-_-)m
-Package* get_package_containing_module(Module* m) {
-	auto ctx = m->context;
-	const auto dir = m->filename.parent();
-
+Package* Context::get_package_at(const Path& dir) {
 	// already initialized?
-	for (const auto p: weak(ctx->external_packages))
+	for (const auto p: weak(external_packages))
 		if (p->directory == dir)
 			return p;
 
+	return try_load_package(dir);
+}
+
+Package* Context::try_load_package(const Path& dir) {
 	// is a package directory?
 	if (!os::fs::exists(dir | ".kaba-package"))
 		return nullptr;
-	// TODO check parents...
+	// TODO check parents...?
 
 	// new package
-	auto package = new Package(dir.basename(), "0", dir, m->context);
-	ctx->external_packages.add(package);
+	auto package = new Package(dir.basename(), "0", dir, this);
+	external_packages.add(package);
 
 	// parse info
 	{
@@ -144,15 +148,15 @@ Package* get_package_containing_module(Module* m) {
 	}
 
 	// package init override?
-	for (const auto& init: ctx->package_inits)
+	for (const auto& init: package_inits)
 		if (init.dir == dir) {
-			Exporter exporter(ctx, package);
+			Exporter exporter(this, package);
 			init.f(&exporter);
 			return package;
 		}
 
 	// dll?
-	try_import_dynamic_library_for_package(package, ctx);
+	try_import_dynamic_library_for_package(package, this);
 	return package;
 }
 
@@ -178,11 +182,13 @@ shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
 	for (auto ps: public_modules)
 		if (ps->filename == _filename)
 			return ps;
-	
+
+	// package?
+	if (!just_analyse)
+		get_package_at(filename.parent());
+
 	// load
 	auto module = create_empty_module(filename);
-	if (!just_analyse)
-		get_package_containing_module(module.get());
 	module->load(filename, just_analyse);
 
 	// store module in database
@@ -356,14 +362,15 @@ xfer<Context> Context::create() {
 	return c;
 }
 
-Package *Context::get_package(const string &name) const {
+Package* Context::get_package(const string &name) const {
 	for (auto p: weak(internal_packages))
 		if (p->name == name)
 			return p;
 	for (auto p: weak(external_packages))
 		if (p->name == name)
 			return p;
-	return nullptr;
+	// argh, should change the interface...
+	return const_cast<Context*>(this)->try_load_package(packages_root() | name);
 }
 
 Path Context::installation_root() const {
@@ -376,6 +383,13 @@ Path Context::packages_root() const {
 
 void Context::set_installation_root(const Path &dir) {
 	_installation_root = dir;
+}
+
+void* Context::get_global_symbol(const string& package, const string& name) {
+	if (auto p = get_package(package))
+		if (p->get_global_symbol)
+			return p->get_global_symbol(name);
+	return nullptr;
 }
 
 string Context::type_name(const Class* c) const {

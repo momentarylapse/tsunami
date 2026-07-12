@@ -357,7 +357,8 @@ int string::rfind(const string &s, int start) const {
 	unsigned char *b = (unsigned char*)data;
 	unsigned char *aa = (unsigned char*)s.data;
 	if (start < 0)
-		start = num - 1;
+		start = num - s.num;
+	start = min(start, num - s.num);
 	for (int i=start;i>=0;i--) {
 		bool ok = true;
 		for (int j=0;j<s.num;j++)

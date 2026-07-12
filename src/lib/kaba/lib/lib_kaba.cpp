@@ -74,7 +74,12 @@ public:
 };
 
 extern Array<shared<Module>> loading_module_stack;
-Package* get_package_containing_module(Module* m);
+Package* get_package_containing_module(Module* m) {
+	for (auto p: default_context->external_packages)
+		if (m->filename.is_in(p->directory))
+			return p;
+	return nullptr;
+}
 
 Module* get_current_module() {
 	return loading_module_stack.back().get();

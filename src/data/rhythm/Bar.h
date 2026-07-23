@@ -15,11 +15,10 @@
 
 namespace tsunami {
 
-class BarCollection;
-class Beat;
+struct BarCollection;
+struct Beat;
 
-class BarPattern {
-public:
+struct BarPattern {
 	BarPattern();
 	BarPattern(int length, int num_beats, int divisor);
 	int length;
@@ -43,8 +42,7 @@ public:
 	};
 };
 
-class Bar : public Sharable<BarPattern> {
-public:
+struct Bar : Sharable<BarPattern> {
 	Bar(const BarPattern &b);
 	Bar(int length, int num_beats, int divisor);
 	void __init__(int length, int num_beats, int divisor);

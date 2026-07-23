@@ -17,13 +17,13 @@
 #include "../port/Port.h"
 
 namespace kaba {
-	class Class;
+	struct Class;
 }
 
 namespace tsunami {
 
-class Range;
-class AudioBuffer;
+struct Range;
+struct AudioBuffer;
 class PluginManager;
 class TemperamentDialog;
 class ActionTrackDetuneSynthesizer;

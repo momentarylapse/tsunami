@@ -16,7 +16,7 @@ namespace tsunami {
 
 class MidiPainter;
 class ViewPort;
-class Range;
+struct Range;
 class ColorScheme;
 
 class FormatPdf : public Format {

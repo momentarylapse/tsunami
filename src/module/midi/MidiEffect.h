@@ -17,11 +17,11 @@
 namespace tsunami {
 
 class Plugin;
-class Track;
-class TrackLayer;
-class AudioBuffer;
-class MidiEventBuffer;
-class SongSelection;
+struct Track;
+struct TrackLayer;
+struct AudioBuffer;
+struct MidiEventBuffer;
+struct SongSelection;
 
 class MidiEffect : public Module {
 public:

@@ -11,8 +11,8 @@
 
 namespace tsunami {
 
-class Song;
-class Range;
+struct Song;
+struct Range;
 
 class BufferCompressionDialog : public hui::Dialog {
 public:

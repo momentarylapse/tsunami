@@ -54,8 +54,8 @@ void* mf(T tmf) {
 }
 
 namespace kaba {
-
-class KabaException;
+	struct IContext;
+	class KabaException;
 
 KabaException* create_kaba_exception(const string& message);
 void kaba_raise_exception(KabaException* e);
@@ -89,6 +89,8 @@ public:
 	void link_virtual(const string& name, T pointer, void* instance) {
 		_link_virtual(name, mf(pointer), instance);
 	}
+
+	virtual IContext* context() = 0;
 };
 
 template<class T>

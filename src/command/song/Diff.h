@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
+struct Song;
+struct Track;
 
 Array<string> diff_song(Song *a, Song *b);
 

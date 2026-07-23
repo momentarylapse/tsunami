@@ -17,13 +17,13 @@ namespace tsunami {
 class MidiEventStreamer;
 class BarStreamer;
 class BeatMidifier;
-class Song;
-class Track;
-class TrackLayer;
+struct Song;
+struct Track;
+struct TrackLayer;
 class AudioEffect;
-class AudioBuffer;
+struct AudioBuffer;
 class Synthesizer;
-class Range;
+struct Range;
 class TrackRenderer;
 
 class SongRenderer : public AudioSource {

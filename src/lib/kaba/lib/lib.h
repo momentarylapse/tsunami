@@ -22,14 +22,14 @@ namespace kaba {
 #define MAX_OPCODE				(2*65536)	// max. amount of opcode
 
 
-class SyntaxTree;
+struct SyntaxTree;
 class Module;
-class Class;
-class Value;
-class Function;
-class Variable;
-class Constant;
-class Context;
+struct Class;
+struct Value;
+struct Function;
+struct Variable;
+struct Constant;
+struct Context;
 enum class DeriveFlags;
 
 
@@ -42,8 +42,7 @@ enum class DeriveFlags;
 //--------------------------------------------------------------------------------------------------
 // type casting
 
-class TypeCast {
-public:
+struct TypeCast {
 	int penalty;
 	const Class *source, *dest;
 	Function *f;

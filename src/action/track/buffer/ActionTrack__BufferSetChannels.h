@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class ActionTrack__BufferSetChannels : public history::Action {
 public:

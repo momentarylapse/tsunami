@@ -14,8 +14,7 @@ string function_link_name(Function *f);
 
 KABA_LINK_GROUP_BEGIN
 
-class KabaContext : public Context {
-public:
+struct KabaContext : Context {
 	shared<Module> __load_module__(const string &filename, bool just_analyse) {
 		KABA_EXCEPTION_WRAPPER( return load_module(filename, just_analyse); );
 		return nullptr;
@@ -41,25 +40,15 @@ void show_func(Function *f) {
 	config.verbose = v;
 }
 
-class ClassX : public Class {
-public:
+struct ClassX : Class {
 	string repr() const {
 		return class_repr(this);
 	}
 };
 
-class FunctionX : public Function {
-public:
+struct FunctionX : Function {
 	string repr() const {
 		return func_repr(this);
-	}
-};
-
-template<class T>
-class XSharedArray : public shared_array<T> {
-public:
-	void __init__() {
-		new(this) shared_array<T>;
 	}
 };
 

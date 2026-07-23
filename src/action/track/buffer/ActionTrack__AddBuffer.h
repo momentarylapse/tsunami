@@ -15,7 +15,7 @@ namespace tsunami {
 
 // TODO: move to layer
 
-class TrackLayer;
+struct TrackLayer;
 
 class ActionTrack__AddBuffer : public history::Action {
 public:

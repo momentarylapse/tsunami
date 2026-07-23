@@ -8,12 +8,12 @@
 namespace kaba {
 
 class Module;
-class SyntaxTree;
-class Class;
-class Function;
-class Constant;
-class Variable;
-class Node;
+struct SyntaxTree;
+struct Class;
+struct Function;
+struct Constant;
+struct Variable;
+struct Node;
 enum class Flags;
 
 
@@ -47,8 +47,7 @@ enum class DeriveFlags {
 };
 DeriveFlags operator|(DeriveFlags a, DeriveFlags b);
 
-class Class : public Sharable<base::Empty> {
-public:
+struct Class : Sharable<base::Empty> {
 	
 	//Class();
 	Class(const Class* from_template, const string &name, int64 size, int alignment, SyntaxTree *owner, const Class *parent = nullptr, const Array<const Class*> &param = {});

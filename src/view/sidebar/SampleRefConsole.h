@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
-class SampleRef;
+struct Track;
+struct TrackLayer;
+struct SampleRef;
 class VolumeControl;
 
 class SampleRefConsole: public SideBarConsole {

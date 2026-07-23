@@ -22,11 +22,11 @@ const int MiddleC = 60;
 const int MiddleA = 69;
 
 class MidiEffect;
-class Instrument;
-class Clef;
-class Scale;
-class SongSelection;
-class MidiNoteBuffer;
+struct Instrument;
+struct Clef;
+struct Scale;
+struct SongSelection;
+struct MidiNoteBuffer;
 
 enum class MidiMode {
 	Linear,
@@ -37,8 +37,7 @@ enum class MidiMode {
 };
 
 
-class MidiEventBuffer : public Array<MidiEvent> {
-public:
+struct MidiEventBuffer : Array<MidiEvent> {
 	MidiEventBuffer();
 	void clear();
 	Array<MidiEvent> get_events(const Range &r) const;
@@ -57,8 +56,7 @@ public:
 	void append(const MidiEventBuffer &data);
 };
 
-class MidiNoteBuffer : public shared_array<MidiNote> {
-public:
+struct MidiNoteBuffer : shared_array<MidiNote> {
 	MidiNoteBuffer();
 	MidiNoteBuffer(const MidiNoteBuffer &midi);
 	~MidiNoteBuffer();

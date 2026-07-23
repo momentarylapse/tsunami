@@ -15,11 +15,11 @@
 namespace tsunami {
 
 class ViewPort;
-class Song;
+struct Song;
 class ColorScheme;
-class SongSelection;
+struct SongSelection;
 class HoverData;
-class Bar;
+struct Bar;
 
 class GridPainter : public BasicGridPainter {
 public:

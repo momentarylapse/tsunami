@@ -18,7 +18,7 @@ class SignalChain;
 class SongRenderer;
 class PeakMeter;
 class AudioOutput;
-class Range;
+struct Range;
 class AudioView;
 
 class Playback : public obs::Node<VirtualBase> {

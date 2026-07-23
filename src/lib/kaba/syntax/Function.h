@@ -12,17 +12,16 @@
 
 namespace kaba {
 
-class Class;
-class Block;
-class SyntaxTree;
-class Variable;
-class Node;
+struct Class;
+struct Block;
+struct SyntaxTree;
+struct Variable;
+struct Node;
 enum class InlineID;
 enum class Flags;
 
 
-class Function : public Sharable<base::Empty> {
-public:
+struct Function : Sharable<base::Empty> {
 	Function(const string &name, const Class *return_type, const Class *name_space, Flags flags = Flags(0));
 	~Function();
 

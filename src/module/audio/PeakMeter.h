@@ -13,7 +13,7 @@
 namespace tsunami {
 
 class PeakMeterDisplay;
-class AudioBuffer;
+struct AudioBuffer;
 
 
 struct PeakMeterData {

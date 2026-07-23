@@ -12,8 +12,8 @@
 namespace kaba {
 
 class Module;
-class SyntaxTree;
-class Function;
+struct SyntaxTree;
+struct Function;
 class Serializer;
 struct CommandList;
 struct SerialNode;

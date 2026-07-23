@@ -34,7 +34,7 @@ class Synthesizer;
 class Module;
 class SignalChain;
 enum class SignalType;
-class Track;
+struct Track;
 class Session;
 
 

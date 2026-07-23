@@ -19,8 +19,8 @@ namespace hui {
 namespace tsunami {
 
 class CaptureConsole;
-class Song;
-class Track;
+struct Song;
+struct Track;
 class AudioView;
 class Session;
 class SignalChain;

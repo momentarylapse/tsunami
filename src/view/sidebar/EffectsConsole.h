@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class ModulePanel;
 class FxListEditor;
 

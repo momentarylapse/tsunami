@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrackSetChannels : public history::ActionGroup {
 public:

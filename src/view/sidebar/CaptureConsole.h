@@ -21,7 +21,7 @@ class Session;
 class AudioInput;
 class AudioSucker;
 class SignalChain;
-class MidiEventBuffer;
+struct MidiEventBuffer;
 
 class CaptureConsole : public SideBarConsole {
 public:

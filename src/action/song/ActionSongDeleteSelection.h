@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class SongSelection;
+struct SongSelection;
 
 class ActionSongDeleteSelection : public history::ActionGroup {
 public:

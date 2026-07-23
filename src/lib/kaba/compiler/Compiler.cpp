@@ -20,6 +20,8 @@
 #include "../../os/filesystem.h"
 #include <stdio.h>
 #include <functional>
+
+#include "lib/kaba/parser/Transformer.h"
 #if HAS_LIB_DL
 #include <dlfcn.h>
 #endif
@@ -55,8 +57,7 @@ Compiler::Compiler(Module *m) {
 	context = m->context;
 }
 
-Compiler::~Compiler() {
-}
+Compiler::~Compiler() = default;
 
 int LocalOffset,LocalOffsetMax;
 
@@ -393,7 +394,7 @@ void Compiler::map_constants_to_memory(char *mem, int &offset, char *address) {
 	remap_virtual_tables(module, mem, offset, address, tree->base_class);
 
 
-	tree->transform([this] (shared<Node> n) {
+	Transformer::transform(tree, [this] (shared<Node> n) {
 		return check_const_used(n, module);
 	});
 
@@ -429,7 +430,7 @@ void Compiler::map_constants_to_opcode() {
 
 void Compiler::map_address_constants_to_opcode() {
 	for (auto f: module->functions()) {
-		tree->transform_block(f->block_node.get(), [this] (shared<Node> n) {
+		Transformer::transform_block(f->block_node.get(), [this] (shared<Node> n) {
 			if (n->kind == NodeKind::Address) {
 				//msg_write(format("ADDRESS   %x", n->link_no));
 				memcpy(&module->opcode[module->opcode_size], &n->link_no, config.target.pointer_size);
@@ -737,7 +738,8 @@ void Compiler::_compile() {
 	if (config.verbose)
 		tree->show("compile:b");
 
-	tree->pre_processor_addresses();
+	Transformer t(tree);
+	t.pre_processor_addresses();
 
 	if (config.fully_linear_output)
 		map_address_constants_to_opcode();
@@ -797,7 +799,7 @@ bool is_func(shared<Node> n) {
 
 int check_needed(SyntaxTree *tree, Function *f) {
 	int ref_count = 0;
-	tree->transform([&ref_count, f](shared<Node> n) {
+	Transformer::transform(tree, [&ref_count, f](shared<Node> n) {
 		if (is_func(n) and n->as_func() == f)
 			ref_count ++;
 		return n;

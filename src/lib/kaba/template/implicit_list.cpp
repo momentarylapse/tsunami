@@ -73,7 +73,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 
 		b->add(add_assign(f, "", add_node_local(v_el)->deref(), n_other_el));
 
-		auto n_for = add_node_statement(StatementID::ForContainer);
+		auto n_for = add_node_statement(StatementID::For);
 		// [VAR, INDEX, ARRAY, BLOCK]
 		n_for->set_param(0, add_node_local(v_el));
 		n_for->set_param(1, add_node_local(v_i));
@@ -100,7 +100,7 @@ void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 		auto cmd_delete = add_node_member_call(f_del, add_node_local(var_el)->deref());
 		b->add(cmd_delete);
 
-		auto cmd_for = add_node_statement(StatementID::ForContainer);
+		auto cmd_for = add_node_statement(StatementID::For);
 		cmd_for->set_param(0, add_node_local(var_el));
 		cmd_for->set_param(1, add_node_local(var_i));
 		cmd_for->set_param(2, self);
@@ -288,7 +288,7 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 		}
 
 
-		auto n_for = add_node_statement(StatementID::ForContainer);
+		auto n_for = add_node_statement(StatementID::For);
 		// [VAR, INDEX, ARRAY, BLOCK]
 		n_for->set_param(0, add_node_local(v_el));
 		n_for->set_param(1, add_node_local(v_i));

@@ -16,25 +16,24 @@
 
 namespace tsunami {
 
-class AudioBuffer;
-class Song;
-class TrackLayer;
+struct AudioBuffer;
+struct Song;
+struct TrackLayer;
 class Synthesizer;
 class AudioEffect;
-class CrossFadeLegacy;
-class TrackMarker;
-class Temperament;
-class Curve;
-class CurveTarget;
+struct CrossFadeLegacy;
+struct TrackMarker;
+struct Temperament;
+struct Curve;
+struct CurveTarget;
 enum class CurveType;
 enum class SignalType;
 
 
 
-class Track : public Sharable<obs::Node<VirtualBase>> {
-public:
+struct Track : Sharable<obs::Node<VirtualBase>> {
 	Track(Song *song, SignalType type, Synthesizer *synth);
-	virtual ~Track();
+	~Track() override;
 
 	Range _cdecl range() const;
 

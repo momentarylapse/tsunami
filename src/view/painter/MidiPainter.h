@@ -24,15 +24,15 @@ namespace tsunami {
 
 class AudioView;
 class ViewPort;
-class SongSelection;
+struct SongSelection;
 class HoverData;
-class MidiNote;
-class MidiNoteBuffer;
-class Clef;
-class Scale;
-class Song;
-class Range;
-class Instrument;
+struct MidiNote;
+struct MidiNoteBuffer;
+struct Clef;
+struct Scale;
+struct Song;
+struct Range;
+struct Instrument;
 class Synthesizer;
 class ColorScheme;
 enum class NoteModifier;

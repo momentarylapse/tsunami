@@ -57,7 +57,7 @@ void AutoImplementer::implement_dict_clear(Function *f, const Class *t) {
 		do_error_implicit(f, "element destructor missing");
 	}
 
-	auto cmd_for = add_node_statement(StatementID::ForContainer);
+	auto cmd_for = add_node_statement(StatementID::For);
 	cmd_for->set_param(0, add_node_local(var_val));
 	cmd_for->set_param(1, add_node_local(var_key));
 	cmd_for->set_param(2, self);
@@ -99,7 +99,7 @@ void AutoImplementer::implement_dict_assign(Function *f, const Class *t) {
 		b_loop->add(cmd_set);
 	}
 
-	auto cmd_for = add_node_statement(StatementID::ForContainer);
+	auto cmd_for = add_node_statement(StatementID::For);
 	cmd_for->set_param(0, add_node_local(var_val));
 	cmd_for->set_param(1, add_node_local(var_key));
 	cmd_for->set_param(2, other);
@@ -145,7 +145,7 @@ void AutoImplementer::implement_dict_get(Function *f, const Class *t) {
 		b_loop->add(cmd_if);
 	}
 
-	auto cmd_for = add_node_statement(StatementID::ForContainer);
+	auto cmd_for = add_node_statement(StatementID::For);
 	cmd_for->set_param(0, add_node_local(var_val));
 	cmd_for->set_param(1, add_node_local(var_key));
 	cmd_for->set_param(2, self);
@@ -196,7 +196,7 @@ void AutoImplementer::implement_dict_set(Function *f, const Class *t) {
 	cmd_if->set_param(1, b_if);
 	b_loop->add(cmd_if);
 
-	auto cmd_for = add_node_statement(StatementID::ForContainer);
+	auto cmd_for = add_node_statement(StatementID::For);
 	cmd_for->set_param(0, add_node_local(var_val));
 	cmd_for->set_param(1, add_node_local(var_key));
 	cmd_for->set_param(2, self);
@@ -256,7 +256,7 @@ void AutoImplementer::implement_dict_contains(Function *f, const Class *t) {
 		b_loop->add(cmd_if);
 	}
 
-	auto cmd_for = add_node_statement(StatementID::ForContainer);
+	auto cmd_for = add_node_statement(StatementID::For);
 	cmd_for->set_param(0, add_node_local(var_val));
 	cmd_for->set_param(1, add_node_local(var_key));
 	cmd_for->set_param(2, self);

@@ -14,8 +14,8 @@
 
 namespace tsunami {
 
-class TrackLayer;
-class TrackMarker;
+struct TrackLayer;
+struct TrackMarker;
 
 class MarkerDialog: public hui::Dialog {
 public:

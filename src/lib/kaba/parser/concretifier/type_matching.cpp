@@ -6,13 +6,13 @@
  */
 
 #include "Concretifier.h"
-#include "Parser.h"
-#include "../template/template.h"
-#include "../Context.h"
-#include "../lib/lib.h"
-#include "../../base/set.h"
-#include "../../base/iter.h"
-#include "../../os/msg.h"
+#include "../Parser.h"
+#include "../../template/template.h"
+#include "../../Context.h"
+#include "../../lib/lib.h"
+#include <lib/base/set.h>
+#include <lib/base/iter.h>
+#include <lib/os/msg.h>
 
 
 namespace kaba {

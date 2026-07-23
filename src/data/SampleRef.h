@@ -14,16 +14,15 @@
 
 namespace tsunami {
 
-class Song;
-class TrackLayer;
-class Sample;
-class MidiNoteBuffer;
-class AudioBuffer;
-class Range;
+struct Song;
+struct TrackLayer;
+struct Sample;
+struct MidiNoteBuffer;
+struct AudioBuffer;
+struct Range;
 enum class SignalType;
 
-class SampleRef : public Sharable<obs::Node<VirtualBase>> {
-public:
+struct SampleRef : Sharable<obs::Node<VirtualBase>> {
 	explicit SampleRef(shared<Sample> sample);
 	~SampleRef() override;
 	void __delete__() override;

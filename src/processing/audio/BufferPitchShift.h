@@ -14,7 +14,7 @@
 
 namespace tsunami {
 
-class AudioBuffer;
+struct AudioBuffer;
 
 namespace BufferInterpolator {
 	enum class Method;

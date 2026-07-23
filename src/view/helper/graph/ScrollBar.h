@@ -13,7 +13,7 @@ class Painter;
 
 namespace tsunami {
 
-class Range;
+struct Range;
 
 class ScrollBar : public scenegraph::Node {
 public:

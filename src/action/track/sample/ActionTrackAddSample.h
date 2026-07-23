@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class Sample;
-class SampleRef;
-class TrackLayer;
+struct Sample;
+struct SampleRef;
+struct TrackLayer;
 
 class ActionTrackAddSample: public history::Action {
 public:

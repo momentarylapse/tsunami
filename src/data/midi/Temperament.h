@@ -23,8 +23,7 @@ enum class TemperamentType {
 	Count
 };
 
-class Temperament {
-public:
+struct Temperament {
 	float freq[MaxPitch];
 
 	bool operator==(const Temperament &t) const;

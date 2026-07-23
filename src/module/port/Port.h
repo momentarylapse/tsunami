@@ -15,9 +15,9 @@ namespace tsunami {
 enum class SignalType;
 
 class Module;
-class AudioBuffer;
-class MidiEventBuffer;
-class Beat;
+struct AudioBuffer;
+struct MidiEventBuffer;
+struct Beat;
 struct InPort;
 
 

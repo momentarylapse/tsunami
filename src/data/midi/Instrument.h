@@ -13,10 +13,9 @@
 
 namespace tsunami {
 
-class Clef;
+struct Clef;
 
-class Instrument {
-public:
+struct Instrument {
 	enum class Type{
 		None,
 		Piano,

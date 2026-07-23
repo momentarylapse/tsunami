@@ -16,7 +16,7 @@ namespace tsunami {
 class AudioInput;
 class PeakMeter;
 class Device;
-class Track;
+struct Track;
 class SignalChain;
 
 class CaptureConsoleModeAudio : public CaptureConsoleMode {

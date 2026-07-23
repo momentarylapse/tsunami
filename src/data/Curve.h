@@ -12,19 +12,18 @@
 #include "../lib/obs/Observable.h"
 
 namespace kaba {
-	class Class;
+	struct Class;
 };
 
 namespace tsunami {
 
-class Song;
-class Track;
+struct Song;
+struct Track;
 class AudioEffect;
 class Module;
 
 
-class CurveTarget {
-public:
+struct CurveTarget {
 	float *p;
 	string id;
 	string temp_name_nice;
@@ -45,8 +44,7 @@ enum class CurveType {
 	Exponential,
 };
 
-class Curve : public Sharable<obs::Node<VirtualBase>> {
-public:
+struct Curve : Sharable<obs::Node<VirtualBase>> {
 	Curve();
 	~Curve() override;
 

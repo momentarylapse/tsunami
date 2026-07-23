@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class ActionTrackInsertSample : public history::ActionGroup {
 public:

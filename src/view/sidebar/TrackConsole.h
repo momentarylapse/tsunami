@@ -13,11 +13,11 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class Slider;
 class ModulePanel;
 class FxListEditor;
-class Instrument;
+struct Instrument;
 
 class TrackConsole: public SideBarConsole {
 public:

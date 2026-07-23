@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 
 class SongConsole: public SideBarConsole {
 public:

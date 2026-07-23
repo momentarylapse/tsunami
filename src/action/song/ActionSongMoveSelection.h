@@ -11,13 +11,13 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
-class TrackLayer;
-class SampleRef;
-class MidiNote;
-class TrackMarker;
-class SongSelection;
+struct Song;
+struct Track;
+struct TrackLayer;
+struct SampleRef;
+struct MidiNote;
+struct TrackMarker;
+struct SongSelection;
 
 class ActionSongMoveSelection: public history::Action {
 public:

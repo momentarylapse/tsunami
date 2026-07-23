@@ -13,7 +13,7 @@
 namespace tsunami {
 
 class Port;
-class AudioBuffer;
+struct AudioBuffer;
 
 class PitchDetector : public MidiSource {
 public:

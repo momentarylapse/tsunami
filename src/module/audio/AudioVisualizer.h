@@ -14,8 +14,8 @@
 
 namespace tsunami {
 
-class AudioBuffer;
-class RingBuffer;
+struct AudioBuffer;
+struct RingBuffer;
 class Session;
 
 class AudioVisualizer : public Module {

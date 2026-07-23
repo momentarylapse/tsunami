@@ -76,7 +76,13 @@ void _cdecl draw(PrimitiveTopology topology, VertexBuffer *vb) {
 
 	bind_vertex_buffer(vb);
 
-	glDrawArrays((int)topology, 0, vb->count());
+	if (topology == PrimitiveTopology::PATCHES)
+		glPatchParameteri(GL_PATCH_VERTICES, 4); // TODO
+
+	if (vb->is_indexed())
+		glDrawElements((int)topology, vb->index.count, vb->index.type, (void*)0);
+	else
+		glDrawArrays((int)topology, 0, vb->count());
 }
 
 void draw_mesh_tasks(int offset, int count) {

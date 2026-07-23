@@ -14,9 +14,7 @@ namespace tsunami {
 
 enum class NoteModifier;
 
-class Scale {
-public:
-
+struct Scale {
 	enum class Type {
 		Major,
 		Dorian,

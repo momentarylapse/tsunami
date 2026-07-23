@@ -15,18 +15,18 @@ class Painter;
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
+struct Track;
+struct TrackLayer;
 class AudioView;
-class AudioBuffer;
-class SampleRef;
-class MidiNoteBuffer;
-class MidiNote;
-class MidiEvent;
-class TrackMarker;
-class Clef;
-class Scale;
-class Range;
+struct AudioBuffer;
+struct SampleRef;
+struct MidiNoteBuffer;
+struct MidiNote;
+struct MidiEvent;
+struct TrackMarker;
+struct Clef;
+struct Scale;
+struct Range;
 class GridColors;
 class HoverData;
 enum class NoteModifier;

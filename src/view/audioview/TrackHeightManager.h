@@ -13,9 +13,9 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class AudioView;
-class Track;
+struct Track;
 
 class TrackHeightManager {
 public:

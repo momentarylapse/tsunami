@@ -17,13 +17,13 @@ namespace hui {
 
 namespace tsunami {
 
-class Song;
-class Track;
-class SongSelection;
+struct Song;
+struct Track;
+struct SongSelection;
 struct AudioOutPort;
-class AudioBuffer;
-class Range;
-class TrackLayer;
+struct AudioBuffer;
+struct Range;
+struct TrackLayer;
 class Progress;
 class AudioView;
 class AudioSource;

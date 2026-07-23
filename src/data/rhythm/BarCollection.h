@@ -17,13 +17,12 @@
 
 namespace tsunami {
 
-class Beat;
-class Bar;
-class Range;
+struct Beat;
+struct Bar;
+struct Range;
 
 
-class BarCollection : public shared_array<Bar> {
-public:
+struct BarCollection : shared_array<Bar> {
 	Array<Beat> get_beats(const Range &r, bool include_hidden = false, const base::optional<int>& sub_beat_partition = base::None) const;
 	Array<Bar*> get_bars(const Range &r) const;
 	int get_bar_no(int pos) const;

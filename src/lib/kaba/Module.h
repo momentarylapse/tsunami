@@ -14,13 +14,13 @@
 
 namespace kaba {
 
-class Class;
-class Function;
-class Variable;
-class Constant;
-class SyntaxTree;
+struct Class;
+struct Function;
+struct Variable;
+struct Constant;
+struct SyntaxTree;
 class Interpreter;
-class Context;
+struct Context;
 
 
 // executable (compiled) data

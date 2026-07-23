@@ -21,8 +21,8 @@ struct rect;
 
 namespace tsunami {
 
-class AudioBuffer;
-class Range;
+struct AudioBuffer;
+struct Range;
 class PeakThread;
 enum class AudioViewMode;
 

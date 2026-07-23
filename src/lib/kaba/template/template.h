@@ -13,13 +13,13 @@
 
 namespace kaba {
 
-class Function;
-class Class;
-class Node;
-class Block;
+struct Function;
+struct Class;
+struct Node;
+struct Block;
 class Parser;
-class SyntaxTree;
-class Context;
+struct SyntaxTree;
+struct Context;
 class TemplateManager;
 
 

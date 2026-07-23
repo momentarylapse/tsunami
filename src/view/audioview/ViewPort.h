@@ -13,8 +13,8 @@
 
 namespace tsunami {
 
-class Range;
-class Song;
+struct Range;
+struct Song;
 
 class ViewPort : public obs::Node<VirtualBase> {
 public:

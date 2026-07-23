@@ -13,11 +13,11 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
+struct Song;
+struct Track;
 class AudioView;
-class Curve;
-class CurveTarget;
+struct Curve;
+struct CurveTarget;
 enum class CurveType;
 class Session;
 

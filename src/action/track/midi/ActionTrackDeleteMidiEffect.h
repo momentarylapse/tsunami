@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrackDeleteMidiEffect: public history::Action {
 public:

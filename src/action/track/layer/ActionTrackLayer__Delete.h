@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
+struct Track;
+struct TrackLayer;
 
 class ActionTrackLayer__Delete : public history::Action {
 public:

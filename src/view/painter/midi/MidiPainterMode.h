@@ -16,13 +16,13 @@ class Painter;
 namespace tsunami {
 
 class ViewPort;
-class Song;
+struct Song;
 class ColorScheme;
-class SongSelection;
+struct SongSelection;
 class HoverData;
-class MidiNoteBuffer;
+struct MidiNoteBuffer;
 class MidiPainter;
-class MidiNote;
+struct MidiNote;
 
 
 

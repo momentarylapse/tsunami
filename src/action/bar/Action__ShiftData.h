@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 enum class BarEditMode;
 
 class Action__ShiftData: public history::Action {

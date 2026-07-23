@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
+struct Song;
+struct Track;
 
 class TrackRoutingDialog : public hui::Dialog {
 public:

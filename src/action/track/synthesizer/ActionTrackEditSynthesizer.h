@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrackEditSynthesizer: public history::MergableValueAction<string> {
 public:

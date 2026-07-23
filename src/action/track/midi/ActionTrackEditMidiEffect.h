@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class MidiEffect;
 
 class ActionTrackEditMidiEffect: public history::MergableValueAction<string> {

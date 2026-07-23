@@ -12,10 +12,9 @@
 
 namespace tsunami {
 
-class MidiNote;
+struct MidiNote;
 
-class MidiEvent {
-public:
+struct MidiEvent {
 	MidiEvent(){}
 	MidiEvent(int pos, float pitch, float volume);
 	explicit MidiEvent(const MidiNote *n);

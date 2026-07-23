@@ -8,20 +8,20 @@
 #ifndef SRC_LIB_KABA_PARSER_CONCRETIFIER_H_
 #define SRC_LIB_KABA_PARSER_CONCRETIFIER_H_
 
-#include "../syntax/SyntaxTree.h"
-#include "lexical.h"
+#include "../../syntax/SyntaxTree.h"
+#include "../Transformer.h"
 
 namespace kaba {
 
-class Class;
-class Function;
-class Block;
-class SyntaxTree;
-class Statement;
+struct Class;
+struct Function;
+struct Block;
+struct SyntaxTree;
+struct Statement;
 enum class Flags;
 class Parser;
 class AutoImplementer;
-class Context;
+struct Context;
 
 struct CastingDataSingle {
 	int cast;
@@ -74,13 +74,14 @@ public:
 	shared<Node> concretify_block(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_definitely(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_call(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_slice(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_return(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_if(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_if_compiletime(shared<Node> node, Block *block, const Class *ns);
 	shared<Node> concretify_statement_while(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_for_range(shared<Node> node, Block *block, const Class *ns);
-	shared<Node> concretify_statement_for_container(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_statement_for(shared<Node> node, Block *block, const Class *ns);
+	shared<Node> concretify_statement_for_slice(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_array(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_dict(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
 	shared<Node> concretify_statement_for_unwrap_pointer(shared<Node> node, shared<Node> container, Block *block, const Class *ns);
@@ -176,6 +177,7 @@ public:
 	Context *context;
 	SyntaxTree *tree;
 	Parser *parser;
+	Transformer transformer;
 	AutoImplementer *auto_implementer;
 	int for_index_count = 0;
 	int _try_level = 0;

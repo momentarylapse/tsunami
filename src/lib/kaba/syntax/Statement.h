@@ -23,7 +23,7 @@ enum class StatementID {
 	If,
 	IfCompiletime,
 	While,
-	ForContainer,
+	For,
 	ForRange,
 	ForDigest,
 	Break,
@@ -45,8 +45,7 @@ enum class StatementID {
 	Match
 };
 
-class Statement {
-public:
+struct Statement {
 	string name;
 	int num_params;
 	StatementID id;
@@ -71,8 +70,7 @@ enum class SpecialFunctionID {
 	Give
 };
 
-class SpecialFunction {
-public:
+struct SpecialFunction {
 	string name;
 	int min_params;
 	int max_params;

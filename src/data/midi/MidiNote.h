@@ -14,9 +14,9 @@
 
 namespace tsunami {
 
-class Scale;
-class Clef;
-class Instrument;
+struct Scale;
+struct Clef;
+struct Instrument;
 enum class NoteModifier;
 
 namespace NoteFlag {
@@ -34,8 +34,7 @@ namespace NoteFlag {
 }
 
 
-class MidiNote : public Sharable<base::Empty> {
-public:
+struct MidiNote : Sharable<base::Empty> {
 	MidiNote();
 	MidiNote(const Range &range, float pitch, float volume);
 	MidiNote *copy(int offset=0) const;

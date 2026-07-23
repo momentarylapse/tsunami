@@ -15,8 +15,7 @@
 #include "../lib/obs/Observable.h"
 
 namespace kaba {
-	class Script;
-	class Class;
+	struct Class;
 };
 
 namespace hui {
@@ -33,9 +32,9 @@ class Session;
 class Plugin;
 struct OutPort;
 struct InPort;
-class AudioBuffer;
-class MidiEventBuffer;
-class Beat;
+struct AudioBuffer;
+struct MidiEventBuffer;
+struct Beat;
 
 enum class ModuleCategory {
 	// plug-ins

@@ -17,12 +17,12 @@
 namespace kaba {
 
 class Module;
-class Function;
-class Class;
-class TypeCast;
-class Operator;
+struct Function;
+struct Class;
+struct TypeCast;
+struct Operator;
 class TemplateManager;
-class ExternalLinkData;
+struct ExternalLinkData;
 class Exporter;
 class IExporter;
 
@@ -56,8 +56,7 @@ struct Package : Sharable<base::Empty> {
 	std::function<void*(const string&)> get_global_symbol;
 };
 
-class Context : public IContext {
-public:
+struct Context : IContext {
 	Array<TypeCast> type_casts;
 	owned<TemplateManager> template_manager;
 	owned<ExternalLinkData> external;

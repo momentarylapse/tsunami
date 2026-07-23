@@ -10,7 +10,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 
 void show_song(Song *song);
 

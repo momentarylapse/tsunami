@@ -22,7 +22,7 @@ namespace kaba {
 class Serializer;
 struct SerialNode;
 struct SerialNodeParam;
-class Class;
+struct Class;
 
 
 

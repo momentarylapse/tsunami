@@ -14,16 +14,15 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
-class TrackLayer;
-class SampleRef;
-class TrackMarker;
-class MidiNote;
-class Bar;
+struct Song;
+struct Track;
+struct TrackLayer;
+struct SampleRef;
+struct TrackMarker;
+struct MidiNote;
+struct Bar;
 
-class SongSelection {
-public:
+struct SongSelection {
 	SongSelection();
 
 	void clear();

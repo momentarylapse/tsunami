@@ -19,13 +19,13 @@ namespace tsunami {
 
 class AudioViewTrack;
 class AudioViewLayer;
-class Track;
-class TrackLayer;
-class SampleRef;
-class MidiNote;
-class TrackMarker;
-class Bar;
-class SongSelection;
+struct Track;
+struct TrackLayer;
+struct SampleRef;
+struct MidiNote;
+struct TrackMarker;
+struct Bar;
+struct SongSelection;
 enum class NoteModifier;
 
 class HoverData {

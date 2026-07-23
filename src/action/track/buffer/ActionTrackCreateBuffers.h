@@ -13,8 +13,8 @@
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
+struct Track;
+struct TrackLayer;
 
 class ActionTrackCreateBuffers : public history::ActionGroup {
 public:

@@ -11,8 +11,8 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
+struct Song;
+struct Track;
 
 class ActionSongChangeAllTrackVolumes : public history::MergableValueAction<float> {
 public:

@@ -12,12 +12,11 @@
 
 namespace kaba {
 
-class Class;
+struct Class;
 enum class Flags;
 
 
-class Variable : public Sharable<base::Empty> {
-public:
+struct Variable : Sharable<base::Empty> {
 	Variable(const string& name, const Class* type, const Class* ns, int token_id);
 	~Variable();
 	const Class* type; // for creating instances

@@ -13,8 +13,7 @@
 
 namespace tsunami {
 
-class RingBuffer {
-public:
+struct RingBuffer {
 	explicit RingBuffer(int size);
 	~RingBuffer();
 

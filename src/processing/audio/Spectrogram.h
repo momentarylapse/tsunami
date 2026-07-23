@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class AudioBuffer;
+struct AudioBuffer;
 
 namespace Spectrogram {
 

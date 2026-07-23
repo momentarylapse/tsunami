@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class Sample;
+struct Sample;
 class Session;
-class Song;
+struct Song;
 
 class SampleSelectionDialog : public hui::Dialog {
 public:

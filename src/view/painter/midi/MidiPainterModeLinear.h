@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class MidiNote;
+struct MidiNote;
 enum class NoteModifier;
 
 class MidiPainterModeLinear : public MidiPainterMode {

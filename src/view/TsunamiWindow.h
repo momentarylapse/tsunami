@@ -16,7 +16,7 @@ class Path;
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class MainView;
 class AudioView;
 class SideBar;

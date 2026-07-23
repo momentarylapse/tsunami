@@ -12,7 +12,7 @@
 #include "../lib/base/pointer.h"
 
 namespace kaba {
-	class Class;
+	struct Class;
 }
 
 namespace tsunami {

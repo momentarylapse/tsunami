@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 
 class BarAddDialog : public hui::Dialog {
 public:

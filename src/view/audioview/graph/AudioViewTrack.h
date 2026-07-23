@@ -14,7 +14,7 @@ class Painter;
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class AudioView;
 class AudioViewLayer;
 class MidiKeyChange;

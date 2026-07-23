@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrackEditPanning : public history::MergableValueAction<float> {
 public:

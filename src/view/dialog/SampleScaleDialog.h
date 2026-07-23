@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Sample;
+struct Sample;
 
 class SampleScaleDialog : public hui::Dialog {
 public:

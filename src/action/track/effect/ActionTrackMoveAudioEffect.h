@@ -12,7 +12,7 @@
 namespace tsunami {
 
 class AudioEffect;
-class Track;
+struct Track;
 
 class ActionTrackMoveAudioEffect: public history::Action {
 public:

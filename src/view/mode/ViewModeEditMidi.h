@@ -14,18 +14,18 @@
 
 namespace tsunami {
 
-class MidiNoteBuffer;
-class MidiNote;
-class MidiEvent;
+struct MidiNoteBuffer;
+struct MidiNote;
+struct MidiEvent;
 class AudioOutput;
 class Synthesizer;
 class MidiPreview;
-class TrackLayer;
+struct TrackLayer;
 class ScrollBar;
 class MidiInput;
 class Device;
 class SignalChain;
-class Scale;
+struct Scale;
 class ViewModeEdit;
 enum class NoteModifier;
 enum class ChordType;

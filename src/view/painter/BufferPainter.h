@@ -19,8 +19,8 @@ namespace tsunami {
 
 class AudioView;
 class PeakDatabase;
-class AudioBuffer;
-class Range;
+struct AudioBuffer;
+struct Range;
 
 enum class AudioViewMode;
 

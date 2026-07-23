@@ -9,13 +9,12 @@
 
 
 namespace kaba {
-	class Class;
-	class SyntaxTree;
+	struct Class;
+	struct SyntaxTree;
 
 
 	template<class T>
-	class XDict : public base::map<string, T> {
-	public:
+	struct XDict : base::map<string, T> {
 		void __init__() {
 			new(this) base::map<string, T>();
 		}

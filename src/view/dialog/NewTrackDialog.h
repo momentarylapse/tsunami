@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class Session;
 class Synthesizer;
 enum class SignalType;

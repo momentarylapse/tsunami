@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Sample;
+struct Sample;
 
 class ActionSampleEditName : public history::MergableValueAction<string> {
 public:

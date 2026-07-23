@@ -11,8 +11,8 @@
 
 namespace tsunami {
 
-class TrackLayer;
-class MidiNote;
+struct TrackLayer;
+struct MidiNote;
 
 class ActionTrackAddMidiNote : public history::Action {
 public:

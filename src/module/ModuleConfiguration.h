@@ -12,8 +12,7 @@
 #include "../lib/base/base.h"
 
 namespace kaba {
-	class Script;
-	class Class;
+	struct Class;
 };
 class Any;
 

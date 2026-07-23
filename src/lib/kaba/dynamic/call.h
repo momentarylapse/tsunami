@@ -9,7 +9,7 @@
 
 namespace kaba {
 
-class Function;
+struct Function;
 
 //bool call_function(Function *f, void *ff, void *ret, const Array<void*> &param);
 bool call_function(Function *f, void *ret, const Array<void*> &param);

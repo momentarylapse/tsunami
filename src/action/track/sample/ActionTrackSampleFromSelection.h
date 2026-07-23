@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class SongSelection;
-class TrackLayer;
+struct SongSelection;
+struct TrackLayer;
 
 class ActionTrackSampleFromSelection : public history::ActionGroup {
 public:

@@ -13,9 +13,7 @@
 
 namespace tsunami {
 
-class CrossFade {
-public:
-
+struct CrossFade {
 	enum Mode {
 		Inward,
 		Outward
@@ -30,8 +28,7 @@ public:
 	bool operator!=(const CrossFade &o) const;
 };
 
-class CrossFadeLegacy {
-public:
+struct CrossFadeLegacy {
 	int position;
 	int target;
 	int samples;

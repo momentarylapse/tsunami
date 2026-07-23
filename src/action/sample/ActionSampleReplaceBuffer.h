@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class AudioBuffer;
-class Sample;
+struct AudioBuffer;
+struct Sample;
 
 class ActionSampleReplaceBuffer : public history::Action {
 public:

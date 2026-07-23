@@ -15,13 +15,12 @@ struct complex;
 
 namespace kaba {
 
-class Class;
-class Block;
-class SyntaxTree;
+struct Class;
+struct Block;
+struct SyntaxTree;
 
 
-class Value {
-public:
+struct Value {
 	string value;
 	shared<const Class> type;
 
@@ -48,8 +47,7 @@ public:
 };
 
 // for any type of constant used in the module
-class Constant : public Sharable<Value> {
-public:
+struct Constant : Sharable<Value> {
 	Constant(const Class* type, SyntaxTree* owner, int token_id);
 	string name;
 	string str() const;

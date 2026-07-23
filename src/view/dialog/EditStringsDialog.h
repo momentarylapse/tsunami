@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class EditStringsDialog : public hui::Dialog {
 public:

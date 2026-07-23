@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "../asm/asm.h"
 #include "../dynamic/call.h"
+#include "../parser/Transformer.h"
 #include "../../os/msg.h"
 
 namespace kaba {
@@ -159,21 +160,21 @@ shared<Node> eval_constructor_function(SyntaxTree *tree, shared<Node> c, Functio
 }
 
 // BEFORE transforming to call-by-reference!
-shared<Node> SyntaxTree::conv_eval_const_func(shared<Node> c) {
+shared<Node> Transformer::conv_eval_const_func(shared<Node> c) {
 	if (c->kind == NodeKind::Operator) {
-		return eval_function_call(this, c, c->as_op()->f);
+		return eval_function_call(tree, c, c->as_op()->f);
 	} else if (c->kind == NodeKind::ConstructorAsFunction) {
-		return eval_constructor_function(this, c, c->as_func());
+		return eval_constructor_function(tree, c, c->as_func());
 	} else if (c->kind == NodeKind::CallFunction) {
-		return eval_function_call(this, c, c->as_func());
+		return eval_function_call(tree, c, c->as_func());
 	}
 	return conv_eval_const_func_nofunc(c);
 }
 
-shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
+shared<Node> Transformer::conv_eval_const_func_nofunc(shared<Node> c) {
 	if (c->kind == NodeKind::DynamicArray) {
 		if (all_params_are_const(c)) {
-			auto cr = add_node_const(add_constant(c->type, c->token_id));
+			auto cr = add_node_const(tree->add_constant(c->type, c->token_id));
 			DynamicArray *da = &c->params[0]->as_const()->as_array();
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)da->data + index * da->element_size, c->type);
@@ -182,14 +183,14 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 	} else if (c->kind == NodeKind::Array) {
 		// hmmm, not existing, I guess....
 		if (all_params_are_const(c)) {
-			auto cr = add_node_const(add_constant(c->type, c->token_id));
+			auto cr = add_node_const(tree->add_constant(c->type, c->token_id));
 			int index = c->params[1]->as_const()->as_int();
 			rec_assign(cr->as_const()->p(), (char*)c->params[0]->as_const()->p() + index * c->type->size, c->type);
 			return cr;
 		}
 	} else if (c->kind == NodeKind::ArrayBuilder) {
 		if (all_params_are_const(c)) {
-			auto c_array = add_node_const(add_constant(c->type, c->token_id));
+			auto c_array = add_node_const(tree->add_constant(c->type, c->token_id));
 			DynamicArray &da = c_array->as_const()->as_array();
 			rec_resize(&da, c->params.num, c->type);
 			for (int i=0; i<c->params.num; i++)
@@ -205,7 +206,7 @@ shared<Node> SyntaxTree::conv_eval_const_func_nofunc(shared<Node> c) {
 
 
 // may not use AddConstant()!!!
-shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
+shared<Node> Transformer::pre_process_node_addresses(shared<Node> c) {
 	if (c->kind == NodeKind::CallInline) {
 		auto *f = c->as_func();
 		//if (!f->is_pure or !f->address_preprocess)
@@ -251,20 +252,20 @@ shared<Node> SyntaxTree::pre_process_node_addresses(shared<Node> c) {
 	return c;
 }
 
-void SyntaxTree::eval_const_expressions(bool allow_func_eval) {
+void Transformer::eval_const_expressions(bool allow_func_eval) {
 	if (allow_func_eval) {
-		transform([this] (shared<Node> n) {
+		transform(tree, [this] (shared<Node> n) {
 			return conv_eval_const_func(n);
 		});
 	} else {
-		transform([this] (shared<Node> n) {
+		transform(tree, [this] (shared<Node> n) {
 			return conv_eval_const_func_nofunc(n);
 		});
 	}
 }
 
-void SyntaxTree::pre_processor_addresses() {
-	transform([this] (shared<Node> n) {
+void Transformer::pre_processor_addresses() {
+	transform(tree, [this] (shared<Node> n) {
 		return pre_process_node_addresses(n);
 	});
 }

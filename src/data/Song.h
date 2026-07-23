@@ -20,29 +20,27 @@ namespace tsunami {
 class Session;
 class AudioEffect;
 class MidiEffect;
-class Track;
-class TrackLayer;
-class Sample;
+struct Track;
+struct TrackLayer;
+struct Sample;
 class Synthesizer;
-class SongSelection;
-class AudioBuffer;
-class BarPattern;
-class TrackMarker;
-class MidiNoteBuffer;
+struct SongSelection;
+struct AudioBuffer;
+struct BarPattern;
+struct TrackMarker;
+struct MidiNoteBuffer;
 enum class SampleFormat;
 enum class SignalType;
 enum class BarEditMode;
 
-class Tag {
-public:
+struct Tag {
 	string key, value;
 	bool operator==(const Tag &o) const;
 	bool operator!=(const Tag &o) const;
 	bool valid() const;
 };
 
-class Song : public history::Data {
-public:
+struct Song : history::Data {
 	Song(Session *session, int sample_rate);
 	~Song() override;
 

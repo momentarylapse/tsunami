@@ -5,18 +5,17 @@
  *      Author: michi
  */
 
-#ifndef SRC_LIB_KABA_COMPILER_COMPILER_H_
-#define SRC_LIB_KABA_COMPILER_COMPILER_H_
+#pragma once
 
 namespace kaba {
 
 #include "../asm/asm.h"
 
-class SyntaxTree;
+struct SyntaxTree;
 class Module;
-class Function;
-class Class;
-class Context;
+struct Function;
+struct Class;
+struct Context;
 
 class Compiler {
 public:
@@ -48,5 +47,3 @@ public:
 };
 
 }
-
-#endif /* SRC_LIB_KABA_COMPILER_COMPILER_H_ */

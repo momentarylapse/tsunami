@@ -39,10 +39,12 @@ vec2 Node::get_content_min_size() const {
 
 vec2 Node::effective_min_size() const {
 	vec2 s = get_content_min_size() + padding.p00() + padding.p11();
-	if (min_width_user >= 0)
+	s.x = max(s.x, min_width_user);
+	s.y = max(s.y, min_height_user);
+	/*if (min_width_user >= 0)
 		s.x = min_width_user;
 	if (min_height_user >= 0)
-		s.y = min_height_user;
+		s.y = min_height_user;*/
 	return s + margin.p00() + margin.p11();
 }
 

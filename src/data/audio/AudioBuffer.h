@@ -16,8 +16,7 @@ namespace tsunami {
 
 enum class SampleFormat;
 
-class AudioBuffer {
-public:
+struct AudioBuffer {
 	AudioBuffer();
 	AudioBuffer(const AudioBuffer &b);
 	AudioBuffer(AudioBuffer &&b) noexcept;

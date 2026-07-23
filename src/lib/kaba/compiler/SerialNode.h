@@ -20,7 +20,7 @@ namespace kaba {
 
 class Serializer;
 enum class NodeKind;
-class Class;
+struct Class;
 
 struct SerialNodeParam {
 	NodeKind kind;

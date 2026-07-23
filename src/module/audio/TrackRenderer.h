@@ -12,14 +12,14 @@
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
+struct Track;
+struct TrackLayer;
 class AudioEffect;
 class Synthesizer;
 class MidiEventStreamer;
 class BeatMidifier;
 class SongRenderer;
-class AudioBuffer;
+struct AudioBuffer;
 
 class TrackRenderer : public AudioSource {
 	friend SongRenderer;

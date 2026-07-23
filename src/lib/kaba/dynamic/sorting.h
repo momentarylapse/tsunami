@@ -11,7 +11,7 @@ struct DynamicArray;
 
 namespace kaba {
 	
-class Class;
+struct Class;
 
 DynamicArray array_sort(DynamicArray &array, const Class *type, const string &by);
 

@@ -66,7 +66,7 @@ void AutoImplementer::implement_array_assign(Function *f, const Class *t) {
 
 	b->add(add_assign(f, "", add_node_local(v_el)->deref(), n_other_el));
 
-	auto n_for = add_node_statement(StatementID::ForContainer);
+	auto n_for = add_node_statement(StatementID::For);
 	// [VAR, INDEX, ARRAY, BLOCK]
 	n_for->set_param(0, add_node_local(v_el));
 	n_for->set_param(1, add_node_local(v_i));

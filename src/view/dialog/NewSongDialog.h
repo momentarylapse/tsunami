@@ -14,7 +14,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 enum class SignalType;
 
 class NewSongDialog: public hui::Dialog {

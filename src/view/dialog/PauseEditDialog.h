@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class Range;
+struct Song;
+struct Range;
 
 class PauseEditDialog : public hui::Dialog {
 public:

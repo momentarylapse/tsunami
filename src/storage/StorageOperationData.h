@@ -20,15 +20,15 @@ namespace hui {
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class Progress;
-class AudioBuffer;
-class Track;
-class TrackLayer;
+struct AudioBuffer;
+struct Track;
+struct TrackLayer;
 class Storage;
 class Format;
 struct AudioOutPort;
-class Tag;
+struct Tag;
 class Storage;
 class Session;
 enum class SampleFormat;

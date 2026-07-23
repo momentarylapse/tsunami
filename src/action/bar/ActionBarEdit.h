@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class BarPattern;
+struct Song;
+struct BarPattern;
 enum class BarEditMode;
 
 class ActionBarEdit: public history::ActionGroup {

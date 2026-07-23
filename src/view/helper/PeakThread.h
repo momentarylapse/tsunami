@@ -13,9 +13,9 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
-class AudioBuffer;
+struct Song;
+struct Track;
+struct AudioBuffer;
 class PeakDatabase;
 
 class InterThreadMessenger : public obs::Node<VirtualBase> {

@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class AudioEditorConsole : public SideBarConsole {
 public:

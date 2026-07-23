@@ -25,13 +25,13 @@ class AudioView;
 class AudioViewTrack;
 class AudioViewLayer;
 class HoverData;
-class SongSelection;
-class Track;
+struct SongSelection;
+struct Track;
 class ViewPort;
 class TsunamiWindow;
-class Song;
-class MidiNoteBuffer;
-class Range;
+struct Song;
+struct MidiNoteBuffer;
+struct Range;
 class Session;
 
 class ViewMode : public obs::Node<VirtualBase> {

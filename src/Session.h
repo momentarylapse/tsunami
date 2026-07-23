@@ -23,7 +23,7 @@ class Path;
 namespace tsunami {
 
 class TsunamiWindow;
-class Song;
+struct Song;
 class Storage;
 class AudioView;
 class MainView;

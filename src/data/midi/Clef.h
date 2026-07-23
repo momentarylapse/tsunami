@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Scale;
+struct Scale;
 enum class NoteModifier;
 
 enum class ClefType {
@@ -25,8 +25,7 @@ enum class ClefType {
 	Count
 };
 
-class Clef {
-public:
+struct Clef {
 	Clef(ClefType type, const string &symbol, int offset);
 
 	static const Clef Treble;

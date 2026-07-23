@@ -2,7 +2,7 @@
 #include "kaba.h"
 #include "Interpreter.h"
 #include "parser/Parser.h"
-#include "parser/Concretifier.h"
+#include "parser/concretifier/Concretifier.h"
 #include "template/template.h"
 #include "compiler/Compiler.h"
 #include "dynamic/dynamic.h"

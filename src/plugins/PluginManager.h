@@ -20,7 +20,7 @@ namespace hui {
 namespace kaba {
 	class IExporter;
 	class Module;
-	class Class;
+	struct Class;
 }
 
 namespace tsunami {

@@ -14,11 +14,10 @@
 namespace tsunami {
 
 class AudioEffect;
-class Scale;
+struct Scale;
 
 
-class TrackMarker : public Sharable<base::Empty>{
-public:
+struct TrackMarker : Sharable<base::Empty>{
 	TrackMarker();
 	TrackMarker(const Range &r, const string &t);
 	Range range;

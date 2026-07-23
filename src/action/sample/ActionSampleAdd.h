@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class AudioBuffer;
-class MidiNoteBuffer;
-class Sample;
+struct AudioBuffer;
+struct MidiNoteBuffer;
+struct Sample;
 
 class ActionSampleAdd : public history::Action {
 public:

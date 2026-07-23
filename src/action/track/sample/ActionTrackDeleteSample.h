@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class SampleRef;
+struct SampleRef;
 
 class ActionTrackDeleteSample : public history::ActionGroup {
 public:

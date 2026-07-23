@@ -11,9 +11,9 @@
 
 namespace tsunami {
 
-class TrackLayer;
-class TrackMarker;
-class Range;
+struct TrackLayer;
+struct TrackMarker;
+struct Range;
 
 class ActionTrackAddMarker: public history::Action {
 public:

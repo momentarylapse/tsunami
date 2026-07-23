@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 
 class Action__ScaleData: public history::Action {
 public:

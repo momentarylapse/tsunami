@@ -10,13 +10,12 @@ class Any;
 namespace kaba {
 
 class Module;
-class Context;
-class Class;
+struct Context;
+struct Class;
 struct Package;
 class IExporter;
 
-class IContext {
-public:
+struct IContext {
 	virtual ~IContext() = default;
 	virtual shared<Module> load_module(const Path& filename, bool just_analyse) = 0;
 	virtual shared<Module> create_module_for_source(const string& source, const Path& filename, bool just_analyse) = 0;

@@ -16,7 +16,7 @@ namespace tsunami {
 class Session;
 class Device;
 class DeviceManager;
-class MidiEventBuffer;
+struct MidiEventBuffer;
 
 
 class MidiInputStream {

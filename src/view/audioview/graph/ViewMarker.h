@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class TrackMarker;
+struct TrackMarker;
 class AudioViewTrack;
 
 class ViewMarker : public ::scenegraph::Node {

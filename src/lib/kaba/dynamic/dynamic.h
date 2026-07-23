@@ -7,8 +7,8 @@ class Any;
 
 namespace kaba {
 	
-class Class;
-class Function;
+struct Class;
+struct Function;
 
 void var_assign(void *pa, const void *pb, const Class *type);
 void var_init(void *p, const Class *type);

@@ -7,12 +7,11 @@
 
 namespace kaba {
 
-class SyntaxTree;
+struct SyntaxTree;
 
 // character buffer and expressions (syntax analysis)
 
-class ExpressionBuffer {
-public:
+struct ExpressionBuffer {
 	ExpressionBuffer();
 
 	struct Token {

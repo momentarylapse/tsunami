@@ -16,9 +16,9 @@ class Path;
 
 namespace tsunami {
 
-class Song;
-class Track;
-class SongSelection;
+struct Song;
+struct Track;
+struct SongSelection;
 
 shared<Song> copy_song_from_selection(Song *song, const SongSelection &sel);
 base::future<void> export_selection(Song *song, const SongSelection& sel, const Path& filename, bool force_unmute = false);

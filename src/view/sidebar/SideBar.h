@@ -15,7 +15,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class SongConsole;
 class TrackConsole;
 class EffectsConsole;

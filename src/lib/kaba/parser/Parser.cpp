@@ -6,6 +6,7 @@
 #include "../../base/iter.h"
 #include "Parser.h"
 #include "import.h"
+#include "Transformer.h"
 #include "../template/template.h"
 
 
@@ -56,6 +57,7 @@ int64 s2i2(const string &str) {
 Parser::Parser(SyntaxTree *t) :
 	AbstractParser(t),
 	con(t->module->context, this, t),
+	transformer(t),
 	auto_implementer(this, t)
 {
 	context = t->module->context;
@@ -316,7 +318,7 @@ void Parser::post_process_for(shared<Node> cmd_for) {
 
 	// force for_var out of scope...
 	var->name = ":" + var->name;
-	if (cmd_for->as_statement()->id == StatementID::ForContainer) {
+	if (cmd_for->as_statement()->id == StatementID::For) {
 		auto *index = cmd_for->params[1]->as_local();
 		index->name = ":" + index->name;
 	}
@@ -531,7 +533,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 				return n;
 			};
 
-			nn = SyntaxTree::transform_node(nn, convert);
+			nn = Transformer::transform_node(nn, convert);
 
 			string _name = format("%s[%s]", _nn->params[1]->as_token(), tparams[0]->name);
 
@@ -710,8 +712,8 @@ shared<Node> Parser::eval_to_const(shared<Node> cv, Block *block, const Class *t
 		type = cv->type;
 	}
 
-	cv = tree->transform_node(cv, [this] (shared<Node> n) {
-		return tree->conv_eval_const_func(tree->conv_fake_constructors(n));
+	cv = Transformer::transform_node(cv, [this] (shared<Node> n) {
+		return transformer.conv_eval_const_func(transformer.conv_fake_constructors(n));
 	});
 
 	if (cv->kind == NodeKind::Class)
@@ -905,7 +907,7 @@ void Parser::realize_tree(shared<Node> node) {
 	prerealize_all_class_names_in_block(node, tree->base_class);
 
 	// realize all lambdas
-	node = tree->transform_node(node, [this] (shared<Node> n) {
+	node = Transformer::transform_node(node, [this] (shared<Node> n) {
 		if (n->kind == NodeKind::Statement and n->as_statement()->id == StatementID::Lambda) {
 			realize_lambda(n, tree->base_class);
 		}

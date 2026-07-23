@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Bar;
+struct Bar;
 
 class ActionBar__Add: public history::Action {
 public:

@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class Track;
-class TrackLayer;
-class Range;
+struct Track;
+struct TrackLayer;
+struct Range;
 
 class ActionTrackLayerActivateVersion : public history::ActionGroup {
 public:

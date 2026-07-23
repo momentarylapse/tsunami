@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class Sample;
+struct Song;
+struct Sample;
 class SampleManagerItem;
 class Session;
 class SamplePreviewPlayer;

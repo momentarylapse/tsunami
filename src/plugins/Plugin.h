@@ -14,7 +14,7 @@
 
 namespace kaba {
 	class Module;
-	class Class;
+	struct Class;
 };
 
 namespace tsunami {

@@ -564,11 +564,12 @@ shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class 
 	return el;
 }
 
-shared<Node> add_node_slice(shared<Node> start, shared<Node> end) {
+shared<Node> add_node_slice(shared<Node> start, shared<Node> end, shared<Node> step) {
 	auto n = new Node(NodeKind::Slice, 0, common_types.unknown);
-	n->set_num_params(2);
+	n->set_num_params(3);
 	n->set_param(0, start);
 	n->set_param(1, end);
+	n->set_param(2, step);
 	return n;
 }
 

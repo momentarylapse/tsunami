@@ -13,8 +13,7 @@
 namespace kaba {
 
 // {...}-block
-class Block {
-public:
+struct Block {
 	Block(Function *f, Block *parent);
 	Array<Variable*> vars;
 	Function *function;

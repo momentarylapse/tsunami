@@ -15,11 +15,9 @@ namespace kaba {
 	struct Package;
 	class Module;
 
-class Context;
+struct Context;
 
-class ExternalLinkData {
-public:
-
+struct ExternalLinkData {
 	Context* context;
 	struct ExternalLink {
 		string name;
@@ -88,6 +86,8 @@ public:
 	void _declare_class_element(const string& name, int offset) override;
 	void link(const string& name, void* p) override;
 	void _link_virtual(const string& name, void* p, void* instance) override;
+
+	IContext* context() override;
 };
 
 

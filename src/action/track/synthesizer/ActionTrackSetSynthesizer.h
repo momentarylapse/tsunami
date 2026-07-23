@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class Synthesizer;
 
 class ActionTrackSetSynthesizer : public history::Action {

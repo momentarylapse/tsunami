@@ -30,12 +30,12 @@ namespace scenegraph {
 
 namespace tsunami {
 
-class Song;
-class Track;
-class TrackLayer;
-class Sample;
-class SampleRef;
-class AudioBuffer;
+struct Song;
+struct Track;
+struct TrackLayer;
+struct Sample;
+struct SampleRef;
+struct AudioBuffer;
 class DeviceManager;
 class AudioOutput;
 class SongRenderer;

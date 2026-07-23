@@ -11,8 +11,8 @@
 
 namespace tsunami {
 
-class Curve;
-class Track;
+struct Curve;
+struct Track;
 
 class ActionTrackDeleteCurve : public history::Action {
 public:

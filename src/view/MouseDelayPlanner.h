@@ -56,7 +56,7 @@ public:
 namespace tsunami {
 
 class AudioView;
-class SongSelection;
+struct SongSelection;
 class AudioViewLayer;
 enum class SelectionMode;
 

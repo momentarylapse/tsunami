@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Curve;
+struct Curve;
 enum class CurveType;
 
 class ActionTrackEditCurve : public history::Action {

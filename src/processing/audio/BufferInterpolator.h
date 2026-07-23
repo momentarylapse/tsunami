@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class AudioBuffer;
-//class RingBuffer;
+struct AudioBuffer;
+//struct RingBuffer;
 
 namespace BufferInterpolator {
 

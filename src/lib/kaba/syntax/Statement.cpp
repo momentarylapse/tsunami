@@ -55,7 +55,7 @@ void SIAddStatements() {
 	add_statement(Identifier::If, StatementID::If, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
 	add_statement("-if-compiletime-", StatementID::IfCompiletime, 2); // [CMP, BLOCK, [ELSE-BLOCK]]
 	add_statement(Identifier::While, StatementID::While, 2); // [CMP, BLOCK]
-	add_statement("-for-con-", StatementID::ForContainer, 4); // [VAR, INDEX, ARRAY, BLOCK]
+	add_statement("-for-con-", StatementID::For, 4); // [VAR, INDEX, CONTAINER, BLOCK]
 	add_statement("-for-range-", StatementID::ForRange, 5); // [VAR, START, STOP, STEP, BLOCK]
 	add_statement(Identifier::For, StatementID::ForDigest, 4); // [INIT, CMP, BLOCK, INC] internally like a while-loop... but a bit different...
 	add_statement(Identifier::Break, StatementID::Break);

@@ -191,6 +191,9 @@ void Exporter::_link_virtual(const string& name, void* p, void* instance) {
 	//msg_write("LINK VIRTUAL:  " + name);
 	ctx->external->_link_virtual(name, p, instance);
 }
+IContext* Exporter::context() {
+	return ctx;
+}
 
 }
 

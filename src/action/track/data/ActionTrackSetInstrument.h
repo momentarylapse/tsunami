@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Track;
-class MidiNote;
+struct Track;
+struct MidiNote;
 
 class ActionTrackSetInstrument: public history::MergableValueAction<Instrument> {
 public:

@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 class AudioView;
 
 class TemperamentDialog : public hui::Dialog {

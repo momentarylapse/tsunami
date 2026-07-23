@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrackDetuneSynthesizer: public history::Action {
 public:

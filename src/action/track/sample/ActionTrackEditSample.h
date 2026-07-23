@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Track;
-class SampleRef;
+struct Track;
+struct SampleRef;
 
 struct EditSampleRefData {
 	float volume;

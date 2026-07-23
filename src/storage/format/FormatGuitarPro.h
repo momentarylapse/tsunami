@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Bar;
+struct Bar;
 
 class FormatGuitarPro: public Format {
 public:

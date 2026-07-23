@@ -19,13 +19,13 @@ struct vec2;
 namespace tsunami {
 	class GridPainter;
 
-	class Song;
-class Track;
+	struct Song;
+struct Track;
 class MidiPainter;
 class ColorScheme;
 class ViewPort;
-class Range;
-class SongSelection;
+struct Range;
+struct SongSelection;
 class HoverData;
 
 class MultiLinePainter {

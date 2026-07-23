@@ -14,8 +14,7 @@ struct string;
 
 namespace tsunami {
 
-class Range {
-public:
+struct Range {
 	Range();
 	Range(int _offset, int _length);
 	Range(const Range &r);

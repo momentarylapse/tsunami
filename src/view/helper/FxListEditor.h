@@ -19,7 +19,7 @@ namespace hui {
 namespace tsunami {
 
 class Session;
-class Track;
+struct Track;
 class Module;
 class ModulePanel;
 enum class ConfigPanelMode;

@@ -12,8 +12,8 @@
 
 namespace tsunami {
 
-class Song;
-class Range;
+struct Song;
+struct Range;
 
 class BarDeleteDialog : public hui::Dialog {
 public:

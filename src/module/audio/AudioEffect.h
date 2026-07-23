@@ -16,9 +16,9 @@
 namespace tsunami {
 
 class Plugin;
-class Track;
-class TrackLayer;
-class AudioBuffer;
+struct Track;
+struct TrackLayer;
+struct AudioBuffer;
 class Session;
 
 class AudioEffect : public Module {

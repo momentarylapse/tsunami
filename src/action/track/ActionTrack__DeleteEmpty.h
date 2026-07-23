@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Track;
+struct Track;
 
 class ActionTrack__DeleteEmpty: public history::Action {
 public:

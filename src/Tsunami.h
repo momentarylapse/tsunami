@@ -21,7 +21,7 @@ extern const string AppName;
 extern const string AppVersion;
 
 
-class Song;
+struct Song;
 class PluginManager;
 class Slider;
 class AudioInput;

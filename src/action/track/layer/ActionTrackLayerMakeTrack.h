@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class ActionTrackLayerMakeTrack : public history::ActionGroup {
 public:

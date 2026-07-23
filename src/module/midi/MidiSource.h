@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class MidiProduceData;
 
 class MidiSource : public Module {

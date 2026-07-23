@@ -17,17 +17,17 @@
 
 namespace kaba {
 
-class Class;
-class Block;
-class SyntaxTree;
+struct Class;
+struct Block;
+struct SyntaxTree;
 class Module;
-class Function;
-class Variable;
-class Constant;
-class Operator;
-class AbstractOperator;
-class Statement;
-class SpecialFunction;
+struct Function;
+struct Variable;
+struct Constant;
+struct Operator;
+struct AbstractOperator;
+struct Statement;
+struct SpecialFunction;
 enum class StatementID;
 enum class SpecialFunctionID;
 enum class InlineID;
@@ -110,8 +110,7 @@ enum class NodeKind {
 };
 
 // single operand/command
-class Node : public Sharable<base::Empty> {
-public:
+struct Node : Sharable<base::Empty> {
 	NodeKind kind;
 	int token_id;
 	int64 link_no;
@@ -190,7 +189,7 @@ shared<Node> add_node_local(const Variable *var, const Class *type, int token_id
 shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
 shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
 shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
-shared<Node> add_node_slice(shared<Node> start, shared<Node> end);
+shared<Node> add_node_slice(shared<Node> start, shared<Node> end, shared<Node> step);
 shared<Node> add_node_constructor(const Function *f, int token_id = -1);
 shared<Node> make_constructor_static(shared<Node> n, const string &name);
 shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, shared<Node> param);

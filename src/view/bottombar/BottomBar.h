@@ -15,9 +15,9 @@
 namespace tsunami {
 
 class AudioView;
-class Song;
+struct Song;
 class DeviceManager;
-class Track;
+struct Track;
 class MixingConsole;
 class LogConsole;
 class SignalChainConsole;

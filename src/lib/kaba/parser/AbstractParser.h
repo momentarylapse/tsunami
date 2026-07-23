@@ -2,14 +2,21 @@
 // Created by michi on 2/16/26.
 //
 
-#ifndef KABA_ABSTRACTPARSER_H
-#define KABA_ABSTRACTPARSER_H
+#pragma once
+
+#include "../syntax/Flags.h"
+#include "../syntax/Operator.h"
 
 namespace kaba {
 
-class ExpressionBuffer;
-class Context;
-class SyntaxTree;
+struct ExpressionBuffer;
+struct Context;
+struct SyntaxTree;
+enum class Flags;
+enum class OperatorFlags;
+struct SpecialFunction;
+struct AbstractOperator;
+struct Statement;
 
 class AbstractParser {
 public:
@@ -53,8 +60,8 @@ public:
 	void parse_abstract_complete_command_into_block(Node* block);
 	shared<Node> parse_abstract_block();
 	shared<Node> parse_abstract_operand(bool prefer_class = false);
-	shared<Node> parse_operand_greedy(Block *block, bool allow_tuples = false);
 	shared<Node> parse_abstract_operand_greedy(bool allow_tuples = false, int min_op_level = -999);
+	shared<Node> parse_abstract_value_or_slice();
 	shared<Node> parse_abstract_set_builder();
 	shared<Node> parse_abstract_token();
 	shared<Node> parse_abstract_type();
@@ -97,5 +104,3 @@ public:
 };
 
 }
-
-#endif //KABA_ABSTRACTPARSER_H

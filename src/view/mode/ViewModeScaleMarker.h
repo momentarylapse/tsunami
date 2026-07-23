@@ -15,8 +15,8 @@
 
 namespace tsunami {
 
-class TrackMarker;
-class TrackLayer;
+struct TrackMarker;
+struct TrackLayer;
 
 class ViewModeScaleMarker : public ViewModeDefault {
 public:

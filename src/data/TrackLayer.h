@@ -22,22 +22,20 @@ namespace history {
 
 namespace tsunami {
 
-class AudioBuffer;
-class Song;
-class SampleRef;
-class Sample;
-class Track;
-class CrossFade;
-class TrackMarker;
+struct AudioBuffer;
+struct Song;
+struct SampleRef;
+struct Sample;
+struct Track;
+struct CrossFade;
+struct TrackMarker;
 enum class SignalType;
 
 
 
-class TrackLayer : public Sharable<obs::Node<VirtualBase>> {
-public:
-	TrackLayer();
-	TrackLayer(Track *track);
-	~TrackLayer();
+struct TrackLayer : Sharable<obs::Node<VirtualBase>> {
+	explicit TrackLayer(Track *track);
+	~TrackLayer() override;
 
 	Range range(int keep_notes = 0) const;
 	AudioBuffer _cdecl _read_buffers(const Range &r, bool allow_ref);

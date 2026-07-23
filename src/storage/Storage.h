@@ -20,17 +20,17 @@ class Any;
 
 namespace tsunami {
 
-class Range;
+struct Range;
 class Format;
 class FormatDescriptor;
-class Song;
-class Track;
-class TrackLayer;
-class AudioBuffer;
+struct Song;
+struct Track;
+struct TrackLayer;
+struct AudioBuffer;
 struct AudioOutPort;
-class SongSelection;
+struct SongSelection;
 class StorageOperationData;
-class Tag;
+struct Tag;
 class Session;
 
 class Storage {

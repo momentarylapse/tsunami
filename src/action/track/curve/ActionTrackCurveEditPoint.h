@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-//class Curve;
+//struct Curve;
 
 class ActionTrackCurveEditPoint : public history::MergableValueAction<Curve::Point> {
 public:

@@ -20,7 +20,7 @@ class AudioOutput;
 class BufferStreamer;
 class MidiEventStreamer;
 class Progress;
-class Sample;
+struct Sample;
 class Session;
 
 class SamplePreviewPlayer : public obs::Node<VirtualBase>{

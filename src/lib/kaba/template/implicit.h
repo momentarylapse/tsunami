@@ -12,12 +12,12 @@
 
 namespace kaba {
 
-class Node;
-class Function;
-class Class;
-class SyntaxTree;
+struct Node;
+struct Function;
+struct Class;
+struct SyntaxTree;
 class Parser;
-class Block;
+struct Block;
 
 class AutoImplementer {
 public:

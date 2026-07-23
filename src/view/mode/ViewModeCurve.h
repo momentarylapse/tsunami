@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Curve;
+struct Curve;
 
 class ViewModeCurve : public ViewModeDefault {
 public:

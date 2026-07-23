@@ -13,10 +13,10 @@
 namespace kaba {
 
 class Module;
-class Class;
-class Function;
-class Variable;
-class Constant;
+struct Class;
+struct Function;
+struct Variable;
+struct Constant;
 
 struct ImportSource {
 	shared<Module> module;

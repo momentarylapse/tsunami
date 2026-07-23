@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 class StorageOperationData;
 
 class PdfConfigDialog : public hui::Dialog {

@@ -15,14 +15,13 @@
 
 namespace tsunami {
 
-class Song;
-class Track;
-class SampleRef;
-class Tag;
+struct Song;
+struct Track;
+struct SampleRef;
+struct Tag;
 enum class SignalType;
 
-class Sample : public Sharable<obs::Node<VirtualBase>> {
-public:
+struct Sample : Sharable<obs::Node<VirtualBase>> {
 	explicit Sample(SignalType type);
 	Sample(const string &name, const AudioBuffer &buf);
 	Sample(const string &name, const MidiNoteBuffer &buf);

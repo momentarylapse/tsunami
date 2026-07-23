@@ -12,9 +12,9 @@
 
 namespace tsunami {
 
-class SongSelection;
-class Range;
-class Track;
+struct SongSelection;
+struct Range;
+struct Track;
 
 class ViewModeDefault : public ViewMode {
 public:

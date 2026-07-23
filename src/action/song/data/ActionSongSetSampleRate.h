@@ -11,7 +11,7 @@
 
 namespace tsunami {
 
-class Song;
+struct Song;
 
 class ActionSongSetSampleRate : public history::MergableValueAction<int> {
 public:

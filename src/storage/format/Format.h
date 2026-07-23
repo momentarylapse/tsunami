@@ -21,7 +21,7 @@ namespace tsunami {
 class StorageOperationData;
 struct AudioOutPort;
 class Format;
-class Song;
+struct Song;
 enum class SampleFormat;
 
 const int CHUNK_SIZE = 1 << 18;

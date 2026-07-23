@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class DummyEditorConsole : public SideBarConsole {
 public:

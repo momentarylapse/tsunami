@@ -28,10 +28,10 @@ const float NOTE_NECK_WIDTH = 2.0f;
 const float NOTE_FLAG_DX = 10.0f;
 const float NOTE_FLAG_DY = 15.0f;
 
-class MidiNoteBuffer;
-class MidiNote;
+struct MidiNoteBuffer;
+struct MidiNote;
 class MidiPainter;
-class Bar;
+struct Bar;
 
 
 struct QuantizedNote {

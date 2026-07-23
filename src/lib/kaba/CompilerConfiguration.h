@@ -16,7 +16,7 @@ namespace Asm {
 
 namespace kaba {
 
-class Function;
+struct Function;
 
 enum class Abi {
 	NATIVE = -1,
@@ -39,8 +39,7 @@ inline int mem_align(int x, int n) {
 	return ((x + n - 1) / n) * n;
 }
 
-class CompilerConfiguration {
-public:
+struct CompilerConfiguration {
 	CompilerConfiguration();
 
 	struct Target {

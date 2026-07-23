@@ -13,7 +13,7 @@
 
 namespace tsunami {
 
-class TrackLayer;
+struct TrackLayer;
 
 class ActionTrack__ShrinkBuffer : public history::Action {
 public:

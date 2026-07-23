@@ -17,8 +17,8 @@ class Path;
 
 namespace tsunami {
 
-class AudioBuffer;
-class Range;
+struct AudioBuffer;
+struct Range;
 
 class UnitTest {
 public:

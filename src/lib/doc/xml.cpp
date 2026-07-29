@@ -57,7 +57,7 @@ base::optional<char> next_non_whitespace(Stream *f) {
 	return skip_whitespace(f, false);
 }
 
-base::expected<string, Error> read_next_exp(Stream *f) {
+base::result<string, Error> read_next_exp(Stream *f) {
 	string e;
 	auto cc=  next_non_whitespace(f);
 	if (!cc.has_value())
@@ -241,7 +241,7 @@ bool skip_recursive(Stream *f) {
 	return false;
 }
 
-base::expected<Element, Error> Parser::read_element(Stream *f) {
+base::result<Element, Error> Parser::read_element(Stream *f) {
 	//msg_write("<< element");
 	//msg_right();
 	auto e = read_tag(f);
@@ -287,7 +287,7 @@ base::expected<Element, Error> Parser::read_element(Stream *f) {
 	return e;
 }
 
-base::expected<Element, Error> Parser::read_tag(Stream *f) {
+base::result<Element, Error> Parser::read_tag(Stream *f) {
 	nn ++;
 	//msg_write("--tag");
 	Element e;

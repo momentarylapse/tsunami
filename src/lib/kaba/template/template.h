@@ -194,6 +194,11 @@ class TemplateClassInstantiatorOptional : public TemplateClassInstantiator {
 	void add_function_headers(Class* c) override;
 };
 
+class TemplateClassInstantiatorResult : public TemplateClassInstantiator {
+	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
+	void add_function_headers(Class* c) override;
+};
+
 class TemplateClassInstantiatorEnum : public TemplateClassInstantiator {
 	Class* declare_new_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) override;
 	void add_function_headers(Class* c) override;

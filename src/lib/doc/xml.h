@@ -51,8 +51,8 @@ class Parser {
 public:
 	Error load(const Path &filename);
 
-	base::expected<Element, Error> read_element(Stream *f);
-	base::expected<Element, Error> read_tag(Stream *f);
+	base::result<Element, Error> read_element(Stream *f);
+	base::result<Element, Error> read_tag(Stream *f);
 
 	void save(const Path &filename);
 	void write_element(Stream *f, Element &e, int indent);

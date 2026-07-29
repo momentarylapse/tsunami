@@ -77,6 +77,7 @@ struct ParserState {
 	bool end_of_code;
 	int line_no;
 	int column_no;
+	int offset_of_current_line;
 	int default_param_size;
 	int default_addr_size;
 	int param_size, addr_size;

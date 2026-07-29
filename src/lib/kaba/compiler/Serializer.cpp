@@ -7,9 +7,13 @@
 #include <lib/base/algo.h>
 #include <lib/base/iter.h>
 #include <lib/base/sort.h>
+#include <lib/base/error.h>
 
 
 namespace kaba {
+
+
+static base::Error kaba_local_raise_error;
 
 
 //#define debug_evil_corrections	1
@@ -372,6 +376,7 @@ SerialNodeParam Serializer::serialize_node(Node *com, Block *block, int index) {
 
 SerialNodeParam Serializer::serialize_group(Node* node, Block* block) {
 	SerialNodeParam ret{};
+	cur_block_level ++;
 
 	for (int i=0; i<node->params.num; i++) {
 		stack_offset = cur_func->_var_size;
@@ -395,6 +400,7 @@ SerialNodeParam Serializer::serialize_group(Node* node, Block* block) {
 			if ((loop_stack.back().level == block->level) and (loop_stack.back().index == i - 1))
 				loop_stack.pop();
 	}
+	cur_block_level --;
 	return ret;
 }
 
@@ -614,10 +620,15 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			break;}
 		case StatementID::Raise:{
 			auto e = com->params[0]->as_const_p();
-			auto f = syntax_tree->required_func_global(is_in_try() ? Identifier::Raise : "@die");
+			auto f = syntax_tree->required_func_global(is_in_try() ? "@raise_legacy" : "@die_exception");
 			add_function_call(f, {param_global(common_types.pointer, e)}, p_none);
 			break;}
 		case StatementID::RaiseLocal:{
+			if (try_stack.back().error_variable) {
+				auto p = serialize_node(com->params[0].get(), block, index);
+				serialize_assign(param_global(common_types.error, &kaba_local_raise_error), p, block, com->token_id);
+			}
+
 			// FIXME destructors!
 			cmd.add_cmd(Asm::InstID::JMP, param_label32(try_stack.back().label_except));
 			break;}
@@ -625,8 +636,13 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			int label_except = list->create_label("_TRY_EXCEPT_" + i2s(num_labels ++));
 			int label_after = list->create_label("_TRY_AFTER_" + i2s(num_labels ++));
 
+			Variable* v = nullptr;
+			if (com->params.num == 3 and com->params[1]->params[0]) {
+				v = com->params[1]->params[0]->as_local();
+			}
+
 			// try
-			try_stack.add({label_except, label_after});
+			try_stack.add({label_except, label_after, v});
 			_try_level ++;
 			serialize_node(com->params[0].get(), block, index);
 			_try_level --;
@@ -637,6 +653,9 @@ SerialNodeParam Serializer::serialize_statement(Node *com, Block *block, int ind
 			for (int i=2; i<com->params.num; i+=2) {
 				if (i == com->params.num-1)
 					cmd.add_label(label_except);
+				if (v)
+					// local exception -> assign to &kaba_local_raise_error
+					serialize_assign(param_local(common_types.reference, v->_offset), param_imm(common_types.reference, (int_p)&kaba_local_raise_error), block, com->token_id);
 				serialize_node(com->params[i].get(), block, index);
 				if (i < com->params.num-1)
 					cmd.add_cmd(Asm::InstID::JMP, param_label32(label_after));

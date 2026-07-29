@@ -552,11 +552,11 @@ string disassemble(void *code, int length = -1, bool allow_comments = true);
 
 class Exception : public ::Exception {
 public:
-	Exception(const string &message, const string &expression, int line, int column);
+	Exception(const string &message, const string &expression, int line, int column, int offset);
 	~Exception() override;
 	string message() const override;
 	void print() const;
-	int line, column;
+	int line, column, offset;
 	string expression;
 };
 

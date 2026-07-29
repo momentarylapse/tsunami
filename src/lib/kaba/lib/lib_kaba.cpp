@@ -1,36 +1,17 @@
 #include "../kaba.h"
 #include "lib.h"
 #include "list.h"
+#include "optional.h"
 #include "shared.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
+#include "lib/base/error.h"
 
 
 namespace kaba {
 
 string function_link_name(Function *f);
 
-
-
-KABA_LINK_GROUP_BEGIN
-
-struct KabaContext : Context {
-	shared<Module> __load_module__(const string &filename, bool just_analyse) {
-		KABA_EXCEPTION_WRAPPER( return load_module(filename, just_analyse); );
-		return nullptr;
-	}
-
-	shared<Module> __create_from_source__(const string &source, bool just_analyse) {
-		KABA_EXCEPTION_WRAPPER( return create_module_for_source(source, "<from-source>", just_analyse); );
-		return nullptr;
-	}
-
-	void __execute_single_command__(const string &cmd) {
-		KABA_EXCEPTION_WRAPPER( execute_single_command(cmd); );
-	}
-};
-
-KABA_LINK_GROUP_END
 
 
 void show_func(Function *f) {
@@ -120,12 +101,14 @@ void SIAddPackageKaba(Context *c) {
 
 	auto TypeModule = add_type  ("Module", sizeof(Module));
 	auto TypeModuleXfer = add_type_p_xfer(TypeModule);
-	auto TypeModuleShared = add_type_p_shared(TypeModule);
-	auto TypeModuleSharedList = add_type_list(TypeModuleShared);
+	auto TypeModuleSharedNN = add_type_p_shared_not_null(TypeModule);
+	auto TypeModuleSharedList = add_type_list(TypeModuleSharedNN);
+	auto TypeModuleSharedResult = add_type_result(TypeModuleSharedNN);
 	common_types.module_ref = add_type_ref(TypeModule);
 	auto TypeModuleRefList = add_type_list(common_types.module_ref);
 	lib_create_list<shared<Module>, true, false>(TypeModuleSharedList);
 	lib_create_list<Module*>(TypeModuleRefList);
+	lib_create_result<shared<Module>>(TypeModuleSharedResult);
 
 	auto TypePackage = add_type  ("Package", sizeof(Package));
 	auto TypePackageP = add_type_p_raw(TypePackage);
@@ -150,8 +133,15 @@ void SIAddPackageKaba(Context *c) {
 	lib_create_list<Constant*>(TypeConstantRefList);
 	
 	lib_create_pointer_xfer(TypeContextXfer);
-	lib_create_pointer_shared<Module>(TypeModuleShared, TypeModuleXfer);
-	
+	lib_create_pointer_shared<Module>(TypeModuleSharedNN, TypeModuleXfer);
+
+	auto TypeCompilerFlags = add_type_enum("CompilerFlags");
+
+	add_class(TypeCompilerFlags);
+		class_add_enum("NONE", TypeCompilerFlags, CompilerFlags::None);
+		class_add_enum("JUST_PARSE", TypeCompilerFlags, CompilerFlags::JustParse);
+
+
 	add_class(TypeClassElement);
 		class_add_element("name", common_types.string, &ClassElement::name);
 		class_add_element("type", common_types.class_ref, &ClassElement::type);
@@ -280,13 +270,13 @@ void SIAddPackageKaba(Context *c) {
 	add_class(TypeContext);
 		class_add_element("packages", TypePackageRefList, &Context::internal_packages);
 		class_add_func(Identifier::func::Delete, common_types._void, &generic_delete<Context>, Flags::Mutable);
-		class_add_func("load_module", TypeModuleShared, &KabaContext::__load_module__, Flags::RaisesExceptions | Flags::Mutable);
+		class_add_func_virtual("load_module", TypeModuleSharedResult, &Context::load_module, Flags::Mutable);
 			func_add_param("filename", common_types.path);
-			func_add_param("just_analize", common_types._bool);
-		class_add_func("create_module_for_source", TypeModuleShared, &KabaContext::__create_from_source__, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param_def("flags", TypeCompilerFlags, CompilerFlags::None);
+		class_add_func_virtual("create_module_for_source", TypeModuleSharedResult, &Context::create_module_for_source, Flags::Mutable);
 			func_add_param("source", common_types.string);
-			func_add_param("just_analize", common_types._bool);
-		class_add_func("execute_single_command", common_types._void, &KabaContext::__execute_single_command__, Flags::RaisesExceptions | Flags::Mutable);
+			func_add_param_def("flags", TypeCompilerFlags, CompilerFlags::None);
+		class_add_func_virtual("execute_single_command", common_types.result_void, &Context::execute_single_command, Flags::Mutable);
 			func_add_param("cmd", common_types.string);
 		class_add_func("get_dynamic_type", TypeClassP, &Context::get_dynamic_type, Flags::Pure);
 			func_add_param("p", common_types.pointer);

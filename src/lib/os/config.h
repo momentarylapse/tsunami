@@ -10,6 +10,7 @@
 
 #include "../base/base.h"
 #include "../base/map.h"
+#include "../base/error.h"
 #include "../any/any.h"
 
 
@@ -35,7 +36,7 @@ public:
 	Array<string> get_str_array(const string &name, const Array<string> &default_val = {}) const;
 	Any get(const string &name, const Any &default_val = Any()) const;
 	bool has(const string &name) const;
-	bool load(const Path &filename);
+	base::result_void load(const Path &filename);
 	void save(const Path &filename);
 	void clear();
 

@@ -29,6 +29,8 @@ public:
 
 	Function *add_func_header(Class *t, const string &name, const Class *return_type, const Array<const Class*> &param_types, const Array<string> &param_names, Function *cf = nullptr, Flags flags = Flags::None, const shared_array<Node> &def_params = {});
 
+	void implement_from_code(Function* f, const string& code);
+
 	void implement_add_virtual_table(shared<Node> self, Function *f, const Class *t);
 	void implement_add_child_constructors(shared<Node> self, Function *f, const Class *t, bool allow_elements_from_parent);
 	void implement_regular_constructor(Function *f, const Class *t, bool allow_parent_constructor);
@@ -70,7 +72,7 @@ public:
 	void implement_callable_fp_call(Function *f, const Class *t);
 	void implement_callable_bind_call(Function *f, const Class *t);
 	void implement_optional_constructor(Function *f, const Class *t);
-	void implement_optional_constructor_wrap(Function *f, const Class *t);
+	void implement_optional_constructor_value(Function *f, const Class *t);
 	void implement_optional_destructor(Function *f, const Class *t);
 	void implement_optional_assign(Function *f, const Class *t);
 	void implement_optional_assign_raw(Function *f, const Class *t);
@@ -78,6 +80,15 @@ public:
 	void implement_optional_has_value(Function *f, const Class *t);
 	void implement_optional_equal(Function *f, const Class *t);
 	void implement_optional_equal_raw(Function *f, const Class *t);
+	void implement_result_constructor(Function *f, const Class *t);
+	void implement_result_constructor_value(Function *f, const Class *t);
+	void implement_result_constructor_error(Function *f, const Class *t);
+	void implement_result_destructor(Function *f, const Class *t);
+	void implement_result_has_value(Function *f, const Class *t);
+	void implement_result_equal(Function *f, const Class *t);
+	void implement_result_equal_raw(Function *f, const Class *t);
+	void implement_result_error(Function *f, const Class *t);
+	void implement_result_assign(Function *f, const Class *t);
 	void implement_product_equal(Function *f, const Class *t);
 	void implement_product_not_equal(Function *f, const Class *t);
 	void implement_future_constructor(Function *f, const Class *t);
@@ -85,6 +96,7 @@ public:
 	void _implement_functions_for_list(const Class *t);
 	void _implement_functions_for_dict(const Class *t);
 	void _implement_functions_for_optional(const Class *t);
+	void _implement_functions_for_result(const Class *t);
 	void _implement_functions_for_enum(const Class *t);
 	void _implement_functions_for_product(const Class *t);
 	void _implement_functions_for_shared(const Class *t);
@@ -120,6 +132,7 @@ public:
 
 	static shared<Node> optional_has_value(shared<Node> node);
 	static shared<Node> optional_data(shared<Node> node);
+	static shared<Node> result_type(shared<Node> node);
 
 	static bool needs_new(Function *f);
 	void remove_inherited_constructors(Class *t);

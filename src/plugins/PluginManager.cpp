@@ -113,7 +113,7 @@ PluginManager::PluginManager() {
 	//ctx->internal_packages.add(internal_module);
 	ctx->public_modules.add(internal_module.get());
 
-	auto *type_dev = internal_module->tree->create_new_class("Device", nullptr, 0, 0, nullptr, {}, internal_module->tree->base_class, -1);
+	auto *type_dev = internal_module->tree->create_new_class("Device", kaba::MetaClass::NONE, nullptr, 0, 0, nullptr, {}, internal_module->tree->base_class, -1);
 	internal_module->tree->get_pointer(type_dev);
 	//package->tree->make_class("Device*", kaba::Class::Type::POINTER, sizeof(void*), 0, nullptr, {type_dev}, package->tree->base_class, -1);
 }
@@ -1107,7 +1107,7 @@ kaba::Class* PluginManager::get_class(const string &name) {
 	for (auto c: weak(internal_module->tree->base_class->classes))
 		if (c->name == name)
 			return (kaba::Class*)c;
-	return (kaba::Class*)internal_module->tree->create_new_class(name, nullptr, 0, 0, nullptr, {}, internal_module->tree->base_class, -1);
+	return internal_module->tree->create_new_class(name, kaba::MetaClass::NONE, nullptr, 0, 0, nullptr, {}, internal_module->tree->base_class, -1);
 }
 
 void get_plugin_file_data(PluginManager::PluginFile &pf) {

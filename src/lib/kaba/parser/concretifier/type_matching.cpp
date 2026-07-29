@@ -21,8 +21,8 @@ namespace kaba {
 bool type_match_up(const Class *given, const Class *wanted);
 
 
-shared<Node> Concretifier::deref_if_reference(shared<Node> node) {
-	if (node->type->is_some_pointer_not_null())
+shared<Node> Concretifier::try_auto_deref(shared<Node> node) {
+	if (node->type->is_some_pointer_not_null() and !flags_has(node->flags, Flags::Noderef))
 		return node->deref();
 	return node;
 }
@@ -198,7 +198,7 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 	//msg_write("?   " + given->long_name() + " -> " + wanted->long_name());
 
 
-	if (given->is_some_pointer_not_null()) {
+	if (given->is_some_pointer_not_null() and !flags_has(node->flags, Flags::Noderef)) {
 		CastingDataSingle cd_sub;
 		if (type_match_with_cast(node->deref(), is_modifiable, wanted, cd_sub)) {
 			cd = cd_sub;
@@ -386,8 +386,6 @@ bool Concretifier::type_match_with_cast(shared<Node> node, bool is_modifiable, c
 shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, shared<Node> node, const Class *wanted) {
 	if (cast.cast == TypeCastId::NONE)
 		return node;
-	if (cast.cast == TypeCastId::DEREFERENCE)
-		return node->deref();
 	if (cast.cast == TypeCastId::REFERENCE)
 		return node->ref(tree);
 	if (cast.cast == TypeCastId::OWN_STRING)
@@ -441,7 +439,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, 
 			if (!type_match_with_cast(e, false, f->literal_param_type[i+1], c.params[i])) {
 				do_error("tuple as constructor...mismatch", e);
 			}
-		auto cmd = add_node_constructor(f);
+		auto cmd = add_node_constructor(f, node->token_id);
 		c.wanted = f->literal_param_type.sub_ref(1);
 		return apply_params_with_cast(cmd, node->params, c, 1);
 	}
@@ -451,7 +449,7 @@ shared<Node> Concretifier::apply_type_cast_basic(const CastingDataSingle &cast, 
 		if (!type_match_with_cast(node, false, f->literal_param_type[1], c)) {
 			do_error("auto constructor...mismatch", node);
 		}
-		auto cmd = add_node_constructor(f);
+		auto cmd = add_node_constructor(f, node->token_id);
 		CastingDataCall cc;
 		cc.params = {c};
 		cc.wanted = f->literal_param_type.sub_ref(1);

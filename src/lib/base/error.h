@@ -13,6 +13,9 @@
 namespace base {
 	struct Error {
 		string msg;
+		Error() = default;
+		Error(const string& s) { msg = s; }
+		string str() const { return msg; }
 	};
 
 	inline constexpr size_t _size_max(size_t a, size_t b) {
@@ -21,26 +24,26 @@ namespace base {
 
 	// still very experimental!
 	template<class T, class E = Error>
-	class expected {
+	class result {
 	public:
-		expected() {
+		result() {
 			type = 0;
 		}
-		expected(const E& e) : expected() {
+		result(const E& e) : result() {
 			_switch_type(2);
-			error() = e;
+			_error() = e;
 		}
-		expected(const T& v) : expected() {
+		result(const T& v) : result() {
 			_switch_type(1);
 			value() = v;
 		}
-		expected(const expected &o) : expected() {
+		result(const result &o) : result() {
 			*this = o;
 		}
-		expected(expected &&o) : expected() {
+		result(result &&o) : result() {
 			*this = std::move(o);
 		}
-		~expected() {
+		~result() {
 			_switch_type(0);
 		}
 
@@ -71,17 +74,17 @@ namespace base {
 			_switch_type(1);
 			value() = o;
 		}
-		void operator=(const expected &o) {
+		void operator=(const result &o) {
 			_switch_type(o.type);
 			if (type == 1)
 				value() = o.value();
 			else if (type == 2)
-				error() = o.error();
+				_error() = o.error();
 		}
-		/*void operator=(expected<T, E> &&o) {  TODO
+		/*void operator=(result<T, E> &&o) {  TODO
 		}*/
 
-		bool operator==(const expected &o) const {
+		bool operator==(const result &o) const {
 			if (type != o.type)
 				return false;
 			if (type == 1)
@@ -102,14 +105,26 @@ namespace base {
 		T value_or(const T& alt) const {
 			if (type != 1)
 				return alt;
-			return *(T*)&_value;
+			return value();
 		}
-		E& error() const {
+		template<class F>
+		T value_or_do(F f) const {
+			if (type != 1)
+				f(error().msg);
+			return value();
+		}
+		template<class R, class F>
+		result<R> transform(F f) const {
+			if (has_value())
+				return f(value());
+			return error();
+		}
+		const E& error() const {
 			//if (type != 2)
 			//	throw Exception("no error");
 			return *(E*)&_value;
 		}
-		E& error() {
+		E& _error() {
 			//if (type != 2)
 			//	throw Exception("no error");
 			return *(E*)&_value;
@@ -134,13 +149,25 @@ namespace base {
 		}
 	};
 
+	using result_void = result<int>; // TODO result<void>
+	inline result_void result_success() {
+		return 0;
+	}
 }
 
 template<class T, class E>
-string str(const base::expected<T, E>& e) {
+string str(const base::result<T, E>& e) {
 	if (e.has_value())
 		return str(e.value());
+	if (e.has_error())
+		return "ERROR: " + str(e.error());
 	return "nil";
 }
+
+#define RESULT_PROPAGATE_ERROR(VAR, EXPR, X) \
+	auto X = (EXPR); \
+	if (X.has_error()) \
+		return X.error(); \
+	auto& VAR = X.value();
 
 #endif

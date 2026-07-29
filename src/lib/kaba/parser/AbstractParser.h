@@ -20,7 +20,7 @@ struct Statement;
 
 class AbstractParser {
 public:
-	explicit AbstractParser(SyntaxTree* tree);
+	explicit AbstractParser(SyntaxTree* tree, ExpressionBuffer& buf);
 
 	void do_error(const string &msg, shared<Node> node);
 	void do_error(const string &msg, int token_id);

@@ -68,7 +68,7 @@ Class *TemplateManager::create_class_template(SyntaxTree *tree, const string &na
 	if (config.verbose)
 		msg_write("CREATE CLASS TEMPLATE " + name);
 	//msg_write("add class template  " + c->long_name());
-	Class *c = new Class(nullptr, name, 0, 1, tree);
+	Class *c = new Class(MetaClass::NONE, nullptr, name, 0, 1, tree);
 	flags_set(c->flags, Flags::Template);
 	auto m = new TemplateClassInstanceManager(c, param_names, instantiator);
 	class_managers.add(m);
@@ -76,6 +76,11 @@ Class *TemplateManager::create_class_template(SyntaxTree *tree, const string &na
 }
 
 void TemplateManager::clear_from_module(Module *m) {
+	for (auto manager: weak(class_managers)) {
+		base::remove_if(manager->instances, [m] (const TemplateClassInstanceManager::ClassInstance& i) {
+			return i.c->owner->module == m;
+		});
+	}
 }
 
 
@@ -339,7 +344,7 @@ TemplateClassInstanceManager::TemplateClassInstanceManager(const Class* template
 }
 
 const Class* TemplateClassInstanceManager::request_instance(SyntaxTree *tree, const Array<const Class*> &params, int array_size, int token_id) {
-	// already instanciated?
+	// already instantiated?
 	for (auto &i: instances)
 		if (i.params == params and i.array_size == array_size)
 			return i.c;
@@ -377,7 +382,7 @@ Class* TemplateClassInstantiator::create_raw_class(SyntaxTree* tree, const strin
 
 	auto ns = tree->implicit_symbols.get();
 
-	Class *t = new Class(from_template, name, size, alignment, tree, parent, params);
+	Class *t = new Class(MetaClass::NONE, from_template, name, size, alignment, tree, parent, params);
 	t->token_id = token_id;
 	t->array_length = array_size;
 	tree->owned_classes.add(t);

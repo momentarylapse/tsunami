@@ -16,8 +16,8 @@ class EditorPanel extends CircuitPanel
 class CircuitEditor extends hui.Window
 	var c: Circuit
 	var panel: shared![CircuitPanel]
-	
-	
+
+
 	func __init__(arg: string[])
 		super.__init__("Circuit Editor", 800, 600)
 		from_source("
@@ -56,16 +56,16 @@ Toolbar toolbar ''
 	Item save 'Save' image=hui:save
 	Separator
 	Item simulate 'Run' image=hui:media-play")
-		
+
 		set_maximized(true)
-		
+
 		for t in EdgeType.all()
 			set_string("add-type", str(t))
 		set_string("add-type", "Node")
-		
+
 		if len(arg) > 0
-			c.import(fs.read_text(Path(arg[0])))
-		
+			c.import(fs.read_text(Path(arg[0]))!)
+
 		event("new", on_new)
 		event("open", on_open)
 		event("save", on_save)
@@ -73,38 +73,38 @@ Toolbar toolbar ''
 		event("add-type", on_add_type)
 		event_x("params", "hui:change", on_param)
 		load_from_part(nil)
-	
+
 	func mut on_new()
 		panel.res.clear()
 		c.reset_default()
 		panel.redraw()
-	
+
 	func on_save()
 		var f = func(p: Path)
-			fs.write_text(p, c.export())
+			fs.write_text(p, c.export())!
 		hui.file_dialog_save(&self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
-	
+
 	func mut on_open()
 		var f = func(p: Path)
-			c.import(fs.read_text(p))
+			c.import(fs.read_text(p)!)
 		hui.file_dialog_open(&self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
-	
+
 	func mut on_param()
 		var row = hui.get_event().row
 		var p = get_cell("params", row, 1)
 		if panel.sel.type == SelectionType.EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
-	
+
 	func mut load_from_part(_e: Edge*)
 		reset("params")
 		for e in _e
 			var names = e.param_names()
 			for i=>n in names
 				add_string("params", "{{n}}\\{{e.param[i]}}")
-			
-		
 
-		
+
+
+
 	func mut on_simulate()
 		var duration = get_float("t")
 		var dt = get_float("dt")
@@ -116,8 +116,8 @@ Toolbar toolbar ''
 		c.simulate(duration, dt, I, f*2*pi, type, panel.res)
 		panel.auto_scale()
 		panel.redraw()
-	
-	
+
+
 	func mut on_add_type()
 		var t = get_int("")
 		panel.first_node = -1

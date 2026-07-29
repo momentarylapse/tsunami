@@ -228,14 +228,16 @@ AudioView::AudioView(Session *_session) :
 	set_high_details(hui::config.get_bool("View.HighDetails", true));
 	hui::config.set_float("View.ZoomSpeed", zoom_speed);
 
-	images.speaker = Image::load(os::app::directory_static | "icons/volume.png");
-	images.solo = Image::load(os::app::directory_static | "icons/solo.png");
-	images.config = Image::load(os::app::directory_static | "icons/wrench.png");
-	images.x = Image::load(os::app::directory_static | "icons/x.png");
-	images.track_audio = Image::load(os::app::directory_static | "icons/track-audio.png");
-	images.track_time = Image::load(os::app::directory_static | "icons/track-time.png");
-	images.track_midi = Image::load(os::app::directory_static | "icons/track-midi.png");
-	images.track_group = Image::load(os::app::directory_static | "icons/track-group.png");
+	Image dummy(16, 16, Red);
+
+	images.speaker = Image::load(os::app::directory_static | "icons/volume.png").value_or(dummy);
+	images.solo = Image::load(os::app::directory_static | "icons/solo.png").value_or(dummy);
+	images.config = Image::load(os::app::directory_static | "icons/wrench.png").value_or(dummy);
+	images.x = Image::load(os::app::directory_static | "icons/x.png").value_or(dummy);
+	images.track_audio = Image::load(os::app::directory_static | "icons/track-audio.png").value_or(dummy);
+	images.track_time = Image::load(os::app::directory_static | "icons/track-time.png").value_or(dummy);
+	images.track_midi = Image::load(os::app::directory_static | "icons/track-midi.png").value_or(dummy);
+	images.track_group = Image::load(os::app::directory_static | "icons/track-group.png").value_or(dummy);
 
 	draw_runner_id = -1;
 

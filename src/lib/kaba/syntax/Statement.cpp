@@ -65,8 +65,9 @@ void SIAddStatements() {
 	add_statement(Identifier::Let, StatementID::Let);
 	add_statement(Identifier::Var, StatementID::Var);
 	add_statement(Identifier::Asm, StatementID::Asm);
-	add_statement(/*Identifier::RAISE*/ "-raise-", StatementID::Raise, 1); // [EXCEPTION (pointer into static array)]
-	add_statement("-raise-local-", StatementID::RaiseLocal);
+	add_statement(Identifier::Raise, StatementID::Raise, 1); // [EXCEPTION (pointer into static array)]
+	add_statement("-raise-local-", StatementID::RaiseLocal, 1);
+	add_statement("-raise-legacy-", StatementID::RaiseLegacy);
 	add_statement(Identifier::Try, StatementID::Try); // return: ParamType will be defined by the parser!
 	add_statement(Identifier::Except, StatementID::Except); // return: ParamType will be defined by the parser!
 	add_statement(Identifier::Pass, StatementID::Pass);
@@ -86,6 +87,7 @@ void SIAddStatements() {
 	add_special_function(Identifier::Dyn, SpecialFunctionID::Dyn, 1, 1);
 	add_special_function(Identifier::Weak, SpecialFunctionID::Weak, 1, 1);
 	add_special_function(Identifier::Give, SpecialFunctionID::Give, 1, 1);
+	add_special_function(Identifier::Noderef, SpecialFunctionID::Noderef, 1, 1);
 }
 
 

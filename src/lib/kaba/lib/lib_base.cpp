@@ -3,6 +3,7 @@
 #include "list.h"
 #include "dict.h"
 #include "optional.h"
+#include "future.h"
 #include "../dynamic/exception.h"
 #include "../dynamic/dynamic.h"
 #include "../dynamic/sorting.h"
@@ -13,11 +14,11 @@
 #include "../../os/terminal.h"
 #include "../../base/callable.h"
 #include "../../base/map.h"
+#include "../../base/error.h"
+#include "../../base/sort.h"
 #include <math.h>
 #include <cstdio>
 
-#include "future.h"
-#include "../../base/sort.h"
 
 namespace kaba {
 
@@ -87,6 +88,7 @@ static void kaba_xxx(int a, int b, int c, int d, int e, int f, int g, int h) {
 }
 
 static int extern_variable1 = 13;
+static base::result_void kaba_result_ok;
 
 
 MAKE_OP_FOR(int)
@@ -351,6 +353,7 @@ void SIAddPackageBase(Context *c) {
 	common_types.callable_base	= add_type  ("@CallableBase", sizeof(Callable<void()>));
 
 	common_types.no_value_error    = add_type  ("NoValueError", sizeof(KabaException));
+	common_types.error    = add_type  ("Error", config.target.dynamic_array_size);
 
 	// type aliases
 	cur_package_module->tree->base_class->type_aliases.add({"int", common_types.i32});
@@ -371,24 +374,21 @@ void SIAddPackageBase(Context *c) {
 	common_types.callable_fp_t = add_class_template("@CallableFP", {"T..."}, new TemplateClassInstantiatorCallableFP);
 	common_types.callable_bind_t = add_class_template("@Bind", {"T..."}, new TemplateClassInstantiatorCallableBind);
 	common_types.optional_t = add_class_template("@Optional", {"T"}, new TemplateClassInstantiatorOptional);
+	common_types.result_t = add_class_template("result", {"T"}, new TemplateClassInstantiatorResult);
 	common_types.product_t = add_class_template("@Product", {"T"}, new TemplateClassInstantiatorProduct);
-	common_types.struct_t = add_class_template("@Struct", {"T"}, nullptr);
 	common_types.enum_t = add_class_template("@Enum", {"T"}, new TemplateClassInstantiatorEnum);
-	common_types.interface_t = add_class_template("@Interface", {"T"}, nullptr);
-	common_types.namespace_t = add_class_template("@Namespace", {"T"}, nullptr);
-	common_types.trait_t = add_class_template("@Trait", {"T"}, nullptr);
 
 	add_const(":0", common_types.i32, nullptr);
 	auto c_zero = weak(cur_package_module->tree->base_class->constants).back();
 
 	// traits
 	common_types.noauto_trait	= add_type  ("@noauto", 0);
-		const_cast<Class*>(common_types.noauto_trait)->from_template = common_types.trait_t;
+		const_cast<Class*>(common_types.noauto_trait)->meta_class = MetaClass::TRAIT;
 	common_types.sharable_trait	= add_type  ("Sharable", 4);
 	add_class(common_types.sharable_trait);
-		const_cast<Class*>(common_types.sharable_trait)->from_template = common_types.trait_t;
+		const_cast<Class*>(common_types.sharable_trait)->meta_class = MetaClass::TRAIT;
 		class_add_element(Identifier::SharedCount, common_types.i32, 0);
-		const_cast<Class*>(common_types.sharable_trait)->initializers.add({0, add_node_const(c_zero)});
+		const_cast<Class*>(common_types.sharable_trait)->initializers.add({0, add_node_const(c_zero, -1)});
 
 
 	add_class(common_types.object);
@@ -457,6 +457,9 @@ void SIAddPackageBase(Context *c) {
 	common_types.string_auto_cast = add_type("<string-auto-cast>", config.target.dynamic_array_size);	// string := i8[]
 	common_types.string_list  = add_type_list(common_types.string);
 	capture_implicit_type(common_types.bytes, "bytes"); // bytes := u8[]
+	common_types.result_void = add_type_result(common_types._void);
+	common_types.result_bytes = add_type_result(common_types.bytes);
+	common_types.result_string = add_type_result(common_types.string);
 
 	common_types.i32_dict   = add_type_dict(common_types.i32);
 	common_types.f32_dict = add_type_dict(common_types.f32);
@@ -477,6 +480,10 @@ void SIAddPackageBase(Context *c) {
 
 	lib_create_optional<int>(common_types.i32_optional);
 	lib_create_optional<float>(common_types.f32_optional);
+
+	lib_create_result<int>(common_types.result_void);
+	lib_create_result<bytes>(common_types.result_bytes);
+	lib_create_result<string>(common_types.result_string);
 
 
 	auto TypeStringP = add_type_p_raw(common_types.string);
@@ -917,9 +924,11 @@ void SIAddPackageBase(Context *c) {
 	void *kaba_nil = nullptr;
 	bool kaba_true = true;
 	bool kaba_false = false;
+	kaba_result_ok = base::result_success();
 	add_const("nil", common_types.none, &kaba_nil);
 	add_const("false", common_types._bool, &kaba_false);
 	add_const("true",  common_types._bool, &kaba_true);
+	add_const("result_ok",  common_types.result_void, &kaba_result_ok);
 
 
 	add_class(common_types.exception);
@@ -936,10 +945,23 @@ void SIAddPackageBase(Context *c) {
 		class_add_func(Identifier::func::Delete, common_types._void, &KabaNoValueError::__delete__, Flags::Override | Flags::Mutable);
 		class_set_vtable(KabaNoValueError);
 
-	add_func(Identifier::Raise, common_types._void, &kaba_raise_exception, Flags::Static | Flags::RaisesExceptions);
+	add_class(common_types.error);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init<base::Error>, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init_ext<base::Error, const string&>, Flags::Mutable);
+			func_add_param("message", common_types.string);
+		class_add_func(Identifier::func::Str, common_types.string, &base::Error::str);
+		add_operator(OperatorID::Assign, common_types._void, common_types.error, common_types.error, InlineID::None, &generic_assign<base::Error>);
+
+	add_func("@raise_legacy", common_types._void, &kaba_raise_exception, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("e", common_types.exception_xfer);
-	add_func("@die", common_types._void, &kaba_die, Flags::Static | Flags::RaisesExceptions);
+	add_func("@die_exception", common_types._void, &kaba_die_exception, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("e", common_types.pointer);
+	add_func("@die_error", common_types._void, &kaba_die_error, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("e", common_types.pointer);
+	add_func("@die_msg", common_types._void, &kaba_die_msg, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("s", common_types.string);
+	add_func("@die_id", common_types._void, &kaba_die_id, Flags::Static | Flags::RaisesExceptions);
+		func_add_param("id", common_types.i32);
 	add_func(Identifier::Assert, common_types._void, &kaba_assert, Flags::Static | Flags::RaisesExceptions);
 		func_add_param("b", common_types._bool);
 

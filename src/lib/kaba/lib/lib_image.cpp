@@ -1,6 +1,7 @@
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
+#include "optional.h"
 #include "shared.h"
 
 #ifdef _X_USE_IMAGE_
@@ -18,13 +19,13 @@ void SIAddPackageImage(Context *c) {
 	add_internal_package(c, "image", "1");
 
 	common_types.image = add_type("Image", sizeof(Image));
-	auto TypeImageXfer = add_type_p_xfer(common_types.image);
 	common_types.base_painter = add_type("Painter", sizeof(Painter), Flags::None);
 	common_types.base_painter_p = add_type_p_raw(common_types.base_painter);
 	common_types.base_painter_xfer = add_type_p_xfer(common_types.base_painter);
+	auto TypeImageResult = add_type_result(common_types.image);
 
-	lib_create_pointer_xfer(TypeImageXfer);
 	lib_create_pointer_xfer(common_types.base_painter_xfer);
+	lib_create_result<Image>(TypeImageResult);
 
 	
 	add_class(common_types.image);
@@ -32,23 +33,22 @@ void SIAddPackageImage(Context *c) {
 		class_add_element("height", common_types.i32, &Image::height);
 		class_add_element("mode", common_types.i32, &Image::mode);
 		class_add_element("data", common_types.i32_list, &Image::data);
-		class_add_element("error", common_types._bool, &Image::error);
 		class_add_element("alpha_used", common_types._bool, &Image::alpha_used);
-		class_add_func(Identifier::func::Init, common_types._void, &Image::__init_ext__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init_ext<Image, int, int, const color&>, Flags::Mutable);
 			func_add_param("width", common_types.i32);
 			func_add_param("height", common_types.i32);
 			func_add_param("c", common_types.color);
-		class_add_func(Identifier::func::Init, common_types._void, &Image::__init__, Flags::Mutable);
-		class_add_func(Identifier::func::Delete, common_types._void, &Image::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init<Image>, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &generic_delete<Image>, Flags::Mutable);
 		class_add_func("create", common_types._void, &Image::create, Flags::Mutable);
 			func_add_param("width", common_types.i32);
 			func_add_param("height", common_types.i32);
 			func_add_param("c", common_types.color);
-		class_add_func("load", TypeImageXfer, &Image::load, Flags::Static);
+		class_add_func("load", TypeImageResult, &Image::load, Flags::Static);
 			func_add_param("filename", common_types.path);
 		class_add_func("save", common_types._void, &Image::save);
 			func_add_param("filename", common_types.path);
-		class_add_func("scale", TypeImageXfer, &Image::scale);
+		class_add_func("scale", common_types.image, &Image::scale);
 			func_add_param("width", common_types.i32);
 			func_add_param("height", common_types.i32);
 		class_add_func("set_pixel", common_types._void, &Image::set_pixel, Flags::Mutable);
@@ -62,7 +62,7 @@ void SIAddPackageImage(Context *c) {
 			func_add_param("x", common_types.f32);
 			func_add_param("y", common_types.f32);
 		class_add_func("clear", common_types._void, &Image::clear, Flags::Mutable);
-		class_add_func(Identifier::func::Assign, common_types._void, &Image::__assign__, Flags::Mutable);
+		class_add_func(Identifier::func::Assign, common_types._void, &generic_assign<Image>, Flags::Mutable);
 			func_add_param("other", common_types.image);
 		class_add_func("start_draw", common_types.base_painter_xfer, &Image::start_draw, Flags::Mutable);
 

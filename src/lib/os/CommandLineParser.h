@@ -8,6 +8,7 @@
 #pragma once
 
 #include "../base/base.h"
+#include "../base/error.h"
 #include <functional>
 
 
@@ -54,7 +55,8 @@ public:
 
 	void show();
 	//Array<string> arg;
-	void parse(const Array<string> &arg);
+	base::result_void parse(const Array<string> &arg);
+	void parse_or_die(const Array<string> &arg);
 
 private:
 	bool parse_commands(const Array<string> &arg);

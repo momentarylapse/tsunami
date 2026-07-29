@@ -20,6 +20,7 @@ struct SyntaxTree;
 struct Function;
 struct Node;
 struct Block;
+struct Variable;
 
 
 struct LoopData {
@@ -28,6 +29,7 @@ struct LoopData {
 };
 struct TryData {
 	int label_except, label_after;
+	Variable* error_variable;
 };
 
 

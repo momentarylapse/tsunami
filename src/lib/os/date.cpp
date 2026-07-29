@@ -36,6 +36,10 @@ string Date::format(const string &f) const {
 	return buffer;
 }
 
+bool Date::operator==(const Date &o) const {
+	return time == o.time and milli_second == o.milli_second;
+}
+
 string Date::str() const {
 	return this->format("%c");
 }

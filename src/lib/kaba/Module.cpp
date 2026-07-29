@@ -106,6 +106,7 @@ Module::Module(Context *c, const Path &_filename) {
 
 Module::~Module() {
 	_all_modules_.erase(this);
+	context->template_manager->clear_from_module(this);
 	int r = 0;
 	if (opcode) {
 		#if defined(OS_WINDOWS) || defined(OS_MINGW)

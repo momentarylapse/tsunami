@@ -13,7 +13,6 @@
 
 Image::Image() {
 	width = height = 0;
-	error = false;
 	mode = Mode::RGBA;
 	color_space = ColorSpace::SRGB;
 	alpha_used = false;
@@ -23,54 +22,45 @@ Image::Image(int _width, int _height, const color &c) : Image() {
 	create(_width, _height, c);
 }
 
-void Image::__init__() {
-	new(this) Image;
-}
-
-void Image::__init_ext__(int _width, int _height, const color &c) {
-	new(this) Image(_width, _height, c);
-}
-
-void Image::__delete__() {
-	this->Image::~Image();
+bool Image::operator==(const Image &o) const {
+	return width == o.width and height == o.height and mode == o.mode and color_space == o.color_space and data == o.data;
 }
 
 // mode: rgba
 //    = r + g<<8 + b<<16 + a<<24
-void Image::_load_flipped(const Path &filename) {
+base::result_void Image::_load_flipped(const Path &filename) {
 	// reset image
 	width = 0;
 	height = 0;
 	mode = Mode::RGBA;
-	error = false;
 	alpha_used = false;
 	data.clear();
 
 	// file ok?
-	if (!os::fs::exists(filename)) {
-		msg_error("Image.load: file does not exist: " + filename.str());
-		return;
-	}
+	if (!os::fs::exists(filename))
+		return base::Error("Image.load: file does not exist: " + filename.str());
 	
 	string ext = filename.extension();
 	
 	if (ext == "bmp")
-		image_load_bmp(filename, *this);
-	else if (ext == "tga")
-		image_load_tga(filename, *this);
-	else if (ext == "jpg")
-		image_load_jpg(filename, *this);
-	else if (ext == "png")
-		image_load_png(filename, *this);
-	else
-		msg_error("Image.load: unhandled file extension: " + ext);
+		return image_load_bmp(filename, *this);
+	if (ext == "tga")
+		return image_load_tga(filename, *this);
+	if (ext == "jpg")
+		return image_load_jpg(filename, *this);
+	if (ext == "png")
+		return image_load_png(filename, *this);
+	return base::Error("Image.load: unhandled file extension: " + ext);
 }
 
-void Image::_load(const Path &filename) {
-	_load_flipped(filename);
+base::result_void Image::_load(const Path &filename) {
+	auto r = _load_flipped(filename);
+	if (r.has_error())
+		return r.error();
 	flip_v();
 
 	// the "top left" pixel (0,0) in an editor should be the first element in data now
+	return base::result_success();
 }
 
 inline unsigned int image_color_rgba(const color &c) {
@@ -101,7 +91,6 @@ void Image::create(int _width, int _height, const color &c) {
 	height = _height;
 	mode = Mode::RGBA;
 	color_space = ColorSpace::SRGB;
-	error = false;
 	alpha_used = (c.a != 1.0f);
 	
 	// fill image
@@ -128,8 +117,8 @@ void Image::clear()
 	data.clear();
 }
 
-xfer<Image> Image::scale(int _width, int _height) const {
-	Image *r = new Image(_width, _height, Black);
+Image Image::scale(int _width, int _height) const {
+	Image r(_width, _height, Black);
 
 	if (width * height == 0)
 		return r;
@@ -138,7 +127,7 @@ xfer<Image> Image::scale(int _width, int _height) const {
 		for (int y=0;y<_height;y++) {
 			int x0 = (int)( (float)x * (float)width / (float)_width );
 			int y0 = (int)( (float)y * (float)height / (float)_height );
-			r->data[y * _width + x] = data[y0 * width + x0];
+			r.data[y * _width + x] = data[y0 * width + x0];
 		}
 
 	return r;
@@ -247,12 +236,11 @@ color Image::get_pixel_interpolated(float x, float y) const {
 	return (c00 * (1 - sy) + c01 * sy) * (1 - sx) + (c10 * (1 - sy) + c11 * sy) * sx;
 }
 
-xfer<Image> Image::load(const Path &filename) {
-	Image *im = new Image;
-	im->_load(filename);
-	if (!im->error)
-		return im;
-	delete im;
-	return nullptr;
+base::result<Image> Image::load(const Path &filename) {
+	Image im;
+	auto r = im._load(filename);
+	if (r.has_error())
+		return r.error();
+	return im;
 }
 

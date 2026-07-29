@@ -18,26 +18,26 @@ func sanitize(s: string) -> string
 	return t
 
 class CueSplitter extends TsunamiPlugin
-	
+
 	func override on_start()
 		var f = func(p: Path)
 			if bool(p)
 				export_cue(p)
 		hui.file_dialog_open(session.win, "", "", ["filter=*.cue", "showfilter=*.cue"]).then(f)
-	
-	
-	
+
+
+
 	func load_cue_file(filename: Path) -> CueData?
 		let dir = filename.parent()
 		var data: CueData
 		var cur: Part* = nil
 		try
-			var f = fs.open(filename, "rt")
+			var f = fs.open(filename, "rt")!
 			while true
 				var s: string
 				f >> s
 				#print(s)
-				
+
 				if s.head(6) == "FILE \""
 					data.fn = s[6:-6]
 				if s.head(11) == "PERFORMER \""
@@ -63,10 +63,10 @@ class CueSplitter extends TsunamiPlugin
 			return data
 		except
 			return nil
-	
+
 	func mut export_parts_as_flacs(data: CueData, dir: Path)
 		var r = new SongRenderer(session.song)
-		
+
 		for i=>p in data.parts
 			print("-----")
 			var tags: Tag[]
@@ -92,18 +92,18 @@ class CueSplitter extends TsunamiPlugin
 			r.set_range(RangeTo(offset, end))
 			let _fn = "{{i+1|02}} - {{sanitize(p.title)}}.flac"
 			let _ = session.storage.save_via_renderer(r.port_out[0], dir | _fn, end - offset, tags)
-	
+
 	func mut export_cue(filename: Path)
 		let dir = filename.parent()
-		
+
 		let data = load_cue_file(filename)
 		for d in data
 			for fn in d.fn
 				session.storage.load(session.song, dir | fn)
 				export_parts_as_flacs(d, dir)
-		
+
 		print("-----------------done")
 		stop()
-		
-		
+
+
 	func override on_stop()

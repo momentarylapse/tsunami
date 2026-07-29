@@ -10,6 +10,10 @@
 
 #include "../../base/base.h"
 
+namespace base {
+	struct Error;
+}
+
 namespace kaba {
 
 class Module;
@@ -45,7 +49,10 @@ enum class ErrorID {
 
 void kaba_raise_exception(KabaException* kaba_exception);
 KabaException* create_kaba_exception(const string& message);
-void kaba_die(KabaException* e);
+void kaba_die_exception(KabaException* e);
+void kaba_die_error(base::Error* e);
+void kaba_die_msg(const string& msg);
+void kaba_die_id(ErrorID id);
 void kaba_assert(bool b);
 
 
@@ -55,6 +62,14 @@ try{ \
 	CODE; \
 }catch(::Exception &e){ \
 	kaba::kaba_raise_exception(new EXCLASS(e.message())); \
+}
+
+#define KABA_EXCEPTION_WRAPPER_RESULT_VOID(CODE) \
+try{ \
+	CODE; \
+	return base::result_success(); \
+}catch(::Exception &e){ \
+	return base::Error(e.message()); \
 }
 
 

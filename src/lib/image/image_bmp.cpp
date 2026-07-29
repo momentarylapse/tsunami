@@ -89,8 +89,7 @@ inline unsigned int get_int_from_buffer(unsigned char *buffer, int pos, int byte
 	return r;
 }
 
-void image_load_bmp(const Path &filename, Image &image)
-{
+base::result_void image_load_bmp(const Path &filename, Image &image) {
 	//msg_write("bmp");
 	unsigned char Header[56];
 	unsigned char *pal = nullptr, temp_buffer[8];
@@ -150,12 +149,13 @@ void image_load_bmp(const Path &filename, Image &image)
 				fill_image_color(image, (sImageColor*)&image.data[n], data+n*(depth/8),pal,depth,0,false);
 			break;
 		default:
-			msg_error(format("unbehandelte Farbtiefe: %d", depth));
+			return base::Error(format("unhandled color depth: %d", depth));
 	}
 	if (pal)
 		delete[]pal;
 	delete[]data;
 	fclose(f);
+	return base::result_success();
 }
 
 void image_save_bmp(const Path &filename, const Image &image) {

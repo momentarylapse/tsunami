@@ -26,10 +26,8 @@ public:
 	enum class Type {
 		NONE,
 		DEFAULT,
-		DYNAMIC,
 		CUBE,
 		DEPTH,
-		IMAGE,
 		VOLUME,
 		MULTISAMPLE,
 		RENDERBUFFER
@@ -79,9 +77,9 @@ public:
 	VolumeTexture(int nx, int ny, int nz, const string& format);
 };
 
-class ImageTexture : public Texture {
+class StorageTexture : public Texture {
 public:
-	ImageTexture(int width, int height, const string& format);
+	StorageTexture(int width, int height, int depth, const string& format);
 };
 
 class DepthBuffer : public Texture {

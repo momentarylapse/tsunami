@@ -68,8 +68,8 @@ struct SyntaxTree {
 	const Class *which_owned_class(const string &name);
 
 	// syntax analysis
-	Class *create_new_class(const string &name, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
-	Class *create_new_class_no_check(const string &name, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
+	Class *create_new_class(const string &name, MetaClass meta, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
+	Class *create_new_class_no_check(const string &name, MetaClass meta, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id);
 	const Class *get_pointer(const Class *base, int token_id = -1);
 	const Class *type_ref(const Class *base, int token_id = -1);
 	const Class *request_implicit_class_pointer(const Class *parent, int token_id);
@@ -87,11 +87,11 @@ struct SyntaxTree {
 	const Class *request_implicit_class_callable_fp(Function *f, int token_id);
 	const Class *request_implicit_class_callable_fp(const Array<const Class*> &params, const Class *ret, int token_id);
 	const Class *request_implicit_class_callable_bind(const Array<const Class*> &params, const Class *ret, const Array<const Class*> &captures, const Array<bool> &capture_via_ref, int token_id);
-	shared_array<Node> get_existence(const string &name, Block *block, const Class *ns, int token_id);
+	shared_array<Node> get_existence(const string &name, const Block *block, const Class *ns, int token_id);
 	shared_array<Node> get_existence_global(const string &name, const Class *ns, int token_id);
-	shared_array<Node> get_existence_block(const string &name, Block *block, int token_id);
+	shared_array<Node> get_existence_block(const string &name, const Block *block, int token_id);
 
-	shared_array<Node> get_element_of(shared<Node> n, const string &name, int token_id);
+	shared_array<Node> get_element_of(shared<Node> n, const string &name, int token_id, bool check_errors = true);
 
 	Function *required_func_global(const string &name, int token_id = -1);
 

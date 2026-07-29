@@ -44,8 +44,9 @@ bool type_match_up(const Class *given, const Class *wanted);
 
 
 
-Class::Class(const Class* _from_template, const string &_name, int64 _size, int _alignment, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
+Class::Class(MetaClass _meta, const Class* _from_template, const string &_name, int64 _size, int _alignment, SyntaxTree *_owner, const Class *_parent, const Array<const Class*> &_param) {
 	flags = Flags::FullyParsed;
+	meta_class = _meta;
 	name = _name;
 	owner = _owner;
 	size = _size;
@@ -127,11 +128,11 @@ string Class::cname(const Class *ns) const {
 }
 
 bool Class::is_regular() const {
-	return from_template == nullptr;
+	return from_template == nullptr and meta_class == MetaClass::NONE;
 }
 
 bool Class::is_struct() const {
-	return from_template == common_types.struct_t;
+	return meta_class == MetaClass::STRUCT;
 }
 
 bool Class::is_array() const {
@@ -193,19 +194,20 @@ bool Class::is_reference() const {
 }
 
 bool Class::is_enum() const {
-	return from_template == common_types.enum_t;
+	return meta_class == MetaClass::ENUM;
+	//return from_template == common_types.enum_t;
 }
 
 bool Class::is_namespace() const {
-	return from_template == common_types.namespace_t;
+	return meta_class == MetaClass::NAMESPACE;
 }
 
 bool Class::is_interface() const {
-	return from_template == common_types.interface_t;
+	return meta_class == MetaClass::INTERFACE;
 }
 
 bool Class::is_trait() const {
-	return from_template == common_types.trait_t;
+	return meta_class == MetaClass::TRAIT;
 }
 
 bool Class::is_dict() const {
@@ -218,6 +220,10 @@ bool Class::is_product() const {
 
 bool Class::is_optional() const {
 	return from_template == common_types.optional_t;
+}
+
+bool Class::is_result() const {
+	return from_template == common_types.result_t;
 }
 
 bool Class::is_callable() const {
@@ -267,7 +273,7 @@ bool Class::can_memcpy() const {
 		return false;
 	//if (get_assign())
 	//	return false;
-	for (ClassElement &e: elements)
+	for (const auto& e: elements)
 		if (!e.type->can_memcpy())
 			return false;
 	return true;
@@ -276,8 +282,6 @@ bool Class::can_memcpy() const {
 bool Class::usable_as_list() const {
 	if (is_list())
 		return true;
-	if (is_array() or is_dict() or is_pointer_raw())
-		return false;
 	if (parent)
 		return parent->usable_as_list();
 	return false;
@@ -312,7 +316,7 @@ bool Class::needs_constructor() const {
 	if (parent)
 		if (parent->needs_constructor())
 			return true;
-	for (ClassElement &e: elements)
+	for (const auto& e: elements)
 		if (e.type->needs_constructor() or e.type->get_default_constructor())
 			return true;
 	return false;
@@ -325,7 +329,7 @@ bool Class::is_size_known() const {
 		return false;
 	if (is_optional())
 		return param[0]->is_size_known();
-	for (ClassElement &e: elements)
+	for (const auto& e: elements)
 		if (!e.type->is_size_known())
 			return false;
 	return true;
@@ -344,7 +348,7 @@ bool Class::needs_destructor() const {
 		if (parent->needs_destructor())
 			return true;
 	}
-	for (ClassElement &e: elements) {
+	for (const auto& e: elements) {
 		if (e.type->get_destructor())
 			return true;
 		if (e.type->needs_destructor())
@@ -356,8 +360,6 @@ bool Class::needs_destructor() const {
 bool Class::is_derived_from(const Class *root) const {
 	if (this == root)
 		return true;
-	/*if (is_super_array() or is_array() or is_dict() or is_pointer())
-		return false;*/  // since parent/param split
 	if (!parent)
 		return false;
 	return parent->is_derived_from(root);
@@ -366,8 +368,6 @@ bool Class::is_derived_from(const Class *root) const {
 bool Class::is_derived_from_s(const string &root) const {
 	if (long_name().match(root))
 		return true;
-	/*if (is_super_array() or is_array() or is_dict() or is_pointer())
-		return false;*/
 	if (!parent)
 		return false;
 	return parent->is_derived_from_s(root);
@@ -696,7 +696,7 @@ void Class::derive_from(const Class* root, DeriveFlags derive_flags) {
 void *Class::create_instance() const {
 	void *p = malloc(size);
 	memset(p, 0, size);
-	if (Function *c = get_default_constructor()) {
+	if (auto c = get_default_constructor()) {
 		typedef void con_func(void *);
 		if (const auto f = reinterpret_cast<con_func*>(c->address))
 			f(p);

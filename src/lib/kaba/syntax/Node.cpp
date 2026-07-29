@@ -69,11 +69,11 @@ string kind2str(NodeKind kind) {
 		return "group";
 	if (kind == NodeKind::AddressShift)
 		return "address shift";
-	if (kind == NodeKind::Array)
+	if (kind == NodeKind::ArrayElement)
 		return "array element";
-	if (kind == NodeKind::DynamicArray)
-		return "dynamic array element";
-	if (kind == NodeKind::PointerAsArray)
+	if (kind == NodeKind::ListElement)
+		return "list element";
+	if (kind == NodeKind::PointerArrayElement)
 		return "pointer as array element";
 	if (kind == NodeKind::Reference)
 		return "reference operator";
@@ -87,6 +87,8 @@ string kind2str(NodeKind kind) {
 		return "class";
 	if (kind == NodeKind::Module)
 		return "module";
+	if (kind == NodeKind::ClassElement)
+		return "element";
 	if (kind == NodeKind::ArrayBuilder)
 		return "array builder";
 	if (kind == NodeKind::ArrayBuilderFor)
@@ -182,11 +184,11 @@ string Node::signature(const Class *ns) const {
 		return (type == common_types._void) ? "" : t; //p2s(as_block());
 	if (kind == NodeKind::AddressShift)
 		return ::str(link_no) + t;
-	if (kind == NodeKind::Array)
+	if (kind == NodeKind::ArrayElement)
 		return t;
-	if (kind == NodeKind::DynamicArray)
+	if (kind == NodeKind::ListElement)
 		return t;
-	if (kind == NodeKind::PointerAsArray)
+	if (kind == NodeKind::PointerArrayElement)
 		return t;
 	if (kind == NodeKind::Reference)
 		return t;
@@ -199,7 +201,9 @@ string Node::signature(const Class *ns) const {
 	if (kind == NodeKind::Class)
 		return as_class()->cname(ns);
 	if (kind == NodeKind::Module)
-		return as_class()->cname(ns);
+		return as_module()->filename.basename();
+	if (kind == NodeKind::ClassElement)
+		return ((const ClassElement*)(const void*)link_no)->name;
 	if (kind == NodeKind::Register)
 		return Asm::get_reg_name((Asm::RegID)link_no) + t;
 	if (kind == NodeKind::Address)
@@ -328,7 +332,7 @@ AbstractOperator *Node::as_abstract_op() const {
 }
 
 string Node::as_token() const {
-	return reinterpret_cast<SyntaxTree*>((int_p)link_no)->expressions.get_token(token_id);
+	return reinterpret_cast<ExpressionBuffer*>((int_p)link_no)->get_token(token_id);
 }
 
 void Node::set_instance(shared<Node> p) {
@@ -429,22 +433,22 @@ shared<Node> Node::change_type(const Class *type, int token_id) const {
 
 
 // recursive
-shared<Node> cp_node(shared<Node> c, Block *parent_block) {
+shared<Node> cp_node(shared<Node> c, Block *parent_block, int override_token_id) {
 	shared<Node> cmd;
 	if (c->kind == NodeKind::Block and c->as_block()) {
 		if (!parent_block)
 			parent_block = c->as_block()->parent;
-		cmd = add_node_block(new Block(c->as_block()->function, parent_block), c->type);
+		cmd = add_node_block(new Block(c->as_block()->function, parent_block), c->type, c->token_id);
 		cmd->as_block()->vars = c->as_block()->vars;
 		parent_block = cmd->as_block();
 	} else {
 		cmd = new Node(c->kind, c->link_no, c->type, c->flags);
 	}
-	cmd->token_id = c->token_id;
+	cmd->token_id = (override_token_id >= 0) ? override_token_id : c->token_id;
 	cmd->set_num_params(c->params.num);
 	for (int i=0;i<c->params.num;i++)
 		if (c->params[i])
-			cmd->set_param(i, cp_node(c->params[i], parent_block));
+			cmd->set_param(i, cp_node(c->params[i], parent_block, override_token_id));
 	return cmd;
 }
 
@@ -550,26 +554,26 @@ shared<Node> add_node_global(const Variable *v, int token_id) {
 	return new Node(NodeKind::VarGlobal, (int_p)v, v->type, v->flags, token_id);
 }
 
-shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type) {
-	shared<Node> cmd_el = new Node(NodeKind::PointerAsArray, 0, type, p->flags, index->token_id);
+shared<Node> add_node_parray_element(shared<Node> p, shared<Node> index, const Class *type) {
+	shared<Node> cmd_el = new Node(NodeKind::PointerArrayElement, 0, type, p->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, p);
 	cmd_el->set_param(1, index);
 	return cmd_el;
 }
 
-shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index) {
-	shared<Node> cmd_el = new Node(NodeKind::DynamicArray, 0, array->type->get_array_element(), array->flags, index->token_id);
+shared<Node> add_node_list_element(shared<Node> array, shared<Node> index) {
+	shared<Node> cmd_el = new Node(NodeKind::ListElement, 0, array->type->get_array_element(), array->flags, index->token_id);
 	cmd_el->set_num_params(2);
 	cmd_el->set_param(0, array);
 	cmd_el->set_param(1, index);
 	return cmd_el;
 }
 
-shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *type) {
+shared<Node> add_node_array_element(shared<Node> array, shared<Node> index, const Class *type) {
 	if (!type)
 		type = array->type->param[0];
-	auto *el = new Node(NodeKind::Array, 0, type, array->flags, index->token_id);
+	auto *el = new Node(NodeKind::ArrayElement, 0, type, array->flags, index->token_id);
 	el->set_num_params(2);
 	el->set_param(0, array);
 	el->set_param(1, index);
@@ -597,15 +601,15 @@ shared<Node> make_constructor_static(shared<Node> n, const string &name) {
 	return n;
 }
 
-shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, shared<Node> param) {
+shared<Node> add_node_named_parameter(ExpressionBuffer* buf, int name_token_id, shared<Node> param) {
 	auto n = new Node(NodeKind::NamedParameter, 0, param->type, Flags::None, name_token_id);
 	n->set_num_params(2);
-	n->set_param(0, add_node_token(tree, name_token_id));
+	n->set_param(0, add_node_token(buf, name_token_id));
 	n->set_param(1, param);
 	return n;
 }
-shared<Node> add_node_token(SyntaxTree* tree, int token_id) {
-	return new Node(NodeKind::AbstractToken, (int_p)tree, common_types.unknown, Flags::None, token_id);
+shared<Node> add_node_token(ExpressionBuffer* buf, int token_id) {
+	return new Node(NodeKind::AbstractToken, (int_p)buf, common_types.unknown, Flags::None, token_id);
 }
 
 shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type) {
@@ -613,7 +617,7 @@ shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Nod
 		if (op->f->inline_no == inline_index)
 			return add_node_operator(op, p1, p2, token_id, override_type);
 
-	throw Exception(format("INTERNAL ERROR: operator inline index not found: %d", (int)inline_index), "", -1, -1, nullptr);
+	throw Exception(format("INTERNAL ERROR: operator inline index not found: %d", (int)inline_index), "", -1, -1, -1, nullptr);
 	return nullptr;
 }
 

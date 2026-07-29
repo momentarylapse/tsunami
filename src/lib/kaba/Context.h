@@ -28,7 +28,7 @@ class IExporter;
 
 class Exception : public Asm::Exception {
 public:
-	Exception(const string &message, const string &expression, int line, int column, Module *s);
+	Exception(const string &message, const string &expression, int line, int column, int offset, Module *s);
 	Exception(const Asm::Exception &e, Module *s, Function *f);
 	Exception(const Exception& e);
 	string message() const override;
@@ -37,9 +37,17 @@ public:
 
 	owned<Exception> parent;
 };
-/*struct SyntaxException : Exception{};
-struct LinkerException : Exception{};
-struct LinkerException : Exception{};*/
+
+struct ErrorLocation {
+	string expression;
+	Path filename;
+	int offset, line, column;
+};
+
+struct CompilerError {
+	string message;
+	Array<ErrorLocation> locations;
+};
 
 struct Package : Sharable<base::Empty> {
 	Package(const string& name, const string& version, const Path& directory, Context* ctx);
@@ -60,6 +68,7 @@ struct Context : IContext {
 	Array<TypeCast> type_casts;
 	owned<TemplateManager> template_manager;
 	owned<ExternalLinkData> external;
+	shared_array<Module> created_modules;
 
 	shared_array<Operator> global_operators;
 
@@ -79,14 +88,18 @@ struct Context : IContext {
 	void clean_up() override;
 
 
-	shared<Module> load_module(const Path& filename, bool just_analyse) override;
-	shared<Module> create_module_for_source(const string& source, const Path& filename, bool just_analyse) override;
+	base::result<shared<Module>> load_module(const Path &filename, CompilerFlags flags=CompilerFlags::None) override;
+	base::result<shared<Module>> create_module_for_source(const string &source, const Path &filename, CompilerFlags flags=CompilerFlags::None) override;
+	shared<Module> _load_module_throw(const Path& filename, bool just_analyse) override;
+	shared<Module> _create_module_for_source_throw(const string& source, const Path& filename, bool just_analyse) override;
 	shared<Module> create_empty_module(const Path& filename);
 	//void remove_module(Module *s);
+	Array<CompilerError>& get_errors() override;
 
 	Array<string> additional_import_packages;
 
-	void execute_single_command(const string& cmd) override;
+	base::result_void execute_single_command(const string& cmd) override;
+	void _execute_single_command_throw(const string& cmd) override;
 	xfer<Context> create_new_context() const override;
 
 	const Class* get_dynamic_type(const VirtualBase* p) const override;
@@ -111,6 +124,8 @@ struct Context : IContext {
 	void set_installation_root(const Path& dir) override;
 
 	void* get_global_symbol(const string& package, const string& name) override;
+
+	Array<CompilerError> last_compiler_errors;
 };
 
 void make_context_public(IExporter* e);

@@ -23,6 +23,8 @@ public:
 	explicit Transformer(SyntaxTree* tree);
 	~Transformer();
 
+	//static void visit(SyntaxTree* tree, std::function<void(shared<Node>)> F);
+
 	static void transform(SyntaxTree* tree, std::function<shared<Node>(shared<Node>)> F);
 	static void transform_block(Node *block, std::function<shared<Node>(shared<Node>)> F);
 	static shared<Node> transform_node(shared<Node> n, std::function<shared<Node>(shared<Node>)> F);

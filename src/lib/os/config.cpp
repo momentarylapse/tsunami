@@ -105,10 +105,10 @@ bool Configuration::has(const string& name) const {
 	return r;
 }*/
 
-bool Configuration::load(const Path &filename) {
+base::result_void Configuration::load(const Path &filename) {
 	clear();
 	if (!os::fs::exists(filename))
-		return false;
+		return base::Error("file not found: " + str(filename));
 	try {
 		auto f = os::fs::open(filename, "rt");
 
@@ -163,10 +163,11 @@ bool Configuration::load(const Path &filename) {
 		delete f;
 		loaded = true;
 		changed = false;
-		return true;
+		return base::result_success();
 	} catch(Exception &e) {
-		return false;
+		return base::Error(e.message());
 	}
+
 }
 
 /*bool string_needs_quotes(const string &v) {

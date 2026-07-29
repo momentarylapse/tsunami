@@ -3,11 +3,6 @@
 #include "../../template/template.h"
 #include "../../Context.h"
 #include "../../lib/lib.h"
-#include "../../dynamic/exception.h"
-#include "../../dynamic/dynamic.h"
-#include <lib/base/set.h>
-#include <lib/base/iter.h>
-#include <lib/os/msg.h>
 
 namespace kaba {
 
@@ -42,7 +37,7 @@ shared<Node> Concretifier::concretify_special_function_typeof(shared<Node> node,
 shared<Node> implement_len(shared<Node> node, Concretifier *con, Block *block, const Class *ns, int token_id) {
 	node = con->concretify_node(node, block, ns);
 	node = con->force_concrete_type(node);
-	node = con->deref_if_reference(node);
+	node = con->try_auto_deref(node);
 
 	// array?
 	if (node->type->is_array())
@@ -85,7 +80,7 @@ shared<Node> Concretifier::concretify_special_function_sort(shared<Node> node, B
 		node = cp_node(node);
 		node->set_num_params(2);
 		auto crit = tree->add_constant(common_types.string, -1);
-		node->set_param(1, add_node_const(crit));
+		node->set_param(1, add_node_const(crit, node->token_id));
 	}
 
 	auto array = force_concrete_type(node->params[0]);
@@ -100,7 +95,7 @@ shared<Node> Concretifier::concretify_special_function_sort(shared<Node> node, B
 
 	auto cmd = add_node_call(f, node->token_id);
 	cmd->set_param(0, array);
-	cmd->set_param(1, add_node_class(array->type));
+	cmd->set_param(1, add_node_class(array->type, array->token_id));
 	cmd->set_param(2, crit);
 	cmd->type = array->type;
 	return cmd;
@@ -135,17 +130,23 @@ shared<Node> Concretifier::concretify_special_function_give(shared<Node> node, B
 	if (/*t->is_pointer_shared() or*/ t->is_pointer_owned() or t->is_pointer_owned_not_null()) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0], -1);
 		if (auto f = t->get_member_func(Identifier::func::OwnedGive, t_xfer, {}))
-			return add_node_member_call(f, sub);
+			return add_node_member_call(f, sub, node->token_id);
 		do_error("give...aaaa", sub);
 	} else if (t->is_list() and (t->get_array_element()->is_pointer_owned() or t->get_array_element()->is_pointer_owned_not_null())) {
 		auto t_xfer = tree->request_implicit_class_xfer(t->param[0]->param[0], -1);
 		auto t_xfer_list = tree->request_implicit_class_list(t_xfer, -1);
 		if (auto f = t->get_member_func(Identifier::func::OwnedGive, t_xfer_list, {}))
-			return add_node_member_call(f, sub);
+			return add_node_member_call(f, sub, node->token_id);
 		do_error("give...aaaa", sub);
 	}
 	do_error("give() expects an owned pointer", sub);
 	return nullptr;
+}
+
+shared<Node> Concretifier::concretify_special_function_noderef(shared<Node> node, Block *block, const Class *ns) {
+	auto sub = concretify_node(node->params[0], block, block->name_space());
+	flags_set(sub->flags, Flags::Noderef);
+	return sub;
 }
 
 shared<Node> Concretifier::concretify_special_function_call(shared<Node> node, SpecialFunction *s, Block *block, const Class *ns) {
@@ -172,6 +173,8 @@ shared<Node> Concretifier::concretify_special_function_call(shared<Node> node, S
 		return concretify_special_function_weak(node, block, ns);
 	} else if (s->id == SpecialFunctionID::Give) {
 		return concretify_special_function_give(node, block, ns);
+	} else if (s->id == SpecialFunctionID::Noderef) {
+		return concretify_special_function_noderef(node, block, ns);
 	} else if (s->id == SpecialFunctionID::Sort) {
 		return concretify_special_function_sort(node, block, ns);
 	} else if (s->id == SpecialFunctionID::Filter) {

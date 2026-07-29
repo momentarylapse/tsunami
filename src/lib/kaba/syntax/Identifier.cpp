@@ -50,6 +50,7 @@ namespace Identifier {
 	const string Globalref = "globalref";
 	const string Weak = "weak";
 	const string Give = "give";
+	const string Noderef = "@noderef";
 	const string Shared = "shared";
 	const string Owned = "owned";
 	const string Xfer = "xfer";

@@ -32,7 +32,7 @@ InlineID __get_pointer_add_int() {
 bool node_is_executable(shared<Node> n) {
 	if ((n->kind == NodeKind::Constant) or (n->kind == NodeKind::VarLocal) or (n->kind == NodeKind::VarGlobal))
 		return false;
-	if ((n->kind == NodeKind::AddressShift) or (n->kind == NodeKind::Array) or (n->kind == NodeKind::DynamicArray)
+	if ((n->kind == NodeKind::AddressShift) or (n->kind == NodeKind::ArrayElement) or (n->kind == NodeKind::ListElement)
 			or (n->kind == NodeKind::Reference) or (n->kind == NodeKind::Dereference)
 			or (n->kind == NodeKind::DereferenceAddressShift))
 		return node_is_executable(n->params[0]);
@@ -47,9 +47,9 @@ Transformer::~Transformer() = default;
 
 
 shared<Node> Transformer::conv_break_down_med_level(shared<Node> c) {
-	if (c->kind == NodeKind::DynamicArray) {
+	if (c->kind == NodeKind::ListElement) {
 		return conv_break_down_low_level(
-				add_node_parray(
+				add_node_parray_element(
 						c->params[0]->change_type(tree->type_ref(c->type, c->token_id)),
 						c->params[1], c->type));
 	}
@@ -69,7 +69,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		auto *f = b->function;
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		vv->explicitly_constructed = true;
-		auto dummy = add_node_local(vv);
+		auto dummy = add_node_local(vv, n->token_id);
 
 		auto ib = add_node_call(n->as_func(), n->token_id);
 		ib->params = n->params;
@@ -94,9 +94,9 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// temp var
 		auto *f = b->function;
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
-		auto array = add_node_local(vv);
+		auto array = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void);
+		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
 		for (int i=0; i<n->params.num; i++){
 			auto cc = add_node_member_call(cf, array, n->token_id);
 			cc->set_param(1, n->params[i]);
@@ -113,9 +113,9 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// temp var
 		auto *f = b->function;
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
-		auto array = add_node_local(vv);
+		auto array = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void);
+		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
 		for (int i=0; i<n->params.num/2; i++){
 			auto cc = add_node_member_call(cf, array, n->token_id);
 			cc->set_param(1, n->params[i*2]);
@@ -139,10 +139,10 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// [INIT, CMP, BLOCK, INC]
 
 		// assign
-		nn->set_param(0, add_node_operator_by_inline(InlineID::Int32Assign, var, val0));
+		nn->set_param(0, add_node_operator_by_inline(InlineID::Int32Assign, var, val0, n->token_id));
 
 		// while(for_var < val1)
-		nn->set_param(1, add_node_operator_by_inline(InlineID::Int32Smaller, var, val1));
+		nn->set_param(1, add_node_operator_by_inline(InlineID::Int32Smaller, var, val1, n->token_id));
 
 		nn->set_param(2, block);
 
@@ -151,11 +151,11 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		shared<Node> cmd_inc;
 		if (var->type == common_types.i32) {
 			if (step->kind == NodeKind::Constant and step->as_const()->as_int() == 1)
-				cmd_inc = add_node_operator_by_inline(InlineID::Int32Increase, var, nullptr);
+				cmd_inc = add_node_operator_by_inline(InlineID::Int32Increase, var, nullptr, n->token_id);
 			else
-				cmd_inc = add_node_operator_by_inline(InlineID::Int32AddAssign, var, step);
+				cmd_inc = add_node_operator_by_inline(InlineID::Int32AddAssign, var, step, n->token_id);
 		} else {
-			cmd_inc = add_node_operator_by_inline(InlineID::Float32AddAssign, var, step);
+			cmd_inc = add_node_operator_by_inline(InlineID::Float32AddAssign, var, step, n->token_id);
 		}
 		nn->set_param(3, cmd_inc); // add to loop-block
 
@@ -175,10 +175,10 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 			// -> assign into variable before the loop
 			auto *v = b->add_var(b->function->create_slightly_hidden_name(), array->type, n->token_id);
 
-			auto assign = tree->parser->con.link_operator_id(OperatorID::Assign, add_node_local(v), array);
+			auto assign = tree->parser->con.link_operator_id(OperatorID::Assign, add_node_local(v, n->token_id), array);
 			_transform_insert_before_.add(assign);
 
-			array = add_node_local(v);
+			array = add_node_local(v, n->token_id);
 		}
 
 		auto nn = add_node_statement(StatementID::ForDigest);
@@ -188,16 +188,16 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		if (array->type->is_dict()) {
 			static int for_index_count = 0;
 			string index_name = format("-for_dict_index_%d-", for_index_count++);
-			index = add_node_local(b->add_var(index_name, common_types.i32, n->token_id));
+			index = add_node_local(b->add_var(index_name, common_types.i32, n->token_id), n->token_id);
 		}
 
 
 		// 0
-		auto val0 = add_node_const(tree->add_constant_int(0));
+		auto val0 = add_node_const(tree->add_constant_int(0), n->token_id);
 
 		// implement
 		// for_index = 0
-		nn->set_param(0, add_node_operator_by_inline(InlineID::Int32Assign, index, val0));
+		nn->set_param(0, add_node_operator_by_inline(InlineID::Int32Assign, index, val0, n->token_id));
 
 		shared<Node> val1;
 		if (array->type->usable_as_list() or array->type->is_dict()) {
@@ -205,17 +205,17 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 			val1 = array->shift(config.target.pointer_size, common_types.i32, array->token_id);
 		} else {
 			// array.size
-			val1 = add_node_const(tree->add_constant_int(array->type->array_length));
+			val1 = add_node_const(tree->add_constant_int(array->type->array_length), array->token_id);
 		}
 
 		// while(for_index < val1)
-		nn->set_param(1, add_node_operator_by_inline(InlineID::Int32Smaller, index, val1));
+		nn->set_param(1, add_node_operator_by_inline(InlineID::Int32Smaller, index, val1, n->token_id));
 
 		// ...block
 		nn->set_param(2, block);
 
 		// ...for_index += 1
-		nn->set_param(3, add_node_operator_by_inline(InlineID::Int32Increase, index, nullptr));
+		nn->set_param(3, add_node_operator_by_inline(InlineID::Int32Increase, index, nullptr, n->token_id));
 
 		if (array->type->is_dict()) {
 
@@ -223,30 +223,30 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 					array->change_type(common_types.reference),
 					add_node_operator_by_inline(InlineID::Int32Multiply,
 							index,
-							add_node_const(tree->add_constant_int(dict_row_size(array->type->param[0])))),
+							add_node_const(tree->add_constant_int(dict_row_size(array->type->param[0])), n->token_id), n->token_id),
 					n->token_id,
 					common_types.reference)->deref();
 
 
 			// &for_var = &row.value
-			auto cmd_var_assign = add_node_operator_by_inline(InlineID::PointerAssign, var, row->shift(common_types.string->size, array->type->param[0])->ref(tree));
+			auto cmd_var_assign = add_node_operator_by_inline(InlineID::PointerAssign, var, row->shift(common_types.string->size, array->type->param[0])->ref(tree), n->token_id);
 			block->params.insert(cmd_var_assign, 0);
 
 			// &for_var = &row.value
-			auto cmd_key_assign = add_node_operator_by_inline(InlineID::PointerAssign, key, row->change_type(common_types.string)->ref(tree));
+			auto cmd_key_assign = add_node_operator_by_inline(InlineID::PointerAssign, key, row->change_type(common_types.string)->ref(tree), n->token_id);
 			block->params.insert(cmd_key_assign, 0);
 		} else {
 
 			// array[index]
 			shared<Node> el;
 			if (array->type->usable_as_list()) {
-				el = add_node_dyn_array(array, index);
+				el = add_node_list_element(array, index);
 			} else {
-				el = add_node_array(array, index);
+				el = add_node_array_element(array, index);
 			}
 
 			// &for_var = &array[index]
-			auto cmd_var_assign = add_node_operator_by_inline(InlineID::PointerAssign, var, el->ref(tree));
+			auto cmd_var_assign = add_node_operator_by_inline(InlineID::PointerAssign, var, el->ref(tree), n->token_id);
 			block->params.insert(cmd_var_assign, 0);
 		}
 
@@ -260,9 +260,9 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		// temp var
 		auto *f = b->function;
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
-		auto temp = add_node_local(vv);
+		auto temp = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void);
+		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
 
 		// tuple assign -> temp
 		Function *cf = n->params[0]->type->get_assign();
@@ -288,9 +288,9 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 	} else if ((n->kind == NodeKind::Statement) and (n->as_statement()->id == StatementID::Match)) {
 
 		auto *vv = b->add_var(b->function->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
-		auto temp = add_node_local(vv);
+		auto temp = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(b->function, b), common_types._void);
+		auto bb = add_node_block(new Block(b->function, b), common_types._void, n->token_id);
 		bb->type = n->type;
 		auto& ai = tree->parser->auto_implementer;
 		bb->add(ai.add_assign(b->function, "", temp, n->params[0]));
@@ -334,7 +334,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 				msg_error("conv dyn!");
 				auto c = tree->add_constant(common_types.class_ref, n->token_id);
 				c->as_int64() = (int64)(int_p)n->params[i]->type;
-				n->params.insert(add_node_const(c), i+1);
+				n->params.insert(add_node_const(c, n->token_id), i+1);
 				n->show(tree->base_class);
 			}
 	}
@@ -344,7 +344,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 shared<Node> Transformer::conv_cbr(shared<Node> c, Variable *var) {
 	// convert
 	if ((c->kind == NodeKind::VarLocal) and (c->as_local() == var)) {
-		auto r = add_node_local(var);
+		auto r = add_node_local(var, c->token_id);
 		r->set_type(tree->type_ref(c->type, c->token_id));
 		return r->deref();
 	}
@@ -423,11 +423,11 @@ shared<Node> Transformer::conv_easyfy_ref_deref(shared<Node> c, int l) {
 
 // remove (*x)[] and (*x).y
 shared<Node> Transformer::conv_easyfy_shift_deref(shared<Node> c, int l) {
-	if ((c->kind == NodeKind::AddressShift) or (c->kind == NodeKind::Array)) {
+	if ((c->kind == NodeKind::AddressShift) or (c->kind == NodeKind::ArrayElement)) {
 		if (c->params[0]->kind == NodeKind::Dereference) {
 			// unify 2 knots (remove 1)
 			c->show(common_types._void);
-			auto kind = (c->kind == NodeKind::AddressShift) ? NodeKind::DereferenceAddressShift : NodeKind::PointerAsArray;
+			auto kind = (c->kind == NodeKind::AddressShift) ? NodeKind::DereferenceAddressShift : NodeKind::PointerArrayElement;
 			auto r = new Node(kind, 0, c->type, c->flags);
 			r->set_param(0, c->params[0]->params[0]);
 			r->set_param(1, c->params[1]);
@@ -455,7 +455,7 @@ shared<Node> Transformer::conv_return_by_memory(shared<Node> n, Function *f) {
 	shared<Node> p_ret;
 	for (Variable *v: weak(f->var))
 		if (v->name == Identifier::ReturnVar) {
-			p_ret = add_node_local(v);
+			p_ret = add_node_local(v, n->token_id);
 		}
 	if (!p_ret)
 		tree->do_error("-return- not found...");
@@ -523,7 +523,7 @@ void Transformer::simplify_shift_deref() {
 
 shared<Node> Transformer::conv_break_down_low_level(shared<Node> c) {
 
-	if (c->kind == NodeKind::Array) {
+	if (c->kind == NodeKind::ArrayElement) {
 
 		auto *el_type = c->type;
 
@@ -538,11 +538,11 @@ shared<Node> Transformer::conv_break_down_low_level(shared<Node> c) {
 				c->params[0]->ref(tree), // array
 				add_node_operator_by_inline(InlineID::Int32Multiply,
 						c->params[1], // ref
-						add_node_const(tree->add_constant_int(el_type->size))),
+						add_node_const(tree->add_constant_int(el_type->size), c->token_id), c->token_id),
 				c->token_id,
 				tree->type_ref(el_type, c->token_id))->deref();
 
-	} else if (c->kind == NodeKind::PointerAsArray) {
+	} else if (c->kind == NodeKind::PointerArrayElement) {
 
 		auto *el_type = c->type;
 
@@ -557,7 +557,7 @@ shared<Node> Transformer::conv_break_down_low_level(shared<Node> c) {
 				c->params[0], // ref array
 				add_node_operator_by_inline(InlineID::Int32Multiply,
 						c->params[1], // index
-						add_node_const(tree->add_constant_int(el_type->size))),
+						add_node_const(tree->add_constant_int(el_type->size), c->token_id), c->token_id),
 				c->token_id,
 				tree->type_ref(el_type, c->token_id))->deref();
 	} else if (c->kind == NodeKind::AddressShift) {
@@ -576,7 +576,7 @@ shared<Node> Transformer::conv_break_down_low_level(shared<Node> c) {
 
 		return add_node_operator_by_inline(__get_pointer_add_int(),
 				c->params[0]->ref(tree), // struct
-				add_node_const(tree->add_constant_int(c->link_no)),
+				add_node_const(tree->add_constant_int(c->link_no), c->token_id),
 				c->token_id,
 				tree->type_ref(el_type, c->token_id))->deref();
 
@@ -597,7 +597,7 @@ shared<Node> Transformer::conv_break_down_low_level(shared<Node> c) {
 		// address = &struct + shift
 		return add_node_operator_by_inline(__get_pointer_add_int(),
 				c->params[0], // ref struct
-				add_node_const(tree->add_constant_int(c->link_no)),
+				add_node_const(tree->add_constant_int(c->link_no), c->token_id),
 				c->token_id,
 				tree->type_ref(el_type, c->token_id))->deref();
 	}
@@ -715,13 +715,13 @@ shared<Node> Transformer::conv_fake_constructors(shared<Node> n) {
 
 shared<Node> Transformer::conv_class_and_func_to_const(shared<Node> n) {
 	if (n->kind == NodeKind::Class) {
-		return add_node_const(tree->add_constant_pointer(common_types.class_ref, n->as_class()));
+		return add_node_const(tree->add_constant_pointer(common_types.class_ref, n->as_class()), n->token_id);
 	}
 	if (n->kind == NodeKind::Module) {
-		return add_node_const(tree->add_constant_pointer(common_types.module_ref, n->as_module()));
+		return add_node_const(tree->add_constant_pointer(common_types.module_ref, n->as_module()), n->token_id);
 	}
 	if (n->kind == NodeKind::SpecialFunctionName) {
-		return add_node_const(tree->add_constant_pointer(common_types.special_function_ref, n->as_special_function()));
+		return add_node_const(tree->add_constant_pointer(common_types.special_function_ref, n->as_special_function()), n->token_id);
 	}
 	return n;
 }
@@ -730,7 +730,7 @@ shared<Node> Transformer::conv_class_and_func_to_const(shared<Node> n) {
 shared<Node> Transformer::conv_func_inline(shared<Node> n) {
 	if (n->kind == NodeKind::CallFunction) {
 		if (n->as_func()->inline_no != InlineID::None) {
-			auto r = new Node(NodeKind::CallInline, n->link_no, n->type, n->flags);
+			auto r = new Node(NodeKind::CallInline, n->link_no, n->type, n->flags, n->token_id);
 			r->params = n->params;
 			return r;
 		}
@@ -738,11 +738,11 @@ shared<Node> Transformer::conv_func_inline(shared<Node> n) {
 	if (n->kind == NodeKind::Operator) {
 		Operator *op = n->as_op();
 		if (op->f->inline_no != InlineID::None) {
-			auto r = new Node(NodeKind::CallInline, (int_p)op->f, n->type, n->flags);
+			auto r = new Node(NodeKind::CallInline, (int_p)op->f, n->type, n->flags, n->token_id);
 			r->params = n->params;
 			return r;
 		} else {
-			auto r = new Node(NodeKind::CallFunction, (int_p)op->f, n->type, n->flags);
+			auto r = new Node(NodeKind::CallFunction, (int_p)op->f, n->type, n->flags, n->token_id);
 			r->params = n->params;
 			return r;
 		}

@@ -9,9 +9,9 @@
 #define SRC_LIB_KABA_LIB_OPTIONAL_H_
 
 
-#include "../../base/optional.h"
-#include "../../base/xparam.h"
-#include "../../os/msg.h"
+#include <lib/base/optional.h>
+#include <lib/base/xparam.h>
+#include <lib/base/error.h>
 #include "../kaba.h"
 #include "lib.h"
 #include "../dynamic/exception.h"
@@ -25,17 +25,11 @@ KABA_LINK_GROUP_BEGIN
 template<class T>
 class XOptional : public base::optional<T> {
 public:
-	void __init__() {
-		new(this) XOptional();
-	}
 	static void __init_raw__(base::optional<T> &self, typename base::xparam<T>::t x) {
 		new(&self) base::optional(x);
 	}
 	void __init_nil__(void* p) {
 		new(this) XOptional();
-	}
-	void __delete__() {
-		this->XOptional<T>::~XOptional();
 	}
 	T _value() const {
 		try {
@@ -62,6 +56,40 @@ public:
 	}*/
 };
 
+template<class T>
+class XResult : public base::result<T> {
+public:
+	static void __init_raw__(base::optional<T> &self, typename base::xparam<T>::t x) {
+		new(&self) base::result(x);
+	}
+	void __init_err__(const base::Error& e) {
+		//new(this) base::result(e);
+	}
+	/*T _value() const {
+		try {
+			return this->value();
+		} catch(::Exception &e) {
+			kaba_raise_exception(new KabaException(e.message()));
+			return T();
+		}
+	}*/
+	void __assign__(const base::result<T>& o) {
+		*((base::result<T>*)this) = o;
+	}
+	void __assign_raw__(typename base::xparam<T>::t o) {
+		*((base::result<T>*)this) = o;
+	}
+	void __assign_err__(void *p, const base::Error& e) {
+		*((base::result<T>*)this) = e;
+	}
+	bool __equal__(const base::result<T>& o) const {
+		return *((base::result<T>*)this) == o;
+	}
+	/*bool __equal__(const base::optional<T>& o) const {
+		return *((base::optional<T>*)this) == o;
+	}*/
+};
+
 KABA_LINK_GROUP_END
 
 template<class T>
@@ -69,12 +97,12 @@ void lib_create_optional(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
 
 	add_class(t);
-		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init<XOptional<T>>, Flags::Mutable);
 		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init_raw__, Flags::AutoCast | Flags::Mutable);
 			func_add_param("x", tt->param[0]);
 		class_add_func(Identifier::func::Init, common_types._void, &XOptional<T>::__init_nil__, Flags::AutoCast | Flags::Mutable);
 			func_add_param("x", common_types.none);
-		class_add_func(Identifier::func::Delete, common_types._void, &XOptional<T>::__delete__, Flags::Mutable);
+		class_add_func(Identifier::func::Delete, common_types._void, &generic_delete<XOptional<T>>, Flags::Mutable);
 		class_add_func(Identifier::func::OptionalHasValue, common_types._bool, &XOptional<T>::has_value, Flags::Pure);
 		class_add_func("__bool__", common_types._bool, &XOptional<T>::has_value, Flags::Pure);
 		class_add_func("_value", tt->param[0], &XOptional<T>::_value, Flags::Ref | Flags::RaisesExceptions);
@@ -88,6 +116,32 @@ void lib_create_optional(const Class *tt) {
 
 		class_add_func(Identifier::func::Equal, common_types._bool, &XOptional<T>::__equal__);
 			func_add_param("other", tt);
+}
+
+template<class T>
+void lib_create_result(const Class *tt) {
+	auto t = const_cast<Class*>(tt);
+
+	add_class(t);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init<XResult<T>>, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &XResult<T>::__init_raw__, Flags::AutoCast | Flags::Mutable);
+			func_add_param("x", tt->param[0]);
+		class_add_func(Identifier::func::Init, common_types._void, &XResult<T>::__init_err__, Flags::AutoCast | Flags::Mutable);
+			func_add_param("x", common_types.error);
+		class_add_func(Identifier::func::Delete, common_types._void, &generic_delete<XResult<T>>, Flags::Mutable);
+		class_add_func(Identifier::func::OptionalHasValue, common_types._bool, &XResult<T>::has_value, Flags::Pure);
+		class_add_func("__bool__", common_types._bool, &XResult<T>::has_value, Flags::Pure);
+//		class_add_func("_value", tt->param[0], &XResult<T>::_value, Flags::Ref | Flags::RaisesExceptions);
+
+		class_add_func(Identifier::func::Assign, common_types._void, &XResult<T>::__assign__, Flags::Mutable);
+			func_add_param("x", tt);
+	//	class_add_func(Identifier::func::Assign, common_types._void, &XResult<T>::__assign_raw__, Flags::Mutable);
+	//	func_add_param("x", tt->param[0]);
+	//	class_add_func(Identifier::func::Assign, common_types._void, &XResult<T>::__assign_nil__, Flags::Mutable);
+	//	func_add_param("x", common_types.none);
+
+		class_add_func(Identifier::func::Equal, common_types._bool, &XResult<T>::__equal__);
+		func_add_param("other", tt);
 }
 
 }

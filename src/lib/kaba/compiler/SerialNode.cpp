@@ -177,7 +177,7 @@ SerialNodeParam param_global(const Class *type, void *v) {
 	return p;
 }
 
-SerialNodeParam param_local(const Class *type, int offset) {
+SerialNodeParam param_local(const Class *type, int64 offset) {
 	SerialNodeParam p;
 	p.type = type;
 	p.kind = NodeKind::LocalMemory;

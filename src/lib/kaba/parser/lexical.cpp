@@ -334,7 +334,7 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 		if (source[pos] == '{')
 			break;
 		if ((source[pos] != ' ') and (source[pos] != '\t') and (source[pos] != '\n'))
-			do_error_analyse("'{' expected after 'asm'", pos, line_no);
+			do_error_analyse("'{' expected after 'asm'", pos, line_no, -1);
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -347,7 +347,7 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 		if (source[pos] == '}')
 			break;
 		if (source[pos] == 0)
-			do_error_analyse("'}' expected to end \"asm\"", pos, line_no);
+			do_error_analyse("'}' expected to end \"asm\"", pos, line_no, -1);
 		if (source[pos] == '\n')
 			line_breaks ++;
 		pos ++;
@@ -365,8 +365,8 @@ void ExpressionBuffer::do_asm_block(const char *source, int &pos, int &line_no) 
 	line_no += line_breaks;
 }
 
-void ExpressionBuffer::do_error_analyse(const string& msg, int pos, int line_no) {
-	throw Exception(msg, "?", line_no, pos, syntax->module);
+void ExpressionBuffer::do_error_analyse(const string& msg, int pos, int line_no, int offset) {
+	throw Exception(msg, "?", line_no, pos, offset, syntax->module);
 }
 
 // scan one line
@@ -422,7 +422,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 			if ((c == '\"') and (i > 0)) {
 				break;
 			} else if (c == 0) {
-				do_error_analyse("string exceeds file", pos, line_no);
+				do_error_analyse("string exceeds file", pos, line_no, l->offset + pos);
 			} else if (c == '\n') {
 				line_no ++;
 				//syntax->DoError("string exceeds line");
@@ -433,7 +433,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 						while (true) {
 							c = Temp[TempLength ++] = source[pos ++];
 							if (c == 0)
-								do_error_analyse("string interpolation exceeds file", pos, line_no);
+								do_error_analyse("string interpolation exceeds file", pos, line_no, l->offset + pos);
 							if ((c == '}') and (Temp[TempLength-2] == '}'))
 								break;
 						}
@@ -470,7 +470,7 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 		}
 		Temp[TempLength ++] = source[pos ++];
 		if (Temp[TempLength - 1] != '\'')
-			do_error_analyse("character constant should end with '''", pos, line_no);
+			do_error_analyse("character constant should end with '''", pos, line_no, l->offset + pos);
 
 	// word
 	} else if (exp_kind == ExpKind::LETTER) {

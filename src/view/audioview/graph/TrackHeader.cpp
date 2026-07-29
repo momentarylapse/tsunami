@@ -59,10 +59,10 @@ public:
 
 		c->set_color(get_color());
 		//c->draw_str({area.x1, area.y1-2}, "\U0001f50a");
-		c->draw_mask_image({area.x1, area.y1}, view->images.speaker.get());
+		c->draw_mask_image({area.x1, area.y1}, &view->images.speaker);
 		if (track->muted) {
 			c->set_color(color(1, 0.7f, 0, 0));
-			c->draw_mask_image({area.x1, area.y1}, view->images.x.get());
+			c->draw_mask_image({area.x1, area.y1}, &view->images.x);
 		}
 	}
 	void on_click() override {
@@ -79,7 +79,7 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->drawStr(area.x1 + 5 + 17, area.y1 + 22-2, "S");
-		c->draw_mask_image({area.x1, area.y1}, view->images.solo.get());
+		c->draw_mask_image({area.x1, area.y1}, &view->images.solo);
 	}
 	void on_click() override {
 		vtrack->set_solo(!vtrack->solo);
@@ -95,7 +95,7 @@ public:
 	void on_draw(Painter *c) override {
 		c->set_color(get_color());
 		//c->draw_str(area.x1, area.y1, u8"\U0001f527");
-		c->draw_mask_image({area.x1, area.y1}, view->images.config.get());
+		c->draw_mask_image({area.x1, area.y1}, &view->images.config);
 	}
 	void on_click() override {
 		view->set_current(view->hover());
@@ -227,13 +227,13 @@ void TrackHeader::on_draw(Painter *c) {
 	c->set_font("", -1, false, false);
 
 	// icons
-	auto *icon = view->images.track_audio.get();
+	auto icon = &view->images.track_audio;
 	if (track->type == SignalType::Beats)
-		icon = view->images.track_time.get();
+		icon = &view->images.track_time;
 	else if (track->type == SignalType::Midi)
-		icon = view->images.track_midi.get();
+		icon = &view->images.track_midi;
 	else if (track->type == SignalType::Group)
-		icon = view->images.track_group.get();
+		icon = &view->images.track_group;
 	c->draw_mask_image({area.x1 + 5, area.y1 + 5}, icon);
 }
 

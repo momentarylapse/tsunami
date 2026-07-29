@@ -50,6 +50,7 @@ namespace Identifier {
 	extern const string Globalref;
 	extern const string Weak;
 	extern const string Give;
+	extern const string Noderef;
 	extern const string Shared;
 	extern const string Owned;
 	extern const string Xfer;

@@ -15,21 +15,21 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> 
 	auto t0 = expr->type;
 	auto var_name = node->params[0]->as_token();
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void);
+	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
 
 	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
 	auto *var = block_x->as_block()->add_var(var_name, t_out, node->token_id);
 	if (!node->params[0]->is_mutable())
 		flags_clear(var->flags, Flags::Mutable);
-	block_x->add(add_node_operator_by_inline(InlineID::PointerAssign, add_node_local(var), expr->change_type(t_out)));
+	block_x->add(add_node_operator_by_inline(InlineID::PointerAssign, add_node_local(var, node->token_id), expr->change_type(t_out), node->token_id));
 
 	auto n_if = add_node_statement(StatementID::If, node->token_id);
 	n_if->set_num_params(node->params.num - 2);
 	Function *f_p2b = tree->required_func_global("p2b", node->token_id);
-	auto n_p2b = add_node_call(f_p2b);
+	auto n_p2b = add_node_call(f_p2b, node->token_id);
 	n_p2b->set_num_params(1);
-	n_p2b->set_param(0, add_node_local(var));
+	n_p2b->set_param(0, add_node_local(var, node->token_id));
 	n_if->set_param(0, n_p2b);
 	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x->as_block()), block_x->as_block(), ns));
 	if (n_if->params[1]->type != common_types._void)
@@ -47,20 +47,20 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer_shared(shared
 	auto t0 = expr->type;
 	auto var_name = node->params[0]->as_token();
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void);
+	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
 	auto t_out = tree->request_implicit_class_shared_not_null(t0->param[0], node->token_id);
 
 	auto var = block_x->as_block()->add_var(var_name, t_out, node->token_id);
 	if (!node->params[0]->is_mutable())
 		flags_clear(var->flags, Flags::Mutable);
-	block_x->add(parser->con.link_operator_id(OperatorID::Assign, add_node_local(var), expr->change_type(t_out)));
+	block_x->add(parser->con.link_operator_id(OperatorID::Assign, add_node_local(var, node->token_id), expr->change_type(t_out)));
 
 	auto n_if = add_node_statement(StatementID::If, node->token_id);
 	n_if->set_num_params(node->params.num - 2);
 	Function *f_p2b = tree->required_func_global("p2b", node->token_id);
-	auto n_p2b = add_node_call(f_p2b);
+	auto n_p2b = add_node_call(f_p2b, node->token_id);
 	n_p2b->set_num_params(1);
-	n_p2b->set_param(0, add_node_local(var));
+	n_p2b->set_param(0, add_node_local(var, node->token_id));
 	n_if->set_param(0, n_p2b);
 	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x->as_block()), block_x->as_block(), ns));
 	if (n_if->params[1]->type != common_types._void)
@@ -88,7 +88,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_optional(shared<Node>
 	auto var_name = node->params[0]->as_token();
 	bool is_temporary = expression_is_temporary(expr);
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void);
+	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
 
 	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
@@ -103,20 +103,20 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_optional(shared<Node>
 		// store in temp variable
 		static int nnn = 0;
 		auto var1 = block_x->as_block()->add_var(":tempop" + i2s(nnn++), t0, node->token_id);
-		auto assign1 = auto_implementer->add_assign(block->function, "", add_node_local(var1), expr);
+		auto assign1 = auto_implementer->add_assign(block->function, "", add_node_local(var1, node->token_id), expr);
 		block_x->add(assign1);
 
-		expr_static = add_node_local(var1);
+		expr_static = add_node_local(var1, node->token_id);
 	}
 
-	auto assign_p = add_node_operator_by_inline(InlineID::PointerAssign, add_node_local(var_p), expr_static->ref(t_out));
+	auto assign_p = add_node_operator_by_inline(InlineID::PointerAssign, add_node_local(var_p, node->token_id), expr_static->ref(t_out), node->token_id);
 
 	auto n_if = add_node_statement(StatementID::If, node->token_id);
 	n_if->set_num_params(node->params.num - 2);
 	auto f_has_val = t0->get_member_func(Identifier::func::OptionalHasValue, common_types._bool, {});
 //	if (!f_has_val)
 //		do_error("")
-	n_if->set_param(0, add_node_member_call(f_has_val, expr_static));
+	n_if->set_param(0, add_node_member_call(f_has_val, expr_static, expr_static->token_id));
 	n_if->set_param(1, concretify_node(cp_node(node->params[3], block_x->as_block()), block_x->as_block(), ns));
 	if (node->params.num >= 5)
 		n_if->set_param(2, concretify_node(cp_node(node->params[4], block_x->as_block()), block_x->as_block(), ns));
@@ -131,7 +131,7 @@ shared<Node> Concretifier::concretify_statement_for(shared<Node> node, Block *bl
 	// [VAR, INDEX, CONTAINER, BLOCK]
 
 	auto container = force_concrete_type(concretify_node(node->params[2], block, ns));
-	container = deref_if_reference(container);
+	container = try_auto_deref(container);
 
 	if (node->params[0]->is_mutable() and !container->is_mutable())
 		do_error("can not iterate mutating over a constant container", node);
@@ -176,7 +176,7 @@ shared<Node> Concretifier::concretify_statement_for_slice(shared<Node> node, sha
 
 	// variable...
 	auto var = block->add_var(var_name, t, node->token_id);
-	cmd_for->set_param(0, add_node_local(var));
+	cmd_for->set_param(0, add_node_local(var, node->token_id));
 
 	// block
 	cmd_for->params[4] = concretify_node(node->params[3], block, ns);
@@ -197,13 +197,13 @@ shared<Node> Concretifier::concretify_statement_for_array(shared<Node> node, sha
 	auto var = block->add_var(var_name, var_type, node->token_id);
 	if (!node->params[0]->is_mutable())
 		flags_clear(var->flags, Flags::Mutable);
-	node->set_param(0, add_node_local(var));
+	node->set_param(0, add_node_local(var, node->token_id));
 
 	string index_name = format("-for_index_%d-", for_index_count ++);
 	if (node->params[1])
 		index_name = node->params[1]->as_token();
 	auto index = block->add_var(index_name, common_types.i32, node->token_id);
-	node->set_param(1, add_node_local(index));
+	node->set_param(1, add_node_local(index, node->token_id));
 
 	// block
 	node->params[3] = concretify_node(node->params[3], block, ns);
@@ -225,13 +225,13 @@ shared<Node> Concretifier::concretify_statement_for_dict(shared<Node> node, shar
 	auto var = block->add_var(var_name, var_type, node->token_id);
 	if (!node->params[0]->is_mutable())
 		flags_clear(var->flags, Flags::Mutable);
-	node->set_param(0, add_node_local(var));
+	node->set_param(0, add_node_local(var, node->token_id));
 
 	string key_name = format("-for_key_%d-", for_index_count ++);
 	if (node->params[1])
 		key_name = node->params[1]->as_token();
 	auto index = block->add_var(key_name, key_type, node->token_id);
-	node->set_param(1, add_node_local(index));
+	node->set_param(1, add_node_local(index, node->token_id));
 
 	// block
 	node->params[3] = concretify_node(node->params[3], block, ns);

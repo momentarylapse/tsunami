@@ -312,8 +312,8 @@ public:
 	void update_buffer_zoom();
 
 	struct ImageData {
-		owned<Image> speaker, x, solo, config;
-		owned<Image> track_audio, track_time, track_midi, track_group;
+		Image speaker, x, solo, config;
+		Image track_audio, track_time, track_midi, track_group;
 	} images;
 
 	owned<hui::Menu> menu_track;

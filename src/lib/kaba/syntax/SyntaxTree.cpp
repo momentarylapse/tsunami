@@ -111,9 +111,9 @@ SyntaxTree::SyntaxTree(Module *_module) {
 	module = _module;
 	asm_meta_info = new Asm::MetaInfo(config.target.pointer_size);
 
-	base_class = new Class(common_types.namespace_t, "-base-", 0, 1, this);
+	base_class = new Class(MetaClass::NAMESPACE, nullptr, "-base-", 0, 1, this);
 	_base_class = base_class;
-	implicit_symbols = new Class(common_types.namespace_t, "-implicit-", 0, 1, this);
+	implicit_symbols = new Class(MetaClass::NAMESPACE, nullptr, "-implicit-", 0, 1, this);
 	root_of_all_evil = new Function("-root-", common_types._void, base_class, Flags::Static);
 }
 
@@ -192,7 +192,7 @@ const Class *SyntaxTree::which_owned_class(const string &name) {
 	return nullptr;
 }
 
-shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Class *ns, int token_id) {
+shared_array<Node> SyntaxTree::get_existence_global(const string& name, const Class* ns, int token_id) {
 	shared_array<Node> links;
 
 
@@ -225,6 +225,10 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 		if (name == Identifier::SelfClass)
 			return {add_node_class(ns, token_id)};
 
+		for (const auto& e: ns->elements)
+			if (e.name == name)
+				return {new Node(NodeKind::ClassElement, (int_p)&e, common_types.unknown, Flags::None, token_id)};
+
 		// prefer class...
 		if (links.num > 0)
 			return links;
@@ -236,7 +240,7 @@ shared_array<Node> SyntaxTree::get_existence_global(const string &name, const Cl
 	return {};
 }
 
-shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name, int token_id) {
+shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string &name, int token_id, bool check_errors) {
 	//operand = force_concrete_type(operand);
 	const Class *type = operand->type;
 	bool deref = false;
@@ -256,7 +260,7 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 		type = operand->as_module()->tree->base_class;
 		allow_member = false;
 	//} else if (type->is_some_pointer()) {
-	} else if (type->is_some_pointer_not_null()) {
+	} else if (type->is_some_pointer_not_null() and !flags_has(operand->flags, Flags::Noderef)) {
 		// pointer -> dereference
 		type = type->param[0];
 		deref = true;
@@ -321,6 +325,10 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 	for (auto *c: weak(type->classes))
 		if (name == c->name)
 			return {add_node_class(c, token_id)};
+	// type aliases
+	for (const auto& [k, v]: type->type_aliases)
+		if (name == k)
+			return {add_node_class(v, token_id)};
 
 
 	if (deref and allow_member)
@@ -333,10 +341,21 @@ shared_array<Node> SyntaxTree::get_element_of(shared<Node> operand, const string
 			if (cf->is_member() and allow_member)
 				links.back()->params.add(cp_node(operand));
 		}
+
+
+	// include illegal...
+	if (links.num == 0 and !allow_member)
+		for (const auto& e: type->elements)
+			if (e.name == name) {
+				if (check_errors)
+					do_error("using non-static element of class without instance", token_id);
+				links.add({new Node(NodeKind::ClassElement, (int_p)&e, e.type, Flags::None, token_id)});
+			}
+
 	return links;
 }
 
-shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *block, int token_id) {
+shared_array<Node> SyntaxTree::get_existence_block(const string &name, const Block *block, int token_id) {
 	Function *f = block->function;
 
 	// first test local variables
@@ -348,7 +367,7 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 	}
 
 	// self.x?
-	if (f->is_member()) {
+	if (f->is_member() and !f->is_template()) {
 		auto self = add_node_local(f->__get_var(Identifier::Self), token_id);
 		auto links = get_element_of(self, name, token_id);
 		if (links.num > 0)
@@ -357,14 +376,14 @@ shared_array<Node> SyntaxTree::get_existence_block(const string &name, Block *bl
 
 	for (auto *v: weak(f->name_space->static_variables))
 		if (v->name == name)
-			return {add_node_global(v)};
+			return {add_node_global(v, token_id)};
 
 	if (name == Identifier::ReturnClass)
-		return {add_node_class(f->literal_return_type)};
+		return {add_node_class(f->literal_return_type, token_id)};
 	return {};
 }
 
-shared_array<Node> SyntaxTree::get_existence(const string &name, Block *block, const Class *ns, int token_id) {
+shared_array<Node> SyntaxTree::get_existence(const string &name, const Block *block, const Class *ns, int token_id) {
 	if (block) {
 		auto n = get_existence_block(name, block, token_id);
 		if (n.num > 0)
@@ -421,17 +440,17 @@ const Class *SyntaxTree::find_root_type_by_name(const string &name, const Class 
 }
 
 // used by "class/enum XYZ"
-Class *SyntaxTree::create_new_class(const string &name, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
+Class *SyntaxTree::create_new_class(const string &name, MetaClass meta, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
 	if (find_root_type_by_name(name, ns, false))
 		do_error(format("class '%s' already exists", name), token_id);
-	return create_new_class_no_check(name, from_template, size, array_size, parent, params, ns, token_id);
+	return create_new_class_no_check(name, meta, from_template, size, array_size, parent, params, ns, token_id);
 }
 
 
-Class *SyntaxTree::create_new_class_no_check(const string &name, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
+Class *SyntaxTree::create_new_class_no_check(const string &name, MetaClass meta, const Class* from_template, int size, int array_size, const Class *parent, const Array<const Class*> &params, Class *ns, int token_id) {
 	//msg_write("CREATE " + name);
 
-	Class *t = new Class(from_template, name, size, 1, this, parent, params);
+	Class *t = new Class(meta, from_template, name, size, 1, this, parent, params);
 	t->token_id = token_id;
 	t->array_length = array_size;
 	owned_classes.add(t);
@@ -512,8 +531,6 @@ void delete_all_constants(Class *c) {
 SyntaxTree::~SyntaxTree() {
 	// delete all classes, functions etc created by this module
 	delete_all_constants(base_class);
-
-	module->context->template_manager->clear_from_module(module);
 }
 
 void SyntaxTree::show(const string &stage) {

@@ -6,6 +6,7 @@
  */
 
 #include "CommandLineParser.h"
+#include "app.h"
 #include "../base/algo.h"
 #include "../base/sort.h"
 #include "../os/msg.h"
@@ -139,21 +140,20 @@ bool CommandLineParser::parse_commands(const Array<string> &arg) {
 	return false;
 }
 
-void CommandLineParser::parse(const Array<string> &_arg) {
+base::result_void CommandLineParser::parse(const Array<string> &_arg) {
 	auto arg = _arg.sub_ref(1); // ignore progname
 
 	try {
 		auto arg2 = parse_options(arg);
 		if (parse_commands(arg2))
-			return;
+			return base::result_success();
 		if (arg2.num > 0) {
-			msg_error("unhandled command");
 			error = true;
+			return base::Error("unhandled command");
 		}
-		show();
 	} catch (Exception &e) {
 		error = true;
-		msg_error(e.message());
+		return base::Error(e.message());
 	}
 /*
 	for (int i=1; i<_arg.num; i++) {
@@ -185,6 +185,16 @@ void CommandLineParser::parse(const Array<string> &_arg) {
 		}
 	}
 */
+	return base::result_success();
+}
+
+void CommandLineParser::parse_or_die(const Array<string> &_arg) {
+	auto r = parse(_arg);
+	if (!r) {
+		msg_error(r.error().msg);
+		show();
+		os::app::exit(1);
+	}
 }
 
 string CommandLineParser::Option::sig() const {

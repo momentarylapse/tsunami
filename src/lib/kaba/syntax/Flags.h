@@ -42,6 +42,7 @@ enum class Flags {
 	Template = 1<<15,
 	Unimplemented = 1<<16,
 	//Noauto = 1 << 17,
+	Noderef = 1 << 17,
 	Noframe = 1 << 18,
 	Macro = 1 << 19,
 	Globalref = 1 << 20,

@@ -33,6 +33,7 @@ enum class StatementID {
 	Asm,
 	Raise,
 	RaiseLocal,
+	RaiseLegacy,
 	Try,
 	Except,
 	Pass,
@@ -67,7 +68,8 @@ enum class SpecialFunctionID {
 	Filter,
 	Dyn,
 	Weak,
-	Give
+	Give,
+	Noderef
 };
 
 struct SpecialFunction {

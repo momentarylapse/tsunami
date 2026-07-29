@@ -22,7 +22,7 @@ shared<Node> Concretifier::build_pipe_sort(const shared<Node> &input, const shar
 
 	auto cmd = add_node_call(f, token_id);
 	cmd->set_param(0, input);
-	cmd->set_param(1, add_node_class(input->type));
+	cmd->set_param(1, add_node_class(input->type, input->token_id));
 	if (params.num >= 1) {
 		auto crit = concretify_node(params[0], block, ns);
 		if (crit->type != common_types.string or crit->kind != NodeKind::Constant)
@@ -30,7 +30,7 @@ shared<Node> Concretifier::build_pipe_sort(const shared<Node> &input, const shar
 		cmd->set_param(2, crit);
 	} else {
 		auto crit = tree->add_constant(common_types.string, token_id);
-		cmd->set_param(2, add_node_const(crit));
+		cmd->set_param(2, add_node_const(crit, input->token_id));
 	}
 	cmd->type = input->type;
 	return cmd;
@@ -83,15 +83,14 @@ shared<Node> Concretifier::try_build_pipe_map_array_unwrap(const shared<Node> &i
 	string vname = format("<map-var-%d>", map_counter++);
 	auto var = block->add_var(vname, tree->request_implicit_class_reference(el_type, token_id), token_id);
 	flags_clear(var->flags, Flags::Mutable);
-	n_for->set_param(0, add_node_local(var));
-	auto index = block->add_var(viname, common_types.i32, token_id
-		);
-	n_for->set_param(1, add_node_local(index));
+	n_for->set_param(0, add_node_local(var, token_id));
+	auto index = block->add_var(viname, common_types.i32, token_id);
+	n_for->set_param(1, add_node_local(index, token_id));
 
 	auto out = add_node_call(f->as_func(), f->token_id);
 
 	CastingDataCall casts;
-	auto nvar = add_node_local(var);
+	auto nvar = add_node_local(var, token_id);
 
 	if (!param_match_with_cast(out, {nvar}, casts))
 		return nullptr; //do_error("pipe: " + param_match_with_cast_error({input}, wanted), f);
@@ -118,19 +117,19 @@ shared<Node> Concretifier::try_build_pipe_map_optional_unwrap(const shared<Node>
 	if (needs_wrapping)
 		t_out = tree->request_implicit_class_optional(ff->literal_return_type, token_id);
 
-	auto b = add_node_block(new Block(block->function, block), t_out);
+	auto b = add_node_block(new Block(block->function, block), t_out, token_id);
 	// variable into OUTER block for returnable life-time
 	auto v = block->add_var(block->function->create_slightly_hidden_name(), input->type, token_id);
 
-	b->add(auto_implementer->add_assign(block->function, "...", add_node_local(v), input));
+	b->add(auto_implementer->add_assign(block->function, "...", add_node_local(v, token_id), input));
 
 	auto cif = add_node_statement(StatementID::If, token_id, t_out);
 	cif->set_num_params(3);
 
 	auto f_has_val = input->type->get_member_func(Identifier::func::OptionalHasValue, common_types._bool, {});
-	cif->set_param(0, add_node_member_call(f_has_val, add_node_local(v), token_id));
+	cif->set_param(0, add_node_member_call(f_has_val, add_node_local(v, token_id), token_id));
 	auto call = add_node_call(ff, token_id);
-	call->set_param(0, add_node_local(v)->change_type(input->type->param[0]));
+	call->set_param(0, add_node_local(v, token_id)->change_type(input->type->param[0]));
 	if (needs_wrapping) {
 		for (auto c: t_out->get_constructors())
 			if (c->num_params == 2 and c->literal_param_type[1] == pt) {
@@ -215,7 +214,7 @@ shared<Node> Concretifier::build_function_pipe(const shared<Node> &abs_input, co
 	if (input->type == common_types.unknown)
 		input = concretify_node(input, block, ns);
 	input = force_concrete_type(input);
-	input = deref_if_reference(input);
+	input = try_auto_deref(input);
 
 	if ((rhs->kind == NodeKind::AbstractToken)) {
 		if (auto s = parser->which_special_function(rhs->as_token())) {

@@ -193,6 +193,7 @@ template<> string str(const float& f);
 template<> string str(const double& d);
 template<> string str(const bool& b);
 template<> string str(const string& s);
+template<> string str(const bytes& s);
 
 
 template<class T>

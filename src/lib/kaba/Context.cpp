@@ -24,8 +24,8 @@ VirtualTable* get_vtable(const VirtualBase *p);
 extern Array<shared<Module>> loading_module_stack;
 
 
-Exception::Exception(const string &_message, const string &_expression, int _line, int _column, Module *s) :
-	Asm::Exception(_message, _expression, _line, _column)
+Exception::Exception(const string &_message, const string &_expression, int _line, int _column, int _offset, Module *s) :
+	Asm::Exception(_message, _expression, _line, _column, _offset)
 {
 	filename = s->filename;
 }
@@ -38,7 +38,7 @@ Exception::Exception(const Asm::Exception &e, Module *s, Function *f) :
 }
 
 Exception::Exception(const Exception& e) :
-	Asm::Exception(e.text, e.expression, e.line, e.column)
+	Asm::Exception(e.text, e.expression, e.line, e.column, e.offset)
 {
 	filename = e.filename;
 	if (e.parent.get())
@@ -173,7 +173,7 @@ Path Package::default_directory(Context* ctx) const {
 	return ctx->packages_root() | name;
 }
 
-shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
+shared<Module> Context::_load_module_throw(const Path& filename, bool just_analyse) {
 	//msg_write("loading " + filename.str());
 
 	auto _filename = absolute_module_path(filename);
@@ -196,18 +196,55 @@ shared<Module> Context::load_module(const Path& filename, bool just_analyse) {
 	return module;
 }
 
-shared<Module> Context::create_module_for_source(const string& source, const Path& filename, bool just_analyse) {
+shared<Module> Context::_create_module_for_source_throw(const string& source, const Path& filename, bool just_analyse) {
     auto module = create_empty_module(filename);
 	module->just_analyse = just_analyse;
 	module->filename = filename;
 	module->tree->parser = new Parser(module->tree.get());
 	module->tree->default_import();
 	module->tree->parser->parse_buffer(source, just_analyse);
+	created_modules.add(module);
 
 	if (!just_analyse)
 		Compiler::compile(module.get());
 
 	return module;
+}
+
+void exception_to_errors(const Exception& e, Array<CompilerError>& errors) {
+	errors.clear();
+	CompilerError ee;
+	ee.message = e.message();
+	auto _e = &e;
+	while (_e) {
+		ErrorLocation l;
+		l.filename = _e->filename;
+		l.expression = _e->expression;
+		l.line = _e->line;
+		l.column = _e->column;
+		l.offset = 0;//_e->offset;
+		ee.locations.add(l);
+		_e = _e->parent.get();
+	}
+	errors.add(ee);
+}
+
+base::result<shared<Module>> Context::load_module(const Path& filename, CompilerFlags flags) {
+	try {
+		return _load_module_throw(filename, flags == CompilerFlags::JustParse);
+	} catch (Exception& e) {
+		exception_to_errors(e, last_compiler_errors);
+		return base::Error(e.message());
+	}
+}
+
+base::result<shared<Module>> Context::create_module_for_source(const string& source, const Path& filename, CompilerFlags flags) {
+	try {
+		return _create_module_for_source_throw(source, filename, flags == CompilerFlags::JustParse);
+	} catch (Exception& e) {
+		exception_to_errors(e, last_compiler_errors);
+		return base::Error(e.message());
+	}
 }
 
 shared<Module> Context::create_empty_module(const Path &filename) {
@@ -223,10 +260,18 @@ shared<Module> Context::create_empty_module(const Path &filename) {
 			public_modules.erase(i);
 }*/
 
-
+base::result_void Context::execute_single_command(const string &cmd) {
+	try {
+		_execute_single_command_throw(cmd);
+	} catch (Exception& e) {
+		exception_to_errors(e, last_compiler_errors);
+		return base::Error(e.message());
+	}
+	return base::result_success();
+}
 
 // bad:  should clean up in case of errors!
-void Context::execute_single_command(const string &cmd) {
+void Context::_execute_single_command_throw(const string &cmd) {
 	if (cmd.num < 1)
 		return;
 	//msg_write("command: " + cmd);
@@ -283,9 +328,10 @@ void Context::execute_single_command(const string &cmd) {
 		auto n_str = parser->con.add_converter_str(node, true);
 		auto f_print = tree->required_func_global("print");
 
-		auto cmd = add_node_call(f_print);
+		auto cmd = add_node_call(f_print, node->token_id);
 		cmd->set_param(0, n_str);
 		func->block_node->params[0] = cmd;
+		func->block_node->type = common_types._void;
 	}
 	//for (auto *c: tree->owned_classes)
 	for (int i=0; i<tree->owned_classes.num; i++) // array might change...
@@ -314,6 +360,9 @@ void Context::execute_single_command(const string &cmd) {
 	}
 }
 
+Array<CompilerError>& Context::get_errors() {
+	return last_compiler_errors;
+}
 
 
 const Class *_dyn_type_in_namespace(const VirtualTable *p, const Class *ns) {

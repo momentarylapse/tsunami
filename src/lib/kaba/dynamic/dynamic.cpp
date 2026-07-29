@@ -235,6 +235,13 @@ string _cdecl var_repr_str(const void *p, const Class *type, bool as_repr) {
 		if (*reinterpret_cast<const bool*>((int_p)p + type->param[0]->size))
 			return var_repr_str(p, type->param[0], as_repr);
 		return "nil";
+	} else if (type->is_result()) {
+		int state = *reinterpret_cast<char*>((int_p)p + max((int)type->param[0]->size, config.target.dynamic_array_size));
+		if (state == 1)
+			return var_repr_str(p, type->param[0], as_repr);
+		else if (state == 2)
+			return "error " + reinterpret_cast<const string*>(p)->repr();
+		return "nil";
 	} else if (type->is_list()) {
 		string s;
 		auto *da = reinterpret_cast<const DynamicArray*>(p);

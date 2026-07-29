@@ -6,6 +6,7 @@
 #include "../../os/config.h"
 #include "../../os/terminal.h"
 #include "../../os/app.h"
+#include "../../os/date.h"
 #include "../kaba.h"
 #include "../../config.h"
 #include "lib.h"
@@ -14,6 +15,7 @@
 #include "shared.h"
 #include "../dynamic/exception.h"
 #include "../../base/callable.h"
+#include "../../base/error.h"
 
 struct vec3;
 
@@ -123,66 +125,93 @@ class KabaFileNotWritableError : public KabaFileError
 
 
 
-xfer<os::fs::FileStream> kaba_file_open(const Path &filename, const string &mode) {
-	KABA_EXCEPTION_WRAPPER2(return os::fs::open(filename, mode), KabaFileError);
-	return nullptr;
+base::result<xfer<os::fs::FileStream>> kaba_file_open(const Path &filename, const string &mode) {
+	try {
+		return os::fs::open(filename, mode);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-string kaba_file_read(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return os::fs::read_binary(filename), KabaFileError);
-	return "";
+base::result<bytes> kaba_file_read(const Path &filename) {
+	try {
+		return os::fs::read_binary(filename);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-string kaba_file_read_text(const Path &filename) {
-	KABA_EXCEPTION_WRAPPER2(return os::fs::read_text(filename), KabaFileError);
-	return "";
+base::result<string> kaba_file_read_text(const Path &filename) {
+	try {
+		return os::fs::read_text(filename);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-void kaba_file_write(const Path &filename, const string &buffer) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::write_binary(filename, buffer), KabaFileError);
+base::result_void kaba_file_write(const Path &filename, const string &buffer) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::write_binary(filename, buffer));
 }
 
-void kaba_file_write_text(const Path &filename, const string &buffer) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::write_text(filename, buffer), KabaFileError);
+base::result_void kaba_file_write_text(const Path &filename, const string &buffer) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::write_text(filename, buffer));
 }
 
-string kaba_file_hash(const Path &filename, const string &type) {
-	KABA_EXCEPTION_WRAPPER2(return os::fs::hash(filename, type), KabaFileError);
-	return "";
+base::result<int64> kaba_file_size(const Path &filename) {
+	try {
+		return os::fs::size(filename);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-void kaba_file_rename(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::rename(a, b), KabaFileError);
+base::result<Date> kaba_file_mtime(const Path &filename) {
+	try {
+		return os::fs::mtime(filename);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-void kaba_file_move(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::move(a, b), KabaFileError);
+base::result<string> kaba_file_hash(const Path &filename, const string &type) {
+	try {
+		return os::fs::hash(filename, type);
+	} catch (::Exception& e) {
+		return base::Error(e.message());
+	}
 }
 
-void kaba_file_copy(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::copy(a, b), KabaFileError);
+base::result_void kaba_file_rename(const Path &a, const Path &b) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::rename(a, b));
 }
 
-void kaba_file_delete(const Path &f) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::_delete(f), KabaFileError);
+base::result_void kaba_file_move(const Path &a, const Path &b) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::move(a, b));
 }
 
-void kaba_dir_create(const Path &f) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::create_directory(f), KabaFileError);
+base::result_void kaba_file_copy(const Path &a, const Path &b) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::copy(a, b));
 }
 
-void kaba_dir_delete(const Path &f) {
-	KABA_EXCEPTION_WRAPPER2(os::fs::delete_directory(f), KabaFileError);
+base::result_void kaba_file_delete(const Path &f) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::_delete(f));
+}
+
+base::result_void kaba_dir_create(const Path &f) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::create_directory(f));
+}
+
+base::result_void kaba_dir_delete(const Path &f) {
+	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::delete_directory(f));
 }
 
 
-string _cdecl kaba_shell_execute(const string &cmd, bool verbose) {
+base::result<string> kaba_shell_execute(const string &cmd, bool verbose) {
 	try {
 		return os::terminal::shell_execute(cmd, verbose);
 	} catch(::Exception &e) {
-		kaba_raise_exception(new KabaException(e.message()));
+		return base::Error(e.message());
 	}
-	return "";
 }
 
 KABA_LINK_GROUP_END
@@ -279,9 +308,9 @@ public:
 	void cmd1(const string &name, const string &p, const string &comment, Callable<void(const Array<string>&)> &cb) {
 		cmd(name, p, comment, [&cb] (const Array<string> &s) { cb(s); });
 	}
-	void parse1(const Array<string> &arg) {
+	base::result_void parse1(const Array<string> &arg) {
 		Array<string> a = {"?"};
-		parse(a + arg);
+		return parse(a + arg);
 	}
 };
 
@@ -292,20 +321,28 @@ void SIAddPackageOS(Context *c) {
 	auto TypeStreamXfer = add_type_p_xfer(TypeStream);
 	auto TypeFileStream = add_type("FileStream", sizeof(os::fs::FileStream));
 	auto TypeFileStreamXfer = add_type_p_xfer(TypeFileStream);
+	auto TypeFileStreamXferResult = add_type_result(TypeFileStreamXfer);
 	auto TypeFileStreamSharedNN = add_type_p_shared_not_null(TypeFileStream);
 	auto TypeFilesystem = add_type("fs", 0);
-	const_cast<Class*>(TypeFilesystem)->from_template = common_types.namespace_t;
+	const_cast<Class*>(TypeFilesystem)->meta_class = MetaClass::NAMESPACE;
 	auto TypeFileError = add_type("FileError", sizeof(KabaFileError));
 	auto TypeCommandLineParser = add_type("CommandLineParser", sizeof(CommandLineParser));
 	common_types.os_configuration = add_type("Configuration", sizeof(Configuration));
 	auto TypeSystemType = add_type_enum("SystemType");
 	auto TypeTerminal = add_type("terminal", 0);
-	const_cast<Class*>(TypeTerminal)->from_template = common_types.namespace_t;
+	const_cast<Class*>(TypeTerminal)->meta_class = MetaClass::NAMESPACE;
 	auto TypeApp = add_type("app", 0);
-	const_cast<Class*>(TypeApp)->from_template = common_types.namespace_t;
+	const_cast<Class*>(TypeApp)->meta_class = MetaClass::NAMESPACE;
 
 	auto TypeStringOptional = add_type_optional(common_types.string);
 	lib_create_optional<string>(TypeStringOptional);
+
+	auto TypeDateResult = add_type_result(common_types.date);
+	auto TypeInt64Result = add_type_result(common_types.i64);
+
+	lib_create_result<void*>(TypeFileStreamXferResult);
+	lib_create_result<Date>(TypeDateResult);
+	lib_create_result<int64>(TypeInt64Result);
 
 	auto TypeCallbackStringList = add_type_func(common_types._void, {common_types.string_list});
 
@@ -392,7 +429,7 @@ void SIAddPackageOS(Context *c) {
 			func_add_param("cmd", common_types.string);
 			func_add_param("i", common_types.string);
 		class_add_func("show", common_types._void, &CommandLineParser::show);
-		class_add_func("parse", common_types._void, &KabaCommandLineParser::parse1);
+		class_add_func("parse", common_types.result_void, &KabaCommandLineParser::parse1);
 			func_add_param("arg", common_types.string_list);
 		class_add_func("option", common_types._void, &KabaCommandLineParser::option1, Flags::Mutable);
 			func_add_param("name", common_types.string);
@@ -414,7 +451,7 @@ void SIAddPackageOS(Context *c) {
 		class_add_element("dict", common_types.any_dict, &Configuration::map);
 		class_add_func(Identifier::func::Init, common_types._void, &kaba::generic_init<Configuration>, Flags::Mutable);
 		class_add_func(Identifier::func::Delete, common_types._void, &kaba::generic_delete<Configuration>, Flags::Mutable);
-		class_add_func("load", common_types._bool, &Configuration::load, Flags::Mutable);
+		class_add_func("load", common_types.result_void, &Configuration::load, Flags::Mutable);
 			func_add_param("path", common_types.path);
 		class_add_func("save", common_types._void, &Configuration::save);
 			func_add_param("path", common_types.path);
@@ -454,48 +491,48 @@ void SIAddPackageOS(Context *c) {
 
 	// file access
 	add_class(TypeFilesystem);
-		class_add_func("open", TypeFileStreamXfer, &kaba_file_open, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("open", TypeFileStreamXferResult, &kaba_file_open, Flags::Static);
 			func_add_param("filename", common_types.path);
 			func_add_param("mode", common_types.string);
-		class_add_func("read", common_types.bytes, &kaba_file_read, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("read", common_types.result_bytes, &kaba_file_read, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("read_text", common_types.string, &kaba_file_read_text, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("read_text", common_types.result_string, &kaba_file_read_text, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("write", common_types._void, &kaba_file_write, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("write", common_types.result_void, &kaba_file_write, Flags::Static);
 			func_add_param("filename", common_types.path);
 			func_add_param("buffer", common_types.bytes);
-		class_add_func("write_text", common_types._void, &kaba_file_write_text, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("write_text", common_types.result_void, &kaba_file_write_text, Flags::Static);
 			func_add_param("filename", common_types.path);
 			func_add_param("buffer", common_types.string);
 		class_add_func("exists", common_types._bool, &os::fs::exists, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("size", common_types.i64, &os::fs::size, Flags::Static);
+		class_add_func("size", TypeInt64Result, &kaba_file_size, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("mtime", common_types.date, &os::fs::mtime, Flags::Static);
+		class_add_func("mtime", TypeDateResult, &kaba_file_mtime, Flags::Static);
 			func_add_param("filename", common_types.path);
 		class_add_func("is_directory", common_types._bool, &os::fs::is_directory, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("hash", common_types.string, &kaba_file_hash, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("hash", common_types.result_string, &kaba_file_hash, Flags::Static);
 			func_add_param("filename", common_types.path);
 			func_add_param("type", common_types.string);
-		class_add_func("move", common_types._void, &kaba_file_move, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("move", common_types.result_void, &kaba_file_move, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("rename", common_types._void, &kaba_file_rename, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("rename", common_types.result_void, &kaba_file_rename, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("copy", common_types._void, &kaba_file_copy, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("copy", common_types.result_void, &kaba_file_copy, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("delete", common_types._void, &kaba_file_delete, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("delete", common_types.result_void, &kaba_file_delete, Flags::Static);
 			func_add_param("filename", common_types.path);
 		class_add_func("search", common_types.path_list, &os::fs::search, Flags::Static);
 			func_add_param("dir", common_types.path);
 			func_add_param("filter", common_types.string);
 			func_add_param("options", common_types.string);
-		class_add_func("create_directory", common_types._void, &kaba_dir_create, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("create_directory", common_types.result_void, &kaba_dir_create, Flags::Static);
 			func_add_param("dir", common_types.path);
-		class_add_func("delete_directory", common_types._void, &kaba_dir_delete, Flags::Static | Flags::RaisesExceptions);
+		class_add_func("delete_directory", common_types.result_void, &kaba_dir_delete, Flags::Static);
 			func_add_param("dir", common_types.path);
 		class_add_func("current_directory", common_types.path, &os::fs::current_directory, Flags::Static);
 		class_add_func("set_current_directory", common_types._void, &os::fs::set_current_directory, Flags::Static);
@@ -544,7 +581,7 @@ void SIAddPackageOS(Context *c) {
 
 
 	// system
-	add_func("shell_execute", common_types.string, &kaba_shell_execute, Flags::Static | Flags::RaisesExceptions);
+	add_func("shell_execute", common_types.result_string, &kaba_shell_execute, Flags::Static);
 		func_add_param("cmd", common_types.string);
 		func_add_param_def("verbose", common_types._bool, false);
 

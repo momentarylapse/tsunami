@@ -20,7 +20,7 @@ Array<BindingTemplate*> binding_templates;
 Function::Function(const string &_name, const Class *_return_type, const Class *_name_space, Flags _flags) {
 	name = _name;
 	block = new Block(this, nullptr);
-	block_node = add_node_block(block, common_types._void);
+	block_node = add_node_block(block, common_types._void, -1);
 	num_params = 0;
 	mandatory_params = 0;
 	effective_return_type = _return_type;

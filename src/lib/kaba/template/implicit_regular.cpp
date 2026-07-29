@@ -97,7 +97,7 @@ void AutoImplementer::implement_add_virtual_table(shared<Node> self, Function *f
 		auto *c = tree->add_constant_pointer(common_types.pointer, t->_vtable_location_target_);
 		f->block_node->add(add_node_operator_by_inline(InlineID::PointerAssign,
 				self->change_type(common_types.pointer),
-				add_node_const(c)));
+				add_node_const(c, -1), -1));
 	}
 }
 
@@ -114,7 +114,7 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 		if (!ff)
 			continue;
 		f->block_node->add(add_node_member_call(ff,
-				n_self->shift(e.offset, e.type)));
+				n_self->shift(e.offset, e.type), -1));
 	}
 
 	// auto initializers
@@ -143,7 +143,7 @@ void AutoImplementer::implement_add_child_constructors(shared<Node> n_self, Func
 void AutoImplementer::implement_regular_constructor(Function *f, const Class *t, bool allow_parent_constructor) {
 	if (!f)
 		return;
-	auto self = add_node_local(f->__get_var(Identifier::Self));
+	auto self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 	if (flags_has(f->flags, Flags::__InitFillAllParams)) {
 		// init
@@ -152,7 +152,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 		// element[] = param[]
 		for (auto&& [i,e]: enumerate(t->elements))
 			if (!e.hidden()) {
-				auto param = add_node_local(f->__get_var(e.name));
+				auto param = add_node_local(f->__get_var(e.name), -1);
 				f->block_node->add(add_assign(f, "", self->shift(e.offset, e.type), param));
 			}
 	} else {
@@ -163,13 +163,13 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 			Function *f_def = t->parent->get_default_constructor();
 			if (f_same) {
 				// first, try same signature
-				auto n_init_parent = add_node_member_call(f_same, self);
+				auto n_init_parent = add_node_member_call(f_same, self, -1);
 				for (int i=1; i<f_same->num_params; i++)
-					n_init_parent->set_param(i, add_node_local(f->var[i].get()));
+					n_init_parent->set_param(i, add_node_local(f->var[i].get(), -1));
 				f->block_node->add(n_init_parent);
 			} else if (f_def) {
 				// then, try default constructor
-				f->block_node->add(add_node_member_call(f_def, self));
+				f->block_node->add(add_node_member_call(f_def, self, -1));
 			} else if (t->parent->needs_constructor()) {
 				do_error_implicit(f, "parent class does not have a default constructor or one with matching signature. Use super.__init__(...)");
 			}
@@ -188,7 +188,7 @@ void AutoImplementer::implement_regular_constructor(Function *f, const Class *t,
 void AutoImplementer::implement_regular_destructor(Function *f, const Class *t) {
 	if (!f)
 		return;
-	auto self = add_node_local(f->__get_var(Identifier::Self));
+	auto self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 	// call child destructors
 	int i0 = t->parent ? t->parent->elements.num : 0;
@@ -196,7 +196,7 @@ void AutoImplementer::implement_regular_destructor(Function *f, const Class *t) 
 		// self.el.__delete__()
 		if (auto f_des = e.type->get_destructor()) {
 			f->block_node->add(add_node_member_call(f_des,
-					self->shift(e.offset, e.type)));
+					self->shift(e.offset, e.type), -1));
 		} else if (e.type->needs_destructor()) {
 			do_error_implicit(f, format("missing destructor for element %s", e.name));
 		}
@@ -216,8 +216,8 @@ void AutoImplementer::implement_regular_assign(Function *f, const Class *t) {
 	if (!f)
 		return;
 
-	auto n_other = add_node_local(f->__get_var("other"));
-	auto n_self = add_node_local(f->__get_var(Identifier::Self));
+	auto n_other = add_node_local(f->__get_var("other"), -1);
+	auto n_self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 
 	// parent assignment

@@ -260,10 +260,10 @@ public:
 		pdb(format("shared/p = %s", p2s(o)));
 		set(o);
 	}
-	/*bool operator==(const shared<T> o) const {
+	bool operator==(const shared<T> o) const {
 		return _p == o._p;
 	}
-	bool operator!=(const shared<T> o) const {
+	/*bool operator!=(const shared<T> o) const {
 		return _p != o._p;
 	}*/
 	bool operator==(const T* o) const {

@@ -61,7 +61,7 @@ void TestPlugins::test_compile(ModuleCategory type, const Path &filename) {
 
 	try {
 		//auto context = ownify(kaba::Context::create());
-		auto s = kaba::default_context->load_module(filename, false);
+		auto s = kaba::default_context->_load_module_throw(filename, false);
 	} catch (kaba::Exception &e) {
 		throw Failure(e.message());
 	}

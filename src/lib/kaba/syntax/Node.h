@@ -21,6 +21,7 @@ struct Class;
 struct Block;
 struct SyntaxTree;
 class Module;
+struct ExpressionBuffer;
 struct Function;
 struct Variable;
 struct Constant;
@@ -56,9 +57,9 @@ enum class NodeKind {
 	NamedParameter,
 	// data altering
 	AddressShift,        // = struct.element
-	Array,               // = []
-	PointerAsArray,      // = []
-	DynamicArray,        // = []
+	ArrayElement,        // = [i]
+	PointerArrayElement, // = [i]
+	ListElement,         // = [i]
 	Reference,           // = &
 	Dereference,         // = *
 	DereferenceAddressShift,// = ->
@@ -71,6 +72,7 @@ enum class NodeKind {
 	// special
 	Class,
 	Module,
+	ClassElement,        // mostly for errors
 	ArrayBuilder,        // = [X,Y,...]
 	ArrayBuilderFor,
 	ArrayBuilderForIf,
@@ -167,7 +169,7 @@ struct Node : Sharable<base::Empty> {
 void clear_nodes(Array<Node*> &nodes);
 void clear_nodes(Array<Node*> &nodes, Node *keep);
 
-shared<Node> cp_node(shared<Node> c, Block *parent_block = nullptr);
+shared<Node> cp_node(shared<Node> c, Block *parent_block = nullptr, int override_token_id = -1);
 
 Array<const Class*> node_extract_param_types(const shared<Node> n);
 bool node_is_member_function_with_instance(shared<Node> n);
@@ -175,28 +177,28 @@ bool is_type_tuple(const shared<Node> n);
 Array<const Class*> class_tuple_extract_classes(const shared<Node> n);
 
 shared<Node> add_node_statement(StatementID id, int token_id = -1, const Class *type = common_types._void);//, const shared_array<Node> &params);
-shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id = -1, const Class *type = common_types._void);
-shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id = -1, const Class *type = common_types._void);
-shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id = -1, const shared_array<Node> &params = {}, bool force_non_virtual = false);
-shared<Node> add_node_func_name(const Function *f, int token_id = -1);
-shared<Node> add_node_module(const Module *c, int token_id = -1);
-shared<Node> add_node_class(const Class *c, int token_id = -1);
-shared<Node> add_node_call(const Function *f, int token_id = -1);
-shared<Node> add_node_const(const Constant *c, int token_id = -1);
-shared<Node> add_node_block(Block *b, const Class *type /*= common_types.unknown*/, int token_id = -1);
-shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
-shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id = -1, const Class *override_type = nullptr);
-shared<Node> add_node_global(const Variable *var, int token_id = -1);
-shared<Node> add_node_local(const Variable *var, int token_id = -1);
-shared<Node> add_node_local(const Variable *var, const Class *type, int token_id = -1);
-shared<Node> add_node_parray(shared<Node> p, shared<Node> index, const Class *type);
-shared<Node> add_node_dyn_array(shared<Node> array, shared<Node> index);
-shared<Node> add_node_array(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
+shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id, const Class *type = common_types._void);
+shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id, const Class *type = common_types._void);
+shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id, const shared_array<Node> &params = {}, bool force_non_virtual = false);
+shared<Node> add_node_func_name(const Function *f, int token_id);
+shared<Node> add_node_module(const Module *c, int token_id);
+shared<Node> add_node_class(const Class *c, int token_id);
+shared<Node> add_node_call(const Function *f, int token_id);
+shared<Node> add_node_const(const Constant *c, int token_id);
+shared<Node> add_node_block(Block *b, const Class *type /*= common_types.unknown*/, int token_id);
+shared<Node> add_node_operator(const Operator *op, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type = nullptr);
+shared<Node> add_node_operator_by_inline(InlineID inline_index, const shared<Node> p1, const shared<Node> p2, int token_id, const Class *override_type = nullptr);
+shared<Node> add_node_global(const Variable *var, int token_id);
+shared<Node> add_node_local(const Variable *var, int token_id);
+shared<Node> add_node_local(const Variable *var, const Class *type, int token_id);
+shared<Node> add_node_parray_element(shared<Node> p, shared<Node> index, const Class *type);
+shared<Node> add_node_list_element(shared<Node> array, shared<Node> index);
+shared<Node> add_node_array_element(shared<Node> array, shared<Node> index, const Class *override_type = nullptr);
 shared<Node> add_node_slice(shared<Node> start, shared<Node> end, shared<Node> step);
-shared<Node> add_node_constructor(const Function *f, int token_id = -1);
+shared<Node> add_node_constructor(const Function *f, int token_id);
 shared<Node> make_constructor_static(shared<Node> n, const string &name);
-shared<Node> add_node_named_parameter(SyntaxTree* tree, int name_token_id, shared<Node> param);
-shared<Node> add_node_token(SyntaxTree* tree, int token_id);
+shared<Node> add_node_named_parameter(ExpressionBuffer* buf, int name_token_id, shared<Node> param);
+shared<Node> add_node_token(ExpressionBuffer* buf, int token_id);
 
 string kind2str(NodeKind kind);
 string node2str(SyntaxTree *s, Node *n);

@@ -48,7 +48,7 @@ struct SerialNode {
 
 SerialNodeParam param_shift(const SerialNodeParam &param, int shift, const Class *t);
 SerialNodeParam param_global(const Class *type, void *v);
-SerialNodeParam param_local(const Class *type, int offset);
+SerialNodeParam param_local(const Class *type, int64 offset);
 SerialNodeParam param_imm(const Class *type, int64 c);
 SerialNodeParam param_label(const Class *type, int m);
 SerialNodeParam param_label32(int m);

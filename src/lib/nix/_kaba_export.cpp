@@ -41,8 +41,8 @@ public:
 	void _cdecl __init_volume__(int nx, int ny, int nz, const string &format) {
 		new(this) nix::VolumeTexture(nx, ny, nz, format);
 	}
-	void _cdecl __init_image__(int width, int height, const string &format) {
-		new(this) nix::ImageTexture(width, height, format);
+	void _cdecl __init_storage__(int width, int height, int depth, const string &format) {
+		new(this) nix::StorageTexture(width, height, depth, format);
 	}
 	void _cdecl __init_depth__(int width, int height, const string &format) {
 		new(this) nix::DepthBuffer(width, height, format);
@@ -78,7 +78,7 @@ void _dummy_func() {}
 
 
 void export_package_gl(kaba::IExporter* e) {
-	e->package_info("gl", "0.5");
+	e->package_info("gl", "0.6");
 
 	e->declare_class_size("Context", sizeof(nix::Context));
 	e->declare_class_element("Context.gl_version", &nix::Context::gl_version);
@@ -118,9 +118,8 @@ void export_package_gl(kaba::IExporter* e) {
 
 
 	e->link_class_func("VolumeTexture.__init__", &KabaTexture::__init_volume__);
-	// delete...
 
-	e->link_class_func("ImageTexture.__init__", &KabaTexture::__init_image__);
+	e->link_class_func("StorageTexture.__init__", &KabaTexture::__init_storage__);
 	
 	e->link_class_func("DepthBuffer.__init__", &KabaTexture::__init_depth__);
 	

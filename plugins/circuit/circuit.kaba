@@ -181,28 +181,28 @@ class Circuit #as @noauto
 	var _out: i32
 	var node_grounded: i32
 	var node_input: i32
-	
+
 	func __init__()
 		reset_default()
-		
+
 	func mut clear()
 		nodes.clear()
 		_out = 1
 		edges.clear()
 		node_grounded = 0
 		node_input = 1
-	
+
 	func mut reset_default()
 		clear()
 		nodes.add(Node((0.2, 0.3)))
 		nodes.add(Node((0.2, 0.7)))
 		node_grounded = 0
 		node_input = 1
-	
+
 	func mut reset_state()
 		for mut e in edges
 			e.reset_state()
-	
+
 	func quick_out()
 		var s: string
 		for e in edges
@@ -227,7 +227,7 @@ class Circuit #as @noauto
 				G.get(a, a) += g
 			if b >= 0
 				G.get(b, b) += g
-	
+
 	func create_I(out I: f32[], I_in: f32, dt: f32)
 		var n = len(nodes)-1
 		I = []
@@ -255,17 +255,17 @@ class Circuit #as @noauto
 		create_G(G, dt)
 	#	print("G")
 	#	print(G)
-		
-		
+
+
 		var I: f32[]
 		create_I(I, I_in, dt)
 	#	print("I {{I}}")
-	
+
 		# U = R * I
 		# I = G * U
 		var u = solve(G, I)
 	#	print("u {{u}}")
-		
+
 		# update potentials
 		for i in 0:n
 			if i >= node_grounded
@@ -275,29 +275,29 @@ class Circuit #as @noauto
 		# update edges
 		for mut e in edges
 			e.update(nodes, dt)
-	
+
 	func mut time_step(I_in: f32, dt: f32)
-		
+
 		#print("-----")
 		for i in 0:15
 			optimizer_step(I_in, dt)
-		
+
 		# update edges
 		for mut e in edges
 			e.iterate(dt)
-	
+
 	func get_xxxx() -> f32
 		var Uin = nodes[node_input].phi
 		var Uout = nodes[_out].phi
 		var factor = Uout / Uin
 		#print(factor)
 		return factor
-	
+
 	func mut simulate(t_max: f32, dt: f32, amp: f32, omega: f32, type: i32, out res: SimResult)
 		#for t in 0:t_max:dt
 		var t = 0.0
 		while t < t_max
-		
+
 			# input
 			var input = amp
 			if type == 1
@@ -307,10 +307,10 @@ class Circuit #as @noauto
 					input = 0
 		#	else if type == 3
 		#		input = amp * loop(t*omega/2/pi, -1, 1)
-			
-			
+
+
 			time_step(input, dt)
-			
+
 			# result
 			var I, U, phi: f32[]
 			for e in edges
@@ -321,9 +321,9 @@ class Circuit #as @noauto
 			res.U.add(U)
 			res.I.add(I)
 			res.phi.add(phi)
-			
+
 			t += dt
-	
+
 	func export() -> string
 		var s: string
 		for n in nodes
@@ -336,7 +336,7 @@ class Circuit #as @noauto
 			s += "\n"
 		s += "Out:{{_out}}\n"
 		return s
-	
+
 	func mut import(s: string)
 		clear()
 		var lines = s.explode("\n")
@@ -354,7 +354,7 @@ class Circuit #as @noauto
 				var e = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = f32(x[i])
-	
+
 	func mut _create_default(n: i32[], t: EdgeType) -> xfer[Edge]
 		if t == EdgeType.CABLE
 			return new Cable(n)
@@ -370,29 +370,8 @@ class Circuit #as @noauto
 			return new Diode(n)
 		else
 			raise(new Exception("unknown type: {{t}}"))
-			
+
 	func mut add_default(n: i32[], t: EdgeType) -> Edge&
 		edges.add(_create_default(n, t))
 		return &edges[len(edges)-1]
 
-func _main()
-	var c: Circuit
-	c.reset_default()
-	#c.edges.add(new Resistor([0,1], 1))
-	#c.nodes.add(Node((0,0)))
-	#c.edges.add(new Diode([0, 2]))
-	#c.edges.add(new Resistor([2,1], 1))
-	c.edges.add(new Diode([0, 1]))
-	print(str(c))
-	var res: SimResult
-	c.simulate(1, 1, 0.1, 1, 0, res)
-	print(str(c))
-
-func __main()
-	var d = new Diode([0,0])
-	return
-	for f in 0.5:1.5:0.01
-	#	print(f)
-		d.U = f
-		print(d.I_id(f))
-	

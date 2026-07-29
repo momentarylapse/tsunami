@@ -22,27 +22,27 @@ AutoImplementer::AutoImplementer(Parser *p, SyntaxTree *t) {
 shared<Node> AutoImplementer::node_false() {
 	auto c = tree->add_constant(common_types._bool, -1);
 	c->as_int() = 0;
-	return add_node_const(c);
+	return add_node_const(c, -1);
 }
 
 shared<Node> AutoImplementer::node_true() {
 	auto c = tree->add_constant(common_types._bool, -1);
 	c->as_int() = 1;
-	return add_node_const(c);
+	return add_node_const(c, -1);
 }
 
 shared<Node> AutoImplementer::node_nil() {
 	auto c = tree->add_constant(common_types.pointer, -1);
 	c->as_int64() = 0;
-	return add_node_const(c);
+	return add_node_const(c, -1);
 }
 
 shared<Node> AutoImplementer::const_int(int i) {
-	return add_node_const(tree->add_constant_int(i, -1));
+	return add_node_const(tree->add_constant_int(i, -1), -1);
 }
 
 shared<Node> AutoImplementer::node_not(shared<kaba::Node> n) {
-	return add_node_operator_by_inline(InlineID::BoolNot, n, nullptr);
+	return add_node_operator_by_inline(InlineID::BoolNot, n, nullptr, -1);
 }
 
 shared<Node> AutoImplementer::node_return(shared<Node> n) {
@@ -82,25 +82,25 @@ shared<Node> AutoImplementer::node_raise_no_value() {
 	cmd_new->set_param(0, cmd_call_ex);
 	cmd_new->type = common_types.exception_xfer;
 
-	auto cmd_raise = add_node_call(tree->required_func_global("raise"));
+	auto cmd_raise = add_node_call(tree->required_func_global("@raise_legacy"), -1);
 	cmd_raise->set_param(0, cmd_new);
 	return cmd_raise;
 }
 
 shared<Node> AutoImplementer::db_print_node(shared<Node> node) {
 	auto ff = tree->required_func_global("print");
-	auto cmd = add_node_call(ff);
+	auto cmd = add_node_call(ff, -1);
 	cmd->set_param(0, parser->con.add_converter_str(node, false));
 	return cmd;
 }
 
 shared<Node> AutoImplementer::db_print_p2s_node(shared<Node> node) {
 	auto f_p2s = tree->required_func_global("p2s");
-	auto n_p2s = add_node_call(f_p2s);
+	auto n_p2s = add_node_call(f_p2s, -1);
 	n_p2s->set_param(0, node);
 
 	auto f_print = tree->required_func_global("print");
-	auto n_print = add_node_call(f_print);
+	auto n_print = add_node_call(f_print, -1);
 	n_print->set_param(0, n_p2s);
 	return n_print;
 }
@@ -108,7 +108,7 @@ shared<Node> AutoImplementer::db_print_p2s_node(shared<Node> node) {
 shared<Node> AutoImplementer::db_print_label(const string &s) {
 	auto c = tree->add_constant(common_types.string, -1);
 	c->as_string() = s;
-	return db_print_node(add_node_const(c));
+	return db_print_node(add_node_const(c, -1));
 }
 
 shared<Node> AutoImplementer::db_print_label_node(const string &s, shared<Node> node) {
@@ -116,15 +116,15 @@ shared<Node> AutoImplementer::db_print_label_node(const string &s, shared<Node> 
 	c->as_string() = s;
 
 	auto ff = tree->required_func_global("print");
-	auto cmd = add_node_call(ff);
-	cmd->set_param(0, parser->con.link_operator_id(OperatorID::Add, add_node_const(c), parser->con.add_converter_str(node, false)));
+	auto cmd = add_node_call(ff, -1);
+	cmd->set_param(0, parser->con.link_operator_id(OperatorID::Add, add_node_const(c, -1), parser->con.add_converter_str(node, false)));
 	return cmd;
 }
 
 shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, shared<Node> a, shared<Node> b) {
 	if ((a->type->is_reference() and b->type->is_reference())
 				or (a->type->is_pointer_xfer_not_null() and b->type->is_pointer_xfer_not_null()))
-		return add_node_operator_by_inline(InlineID::PointerAssign, a, b);
+		return add_node_operator_by_inline(InlineID::PointerAssign, a, b, -1);
 	if (auto n_assign = parser->con.link_operator_id(OperatorID::Assign, a, b))
 		return n_assign;
 	do_error_implicit(f, format("(%s) no operator %s = %s found", ctx, a->type->long_name(), b->type->long_name()));
@@ -135,7 +135,7 @@ shared<Node> AutoImplementer::add_assign(Function *f, const string &ctx, const s
 	if ((a->type->is_reference() and b->type->is_reference())
 				or (a->type->is_pointer_xfer_not_null() and b->type->is_pointer_xfer_not_null())
 				or (a->type->is_pointer_alias() and b->type->is_pointer_alias()))
-		return add_node_operator_by_inline(InlineID::PointerAssign, a, b);
+		return add_node_operator_by_inline(InlineID::PointerAssign, a, b, -1);
 	if (auto n_assign = parser->con.link_operator_id(OperatorID::Assign, a, b))
 		return n_assign;
 	do_error_implicit(f, format("(%s) %s", ctx, msg));
@@ -146,7 +146,7 @@ shared<Node> AutoImplementer::add_equal(Function *f, const string &ctx, shared<N
 	if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, a, b))
 		return n_eq;
 	if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, a, b))
-		return add_node_operator_by_inline(InlineID::BoolNot, n_neq, nullptr);
+		return add_node_operator_by_inline(InlineID::BoolNot, n_neq, nullptr, -1);
 	do_error_implicit(f, format("neither operator %s == %s nor != found", a->type->long_name(), b->type->long_name()));
 	return nullptr;
 }
@@ -155,7 +155,7 @@ shared<Node> AutoImplementer::add_not_equal(Function *f, const string &ctx, shar
 	if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, a, b))
 		return n_neq;
 	if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, a, b))
-		return add_node_operator_by_inline(InlineID::BoolNot, n_eq, nullptr);
+		return add_node_operator_by_inline(InlineID::BoolNot, n_eq, nullptr, -1);
 	do_error_implicit(f, format("neither operator %s != %s nor == found", a->type->long_name(), b->type->long_name()));
 	return nullptr;
 }
@@ -364,6 +364,8 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 		_implement_functions_for_callable_bind(t);
 	} else if (t->is_optional()) {
 		_implement_functions_for_optional(t);
+	} else if (t->from_template == common_types.result_t) {
+		_implement_functions_for_result(t);
 	} else if (t->is_product()) {
 		_implement_functions_for_product(t);
 	} else {
@@ -376,5 +378,22 @@ void AutoImplementerInternal::implement_functions(const Class *t) {
 	//	implement_functions(c);
 }
 
+void AutoImplementer::implement_from_code(Function *f, const string &code) {
+	ExpressionBuffer xp;
+	xp.analyse(tree, code);
+	//xp.show();
+	AbstractParser abstract_parser(tree, xp);
+	xp.reset_walker();
+	f->block_node = abstract_parser.parse_abstract_block();
+	f->block_node->link_no = (int_p)f->block;
+	//f->block_node->show();
 
+	try {
+		parser->con.concretify_function_body(f);
+	} catch (Exception& e) {
+		msg_write(f->signature());
+		throw;
+	}
+	//f->block_node->show();
+}
 }

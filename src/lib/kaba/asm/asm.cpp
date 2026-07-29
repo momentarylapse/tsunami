@@ -55,11 +55,12 @@ MetaInfo DummyMetaInfo(SIZE_32);
 
 int arm_encode_8l4(unsigned int value);
 
-Exception::Exception(const string &_message, const string &_expression, int _line, int _column) {
+Exception::Exception(const string &_message, const string &_expression, int _line, int _column, int _offset) {
 	expression = _expression;
 	text = _message;
 	line = _line;
 	column = _column;
+	offset = _offset;
 }
 
 Exception::~Exception() {}
@@ -81,7 +82,7 @@ void Exception::print() const {
 void raise_error(const string &str) {
 	msg_error(str);
 	//msg_error(str + format("\nline %d", LineNo + 1));
-	throw Exception(str, "", state.line_no, state.column_no);
+	throw Exception(str, "", state.line_no, state.column_no, state.offset_of_current_line + state.column_no);
 }
 
 
@@ -1284,6 +1285,7 @@ void InstructionWithParamsList::append_from_source(const string &_code) {
 	if (!CurrentMetaInfo)
 		raise_error("no CurrentMetaInfo");
 
+	state.offset_of_current_line = 0; // TODO
 	state.line_no = CurrentMetaInfo->line_offset;
 	state.column_no = 0;
 

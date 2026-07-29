@@ -38,13 +38,13 @@ Array<const Class*> suggest_callable_bind_param_types(const Class *fp) {
 
 
 void AutoImplementer::implement_callable_constructor(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::Self));
+	auto self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 	implement_add_virtual_table(self, f, t);
 
 	// self.fp = p
 	{
-		auto n_p = add_node_local(f->__get_var("p"));
+		auto n_p = add_node_local(f->__get_var("p"), -1);
 		auto fp = get_callable_fp(t, self);
 		f->block_node->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), "_fp"), fp, n_p));
 	}
@@ -52,7 +52,7 @@ void AutoImplementer::implement_callable_constructor(Function *f, const Class *t
 	int i_capture = 0;
 	for (auto &e: t->elements)
 		if (e.name.head(7) == "capture") {
-			auto n_p = add_node_local(f->__get_var(DUMMY_PARAMS[i_capture ++]));
+			auto n_p = add_node_local(f->__get_var(DUMMY_PARAMS[i_capture ++]), -1);
 			auto fp = self->shift(e.offset, e.type);
 			f->block_node->add(add_assign(f, "", format("no operator %s = %s for element \"%s\"", fp->type->long_name(), fp->type->long_name(), e.name), fp, n_p));
 		}
@@ -60,12 +60,12 @@ void AutoImplementer::implement_callable_constructor(Function *f, const Class *t
 
 
 void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::Self));
+	auto self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 	//db_add_print_label(this, f->block, "== callable.call ==");
 
 	// contains a Function* pointer, extract its raw pointer
-	auto raw = add_node_statement(StatementID::RawFunctionPointer);
+	auto raw = add_node_statement(StatementID::RawFunctionPointer, -1);
 	raw->type = common_types.function_code_ref;
 	raw->set_param(0, get_callable_fp(t, self));
 
@@ -74,12 +74,12 @@ void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
 	call->set_num_params(1 + get_callable_param_types(t).num);
 	call->set_param(0, raw);
 	for (int i=1; i<f->num_params; i++) // skip "self"
-		call->set_param(i, add_node_local(f->var[i].get()));
+		call->set_param(i, add_node_local(f->var[i].get(), -1));
 
 	if (f->literal_return_type == common_types._void) {
 		f->block_node->add(call);
 	} else {
-		auto ret = add_node_statement(StatementID::Return);
+		auto ret = add_node_statement(StatementID::Return, -1);
 		ret->set_num_params(1);
 		ret->set_param(0, call);
 		f->block_node->add(ret);
@@ -89,12 +89,12 @@ void AutoImplementer::implement_callable_fp_call(Function *f, const Class *t) {
 
 
 void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) {
-	auto self = add_node_local(f->__get_var(Identifier::Self));
+	auto self = add_node_local(f->__get_var(Identifier::Self), -1);
 
 	//db_add_print_label(this, f->block, "== bind.call ==");
 
 	auto fp = get_callable_fp(t, self);
-	auto call = add_node_member_call(fp->type->param[0]->get_call(), fp);
+	auto call = add_node_member_call(fp->type->param[0]->get_call(), fp, -1);
 	//for (int i=0; i<f->num_params; i++)
 	//	call->set_param(i+1, add_node_local(f->var[i].get()));
 
@@ -109,7 +109,7 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 		//msg_write("V " + v->name + ": " + v->type->name);
 		if (v->name.num == 1) {
 			//db_add_print_label_node(this, f->block, "  param " + v->name + ": ", add_node_local(v));
-			params.add(add_node_local(v));
+			params.add(add_node_local(v, -1));
 			//call->set_param(index ++, add_node_local(v));
 		}
 	}
@@ -129,7 +129,7 @@ void AutoImplementer::implement_callable_bind_call(Function *f, const Class *t) 
 	if (f->literal_return_type == common_types._void) {
 		f->block_node->add(call);
 	} else {
-		auto ret = add_node_statement(StatementID::Return);
+		auto ret = add_node_statement(StatementID::Return, -1);
 		ret->set_num_params(1);
 		ret->set_param(0, call);
 		f->block_node->add(ret);

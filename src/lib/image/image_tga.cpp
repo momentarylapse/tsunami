@@ -84,8 +84,7 @@ inline unsigned int get_int_from_buffer(unsigned char *buffer, int pos, int byte
 	return r;
 }
 
-void image_load_tga(const Path &filename, Image &image)
-{
+base::result_void image_load_tga(const Path &filename, Image &image) {
 	//msg_write("tga");
 	unsigned char Header[18];
 	int x;
@@ -154,8 +153,7 @@ void image_load_tga(const Path &filename, Image &image)
 				}while(currentpixel < size);
 				break;
 			default:
-				msg_error(format("NixLoadTGA: unsupported color depth (compressed): %d", depth));
-				break;
+				return base::Error(format("tga: unsupported color depth (compressed): %d", depth));
 		}
 	}else{
 		// uncompressed
@@ -170,8 +168,7 @@ void image_load_tga(const Path &filename, Image &image)
 					__fill_image_color(image, (sImageColor*)&image.data[x], data + x * bpp, pal, depth, alpha_bits, true);
 				break;
 			default:
-				msg_error(format("image_load_tga: unsupported color depth (uncompressed): %d", depth));
-				break;
+				base::Error(format("tga: unsupported color depth (uncompressed): %d", depth));
 		}
 	}
 	if (pal)
@@ -179,6 +176,7 @@ void image_load_tga(const Path &filename, Image &image)
 	if (data)
 	    delete[]data;
     fclose(f);
+	return base::result_success();
 }
 
 // encode tga files via run-length-encoding

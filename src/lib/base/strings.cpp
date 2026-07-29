@@ -738,6 +738,9 @@ template<> string str(const bool& b) {
 template<> string str(const string& s) {
 	return s;
 }
+template<> string str(const bytes& s) {
+	return s.hex();
+}
 /*template<> string str(const Array<string>& a) {
 	return sa2s(a);
 }*/

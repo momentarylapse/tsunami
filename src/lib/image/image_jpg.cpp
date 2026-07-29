@@ -409,7 +409,7 @@ void jpg_decode(unsigned char *b,s_jpg_color_info ci)
 	delete[](col[2]);
 }
 
-void image_load_jpg(const Path &filename, Image &image)
+base::result_void image_load_jpg(const Path &filename, Image &image)
 {
 	bytes tt = os::fs::read_binary(filename);
 	unsigned char *buf = (unsigned char*)tt.data;
@@ -458,13 +458,12 @@ void image_load_jpg(const Path &filename, Image &image)
 				image.height = b[1]*256 + b[2];
 				image.width = b[3]*256 + b[4];
 				//msg_write(string2("jpg: %d x %d, depth=%d",NixImage.width,NixImage.height,bpp*3));
-				if (bpp!=8){	msg_error("jpg: depth!=24 unsupported!");	break;	}
+				if (bpp!=8)
+					return base::Error("jpg: depth!=24 unsupported!");
 				image.data.resize(image.width * image.height);
 				int nc=b[5];
-				if (nc!=3){
-					msg_error("jpg: number of colors != 3 (unsupported)");
-					break;
-				}
+				if (nc!=3)
+					return base::Error("jpg: number of colors != 3 (unsupported)");
 				for (int i=0;i<3;i++){
 					int c=b[i*3+6];
 					ci.h[c-1]=b[i*3+7]>>4;
@@ -494,10 +493,8 @@ void image_load_jpg(const Path &filename, Image &image)
 				}
 				seg_len-=10;
 				int nc=*(b++);
-				if (nc!=3){
-					msg_error("jpg: number of colors != 3 (unsupported)");
-					break;
-				}
+				if (nc!=3)
+					return base::Error("jpg: number of colors != 3 (unsupported)");
 				for (int i=0;i<3;i++){
 					int c=*(b++);
 					ci.ac[c-1]=b[0]>>4;
@@ -513,16 +510,14 @@ void image_load_jpg(const Path &filename, Image &image)
 				//msg_write(seg_len);
 				b+=seg_len;
 			}
-			if ((int_p)b-(int_p)buf > tt.num){
-				msg_error("jpg: end of file");
-				break;
-			}
+			if ((int_p)b-(int_p)buf > tt.num)
+				return base::Error("jpg: end of file");
 		}else{
-			msg_error("jpg: broken");
-			break;
+			return base::Error("jpg: broken");
 		}
 	}
 	/*for (int i=0;i<image.Data.num;i++)
 		image.Data[i] = (image.Data[i] | 0xff000000);*/
+	return base::result_success();
 }
 

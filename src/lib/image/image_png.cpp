@@ -61,7 +61,7 @@ void png_unfilter(unsigned char *cur, unsigned char *prev, int num, int stride, 
 	}
 }
 
-void image_load_png(const Path &filename, Image &image) {
+base::result_void image_load_png(const Path &filename, Image &image) {
 	Stream *f = nullptr;
 	try {
 	f = os::fs::open(filename, "rb");
@@ -150,13 +150,17 @@ void image_load_png(const Path &filename, Image &image) {
 		msg_error("png: " + e.message());
 		if (f)
 			delete f;
+		return base::Error("png: " + e.message());
 	} catch(string &s) {
-		msg_error("png: " + s);
 		if (f)
 			delete f;
+		return base::Error("png: " + s);
 	}
+	return base::result_success();
 }
 
 #else
-void image_load_png(const string &filename, Image &image) {}
+base::result_void image_load_png(const string &filename, Image &image) {
+	return base::Error("can not load png file. Program was compiled without zlib support");
+}
 #endif

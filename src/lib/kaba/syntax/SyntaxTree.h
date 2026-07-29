@@ -22,6 +22,7 @@ namespace Asm {
 
 namespace kaba {
 
+struct ImportSource;
 class Module;
 struct SyntaxTree;
 class Parser;
@@ -44,6 +45,7 @@ struct Scope {
 	//base::map<string, Entry> entries;
 	Array<Entry> entries;
 	shared_array<Node> find(const string &name, int token_id) const;
+	bool add_module(const string &name, const Module *m);
 	bool add_class(const string &name, const Class *c);
 	bool add_function(const string &name, const Function *f);
 	bool add_variable(const string &name, const Variable *v);
@@ -57,8 +59,8 @@ struct SyntaxTree {
 	~SyntaxTree();
 
 	void default_import();
-	void import_data_all(const Class *source, int token_id);
-	void import_data_selective(const Class *cl, const Function *f, const Variable *v, const Constant *cn, const string &as_name, int token_id);
+	void import_data_all(const ImportSource& source, int token_id, bool also_export);
+	void import_data_single_item(const ImportSource& source, const string &as_name, int token_id, bool also_export);
 
 	void do_error(const string &msg, int override_token_id = -1);
 	
@@ -123,7 +125,8 @@ struct SyntaxTree {
 
 	Class *base_class;
 	shared<Class> _base_class;
-	Scope global_scope;
+	Scope global_scope; // only imports...
+	Scope import_export_scope;
 	shared<Class> implicit_symbols;
 	Array<const Class*> owned_classes;
 	shared_array<Module> includes;

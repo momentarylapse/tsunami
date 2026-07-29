@@ -70,6 +70,7 @@ enum class NodeKind {
 	LocalMemory,         // local (but LinkNr = address)
 	// special
 	Class,
+	Module,
 	ArrayBuilder,        // = [X,Y,...]
 	ArrayBuilderFor,
 	ArrayBuilderForIf,
@@ -133,6 +134,7 @@ struct Node : Sharable<base::Empty> {
 	Block *as_block() const;
 	Function *as_func() const;
 	const Class *as_class() const;
+	const Module *as_module() const;
 	Constant *as_const() const;
 	Operator *as_op() const;
 	AbstractOperator *as_abstract_op() const;
@@ -177,6 +179,7 @@ shared<Node> add_node_special_function_call(SpecialFunctionID id, int token_id =
 shared<Node> add_node_special_function_name(SpecialFunctionID id, int token_id = -1, const Class *type = common_types._void);
 shared<Node> add_node_member_call(const Function *f, const shared<Node> inst, int token_id = -1, const shared_array<Node> &params = {}, bool force_non_virtual = false);
 shared<Node> add_node_func_name(const Function *f, int token_id = -1);
+shared<Node> add_node_module(const Module *c, int token_id = -1);
 shared<Node> add_node_class(const Class *c, int token_id = -1);
 shared<Node> add_node_call(const Function *f, int token_id = -1);
 shared<Node> add_node_const(const Constant *c, int token_id = -1);

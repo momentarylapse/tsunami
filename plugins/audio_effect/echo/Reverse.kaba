@@ -9,7 +9,7 @@ class Reverse extends AudioEffect
 	func override process(out buf: AudioBuffer)
 		let n = len(buf) / 2
 		for mut c in buf.c
-			for mut i in 0:n
+			for i in 0:n
 				let j = len(buf) - i - 1
 				let x = c[i]
 				c[i] = c[j]

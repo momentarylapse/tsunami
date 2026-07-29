@@ -12,6 +12,10 @@ bool plane::operator==(const plane& o) const {
 	return n == o.n and d == o.d;
 }
 
+bool plane::operator!=(const plane& o) const {
+	return !(*this == o);
+}
+
 string plane::str() const {
 	return format("(%f, %f, %f, %f)", n.x, n.y, n.z, d);
 }

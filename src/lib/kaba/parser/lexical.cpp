@@ -533,6 +533,8 @@ bool ExpressionBuffer::analyse_expression(const char *source, int &pos, Expressi
 			((c == '>') and (source[pos] == '>')) or // >>
 			((c == '+') and (source[pos] == '+')) or // ++
 			((c == '-') and (source[pos] == '-')) or // --
+			((c == '&') and (source[pos] == '=')) or // &=
+			((c == '|') and (source[pos] == '=')) or // |=
 			((c == '|') and (source[pos] == '>')) or // |>
 			((c == '=') and (source[pos] == '>')) or // =>
 			((c == '-') and (source[pos] == '>')) or // ->

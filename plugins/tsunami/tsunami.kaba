@@ -9,17 +9,15 @@
 #                                                                      #
 #----------------------------------------------------------------------#
 
-use .common.*
-use .beats.*
-use .midi.*
-use .modules.*
-use .song.*
-use .streams.*
-use .other.*
-use .ui.*
-use .processing.*
-
-let EXPORT_IMPORTS = true
+use out .common.*
+use out .beats.*
+use out .midi.*
+use out .modules.*
+use out .song.*
+use out .streams.*
+use out .other.*
+use out .ui.*
+use out .processing.*
 
 use async.*
 use hui
@@ -36,10 +34,10 @@ class extern override Session
 	var override view: AudioView&
 	var override storage: Storage&
 	var override playback: owned![Playback]
-	
+
 	#DeviceManager* device_manager
 	#PluginManager* plugin_manager
-	
+
 	func extern mut create_signal_chain(name: string) -> shared![SignalChain]
 	func extern mut load_signal_chain(filename: os.Path) -> shared[SignalChain]
 	func extern mut remove_signal_chain(chain: SignalChain*)

@@ -717,6 +717,9 @@ shared<Node> Transformer::conv_class_and_func_to_const(shared<Node> n) {
 	if (n->kind == NodeKind::Class) {
 		return add_node_const(tree->add_constant_pointer(common_types.class_ref, n->as_class()));
 	}
+	if (n->kind == NodeKind::Module) {
+		return add_node_const(tree->add_constant_pointer(common_types.module_ref, n->as_module()));
+	}
 	if (n->kind == NodeKind::SpecialFunctionName) {
 		return add_node_const(tree->add_constant_pointer(common_types.special_function_ref, n->as_special_function()));
 	}

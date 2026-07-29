@@ -20,6 +20,7 @@ struct Constant;
 
 struct ImportSource {
 	shared<Module> module;
+	bool is_scope = false;
 	const Class *_class = nullptr;
 	const Function *func = nullptr;
 	const Variable *var = nullptr;

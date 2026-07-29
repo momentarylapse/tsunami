@@ -466,10 +466,10 @@ void SIAddPackageBase(Context *c) {
 	common_types.exception_xfer	= add_type_p_xfer(common_types.exception);
 
 	lib_create_list<void*>(common_types.pointer_list);
-	lib_create_list<bool>(common_types.bool_list);
-	lib_create_list<int>(common_types.i32_list);
-	lib_create_list<float>(common_types.f32_list);
-	lib_create_list<double>(common_types.f64_list);
+	lib_create_list<bool, true, false>(common_types.bool_list);
+	lib_create_list<int, true, false>(common_types.i32_list);
+	lib_create_list<float, true, false>(common_types.f32_list);
+	lib_create_list<double, true, false>(common_types.f64_list);
 	lib_create_list<char>(common_types.string);
 	lib_create_list<uint8>(common_types.bytes);
 	lib_create_list<string>(common_types.string_list);
@@ -907,6 +907,7 @@ void SIAddPackageBase(Context *c) {
 			func_add_param("glue", common_types.string);
 		add_operator(OperatorID::Equal, common_types._bool, common_types.string_list, common_types.string_list, InlineID::None, &StringList::__eq__);
 		add_operator(OperatorID::NotEqual, common_types._bool, common_types.string_list, common_types.string_list, InlineID::None, &StringList::__neq__);
+		// deprecated: (use 'a|b' instead)
 		add_operator(OperatorID::Add, common_types.string_list, common_types.string_list, common_types.string_list, InlineID::None, &StringList::__add__); // legacy... |
 		add_operator(OperatorID::AddAssign, common_types._void, common_types.string_list, common_types.string_list, InlineID::None, &StringList::__adds__); // legacy... |=
 

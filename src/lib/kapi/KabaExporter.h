@@ -115,6 +115,12 @@ T generic_##NAME(const T& a, O b) { \
 	return a OP b; \
 }
 
+#define CREATE_GENERIC_CMP_OPERATOR(NAME, OP) \
+template<class T, class O = const T&> \
+bool generic_##NAME(const T& a, O b) { \
+	return a OP b; \
+}
+
 CREATE_GENERIC_INPLACE_OPERATOR(assign, =)
 CREATE_GENERIC_OPERATOR(add, +)
 CREATE_GENERIC_INPLACE_OPERATOR(iadd, +=)
@@ -124,6 +130,12 @@ CREATE_GENERIC_OPERATOR(mul, *)
 CREATE_GENERIC_INPLACE_OPERATOR(imul, *=)
 CREATE_GENERIC_OPERATOR(div, /)
 CREATE_GENERIC_INPLACE_OPERATOR(idiv, /=)
+CREATE_GENERIC_CMP_OPERATOR(equal, ==)
+CREATE_GENERIC_CMP_OPERATOR(not_equal, !=)
+CREATE_GENERIC_CMP_OPERATOR(smaller, <)
+CREATE_GENERIC_CMP_OPERATOR(smaller_equal, <=)
+CREATE_GENERIC_CMP_OPERATOR(greater, >)
+CREATE_GENERIC_CMP_OPERATOR(greater_equal, >=)
 
 /*template<class T>
 void generic_assign(T& a, const T& b) {

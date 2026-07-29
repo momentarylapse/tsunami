@@ -35,6 +35,8 @@ AbstractOperator abstract_operators[(int)OperatorID::_Count_] = {
 	{"%",  OperatorID::Modulo,        13, Identifier::func::Modulo, OperatorFlags::Binary},
 	{"&",  OperatorID::BitAnd,       8, Identifier::func::BitAnd, OperatorFlags::Binary},
 	{"|",  OperatorID::BitOr,        6, Identifier::func::BitOr, OperatorFlags::Binary},
+	{"&=",  OperatorID::BitAndAssign,       0, Identifier::func::BitAndAssign, OperatorFlags::Binary | OperatorFlags::LeftIsModifiable},
+	{"|=",  OperatorID::BitOrAssign,        0, Identifier::func::BitOrAssign, OperatorFlags::Binary | OperatorFlags::LeftIsModifiable},
 	{"<<", OperatorID::ShiftLeft,    11, Identifier::func::ShiftLeft, OperatorFlags::Binary},
 	{">>", OperatorID::ShiftRight,   11, Identifier::func::ShiftRight, OperatorFlags::Binary},
 	{"++", OperatorID::Increase,      3, Identifier::func::Increase, OperatorFlags::UnaryLeft | OperatorFlags::LeftIsModifiable},

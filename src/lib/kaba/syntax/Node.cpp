@@ -85,6 +85,8 @@ string kind2str(NodeKind kind) {
 		return "definitely";
 	if (kind == NodeKind::Class)
 		return "class";
+	if (kind == NodeKind::Module)
+		return "module";
 	if (kind == NodeKind::ArrayBuilder)
 		return "array builder";
 	if (kind == NodeKind::ArrayBuilderFor)
@@ -196,6 +198,8 @@ string Node::signature(const Class *ns) const {
 		return ::str(link_no) + t;
 	if (kind == NodeKind::Class)
 		return as_class()->cname(ns);
+	if (kind == NodeKind::Module)
+		return as_class()->cname(ns);
 	if (kind == NodeKind::Register)
 		return Asm::get_reg_name((Asm::RegID)link_no) + t;
 	if (kind == NodeKind::Address)
@@ -277,6 +281,10 @@ Function *Node::as_func() const {
 
 const Class *Node::as_class() const {
 	return (const Class*)link_no;
+}
+
+const Module *Node::as_module() const {
+	return (const Module*)link_no;
 }
 
 Constant *Node::as_const() const {
@@ -507,6 +515,10 @@ shared<Node> add_node_func_name(const Function *f, int token_id) {
 
 shared<Node> add_node_class(const Class *c, int token_id) {
 	return new Node(NodeKind::Class, (int_p)c, common_types.class_ref, Flags::None, token_id);
+}
+
+shared<Node> add_node_module(const Module *c, int token_id) {
+	return new Node(NodeKind::Module, (int_p)c, common_types.module_ref, Flags::None, token_id);
 }
 
 

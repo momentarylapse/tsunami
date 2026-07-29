@@ -69,11 +69,11 @@ Path import_dir_match(const Path &dir0, const string &name) {
 	return Path::EMPTY;
 }*/
 
-Path check_package_dir(const Path& dir, const string& name) {
-	//msg_write(format("CHECK %s  %s", dir, name));
+Path check_package_dir(const Path& dir, const string& package_name, const string& name) {
+	// msg_write(format("CHECK %s  %s", dir, name));
 	auto xx = name.explode("/");
 	string name2 = name;
-	if (xx.num >= 2)
+	if (xx.num >= 2 and xx[0] == package_name)
 		name2 = implode(xx.sub_ref(1), "/");
 
 	const auto fn = dir | (name2 + ".kaba");
@@ -87,11 +87,11 @@ Path find_installed_package_import(Context* ctx, string& package_name, const str
 	// packages provided by host program
 	for (auto& i: ctx->package_inits)
 		if (i.name == package_name)
-			if (auto fn = check_package_dir(i.dir, name))
+			if (auto fn = check_package_dir(i.dir, package_name, name))
 				return fn;
 
 	// system wide install
-	if (auto fn = check_package_dir(ctx->packages_root() | package_name, name))
+	if (auto fn = check_package_dir(ctx->packages_root() | package_name, package_name, name))
 		return fn;
 
 	return Path::EMPTY;
@@ -115,24 +115,25 @@ Path find_import_module_file(Module *s, const string &_name) {
 	} else if (name.num > 0) {
 		// "absolute"...
 
-		string package_name = name.explode("/")[0];
+		string wanted_package_name = name.explode("/")[0];
 
 		// already loaded package
 		for (auto p: s->context->external_packages)
-			if (p->name == package_name)
-				if (auto fn = check_package_dir(p->directory, name))
+			if (p->name == wanted_package_name)
+				if (auto fn = check_package_dir(p->directory, p->name, name))
 					return fn;
 
 		// installed?
-		if (auto fn = find_installed_package_import(s->context, package_name, name))
+		if (auto fn = find_installed_package_import(s->context, wanted_package_name, name))
 			return fn;
 
-		// local/relative path
+		// fallback: local/relative path
+		//  useful for editors finding not-installed packages
 		for (int i=0; i<MAX_IMPORT_DIRECTORY_PARENTS; i++) {
-			if (auto fn = check_package_dir((s->filename.parent() | string("../").repeat(i)).canonical() | package_name, name))
-				return fn;
-			if (auto fn = check_package_dir((s->filename.parent() | string("../").repeat(i)).canonical(), name))
-				return fn;
+			const auto dir = (s->filename.parent() | string("../").repeat(i)).canonical() | wanted_package_name;
+			if (os::fs::exists(dir))
+				if (auto fn = check_package_dir(dir, wanted_package_name, name))
+					return fn;
 		}
 	}
 	return Path::EMPTY;
@@ -219,7 +220,7 @@ ImportSource resolve_import_source(Parser *parser, const Array<string> &name, in
 	for (int i=name.num-1; i>=0; i--) {
 		if (auto m = get_import_module(parser, implode(name.sub_ref(0, i+1), "."), token)) {
 			source.module = m;
-			source._class = m->base_class();
+			source.is_scope = true;
 			i_module = i;
 			break;
 		}
@@ -229,6 +230,10 @@ ImportSource resolve_import_source(Parser *parser, const Array<string> &name, in
 
 	// symbol in module...
 	for (int i=i_module+1; i<name.num; i++) {
+		if (source.is_scope) {
+			source._class = source.module->base_class();
+			source.is_scope = false;
+		}
 		if (source._class) {
 			source = resolve_import_sub(source, name[i]);
 			if (!source.module)
@@ -264,20 +269,31 @@ void namespace_import_contents(SyntaxTree *tree, Scope &dest, const Class *sourc
 		if (!ok)
 			tree->do_error(format("can not import class '%s' since symbol '%s' is already in scope", source->long_name(), name));
 	};
+	auto filter = [] (const string& name) {
+		if (/*name.head(1) == "_" or*/ name.head(1) == "-") // FIXME  _int_out() _print_postfix_ etc... :P
+			return false;
+		if (name == "EXPORT_IMPORTS") // :P
+			return false;
+		return true;
+	};
 	for (const auto&& [name, type]: source->type_aliases)
-		check(dest.add_class(name, type), name);
-	for (auto *c: weak(source->classes))
-		check(dest.add_class(c->name, c), c->name);
-	for (auto *f: weak(source->functions))
-		check(dest.add_function(f->name, f), f->name);
-	for (auto *v: weak(source->static_variables))
-		check(dest.add_variable(v->name, v), v->name);
-	for (auto *c: weak(source->constants))
-		if (c->name.head(1) != "-" and c->name != "EXPORT_IMPORTS")
+		if (filter(name))
+			check(dest.add_class(name, type), name);
+	for (auto c: weak(source->classes))
+		if (filter(c->name))
+			check(dest.add_class(c->name, c), c->name);
+	for (auto f: weak(source->functions))
+		if (filter(f->name))
+			check(dest.add_function(f->name, f), f->name);
+	for (auto v: weak(source->static_variables))
+		if (filter(v->name))
+			check(dest.add_variable(v->name, v), v->name);
+	for (auto c: weak(source->constants))
+		if (filter(c->name))
 			check(dest.add_const(c->name, c), c->name);
 }
 
-void general_import(SyntaxTree *me, SyntaxTree *source) {
+void import_flags(SyntaxTree *me, SyntaxTree *source) {
 	for (auto i: weak(me->includes))
 		if (i->tree == source)
 			return;
@@ -293,84 +309,54 @@ void general_import(SyntaxTree *me, SyntaxTree *source) {
 	me->includes.add(source->module);
 }
 
-void SyntaxTree::import_data_all(const Class *source, int token_id) {
-	general_import(this, source->owner);
-	namespace_import_contents(this, global_scope, source, token_id);
-
-
-	// hack: package auto import
-	for (auto c: weak(source->constants))
-		if (c->name == "EXPORT_IMPORTS") {
-			for (auto i: weak(source->owner->includes))
-				if (!i->is_system_module())
-					import_data_all(i->base_class(), token_id);
-		}
+void SyntaxTree::import_data_all(const ImportSource& source, int token_id, bool also_export) {
+	import_flags(this, source.module->tree.get());
+	auto source_class = source._class;
+	if (source.is_scope) {
+		source_class = source.module->tree->base_class;
+		global_scope.entries.append(source.module->tree->import_export_scope.entries);
+		if (also_export)
+			import_export_scope.entries.append(source.module->tree->import_export_scope.entries);
+	}
+	namespace_import_contents(this, global_scope, source_class, token_id);
+	if (also_export)
+		namespace_import_contents(this, import_export_scope, source_class, token_id);
 }
 
-void SyntaxTree::import_data_selective(const Class *cl, const Function *f, const Variable *v, const Constant *cn, const string &as_name, int token_id) {
-	if (cl) {
-		general_import(this, cl->owner);
-		if (global_scope.add_class(as_name, cl))
+void SyntaxTree::import_data_single_item(const ImportSource& source, const string &as_name, int token_id, bool also_export) {
+	if (source.is_scope) {
+		import_flags(this, source.module->tree.get());
+		if (also_export)
+			import_export_scope.add_module(as_name, source.module.get());
+		if (global_scope.add_module(as_name, source.module.get()))
 			return;
-	} else if (f) {
-		general_import(this, f->owner());
-		if (global_scope.add_function(as_name, f))
+	} else if (source._class) {
+		import_flags(this, source._class->owner);
+		if (also_export)
+			import_export_scope.add_class(as_name, source._class);
+		if (global_scope.add_class(as_name, source._class))
 			return;
-	} else if (v) {
+	} else if (source.func) {
+		import_flags(this, source.func->owner());
+		if (also_export)
+			import_export_scope.add_function(as_name, source.func);
+		if (global_scope.add_function(as_name, source.func))
+			return;
+	} else if (source.var) {
 		//general_import(this, v->);
-		if (global_scope.add_variable(as_name, v))
+		if (also_export)
+			import_export_scope.add_variable(as_name, source.var);
+		if (global_scope.add_variable(as_name, source.var))
 			return;
-	} else if (cn) {
-		general_import(this, cn->owner);
-		if (global_scope.add_const(as_name, cn))
+	} else if (source._const) {
+		import_flags(this, source._const->owner);
+		if (also_export)
+			import_export_scope.add_const(as_name, source._const);
+		if (global_scope.add_const(as_name, source._const))
 			return;
 	}
 	do_error(format("symbol '%s' already in scope", as_name), token_id);
 }
-
-#if 0
-// import data from an included module file
-void SyntaxTree::import_data(shared<Module> source, const Class *source, bool directly_import_contents, const string &as_name) {
-	for (auto i: weak(includes))
-		if (i == source)
-			return;
-
-	SyntaxTree *ps = source->tree.get();
-
-	// propagate immortality TO the (dependent) source!
-	//  (might be unnecessary due to shared pointers)
-	if (flag_immortal)
-		SetImmortal(ps);
-
-	flag_string_const_as_cstring |= ps->flag_string_const_as_cstring;
-
-
-	/*if (FlagCompileOS) {
-		import_deep(this, ps);
-	} else {*/
-	if (!directly_import_contents) {
-		// "use aaa.bbb"
-		namespace_import_contents(imported_symbols.get(), ps->base_class);
-	} else {
-		// "use aaa.bbb.*"
-		namespace_import_contents(imported_symbols.get(), ps->base_class);
-		if (source->is_system_module())
-			if (!_class_contains(imported_symbols.get(), ps->base_class->name)) {
-				imported_symbols->classes.add(ps->base_class);
-			}
-
-		// hack: package auto import
-		for (auto c: weak(ps->base_class->constants))
-			if (c->name == "EXPORT_IMPORTS") {
-				for (auto i: weak(ps->includes))
-					if (!i->is_system_module())
-						import_data(i, directly_import_contents, "");
-			}
-	}
-	includes.add(source);
-	//}
-}
-#endif
 
 
 }

@@ -60,7 +60,7 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 	}
 
 	{
-		// for i=>el in self
+		// for mut i=>el in self
 		//    el = other[i]
 
 		auto v_el = f->block->add_var("el", tree->type_ref(t_el), -1);
@@ -303,6 +303,134 @@ void AutoImplementer::implement_list_equal(Function *f, const Class *t) {
 	}
 }
 
+void AutoImplementer::implement_list_contains(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto te = t->get_array_element();
+	auto other = add_node_local(f->__get_var("x"));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
+
+	{
+		// for i=>e in self
+		//     if e == other
+		//         return true
+		auto v_el = f->block->add_var("el", tree->type_ref(t->get_array_element()), -1);
+		auto v_i = f->block->add_var("i", common_types.i32, -1);
+
+		auto b = add_node_block(new Block(f, f->block), common_types._void);
+
+		auto n_if = add_node_statement(StatementID::If);
+		n_if->set_num_params(2);
+		n_if->set_param(1, node_return(node_true()));
+		b->add(n_if);
+
+		if (auto n_eq = parser->con.link_operator_id(OperatorID::Equal, add_node_local(v_el)->deref(), other)) {
+			n_if->set_param(0, n_eq);
+		} else if (auto n_neq = parser->con.link_operator_id(OperatorID::NotEqual, add_node_local(v_el)->deref(), other)) {
+			n_if->set_param(0, add_node_operator_by_inline(InlineID::BoolNot, n_neq, nullptr));
+		} else {
+			do_error_implicit(f, format("neither operator %s != %s nor == found", te->long_name(), te->long_name()));
+		}
+
+
+		auto n_for = add_node_statement(StatementID::For);
+		// [VAR, INDEX, ARRAY, BLOCK]
+		n_for->set_param(0, add_node_local(v_el));
+		n_for->set_param(1, add_node_local(v_i));
+		n_for->set_param(2, self);
+		n_for->set_param(3, b);
+		f->block_node->add(n_for);
+	}
+
+	{
+		// return false
+		f->block_node->add(node_return(node_false()));
+	}
+}
+
+void AutoImplementer::implement_list_join_into(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto te = t->get_array_element();
+	auto other = add_node_local(f->__get_var("other"));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
+
+	auto i0 = f->block->add_var("i0", common_types.i32, -1);
+
+	{
+		// i0 = len(self)
+		f->block_node->add(add_assign(f, "", add_node_local(i0), sa_num(self)));
+	}
+
+
+	if (auto f_resize = t->get_member_func("resize", common_types._void, {common_types.i32})) {
+		// self.resize(self.num + other.num)
+		auto other_num = sa_num(other);
+
+		auto n_resize = add_node_member_call(f_resize, self);
+		n_resize->set_num_params(2);
+		n_resize->set_param(1, add_node_operator_by_inline(InlineID::Int32Add, sa_num(self), sa_num(other)));
+		f->block_node->add(n_resize);
+	} else {
+		do_error_implicit(f, format("no %s.resize(int) found", t->long_name()));
+	}
+
+
+	{
+		// for i=>el in other
+		//    self[i + i0] = el
+
+		auto v_el = f->block->add_var("el", tree->type_ref(te), -1);
+		auto v_i = f->block->add_var("i", common_types.i32, -1);
+
+		auto b = add_node_block(new Block(f, f->block), common_types._void);
+
+		// self[i + i0]
+		auto self_el = add_node_dyn_array(self, add_node_operator_by_inline(InlineID::Int32Add, add_node_local(v_i), add_node_local(i0)));
+
+		b->add(add_assign(f, "", self_el, add_node_local(v_el)->deref()));
+
+		auto n_for = add_node_statement(StatementID::For);
+		// [VAR, INDEX, ARRAY, BLOCK]
+		n_for->set_param(0, add_node_local(v_el));
+		n_for->set_param(1, add_node_local(v_i));
+		n_for->set_param(2, other);
+		n_for->set_param(3, b);
+		f->block_node->add(n_for);
+	}
+}
+
+void AutoImplementer::implement_list_join(Function *f, const Class *t) {
+	if (!f)
+		return;
+	auto other = add_node_local(f->__get_var("other"));
+	auto self = add_node_local(f->__get_var(Identifier::Self));
+
+	auto r = f->block->add_var("r", t, -1);
+
+	{
+		// r = self
+		f->block_node->add(add_assign(f, "", add_node_local(r), self));
+	}
+
+	if (auto f_join = t->get_member_func(Identifier::func::BitOrAssign, common_types._void, {t})) {
+		// r |= other
+
+		auto n_join = add_node_member_call(f_join, add_node_local(r));
+		n_join->set_num_params(2);
+		n_join->set_param(1, other);
+		f->block_node->add(n_join);
+	} else {
+		do_error_implicit(f, format("no %s.__ibitor__(...) found", t->long_name()));
+	}
+
+
+	{
+		// return r
+		f->block_node->add(node_return(add_node_local(r)));
+	}
+}
+
 void AutoImplementer::implement_list_give(Function *f, const Class *t) {
 	auto t_el = t->get_array_element();
 	auto t_xfer = tree->request_implicit_class_xfer(t_el->param[0], -1);
@@ -340,7 +468,10 @@ void AutoImplementer::_implement_functions_for_list(const Class *t) {
 		implement_list_assign(prepare_auto_impl(t, t->get_member_func(Identifier::func::Assign, common_types._void, {t_xfer_list})), t);
 	}
 	implement_list_assign(prepare_auto_impl(t, t->get_assign()), t);
+	implement_list_join_into(prepare_auto_impl(t, t->get_member_func(Identifier::func::BitOrAssign, common_types._void, {t})), t);
+	implement_list_join(prepare_auto_impl(t, t->get_member_func(Identifier::func::BitOr, t, {t})), t);
 	implement_list_equal(prepare_auto_impl(t, t->get_member_func(Identifier::func::Equal, common_types._bool, {t})), t);
+	implement_list_contains(prepare_auto_impl(t, t->get_member_func(Identifier::func::Contains, common_types._bool, {t->param[0]})), t);
 }
 
 
@@ -351,34 +482,43 @@ Class* TemplateClassInstantiatorList::declare_new_instance(SyntaxTree *tree, con
 
 void TemplateClassInstantiatorList::add_function_headers(Class* c) {
 	c->derive_from(common_types.dynamic_array); // we already set its size!
-	if (!class_can_default_construct(c->param[0]))
-		c->owner->do_error(format("can not create a dynamic array from type '%s', missing default constructor", c->param[0]->long_name()), c->token_id);
+	auto el = c->param[0];
+	if (!class_can_default_construct(el))
+		c->owner->do_error(format("can not create a dynamic array from type '%s', missing default constructor", el->long_name()), c->token_id);
+	bool single_ownership = false;
 
 	add_func_header(c, Identifier::func::Init, common_types._void, {}, {}, nullptr, Flags::Mutable);
 	add_func_header(c, Identifier::func::Delete, common_types._void, {}, {}, nullptr, Flags::Mutable);
 	add_func_header(c, "clear", common_types._void, {}, {}, nullptr, Flags::Mutable);
 	add_func_header(c, "resize", common_types._void, {common_types.i32}, {"num"}, nullptr, Flags::Mutable);
-	if (c->param[0]->is_pointer_owned() or c->param[0]->is_pointer_owned_not_null()) {
-		auto t_xfer = c->owner->request_implicit_class_xfer(c->param[0]->param[0], -1);
+	if (el->is_pointer_owned() or el->is_pointer_owned_not_null()) {
+		single_ownership = true;
+		auto t_xfer = c->owner->request_implicit_class_xfer(el->param[0], -1);
 		auto t_xfer_list = c->owner->request_implicit_class_list(t_xfer, -1);
 		add_func_header(c, "add", common_types._void, {t_xfer}, {"x"}, nullptr, Flags::Mutable);
 		add_func_header(c, Identifier::func::OwnedGive, t_xfer_list, {}, {}, nullptr, Flags::Mutable);
 		//add_func_header(c, Identifier::Func::ASSIGN, common_types._void, {t_xfer_list}, {"other"});
 		add_func_header(c, Identifier::func::Assign, common_types._void, {t_xfer_list}, {"other"}, nullptr, Flags::Mutable);
-	} else if (c->param[0]->is_pointer_xfer_not_null()) {
-		//	add_func_header(c, "add", common_types._void, {c->param[0]}, {"x"});
+	} else if (el->is_pointer_xfer_not_null()) {
+		//	add_func_header(c, "add", common_types._void, {el}, {"x"});
 		add_func_header(c, Identifier::func::Assign, common_types._void, {c}, {"other"}, nullptr, Flags::Mutable);
-	} else if (c->param[0]->is_reference()) {
-		add_func_header(c, "add", common_types._void, {c->param[0]}, {"x"});
+	} else if (el->is_reference()) {
+		add_func_header(c, "add", common_types._void, {el}, {"x"});
 		add_func_header(c, Identifier::func::Assign, common_types._void, {c}, {"other"}, nullptr, Flags::Mutable);
 	} else {
-		add_func_header(c, "add", common_types._void, {c->param[0]}, {"x"}, nullptr, Flags::Mutable);
-		if (class_can_assign(c->param[0]))
+		add_func_header(c, "add", common_types._void, {el}, {"x"}, nullptr, Flags::Mutable);
+		if (class_can_assign(el))
 			add_func_header(c, Identifier::func::Assign, common_types._void, {c}, {"other"}, nullptr, Flags::Mutable);
 	}
 	add_func_header(c, "remove", common_types._void, {common_types.i32}, {"index"}, nullptr, Flags::Mutable);
-	if (class_can_equal(c->param[0]))
+	if (!single_ownership and class_can_assign(el)) {
+		add_func_header(c, Identifier::func::BitOrAssign, common_types._void, {c}, {"other"}, nullptr, Flags::Mutable);
+		add_func_header(c, Identifier::func::BitOr, c, {c}, {"other"}, nullptr, Flags::Pure);
+	}
+	if (class_can_equal(el)) {
 		add_func_header(c, Identifier::func::Equal, common_types._bool, {c}, {"other"}, nullptr, Flags::Pure);
+		add_func_header(c, Identifier::func::Contains, common_types._bool, {el}, {"x"}, nullptr, Flags::Pure);
+	}
 }
 
 }

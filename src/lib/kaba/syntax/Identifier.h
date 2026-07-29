@@ -119,6 +119,8 @@ namespace Identifier {
 		extern const string ShiftRight;
 		extern const string BitAnd;
 		extern const string BitOr;
+		extern const string BitAndAssign;
+		extern const string BitOrAssign;
 		extern const string Increase;
 		extern const string Decrease;
 		extern const string Exponent;

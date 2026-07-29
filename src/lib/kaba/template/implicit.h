@@ -45,6 +45,9 @@ public:
 	void implement_list_add(Function *f, const Class *t);
 	void implement_list_remove(Function *f, const Class *t);
 	void implement_list_equal(Function *f, const Class *t);
+	void implement_list_join_into(Function *f, const Class *t);
+	void implement_list_join(Function *f, const Class *t);
+	void implement_list_contains(Function *f, const Class *t);
 	void implement_list_give(Function *f, const Class *t);
 	void implement_dict_constructor(Function *f, const Class *t);
 	void implement_dict_clear(Function *f, const Class *t);

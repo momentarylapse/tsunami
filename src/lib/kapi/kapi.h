@@ -122,6 +122,7 @@ struct CommonTypes {
 	const Class* function_code;
 	const Class* function_code_ref;
 	const Class* special_function;
+	const Class* module_ref;
 
 	const Class* raw_t;
 	const Class* xfer_t;

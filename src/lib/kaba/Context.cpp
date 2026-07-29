@@ -241,7 +241,7 @@ void Context::execute_single_command(const string &cmd) {
 
 	for (const auto& name: additional_import_packages) {
 		auto source = resolve_import_source(parser, {name}, -1);
-		tree->import_data_selective(source._class, source.func, source.var, source._const, name, -1);
+		tree->import_data_single_item(source, name, -1, false);
 	}
 
 // find expressions
@@ -253,7 +253,7 @@ void Context::execute_single_command(const string &cmd) {
 	
 	for (auto p: weak(internal_packages))
 		if (!p->auto_import)
-			tree->import_data_selective(p->main_module->base_class(), nullptr, nullptr, nullptr, str(p->main_module->filename), -1);
+			tree->import_data_single_item({p->main_module, true}, str(p->main_module->filename), -1, false);
 
 // analyse syntax
 
@@ -522,6 +522,8 @@ Array<string> Context::list_operator_functions() const {
 		Identifier::func::Negative,
 		Identifier::func::BitAnd,
 		Identifier::func::BitOr,
+		Identifier::func::BitAndAssign,
+		Identifier::func::BitOrAssign,
 		Identifier::func::MapsTo,
 		Identifier::func::Call
 	};

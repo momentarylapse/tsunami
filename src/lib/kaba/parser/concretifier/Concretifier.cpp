@@ -9,6 +9,7 @@
 #include "../Parser.h"
 #include "../../template/template.h"
 #include "../../Context.h"
+#include "../../Module.h"
 #include "../../lib/lib.h"
 #include "../../dynamic/exception.h"
 #include "../../dynamic/dynamic.h"
@@ -56,16 +57,20 @@ const Class *try_digest_type(SyntaxTree *tree, shared<Node> n) {
 	return nullptr;
 }
 
-const Class *get_user_friendly_type(shared<Node> operand) {
+string user_friendly_description(shared<Node> operand) {
 	const Class *type = operand->type;
 
-	if (operand->kind == NodeKind::Class) {
+	if (operand->kind == NodeKind::Module) {
+		return "<module " + operand->as_module()->filename.basename_no_ext() + ">";
+	} else if (operand->kind == NodeKind::Class) {
 		// referencing class functions
-		return operand->as_class();
+		return "<class " + operand->as_class()->long_name() + ">";
+	} else if (operand->kind == NodeKind::Dereference) {
+		return user_friendly_description(operand->params[0]);
 	} else if (type->is_reference()) {
-		return type->param[0];
+		return type->param[0]->long_name();
 	}
-	return type;
+	return type->long_name();
 }
 
 
@@ -169,6 +174,7 @@ shared<Node> Concretifier::link_special_operator_is(shared<Node> param1, shared<
 }
 
 shared<Node> Concretifier::link_special_operator_in(shared<Node> param1, shared<Node> param2, int token_id) {
+	param1 = force_concrete_type(param1);
 	param2 = force_concrete_type(param2);
 	auto *f = param2->type->get_member_func(Identifier::func::Contains, common_types._bool, {param1->type});
 	if (!f)
@@ -341,8 +347,8 @@ shared<Node> Concretifier::link_operator(AbstractOperator *primop, shared<Node> 
 					t1_best = op->param_type_1;
 					t2_best = op->param_type_2;
 				}
-	for (auto *cf: weak(p1->functions))
-		if (cf->name == op_func_name) {
+	for (auto cf: weak(p1->functions))
+		if (cf->name == op_func_name and cf->literal_param_type.num >= 2) {
 			if (type_match_with_cast(param2, false, cf->literal_param_type[1], c2)) {
 				if (c2.penalty < c2_best.penalty) {
 					op_cf_found = cf;
@@ -465,7 +471,7 @@ shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *bl
 
 	base = force_concrete_type(base);
 
-	if (base->kind == NodeKind::Class) {
+	if (base->kind == NodeKind::Class or base->kind == NodeKind::Module) {
 		auto links = tree->get_element_of(base, el, token_id);
 		if (links.num > 0)
 			return links;
@@ -482,7 +488,7 @@ shared_array<Node> Concretifier::concretify_element(shared<Node> node, Block *bl
 	if (links.num > 0)
 		return links;
 
-	do_error(format("unknown element of '%s'", get_user_friendly_type(base)->long_name()), node->params[1]);
+	do_error(format("unknown element of '%s'", user_friendly_description(base)), node->params[1]);
 	return {};
 }
 

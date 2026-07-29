@@ -26,28 +26,30 @@ struct Class;
 // operators
 enum class OperatorID {
 	None = -1,
-	Assign,        //  =
-	Add,           //  +
-	Subtract,      //  -
-	Multiply,      //  *
-	Divide,        //  /
-	Negative,      //  -
+	Assign,        // =
+	Add,           // +
+	Subtract,      // -
+	Multiply,      // *
+	Divide,        // /
+	Negative,      // -
 	AddAssign,     // +=
 	SubtractAssign,// -=
 	MultiplyAssign,// *=
 	DivideAssign,  // /=
 	Equal,         // ==
 	NotEqual,      // !=
-	Negate,        //  not
-	Smaller,       //  <
-	Greater,       //  >
+	Negate,        // not
+	Smaller,       // <
+	Greater,       // >
 	SmallerEqual,  // <=
 	GreaterEqual,  // >=
 	And,           // and
 	Or,            // or
-	Modulo,        //  %
-	BitAnd,        //  &
-	BitOr,         //  |
+	Modulo,        // %
+	BitAnd,        // &
+	BitOr,         // |
+	BitAndAssign,  // &=
+	BitOrAssign,   // |=
 	ShiftLeft,     // <<
 	ShiftRight,    // >>
 	Increase,      // ++

@@ -94,10 +94,6 @@ string kaba_stringify(const Array<T>& a) {
 template<class T>
 class XList : public Array<T> {
 public:
-	void _cdecl __init__() {
-		new(this) Array<T>();
-	}
-
 	static T sum(const Array<T> &list) {
 		T r{};
 		for (int i=0; i<list.num; i++)
@@ -139,9 +135,6 @@ public:
 			return false; // FIXME argh, shared<> == shared<>...
 		else
 			return this->find(v) >= 0;
-	}
-	void assign(const Array<T> &o) {
-		*(Array<T>*)this = o;
 	}
 	Array<T> __add__(const Array<T> &o) const {
 		return *(Array<T>*)this + o;
@@ -266,14 +259,14 @@ public:
 	}
 };
 
-template<class T, bool allow_str = true>
+template<class T, bool allow_str = true, bool allow_eq = true>
 void lib_create_list(const Class *tt) {
 	auto t = const_cast<Class*>(tt);
 	t->derive_from(common_types.dynamic_array, DeriveFlags::SET_SIZE);
 	auto t_element = t->param[0];
 
 	add_class(t);
-		class_add_func(Identifier::func::Init, common_types._void, &XList<T>::__init__, Flags::Mutable);
+		class_add_func(Identifier::func::Init, common_types._void, &generic_init<XList<T>>, Flags::Mutable);
 		class_add_func(Identifier::func::Delete, common_types._void, &XList<T>::clear, Flags::Mutable);
 		class_add_func("clear", common_types._void, &XList<T>::clear, Flags::Mutable);
 		class_add_func("add", common_types._void, &XList<T>::__add, Flags::Mutable);
@@ -292,12 +285,18 @@ void lib_create_list(const Class *tt) {
 		if constexpr (allow_str)
 			class_add_func(Identifier::func::Str, common_types.string, &XList<T>::str, Flags::Pure);
 
-		add_operator(OperatorID::Assign, common_types._void, t, t, InlineID::None, &XList<T>::assign);
+		add_operator(OperatorID::Assign, common_types._void, t, t, InlineID::None, &generic_assign<XList<T>>);
 		add_operator(OperatorID::In, common_types._bool, t, t_element, InlineID::None, &XList<T>::__contains__);
 		add_operator(OperatorID::BitOr, t, t, t, InlineID::None, &XList<T>::__add__);
-		//add_operator(OperatorID::BIT_OR_ASSIGN, common_types._void, t, t, InlineID::NONE, &XList<T>::__adds__);
+		add_operator(OperatorID::BitOrAssign, common_types._void, t, t, InlineID::None, &XList<T>::__adds__);
 
-	// TODO: ==, !=, +, +=
+		if constexpr (allow_eq) {
+			add_operator(OperatorID::Equal, common_types._bool, t, t, InlineID::None, &generic_equal<XList<T>>);
+
+		}
+
+	// TODO: ==, !=
+	// argh, i32[] uses == componentwise.... (-_-)'
 }
 
 }

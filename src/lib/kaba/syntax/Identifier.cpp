@@ -119,6 +119,8 @@ namespace Identifier {
 		const string ShiftRight = "__rshift__";
 		const string BitAnd = "__bitand__";
 		const string BitOr = "__bitor__";
+		const string BitAndAssign = "__ibitand__";
+		const string BitOrAssign = "__ibitor__";
 		const string Increase = "__inc__";
 		const string Decrease = "__dec__";
 		const string Exponent = "__exp__";

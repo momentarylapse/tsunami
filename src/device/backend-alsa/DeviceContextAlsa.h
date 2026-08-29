@@ -19,7 +19,7 @@ public:
 	~DeviceContextAlsa() override;
 
 	bool init() override;
-	void update_device(bool serious) override;
+	void update_device_list(bool serious) override;
 	MidiInputStream* create_midi_input_stream(Session *session, Device *device, void* shared_data) override;
 
 	_snd_seq *alsa_midi_handle = nullptr;

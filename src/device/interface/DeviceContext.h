@@ -28,7 +28,7 @@ public:
 	obs::xsource<Device> out_device_found{this, "device-found"};
 
 	virtual bool init() = 0;
-	virtual void update_device(bool serious) = 0;
+	virtual void update_device_list(bool serious) = 0;
 
 	// will return dummy objects, if not possible
 	virtual AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data);

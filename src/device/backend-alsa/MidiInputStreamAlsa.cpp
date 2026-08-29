@@ -22,7 +22,9 @@ MidiInputStreamAlsa::MidiInputStreamAlsa(Session *session, Device *device, MidiI
 	shared_data.portid = snd_seq_create_simple_port(DeviceContextAlsa::instance->alsa_midi_handle, "Tsunami MIDI in",
 	                                    SND_SEQ_PORT_CAP_WRITE|SND_SEQ_PORT_CAP_SUBS_WRITE,
 	                                    SND_SEQ_PORT_TYPE_APPLICATION);
-	if (shared_data.portid < 0) {
+	if (shared_data.portid >= 0) {
+		update_device(device);
+	} else {
 		log_source->error(string("Error creating sequencer port: ") + snd_strerror(shared_data.portid));
 		error = true;
 	}
@@ -65,11 +67,12 @@ bool MidiInputStreamAlsa::update_device(Device* device) {
 		log_source->error(string("Error connecting to midi port: ") + snd_strerror(r));
 		snd_seq_port_subscribe_free(subs);
 		subs = nullptr;
+		return false;
 	}
 	return true;// r == 0;
 
 	// simple version raises "no permission" error...?!?
-	/*int r = snd_seq_connect_to(handle, portid, p.client, p.port);
+/*	int r = snd_seq_connect_to(DeviceContextAlsa::instance->alsa_midi_handle, portid, p.client, p.port);
 	if (r != 0)
 		tsunami->log->Error(string("Error connecting to midi port: ") + snd_strerror(r));
 	return r == 0;*/
@@ -105,6 +108,8 @@ void MidiInputStreamAlsa::tick() {
 		int r = snd_seq_event_input(DeviceContextAlsa::instance->alsa_midi_handle, &ev);
 		if (r < 0)
 			break;
+		// TODO check ev->dest <-> shared_data.portid
+		// ...needs central event processing for multiple streams...
 		float pitch = (float)ev->data.note.note;
 		switch (ev->type) {
 			case SND_SEQ_EVENT_NOTEON:

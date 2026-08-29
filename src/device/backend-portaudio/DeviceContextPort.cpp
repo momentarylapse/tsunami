@@ -67,7 +67,7 @@ void _portaudio_add_dev(DeviceManager *dm, DeviceType type, int index) {
 	}
 }
 
-void DeviceContextPort::update_device(bool serious) {
+void DeviceContextPort::update_device_list(bool serious) {
 	if (!fully_initialized)
 		return;
 	for (Device *d: device_manager->output_devices)

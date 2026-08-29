@@ -92,7 +92,7 @@ public:
 
 	float output_volume;
 
-	void update_devices(bool initial_discovery);
+	void update_device_list(bool initial_discovery);
 	Array<Device*> empty_device_list;
 	Array<Device*> output_devices;
 	Array<Device*> input_devices;

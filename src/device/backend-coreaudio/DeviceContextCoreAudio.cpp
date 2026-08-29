@@ -54,7 +54,7 @@ AudioInputStream* DeviceContextCoreAudio::create_audio_input_stream(Session *ses
 }
 
 
-void DeviceContextCoreAudio::update_device(bool serious) {
+void DeviceContextCoreAudio::update_device_list(bool serious) {
 	if (!fully_initialized)
 		return;
 

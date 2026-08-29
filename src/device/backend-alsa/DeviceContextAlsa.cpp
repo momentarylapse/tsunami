@@ -38,7 +38,7 @@ bool DeviceContextAlsa::init() {
 }
 
 
-void DeviceContextAlsa::update_device(bool serious) {
+void DeviceContextAlsa::update_device_list(bool serious) {
 	if (!alsa_midi_handle)
 		return;
 

@@ -98,7 +98,7 @@ DeviceContext* create_backend_context(DeviceManager* device_manager, DeviceManag
 	public:
 		DeviceContextDummy(DeviceManager* device_manager) : DeviceContext(device_manager) {}
 		bool init() override { return true; }
-		void update_device(bool serious) override {}
+		void update_device_list(bool serious) override {}
 	};
 	return new DeviceContextDummy(device_manager);
 }
@@ -173,7 +173,7 @@ void DeviceManager::write_config() {
 
 
 // don't poll pulse too much... it will send notifications anyways
-void DeviceManager::update_devices(bool initial_discovery) {
+void DeviceManager::update_device_list(bool initial_discovery) {
 	base::set<Device*> present_old;
 	for (auto d: all_devices()) {
 		if (d->present)
@@ -181,9 +181,9 @@ void DeviceManager::update_devices(bool initial_discovery) {
 		d->present = false;
 	}
 
-	audio_context->update_device(initial_discovery);
+	audio_context->update_device_list(initial_discovery);
 	if (midi_context)
-		midi_context->update_device(initial_discovery);
+		midi_context->update_device_list(initial_discovery);
 
 
 	for (auto d: all_devices()) {
@@ -285,7 +285,7 @@ void DeviceManager::init() {
 
 	auto init_context = [this](DeviceContext* ctx) {
 		ctx->out_request_update >> create_sink([this] {
-			update_devices(false);
+			update_device_list(false);
 		});
 		ctx->out_device_found >> create_data_sink<Device>([this] (const Device& dd) {
 			//msg_write("DEVICE FOUND..." + dd.internal_name);
@@ -305,7 +305,7 @@ void DeviceManager::init() {
 	midi_context = create_backend_context(this, midi_api);
 	init_context(midi_context);
 
-	update_devices(true);
+	update_device_list(true);
 
 
 #if HAS_LIB_ALSA
@@ -313,7 +313,7 @@ void DeviceManager::init() {
 	// pulse sends notifications and portaudio does not refresh internally (-_-)'
 	if (midi_api == ApiType::Alsa)
 		hui_rep_id = hui::run_repeated(2.0f, [] {
-			DeviceContextAlsa::instance->update_device(true);
+			DeviceContextAlsa::instance->update_device_list(true);
 		});
 #endif
 

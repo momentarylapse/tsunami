@@ -22,7 +22,7 @@ public:
 	~DeviceContextPipewire() override;
 
 	bool init() override;
-	void update_device(bool serious) override;
+	void update_device_list(bool serious) override;
 	AudioOutputStream* create_audio_output_stream(Session *session, Device *device, void* shared_data) override;
 	AudioInputStream* create_audio_input_stream(Session *session, Device *device, void* shared_data) override;
 

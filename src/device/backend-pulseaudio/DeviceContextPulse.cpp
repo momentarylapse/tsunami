@@ -159,7 +159,7 @@ void DeviceContextPulse::unlock() {
 }
 
 
-void DeviceContextPulse::update_device(bool serious) {
+void DeviceContextPulse::update_device_list(bool serious) {
 	if (!fully_initialized)
 		return;
 

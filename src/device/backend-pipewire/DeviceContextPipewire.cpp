@@ -123,7 +123,7 @@ void DeviceContextPipewire::unlock() {
 	pw_thread_loop_unlock(loop);
 }
 
-void DeviceContextPipewire::update_device(bool serious) {
+void DeviceContextPipewire::update_device_list(bool serious) {
 }
 
 AudioOutputStream* DeviceContextPipewire::create_audio_output_stream(Session *session, Device *device, void* shared_data) {

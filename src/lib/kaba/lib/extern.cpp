@@ -34,8 +34,15 @@ void ExternalLinkData::reset() {
 static const string LIB_LINK_PREFIX = "/";
 
 string decode_symbol_name(const string &_name) {
-	string name = _name.replace("lib__", "");
-	return name.replace("@list", "[]").replace("@optional", "?").replace("@@", ".").replace(common_types.string_auto_cast->name, "string");//.replace("@", "");
+	string name = _name.replace("lib__", "").
+		replace("@list", "[]").
+		replace("@optional", "?").
+		replace("@@", ".").
+		replace("@lb", "[").
+		replace("@rb", "]").
+		replace(common_types.string_auto_cast->name, "string");//.replace("@", "");
+	//msg_write("DEC: " + name + "            " + _name);
+	return name;
 }
 
 string class_link_name(const Class *c) {

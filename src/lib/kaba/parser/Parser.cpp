@@ -584,7 +584,8 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 			for (auto f: weak(trait->functions)) {
 				if (f->name == Identifier::func::Init or f->name == Identifier::func::AutoInitContext or f->name == Identifier::func::Delete)
 					continue;
-				realize_function(cp_node(f->abstract_node), common_types._void, _class);
+				auto ff = realize_function(cp_node(f->abstract_node), common_types._void, _class);
+				ff->auto_declared = true;
 			}
 		}
 

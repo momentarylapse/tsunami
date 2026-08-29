@@ -647,7 +647,7 @@ void *InstructionWithParamsList::get_label_value(const string &name) {
 
 void InstructionWithParamsList::add_wanted_label(int pos, int label_no, int inst_no, bool rel, bool abs, int size) {
 	if ((label_no < 0) or (label_no >= label.num))
-		raise_error("illegal wanted label request");
+		raise_error(format("illegal wanted label request %d / %d", label_no, label.num));
 	WantedLabel w;
 	w.pos = pos;
 	w.size = size;

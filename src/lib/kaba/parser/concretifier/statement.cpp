@@ -153,9 +153,9 @@ shared<Node> Concretifier::concretify_statement_try(shared<Node> node, Block *bl
 	// [TRY-BLOCK, EX:[TYPE, NAME], EX-BLOCK, ...]
 
 	_try_level ++;
-
 	auto try_block = concretify_node(node->params[0], block, block->name_space());
 	node->params[0] = try_block;
+	_try_level --;
 
 	int num_exceptions = (node->params.num - 1) / 2;
 	bool found_exception = false;
@@ -199,7 +199,6 @@ shared<Node> Concretifier::concretify_statement_try(shared<Node> node, Block *bl
 		node->params[2 + 2*i] = ex_block;
 	}
 	node->type = common_types._void;
-	_try_level --;
 	return node;
 }
 

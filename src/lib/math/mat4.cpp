@@ -315,7 +315,7 @@ mat4 mat4::reflection(const plane &pl) {
 // maps the POSITIVE z-half-space
 mat4 mat4::perspective(float fovy, float aspect, float z_near, float z_far, bool z_sym) {
 	mat4 m;
-	float f = 1 / tan(fovy / 2);
+	float f = 1 / tanf(fovy / 2);
 	float ndz = z_far - z_near;
 	if (z_sym) {
 		m._00 = f / aspect; m._01 = 0; m._02 = 0;                      m._03 = 0;

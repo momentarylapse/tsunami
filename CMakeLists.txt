@@ -698,7 +698,7 @@ add_library(moduletsunami SHARED
 	src/module/ModuleConfiguration.cpp
 	src/module/ModuleFactory.cpp
 	src/module/SignalChain.cpp
-	src/plugins/ExtendedAudioBuffer.cpp
+	src/plugins/export.cpp
 	src/plugins/Plugin.cpp
 	src/plugins/PluginManager.cpp
 	src/plugins/PresetManager.cpp
@@ -1265,7 +1265,7 @@ add_executable(tsunami WIN32
 	src/module/ModuleConfiguration.cpp
 	src/module/ModuleFactory.cpp
 	src/module/SignalChain.cpp
-	src/plugins/ExtendedAudioBuffer.cpp
+	src/plugins/export.cpp
 	src/plugins/Plugin.cpp
 	src/plugins/PluginManager.cpp
 	src/plugins/PresetManager.cpp

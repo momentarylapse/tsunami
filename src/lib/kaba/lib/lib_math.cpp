@@ -685,7 +685,7 @@ void SIAddPackageMath(Context *c) {
 		class_add_func("intersect_line", common_types._bool, &plane::intersect_line, Flags::Pure);
 			func_add_param("l1", common_types.vec3);
 			func_add_param("l2", common_types.vec3);
-			func_add_param("inter", common_types.vec3);
+			func_add_param("inter", common_types.vec3, Flags::Out);
 		class_add_func("inverse", common_types.plane, &plane::inverse, Flags::Pure);
 		class_add_func("distance", common_types.f32, &plane::distance, Flags::Pure);
 			func_add_param("p", common_types.vec3);

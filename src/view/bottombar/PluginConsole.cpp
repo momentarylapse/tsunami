@@ -97,7 +97,9 @@ void PluginConsole::update_favotites() {
 			string id = format("favorite-button-%d", index);
 			add_button("!flat,height=40,big\\" + p.head(1), 0, index+2, id);
 			set_tooltip(id, format("Favorite: %s", name));
-			int h = event(id, [this,name] { session->execute_tsunami_plugin(name); });
+			int h = event(id, [this,name] {
+				session->execute_tsunami_plugin(name);
+			});
 			favorite_buttons.add({id, h});
 			index ++;
 		}

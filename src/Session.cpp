@@ -72,8 +72,10 @@ void Session::prepare_end() {
 	if (persistence_data)
 		session_manager->save_session(this);
 
-	for (auto p: weak(plugins))
+	for (auto p: weak(plugins)) {
+		out_remove_plugin(p); // close UI
 		p->on_stop();
+	}
 	plugins.clear();
 }
 

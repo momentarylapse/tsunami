@@ -56,6 +56,7 @@ void ConfigPanelSocket::integrate(hui::Panel *_panel) {
 
 	ConfigPanel::_hidden_parent_ = panel;
 	config_panel = module->create_panel();
+	ConfigPanel::_hidden_parent_ = nullptr;
 
 	if (config_panel) {
 		panel->embed(config_panel.get(), "content", 0, 0);

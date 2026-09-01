@@ -164,6 +164,8 @@ void MultiLinePainter::draw_beats(Painter *p, float x0, float w, float y, float 
 	GridColors gc;
 	gc.fg = colors.text_soft1;
 	gc.bg = colors.background_track;
+	gc.fg_sel = colors.grid;
+	gc.bg_sel = colors.background;
 	grid_painter->set_context({x0, x0+w, y, y+h}, gc, line_height / 100);
 	grid_painter->draw_bars(p);
 }

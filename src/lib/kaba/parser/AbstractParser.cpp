@@ -756,6 +756,7 @@ shared<Node> AbstractParser::parse_abstract_statement_try() {
 	cmd_try->set_num_params(1);
 	// ...block
 	if (Exp.end_of_line()) {
+		expect_new_line_with_indent();
 		Exp.next_line();
 		cmd_try->set_param(0, parse_abstract_block());
 	} else {

@@ -558,6 +558,9 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 		var_offset0 = _class->size;
 	}
 
+	flags_set(_class->flags, node->flags);
+	// before traits! "extern" required for adding external elements with correct offset
+
 	// traits
 	if (node->params[4])
 		for (auto& p: node->params[4]->params) {
@@ -588,8 +591,6 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 				ff->auto_declared = true;
 			}
 		}
-
-	flags_set(_class->flags, node->flags);
 
 	return _class;
 }

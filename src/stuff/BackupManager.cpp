@@ -45,7 +45,7 @@ void BackupManager::set_save_state(Session *session) {
 	for (auto &bf: files) {
 		if (bf.session == session) {
 			session->i(_("deleting backup: '") + str(bf.filename) + "'");
-			os::fs::_delete(bf.filename);
+			os::fs::remove(bf.filename);
 			bf.session = nullptr; // auto remove
 		}
 	}
@@ -141,7 +141,7 @@ int BackupManager::get_uuid_for_filename(const Path &filename) {
 void BackupManager::delete_old(int uuid) {
 	if (auto *bf = _find_by_uuid(uuid)) {
 		Session::GLOBAL->i(_("deleting backup: '") + str(bf->filename) + "'");
-		os::fs::_delete(bf->filename);
+		os::fs::remove(bf->filename);
 		bf->session = nullptr;
 		_clear_old();
 	} else {

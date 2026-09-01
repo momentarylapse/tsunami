@@ -472,7 +472,7 @@ bytes Storage::compress(AudioBuffer &buffer, const string &codec) {
 	future.then([this, &r, buffer, filename] {
 			r = os::fs::read_binary(filename);
 			session->i(format("compressed buffer... %db   %.1f%%", r.num, 100.0f * (float)r.num / (float)(buffer.length * 2 * buffer.channels)));
-			os::fs::_delete(filename);
+			os::fs::remove(filename);
 	});
 	base::await(future);
 	return r;
@@ -489,7 +489,7 @@ AudioBuffer Storage::decompress(const string &codec, const bytes &data) {
 	}));
 
 	current_directory = dir0;
-	os::fs::_delete(filename);
+	os::fs::remove(filename);
 	return r;
 }
 

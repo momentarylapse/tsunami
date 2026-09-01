@@ -170,4 +170,10 @@ string str(const base::result<T, E>& e) {
 		return X.error(); \
 	auto& VAR = X.value();
 
+#define RESULT_PROPAGATE_ERROR_VOID(EXPR) { \
+	auto X = (EXPR); \
+	if (X.has_error()) \
+		return X.error(); \
+	}
+
 #endif

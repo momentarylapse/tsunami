@@ -129,7 +129,7 @@ void PresetManager::load(Session *session) {
 		// convert from legacy
 		load_from_file_old(os::app::directory_dynamic | "profiles.xml", false, session);
 		save(session);
-		os::fs::_delete(os::app::directory_dynamic | "profiles.xml");
+		os::fs::remove(os::app::directory_dynamic | "profiles.xml");
 	} else {
 		load_from_file(os::app::directory_static | "presets-demo.xml", true, session);
 		load_from_file(os::app::directory_dynamic | "presets.xml", false, session);

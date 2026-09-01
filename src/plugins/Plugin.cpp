@@ -27,14 +27,12 @@ string Plugin::get_error() {
 }
 
 bool Plugin::file_changed() {
-	int new_date = -1;
-	try {
-		new_date = os::fs::mtime(filename).time;
-		if (new_date != file_date) {
-			file_date = new_date;
+	if (auto new_date = os::fs::mtime(filename)) {
+		if (new_date->time != file_date) {
+			file_date = new_date->time;
 			return true;
 		}
-	} catch(...) {}
+	}
 	return false;
 
 }

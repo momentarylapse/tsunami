@@ -147,6 +147,9 @@ Package* Context::try_load_package(const Path& dir) {
 				package->version = l.sub(8);
 	}
 
+	if (!config.allow_compilation)
+		return package;
+
 	// package init override?
 	for (const auto& init: package_inits)
 		if (init.dir == dir) {
@@ -175,6 +178,7 @@ Path Package::default_directory(Context* ctx) const {
 
 shared<Module> Context::_load_module_throw(const Path& filename, bool just_analyse) {
 	//msg_write("loading " + filename.str());
+	config.allow_compilation = !just_analyse;
 
 	auto _filename = absolute_module_path(filename);
 
@@ -184,8 +188,7 @@ shared<Module> Context::_load_module_throw(const Path& filename, bool just_analy
 			return ps;
 
 	// package?
-	if (!just_analyse)
-		get_package_at(filename.parent());
+	get_package_at(filename.parent());
 
 	// load
 	auto module = create_empty_module(filename);
@@ -197,6 +200,7 @@ shared<Module> Context::_load_module_throw(const Path& filename, bool just_analy
 }
 
 shared<Module> Context::_create_module_for_source_throw(const string& source, const Path& filename, bool just_analyse) {
+	config.allow_compilation = !just_analyse;
     auto module = create_empty_module(filename);
 	module->just_analyse = just_analyse;
 	module->filename = filename;

@@ -466,7 +466,7 @@ void SessionManager::delete_saved_session(const Path& filename) {
 	if (auto p = find_for_filename(filename)) {
 		if (p->session)
 			p->session->persistence_data = nullptr;
-		os::fs::_delete(p->session_filename);
+		os::fs::remove(p->session_filename);
 		int index = weak(known_persistence_data).find(p);
 		known_persistence_data.erase(index);
 	}

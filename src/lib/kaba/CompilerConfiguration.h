@@ -66,6 +66,7 @@ struct CompilerConfiguration {
 	bool allow_simplification = true;
 	bool allow_registers = true;
 	bool allow_simplify_consts = true;
+	bool allow_compilation = true;
 
 	Path directory;
 	bool verbose = false;

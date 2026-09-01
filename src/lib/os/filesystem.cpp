@@ -6,276 +6,148 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <stdio.h>
 #include <cerrno>
-
-#ifdef OS_WINDOWS
-	#include <io.h>
-	#include <direct.h>
-#endif
-#if defined (OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
-	#include <unistd.h>
-	#include <dirent.h>
-	//#include <sys/timeb.h>
- 
-	 
-	#define _open	open
-	#define _read	read
-	#define _write	write
-	#define _lseek	lseek
-	#define _close	close
-	#define _rmdir	rmdir
-	#define _unlink	unlink
-	inline unsigned char to_low(unsigned char c) {
-		if ((c >= 'A') and (c <= 'Z'))
-			return c - 'A' + 'a';
-		return c;
-	}
-#endif
-#if defined(OS_LINUX) || defined(OS_MAC)
-	int _stricmp(const char*a,const char*b) {
-		unsigned char a_low = to_low(*a);
-		unsigned char b_low = to_low(*b);
-		while ((*a != 0) and (*b != 0)) {
-			if (a_low != b_low)
-				break;
-			a++,++b;
-			a_low = to_low(*a);
-			b_low = to_low(*b);
-		}
-		return a_low - b_low;
-	}
-#endif
+#include <filesystem>
 
 namespace os::fs {
 
-bool func_did_not_throw(std::function<void()> f) {
-	try {
-		f();
-		return true;
-	} catch (...) {
-		return false;
-	}
-}
-
 
 // just test the existence of a file
-bool exists(const Path &filename) {
-	struct stat s;
-	if (stat(filename.str().c_str(), &s) == 0) {
-		//if (s.st_mode & S_IFREG)
-			return true;
-	}
-	return false;
+bool exists(const Path& path) {
+	std::error_code e;
+	return std::filesystem::exists(path.c_str(), e);
 }
 
-int64 size(const Path &path) {
-	struct stat s;
-	if (stat(path.str().c_str(), &s) != 0)
-		throw FileError(format("unable to stat '%s'", path));
-	return s.st_size;
+base::result<int64> size(const Path& path) {
+	std::error_code e;
+	const auto size = std::filesystem::file_size(path.c_str(), e);
+	if (e)
+		return base::Error(format("file size '%s': %s", path, e.message().c_str()));
+	return (int64)size;
 }
 
-Date mtime(const Path &path) {
+base::result<Date> mtime(const Path &path) {
+	/* fails, because the "file clock" has an undefined epoch... :(
+	std::error_code e;
+	const auto ftime = std::filesystem::last_write_time(path.c_str(), e);
+	if (e)
+		return base::Error(format("file size '%s': %s", path, e.message().c_str()));
+	return Date::from_unix(ftime.time_since_epoch().count());*/
+
 	struct stat s;
 	if (stat(path.str().c_str(), &s) != 0)
-		throw FileError(format("unable to stat '%s'", path));
+		return base::Error(format("mtime '%s': failed", path));
 	return Date::from_unix(s.st_mtime);
 }
 
-bool is_directory(const Path &path) {
-	struct stat s;
-	if (stat(path.str().c_str(), &s) != 0)
-		return false; //throw FileError("unable to stat '" + path + "'");
-	return (s.st_mode & S_IFDIR);
+bool is_directory(const Path& path) {
+	std::error_code e;
+	return std::filesystem::is_directory(path.c_str(), e);
 }
 
 
-void create_directory(const Path &dir) {
+base::result_void create_directory(const Path& dir) {
 	if (dir.is_empty())
-		return;
-	if (is_directory(dir))
-		return;
-#if defined(OS_WINDOWS)
-	if (_mkdir(dir.str().c_str()) != 0)
-#elif defined(OS_MINGW)
-	if (mkdir(dir.str().c_str()) != 0)
-#else // defined(OS_LINUX) || defined(OS_MAC)
-	if (mkdir(dir.str().c_str(),S_IRWXU | S_IRWXG | S_IRWXO) != 0)
-#endif
-		throw FileError(format("can not create directory '%s'", dir));
+		return base::Error("create directory: empty path");
+	std::error_code e;
+	std::filesystem::create_directories(dir.c_str(), e);
+	if (e)
+		return base::Error(format("create directory '%s': %s", dir, e.message().c_str()));
+	return base::result_success();
 }
 
-void delete_directory(const Path &dir) {
-	if (_rmdir(dir.str().c_str()) != 0)
-		throw FileError(format("can not delete directory '%s'", dir));
+base::result_void remove(const Path& path) {
+	std::error_code e;
+	std::filesystem::remove_all(path.c_str(), e);
+	if (e)
+		return base::Error(format("remove '%s': %s", path, e.message().c_str()));
+	return base::result_success();
 }
 
 Path current_directory() {
-	string str;
-	char tmp[256];
-#ifdef OS_WINDOWS
-	static_cast<void>(_getcwd(tmp, sizeof(tmp)));
-	str = tmp;
-	str += "\\";
-#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
-	static_cast<void>(getcwd(tmp, sizeof(tmp)));
-	str = tmp;
-	str += "/";
-#endif
-	return Path(str);
+	std::error_code e;
+	return std::filesystem::current_path(e).c_str();
 }
 
 
 void set_current_directory(const Path &dir) {
-#ifdef OS_WINDOWS
-	_chdir(dir.str().c_str());
-#endif
-#if defined(OS_LINUX) || defined(OS_MAC)
-	static_cast<void>(chdir(dir.str().c_str()));
-#endif
+	std::error_code e;
+	std::filesystem::current_path(dir.c_str(), e);
 }
 
-void rename(const Path &source, const Path &target) {
-	for (auto &p: target.all_parents())
-		create_directory(p);
+base::result_void move(const Path& source, const Path& target) {
+	if (!target.parent().is_empty())
+		RESULT_PROPAGATE_ERROR_VOID(create_directory(target.parent()));
 
 	// linux automatically overwrites, windows will fail rename()
 	if (exists(target))
-		_delete(target);
+		RESULT_PROPAGATE_ERROR_VOID(remove(target));
 
-	if (::rename(source.str().c_str(), target.str().c_str()) != 0)
-		throw FileError(format("can not rename file '%s' -> '%s'", source, target));
+	std::error_code e;
+	std::filesystem::rename(source.c_str(), target.c_str(), e);
+	if (e)
+		return base::Error(format("move '%s' -> '%s': %s", source, target, e.message().c_str()));
+	return base::result_success();
 }
 
-void move(const Path &source, const Path &target) {
-	for (auto &p: target.all_parents())
-		create_directory(p);
+base::result_void copy(const Path& source, const Path& target) {
+	if (!target.parent().is_empty())
+		RESULT_PROPAGATE_ERROR_VOID(create_directory(target.parent()));
 
 	// linux automatically overwrites, windows will fail rename()
 	if (exists(target))
-		_delete(target);
+		RESULT_PROPAGATE_ERROR_VOID(remove(target));
 
-	int r = ::rename(source.str().c_str(), target.str().c_str());
-	if ((r != 0) and (errno == EXDEV)) {
-		copy(source, target);
-		_delete(source);
-	} else if (r != 0) {
-		throw FileError(format("can not move file '%s' -> '%s' (%s)", source, target, strerror(r)));
-	}
+	std::error_code e;
+	std::filesystem::copy(source.c_str(), target.c_str(), e);
+	if (e)
+		return base::Error(format("copy '%s' -> '%s': %s", source, target, e.message().c_str()));
+	return base::result_success();
 }
 
-void copy(const Path &source, const Path &target) {
-	for (auto &p: target.all_parents())
-		create_directory(p);
-
-	int hs = ::_open(source.str().c_str(),O_RDONLY);
-	if (hs < 0)
-		throw FileError(format("copy: can not open source file '%s'", source));
-#ifdef OS_WINDOWS
-	int ht = ::_creat(target.str().c_str(),_S_IREAD | _S_IWRITE);
-	_setmode(hs,_O_BINARY);
-	_setmode(ht,_O_BINARY);
-#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
-	int ht = ::creat(target.str().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
-#endif
-	if (ht < 0){
-		_close(hs);
-		throw FileError(format("copy: can not create target file '%s'", target));
-	}
-	char buf[10240];
-	int r = 10;
-	while(r > 0){
-		r = ::_read(hs,buf,sizeof(buf));
-		int rr = ::_write(ht,buf,r);
-		if (rr < r)
-			throw FileError(format("can not copy file '%s' -> '%s' (write failed)", source, target));
-	}
-	_close(hs);
-	_close(ht);
-}
-
-void _delete(const Path &filename) {
-	if (_unlink(filename.str().c_str()) != 0)
-		throw FileError(format("can not delete file '%s'", filename));
-}
-
-string hash(const Path &filename, const string &type) {
+base::result<string> hash(const Path &filename, const string &type) {
 	if (type == "md5") {
-		return read_binary(filename).md5();
+		try {
+			return read_binary(filename).md5();
+		} catch (const Exception& e) {
+			return base::Error(e.message());
+		}
 	}
-	return "";
+	return base::Error("file hash: only supporting 'md5'");
 }
 
 
 
 // search a directory for files matching a filter
-void search_single(const Path &dir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
-	string filter2 = filter.sub(1);
-
-#ifdef OS_WINDOWS
-	static _finddata_t t;
-	auto handle = _findfirst((dir.as_dir().str() + "*").c_str(), &t);
-	auto e = handle;
-	while (e >= 0) {
-		string name = t.name;
-		//if ((strcmp(t.name,".")!=0)and(strcmp(t.name,"..")!=0)and(strstr(t.name,"~")==NULL)){
-		if ((name != ".") and (name != "..") and (name.back() != '~')) {
-			if (name.match(filter) or (t.attrib == _A_SUBDIR)) {
-				if (t.attrib == _A_SUBDIR)
-					dir_list.add(name);
-				else
-					file_list.add(name);
-			}
+void search_single(const Path& dir, const string& filter, Array<Path>& dir_list, Array<Path>& file_list) {
+	std::error_code e;
+	for (const auto& entry: std::filesystem::directory_iterator(dir.c_str(), e)) {
+		const string name = entry.path().filename().c_str();
+		if (entry.is_directory()) {
+			dir_list.add(name);
+		} else if (name.match(filter)) {
+			file_list.add(name);
 		}
-		e = _findnext(handle,&t);
 	}
-#else // defined(OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
-	DIR *_dir;
-	_dir = opendir(dir.str().c_str());
-	if (!_dir)
-		return;
-	struct dirent *dn;
-	dn = readdir(_dir);
-	struct stat s;
-	while (dn) {
-		//if ((strcmp(dn->d_name,".")!=0)and(strcmp(dn->d_name,"..")!=0)and(!strstr(dn->d_name,"~"))){
-		string name = dn->d_name;
-		if ((name != ".") and (name != "..") and (name.back() != '~')) {
-			Path ffn = dir | name;
-			stat(ffn.str().c_str(), &s);
-			bool is_reg = (s.st_mode & S_IFREG) > 0;
-			bool is_dir = (s.st_mode & S_IFDIR) > 0;
-			if ((is_reg and name.match(filter)) or is_dir) {
-				if (is_dir)
-					dir_list.add(name);
-				else
-					file_list.add(name);
-			}
-		}
-		dn = readdir(_dir);
-	}
-	closedir(_dir);
-#endif
 
 	// sorting...
-	base::inplace_sort(dir_list, [](const Path &a, const Path &b) { return a <= b; });
-	base::inplace_sort(file_list, [](const Path &a, const Path &b) { return a <= b; });
+	base::inplace_sort(dir_list, [] (const Path& a, const Path& b) { return a <= b; });
+	base::inplace_sort(file_list, [] (const Path& a, const Path& b) { return a <= b; });
 }
 
-void search_single_rec(const Path &dir0, const Path &subdir, const string &filter, Array<Path> &dir_list, Array<Path> &file_list) {
+void search_single_rec(const Path& dir0, const Path& subdir, const string& filter, Array<Path>& dir_list, Array<Path>& file_list) {
 	Array<Path> sub_dir_list, sub_file_list;
 	search_single(dir0 | subdir, filter, sub_dir_list, sub_file_list);
-	for (auto &x: sub_dir_list) {
+	for (const auto &x: sub_dir_list) {
 		dir_list.add(subdir | x);
 		search_single_rec(dir0, subdir | x, filter, dir_list, file_list);
 	}
-	for (auto &x: sub_file_list)
+	for (const auto &x: sub_file_list)
 		file_list.add(subdir | x);
 }
 
 // search a directory for files matching a filter
-Array<Path> search(const Path &dir, const string &filter, const string &options) {
+Array<Path> search(const Path& dir, const string& filter, const string& options) {
 	Array<Path> dir_list, file_list;
 
 	bool show_files = options.find("f") >= 0;
@@ -300,14 +172,4 @@ Array<Path> search(const Path &dir, const string &filter, const string &options)
 }
 
 }
-
-#if defined (OS_LINUX) || defined(OS_MAC) || defined(OS_MINGW)
-	#undef _open
-	#undef _read
-	#undef _write
-	#undef _lseek
-	#undef _close
-	#undef _rmdir
-	#undef _unlink
-#endif
 

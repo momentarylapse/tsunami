@@ -157,54 +157,6 @@ base::result_void kaba_file_write_text(const Path &filename, const string &buffe
 	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::write_text(filename, buffer));
 }
 
-base::result<int64> kaba_file_size(const Path &filename) {
-	try {
-		return os::fs::size(filename);
-	} catch (::Exception& e) {
-		return base::Error(e.message());
-	}
-}
-
-base::result<Date> kaba_file_mtime(const Path &filename) {
-	try {
-		return os::fs::mtime(filename);
-	} catch (::Exception& e) {
-		return base::Error(e.message());
-	}
-}
-
-base::result<string> kaba_file_hash(const Path &filename, const string &type) {
-	try {
-		return os::fs::hash(filename, type);
-	} catch (::Exception& e) {
-		return base::Error(e.message());
-	}
-}
-
-base::result_void kaba_file_rename(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::rename(a, b));
-}
-
-base::result_void kaba_file_move(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::move(a, b));
-}
-
-base::result_void kaba_file_copy(const Path &a, const Path &b) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::copy(a, b));
-}
-
-base::result_void kaba_file_delete(const Path &f) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::_delete(f));
-}
-
-base::result_void kaba_dir_create(const Path &f) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::create_directory(f));
-}
-
-base::result_void kaba_dir_delete(const Path &f) {
-	KABA_EXCEPTION_WRAPPER_RESULT_VOID(os::fs::delete_directory(f));
-}
-
 
 base::result<string> kaba_shell_execute(const string &cmd, bool verbose) {
 	try {
@@ -506,33 +458,33 @@ void SIAddPackageOS(Context *c) {
 			func_add_param("buffer", common_types.string);
 		class_add_func("exists", common_types._bool, &os::fs::exists, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("size", TypeInt64Result, &kaba_file_size, Flags::Static);
+		class_add_func("size", TypeInt64Result, &os::fs::size, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("mtime", TypeDateResult, &kaba_file_mtime, Flags::Static);
+		class_add_func("mtime", TypeDateResult, &os::fs::mtime, Flags::Static);
 			func_add_param("filename", common_types.path);
 		class_add_func("is_directory", common_types._bool, &os::fs::is_directory, Flags::Static);
 			func_add_param("filename", common_types.path);
-		class_add_func("hash", common_types.result_string, &kaba_file_hash, Flags::Static);
+		class_add_func("hash", common_types.result_string, &os::fs::hash, Flags::Static);
 			func_add_param("filename", common_types.path);
 			func_add_param("type", common_types.string);
-		class_add_func("move", common_types.result_void, &kaba_file_move, Flags::Static);
+		class_add_func("move", common_types.result_void, &os::fs::move, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("rename", common_types.result_void, &kaba_file_rename, Flags::Static);
+		class_add_func("rename", common_types.result_void, &os::fs::move, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("copy", common_types.result_void, &kaba_file_copy, Flags::Static);
+		class_add_func("copy", common_types.result_void, &os::fs::copy, Flags::Static);
 			func_add_param("source", common_types.path);
 			func_add_param("dest", common_types.path);
-		class_add_func("delete", common_types.result_void, &kaba_file_delete, Flags::Static);
+		class_add_func("delete", common_types.result_void, &os::fs::remove, Flags::Static);
 			func_add_param("filename", common_types.path);
 		class_add_func("search", common_types.path_list, &os::fs::search, Flags::Static);
 			func_add_param("dir", common_types.path);
 			func_add_param("filter", common_types.string);
 			func_add_param("options", common_types.string);
-		class_add_func("create_directory", common_types.result_void, &kaba_dir_create, Flags::Static);
+		class_add_func("create_directory", common_types.result_void, &os::fs::create_directory, Flags::Static);
 			func_add_param("dir", common_types.path);
-		class_add_func("delete_directory", common_types.result_void, &kaba_dir_delete, Flags::Static);
+		class_add_func("delete_directory", common_types.result_void, &os::fs::remove, Flags::Static);
 			func_add_param("dir", common_types.path);
 		class_add_func("current_directory", common_types.path, &os::fs::current_directory, Flags::Static);
 		class_add_func("set_current_directory", common_types._void, &os::fs::set_current_directory, Flags::Static);

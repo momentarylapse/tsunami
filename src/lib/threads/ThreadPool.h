@@ -45,6 +45,8 @@ public:
 	void _emit_cluster(std::function<void()> f);
 
 	Array<PoolWorkerThread*> threads;
+
+	static thread_local int worker_id;
 };
 
 

@@ -109,6 +109,7 @@ private:
 
 	struct FunctionInstance {
 		Function *f;
+		Module* requested_by;
 		Array<const Class*> params;
 	};
 	struct FunctionTemplate {
@@ -124,7 +125,7 @@ private:
 	FunctionTemplate &get_function_template(SyntaxTree *tree, Function *f0, int token_id);
 	TemplateClassInstanceManager &get_class_manager(SyntaxTree *tree, const Class *c0, int token_id);
 
-	static Function* full_copy(Function* f0);
+	static Function* full_copy_abstract(Function* f0);
 	static shared<Node> node_replace(shared<Node> n, const Array<string> &names, const Array<const Class*> &params);
 	static Function* instantiate_function_abstract(SyntaxTree *tree, FunctionTemplate &t, const Array<const Class*> &params, int token_id);
 	void concretify_function_body(SyntaxTree *tree, Function* f, int token_id);

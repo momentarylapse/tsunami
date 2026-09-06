@@ -385,7 +385,7 @@ void AutoImplementer::implement_from_code(Function *f, const string &code) {
 	AbstractParser abstract_parser(tree, xp);
 	xp.reset_walker();
 	f->block_node = abstract_parser.parse_abstract_block();
-	f->block_node->link_no = (int_p)f->block;
+	f->block_node->link_no = (int_p)f->block.get();
 	//f->block_node->show();
 
 	try {

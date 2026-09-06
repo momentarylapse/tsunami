@@ -14,13 +14,16 @@ namespace kaba {
 
 // {...}-block
 struct Block {
-	Block(Function *f, Block *parent);
+	Block(Function *f, Block *parent, int x);
 	Array<Variable*> vars;
 	Function *function;
 	Block *parent;
+	owned_array<Block> children;
 	void *_start, *_end; // opcode range
 	int _label_start, _label_end;
 	int level;
+
+	Block* create_child();
 
 	const Class *name_space() const;
 

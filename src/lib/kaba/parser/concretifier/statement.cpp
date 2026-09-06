@@ -166,7 +166,7 @@ shared<Node> Concretifier::concretify_statement_try(shared<Node> node, Block *bl
 		auto ex = node->params[1 + 2*i];
 
 		auto ex_block = node->params[2 + 2*i];
-		ex_block->link_no = (int_p)new Block(block->function, block); // we need block/variables BEFORE actually concretifying the block...
+		ex_block->link_no = (int_p)block->create_child(); // we need block/variables BEFORE actually concretifying the block...
 
 		if (ex->params[0]) {
 			auto ex_type = ex->params[0];
@@ -326,7 +326,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		//     return i*i       (explicit return)
 
 		auto cmd = f->block_node->params[0];
-		cmd = concretify_node(cmd, f->block, block->name_space());
+		cmd = concretify_node(cmd, f->block.get(), block->name_space());
 
 		f->literal_return_type = cmd->type;
 		f->effective_return_type = cmd->type;
@@ -345,7 +345,7 @@ shared<Node> Concretifier::concretify_statement_lambda(shared<Node> node, Block 
 		f->block_node->type = common_types.unknown;
 		f->literal_return_type = common_types._void;
 		f->effective_return_type = common_types._void;
-		concretify_node(f->block_node.get(), f->block, f->name_space);
+		concretify_node(f->block_node.get(), f->block.get(), f->name_space);
 	}
 
 	parser->cur_func = prev_func;

@@ -39,7 +39,7 @@ void AutoImplementer::implement_dict_clear(Function *f, const Class *t) {
 	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
 	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
-	auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 	// key.__delete__()
 	if (auto f_del = common_types.string->get_destructor()) {
@@ -89,7 +89,7 @@ void AutoImplementer::implement_dict_assign(Function *f, const Class *t) {
 		f->block_node->add(cmd_clear);
 	}
 
-	auto b_loop = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b_loop = add_node_block(f->block->create_child(), common_types._void, -1);
 
 	{
 		// other.set(key, value)
@@ -119,12 +119,12 @@ void AutoImplementer::implement_dict_get(Function *f, const Class *t) {
 	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
 	auto var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
-	auto b_loop = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b_loop = add_node_block(f->block->create_child(), common_types._void, -1);
 
 	{
 		// if key == in_key
 		//     return T&?(&value)
-		auto b_if = add_node_block(new Block(f, b_loop->as_block()), common_types._void, -1);
+		auto b_if = add_node_block(b_loop->as_block()->create_child(), common_types._void, -1);
 		auto ret = add_node_statement(StatementID::Return);
 		ret->set_num_params(1);
 		if (auto ff = te_ref_opt->get_func(Identifier::func::Init, common_types._void, {nullptr, te_ref})) {
@@ -179,9 +179,9 @@ void AutoImplementer::implement_dict_set(Function *f, const Class *t) {
 	auto *var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
 	auto *var_val = f->block->add_var("v", tree->request_implicit_class_reference(te, -1), -1);
 
-	auto b_loop = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b_loop = add_node_block(f->block->create_child(), common_types._void, -1);
 
-	auto b_if = add_node_block(new Block(f, b_loop->as_block()), common_types._void, -1);
+	auto b_if = add_node_block(b_loop->as_block()->create_child(), common_types._void, -1);
 	b_if->add(add_assign(f, "...", add_node_local(var_val, -1)->deref(), in_value));
 	b_if->add(add_node_statement(StatementID::Return));
 
@@ -237,12 +237,12 @@ void AutoImplementer::implement_dict_contains(Function *f, const Class *t) {
 	auto var_key = f->block->add_var("k", tree->request_implicit_class_reference(common_types.string, -1), -1);
 	auto var_val = f->block->add_var("v", common_types.reference, -1);
 
-	auto b_loop = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b_loop = add_node_block(f->block->create_child(), common_types._void, -1);
 
 	{
 		// if key == in_key
 		//     return true
-		auto b_if = add_node_block(new Block(f, b_loop->as_block()), common_types._void, -1);
+		auto b_if = add_node_block(b_loop->as_block()->create_child(), common_types._void, -1);
 		auto ret = add_node_statement(StatementID::Return);
 		ret->set_num_params(1);
 		ret->set_param(0, node_true());

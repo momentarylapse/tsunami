@@ -27,7 +27,7 @@ void AutoImplementer::implement_product_equal(Function *f, const Class *t) {
 		auto cmd_if = add_node_statement(StatementID::If, -1);
 		cmd_if->set_param(0, add_not_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
 
-		auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+		auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 		auto cmd_ret = add_node_statement(StatementID::Return, -1);
 		cmd_ret->set_num_params(1);
@@ -60,7 +60,7 @@ void AutoImplementer::implement_product_not_equal(Function *f, const Class *t) {
 		auto cmd_if = add_node_statement(StatementID::If, -1);
 		cmd_if->set_param(0, add_equal(f, "", self->shift(e.offset, e.type), other->shift(e.offset, e.type)));
 
-		auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+		auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 		auto cmd_ret = add_node_statement(StatementID::Return, -1);
 		cmd_ret->set_num_params(1);

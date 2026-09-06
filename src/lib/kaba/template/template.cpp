@@ -81,6 +81,12 @@ void TemplateManager::clear_from_module(Module *m) {
 			return i.c->owner->module == m;
 		});
 	}
+
+	for (auto& t: function_templates) {
+		base::remove_if(t.instances, [m] (const FunctionInstance& f) {
+			return f.requested_by == m;
+		});
+	}
 }
 
 
@@ -103,36 +109,9 @@ void show_func_details(Function *f) {
 	show_node_details(f->block_node.get());
 }
 
-Function *TemplateManager::full_copy(Function *f0) {
-	//msg_error("FULL COPY");
+Function *TemplateManager::full_copy_abstract(Function *f0) {
 	auto f = f0->create_dummy_clone(f0->name_space);
-	f->block_node = cp_node(f0->block_node.get());
-	f->block = f->block_node->as_block();
 	flags_clear(f->flags, Flags::Unimplemented);
-
-	auto convert = [f] (shared<Node> n) {
-		if (n->kind != NodeKind::Block)
-			return n;
-		auto b = n->as_block();
-		//msg_write("block " + p2s(b));
-		for (auto&& [vi,v]: enumerate(b->vars)) {
-			int i = weak(b->function->var).find(v);
-			b->vars[vi] = f->var[i].get();
-		}
-		b->function = f;
-		return n;
-	};
-
-	// only convert top level variables (function parameters)
-	// TODO this can be removed after function header realization in Concretifier
-	f->block_node = convert(f->block_node.get());
-	//tree->transform_node(f->block_node.get(), convert);
-
-	//show_func_details(f0);
-	//show_func_details(f);
-
-	//parser->do_error("x", -1);
-
 	return f;
 }
 
@@ -148,6 +127,7 @@ Function *TemplateManager::request_function_instance(SyntaxTree *tree, Function 
 	FunctionInstance ii;
 	ii.f = instantiate_function_abstract(tree, t, params, token_id);
 	ii.params = params;
+	ii.requested_by = tree->module;
 	t.instances.add(ii);
 	concretify_function_body(tree, ii.f, token_id);
 	return ii.f;
@@ -275,42 +255,20 @@ Function *TemplateManager::instantiate_function_abstract(SyntaxTree *tree, Funct
 	Function *f0 = t.func;
 
 	Function *f = nullptr;
-	if (t.f_create) {
-		f = t.f_create(tree, params, token_id);
-	} else {
-		// TODO just realize from node_replace(f0->abstract_node, ...)
-
-		f = full_copy(f0);
-		f->name += format("[%s]", type_list_to_str(params));
-
-		f->abstract_node = node_replace(f->abstract_node, t.params, params);
-
-/*		// replace in parameters/return type
-		for (int i=0; i<f->num_params; i++)
-			f->abstract_node->params[2]->set_param(i*3+1, node_replace(f->abstract_param_type(i), t.params, params));
-		if (auto rt = f->abstract_return_type())
-			f->abstract_node->params[1] = node_replace(rt, t.params, params);*/
-
-		// replace in body
-		for (int i=0; i<f->block_node->params.num; i++)
-			f->block_node->params[i] = node_replace(f->block_node->params[i], t.params, params);
-	}
-
-	// (partially) concretify
 	try {
-
-		tree->parser->con.concretify_function_header(f);
-
-		auto __ns = const_cast<Class*>(f0->name_space);
-		__ns->add_function(tree, f, false, false);
-
-		tree->functions.add(f);
-
+		if (t.f_create) {
+			f = t.f_create(tree, params, token_id);
+		} else {
+			auto abstract_node = node_replace(cp_node(f0->abstract_node), t.params, params);
+			flags_clear(abstract_node->flags, Flags::Template);
+			abstract_node->set_param(3, nullptr);
+			f = tree->parser->realize_function(abstract_node, common_types._void, const_cast<Class*>(f0->name_space));
+			f->name += format("[%s]", type_list_to_str(params));
+		}
 	} catch (kaba::Exception &e) {
 		//msg_write(e.message());
 		tree->do_error(format("failed to instantiate template %s: %s", f->name, e.message()), token_id);
 	}
-
 	return f;
 }
 

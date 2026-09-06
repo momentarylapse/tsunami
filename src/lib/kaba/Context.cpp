@@ -320,7 +320,7 @@ void Context::_execute_single_command_throw(const string &cmd) {
 		func->block_node->show();
 	}
 	parser->realize_tree(func->block_node.get());
-	parser->con.concretify_node(func->block_node.get(), func->block, func->name_space);
+	parser->con.concretify_node(func->block_node.get(), func->block.get(), func->name_space);
 
 	if (func->block_node->params.num == 0)
 		return;

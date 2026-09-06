@@ -14,7 +14,7 @@
 
 namespace kaba {
 
-Block::Block(Function *f, Block *_parent) {
+Block::Block(Function *f, Block *_parent, int) {
 	level = 0;
 	function = f;
 	parent = _parent;
@@ -22,6 +22,12 @@ Block::Block(Function *f, Block *_parent) {
 		level = parent->level + 1;
 	_start = _end = nullptr;
 	_label_start = _label_end = -1;
+}
+
+Block *Block::create_child() {
+	auto b = new Block(function, this, level + 1);
+	children.add(b);
+	return b;
 }
 
 Variable *Block::add_var(const string &name, const Class *type, int token_id, Flags flags) {

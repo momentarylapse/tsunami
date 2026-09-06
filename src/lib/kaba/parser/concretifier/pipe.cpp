@@ -117,7 +117,7 @@ shared<Node> Concretifier::try_build_pipe_map_optional_unwrap(const shared<Node>
 	if (needs_wrapping)
 		t_out = tree->request_implicit_class_optional(ff->literal_return_type, token_id);
 
-	auto b = add_node_block(new Block(block->function, block), t_out, token_id);
+	auto b = add_node_block(block->create_child(), t_out, token_id);
 	// variable into OUTER block for returnable life-time
 	auto v = block->add_var(block->function->create_slightly_hidden_name(), input->type, token_id);
 

@@ -12,6 +12,8 @@
 //#define USE_PROFILER
 #endif
 
+thread_local int ThreadPool::worker_id = 0;
+
 class PoolWorkerThread : public Thread {
 public:
 	explicit PoolWorkerThread(int _id) {
@@ -26,6 +28,7 @@ public:
 	std::atomic<bool> has_work = false;
 	std::function<void()> f;
 	void on_run() override {
+		ThreadPool::worker_id = id;
 		while (true) {
 			if (has_work) {
 #ifdef USE_PROFILER

@@ -96,7 +96,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		auto array = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
+		auto bb = add_node_block(b->create_child(), common_types._void, n->token_id);
 		for (int i=0; i<n->params.num; i++){
 			auto cc = add_node_member_call(cf, array, n->token_id);
 			cc->set_param(1, n->params[i]);
@@ -115,7 +115,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->type, n->token_id);
 		auto array = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
+		auto bb = add_node_block(b->create_child(), common_types._void, n->token_id);
 		for (int i=0; i<n->params.num/2; i++){
 			auto cc = add_node_member_call(cf, array, n->token_id);
 			cc->set_param(1, n->params[i*2]);
@@ -262,7 +262,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		auto *vv = b->add_var(f->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
 		auto temp = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(f, b), common_types._void, n->token_id);
+		auto bb = add_node_block(b->create_child(), common_types._void, n->token_id);
 
 		// tuple assign -> temp
 		Function *cf = n->params[0]->type->get_assign();
@@ -290,7 +290,7 @@ shared<Node> Transformer::conv_break_down_high_level(shared<Node> n, Block *b) {
 		auto *vv = b->add_var(b->function->create_slightly_hidden_name(), n->params[0]->type, n->token_id);
 		auto temp = add_node_local(vv, n->token_id);
 
-		auto bb = add_node_block(new Block(b->function, b), common_types._void, n->token_id);
+		auto bb = add_node_block(b->create_child(), common_types._void, n->token_id);
 		bb->type = n->type;
 		auto& ai = tree->parser->auto_implementer;
 		bb->add(ai.add_assign(b->function, "", temp, n->params[0]));

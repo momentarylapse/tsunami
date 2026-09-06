@@ -395,7 +395,7 @@ shared<Node> apply_macro(Concretifier *con, Function* f, shared<Node> node, shar
 	if (f->num_params != params.num)
 		con->do_error(format("can not pass %d parameters to a macro expecting %d", params.num, f->num_params), node);
 
-	auto b = cp_node(f->block_node.get());
+	auto b = cp_node(f->block_node.get(), block);
 	Transformer::transform_block(b.get(), [f, params] (shared<Node> n) {
 		if (n->kind == NodeKind::AbstractToken) {
 			for (int i=0; i<params.num; i++) {
@@ -744,7 +744,7 @@ bool is_non_owning_pointer(const Class *t) {
 shared<Node> Concretifier::concretify_block(shared<Node> node, Block *block, const Class *ns) {
 	if (node->kind == NodeKind::Block) {
 		if (!node->as_block())
-			node->link_no = (int_p)new Block(block->function, block);
+			node->link_no = (int_p)block->create_child();
 		block = node->as_block();
 	}
 
@@ -872,8 +872,8 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 	// add new code to the loop
 	shared<Node> b;
 	if (n_cmp) {
-		auto b_if = add_node_block(new Block(block->function, block), common_types.unknown, n_cmp->token_id);
-		auto b_add = add_node_block(new Block(block->function, b_if->as_block()), common_types.unknown, n_cmp->token_id);
+		auto b_if = add_node_block(block->create_child(), common_types.unknown, n_cmp->token_id);
+		auto b_add = add_node_block(b_if->as_block()->create_child(), common_types.unknown, n_cmp->token_id);
 		b_add->add(n_add);
 
 		auto n_if = add_node_statement(StatementID::If, token_id, common_types.unknown);
@@ -883,7 +883,7 @@ shared<Node> Concretifier::concretify_array_builder_for_inner(shared<Node> n_for
 		b_if->add(n_if);
 		b = b_if;
 	} else {
-		b = add_node_block(new Block(block->function, block), common_types.unknown, n_exp->token_id);
+		b = add_node_block(block->create_child(), common_types.unknown, n_exp->token_id);
 		b->add(n_add);
 	}
 
@@ -1175,7 +1175,7 @@ shared<Node> Concretifier::concretify_definitely(shared<Node> node, Block *block
 	auto raise = add_node_statement(StatementID::Raise, node->token_id, common_types.unknown);
 	raise->set_param(0, create_error());
 	raise = concretify_statement_raise(raise, block, ns); // raise -> die/return/raise-local
-	auto bb = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
+	auto bb = add_node_block(block->create_child(), common_types._void, node->token_id);
 	bb->add(raise);
 	cmd_if->set_param(1, bb);
 	group->add(cmd_if);
@@ -1464,7 +1464,7 @@ void check_function_signature_legal(Concretifier *c, Function *f) {
 }
 
 void Concretifier::concretify_function_header(Function *f) {
-	auto block = tree->root_of_all_evil->block;
+	auto block = tree->root_of_all_evil->block.get();
 
 	f->set_return_type(common_types._void);
 	if (auto rt = f->abstract_return_type()) {
@@ -1537,7 +1537,7 @@ void Concretifier::concretify_function_body(Function *f) {
 		f->block_node->params.move(n0 + i, i0 + i);
 	}
 
-	concretify_node(f->block_node.get(), f->block, f->name_space);
+	concretify_node(f->block_node.get(), f->block.get(), f->name_space);
 
 	// auto implement destructor?
 	if (f->name == Identifier::func::Delete)

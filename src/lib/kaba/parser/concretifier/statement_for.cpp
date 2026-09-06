@@ -15,7 +15,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer(shared<Node> 
 	auto t0 = expr->type;
 	auto var_name = node->params[0]->as_token();
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
+	auto block_x = add_node_block(block->create_child(), common_types._void, node->token_id);
 
 	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 
@@ -47,7 +47,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_pointer_shared(shared
 	auto t0 = expr->type;
 	auto var_name = node->params[0]->as_token();
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
+	auto block_x = add_node_block(block->create_child(), common_types._void, node->token_id);
 	auto t_out = tree->request_implicit_class_shared_not_null(t0->param[0], node->token_id);
 
 	auto var = block_x->as_block()->add_var(var_name, t_out, node->token_id);
@@ -88,7 +88,7 @@ shared<Node> Concretifier::concretify_statement_for_unwrap_optional(shared<Node>
 	auto var_name = node->params[0]->as_token();
 	bool is_temporary = expression_is_temporary(expr);
 
-	auto block_x = add_node_block(new Block(block->function, block), common_types._void, node->token_id);
+	auto block_x = add_node_block(block->create_child(), common_types._void, node->token_id);
 
 	auto t_out = tree->request_implicit_class_alias(t0->param[0], node->token_id);
 

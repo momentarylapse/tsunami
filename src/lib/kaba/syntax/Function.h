@@ -39,7 +39,7 @@ struct Function : Sharable<base::Empty> {
 	shared<Node> abstract_return_type() const;
 	// block of code
 	shared<Node> block_node; // TODO make consistent
-	Block* block;
+	owned<Block> block;
 	// local variables
 	shared_array<Variable> var;
 	Array<const Class*> literal_param_type;

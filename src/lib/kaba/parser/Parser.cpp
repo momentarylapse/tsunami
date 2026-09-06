@@ -341,7 +341,7 @@ Function* Parser::realize_lambda(shared<Node> node, Class* name_space) {
 	auto f = realize_function_header(node->params[0], common_types.unknown, name_space);
 
 	f->block_node = node->params[0]->params[4];
-	f->block_node->link_no = (int_p)f->block;
+	f->block_node->link_no = (int_p)f->block.get();
 
 	node->set_param(0, add_node_func_name(f, node->token_id));
 	return f;
@@ -417,7 +417,7 @@ void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 
 		// explicit value
 		if (node->params[i*3+3]) {
-			auto cv = eval_to_const(node->params[i*3+3], tree->root_of_all_evil->block, common_types.i32);
+			auto cv = eval_to_const(node->params[i*3+3], tree->root_of_all_evil->block.get(), common_types.i32);
 			next_value = cv->as_const()->as_int();
 		} else if (flags_has(_class->flags, Flags::Extern)) {
 			// linked from host program?
@@ -426,7 +426,7 @@ void Parser::realize_enum(shared<Node> node, Class *_namespace) {
 		c->as_int() = (next_value ++);
 
 		if (node->params[i*3+4]) {
-			auto cn = eval_to_const(node->params[i*3+4], tree->root_of_all_evil->block, common_types.string);
+			auto cn = eval_to_const(node->params[i*3+4], tree->root_of_all_evil->block.get(), common_types.string);
 			auto label = cn->as_const()->as_string();
 			add_enum_label(_class, c->as_int(), label);
 		}
@@ -499,7 +499,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 	Class *_class = nullptr;
 	if (flags_has(node->flags, Flags::Override)) {
 		// class override X
-		_class = const_cast<Class*>(con.concretify_as_type(node->params[1], tree->root_of_all_evil->block, _namespace));
+		_class = const_cast<Class*>(con.concretify_as_type(node->params[1], tree->root_of_all_evil->block.get(), _namespace));
 		var_offset0 = _class->size;
 		restore_namespace_mapping.add({_class, _class->name_space});
 		_class->name_space = _namespace;
@@ -550,7 +550,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 
 	// parent class
 	if (node->params[2]) {
-		auto parent = con.concretify_as_type(node->params[2], tree->root_of_all_evil->block, _namespace); // force
+		auto parent = con.concretify_as_type(node->params[2], tree->root_of_all_evil->block.get(), _namespace); // force
 		if (!parent->fully_parsed())
 			return nullptr;
 			//do_error(format("parent class '%s' not fully parsed yet", parent->long_name()));
@@ -565,7 +565,7 @@ Class *Parser::realize_class_header(shared<Node> node, Class* _namespace, int64&
 	if (node->params[4])
 		for (auto& p: node->params[4]->params) {
 			int num_elements_before = _class->elements.num;
-			auto trait = con.concretify_as_type(p, tree->root_of_all_evil->block, _namespace); // force
+			auto trait = con.concretify_as_type(p, tree->root_of_all_evil->block.get(), _namespace); // force
 			if (!trait->fully_parsed()) {
 				do_error(format("trait class '%s' not defined or nor fully parsed yet", trait->long_name()), p);
 				//return nullptr;
@@ -617,9 +617,9 @@ Class* Parser::realize_class(shared<Node> node, Class* name_space, const string&
 		} else if (n->kind == NodeKind::AbstractFunction) {
 			realize_function(n, common_types._void, _class);
 		} else if (n->kind == NodeKind::AbstractLet) {
-			realize_named_const(n, _class, tree->root_of_all_evil->block);
+			realize_named_const(n, _class, tree->root_of_all_evil->block.get());
 		} else if (n->kind == NodeKind::AbstractVar) {
-			realize_class_variable_declaration(n, _class, tree->root_of_all_evil->block, var_offset);
+			realize_class_variable_declaration(n, _class, tree->root_of_all_evil->block.get(), var_offset);
 		} else if (n->kind == NodeKind::AbstractUseClassElement) {
 			realize_class_use_statement(n, _class);
 		}
@@ -741,7 +741,7 @@ void Parser::realize_named_const(shared<Node> node, Class *name_space, Block *bl
 	// explicit type?
 	const Class *type = nullptr;
 	if (node->params[1])
-		type = con.concretify_as_type(node->params[1], tree->root_of_all_evil->block, name_space);
+		type = con.concretify_as_type(node->params[1], tree->root_of_all_evil->block.get(), name_space);
 
 	// find const value
 	auto cv = eval_to_const(node->params[2], block, type);
@@ -766,7 +766,7 @@ void Parser::realize_class_variable_declaration(shared<Node> node, const Class *
 	// explicit type?
 	const Class *type = nullptr;
 	if (node->params[1])
-		type = con.concretify_as_type(node->params[1], tree->root_of_all_evil->block, ns);
+		type = con.concretify_as_type(node->params[1], tree->root_of_all_evil->block.get(), ns);
 
 	shared<Node> value;
 	if (node->params[2]) {
@@ -782,7 +782,7 @@ void Parser::realize_class_variable_declaration(shared<Node> node, const Class *
 		}
 
 		//auto cv = eval_to_const(node->params[2], block, type);
-		value = con.force_concrete_type(con.concretify_node(node->params[2], ff->block, ns));
+		value = con.force_concrete_type(con.concretify_node(node->params[2], ff->block.get(), ns));
 		if (!type)
 			type = value->type;
 	}
@@ -868,7 +868,7 @@ Function* Parser::realize_function(shared<Node> node, const Class* default_type,
 	auto f = realize_function_header(node, default_type, name_space);
 	if (node->params[4]) {
 		f->block_node = cp_node(node->params[4]);
-		f->block_node->link_no = (int_p)f->block;
+		f->block_node->link_no = (int_p)f->block.get();
 
 		if (config.verbose) {
 			msg_write("ABSTRACT:");
@@ -927,10 +927,10 @@ void Parser::realize_tree(shared<Node> node) {
 		} else if (n->kind == NodeKind::AbstractFunction) {
 			realize_function(n, common_types._void, tree->base_class);
 		} else if (n->kind == NodeKind::AbstractLet) {
-			realize_named_const(n, tree->base_class, tree->root_of_all_evil->block);
+			realize_named_const(n, tree->base_class, tree->root_of_all_evil->block.get());
 		} else if (n->kind == NodeKind::AbstractVar) {
 			int64 var_offset = 0;
-			realize_class_variable_declaration(n, tree->base_class, tree->root_of_all_evil->block, var_offset);
+			realize_class_variable_declaration(n, tree->base_class, tree->root_of_all_evil->block.get(), var_offset);
 		}
 	}
 }

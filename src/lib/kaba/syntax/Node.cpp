@@ -438,7 +438,7 @@ shared<Node> cp_node(shared<Node> c, Block *parent_block, int override_token_id)
 	if (c->kind == NodeKind::Block and c->as_block()) {
 		if (!parent_block)
 			parent_block = c->as_block()->parent;
-		cmd = add_node_block(new Block(c->as_block()->function, parent_block), c->type, c->token_id);
+		cmd = add_node_block(parent_block->create_child(), c->type, c->token_id);
 		cmd->as_block()->vars = c->as_block()->vars;
 		parent_block = cmd->as_block();
 	} else {

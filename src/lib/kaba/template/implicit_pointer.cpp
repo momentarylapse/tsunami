@@ -65,7 +65,7 @@ void AutoImplementer::implement_shared_assign(Function *f, const Class *t) {
 	auto cmd_cmp = add_node_call(ff, -1);
 	cmd_cmp->set_param(0, other);
 
-	auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 	f->block_node->add(node_if(cmd_cmp, b));
 
@@ -101,7 +101,7 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 	auto cmd_cmp = add_node_call(ff, -1);
 	cmd_cmp->set_param(0, SHARED_P(self));
 
-	auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 
 	shared<Node> count;
@@ -122,7 +122,7 @@ void AutoImplementer::implement_shared_clear(Function *f, const Class *t) {
 	auto cmp = add_node_operator_by_inline(InlineID::Int32Equal, count, const_int(0), -1);
 	cmd_if_del->set_param(0, cmp);
 
-	auto b2 = add_node_block(new Block(f, b->as_block()), common_types._void, -1);
+	auto b2 = add_node_block(b->as_block()->create_child(), common_types._void, -1);
 
 
 	// del self.p
@@ -246,7 +246,7 @@ void AutoImplementer::implement_owned_clear(Function *f, const Class *t) {
 	auto cmd_cmp = add_node_call(ff, -1);
 	cmd_cmp->set_param(0, SHARED_P(self));
 
-	auto b = add_node_block(new Block(f, f->block), common_types._void, -1);
+	auto b = add_node_block(f->block->create_child(), common_types._void, -1);
 
 
 	// del self.p

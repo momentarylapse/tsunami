@@ -3,9 +3,16 @@
 #include "../mode/ViewModeEditBars.h"
 #include "../TsunamiWindow.h"
 #include "../../module/Module.h"
-#include "../../Session.h"
-#include "../../EditModes.h"
-#include "../../lib/hui/language.h"
+#include <Session.h>
+#include <EditModes.h>
+#include <view/dialog/MarkerDialog.h>
+#include <lib/hui/language.h>
+
+
+#include <lib/os/msg.h>
+
+#include "data/Song.h"
+#include "data/Track.h"
 
 namespace tsunami {
 
@@ -28,6 +35,9 @@ BarsEditorConsole::BarsEditorConsole(Session *session, SideBar *bar) :
 	});
 	event("action-replace", [this] {
 		on_action_replace();
+	});
+	event("action-add-key-change", [this] {
+		on_add_key_change();
 	});
 }
 
@@ -63,6 +73,13 @@ void BarsEditorConsole::on_action_edit_speed() {
 
 void BarsEditorConsole::on_action_replace() {
 	view->session->win->on_replace_bars();
+}
+
+void BarsEditorConsole::on_add_key_change() {
+	if (auto t = song->time_track()) {
+		layer = t->layers[0].get();
+		hui::fly(new MarkerDialog(win, layer, Range(view->cursor_pos(), 0), "::key=c-major::"));
+	}
 }
 
 void BarsEditorConsole::clear() {

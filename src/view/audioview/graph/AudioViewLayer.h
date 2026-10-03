@@ -31,7 +31,7 @@ class GridColors;
 class HoverData;
 enum class NoteModifier;
 enum class MidiMode;
-class MidiKeyChange;
+struct MidiKeyChange;
 class LayerHeader;
 class AudioViewTrack;
 class MidiPainter;

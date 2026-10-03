@@ -17,7 +17,7 @@ namespace tsunami {
 struct Track;
 class AudioView;
 class AudioViewLayer;
-class MidiKeyChange;
+struct MidiKeyChange;
 class TrackHeader;
 enum class MidiMode;
 

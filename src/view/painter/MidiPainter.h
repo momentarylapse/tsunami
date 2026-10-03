@@ -38,11 +38,10 @@ class ColorScheme;
 enum class NoteModifier;
 enum class MidiMode;
 struct QuantizedNote;
-class QuantizedNoteGroup;
+struct QuantizedNoteGroup;
 class PluginManager;
 
-class MidiKeyChange {
-public:
+struct MidiKeyChange {
 	MidiKeyChange();
 	MidiKeyChange(double pos, const Scale &key);
 	double pos;

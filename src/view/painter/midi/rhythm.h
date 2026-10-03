@@ -47,8 +47,7 @@ struct QuantizedNote {
 	bool up;
 };
 
-class QuantizedNoteGroup {
-public:
+struct QuantizedNoteGroup {
 	Array<QuantizedNote> notes;
 	bool starts_on_beat = false;
 	int special_divisor = -1;

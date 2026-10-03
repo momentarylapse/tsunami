@@ -28,6 +28,7 @@ public:
 
 	void on_action_edit_speed();
 	void on_action_replace();
+	void on_add_key_change();
 
 	void clear();
 	void set_layer(TrackLayer *t);

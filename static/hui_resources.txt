@@ -878,7 +878,7 @@ Grid
 
 0
 0
-2
+3
 Button
 action-edit-speed
 expandx
@@ -890,6 +890,12 @@ action-replace
 expandx
 1
 0
+0
+Button
+action-add-key-change
+image=midi-set-key,big,ignorefocus
+0
+1
 0
 Label
 ?
@@ -9426,7 +9432,7 @@ default,image=hui:ok
 # Language
 English
 # Number Of IDs
-822
+823
 # Text
 /bars-add
 Add bars...
@@ -9977,6 +9983,9 @@ Replace by pause
 bar_delete_dialog/shift-data
 Move data accordingly
 
+bars-editor/action-add-key-change
+
+Add a key change at the cursor position
 bars-editor/action-edit-speed
 Edit speed...
 Change speed of selected bars

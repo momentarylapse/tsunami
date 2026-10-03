@@ -12,7 +12,7 @@
 
 namespace tsunami {
 
-class MidiKeyChange;
+struct MidiKeyChange;
 struct MidiNote;
 enum class NoteModifier;
 

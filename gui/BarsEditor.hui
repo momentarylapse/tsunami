@@ -12,6 +12,9 @@ Dialog bars-editor "Bars" width=300 height=516
 			Grid ? ""
 				Button action-edit-speed "Edit speed..." expandx "tooltip=Change speed of selected bars"
 				Button action-replace "Replace..." expandx "tooltip=Change number or beats of selected bars while keeping the overall duration"
+				---|
+				Button action-add-key-change "" image=midi-set-key big "tooltip=Add a key change at the cursor position" ignorefocus
+				.
 		Label ? "" expandy
 		Group group-edit "Edit"
 			Grid ? ""

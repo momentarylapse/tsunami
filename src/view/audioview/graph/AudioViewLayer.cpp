@@ -38,6 +38,8 @@
 #include "../../../lib/hui/language.h"
 #include <cmath>
 
+#include "lib/base/sort.h"
+
 namespace tsunami {
 
 
@@ -138,14 +140,21 @@ MidiMode AudioViewLayer::midi_mode() {
 
 Array<MidiKeyChange> get_key_changes(const TrackLayer *l) {
 	Array<MidiKeyChange> key_changes;
-	for (auto *m: l->markers_sorted())
-		if (marker_is_key(m->text)) {
-			MidiKeyChange c;
-			c.pos = m->range.offset;
-			c.key = parse_marker_key(m->text);
-			key_changes.add(c);
-		}
-	return key_changes;
+	auto add_from_layer = [&key_changes] (const TrackLayer* ll) {
+		for (auto *m: ll->markers_sorted())
+			if (marker_is_key(m->text)) {
+				MidiKeyChange c;
+				c.pos = m->range.offset;
+				c.key = parse_marker_key(m->text);
+				key_changes.add(c);
+			}
+	};
+	if (auto t = l->song()->time_track())
+		add_from_layer(t->layers[0].get());
+	add_from_layer(l);
+	return base::sorted(key_changes, [] (const MidiKeyChange& a, const MidiKeyChange& b) {
+		return a.pos <= b.pos;
+	});
 }
 
 void AudioViewLayer::update_midi_key_changes() {

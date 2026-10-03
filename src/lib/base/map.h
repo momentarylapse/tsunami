@@ -24,49 +24,55 @@ public:
 };
 
 template<class K, class V>
-struct map : set<MapEntry<K, V>> {
+struct map {
 	using KeyType = K;
 	using ValueType = V;
 	using Entry = MapEntry<K, V>;
-	using DynamicArray::num;
-	using DynamicArray::data;
+	base::set<Entry> entries;
+//	using DynamicArray::num;
+//	using DynamicArray::data;
+	void clear() {
+		entries.clear();
+	}
+	int num() const {
+		return entries.num;
+	}
 	void set(const K &key, const V &value) {
 		int n = find(key);
 		if (n >= 0)
-			((Entry*)data)[n].value = value;
+			((Entry*)entries.data)[n].value = value;
 		else
-			::base::set<MapEntry<K, V>>::add({key, value});
+			entries.add({key, value});
 	}
 	int find(const K &key) const {
-		return ::base::set<Entry>::find({key, V()});
+		return entries.find({key, V()});
 	}
 	bool contains(const K &key) const {
 		return find(key) >= 0;
 	}
-	V &by_index(int index) {
-		return ((Entry*)data)[index].value;
+	void remove(const K &key) {
+		int index = find(key);
+		if (index >= 0)
+			((Array<Entry>*)&entries)->erase(index);
 	}
-	const V &by_index(int index) const {
-		return ((Entry*)data)[index].value;
+	V& by_index(int index) {
+		return ((Entry*)entries.data)[index].value;
 	}
-	const V &operator[] (const K &key) const {
+	const V& by_index(int index) const {
+		return ((Entry*)entries.data)[index].value;
+	}
+	const V& operator[] (const K &key) const {
 		//msg_write("const[]");
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
 		return by_index(n);
 	}
-	V &operator[] (const K &key) {
+	V& operator[] (const K &key) {
 		int n = find(key);
 		if (n < 0)
 			throw MapKeyError();
 		return by_index(n);
-	}
-	void drop(const K &key) {
-		int n = find(key);
-		if (n < 0)
-			throw MapKeyError();
-		Array<MapEntry<K, V> >::erase(n);
 	}
 	Array<K> keys() const {
 		Array<K> keys;
@@ -96,7 +102,7 @@ struct map : set<MapEntry<K, V>> {
 		const std::pair<const K&,const V&> operator *()
 		{	return {p->key, p->value};	}
 		ConstIterator(const map<K, V> &m, int n) {
-			p = &((const Entry*)m.data)[n];
+			p = &((const Entry*)m.entries.data)[n];
 			//p = &m.by_index(n);
 			index = n;
 		}
@@ -116,7 +122,7 @@ struct map : set<MapEntry<K, V>> {
 		std::pair<K&,V&> operator *()
 		{	return {p->key, p->value};	}
 		Iterator(map<K, V> &m, int n) {
-			p = &((Entry*)m.data)[n];
+			p = &((Entry*)m.entries.data)[n];
 			index = n;
 		}
 		int index;
@@ -126,13 +132,13 @@ struct map : set<MapEntry<K, V>> {
 		return ConstIterator(*this, 0);
 	}
 	ConstIterator end() const {
-		return ConstIterator(*this, this->num);
+		return ConstIterator(*this, entries.num);
 	}
 	Iterator begin() {
 		return Iterator(*this, 0);
 	}
 	Iterator end() {
-		return Iterator(*this, this->num);
+		return Iterator(*this, entries.num);
 	}
 };
 

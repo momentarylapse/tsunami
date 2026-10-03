@@ -60,9 +60,9 @@ public:
 
 	shared<Texture> tex_white = nullptr;
 	FrameBuffer *default_framebuffer = nullptr;
-	shared<Shader> default_2d;
+	/*shared<Shader> default_2d;
 	shared<Shader> default_3d;
-	shared<Shader> default_load;
+	shared<Shader> default_load;*/
 	Shader *_current_ = nullptr;
 	VertexBuffer *vb_temp = nullptr;
 	VertexBuffer *vb_temp_i = nullptr;
@@ -70,8 +70,8 @@ public:
 	bool supports_mesh_shaders = false;
 
 
-	xfer<Shader> load_shader(const Path &filename);
-	xfer<Shader> create_shader(const string &source);
+	//xfer<Shader> load_shader(const Path &filename);
+	//xfer<Shader> create_shader(const string &source);
 
 	int available_mem() const;
 	int total_mem() const;

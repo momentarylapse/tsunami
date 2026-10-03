@@ -320,7 +320,7 @@ void FormatMidi::load_song(StorageOperationData *od) {
 
 			f->set_pos(pos0 + tsize);
 
-			if ((events.num > 0) or (i > 0)) {
+			if ((events.num() > 0) or (i > 0)) {
 				Array<int> keys = events.keys();
 				for (int k : keys) {
 					Track *t = od->song->add_track(SignalType::Midi);

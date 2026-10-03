@@ -16,7 +16,7 @@ xfer<nix::Texture> __LoadTexture(const Path &filename) {
 	return nullptr;
 }
 
-xfer<nix::Shader> __ContextLoadShader(nix::Context *ctx, const Path &filename) {
+/*xfer<nix::Shader> __ContextLoadShader(nix::Context *ctx, const Path &filename) {
 	KABA_EXCEPTION_WRAPPER(return ctx->load_shader(filename));
 	return nullptr;
 }
@@ -24,7 +24,7 @@ xfer<nix::Shader> __ContextLoadShader(nix::Context *ctx, const Path &filename) {
 xfer<nix::Shader> __ContextCreateShader(nix::Context *ctx, const string &source) {
 	KABA_EXCEPTION_WRAPPER(return ctx->create_shader(source));
 	return nullptr;
-}
+}*/
 
 KABA_LINK_GROUP_END
 
@@ -87,12 +87,12 @@ void export_package_gl(kaba::IExporter* e) {
 	e->declare_class_element("Context.extensions", &nix::Context::extensions);
 	e->declare_class_element("Context.default_framebuffer", &nix::Context::default_framebuffer);
 	e->declare_class_element("Context.tex_white", &nix::Context::tex_white);
-	e->declare_class_element("Context.default_shader_2d", &nix::Context::default_2d);
-	e->declare_class_element("Context.default_shader_3d", &nix::Context::default_3d);
+//	e->declare_class_element("Context.default_shader_2d", &nix::Context::default_2d);
+//	e->declare_class_element("Context.default_shader_3d", &nix::Context::default_3d);
 	e->declare_class_element("Context.vb_temp", &nix::Context::vb_temp);
 	e->declare_class_element("Context.vb_temp_i", &nix::Context::vb_temp_i);
-	e->link_class_func("Context.load_shader", &__ContextLoadShader);
-	e->link_class_func("Context.create_shader", &__ContextCreateShader);
+	//e->link_class_func("Context.load_shader", &__ContextLoadShader);
+	//e->link_class_func("Context.create_shader", &__ContextCreateShader);
 
 	e->declare_class_size("VertexBuffer", sizeof(nix::VertexBuffer));
 	e->link_class_func("VertexBuffer.__init__", &nix::VertexBuffer::__init__);

@@ -1008,7 +1008,7 @@ double s2f64(const string &s) {
 }
 
 bool string::_bool() const {
-	return (*this == "true") or (*this == "yes");
+	return (*this == "true") or (*this == "yes") or (*this == "on");
 }
 
 bool s2b(const string &s) {

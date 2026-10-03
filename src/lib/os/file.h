@@ -19,6 +19,7 @@
 #define SRC_LIB_OS_FILE_H_
 
 #include "../base/base.h"
+#include "../base/error.h"
 #include "stream.h"
 #include "path.h"
 
@@ -40,7 +41,7 @@ public:
 class FileStream : public Stream {
 public:
 	FileStream(int handle, Mode mode);
-	~FileStream();
+	~FileStream() override;
 
 	// meta
 	void set_pos(int pos) override;
@@ -62,12 +63,14 @@ public:
 	int handle = -1;
 };
 
-extern FileStream *open(const Path &filename, const string &mode);
+FileStream *open(const Path &filename, const string &mode);
 
-extern bytes read_binary(const Path &filename);
-extern string read_text(const Path &filename);
-extern void write_binary(const Path &filename, const bytes &data);
-extern void write_text(const Path &filename, const string &str);
+bytes read_binary(const Path &filename);
+string read_text(const Path &filename);
+base::result<bytes> read_binary2(const Path &filename);
+base::result<string> read_text2(const Path &filename);
+void write_binary(const Path &filename, const bytes &data);
+void write_text(const Path &filename, const string &str);
 
 }
 

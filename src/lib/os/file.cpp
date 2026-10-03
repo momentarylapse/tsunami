@@ -150,6 +150,22 @@ string read_text(const Path &filename) {
 	return r;
 }
 
+base::result<bytes> read_binary2(const Path &filename) {
+	try {
+		return read_binary(filename);
+	} catch (Exception& e) {
+		return base::Error(e.message());
+	}
+}
+
+base::result<string> read_text2(const Path &filename) {
+	try {
+		return read_text(filename);
+	} catch (Exception& e) {
+		return base::Error(e.message());
+	}
+}
+
 void write_binary(const Path &filename, const bytes &buf) {
 	auto *f = open(filename, "wb");
 	f->Stream::write(buf);

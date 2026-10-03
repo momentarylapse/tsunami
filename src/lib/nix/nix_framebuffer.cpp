@@ -77,6 +77,8 @@ void FrameBuffer::update_x(const shared_array<Texture> &attachments, int cube_fa
 	if (depth_buffer) {
 		if (depth_buffer->type == Texture::Type::RENDERBUFFER) {
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, depth_buffer->texture);
+		} else if (depth_buffer->samples > 1) {
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, depth_buffer->texture, 0);
 		} else {
 			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depth_buffer->texture, 0);
 		}

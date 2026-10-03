@@ -11,6 +11,7 @@
 
 #include "../base/pointer.h"
 #include "../os/path.h"
+#include "lib/base/error.h"
 
 namespace nix {
 
@@ -50,6 +51,9 @@ public:
 	void find_locations();
 	void set_default_data();
 
+	base::result_void add_module(const string& stage, const string& source);
+	base::result_void build();
+
 	enum {
 		LOCATION_MATRIX_MVP,
 		LOCATION_MATRIX_M,
@@ -66,11 +70,14 @@ public:
 
 	int location[NUM_LOCATIONS];
 	Context* ctx;
+	Array<int> shaders;
 
 
+#if 0
 	static xfer<Shader> _cdecl load(Context* ctx, const Path &filename);
 	static xfer<Shader> _cdecl create(Context* ctx, const string &source);
 	void _cdecl update(const string &source);
+#endif
 };
 
 class Context;

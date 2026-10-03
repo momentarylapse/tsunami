@@ -19,17 +19,42 @@ const int TYPE_MODULE = -42;
 
 bool default_shader_bindings = false;
 
+string overwrite_shader_version;
+
+
+base::result<int> parse_stage(const string& tag) {
+	if (tag == "VertexShader") {
+		return GL_VERTEX_SHADER;
+	} else if (tag == "FragmentShader") {
+		return GL_FRAGMENT_SHADER;
+	} else if (tag == "ComputeShader") {
+		return GL_COMPUTE_SHADER;
+	} else if (tag == "TessellationControlShader") {
+		return GL_TESS_CONTROL_SHADER;
+	} else if (tag == "TessellationEvaluationShader") {
+		return GL_TESS_EVALUATION_SHADER;
+	} else if (tag == "GeometryShader") {
+		return GL_GEOMETRY_SHADER;
+	} else if (tag == "TaskShader") {
+		return GL_TASK_SHADER_NV;
+	} else if (tag == "MeshShader") {
+		return GL_MESH_SHADER_NV;
+	} else {
+		return base::Error("unknown shader tag: '" + tag + "'");
+	}
+}
 
 
 int create_empty_shader_program() {
 	int gl_p = glCreateProgram();
-	if (gl_p <= 0)
+	if (gl_p == 0)
 		throw Exception("could not create gl shader program");
 	return gl_p;
 }
 
+#if 0
 struct ShaderSourcePart {
-	int type;
+	string type;
 	string source;
 };
 
@@ -57,39 +82,20 @@ Array<ShaderSourcePart> get_shader_parts(Context *ctx, const string &source) {
 			continue;
 		ShaderSourcePart p;
 		p.source = source.sub(pos1 + 1, pos2);
+		p.type = tag;
 		pos = pos2 + tag.num + 3;
 		if (tag == "VertexShader") {
-			p.type = GL_VERTEX_SHADER;
 			has_vertex = true;
 		} else if (tag == "FragmentShader") {
-			p.type = GL_FRAGMENT_SHADER;
 			has_fragment = true;
-		} else if (tag == "ComputeShader") {
-			p.type = GL_COMPUTE_SHADER;
-		} else if (tag == "TessellationControlShader") {
-			p.type = GL_TESS_CONTROL_SHADER;
-		} else if (tag == "TessellationEvaluationShader") {
-			p.type = GL_TESS_EVALUATION_SHADER;
-		} else if (tag == "GeometryShader") {
-			p.type = GL_GEOMETRY_SHADER;
-		} else if (tag == "TaskShader") {
-			p.type = GL_TASK_SHADER_NV;
 		} else if (tag == "MeshShader") {
-			p.type = GL_MESH_SHADER_NV;
 			has_mesh = true;
-		} else if (tag == "Module") {
-			p.type = TYPE_MODULE;
-		} else if (tag == "Layout") {
-			p.type = TYPE_LAYOUT;
-		} else {
-			msg_error("unknown shader tag: '" + tag + "'");
-			continue;
 		}
 		parts.add(p);
 	}
 	if (has_fragment and !has_vertex and !has_mesh) {
 		msg_write(" ...auto import " + ctx->vertex_module_default);
-		parts.add({GL_VERTEX_SHADER, format("#import %s\n", ctx->vertex_module_default)});
+		parts.add({"VertexShader", format("#import %s\n", ctx->vertex_module_default)});
 	}
 	return parts;
 }
@@ -106,7 +112,7 @@ string get_inside_of_tag(const string &source, const string &tag) {
 	return source.sub(pos0, pos1);
 }
 
-string expand_shader_source(Context *ctx, const string &source, ShaderMetaData &meta) {
+string expand_shader_source(Context *ctx, const string &source, const ShaderMetaData &meta) {
 	string r = source;
 	while (true) {
 		int p = r.find("#import", 0);
@@ -136,19 +142,21 @@ string expand_shader_source(Context *ctx, const string &source, ShaderMetaData &
 		intro += "#extension GL_ARB_separate_shader_objects : enable\n";
 	return intro + r;
 }
+#endif
 
-int create_gl_shader(Context* ctx, const string &_source, int type, ShaderMetaData &meta) {
-	string source = expand_shader_source(ctx, _source, meta);
+base::result<int> create_gl_shader(Context* ctx, const string &_source, const string& type, const ShaderMetaData &meta) {
+	string source = _source;//expand_shader_source(ctx, _source, meta);
 	if (source.num == 0)
 		return -1;
-	int gl_shader = glCreateShader(type);
-	if (gl_shader <= 0)
-		throw Exception("could not create gl shader object");
+	RESULT_PROPAGATE_ERROR(stage, parse_stage(type), x1);
+	int gl_shader = (int)glCreateShader(stage);
+	if (gl_shader == 0)
+		return base::Error("could not create gl shader object");
 	
 	const char *pbuf[2];
 
 	pbuf[0] = source.c_str();
-	glShaderSource(gl_shader, 1, pbuf, NULL);
+	glShaderSource(gl_shader, 1, pbuf, nullptr);
 
 
 	glCompileShader(gl_shader);
@@ -161,11 +169,12 @@ int create_gl_shader(Context* ctx, const string &_source, int type, ShaderMetaDa
 		int size;
 		glGetShaderInfoLog(gl_shader, ctx->shader_error.num, &size, (char*)ctx->shader_error.data);
 		ctx->shader_error.resize(size);
-		throw Exception("while compiling shader: " + ctx->shader_error);
+		return base::Error("while compiling shader: " + ctx->shader_error);
 	}
 	return gl_shader;
 }
 
+#if 0
 ShaderMetaData parse_meta(string source) {
 	ShaderMetaData m;
 	for (auto &x: source.explode("\n")) {
@@ -181,7 +190,44 @@ ShaderMetaData parse_meta(string source) {
 	}
 	return m;
 }
+#endif
 
+base::result_void Shader::add_module(const string &stage, const string &source) {
+	if (program <= 0)
+		program = create_empty_shader_program();
+
+	RESULT_PROPAGATE_ERROR(shader, create_gl_shader(ctx, source, stage, {}), x1);
+	shaders.add(shader);
+	if (shader >= 0)
+		glAttachShader(program, shader);
+	return base::result_success();
+}
+
+base::result_void Shader::build() {
+	int status;
+	glLinkProgram(program);
+	glGetProgramiv(program, GL_LINK_STATUS, &status);
+	if (status != GL_TRUE) {
+		ctx->shader_error.resize(16384);
+		int size;
+		glGetProgramInfoLog(program, ctx->shader_error.num, &size, (char*)ctx->shader_error.data);
+		ctx->shader_error.resize(size);
+		return base::Error("while linking the shader program: " + ctx->shader_error);
+	}
+
+	for (int shader: shaders)
+		glDeleteShader(shader);
+	shaders.clear();
+
+	//program = prog;
+	ctx->shader_error = "";
+
+	//if (default_shader_bindings)
+	find_locations();
+	return base::result_success();
+}
+
+#if 0
 void Shader::update(const string &source) {
 	auto parts = get_shader_parts(ctx, source);
 
@@ -190,20 +236,24 @@ void Shader::update(const string &source) {
 
 	int prog = create_empty_shader_program();
 
-	Array<int> shaders;
 	ShaderMetaData meta;
 	for (auto p: parts) {
-		if (p.type == TYPE_MODULE) {
+		if (p.type == "Module") {
 			ShaderModule m;
 			m.source = p.source;
 			m.meta = meta;
 			ctx->shader_modules.add(m);
 			//msg_write("new module '" + m.meta.name + "'");
 			return;
-		} else if (p.type == TYPE_LAYOUT) {
+		} else if (p.type == "Layout") {
 			meta = parse_meta(p.source);
+			if (overwrite_shader_version != "")
+				meta.version = overwrite_shader_version;
 		} else {
-			int shader = create_gl_shader(ctx, p.source, p.type, meta);
+			add_module(p.type, p.source);
+			int shader = create_gl_shader(ctx, p.source, p.type, meta).value_or_do([] (const string& e) {
+				throw Exception(e);
+			});
 			shaders.add(shader);
 			if (shader >= 0)
 				glAttachShader(prog, shader);
@@ -223,6 +273,7 @@ void Shader::update(const string &source) {
 
 	for (int shader: shaders)
 		glDeleteShader(shader);
+	shaders.clear();
 
 	program = prog;
 	ctx->shader_error = "";
@@ -235,6 +286,7 @@ xfer<Shader> Shader::create(Context* ctx, const string &source) {
 	s->update(source);
 	return s;
 }
+#endif
 
 void Shader::find_locations() {
 	location[LOCATION_MATRIX_M] = get_location("matrix.model");
@@ -266,6 +318,7 @@ void Shader::find_locations() {
 	}
 }
 
+#if 0
 xfer<Shader> Shader::load(Context *ctx, const Path &filename) {
 	//if (filename.is_empty())
 	//	return default_load;
@@ -279,6 +332,7 @@ xfer<Shader> Shader::load(Context *ctx, const Path &filename) {
 
 	return shader;
 }
+#endif
 
 void select_default_vertex_module(Context *ctx, const string &name) {
 	ctx->vertex_module_default = name;
@@ -415,7 +469,9 @@ void image_barrier() {
 
 void init_shaders(Context *ctx) {
 	ctx->vertex_module_default = "vertex-default-nix";
+	return;
 
+#if 0
 	try {
 
 
@@ -547,6 +603,7 @@ void main() {
 		throw e;
 	}
 	ctx->default_load = ctx->default_3d;
+#endif
 }
 
 };

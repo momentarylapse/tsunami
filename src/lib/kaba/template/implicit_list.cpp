@@ -27,15 +27,15 @@ void AutoImplementer::implement_list_assign(Function *f, const Class *t) {
 		return;
 	auto t_el = t->get_array_element();
 	if (t_el->is_reference())
-		implement_from_code(f, "resize(other.num)\nfor mut i=>el in self\n\tel := other[i]");
+		implement_from_code(f, "if &self == &other\n\treturn\nresize(other.num)\nfor mut i=>el in self\n\tel := other[i]");
 	else
-		implement_from_code(f, "resize(other.num)\nfor mut i=>el in self\n\t@noderef(el) = @noderef(other[i])");
+		implement_from_code(f, "if &self == &other\n\treturn\nresize(other.num)\nfor mut i=>el in self\n\t@noderef(el) = @noderef(other[i])");
 }
 
 void AutoImplementer::implement_list_clear(Function *f, const Class *t) {
 	auto te = t->get_array_element();
 	if (te->get_destructor())
-		implement_from_code(f, "for mut el in self\n\t@noderef(el).__delete__()\n__mem_clear__()");
+		implement_from_code(f, "if _allocated > 0\n\tfor mut el in self\n\t\t@noderef(el).__delete__()\n__mem_clear__()");
 	else if (te->needs_destructor())
 		do_error_implicit(f, "element destructor missing");
 	else

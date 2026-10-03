@@ -69,12 +69,12 @@ float Random::normal(float mean, float stddev) {
 
 	float xx = 0;
 	if (x > 0) {
-		xx = sqrt( -2.0f * log(x));
+		xx = sqrtf( -2.0f * logf(x));
 	} else if (x < 0) {
-		xx = -sqrt( -2.0f * log(-x));
+		xx = -sqrtf( -2.0f * logf(-x));
 	}
 
-	const float a = xx * cos(y);
+	const float a = xx * cosf(y);
 	//float b = xx * sin(y);
 
 	return mean + a * stddev;
@@ -90,11 +90,10 @@ vec3 Random::in_ball(float r) {
 }
 
 vec3 Random::dir() {
-	const vec3 v = in_ball(1);
-	const float l = v.length();
-	if (l != 0)
-		return v / l;
-	return vec3::EZ;
+	const float z = uniform(-1,1);
+	const float phi = uniform(0, 2*pi);
+	const float a = sqrtf(1 - z * z);
+	return {cosf(phi) * a, sinf(phi) * a, z};
 }
 
 vec3 Random::in_box(const Box& b) {

@@ -257,7 +257,7 @@ void Configuration::migrate(const string& from_key, const string& to_key) {
 }
 
 void Configuration::remove(const string& key) {
-	map.drop(key);
+	map.remove(key);
 }
 
 

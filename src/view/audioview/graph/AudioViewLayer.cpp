@@ -635,7 +635,7 @@ HoverData AudioViewLayer::get_hover_data_default(const vec2 &m) {
 	s.type = HoverData::Type::Layer;
 
 	// markers
-	for (int i=0; i<min(layer->markers.num, marker_areas.num); i++) {
+	for (int i=0; i<min(layer->markers.num, marker_areas.num()); i++) {
 		auto *mm = layer->markers[i].get();
 		if (marker_areas.contains(mm) and marker_label_areas.contains(mm))
 			if (marker_areas[mm].inside(m) or marker_label_areas[mm].inside(m)) {

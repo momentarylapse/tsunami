@@ -374,7 +374,7 @@ void PeakDatabase::iterate_items(Map& map) {
 	}
 
 	for (int uid: to_drop)
-		map.drop(uid);
+		map.remove(uid);
 }
 
 void PeakDatabase::process_replies() {

@@ -39,6 +39,11 @@ void Grid::remove_child(Node* c) {
 	base::remove_if(children, [c] (const layout::GridChild& child) {
 		return child.node == c;
 	});
+	nx = ny = 0;
+	for (const auto& cc: children) {
+		nx = max(nx, cc.x + 1);
+		ny = max(ny, cc.y + 1);
+	}
 }
 
 void Grid::get_min_sizes(Array<float> &w, Array<float> &h) const {

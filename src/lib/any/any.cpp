@@ -514,7 +514,7 @@ int Any::length() const {
 	if (is_list())
 		return as_list().num;
 	if (is_dict())
-		return as_dict().num;
+		return as_dict().num();
 	if (is_string())
 		return as_string().num;
 	return 0;
@@ -628,7 +628,7 @@ void Any::dict_set(const string &key, const Any &value) {
 
 void Any::dict_drop(const string &key) {
 	if (is_dict())
-		as_dict().drop(key);
+		as_dict().remove(key);
 }
 
 template<> string repr(const Any& a) {

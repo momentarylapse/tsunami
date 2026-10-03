@@ -55,12 +55,12 @@ rect target_rect;
 
 Context* Context::CURRENT = nullptr;
 
-xfer<Shader> Context::load_shader(const Path &filename) {
+/*xfer<Shader> Context::load_shader(const Path &filename) {
 	return Shader::load(this, filename);
 }
 xfer<Shader> Context::create_shader(const string &source) {
 	return Shader::create(this, source);
-}
+}*/
 
 Fog fog;
 
@@ -196,7 +196,7 @@ xfer<Context> init(const Array<string>& flags) {
 	set_material(White, 0.5f, 0, color(0.1f, 0.1f, 0.1f, 0.1f));
 	set_projection_perspective();
 	set_z(true, true);
-	set_shader(ctx->default_3d.get());
+//	set_shader(ctx->default_3d.get());
 
 	int vp[4];
 	glGetIntegerv(GL_VIEWPORT, vp);

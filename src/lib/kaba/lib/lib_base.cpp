@@ -356,8 +356,8 @@ void SIAddPackageBase(Context *c) {
 	common_types.error    = add_type  ("Error", config.target.dynamic_array_size);
 
 	// type aliases
-	cur_package_module->tree->base_class->type_aliases.add({"int", common_types.i32});
-	cur_package_module->tree->base_class->type_aliases.add({"float", common_types.f32});
+	cur_package_module->tree->base_class->type_aliases.set("int", common_types.i32);
+	cur_package_module->tree->base_class->type_aliases.set("float", common_types.f32);
 
 
 	common_types.raw_t = add_class_template("ptr", {"T"}, new TemplateClassInstantiatorPointerRaw);
@@ -398,6 +398,7 @@ void SIAddPackageBase(Context *c) {
 
 	add_class(common_types.dynamic_array);
 		class_add_element("num", common_types.i32, config.target.pointer_size);
+		class_add_element("_allocated", common_types.i32, config.target.pointer_size + 4);
 		class_add_func("swap", common_types._void, &DynamicArray::simple_swap, Flags::Mutable);
 			func_add_param("i1", common_types.i32);
 			func_add_param("i2", common_types.i32);

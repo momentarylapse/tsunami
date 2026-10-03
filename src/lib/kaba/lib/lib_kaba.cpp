@@ -38,8 +38,8 @@ public:
 	void *match_function_x(const string& name, const Class* ret, const Array<const Class*>& _params) {
 		Array<string> params;
 		for (auto p: _params)
-			params.add(p->name);
-		return match_function(name, ret->name, params);
+			params.add(p->long_name());
+		return match_function(name, ret->long_name(), params);
 	}
 };
 
@@ -275,6 +275,7 @@ void SIAddPackageKaba(Context *c) {
 			func_add_param_def("flags", TypeCompilerFlags, CompilerFlags::None);
 		class_add_func_virtual("create_module_for_source", TypeModuleSharedResult, &Context::create_module_for_source, Flags::Mutable);
 			func_add_param("source", common_types.string);
+			func_add_param("filename", common_types.path);
 			func_add_param_def("flags", TypeCompilerFlags, CompilerFlags::None);
 		class_add_func_virtual("execute_single_command", common_types.result_void, &Context::execute_single_command, Flags::Mutable);
 			func_add_param("cmd", common_types.string);
